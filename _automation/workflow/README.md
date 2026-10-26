@@ -2,10 +2,15 @@
 
 ## Sincronizar integração
 
-Requer PowerShell 7.5+, Git e SVN no PATH. Abra **Sincronizar integração** no menu ou execute:
+Requer PowerShell 7.5+, Git e SVN no PATH. **O diretório atual deve ser exatamente `IntegrationPath`**, e o script executado deve ser o arquivo `_automation/workflow/sync-integration.ps1` dessa integração. A chamada direta do PS1 a partir de outra pasta, inclusive uma subpasta ou `WorkPath`, provoca erro antes de ler os segredos ou executar Git/SVN. Estar na integração e chamar uma cópia do script localizada em outro lugar também é rejeitado.
+
+O `menu.bat` aberto na própria `_automation` pelo Explorer inicia o menu na raiz do projeto ao qual pertence. Assim, o BAT da integração atende à regra, enquanto o BAT do WorkPath continua no projeto de trabalho e não pode sincronizar a integração. Se o BAT da integração for chamado de um terminal no WorkPath ou em outra pasta, esse diretório é preservado e a sincronização continua bloqueada.
+
+Abra **Sincronizar integração** no menu iniciado a partir dessa raiz, ou execute:
 
 ```powershell
-pwsh -NoLogo -NoProfile -File D:\Hw\ERP-Master\_automation\workflow\sync-integration.ps1
+Set-Location 'D:\Hw\ERP-Master' # IntegrationPath da sua configuração
+.\_automation\workflow\sync-integration.ps1
 # Outra configuração pessoal:
 .\_automation\workflow\sync-integration.ps1 -ConfigPath 'D:\minhas-configuracoes\workflow.local.psd1'
 ```
@@ -18,7 +23,7 @@ O modelo é `config/workflow.exemplo.psd1`. A configuração de uso é `config/w
 
 ## Operação
 
-1. Consulta `git --version` e `svn --version`, confere raiz Git, branch configurada, URL SVN e existência de `origin`.
+1. Confere diretório atual e origem do próprio script. Depois consulta `git --version` e `svn --version`, confere raiz Git, branch configurada, URL SVN e existência de `origin`. Não muda o diretório para contornar essa validação.
 2. Interrompe diante de operação Git em andamento, conflito, índice Git previamente preparado ou mudanças locais SVN fora da changelist `ignore-on-commit`. Conflitos nessa changelist também interrompem. Diferenças Git não preparadas são permitidas.
 3. Executa `svn update`, confere seu resultado e obtém a revisão e a relação de arquivos versionados com **`svn info --xml --depth infinity .` após o update**. Essa consulta lê os metadados da working copy.
 4. Executa `git fetch origin` e `git reset --soft refs/remotes/origin/main` (ou a branch configurada). O reset conserva arquivos e índice; o commit seguinte tem como pai a ponta remota recebida. Não compara históricos para bloquear branches à frente/divergentes. No remoto inicialmente vazio, omite o reset e faz a primeira publicação.

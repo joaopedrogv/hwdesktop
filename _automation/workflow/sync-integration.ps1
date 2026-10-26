@@ -5,6 +5,7 @@
 .DESCRIPTION
     O SVN determina o conteúdo. Fetch e reset --soft preservam os arquivos
     e preparam o próximo commit sobre a main remota. Nunca usa push forçado.
+    Exige diretório atual igual a IntegrationPath e o script dessa integração.
 .PARAMETER ConfigPath
     Configuração pessoal; por padrão, config/workflow.local.psd1.
 #>
@@ -106,6 +107,19 @@ function Invoke-SyncIntegration {
         $configDirectory = Split-Path -Parent $configFile
         $root = [IO.Path]::GetFullPath([IO.Path]::Combine($configDirectory, $config.IntegrationPath)).TrimEnd('\', '/')
         if (-not [IO.Directory]::Exists($root)) { throw "Diretório de integração não encontrado: $root" }
+        $phase = 'Conferir local de execução'
+        $location = Get-Location
+        if ($location.Provider.Name -ne 'FileSystem') { throw "Execute na raiz da integração: $root" }
+        $currentDirectory = [IO.Path]::GetFullPath($location.ProviderPath).TrimEnd('\', '/')
+        if (-not $root.Equals($currentDirectory, [StringComparison]::OrdinalIgnoreCase)) {
+            throw "O diretório atual deve ser IntegrationPath.`nAtual: $currentDirectory`nEsperado: $root"
+        }
+        $expectedScript = [IO.Path]::GetFullPath((Join-Path $root '_automation\workflow\sync-integration.ps1'))
+        $executedScript = [IO.Path]::GetFullPath($PSCommandPath)
+        if (-not $expectedScript.Equals($executedScript, [StringComparison]::OrdinalIgnoreCase)) {
+            throw "Utilize o script da integração, que é a fonte da verdade.`nScript executado: $executedScript`nEsperado: $expectedScript"
+        }
+        $phase = 'Ler configuração e segredos'
         $branch = [string] $config.GitBranch
         $suffix = '/' + ([string] $config.SvnUrlSuffix).Trim('/')
         $secretsPath = [IO.Path]::GetFullPath([IO.Path]::Combine($configDirectory, $config.SecretsFile))

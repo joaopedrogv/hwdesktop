@@ -26,7 +26,14 @@ if not exist "%MENU_SCRIPT%" (
     exit /b 2
 )
 
-"%PWSH_EXE%" -NoLogo -NoProfile -File "%MENU_SCRIPT%" %*
+rem O Explorer abre o BAT em _automation. Nesse caso, usar a raiz deste projeto.
+rem Chamadas de outro diretorio preservam a origem, inclusive o WorkPath.
+for %%D in ("%~dp0.") do set "AUTOMATION_DIR=%%~fD"
+if /i "%CD%"=="%AUTOMATION_DIR%" (
+    "%PWSH_EXE%" -NoLogo -NoProfile -WorkingDirectory "%~dp0.." -File "%MENU_SCRIPT%" %*
+) else (
+    "%PWSH_EXE%" -NoLogo -NoProfile -File "%MENU_SCRIPT%" %*
+)
 set "MENU_EXIT_CODE=%ERRORLEVEL%"
 
 if not "%MENU_EXIT_CODE%"=="0" (

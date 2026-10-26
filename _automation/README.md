@@ -50,13 +50,15 @@ pwsh -NoLogo -NoProfile -File .\_automation\menu.ps1 -Preview
 .\_automation\menu.ps1 -Section Build
 ```
 
-O BAT também encaminha esses parâmetros. Os caminhos do projeto são calculados a partir da localização do script; não é necessário abrir o terminal na raiz. O modo interativo retorna erro se entrada ou saída estiver redirecionada; `-Preview` permite a visualização nesse cenário.
+O BAT também encaminha esses parâmetros. Quando aberto na própria pasta `_automation`, como acontece pelo Explorer, inicia o PowerShell na raiz do projeto ao qual esse BAT pertence. Chamadas a partir de outros diretórios preservam o diretório de origem. Para **Sincronizar integração**, utilize o menu da integração: a ação exige diretório atual igual a `IntegrationPath` e o script dessa integração. O BAT do WorkPath usa a raiz do próprio WorkPath, sem redirecionar para a integração; chamar o BAT da integração a partir de um terminal no WorkPath também continua sujeito ao bloqueio. As demais ações mantêm seus critérios próprios. O modo interativo retorna erro se entrada ou saída estiver redirecionada; `-Preview` permite a visualização nesse cenário.
 
 Códigos de saída: `0` para encerramento normal/preview, `1` para falha de execução do menu e `2` para pré-condição não atendida detectada pelo menu/lançador. Falhas do próprio PowerShell também são propagadas pelo BAT. Em caso de erro, o BAT mantém a mensagem visível até uma tecla ser pressionada.
 
 ## Manutenção
 
 O BAT permanece um lançador, encaminhando argumentos e o código de saída. A apresentação e a navegação ficam no PS1. Não há módulos externos, reorganização do acervo antigo ou descoberta automática de scripts para execução. O menu usa processos PowerShell separados para que os códigos de saída dos comandos não encerrem a navegação.
+
+`tests/verify-menu-launcher.ps1` verifica o diretório e o encaminhamento dos parâmetros do BAT em projetos temporários, abrindo o menu real somente em preview, sem operações Git/SVN.
 
 A seleção usa texto branco e fundo azul escuro em RGB explícito, evitando depender das cores personalizadas da paleta do terminal. As bordas utilizam caracteres retos para compatibilidade de apresentação. Ajustes das chamadas devem preservar as mensagens e as interações dos scripts originais.
 

@@ -6,7 +6,8 @@ Testa Git real com remoto local e SVN simulado, somente em diretórios temporár
 param()
 
 $ErrorActionPreference = 'Stop'
-. (Join-Path $PSScriptRoot '..\sync-integration.ps1')
+$syncSource = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\sync-integration.ps1'))
+. $syncSource
 $temporaryBase = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
 $fixture = Join-Path $temporaryBase ('hwdesktop-sync-' + [guid]::NewGuid().ToString('N'))
 $checks = 0
@@ -37,7 +38,7 @@ function New-TestArea {
     [void] (Invoke-TestGit $root @('config', 'user.email', 'teste@example.invalid'))
     [void] (Invoke-TestGit $root @('config', 'core.autocrlf', 'false'))
     [void] (Invoke-TestGit $root @('remote', 'add', 'origin', $origin))
-    [IO.File]::WriteAllText((Join-Path $root '.gitignore'), "config/`n")
+    [IO.File]::WriteAllText((Join-Path $root '.gitignore'), "config/`n_automation/`n")
     [IO.File]::WriteAllText((Join-Path $root 'fonte.pas'), "estado inicial`n")
     [IO.File]::WriteAllText((Join-Path $root 'remover.txt'), "remover pelo SVN`n")
     [IO.File]::WriteAllText((Join-Path $root 'local.ini'), "inicial`n")
@@ -52,6 +53,9 @@ function New-TestArea {
     $rootValue = $root.Replace("'", "''")
     [IO.File]::WriteAllText($configFile, "@{ IntegrationPath='$rootValue'; GitBranch='main'; SvnUrlSuffix='/svn/hwsistemas/Projeto_Fiscal40'; SecretsFile='segredos.md' }")
     [IO.File]::WriteAllText((Join-Path $configDirectory 'segredos.md'), "SVN_USER=usuario-ficticio`nSVN_PASS=senha=ficticia\teste`n")
+    $syncScript = Join-Path $root '_automation\workflow\sync-integration.ps1'
+    [void] [IO.Directory]::CreateDirectory((Split-Path -Parent $syncScript))
+    Copy-Item -LiteralPath $syncSource -Destination $syncScript
     $state = @{
         Updated = $false; BeforeRevision = '19038'; AfterRevision = '19040'
         Url = 'https://servidor.invalid/svn/hwsistemas/Projeto_Fiscal40'
@@ -113,19 +117,23 @@ function New-TestArea {
         }
         [pscustomobject]@{ ExitCode = $code; Output = $output; Error = $errorText }
     }.GetNewClosure()
-    [pscustomobject]@{ Root = $root; Origin = $origin; Base = $base; Config = $configFile; State = $state; Runner = $runner }
+    [pscustomobject]@{ Root = $root; Origin = $origin; Base = $base; Config = $configFile; State = $state; Runner = $runner; SyncScript = $syncScript }
 }
 
 function Invoke-TestSync {
-    param($Area)
+    param($Area, [string] $Directory = $Area.Root, [string] $ScriptPath = $Area.SyncScript)
     $Area.State.Calls.Clear()
     $Area.State.Updated = $false
     $log = [Collections.Generic.List[string]]::new()
     $failure = ''
+    Push-Location -LiteralPath $Directory
     try {
+        # Carregar a cópia da própria integração temporária, sem bypass da validação.
+        . $ScriptPath
         Invoke-SyncIntegration -ConfigPath $Area.Config -CommandRunner $Area.Runner 6>&1 | ForEach-Object { $log.Add([string] $_) }
     }
     catch { $failure = $_.Exception.Message }
+    finally { Pop-Location }
     [pscustomobject]@{ Success = ($failure -eq ''); Error = $failure; Log = ($log -join "`n") }
 }
 
@@ -151,6 +159,26 @@ try {
     $initialHead = Invoke-TestGit $area.Root @('rev-parse', 'HEAD')
     $development = Join-Path $area.Base 'Desenvolvimento'
     [void] (Invoke-TestGit $area.Base @('clone', $area.Origin, $development))
+    $result = Invoke-TestSync $area -Directory $development
+    Assert-Check (-not $result.Success -and $result.Error.Contains('O diretório atual deve ser IntegrationPath') -and $area.State.Calls.Count -eq 0) 'Execução do WorkPath é rejeitada antes de qualquer comando Git ou SVN'
+    $result = Invoke-TestSync $area -Directory (Split-Path -Parent $area.Config)
+    Assert-Check (-not $result.Success -and $result.Error.Contains('O diretório atual deve ser IntegrationPath') -and $area.State.Calls.Count -eq 0) 'Subpasta da integração também é rejeitada: exige a raiz exata'
+    $workScript = Join-Path $development '_automation\workflow\sync-integration.ps1'
+    [void] [IO.Directory]::CreateDirectory((Split-Path -Parent $workScript))
+    Copy-Item -LiteralPath $syncSource -Destination $workScript
+    $result = Invoke-TestSync $area -ScriptPath $workScript
+    Assert-Check (-not $result.Success -and $result.Error.Contains('Utilize o script da integração') -and $area.State.Calls.Count -eq 0) 'Cópia do script no WorkPath é rejeitada mesmo com terminal na integração'
+    $secretsFile = Join-Path (Split-Path -Parent $area.Config) 'segredos.md'
+    $savedSecrets = [IO.File]::ReadAllText($secretsFile)
+    [IO.File]::Delete($secretsFile)
+    $result = Invoke-TestSync $area -Directory $development
+    Assert-Check (-not $result.Success -and $result.Error.Contains('O diretório atual deve ser IntegrationPath')) 'Local incorreto é rejeitado antes de tentar ler segredos'
+    [IO.File]::WriteAllText($secretsFile, $savedSecrets)
+    $engine = (Get-Process -Id $PID).Path
+    $cli = Invoke-SyncProcess $engine @('-NoLogo', '-NoProfile', '-File', $area.SyncScript, '-ConfigPath', $area.Config) $development
+    Assert-Check ($cli.ExitCode -eq 1 -and $cli.Error.Contains('atual deve ser IntegrationPath')) 'Entrada independente também retorna código 1 quando chamada de outro terminal/diretório'
+    $cli = Invoke-SyncProcess $engine @('-NoLogo', '-NoProfile', '-File', $workScript, '-ConfigPath', $area.Config) $area.Root
+    Assert-Check ($cli.ExitCode -eq 1 -and $cli.Error.Contains('Utilize o script da integra')) 'Entrada independente rejeita script externo mesmo com diretório atual correto'
     [void] (Invoke-TestGit $development @('config', 'user.name', 'Teste remoto'))
     [void] (Invoke-TestGit $development @('config', 'user.email', 'remoto@example.invalid'))
     [IO.File]::WriteAllText((Join-Path $development 'fonte.pas'), "conteudo somente Git`n")
