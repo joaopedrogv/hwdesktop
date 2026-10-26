@@ -1,25 +1,26 @@
--- REUTILIZÁVEIS --
-ÍNDICES - 1;
+-- REUTILIZï¿½VEIS --
+ï¿½NDICES - 1;
 
--- ÍNDICE --
-1 - RELATÓRIOS COM GRID     
-2 - RESTRUTURAÇÃO
-        2.1 - UTILIZAÇÃO
+-- ï¿½NDICE --
+1 - RELATï¿½RIOS COM GRID     
+2 - RESTRUTURAï¿½ï¿½O
+        2.1 - UTILIZAï¿½ï¿½O
 
+reverter essa linja ou 
 
 
 
 -- TEXTO --
-1 - Para relatórios que utilizem DBGRID utilizar UGridPesquisa. ex:. ULocalizar
-2 - RESTRUTURAÇÃO
-        2.1 - Antes de colocar o código verificar a versão no formulário uRestruturacao.pas
-        e colocar no início do código a versão, menos na aba tsHwF e na
-        aba tsOutros pois estes são atualizados tudo sempre que ocorre uma atualização.
+1 - Para relatï¿½rios que utilizem DBGRID utilizar UGridPesquisa. ex:. ULocalizar
+2 - RESTRUTURAï¿½ï¿½O
+        2.1 - Antes de colocar o cï¿½digo verificar a versï¿½o no formulï¿½rio uRestruturacao.pas
+        e colocar no inï¿½cio do cï¿½digo a versï¿½o, menos na aba tsHwF e na
+        aba tsOutros pois estes sï¿½o atualizados tudo sempre que ocorre uma atualizaï¿½ï¿½o.
         Colocar em uma linha campos,tabelas,fk,pk, indices, etc...,
-        nas abas de alteração no banco utilizar as abas tshw, tshwf,tsfiscal.
-        Para processos a aba tsprocessos  e no código da empresa colocar :COD_EMPRESA
-        Utilizar tsOutros para triggers e procedures views, colocar 'inicio' (código)  'fim'
-        Na aba tsoutros e na aba tshw modificar versão no procedimento do formulário
-        uRestruturacao.pas setVariaveisVersao na variável pVersaoBancoHw,
-        os demais nas respectivas variáveis.
+        nas abas de alteraï¿½ï¿½o no banco utilizar as abas tshw, tshwf,tsfiscal.
+        Para processos a aba tsprocessos  e no cï¿½digo da empresa colocar :COD_EMPRESA
+        Utilizar tsOutros para triggers e procedures views, colocar 'inicio' (cï¿½digo)  'fim'
+        Na aba tsoutros e na aba tshw modificar versï¿½o no procedimento do formulï¿½rio
+        uRestruturacao.pas setVariaveisVersao na variï¿½vel pVersaoBancoHw,
+        os demais nas respectivas variï¿½veis.
 
