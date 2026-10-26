@@ -1,0 +1,54 @@
+package PkPrestacoes;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+{%TogetherDiagram 'ModelSupport_PkPrestacoes\default.txaPackage'}
+
+requires
+  rtl,
+  vcl,
+  pkFormPag,
+  dbrtl,
+  dsnap,
+  vcldb,
+  ibxpress,
+  pkEditMoeda,
+  DelPrint2006,
+  VclSmp,
+  vclx,
+  designide,
+  xmlrtl,
+  vclactnband,
+  PkFormularios,
+  pkPedidoVenda;
+
+contains
+  UpendPrestacao in '..\fonte\UpendPrestacao.pas' {FrmPendPrestacao},
+  UDtmPrestacao in '..\fonte\UDtmPrestacao.pas' {DtmPrestacao: TDataModule},
+  UBaixaParcial in '..\fonte\UBaixaParcial.pas' {FrmBaixaParcial},
+  UClassesPrestacao in '..\fonte\UClassesPrestacao.pas',
+  UDescPrestacao in '..\fonte\UDescPrestacao.pas' {FrmDescPrestacao};
+
+end.

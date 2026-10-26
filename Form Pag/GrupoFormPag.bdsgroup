@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{582F34E3-FBA1-4BDF-9FAF-D14570BCD393}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  <Projects>
+      <Projects Name="HwSistemas.exe">..\HwSistemas.bdsproj</Projects>
+      <Projects Name="pkFormPag.bpl">dpk\pkFormPag.bdsproj</Projects>
+      <Projects Name="TesteFormPag.exe">Exe Teste\TesteFormPag.bdsproj</Projects>
+      <Projects Name="Targets">HwSistemas.exe pkFormPag.bpl TesteFormPag.exe</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+	<StarTeamAssociation></StarTeamAssociation>
+	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+</BorlandProject>

@@ -1,0 +1,551 @@
+inherited frmPrestacoesF: TfrmPrestacoesF
+  Left = 398
+  Top = 188
+  Caption = 'Presta'#231#245'es'
+  ClientHeight = 412
+  ClientWidth = 584
+  KeyPreview = True
+  Menu = MainMenu1
+  Position = poMainFormCenter
+  OnClose = FormClose
+  ExplicitWidth = 600
+  ExplicitHeight = 470
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Splitter1: TSplitter
+    Left = 0
+    Top = 360
+    Width = 584
+    Height = 3
+    Cursor = crVSplit
+    Align = alBottom
+    ExplicitTop = 290
+    ExplicitWidth = 85
+  end
+  object Splitter2: TSplitter
+    Left = 0
+    Top = 180
+    Width = 584
+    Height = 3
+    Cursor = crVSplit
+    Align = alBottom
+    ExplicitTop = 49
+    ExplicitWidth = 191
+  end
+  object GroupBox2: TGroupBox
+    Left = 0
+    Top = 183
+    Width = 584
+    Height = 177
+    Align = alBottom
+    Caption = 'Cadastro de Presta'#231#245'es'
+    TabOrder = 2
+    Visible = False
+    object Label1: TLabel
+      Left = 182
+      Top = 107
+      Width = 93
+      Height = 13
+      Caption = 'Valor Recebimento:'
+    end
+    object GroupBox3: TGroupBox
+      Left = 53
+      Top = 19
+      Width = 233
+      Height = 74
+      Caption = 'Totalizador Impressora (F6)'
+      TabOrder = 0
+      object DBGrid2: TDBGrid
+        Left = 2
+        Top = 15
+        Width = 229
+        Height = 57
+        Align = alClient
+        DataSource = DtmFiscal.dsTotNaoF
+        Options = [dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit]
+        TabOrder = 0
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -11
+        TitleFont.Name = 'MS Sans Serif'
+        TitleFont.Style = []
+        OnKeyDown = DBGrid2KeyDown
+        Columns = <
+          item
+            Expanded = False
+            FieldName = 'SEQUENCIA'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'DESCRICAO'
+            Visible = True
+          end>
+      end
+    end
+    object GroupBox4: TGroupBox
+      Left = 298
+      Top = 19
+      Width = 233
+      Height = 74
+      Caption = 'Finalizador (F7)'
+      TabOrder = 1
+      object DBGrid3: TDBGrid
+        Left = 2
+        Top = 15
+        Width = 229
+        Height = 57
+        Align = alClient
+        DataSource = DtmConfigF.dsFinaliz
+        Options = [dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit]
+        TabOrder = 0
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -11
+        TitleFont.Name = 'MS Sans Serif'
+        TitleFont.Style = []
+        OnKeyDown = DBGrid3KeyDown
+        Columns = <
+          item
+            Expanded = False
+            FieldName = 'COD_FINALIZADOR'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'DESCRICAO'
+            Width = 130
+            Visible = True
+          end>
+      end
+    end
+    object EditMoeda1: TEditMoeda
+      Left = 281
+      Top = 99
+      Width = 121
+      Height = 21
+      Alignment = taRightJustify
+      TabOrder = 2
+      FormatReal = fMoney
+      FormatSize = '10.2'
+    end
+    object BitBtn3: TBitBtn
+      Left = 181
+      Top = 133
+      Width = 108
+      Height = 25
+      Caption = 'Imprimir (F2)'
+      TabOrder = 3
+      OnClick = BitBtn3Click
+      Glyph.Data = {
+        36050000424D3605000000000000360400002800000010000000100000000100
+        08000000000000010000220B0000220B00000001000000010000181818002118
+        21001821210031313100393939004242420052525200636363006B6B6B007373
+        7300848484008C8C8C00948C8C00949494009C949400F7AD94009C9C9C00CE9C
+        9C00F7AD9C00FFAD9C00FFB59C009C9CA500A5A5A500ADA5A500C6A5A500A5AD
+        A500FFBDA500A5D6A500ADADAD00B5ADAD00FFC6AD00B5B5B500FFC6B500BDBD
+        BD00C6BDBD00BDC6BD00E7C6BD00EFCEBD00FFCEBD00BDBDC600C6C6C600CEC6
+        C600E7CEC600CECECE00D6CECE00DED6CE00FFDECE00D6D6D600FFE7D600D6DE
+        DE00DEDEDE00EFE7DE00E7E7E700EFE7E700FFE7E700EFEFEF00F7EFEF00F7EF
+        F700F7F7F700FF00FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF003B3B3B3B3B3B
+        103B3B3B0A0A0B3B3B3B3B3B3B3B10102C0D04060E282F0A3B3B3B3B10103A3C
+        2F1005010103070A0B3B0C10373C3528100B0D0A07040201093B10343421161D
+        22160D0C0D0E0B080A3B0D1C161C282F373732281C100C0D0B3B0C1C282B2832
+        2B19212B2F2F281F0D3B3B102B2B32281F1B231817161F22163B3B3B10211C1C
+        343837332F2B1F0D3B3B3B3B3B102F2B10212F2F2F281C3B3B3B3B3B3B3B362E
+        24242A2D2B0D3B3B3B3B3B3B3B3B112E261E1A133B3B3B3B3B3B3B3B3B3B112E
+        261E1A0F3B3B3B3B3B3B3B3B3B3B112E261E1A123B3B3B3B3B3B3B3B3B11302E
+        261E1A123B3B3B3B3B3B3B3B3B1111111112123B3B3B3B3B3B3B}
+    end
+    object BitBtn2: TBitBtn
+      Left = 295
+      Top = 133
+      Width = 108
+      Height = 25
+      Caption = 'Cancelar (F3)'
+      TabOrder = 4
+      OnClick = BitBtn2Click
+      Glyph.Data = {
+        12020000424D1202000000000000120100002800000010000000100000000100
+        08000000000000010000120B0000120B0000370000003700000000000000FFFF
+        FF00FF00FF001442E4001645EB001C4BE7000430EB000C35E4000E3CEB001037
+        DB000027EB00002AEB000027E400012CEB00052BDC00062DE300092ED9000022
+        EB000021E7000020E200001FDC000022DC000020D900001EEB00001FEB000020
+        EB00001DE800001BE300001EE200001FE200001BDF00001CDF00001AEB00001A
+        E2000017DF000019DF00001ADF000011EB000016EB000012E6000010DC000013
+        DC000010D9000009EB00000BEB000008EA000008E700000ADF000004E2000005
+        E2000004DF000005DF000003DB000004DA0000006E0002020202020202020202
+        0202020202020202020202020202020202020202020202020236360202020202
+        0236360202020202361A28360202020236302E36020202023621182A36020236
+        332B34360202020202362419293636312C353602020202020202361E11272D2B
+        3236020202020202020202361B26252F36020202020202020202023612172022
+        36020202020202020202360F06131C0A2336020202020202023607080E363614
+        0B1F3602020202023603041036020236160D1D36020202023605093602020202
+        36150C3602020202023636020202020202363602020202020202020202020202
+        02020202020202020202020202020202020202020202}
+    end
+  end
+  object Panel1: TPanel
+    Left = 0
+    Top = 363
+    Width = 584
+    Height = 49
+    Align = alBottom
+    TabOrder = 0
+    object BitBtn4: TBitBtn
+      Left = 416
+      Top = 12
+      Width = 99
+      Height = 25
+      Caption = 'Sair (Esc)'
+      TabOrder = 0
+      OnClick = BitBtn4Click
+      Glyph.Data = {
+        36030000424D3603000000000000360000002800000010000000100000000100
+        18000000000000030000120B0000120B00000000000000000000FF00FFFF00FF
+        FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+        FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+        00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFBB4200
+        BB4200BB4200BB4200BB4200BB4200BB4200BB4200BB4200BB4200BB4200BB42
+        00FF00FFFF00FFFF00FFFF00FFBB4200FFFFFFFFFFFAFFFAEAFFEFD7FFE7C7FF
+        E1B8FFDAADFFD9A9FFD8A7FFEAC2BB4200FF00FFFF00FFFF00FFFF00FFBB4200
+        FFFFFFFFF6EFFEF0E2FFEAD1FEE2C4FEDAB4FED3A5FECE9CFECA95FFDAABBB42
+        00FF00FFFF00FFFF00FFFF00FFBB4200FFFFFFFFFEFBFFF8F2FFF2E5FFEBD5FF
+        E3C5FFDCB6FFD4A9FFCE9CFFDCACBB4200FF00FFFF00FFFF00FFFF00FFBB4200
+        FFFFFFFFFFFFFFFFFEFFFAF4FFF3E7FEEBD8FFE5C9FEDDB8FED5AAFFE1B5BB42
+        00FF00FFFF00FFFF00FFFF00FFBB4200FFFFFFFFFFFFFFFFFFFFFFFEFFFBF6FE
+        F3E7FEEED9FFE6CAFEDDBAFFE7C4BB4200FF00FFFF00FFFF00FFFF00FFBB4200
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBF7FFF4EA000D66FEE5CAFFEFD7BB42
+        00000D66FF00FFFF00FFFF00FFBB4200FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFF000D66123BFF000D66FFFFFF000D66001EFF000D66FF00FFFF00FFBB4200
+        E9A362E69C59E69C59E69C59E69C59E69C59E69D59000D66153DFF000D66072B
+        FF000D66FF00FFFF00FFFF00FFFF00FFBB4100BB4200BB4200BB4200BB4200BB
+        4200BB4200BB4200000D661841FF000D66FF00FFFF00FFFF00FFFF00FFFF00FF
+        FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF000D662A56FF000D661A44
+        FF000D66FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+        00FF000D66315EFF000D66FF00FF000D661D47FF000D66FF00FFFF00FFFF00FF
+        FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF000D66FF00FFFF00FFFF00
+        FF000D66FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+        00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF}
+    end
+    object BitBtn1: TBitBtn
+      Left = 242
+      Top = 12
+      Width = 168
+      Height = 25
+      Caption = 'Recebimento Avulso (F4)'
+      TabOrder = 1
+      OnClick = BitBtn1Click
+      Glyph.Data = {
+        FE020000424DFE02000000000000FE0100002800000010000000100000000100
+        08000000000000010000120B0000120B00007200000072000000FF00FF000150
+        000000440000037303000257040003740400035A05000A6C0C00015B06000790
+        0F00099212000A9516000B951600119E1F00127E1C0015A126000E771C000C76
+        20001CAD350021B13C0026B642002DC04F0001621A0030C2550033C55900025B
+        1F0002551C0000511E0000491D0000502C0009844E00015D360001593700015F
+        5400046E690000676D0046F4FF0048EFFA0056F0F8005AF0F7002EEAFF0035ED
+        FF0021CAE1000FDAFF0017DDFF0026E2FF00005D7000026A7E0007D3FF0008D4
+        FF0013D8FF0000CCFF0014CEFB001BC0E9002BBCDD0000C5FB0000C6FB0002C7
+        FF0004BAEF000FBCEE0000C1FA0000AFE90000ADE50003B4ED001099C50000AF
+        F00000628600015A7800188FB70000A3E7000092CF00015E8400008AC600007F
+        B800038CC6000778AC000C7AAB00007BB6000075B000017DBD000C70A0000D6A
+        9A000F6E9E0010709E00006EAA0000659F00016AA30001659F0002598A000470
+        A90004669C0004649A0006679E00076A9E000A78B2000A679800006EB0000064
+        A40000639E00005F9900025D9300046CA900045D920007649F00005D9D00005C
+        9700005995000056920000558F00016AB0000369AD000460A300004880000000
+        0000000000000000000000000000000000000004060606000000000000000000
+        00000000070C09061F707070700000000000000000020E0A102F4F4E54707000
+        0000000000001B0D0B1E2B393C3D696C00000070707023060F112A343A465563
+        6B00705C06061D06130606064361554D3E51705E220118181514121C57624A37
+        3349705D6E21051818171A5A654032314800704C4B6D20031816586744292D48
+        00007066646A681908426F53262548000000705B595660472E5F005248480000
+        00005F36353B3F41455F00000000000000005F2724282C30385F000000000000
+        0000005050505050500000000000000000000000000000000000000000000000
+        0000}
+    end
+    object BitBtn6: TBitBtn
+      Left = 68
+      Top = 12
+      Width = 168
+      Height = 25
+      Caption = 'Presta'#231#245'es Caixa (F8)'
+      TabOrder = 2
+      OnClick = BitBtn6Click
+      Glyph.Data = {
+        FE020000424DFE02000000000000FE0100002800000010000000100000000100
+        08000000000000010000120B0000120B00007200000072000000FF00FF000150
+        000000440000037303000257040003740400035A05000A6C0C00015B06000790
+        0F00099212000A9516000B951600119E1F00127E1C0015A126000E771C000C76
+        20001CAD350021B13C0026B642002DC04F0001621A0030C2550033C55900025B
+        1F0002551C0000511E0000491D0000502C0009844E00015D360001593700015F
+        5400046E690000676D0046F4FF0048EFFA0056F0F8005AF0F7002EEAFF0035ED
+        FF0021CAE1000FDAFF0017DDFF0026E2FF00005D7000026A7E0007D3FF0008D4
+        FF0013D8FF0000CCFF0014CEFB001BC0E9002BBCDD0000C5FB0000C6FB0002C7
+        FF0004BAEF000FBCEE0000C1FA0000AFE90000ADE50003B4ED001099C50000AF
+        F00000628600015A7800188FB70000A3E7000092CF00015E8400008AC600007F
+        B800038CC6000778AC000C7AAB00007BB6000075B000017DBD000C70A0000D6A
+        9A000F6E9E0010709E00006EAA0000659F00016AA30001659F0002598A000470
+        A90004669C0004649A0006679E00076A9E000A78B2000A679800006EB0000064
+        A40000639E00005F9900025D9300046CA900045D920007649F00005D9D00005C
+        9700005995000056920000558F00016AB0000369AD000460A300004880000000
+        0000000000000000000000000000000000000004060606000000000000000000
+        00000000070C09061F707070700000000000000000020E0A102F4F4E54707000
+        0000000000001B0D0B1E2B393C3D696C00000070707023060F112A343A465563
+        6B00705C06061D06130606064361554D3E51705E220118181514121C57624A37
+        3349705D6E21051818171A5A654032314800704C4B6D20031816586744292D48
+        00007066646A681908426F53262548000000705B595660472E5F005248480000
+        00005F36353B3F41455F00000000000000005F2724282C30385F000000000000
+        0000005050505050500000000000000000000000000000000000000000000000
+        0000}
+    end
+  end
+  object PageControl1: TPageControl
+    Left = 0
+    Top = 0
+    Width = 584
+    Height = 180
+    ActivePage = TabSheet2
+    Align = alClient
+    TabOrder = 1
+    object TabSheet1: TTabSheet
+      Caption = 'TabSheet1'
+      object GroupBox1: TGroupBox
+        Left = 0
+        Top = 0
+        Width = 576
+        Height = 152
+        Align = alClient
+        Caption = 'Rela'#231#227'o de Presta'#231#245'es (F5)'
+        TabOrder = 0
+        object DBGrid1: TDBGrid
+          Left = 2
+          Top = 15
+          Width = 572
+          Height = 135
+          Align = alClient
+          DataSource = DtmFiscal.dsPrest
+          TabOrder = 0
+          TitleFont.Charset = DEFAULT_CHARSET
+          TitleFont.Color = clWindowText
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          TitleFont.Style = []
+          Columns = <
+            item
+              Expanded = False
+              FieldName = 'VALOR'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'DATALANC'
+              Width = 90
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'SEQUENCIA'
+              Width = 80
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'DESCRICAO'
+              Width = 122
+              Visible = True
+            end>
+        end
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = 'TabSheet2'
+      ImageIndex = 1
+      object GroupBox5: TGroupBox
+        Left = 0
+        Top = 0
+        Width = 576
+        Height = 152
+        Align = alClient
+        Caption = 'Recebimento de Presta'#231#245'es (F5)'
+        TabOrder = 0
+        object DBGrid4: TDBGrid
+          Left = 2
+          Top = 15
+          Width = 572
+          Height = 108
+          Align = alClient
+          DataSource = dtmDAVF.dsPrestCred
+          TabOrder = 1
+          TitleFont.Charset = DEFAULT_CHARSET
+          TitleFont.Color = clWindowText
+          TitleFont.Height = -11
+          TitleFont.Name = 'MS Sans Serif'
+          TitleFont.Style = []
+          OnKeyDown = DBGrid4KeyDown
+          Columns = <
+            item
+              Expanded = False
+              FieldName = 'COD_CRED'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'DATA_VENC_C'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'VALOR_C'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'TP_REC_CXL'
+              Width = 64
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'DIA_CXL'
+              Width = 64
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'VL_RQ_PG_CXL'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'N_DOC_C'
+              Width = 64
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'TP_DOC_V'
+              Width = 64
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'N_DOC_V'
+              Visible = True
+            end>
+        end
+        object Panel2: TPanel
+          Left = 2
+          Top = 123
+          Width = 572
+          Height = 27
+          Align = alBottom
+          BevelOuter = bvNone
+          TabOrder = 0
+          object Label2: TLabel
+            Left = 9
+            Top = 11
+            Width = 76
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Vencimento De:'
+          end
+          object Label3: TLabel
+            Left = 162
+            Top = 11
+            Width = 19
+            Height = 13
+            Caption = 'At'#233':'
+          end
+          object Label4: TLabel
+            Left = 362
+            Top = 11
+            Width = 42
+            Height = 13
+            Alignment = taRightJustify
+            Caption = 'Dia CXL:'
+          end
+          object MaskEdit1: TMaskEdit
+            Left = 91
+            Top = 3
+            Width = 65
+            Height = 21
+            EditMask = '!99/99/0000;1;_'
+            MaxLength = 10
+            TabOrder = 0
+            Text = '  /  /    '
+          end
+          object MaskEdit2: TMaskEdit
+            Left = 189
+            Top = 3
+            Width = 65
+            Height = 21
+            EditMask = '!99/99/0000;1;_'
+            MaxLength = 10
+            TabOrder = 1
+            Text = '  /  /    '
+          end
+          object BitBtn5: TBitBtn
+            Left = 260
+            Top = 1
+            Width = 75
+            Height = 25
+            Caption = 'Procurar'
+            TabOrder = 2
+            OnClick = BitBtn5Click
+          end
+          object MaskEdit3: TMaskEdit
+            Left = 412
+            Top = 3
+            Width = 65
+            Height = 21
+            EditMask = '!99/99/0000;1;_'
+            MaxLength = 10
+            TabOrder = 3
+            Text = '  /  /    '
+          end
+          object BitBtn7: TBitBtn
+            Left = 487
+            Top = 1
+            Width = 75
+            Height = 25
+            Caption = 'Procurar'
+            TabOrder = 4
+            OnClick = BitBtn7Click
+          end
+        end
+      end
+    end
+  end
+  object MainMenu1: TMainMenu
+    Left = 360
+    Top = 192
+    object MenuFiscal1: TMenuItem
+      Caption = 'Menu Fiscal'
+      OnClick = MenuFiscal1Click
+    end
+  end
+end

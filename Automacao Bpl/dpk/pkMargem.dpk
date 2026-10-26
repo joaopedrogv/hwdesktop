@@ -1,0 +1,47 @@
+package pkMargem;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  vcl,
+  dbrtl,
+  dsnap,
+  vcldb,
+  ibxpress,
+  pkEditMoeda,
+  pkAtivos,
+  xhCntrls100,
+  xhStd100,
+  pkCadastrosBasicos;
+
+contains
+  uClasseMargemProduto in '..\fonte\uClasseMargemProduto.pas',
+  uDtmMargemProduto in '..\fonte\uDtmMargemProduto.pas' {dtmMargemProd},
+  uMargemProduto in '..\fonte\uMargemProduto.pas' {frmMargemProduto},
+  uLucratividade in '..\fonte\uLucratividade.pas' {frmLucratividade};
+
+end.

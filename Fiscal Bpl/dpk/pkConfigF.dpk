@@ -1,0 +1,50 @@
+package pkConfigF;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  dbrtl,
+  dsnap,
+  vcldb,
+  vcl,
+  ibxpress,
+  pkAtivosF,
+  VclSmp;
+
+contains
+  uDtmConfigF in '..\fonte\uDtmConfigF.pas' {DtmConfigF},
+  uConfiguracoes in '..\fonte\uConfiguracoes.pas' {frmConfiguracoes},
+  uCadastrosF in '..\fonte\uCadastrosF.pas',
+  uConfigImp in '..\fonte\uConfigImp.pas' {frmConfigImp},
+  uTeclado in '..\fonte\uTeclado.pas' {frmTeclado},
+  uTesteTeclas in '..\fonte\uTesteTeclas.pas' {frmTesteTeclas},
+  uProcessoF in '..\fonte\uProcessoF.pas' {frmProcesso},
+  uFinalizador in '..\fonte\uFinalizador.pas' {frmFinalizador},
+  uClasseBalanca in '..\fonte\uClasseBalanca.pas',
+  uCopiaHwF in '..\fonte\uCopiaHwF.pas' {frmCopiaDadosServidor};
+
+end.

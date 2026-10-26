@@ -1,0 +1,98 @@
+package pkProdutos;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+{%File 'pkProdutos_INFO.txt'}
+
+requires
+  rtl,
+  PkFormularios,
+  pkAtivos,
+  vcl,
+  vcldb,
+  dbrtl,
+  VclSmp,
+  DelPrint2006,
+  bdertl,
+  QR5RunD2006,
+  vcljpg,
+  vclx,
+  pkCadastrosBasicos,
+  dcl7cr10,
+  BarcodeRunD2006,
+  QRBarcodeRunD2006,
+  pkEditHw,
+  vclie,
+  dsnap,
+  ibxpress;
+
+contains
+  UCadProdutos in '..\fonte\UCadProdutos.pas' {FrmCadProdutos},
+  UCadGrupos in '..\fonte\UCadGrupos.pas' {FrmCadGrupos},
+  UDtmProdutos in '..\fonte\UDtmProdutos.pas' {dtmProdutos: TDataModule},
+  UClassesProdutos in '..\fonte\UClassesProdutos.pas',
+  UCadSubGrupos in '..\fonte\UCadSubGrupos.pas' {FrmCadSubGrupos},
+  UCadNBM in '..\fonte\UCadNBM.pas' {FrmCadNBM},
+  UCadDSGS in '..\fonte\UCadDSGS.pas' {FrmCadDSGS},
+  UCadPerfilProdutos in '..\fonte\UCadPerfilProdutos.pas' {FrmCadPerfilProdutos},
+  UClassesRelProdutos in '..\fonte\UClassesRelProdutos.pas',
+  uCadGrade in '..\fonte\uCadGrade.pas' {frmCadGrade},
+  UCadKits in '..\fonte\UCadKits.pas' {FrmCadKits},
+  UCadProdSimilares in '..\fonte\UCadProdSimilares.pas' {FrmCadProdSimilares},
+  UCadTipoServ in '..\fonte\UCadTipoServ.pas' {FrmCadTipoServ1},
+  UFichaInventario in '..\fonte\UFichaInventario.pas' {FrmFichaInv},
+  UPromocaoProd in '..\fonte\UPromocaoProd.pas' {FrmPromocaoProd},
+  uAlteracaoDePreco in '..\fonte\uAlteracaoDePreco.pas' {frmAlteracaoDePreco},
+  UBalanco in '..\fonte\UBalanco.pas' {frmBalanco},
+  UMontaArqBalanca in '..\fonte\UMontaArqBalanca.pas' {FrmMntBalanca},
+  UDtmBalanco in '..\fonte\UDtmBalanco.pas' {dtmBalanco: TDataModule},
+  UCadModeloEtiTermicas in '..\fonte\UCadModeloEtiTermicas.pas' {FrmCadModeloEtiTermica},
+  UCadReceitas in '..\fonte\UCadReceitas.pas' {frmCadReceitas},
+  uClassesIndiceTecnico in '..\fonte\uClassesIndiceTecnico.pas',
+  uIndiceTecnico in '..\fonte\uIndiceTecnico.pas' {frmIndiceTecnico},
+  UCadPromocao in '..\fonte\UCadPromocao.pas' {frmCadPromocao},
+  uCadTipoServicoNFSE in '..\fonte\uCadTipoServicoNFSE.pas' {FrmCadTipoServicoNFSE},
+  UCadNBS in '..\fonte\UCadNBS.pas' {FrmCadNBS},
+  uCadPerfTributAdicional in '..\fonte\uCadPerfTributAdicional.pas' {frmCadPerfTribAd},
+  uCadCEST in '..\fonte\uCadCEST.pas' {frmCadCEST},
+  uFotosProdutos in '..\fonte\uFotosProdutos.pas' {frmFotosProdutos},
+  uCadCategoria in '..\fonte\uCadCategoria.pas' {frmCadCategoria},
+  uRelIndTecGrade in '..\fonte\uRelIndTecGrade.pas' {frmRelIndTecGrade},
+  uCadProdutos_nfe_dados_entrada in '..\fonte\uCadProdutos_nfe_dados_entrada.pas' {frmCadProdutos_nfe_dados_entrada},
+  uCadDesoneracao in '..\fonte\uCadDesoneracao.pas' {frmCadDesoneracao},
+  uClassesDesoneracao in '..\fonte\uClassesDesoneracao.pas',
+  uClassesCEST in '..\fonte\uClassesCEST.pas',
+  uCadCEST_v2 in '..\fonte\uCadCEST_v2.pas' {frmCadCEST_v2},
+  uCadCest_MVA in '..\fonte\uCadCest_MVA.pas' {frmCadCest_MVA},
+  uCadCEST_ConsultaDet in '..\fonte\uCadCEST_ConsultaDet.pas' {frmCadCEST_ConsultaDet},
+  uManutencaoInventarioItem in '..\fonte\uManutencaoInventarioItem.pas' {frmManutencaoInventarioItem},
+  uClassesManutencaoInventario in '..\fonte\uClassesManutencaoInventario.pas',
+  UEtiquetaComumBuscarProd in '..\fonte\UEtiquetaComumBuscarProd.pas' {frmEtiquetaComumBuscarProd},
+  UVisualizarAcabadoMateriasPrimas in '..\fonte\UVisualizarAcabadoMateriasPrimas.pas' {TFrmVisualizarAcabadoMateriasPrimas},
+  uCadProdutos_HistoricoPreco in '..\fonte\uCadProdutos_HistoricoPreco.pas' {frmCadProdutosHistPreco},
+  uCadProdutos_PrecosUnificados in '..\fonte\uCadProdutos_PrecosUnificados.pas' {frmCadProdutosPrecosUnificados},
+  uCadProdutosValidade in '..\fonte\uCadProdutosValidade.pas' {frmCadProdutosValidade};
+
+end.

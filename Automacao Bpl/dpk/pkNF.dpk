@@ -1,0 +1,113 @@
+package pkNF;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+{%ToDo 'pkNF.todo'}
+
+requires
+  rtl,
+  vcl,
+  vcldb,
+  dbrtl,
+  pkAtivos,
+  pkProdutos,
+  pkEditHw,
+  pkEquipamentos,
+  QR5RunD2006,
+  vcljpg,
+  bdertl,
+  vclx,
+  DelPrint2006,
+  VclSmp,
+  designide,
+  xmlrtl,
+  vclactnband,
+  inet,
+  soaprtl,
+  pkFormPag,
+  pkMargem,
+  pkBoletos,
+  pkFiscal,
+  dsnap,
+  ibxpress;
+
+contains
+  uCadNF in '..\fonte\uCadNF.pas' {frmCadNF},
+  uClassesNotasFiscais in '..\fonte\uClassesNotasFiscais.pas',
+  uDtmNF in '..\fonte\uDtmNF.pas' {dtmNF: TDataModule},
+  UCadServicoTransporte in '..\fonte\UCadServicoTransporte.pas' {frmCadServicoTransporte},
+  uEscollhaDescCFOP in '..\fonte\uEscollhaDescCFOP.pas' {frmEscolhaDescCFOP},
+  uEscollhaProdutoNF in '..\fonte\uEscollhaProdutoNF.pas' {frmEscolhaProdutoNf},
+  uDtmConfigNf in '..\fonte\uDtmConfigNf.pas' {dtmConfigNf: TDataModule},
+  uClassesConfigNf in '..\fonte\uClassesConfigNf.pas',
+  UCadCabecalhonf in '..\fonte\UCadCabecalhonf.pas' {frmCadCabecalhonf},
+  uDtmSpedNf in '..\fonte\uDtmSpedNf.pas' {dtmSpedNf: TDataModule},
+  uImportXmlNf in '..\fonte\uImportXmlNf.pas',
+  uCadConferenciaCega in '..\fonte\uCadConferenciaCega.pas' {frmCadConferenciaCega},
+  uClasseConferenciaCega in '..\fonte\uClasseConferenciaCega.pas',
+  uDtmConferenciaCega in '..\fonte\uDtmConferenciaCega.pas' {dtmConferenciaCega: TDataModule},
+  uClassesMDFe in '..\fonte\uClassesMDFe.pas',
+  uCadMDFe in '..\fonte\uCadMDFe.pas' {frmCadMDFe},
+  uDtmMDFe in '..\fonte\uDtmMDFe.pas' {dtmMDFe: TDataModule},
+  uOpcoesPesquisaNFe in '..\fonte\uOpcoesPesquisaNFe.pas' {frmOpcoesPesquisaNFe},
+  uCadNF_lote in '..\fonte\uCadNF_lote.pas' {frmCadNF_lote},
+  uCadNF_Ajuste_Estoque in '..\fonte\uCadNF_Ajuste_Estoque.pas' {frmCadNF_Ajuste_Estoque},
+  uCadNF_icmsst_rest_compl in '..\fonte\uCadNF_icmsst_rest_compl.pas' {frmCadNF_icmsst_rest_compl},
+  uClassesNotasFiscais_Coleta_Entrega in '..\fonte\uClassesNotasFiscais_Coleta_Entrega.pas',
+  uClassesNotasFiscais_ObsCont in '..\fonte\uClassesNotasFiscais_ObsCont.pas',
+  uCadNF_PendCanc in '..\fonte\uCadNF_PendCanc.pas' {frmCadNF_PencCanc},
+  uClassesNotasFiscais_ServTransporte in '..\fonte\uClassesNotasFiscais_ServTransporte.pas',
+  uClassesNotasFiscais_pedidos in '..\fonte\uClassesNotasFiscais_pedidos.pas',
+  uClassesNotasFiscais_itens_cadastros in '..\fonte\uClassesNotasFiscais_itens_cadastros.pas',
+  uClassesNotasFiscais_Cobranca in '..\fonte\uClassesNotasFiscais_Cobranca.pas',
+  uClassesNotasFiscais_consts in '..\fonte\uClassesNotasFiscais_consts.pas',
+  uClassesNotasFiscais_infoadfisco in '..\fonte\uClassesNotasFiscais_infoadfisco.pas',
+  uClassesNotasFiscais_nfe in '..\fonte\uClassesNotasFiscais_nfe.pas',
+  uClassesNotasFiscais_itens_detalhes in '..\fonte\uClassesNotasFiscais_itens_detalhes.pas',
+  uCadNF_AlterarDados in '..\fonte\uCadNF_AlterarDados.pas' {frmCadNfAlterarDados},
+  uCadNF_AlterarItens in '..\fonte\uCadNF_AlterarItens.pas' {fmrCadNF_AlterarItens},
+  uCadNF_AntecipacaoST_Itens in '..\fonte\uCadNF_AntecipacaoST_Itens.pas' {frmCadNF_AntecipacaoST_Itens},
+  uGradeVoltaEstoque in '..\fonte\uGradeVoltaEstoque.pas' {frmGradeVoltaEstoque},
+  uCadNF_FretePorPeso in '..\fonte\uCadNF_FretePorPeso.pas' {frmCadNFFretePorPeso},
+  uCadNF_LancC195C197 in '..\fonte\uCadNF_LancC195C197.pas' {frmCadNFLancC195C197},
+  uCadNF_Precos in '..\fonte\uCadNF_Precos.pas' {frmCadNFPrecos},
+  uCadNf_AjustesFiscais in '..\fonte\uCadNf_AjustesFiscais.pas' {frmCadNF_AjustesFiscais},
+  uCadNF_Copiador in '..\fonte\uCadNF_Copiador.pas' {frmCadNFCopiador},
+  uClassesNotasFiscais_gerar_enviar in '..\fonte\uClassesNotasFiscais_gerar_enviar.pas',
+  uCadServicoTr_LancD195D197 in '..\fonte\uCadServicoTr_LancD195D197.pas' {frmCadServicoTr_LancD195D197},
+  uClassesNotasFiscais_agro in '..\fonte\uClassesNotasFiscais_agro.pas',
+  uCadNF_ReferenciaItem in '..\fonte\uCadNF_ReferenciaItem.pas' {FrmCadNF_ReferenciaItem},
+  uClassesNotasFiscais_Tipos in '..\fonte\uClassesNotasFiscais_Tipos.pas',
+  UFrameGrupoIbsCbsTribRegular in '..\fonte\View\Frames\NF\Tributos\UFrameGrupoIbsCbsTribRegular.pas' {FrameGrupoIbsCbsTribRegular: TFrame},
+  UFrameGrupoIbsCbsDados in '..\fonte\View\Frames\NF\Tributos\UFrameGrupoIbsCbsDados.pas' {FrameGrupoIbsCbsDados: TFrame},
+  UFrameGrupoIbsCbs in '..\fonte\View\Frames\NF\Tributos\UFrameGrupoIbsCbs.pas' {FrameGrupoIbsCbs: TFrame},
+  UFrameIbsCbs in '..\fonte\View\Frames\NF\Tributos\UFrameIbsCbs.pas' {FrameIbsCbs: TFrame},
+  UFrameGrupoIbsCbsCompraGovItem in '..\fonte\View\Frames\NF\Tributos\UFrameGrupoIbsCbsCompraGovItem.pas' {FrameGrupoIbsCbsCompraGovItem: TFrame},
+  UFrameMonofasiaIbsCbs in '..\fonte\View\Frames\NF\Tributos\UFrameMonofasiaIbsCbs.pas' {FrameMonofasiaIbsCbs: TFrame},
+  UFrameCreditoPresumidoIbsCbs in '..\fonte\View\Frames\NF\Tributos\UFrameCreditoPresumidoIbsCbs.pas' {FrameCreditoPresumidoIbsCbs: TFrame},
+  ImpostoCalculadoModelUnit in '..\fonte\View\Frames\NF\Tributos\ImpostoCalculadoModelUnit.pas',
+  uNfInteg in '..\fonte\uNfInteg.pas' {frmNfInteg};
+
+end.

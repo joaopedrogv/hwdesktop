@@ -1,0 +1,1707 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{D8DDA7B6-3603-4D19-BA14-AA3A4C8B7AD7}</ProjectGuid>
+        <ProjectVersion>18.8</ProjectVersion>
+        <FrameworkType>None</FrameworkType>
+        <MainSource>MirrorPacote.dpr</MainSource>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <TargetedPlatforms>1</TargetedPlatforms>
+        <AppType>Console</AppType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Linux64' and '$(Base)'=='true') or '$(Base_Linux64)'!=''">
+        <Base_Linux64>true</Base_Linux64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_E>false</DCC_E>
+        <DCC_N>false</DCC_N>
+        <DCC_S>false</DCC_S>
+        <DCC_F>false</DCC_F>
+        <DCC_K>false</DCC_K>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;$(DCC_Namespace)</DCC_Namespace>
+        <SanitizedProjectName>MirrorPacote</SanitizedProjectName>
+        <VerInfo_Locale>1046</VerInfo_Locale>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Linux64)'!=''">
+        <DCC_UsePackage>RESTComponents;DataSnapServerMidas;sgcWebSocketsD10_3;emsclientfiredac;DataSnapFireDAC;FireDACADSDriver;DatasnapConnectorsFreePascal;FireDACMSSQLDriver;inetdb;emsedge;FireDACIBDriver;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;ACBr_NFSeX;RESTBackendComponents;DataSnapConnectors;soapserver;bindengine;FireDACOracleDriver;CloudService;FireDACMySQLDriver;FireDACCommonODBC;FireDACCommonDriver;DataSnapClient;inet;IndySystem;FireDACDb2Driver;FireDACInfxDriver;FireDAC;emshosting;FireDACSqliteDriver;FireDACPgDriver;FireDACASADriver;FireDACTDataDriver;soaprtl;DbxCommonDriver;DataSnapServer;xmlrtl;soapmidas;DataSnapNativeClient;rtl;emsserverresource;DbxClientDriver;CustomIPTransport;bindcomp;LockBox3DR;IcsCommonD103Run;ACBr_NFSeXDanfseRL;dbxcds;FireDACODBCDriver;DataSnapIndy10ServerTransport;dsnapxml;dbrtl;FireDACMongoDBDriver;IndyProtocols;$(DCC_UsePackage)</DCC_UsePackage>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <DCC_UsePackage>DBXSqliteDriver;RESTComponents;DataSnapServerMidas;DBXDb2Driver;DBXInterBaseDriver;FmxTeeUI926;sgcWebSocketsD10_3;vclactnband;ACBr_NF3e;vclFireDAC;ZComponent;ZCore;emsclientfiredac;DataSnapFireDAC;svnui;tethering;FireDACADSDriver;xhExportDsgn260;DBXMSSQLDriver;ACBr_MDFeDamdfeRL;DatasnapConnectorsFreePascal;FireDACMSSQLDriver;vcltouch;ACBr_NFe;vcldb;bindcompfmx;svn;DBXOracleDriver;inetdb;ACBr_NFeDanfeESCPOS;ACBr_Diversos;IcsVclD103Run;emsedge;FireDACIBDriver;fmx;fmxdae;QRWRunDXE10_3_w64;vclib;FireDACDBXDriver;dbexpress;IndyCore;vclx;Python_D;ZParseSql;dsnap;DataSnapCommon;emsclient;ACBr_NFCom;FireDACCommon;ACBr_NFSeX;RESTBackendComponents;DataSnapConnectors;xhHierCubeRtl260;ACBR_DeSTDA;VCLRESTComponents;soapserver;xhCntrlsRtl260;vclie;FMXTeeDB926;bindengine;DBXMySQLDriver;FireDACOracleDriver;CloudService;FireDACMySQLDriver;DBXFirebirdDriver;ACBr_Sintegra;FireDACCommonODBC;FireDACCommonDriver;TeeUI926;DataSnapClient;ACBr_GNRE;inet;bindcompdbx;IndyIPCommon;ACBr_TCP;ACBr_CTeDacteRL;vcl;DBXSybaseASEDriver;IndyIPServer;ACBr_CTe;ACBr_NFeDanfeRL;IndySystem;FireDACDb2Driver;FMXTee926;dsnapcon;ACBr_Integrador;madExcept_;FireDACMSAccDriver;fmxFireDAC;FireDACInfxDriver;vclimg;madBasic_;ZDbc;FireDAC;ACBr_SPED;ACBr_MDFe;emshosting;ACBr_Comum;Tee926;FireDACSqliteDriver;FireDACPgDriver;ibmonitor;FireDACASADriver;ACBr_GNREGuiaRL;DBXOdbcDriver;FireDACTDataDriver;soaprtl;DbxCommonDriver;TeeDB926;ibxpress;ACBr_NFSeDanfseRL;DataSnapServer;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;vclwinx;ibxbindings;rtl;emsserverresource;DbxClientDriver;FireDACDSDriver;DBXSybaseASADriver;xhChartRtl260;CustomIPTransport;vcldsnap;madDisAsm_;DOSCommandDR;ACBr_OpenSSL;SynEditDR;bindcomp;appanalytics;ACBr_Serial;DBXInformixDriver;ZPlain;LockBox3DR;IndyIPClient;frce;bindcompvcl;IcsCommonD103Run;ACBr_NFSeXDanfseRL;dbxcds;VclSmp;ACBr_NFCeECFVirtual;adortl;FireDACODBCDriver;DataSnapIndy10ServerTransport;dsnapxml;DataSnapProviderClient;dbrtl;inetdbxpress;FireDACMongoDBDriver;IndyProtocols;GLibWMI;ACBr_NFSe;WebView4DelphiVCLRTL;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <BT_BuildType>Debug</BT_BuildType>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <DCC_ConsoleTarget>true</DCC_ConsoleTarget>
+        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+        <Manifest_File>(None)</Manifest_File>
+        <DCC_ExeOutput>..\..\bpl</DCC_ExeOutput>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <DCC_UsePackage>DBXSqliteDriver;RESTComponents;DataSnapServerMidas;DBXDb2Driver;DBXInterBaseDriver;sgcWebSocketsD10_3;vclactnband;vclFireDAC;ZComponent;ZCore;emsclientfiredac;DataSnapFireDAC;tethering;FireDACADSDriver;DBXMSSQLDriver;DatasnapConnectorsFreePascal;FireDACMSSQLDriver;vcltouch;vcldb;bindcompfmx;DBXOracleDriver;inetdb;IcsVclD103Run;emsedge;FireDACIBDriver;fmx;fmxdae;QRWRunDXE10_3_w64;vclib;FireDACDBXDriver;dbexpress;IndyCore;vclx;ZParseSql;dsnap;DataSnapCommon;emsclient;FireDACCommon;RESTBackendComponents;DataSnapConnectors;VCLRESTComponents;soapserver;vclie;bindengine;DBXMySQLDriver;FireDACOracleDriver;CloudService;FireDACMySQLDriver;DBXFirebirdDriver;FireDACCommonODBC;FireDACCommonDriver;DataSnapClient;inet;bindcompdbx;IndyIPCommon;vcl;DBXSybaseASEDriver;IndyIPServer;IndySystem;FireDACDb2Driver;dsnapcon;FireDACMSAccDriver;fmxFireDAC;FireDACInfxDriver;vclimg;ZDbc;FireDAC;emshosting;FireDACSqliteDriver;FireDACPgDriver;ibmonitor;FireDACASADriver;DBXOdbcDriver;FireDACTDataDriver;soaprtl;DbxCommonDriver;ibxpress;DataSnapServer;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;vclwinx;ibxbindings;rtl;emsserverresource;DbxClientDriver;FireDACDSDriver;DBXSybaseASADriver;CustomIPTransport;vcldsnap;DOSCommandDR;SynEditDR;bindcomp;appanalytics;DBXInformixDriver;ZPlain;LockBox3DR;IndyIPClient;bindcompvcl;IcsCommonD103Run;dbxcds;VclSmp;adortl;FireDACODBCDriver;DataSnapIndy10ServerTransport;dsnapxml;DataSnapProviderClient;dbrtl;inetdbxpress;FireDACMongoDBDriver;IndyProtocols;WebView4DelphiVCLRTL;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_ConsoleTarget>true</DCC_ConsoleTarget>
+        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
+        <DCC_Optimize>false</DCC_Optimize>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <DCC_RemoteDebug>true</DCC_RemoteDebug>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <DCC_RemoteDebug>false</DCC_RemoteDebug>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <DCC_DebugDCUs>false</DCC_DebugDCUs>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="..\Adapters\Secondary\Database\BaseDatabaseConnectionUnit.pas"/>
+        <DCCReference Include="..\Adapters\Secondary\Database\DatabaseConnectionFactoryUnit.pas"/>
+        <DCCReference Include="..\Adapters\Secondary\Database\Firebird\IBXDatabaseConnectionUnit.pas"/>
+        <DCCReference Include="..\Adapters\Secondary\Database\Firebird\IBXTransactionBaseUnit.pas"/>
+        <DCCReference Include="..\Adapters\Secondary\Database\Firebird\IBXTransactionLegacyUnit.pas"/>
+        <DCCReference Include="..\Adapters\Secondary\Database\Firebird\IBXTransactionUnit.pas"/>
+        <DCCReference Include="..\Adapters\Secondary\Database\SQLite\ZeosLibCompatibilityWithERPUnit.pas"/>
+        <DCCReference Include="..\Adapters\Secondary\Database\SQLite\ZeosLibDatabaseConnectionUnit.pas"/>
+        <DCCReference Include="..\Adapters\Secondary\Database\SQLite\ZeosLibTransactionUnit.pas"/>
+        <DCCReference Include="..\Adapters\Secondary\Files\CSVFileReaderUnit.pas"/>
+        <DCCReference Include="..\Adapters\Secondary\Repositories\AnexosRepositoryUnit.pas"/>
+        <DCCReference Include="..\Adapters\Secondary\Repositories\ItensIbptRepositoryUnit.pas"/>
+        <DCCReference Include="..\Adapters\Secondary\Repositories\MunicipiosRepositoryUnit.pas"/>
+        <DCCReference Include="..\Adapters\Secondary\Repositories\NcmsRepositoryUnit.pas"/>
+        <DCCReference Include="..\Adapters\Secondary\Services\DownloadServiceUnit.pas"/>
+        <DCCReference Include="..\Adapters\Secondary\Services\HttpJsonClient\NetHttpJsonClientUnit.pas"/>
+        <DCCReference Include="..\Core\Application\Contexts\SessionContextUnit.pas"/>
+        <DCCReference Include="..\Core\Application\Interfaces\Shared\IEnviarEmailUseCaseUnit.pas"/>
+        <DCCReference Include="..\Core\Application\OutputPorts\Shared\ValidacaoOutputUnit.pas"/>
+        <DCCReference Include="..\Core\Application\OutputPorts\Shared\ValidationEntityOutputUnit.pas"/>
+        <DCCReference Include="..\Core\Application\UseCases\Shared\EnviarEmailUseCaseUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Constants\Shared\LimitesBasicosUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Constants\Shared\VersaoAplicacaoUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Constants\Shared\ConfiguracaoRtcUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Entities\Shared\CorrelacaoFiscalNFSeEtdUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Entities\Shared\EstadoEtdUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Entities\Shared\ItemIbptEtdUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Entities\Shared\MunicipioEtdUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Entities\Shared\NcmEtdUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Ports\Services\Shared\ICalculadorBaseCalculoServiceUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Ports\Services\Shared\ICalculadorROCServiceUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Ports\Services\Shared\IDownloadServiceUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Ports\Services\Shared\IHttpJsonClientUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Ports\Shared\IAnexosRepositoryUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Ports\Shared\ICSVReaderUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Ports\Shared\IEmailServiceUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Ports\Shared\IItensIbptRepositoryUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Ports\Shared\IMunicipiosRepositoryUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Ports\Shared\INcmsRepositoryUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Ports\Shared\ISessionContextUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Services\Shared\EmailComposerServiceUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Services\Shared\IEmailComposerServiceUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Services\Shared\ITradutorErrosRtcUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Services\Shared\IZipCompressorServiceUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Services\Shared\ZipCompressorServiceUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Types\Shared\BooleanNullableUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Types\Shared\CurrencyNullableUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Types\Shared\DateAndTimeNullableUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Types\Shared\DoubleNullableUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Types\Shared\EmailConfigRemetenteEnumUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Types\Shared\IntegerNullableUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Types\Shared\StatusRegistroEnumUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Types\Shared\StringNullableUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Types\Shared\TipoComunsUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Types\Shared\TipoTributoFiscalEnumUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\ValueObjects\Shared\EmailConfigModelUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\ValueObjects\Shared\EmailMessageTypesUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\ValueObjects\Shared\EmailNFSeInputUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\ValueObjects\Shared\ValidacaoItemOutputUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\ISharedFactoryUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\SetupUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\SharedFactoryContainerUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\SharedRepoContainerUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Base\BaseClassUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Base\BaseRepositoryUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Base\BaseUseCaseUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Base\CacheableRepositoryUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Base\EntityBaseUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Base\EntityMetadataUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Cache\ObjectCacheUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Cache\SimpleRecordCacheUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Config\FileConfigUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Config\MasksConstsUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Config\SetupConfigUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Data\DataMatrixUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Data\ParameterValueUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Data\QueryResultUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Data\ScalarResultUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\DI\ContainerDFeUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\DI\ContainerEFDUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\DI\ContainerUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\DI\IServiceFactoryUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Exceptions\EValidacaoNegocioUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Interfaces\IDatabaseConnectionFactoryUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Interfaces\IDataBaseConnectionUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Interfaces\IEntityValidatorUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Interfaces\IErrorLoggerUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Interfaces\IObjectCacheUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Interfaces\IProgressObserverUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Interfaces\IRecordCacheUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Interfaces\ISimpleLoggerUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Interfaces\ISqlLoggerUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Interfaces\ITransactionUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Logging\BaseSqlLoggerUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Logging\FileErrorLoggerUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Logging\SimpleFileLoggerUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Logging\SqlConsoleLoggerUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Logging\SqlFileLoggerUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Logging\UIProgressObserverUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Services\ArrayServiceUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Services\ArredondamentoUtilsUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Services\DateTimeServiceUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Services\EntityValidatorFactoryUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Services\EnumServiceUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Services\FilesServiceUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Services\GuidServiceUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Services\NumberServiceUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Services\StringServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\ACBr\ACBrEmailServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\ACBr\ACBrNFSeAdapterTypes.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\ACBr\ACBrNFSeAdapterUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\ACBr\IACBrNFSeAdapterUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\DFeDLL\DFeDLLAdapterUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\DFeDLL\DFeDLLHeader.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\DFeDLL\LegacyDFeDLLAdapterUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Executors\NFSExecutorLegadoUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\AjustesRedBenefPcRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\ClientesRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\ConfiguracoesRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\ConsultasSqlRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\ControleCreditosRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\DFeAlertasRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\DocumentosEletronicosRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\EmpresasRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\FormasPagamentoRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\GruposFiscaisRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\InfComplementarDFeRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\NFSeRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\NotasConsumidorRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\NotasFiscaisRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\OperacoesFiscaisIbsCbsRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\OperacoesInternasRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\OpInternasComTpVendasRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\PedVendaRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\ProdutosRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\RegrasFiscaisIbsCbsRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\RegrasRedBenefPcRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\TiposServicosRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\TiposVendasRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Adapters\Secondary\Repositories\TributosDFeRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Executors\NFSExecutorNovoUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\InputPorts\ObterResumoDadosFiscaisInputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\InputPorts\ResolverRegraFiscalIbsCbsTypesUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\InputPorts\VincularOpInternasATipoVendaInputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\InputPorts\VincularTiposVendasAOpInternaInputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\InputPorts\Configuracoes\SalvarConfigNFSeInputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\InputPorts\DFe\RegistrarDFeAlertasInputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\InputPorts\EFD\ResolverAjustesEFDRedBenefPcInputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\InputPorts\NFSe\CancelarNFSeInputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\InputPorts\NFSe\ConluirNFSeInputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\InputPorts\NFSe\CriarNFSeAgrupadasInputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\InputPorts\NFSe\EmitirNFSeInputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\InputPorts\NotasFiscais\AvancarPendenciaSefazInputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\CreateEntityUseCaseOutputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\IControleCreditosRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\IFormasPagamentoRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\ObterResumoDadosFiscaisOutputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\VersaoDadosFiscaisOutputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\DFe\ResultadoExecucaoTransmissaoDFeOutputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\EFD\ObterRegistrosDeAjusteEFDRedBenefPCOutputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\Models\ControleCreditos\UpdateControleCreditoNumDocumentoCommandUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\Models\DFe\UpdateDFeRedBenefPcCalcCommandsUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\Models\FormasPagamento\UpdateFormaPagamentoVincularNFCommandsUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\Models\NotaFiscal\ConverterParaContingenciaResultUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\Models\NotaFiscal\UpdateNotaFiscalConverterParaContingenciaCommandUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\Models\NotaFiscal\UpdateNotaFiscalItemContextoRtcCommandUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\Models\NotaFiscal\UpdatePendenciaSefazAvancoCommandUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\Models\PedVenda\UpdatePedvendaEmissaoNFSeCommandsUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\Models\PedVenda\UpdatePedvendaVinculoDpsNFSeCommandUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\Models\PedVenda\UpdatePedvendaVinculoNFSeCommandsUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\Models\PedVenda\UpdatePedvendaVinculoNFSeSubstituidaCommandUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\NFSe\EmissaoLoteNFSeOutputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\NFSe\ResultadoNFSeOutputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\NFSe\RetencoesNFSeDaOSOutputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\NFSe\TributoNFSeAproximadosOutputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\NFSe\TributoNFSeIssQnOutputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\NFSe\TributoNFSePisCofinsOutputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\OutputPorts\NFSe\TributoNFSeRetenFederalOutputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NFSe\AplicarRegrasTributosNFSeServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NFSe\AtualizarSituacaoNFSeServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NFSe\EmitirNFSeServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NFSe\IAplicarRegrasTributosNFSeServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NFSe\IAtualizarSituacaoNFSeServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NFSe\IEmitirNFSeServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NFSe\IInicializarDpsServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NFSe\INFSeAnexosServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NFSe\InicializarDpsServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NFSe\IParametrosFiscaisNFSeServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NFSe\IPrepararNFSeParaEmissaoServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NFSe\NFSeAnexosServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NFSe\NFSExecutorCoordinatorUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NFSe\ParametrosFiscaisNFSeServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NFSe\PrepararNFSeParaEmissaoServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NFSe\Commands\EmitirLoteNFSeCommandUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NFSe\Commands\EmitirNFSeCommandUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NFSe\Commands\ParametrosFiscaisNFSeCommandUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NuvemHW\HashComparatorServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NuvemHW\IHashComparatorServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NuvemHW\ILocalManifestHashesServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NuvemHW\IManifestSincServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NuvemHW\LocalManifestHashesServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\NuvemHW\ManifestSincServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\RedBenefPC\ConsolidadorContextoFiscalPcServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\Services\RedBenefPC\IConsolidadorContextoFiscalPcServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\Anexos\ListarAnexosUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\CentralDadosFiscais\ObterResumoDadosFiscaisUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\CentralDadosFiscais\ObterVersaoDadosFiscaisUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\Clientes\ObterClienteUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\Configuracoes\ObterConfiguracaoNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\Configuracoes\SalvarConfiguracaoNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\DFe\ListarDFeAlertasUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\DFe\RegistrarDFeAlertasUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\Empresas\ListarEmpresasUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\FiscalDFe\ListarInfComplPorTipoPcUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\GruposFiscais\CriarGruposFiscaisDeAnexosTypes.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\GruposFiscais\CriarGruposFiscaisDeAnexosUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\GruposFiscais\ListarGruposFiscaisUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\GruposFiscais\ObterGruposFiscaisUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\GruposFiscais\RemoverGrupoFiscalUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\GruposFiscais\SalvarGrupoFiscalUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\Municipios\ListarMunicipiosUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NCMs\ObterNcmUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\AlternarNaturezaEmissaoPropiaNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\CalcularTotaisNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\CalcularTributosNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\CancelarNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\CancelarWsNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\ChecarPossivelRetencaoNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\ConcluirDoPortalNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\ConsultarEmissaoNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\ConsultarEmissaoWsNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\CriarAnexosDxNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\CriarAnexosEmailUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\CriarEmitirNFSeAgrupadasUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\EmitirNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\EmitirWsNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\EnviarEmailNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\ExcluirCancelamentoNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\ExcluirRascunhoNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\IConfiguracaoNFSeServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\ICriarAnexosEmailUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\ICriarEmitirNFSeAgrupadasUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\ImprimirNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\IniciarDpsVazioUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\IniciarSubstuicaoNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\ListarRegimesEspeciaisDeTributacaoNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\NFSeComACBrUseCaseBaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\ObterNFSeEventoUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\ObterNFSeOSsUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\ObterNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\ObterRetencoesNFSeDaOSUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\RemoverNFSeOSUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\ReverterAutorizacaoPortalNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\ReverterCancelamentoPortalNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\SalvarNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\SalvarPdfNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NFSe\ValidacaoNFSeFactoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NotaFiscal\AvancarPendenciaSefazUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NotaFiscal\ConverterNFeParaContingenciaUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NotaFiscal\ObterPendenciaNFeSefazUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NotaFiscal\ObterQuantidadePendenciasSefazUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NotaFiscal\ResolverManualmentePendenciaSefazUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NuvemHW\DownloadArquivosFiscaisTypesUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NuvemHW\ConsultasSQL\ExisteAtualizacaoConsultasSqlUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NuvemHW\ConsultasSQL\SincronizarConsultasSqlUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NuvemHW\Fiscal\ObterArquivosFiscaisModificadosUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\NuvemHW\Models\ArquivosERPConstsUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\OperacoesFiscais\ObterOperacaoFiscalIbsCbsPorIdUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\OperacoesFiscais\RemoverOperacaoFiscalIbsCbsUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\OperacoesFiscais\SalvarOperacaoFiscalIbsCbsUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\OperacoesInternas\ListarOperacoesInternasUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\OperacoesInternas\ObterOperacaoInternaPorIdUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\OperacoesInternas\RemoverOperacaoInternaUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\OperacoesInternas\SalvarOperacaoInternaUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\OpInternasComTpVendas\ListarOpIntComTpVendasUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\OpInternasComTpVendas\VincularOpInternasATipoVendaUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\OpInternasComTpVendas\VincularTiposVendasAOpInternaUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\PedVenda\ObterSituacaoEmissaoNFSeDeOrdemServUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\Produtos\AtualizarGruposFiscaisNoProdutoEmLoteUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RedBenefPC\AjusteRedBenefPcValidacaoFactoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RedBenefPC\IOperacaoPassivelDeRedBenefPcUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RedBenefPC\IRegistrarAjusteRedBenefPcUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RedBenefPC\ListarRegrasRedBenefPcUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RedBenefPC\ObterAjusteRedBenefPcPorIdUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RedBenefPC\ObterRegistrosDeAjusteEFDRedBenefPCUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RedBenefPC\ObterRegraRedBenefPcUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RedBenefPC\OperacaoPassivelDeRedBenefPcUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RedBenefPC\RegistrarAjusteRedBenefPcUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RedBenefPC\RegraRedBenefPcValidacaoFactoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RedBenefPC\RemoverAjusteRedBenefPcUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RedBenefPC\RemoverRegraRedBenefPcUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RedBenefPC\ResolverAjustesEFDRedBenefPcUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RedBenefPC\SalvarAjusteRedBenefPcUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RedBenefPC\SalvarRegraRedBenefPcUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RegrasFiscais\ListarRegrasFiscaisUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RegrasFiscais\ObterRegraFiscalIbsCbsPorIdUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RegrasFiscais\RemoverRegraFiscalIbsCbsUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RegrasFiscais\ResolverRegraFiscalIbsCbsUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RegrasFiscais\SalvarRegraFiscalIbsCbsTypesUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\RegrasFiscais\SalvarRegraFiscalIbsCbsUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\TiposServicos\AtualizarFiscalNFSeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\TiposServicos\ObterTipoServicoUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\TiposVendas\ListarTiposVendasUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\TiposVendas\ObterTiposVendasUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\TributosDFe\ListarTributosDFePorDocFiscalUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\TributosDFe\RemoverTributoDFeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Application\UseCases\TributosDFe\SalvarTributoDFeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\ClienteEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\ConfiguracaoEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\ConsultaSqlEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\EmpresaEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\GrupoFiscalEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\OperacaoFiscalIbsCbsCondicaoEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\OperacaoFiscalIbsCbsEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\OperacaoInternaEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\OpInternaComTpVendaEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\ProdutoEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\RegraFiscalIbsCbsEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\TipoServicoEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\TipoVendaEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\ControleCreditos\ControleCreditoEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\DocEletronico\DocumentoEletronicoEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\FiscalDFe\DFeAlertaEdtUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\FiscalDFe\InfComplementarDFeEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\FiscalNFSe\CodigoIndicadorOperacaoNFSeEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\FiscalNFSe\CodigoTributacaoNacionalNFSeEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\FormaPagamento\FormaPagamentoEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\NFSe\NFSeDocEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\NFSe\NFSeEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\NFSe\NFSeEventoEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\NFSe\NFSeHistoricoEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\NFSe\NFSeOSEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\NFSe\NFSeParticipanteEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\NFSe\NFSeSubstEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\NotaFiscal\NotaFiscalEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\NotaFiscal\NotaFiscalPendenciaSefEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\PedVenda\OSItemFiscalEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\RedBenefPC\AjusteRedBenefPcEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\RedBenefPC\RegraRedBenefPcEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeAjusteCompetIbsCbsEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeContextEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeCredPresOpIbsCbsEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeCredPresZfmIbsCbsEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeGrupoIbsCbsEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeIbsCbsCompraGovEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeIbsCbsEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeIbsCbsTribRegEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeImpostoSeletivoEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeMonofasiaIbsCbsEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeTransfCredIbsCbsEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Metadata\DFeAlertaMetadataUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Metadata\NFSeMetadataUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Metadata\NFSeOSMetadataUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Metadata\NFSeSubstMetadataUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Metadata\NotaFiscalMetadataUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Metadata\NotasFiscais\NotaFiscalPendenciaSefMetadataUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Metadata\RedBenefPC\AjusteRedBenefPcMetadataUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Metadata\RedBenefPC\RegraRedBenefPcMetadataUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Models\NotaFiscal\NotaFiscalItemContextoRtcModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Models\NotaFiscal\NotaFiscalPendenciaSefModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Models\NotaFiscal\NotaFiscalResumoModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Models\RedBenefPC\AjusteRedBenefPcModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\IAjustesRedBenefPcRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\IClientesRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\IConfiguracoesRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\IConsultasSqlRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\IDFeAlertasRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\IDocumentosEletronicosRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\IEmpresasRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\IGruposFiscaisRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\IInfComplementarDFeRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\INFSeRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\INFSExecutorUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\INotasConsumidorRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\INotasFiscaisRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\IOperacoesFiscaisIbsCbsRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\IOperacoesInternasRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\IOpInternasComTpVendasRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\IPedVendaRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\IProdutosRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\IRegrasFiscaisIbsCbsRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\IRegrasRedBenefPcRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\IRemoverTributoDFeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\ISalvarTributoDFeUseCaseUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\ITiposServicosRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\ITiposVendasRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Ports\ITributosDFeRepositoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\CalculoTributos\CalcularISSQNServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\CalculoTributos\CalcularPisCofinsServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\CalculoTributos\CalcularRetenFederalServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\CalculoTributos\CalcularTributosAproximadosServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\CalculoTributos\ICalcularISSQNServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\CalculoTributos\ICalcularPisCofinsServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\CalculoTributos\ICalcularRetenFederalServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\CalculoTributos\ICalcularTributosAproximadosServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\CentralDadosFiscais\AnexosServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\CentralDadosFiscais\TiposTributosServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\Configuracao\ConfigFactoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\Configuracao\IConfigReaderAndWriterUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\Configuracao\IniConfigReaderAndWriterUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Services\Shared\EstadosServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\NFSe\CalcularTributosNFSeServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\NFSe\CalculoTotaisNFSeServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\NFSe\ConfiguracaoNFSeServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\NFSe\FinalizarNFSeServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\NFSe\ICalcularTributosNFSeServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\NFSe\ICalculoTotaisNFSeServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\NFSe\IFinalizarNFSeServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\NFSe\INFSeAgrupamentoServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\NFSe\INFSeCalculoAplicadorServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\NFSe\INFSeConverterUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\NFSe\IRatearRetencoesNFSeOSServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\NFSe\NFSeAgrupamentoServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\NFSe\NFSeCalculoAplicadorServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\NFSe\NFSeConverterUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\NFSe\NFSeIbsCbsFactoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\NFSe\NFSeParticipanteFactoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\NFSe\RatearRetencoesNFSeOSServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\RedBenefPC\AplicadorRedBenefPcServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\RedBenefPC\CalcularAjusteRedBenefPcServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\RedBenefPC\CompilarRegistrosDeAjusteEFDRedBenefPCServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\RedBenefPC\IAplicadorRedBenefPcServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\RedBenefPC\ICalcularAjusteRedBenefPcServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\RedBenefPC\ICompilarRegistrosDeAjusteEFDRedBenefPCServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\RegrasFiscais\IResolverRegraFiscalIbsCbsServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\RegrasFiscais\ResolverRegraFiscalIbsCbsServiceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\TiposServicos\TipoServicoFactoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\TributosDFe\TributosDFeSerivceUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Services\TributosDFe\TributosDFeServiceTypes.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Types\ConfiguracaoTipoEnumUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Types\TipoRegraTributoDFeEnumUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Types\TipoRetencaoFederalPJEnumUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Types\TributoDFeOrigemEnumUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Types\DFe\ModelosDFeEnumUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Types\DFe\ResultadoOperacaoDFeUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Types\DFe\TipoInfComplementarEnumUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Types\NotaFiscal\FormatoImpressaoDANFeEnumUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Types\NotaFiscal\NaturezaNfEnumUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Types\NotaFiscal\SituacaoNFeEnumUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Types\NotaFiscal\StatusNfEnumUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Types\NotaFiscal\StatusResolucaoNFeSefEnumUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Types\NotaFiscal\TipoAmbienteNFeEnumUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Types\NotaFiscal\TipoEmissaoNFeEnumUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Types\NotaFiscal\TipoNfEnumUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\OpInternaTpVendaVinculoModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\PeriodoEmpresaVOUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\PeriodoMultiEmpresaVOUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\CalculoTributos\CalcularTributosAproximadosTypesUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\CalculoTributos\CalculoISSQNResultUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\CalculoTributos\CalculoPisCofinsInputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\CalculoTributos\CalculoPisCofinsResultUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\CalculoTributos\CalculoRetenFederalInputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\CalculoTributos\CalculoRetenFederalResultUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\Configuracoes\ConfigLegacyTypes.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\CalculoTributosNFSeInputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\CalculoTributosNFSeOutputUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\CertificadoDigitalConfigUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\ConfiguracaoNFSeModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\ContextoDocTribPcModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\DFeTypesUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\DpsEmitirIbsCbsNacionalModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\DpsEmitirModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\InicializarDpsModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeAtualizarSituacaoEventoTypesUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeAtualizarSituacaoTypesUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeDocModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeEventoModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeEventoResumoModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeHistoricoTypesUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeResponseTypesUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeResumoModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeTypesUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\WebServiceDFeModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\DFe\WebServiceResponseTypesUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\EFD\PISCOFINS\RegistroAjusteDetalheEFDPCVOUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\EFD\PISCOFINS\RegistroAjusteEFDPCVOUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\NFSe\CalculoTotaisNFSeTypes.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\NuvemHW\ArquivoDownloadModel.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\NuvemHW\ManifestFilesModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\Produtos\ProdutoAnexoResumoModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\Produtos\ProdutoGrupoFiscalUpdateModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\Produtos\ProdutoNcmGrupoFiscalUpdateModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\ValueObjects\TipoServico\AlteracaoFiscalNFSeModelUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Infrastructure\ErpFeaturesFactoryDFeUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Infrastructure\ErpFeaturesFactoryEFDUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Infrastructure\ErpFeaturesFactoryUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Infrastructure\ErpFeaturesRepoContainerUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\AliquotaAdRemProdutoRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\AliquotaAdValoremProdutoRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\AliquotaAdValoremServicoRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\AliquotaPadraoRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\AliquotaReferenciaRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\ClassificacaoTributariaRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\FundamentacaoClassificacaoRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\IndicadorOperacaoRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\NbsAplicavelRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\NbsRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\NcmAplicavelRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\PercentualReducaoRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\RedutorCompraGovernamentalRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\TratamentoClassificacaoRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\TratamentosTributariosRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\TributoSituacaoTributariaRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\InputPorts\Calculo\CalcularTributoInputUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\InputPorts\Calculo\CompraGovernamentalInputUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\InputPorts\Calculo\ImpostoSeletivoInputUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\InputPorts\Calculo\ItemCalculoInputUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\InputPorts\Calculo\TributacaoRegularInputUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\OutputPorts\ITratamentosTributariosRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\CBSTotalUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\IBSCBSTotalUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\IBSMunTotalUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\IBSTotalUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\IBSUFTotalUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\ImpostoSeletivoTotalUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\MonofasiaTotalUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\OperacaoConsumoModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\ROCItemDomainUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\ROCDomainUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\TributosTotaisUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\ValoresTotaisDomainUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\UseCases\BaseDeCalculo\CalcularBCIbsCbsUseCaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\UseCases\BaseDeCalculo\CalcularBCImpostoSeletivoUseCaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\UseCases\CalcularTributo\CalculaTributoUseCaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\UseCases\ClassificacoesTributarias\ListarClassificacoesTributariasUseCaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\UseCases\ClassificacoesTributarias\ObterClassificacaoTributariaIbsCbsUseCaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarIndicadorOperacaoUseCaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocalOperacaoUseCaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarSituacoesClassificacoesPorNbsUseCaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ValidarIndicadorOperacaoUseCaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\UseCases\PercentuaisDeReducao\ObterPercentualDeReducaoUseCaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\UseCases\TratamentoClassificacoes\ObterTratamentoClassificacaoUseCaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\UseCases\ValidarTributacaoItem\ValidarTributacaoUseCaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Constants\CodigosErroValidacao.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\AliquotaAdRemEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\AliquotaAdRemProdutoEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\AliquotaAdRemServicoEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\AliquotaAdValoremEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\AliquotaAdValoremProdutoEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\AliquotaAdValoremServicoEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\AliquotaPadraoEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\AliquotaReferenciaEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\AnexoEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\ClassificacaoTributariaEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\ExcecaoAdRemProdutoEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\ExcecaoAdRemServicoEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\ExcecaoAdValoremProdutoEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\ExcecaoAdValoremServicoEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\ExcecaoNbsAplicavelEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\ExcecaoNcmAplicavelEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\FundamentacaoClassificacaoEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\FundamentacaoLegalEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\IndicadorOperacaoEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\IndicadorOpNbsClassificacaoEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\ListaServicosLC116EtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\ModalidadeTributoEnumUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\NbsAplicavelEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\NbsEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\NcmAplicavelEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\PercentualReducaoEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\RedutorCompraGovernamentalEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\SituacaoTributariaEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\TipoDfeClassificacaoEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\TipoDfeEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\TipoEnteGovernamentalEnumUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\TipoOperacaoGovernamentalEnumUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\TipoTributoEnumUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\TomadorEspecificoEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\TratamentoClassificacaoEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\TratamentoTributarioEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\TributoSituacaoTributariaEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\UnidadeMedidaEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\VersaoSerproEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Ports\IAliquotaAdRemProdutoRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Ports\IAliquotaAdValoremProdutoRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Ports\IAliquotaAdValoremServicoRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Ports\IAliquotaPadraoRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Ports\IAliquotaReferenciaRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Ports\IClassificacaoTributariaRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Ports\IFundamentacaoClassificacaoRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Ports\IIndicadorOperacaoRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Ports\INbsAplicavelRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Ports\INbsRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Ports\INcmAplicavelRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Ports\IPercentualReducaoRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Ports\IRedutorCompraGovernamentalRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Ports\ITratamentoClassificacaoRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Ports\ITributoSituacaoTributariaRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\AvaliadorExpressaoAritmeticaServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\CalculadorROCServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\CalculoBaseCalculoServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\CalculoCbsIbsServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\CalculoImpostoSeletivoServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\CalculoTributoServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\ClassificacaoTributariaServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\IAvaliadorExpressaoAritmeticaServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\ICalculoBaseCalculoServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\ICalculoTributoServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\IClassificacaoTributariaServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\IPreparacaoCalculoServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\MemoriaCalculoServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\NbsAplicavelServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\NcmAplicavelServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\PreparacaoCalculoServiceInterUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\SimpleStringDictionaryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\TemplateTokenizerServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\TokenCacheServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\TokenizerServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\TradutorErrosRtcUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\AjusteCompetenciaModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\AliquotaAdRemModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\AliquotaImpostoSeletivoModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\AliquotaResultadoModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\CalcularBaseCalculoModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\CBSModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\ClassificacaoTributariaCalculoModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\ClassificacaoTributariaModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\CompraGovernamentalModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\CreditoPresumidoIBSZFMModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\CreditoPresumidoOperacaoModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\DevolucaoTributosModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\DiferimentoModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\EstornoCreditoModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\FundamentacaoClassificacaoModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\GrupoIBSCBSModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\IBSCBSCreditoPresumidoModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\IBSCBSModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\IBSMunModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\IBSUFModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\ImpostoSeletivoModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\MonofasiaDiferimentoModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\MonofasiaModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\MonofasiaPadraoModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\MonofasiaRetencaoModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\MonofasiaRetidoAnteriormenteModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\OperacaoTributacaoModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\PreparacaoResultadoUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\ReducaoAliquotaModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\ResultadoCbsIbsUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\ResultadoGrupoDiferimentoMonofasiaUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\ResultadoGrupoEtapaMonofasiaUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\ResultadoGrupoMonofasiaUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\ResultadoTributacaoRegularUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\TextTokenModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\TransferenciaCreditoModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\TratamentoClassificacaoModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\TratamentoOperacaoModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\TributacaoCompraGovernamentalModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\TributacaoRegularModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\ValueObjects\TributosModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Infrastructure\FiscalCalculosFactoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Infrastructure\FiscalRepoContainerUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.GovNFSe\Adapters\Secondary\TabelasFiscaisNFSeCsvReaderUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.GovNFSe\Core\Domain\Ports\ITabelasFiscaisNFSeReaderUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.GovNFSe\Core\Domain\Ports\ITabelasFiscaisNFSeWriterUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.GovNFSe\Core\Domain\Services\ISincronizadorFiscalNFSeServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.GovNFSe\Core\Domain\Services\SincronizadorFiscalNFSeServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.IBPT\Adapters\Secondary\IbptCsvReaderUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.IBPT\Core\Domain\Ports\IIbptReaderUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.IBPT\Core\Domain\Ports\IIbptWriterUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.IBPT\Core\Domain\Services\ISincronizadorTabelaIbptServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.IBPT\Core\Domain\Services\SincronizadorTabelaIbptServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Core\Domain\ValueObjects\CompatibilidadeRtcModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Core\Domain\ValueObjects\PublicacaoRtcModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Core\Domain\ValueObjects\AtualizacaoCalculadoraModelUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Core\Domain\ValueObjects\SincronizacaoCalculadoraLeaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Core\Domain\ValueObjects\SincronizacaoCalculadoraSnapshotUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Core\Domain\Ports\IControleVersaoCalculadoraApiUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Adapters\Secondary\ControleVersaoCalculadoraApi\ControleVersaoCalculadoraApiUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Adapters\Secondary\CalculadoraApiReader\JsonQueryResultUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Adapters\Secondary\CalculadoraApiReader\CalculadoraApiReaderUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Core\Application\UseCases\SincronizarDadosFiscais\SincronizarDadosFiscaisUseCaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Core\Domain\Ports\IDadosFiscaisReaderUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Core\Domain\Ports\IDadosFiscaisWriterUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Core\Domain\Services\ISincronizadorCalculadoraServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Core\Domain\Services\SincronizadorCalculadoraServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Core\Domain\Services\ConfiguracaoRtcFactoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Core\Domain\Services\ISincronizacaoCalculadoraLockServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Core\Domain\Services\SincronizacaoCalculadoraLockServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Core\Application\UseCases\ObterAtualizacaoCalculadora\ObterAtualizacaoCalculadoraUseCaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Core\Application\UseCases\SincronizarCalculadora\SincronizarCalculadoraUseCaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SICOMEX\Adapters\Secondary\ERPWriter\ERPWriterUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SICOMEX\Adapters\Secondary\NCMReader\NCMJsonReaderUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SICOMEX\Core\Application\InputPorts\Sincronizacao\ArquivosSICOMEXInputUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SICOMEX\Core\Domain\Ports\INcmReaderUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SICOMEX\Core\Domain\Ports\INcmWriterUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SICOMEX\Core\Domain\Services\ISincronizadorNCMsSICOMEXServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SICOMEX\Core\Domain\Services\SincronizadorNCMsSICOMEXServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SICOMEX\Core\Domain\ValueObjects\NcmSicomexModelUnit.pas"/>
+        <DCCReference Include="..\UI\Infrastructure\Components\ConsoleObserverFactoryUnit.pas"/>
+        <DCCReference Include="..\UI\Infrastructure\Services\NFSeTypesDisplayUnit.pas"/>
+        <DCCReference Include="..\UI\Infrastructure\Services\ResultadoOperacaoDFeUIMessagesUnit.pas"/>
+        <DCCReference Include="SetupMirror.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\TransferenciaCBSEnteGovEtdUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\TransferenciaCBSRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\TransferenciaCBSServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Ports\ITransferenciaCBSRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\ProcessamentoItemServiceNovoUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\RedutorCompraGovernamentalServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Infrastructure\Exceptions\EValidacaoRTCUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Ports\ISituacaoTributariaRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\SituacaoTributariaRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\SituacaoTributariaServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Services\ISituacaoTributariaServiceUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Ports\IVersaoBaseDadosRepositoryUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Adapters\Secondary\Repositories\VersaoBaseDadosRepositoryUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Ports\Services\Shared\ITokenDecryptorUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Security\TwofishTokenDecryptorUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Core\Application\UseCases\SincronizarDadosFiscais\ISincronizarDadosFiscaisUseCaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Sinc.SERPRO\Core\Application\UseCases\SincronizarCalculadora\ISincronizarCalculadoraUseCaseUnit.pas"/>
+        <DCCReference Include="..\Core\Domain\Ports\Services\Shared\ITokenEncryptorUnit.pas"/>
+        <DCCReference Include="..\Core\Infrastructure\Security\TwofishTokenEncryptorUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Infrastructure\ErpFeaturesFactoryBaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\LocalIncidenciaEnumUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Domain\Entities\LocalFornecimentoEnumUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocaisFornecimentoUseCaseUnit.pas"/>
+        <DCCReference Include="..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocaisIncidenciaUseCaseUnit.pas"/>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType>Application</Borland.ProjectType>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">MirrorPacote.dpr</Source>
+                </Source>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
+            </Delphi.Personality>
+            <Deployment Version="3">
+                <DeployFile LocalName="..\..\bpl\MirrorPacote.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>MirrorPacote.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
+                    <Platform Name="OSX32">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
+                    <Platform Name="iOSSimulator">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libpcre.dylib" Class="DependencyModule">
+                    <Platform Name="iOSSimulator">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployClass Name="AdditionalDebugSymbols">
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidClassesDexFile">
+                    <Platform Name="Android">
+                        <RemoteDir>classes</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>classes</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidFileProvider">
+                    <Platform Name="Android">
+                        <RemoteDir>res\xml</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\xml</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidGDBServer">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidLibnativeArmeabiFile">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\armeabi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidLibnativeArmeabiv7aFile">
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidLibnativeMipsFile">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\mips</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\mips</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidServiceOutput">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\arm64-v8a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidServiceOutput_Android32">
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashImageDef">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashStyles">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidSplashStylesV21">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-v21</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\values-v21</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_Colors">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_DefaultAppIcon">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon144">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon36">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-ldpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-ldpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon48">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-mdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon72">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon96">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_NotificationIcon24">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-mdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_NotificationIcon36">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_NotificationIcon48">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_NotificationIcon72">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_NotificationIcon96">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage426">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-small</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-small</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage470">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-normal</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-normal</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage640">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-large</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-large</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_SplashImage960">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xlarge</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xlarge</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_Strings">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DebugSymbols">
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DependencyFramework">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.framework</Extensions>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.framework</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="DependencyModule">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.dll;.bpl</Extensions>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Required="true" Name="DependencyPackage">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.bpl</Extensions>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="File">
+                    <Platform Name="Android">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\Resources\StartUp\</RemoteDir>
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\Resources\StartUp\</RemoteDir>
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch1024x768">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch1536x2048">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch1668">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch1668x2388">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch2048x1536">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch2048x2732">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch2224">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch2388x1668">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch2732x2048">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Launch768x1024">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch1125">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch1136x640">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch1242">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch1242x2688">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch1334">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch1792">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch2208">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch2436">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch2688x1242">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch320">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch640">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch640x1136">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch750">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Launch828">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectAndroidManifest">
+                    <Platform Name="Android">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceDebug">
+                    <Platform Name="iOSDevice32">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSDeviceResourceRules">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSEntitlements">
+                    <Platform Name="iOSDevice32">
+                        <RemoteDir>..\</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSInfoPList">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectiOSResource">
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXDebug">
+                    <Platform Name="OSX64">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXEntitlements">
+                    <Platform Name="OSX32">
+                        <RemoteDir>..\</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>..\</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXInfoPList">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOSXResource">
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\Resources</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\Resources</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Required="true" Name="ProjectOutput">
+                    <Platform Name="Android">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\arm64-v8a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSDevice64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Linux64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSX64">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectOutput_Android32">
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="ProjectUWPManifest">
+                    <Platform Name="Win32">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="UWP_DelphiLogo150">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="UWP_DelphiLogo44">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Win64">
+                        <RemoteDir>Assets</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Linux64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="OSX64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Android64" Name="$(PROJECTNAME)"/>
+            </Deployment>
+            <Platforms>
+                <Platform value="Linux64">False</Platform>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+    <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
+</Project>

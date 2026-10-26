@@ -1,0 +1,49 @@
+package pkCxlAuxiliar;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+{%TogetherDiagram 'ModelSupport_pkCxlAuxiliar\default.txaPackage'}
+
+requires
+  rtl,
+  vcl,
+  dbrtl,
+  vcldb,
+  pkbalcao,
+  PkPrestacoes,
+  pkFormPag,
+  pkPedidoVenda,
+  bdertl,
+  dcl7cr10,
+  pkEntrada,
+  pkAutomacao,
+  pkEditMoeda;
+
+contains
+  UPrincipalCxl in '..\fonte\UPrincipalCxl.pas' {FrmPrincipalCxl},
+  URelGCXL in '..\fonte\URelGCXL.pas',
+  uCCJ in '..\fonte\uCCJ.pas';
+
+end.

@@ -1,0 +1,46 @@
+package PkArquivosDig;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  vcl,
+  dbrtl,
+  ibxpress,
+  pkAtivosF,
+  PkFormulariosF,
+  pkEditHw;
+
+contains
+  UAnexoV in 'UAnexoV.pas' {FrmAnexoV},
+  UDtmArqsDig in 'UDtmArqsDig.pas' {DtmArqsDig: TDataModule},
+  UClasseAdig in 'UClasseAdig.pas',
+  UAnexoIIIDavs in 'UAnexoIIIDavs.pas',
+  UAnexoIVEst in 'UAnexoIVEst.pas' {FrmAnexoIVEst},
+  UAnexoVI in 'UAnexoVI.pas' {FrmAnexoVI},
+  uAnexoIV_cotepe_09_13 in 'uAnexoIV_cotepe_09_13.pas' {frmAnexoIV_registrosPAFECF};
+
+end.

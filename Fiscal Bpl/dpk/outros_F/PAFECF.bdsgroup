@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{EBAE72A2-BE1C-4C55-AE6A-6C988243C1CD}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  <Projects>
+      <Projects Name="CompativelHW.dll">..\..\..\Compatibilidade\CompativelHW.bdsproj</Projects>
+      <Projects Name="ManutencaoArquivoCriptografadoAuxiliar.exe">..\..\Manutencao Arquivo Criptografado\ManutencaoArquivoCriptografadoAuxiliar.bdsproj</Projects>
+      <Projects Name="ExemploEpson.exe">D:\Hw\Impressoras fiscais\Epson\InterfaceEpson_1.6.x_Exemplos\Windows\DLL_HL\DELPHI_2006\ExemploEpson.bdsproj</Projects>
+      <Projects Name="Fiscal.exe">..\..\..\Fiscal.bdsproj</Projects>
+      <Projects Name="PkFormulariosF.bpl">PkFormulariosF.bdsproj</Projects>
+      <Projects Name="pkAtivosF.bpl">pkAtivosF.bdsproj</Projects>
+      <Projects Name="pkEntradaF.bpl">pkEntradaF.bdsproj</Projects>
+      <Projects Name="pkConfigF.bpl">..\pkConfigF.bdsproj</Projects>
+      <Projects Name="PkTerminaisFF.bpl">PkTerminaisFF.bdsproj</Projects>
+      <Projects Name="pkNfSerieDF.bpl">pkNfSerieDF.bdsproj</Projects>
+      <Projects Name="PkArquivosDig.bpl">..\..\..\ArquivosDigitais\PkArquivosDig.bdsproj</Projects>
+      <Projects Name="pkTEF.bpl">..\pkTEF.bdsproj</Projects>
+      <Projects Name="pkDavF.bpl">..\pkDavF.bdsproj</Projects>
+      <Projects Name="pkFiscal.bpl">..\pkFiscal.bdsproj</Projects>
+      <Projects Name="Targets">CompativelHW.dll ManutencaoArquivoCriptografadoAuxiliar.exe Fiscal.exe PkFormulariosF.bpl pkAtivosF.bpl pkEntradaF.bpl pkConfigF.bpl PkTerminaisFF.bpl pkNfSerieDF.bpl PkArquivosDig.bpl pkTEF.bpl pkDavF.bpl pkFiscal.bpl</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+	<StarTeamAssociation></StarTeamAssociation>
+	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+</BorlandProject>

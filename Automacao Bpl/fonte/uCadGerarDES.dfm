@@ -1,0 +1,315 @@
+inherited frmCadGerarDES: TfrmCadGerarDES
+  BorderStyle = bsDialog
+  Caption = 'Exportar DES'
+  ClientHeight = 309
+  ClientWidth = 379
+  Position = poScreenCenter
+  OnClose = FormClose
+  ExplicitWidth = 385
+  ExplicitHeight = 334
+  PixelsPerInch = 96
+  TextHeight = 13
+  object pnFundo: TPanel
+    Left = 0
+    Top = 0
+    Width = 379
+    Height = 309
+    Align = alClient
+    BevelInner = bvLowered
+    TabOrder = 0
+    object gbMontagem: TGroupBox
+      Left = 2
+      Top = 2
+      Width = 375
+      Height = 167
+      Align = alTop
+      Caption = 'Dados para Montagem do Arquivo'
+      TabOrder = 0
+      object lbDataInicial: TLabel
+        Left = 22
+        Top = 32
+        Width = 57
+        Height = 13
+        Caption = 'Periodo de: '
+      end
+      object lbDataFinal: TLabel
+        Left = 183
+        Top = 32
+        Width = 15
+        Height = 13
+        Caption = 'at'#233
+      end
+      object edtDataInicial: TMaskEdit
+        Left = 85
+        Top = 29
+        Width = 76
+        Height = 21
+        EditMask = '!99/99/0000;1;_'
+        MaxLength = 10
+        TabOrder = 0
+        Text = '  /  /    '
+        OnExit = edtDataInicialExit
+      end
+      object edtDataFinal: TMaskEdit
+        Left = 227
+        Top = 29
+        Width = 76
+        Height = 21
+        EditMask = '!99/99/0000;1;_'
+        MaxLength = 10
+        TabOrder = 1
+        Text = '  /  /    '
+      end
+      object gbRegistros: TGroupBox
+        Left = 2
+        Top = 64
+        Width = 371
+        Height = 56
+        Align = alBottom
+        Caption = 'Registros'
+        TabOrder = 2
+        object cbH: TCheckBox
+          Left = 28
+          Top = 23
+          Width = 49
+          Height = 17
+          Caption = 'H'
+          Checked = True
+          Enabled = False
+          State = cbChecked
+          TabOrder = 0
+        end
+        object cbE: TCheckBox
+          Left = 83
+          Top = 23
+          Width = 49
+          Height = 17
+          Caption = 'E'
+          Checked = True
+          Enabled = False
+          State = cbChecked
+          TabOrder = 1
+        end
+        object cbD: TCheckBox
+          Left = 138
+          Top = 23
+          Width = 49
+          Height = 17
+          Caption = 'D'
+          Enabled = False
+          TabOrder = 2
+        end
+        object cbR: TCheckBox
+          Left = 189
+          Top = 23
+          Width = 49
+          Height = 17
+          Caption = 'R'
+          Checked = True
+          Enabled = False
+          State = cbChecked
+          TabOrder = 3
+        end
+        object cbT: TCheckBox
+          Left = 244
+          Top = 23
+          Width = 49
+          Height = 17
+          Caption = 'T'
+          Enabled = False
+          TabOrder = 4
+        end
+        object cbI: TCheckBox
+          Left = 299
+          Top = 23
+          Width = 49
+          Height = 17
+          Caption = 'I'
+          Enabled = False
+          TabOrder = 5
+        end
+      end
+      object pnSalvar: TPanel
+        Left = 2
+        Top = 120
+        Width = 371
+        Height = 45
+        Align = alBottom
+        BevelInner = bvLowered
+        BevelOuter = bvNone
+        TabOrder = 3
+        object sbSalvar: TSpeedButton
+          Left = 344
+          Top = 13
+          Width = 23
+          Height = 22
+          Glyph.Data = {
+            36030000424D3603000000000000360000002800000010000000100000000100
+            18000000000000030000C30E0000C30E00000000000000000000FF00FFFF00FF
+            FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFAB528DCC96BAAB528DCC96
+            BACC96BAAB528DAB528DA7CCE466B7EA66B7EA66B7EA66B7EA66B7EA66B7EAFF
+            00FFAB528DAB528DFFFFFFAB528DFFFFFFFFFFFFAB528DAB528D66B7EA66B7EA
+            66B7EA66B7EA66B7EA66B7EA66B7EAFF00FFAB528DAB528DFFFFFFFEFDFEFFFF
+            FFFFFFFFAB528DAB528D66B7EA66B7EA66B7EA66B7EA66B7EA66B7EA66B7EAFF
+            00FFAB528DAB528DAB528DAB528DAB528DAB528DAB528DAB528D66B7EA66B7EA
+            66B7EA66B7EA66B7EA66B7EA66B7EAFF00FFAB528DFFFFFFFFFFFFFFFFFFFFFF
+            FFFFFFFFFFFFFFAB528D66B7EA66B7EA66B7EA66B7EA66B7EA66B7EA66B7EAFF
+            00FFAB528DFFFFFFA6A6A6A6A6A6A6A6A6A6A6A6FFFFFFAB528D66B7EA66B7EA
+            66B7EA66B7EA66B7EA66B7EA66B7EAFF00FFAB528DFFFFFFFFFFFFFFFFFFFFFF
+            FFFFFFFFFFFFFFAB528D66B7EA66B7EA66B7EA66B7EA66B7EA66B7EA66B7EAFF
+            00FFAB528DAB528DAB528DAB528DAB528DAB528DAB528DAB528D66B7EA66B7EA
+            66B7EA66B7EA66B7EA66B7EA66B7EAFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+            FFFF00FFFF00FFFF00FF66B7E966B7EA66B7EA66B7EA66B7EA66B7EA66B7EA66
+            B7EA66B7EA66B7EA66B7EA66B7EA66B7EA66B7EA66B7E9FF00FF66B7E966B7EA
+            66B7EA66B7EA66B7EA66B7EA66B7EA66B7EA66B7EA66B7EA66B7EA66B7EA66B7
+            EA66B7EA66B7E9FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+            00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF787878787878
+            7878787878787878787878787878787878787878787878787878787878787878
+            787878787E7E7EFF00FF797979787878787878787878787878787878787878A4
+            AAAEFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFB8BCBF787878
+            787878787878787878787878AEB4B8FF00FFFF00FFFF00FFFF00FFFF00FFFF00
+            FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+            00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF}
+          OnClick = sbSalvarClick
+        end
+        object lbSalvar: TLabel
+          Left = 7
+          Top = 16
+          Width = 53
+          Height = 13
+          Caption = 'Salvar em: '
+        end
+        object edtSalvar: TEdit
+          Left = 66
+          Top = 14
+          Width = 272
+          Height = 21
+          ReadOnly = True
+          TabOrder = 0
+        end
+      end
+    end
+    object gbStatusMontagem: TGroupBox
+      Left = 2
+      Top = 169
+      Width = 375
+      Height = 104
+      Align = alTop
+      Caption = 'Status da Montagem'
+      TabOrder = 1
+      object lbStatus: TLabel
+        Left = 18
+        Top = 29
+        Width = 161
+        Height = 13
+        Caption = 'N'#227'o Iniciada  Aguardando Inicio...'
+      end
+      object lbTempo: TLabel
+        Left = 22
+        Top = 70
+        Width = 3
+        Height = 13
+      end
+      object pbTotal: TProgressBar
+        Left = 18
+        Top = 48
+        Width = 340
+        Height = 16
+        TabOrder = 0
+      end
+    end
+    object pnBotoes: TPanel
+      Left = 2
+      Top = 271
+      Width = 375
+      Height = 36
+      Align = alBottom
+      BevelInner = bvLowered
+      BevelOuter = bvNone
+      TabOrder = 2
+      object btnParar: TBitBtn
+        Left = 190
+        Top = 6
+        Width = 75
+        Height = 25
+        Caption = '&Parar'
+        TabOrder = 1
+        OnClick = btnPararClick
+        Glyph.Data = {
+          36030000424D3603000000000000360000002800000010000000100000000100
+          18000000000000030000C30E0000C30E00000000000000000000FF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+          B47C45B3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB378
+          3EB67F48FF00FFFF00FFFF00FFFF00FFB3783EB3783EB3783EB3783EB3783EB3
+          783EB3783EB3783EB3783EB3783EB3783EB3783EFF00FFFF00FFFF00FFFF00FF
+          B3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB378
+          3EB3783EFF00FFFF00FFFF00FFFF00FFB3783EB3783EB3783EB3783EB3783EB3
+          783EB3783EB3783EB3783EB3783EB3783EB3783EFF00FFFF00FFFF00FFFF00FF
+          B3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB378
+          3EB3783EFF00FFFF00FFFF00FFFF00FFB3783EB3783EB3783EB3783EB3783EB3
+          783EB3783EB3783EB3783EB3783EB3783EB3783EFF00FFFF00FFFF00FFFF00FF
+          B3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB378
+          3EB3783EFF00FFFF00FFFF00FFFF00FFB3783EB3783EB3783EB3783EB3783EB3
+          783EB3783EB3783EB3783EB3783EB3783EB3783EFF00FFFF00FFFF00FFFF00FF
+          B3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB378
+          3EB3783EFF00FFFF00FFFF00FFFF00FFB3783EB3783EB3783EB3783EB3783EB3
+          783EB3783EB3783EB3783EB3783EB3783EB3783EFF00FFFF00FFFF00FFFF00FF
+          B3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB378
+          3EB3783EFF00FFFF00FFFF00FFFF00FFB67F4AB3783EB3783EB3783EB3783EB3
+          783EB3783EB3783EB3783EB3783EB3783EB67F4AFF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF}
+      end
+      object btnIniciar: TBitBtn
+        Left = 109
+        Top = 6
+        Width = 75
+        Height = 25
+        Caption = '&Iniciar'
+        TabOrder = 0
+        OnClick = btnIniciarClick
+        Glyph.Data = {
+          36030000424D3603000000000000360000002800000010000000100000000100
+          18000000000000030000C30E0000C30E00000000000000000000FF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFB7824DCBB094FF00FFFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFB3783E
+          B3783EB57E48C8A98BFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFB3783EB3783EB3783EB3783EB47B43C5A381FF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFB3783E
+          B3783EB3783EB3783EB3783EB3783EB37940C39C76FF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFB3783EB3783EB3783EB3783EB3783EB3783EB3
+          783EB3783EB3783EC0966DFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFB3783E
+          B3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EBD8F
+          63D2C0AFFF00FFFF00FFFF00FFB3783EB3783EB3783EB3783EB3783EB3783EB3
+          783EB3783EB3783EB3783EB3783EB3783EB3783EBA8A5AD0BBA7FF00FFB3783E
+          B3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EB378
+          3EB3783EB88451CDB49CFF00FFB3783EB3783EB3783EB3783EB3783EB3783EB3
+          783EB3783EB3783EB3783EB3783EBA8A5ACFB9A4FF00FFFF00FFFF00FFB3783E
+          B3783EB3783EB3783EB3783EB3783EB3783EB3783EB3783EBD9064D3C1AFFF00
+          FFFF00FFFF00FFFF00FFFF00FFB3783EB3783EB3783EB3783EB3783EB3783EB3
+          783FC0976FFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFB3783E
+          B3783EB3783EB3783EB37A41C39E7AFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFB3783EB3783EB47C45C7A584FF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFB6804A
+          CAAC8FFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF}
+      end
+    end
+  end
+  object SaveDialog1: TSaveDialog
+    Filter = 'Arquivo de Texto|*.txt'
+    Left = 312
+    Top = 232
+  end
+  object tmrStatus: TTimer
+    Enabled = False
+    OnTimer = tmrStatusTimer
+    Left = 344
+    Top = 232
+  end
+end

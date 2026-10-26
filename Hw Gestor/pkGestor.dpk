@@ -1,0 +1,54 @@
+package pkGestor;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+{%TogetherDiagram 'ModelSupport_pkGestor\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_pkGestor\UprincipalGestor\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_pkGestor\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_pkGestor\UprincipalGestor\default.txvpck'}
+
+requires
+  rtl,
+  PkFormularios,
+  pkAtivos,
+  vcl,
+  pkEntrada,
+  PkGestorChilds,
+  pkMargem,
+  dbrtl,
+  dcl7cr10,
+  designide,
+  xmlrtl,
+  vclactnband,
+  vclx,
+  bdertl,
+  vcldb,
+  VclSmp;
+
+contains
+  UprincipalGestor in 'fontes\UprincipalGestor.pas' {FrmPrincipalGestor},
+  URelCrystal in '..\Automacao Bpl\fonte\URelCrystal.pas';
+
+end.

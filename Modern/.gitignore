@@ -1,0 +1,74 @@
+# --- Binários e Arquivos Compilados ---
+*.exe
+*.dll
+*.bpl
+*.dcp
+*.dcu
+*.map
+*.dres
+*.rsm
+*.tds
+*.lib
+*.obj
+*.res
+
+# --- Arquivos de Configuração Local e Cache (Específicos do Usuário) ---
+*.local
+*.identcache
+*.projdata
+*.tvsconfig
+*.dsk
+*.bdsproj.local
+
+# --- Backups Automáticos do Delphi ---
+*.~*
+__history/
+__recovery/
+
+# --- Outros arquivos temporários ---
+*.cfg
+*.dof
+*.skincfg
+
+# --- Arquivos temporarios criados pela Extensão do VSCode ---
+GPATH
+GRTAGS
+GTAGS
+.vscode/GTEMP.pas
+
+# --- Arquivos/Diretorios de AI's ---
+.aider
+.aider.chat.history.md
+.aider.input.history
+.aider-desk/extensions/*
+.aider.tags.cache.v4/*
+--aider-editor=code --wait
+
+# --- Setups de ferramentas de IA gerados ---
+/.agents/
+/.aider-desk/
+/.kilo/
+/.opencode/
+/.codex/
+/docs/ia-assistida/setups-de-ferramentas/models.local.json
+/.ai-runs/
+
+# --- Arquivos com segredos de acesso ---
+Tests/ERP.IntegrationTests/resources/test-config.json
+
+# --- Arquivos com controle de versão desnecessário ---
+temp-dpr.txt
+
+# --- Diretórios com controle de versão desnecessário ---
+/docs/ia-assistida/temporary/
+/package/Modern.code-workspace
+/package/MirrorPacote.res
+/package/MirrorPacote.zip
+/package/pkModern.res
+/Scripts/Prompts/
+# /Scripts/SQL/
+/Tests/ERP.IntegrationTests/Win32/
+/Tests/ERP.UnitTests/Win32/
+/Tests/Fiscal.Calculos.Tests/Win32/
+/Tests/TestResults/
+/tmp/

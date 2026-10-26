@@ -1,0 +1,82 @@
+package pkVeiculosCCIA;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  vcl,
+  dbrtl,
+  vcldb,
+  dsnap,
+  vclx,
+  ibxpress,
+  DelPrint2006,
+  VclSmp,
+  designide,
+  xmlrtl,
+  vclactnband,
+  pkAtivos,
+  PkFormularios,
+  pkCadastrosBasicos,
+  pkClientes,
+  pkFormPag,
+  BarcodeRunD2006,
+  QRBarcodeRunD2006,
+  pkNF,
+  pkEditMoeda,
+  pkEditHw;
+
+contains
+  UClassesVeiculosCCIA in '..\fonte\UClassesVeiculosCCIA.pas',
+  UCadVeiculosCCIA in '..\fonte\UCadVeiculosCCIA.pas' {FrmCadVeiculosCCIA},
+  UDemonstracaoVeiculosCCIA in '..\fonte\UDemonstracaoVeiculosCCIA.pas' {frmDemonstracaoVeiculosCCIA},
+  UDtmVeiculosCCIA in '..\fonte\UDtmVeiculosCCIA.pas' {DtmVeiculosCCIA},
+  UReservaVeiculosCCIA in '..\fonte\UReservaVeiculosCCIA.pas' {FrmReservaVeiculosCCIA},
+  UCadModVeiculosCCIA in '..\fonte\UCadModVeiculosCCIA.pas' {FrmCadModVeiculosCCIA},
+  UMovVeiculosCCIA in '..\fonte\UMovVeiculosCCIA.pas' {frmMovVeiculosCCIA},
+  uCadEstMotosCCIA in '..\fonte\uCadEstMotosCCIA.pas' {frmEstMotosCCIA},
+  UTransDepVeiculosCCIA in '..\fonte\UTransDepVeiculosCCIA.pas' {frmTransDepVeiculosCCIA},
+  UEntradaCCIA in '..\fonte\UEntradaCCIA.pas' {frmEntradaCCIA},
+  USaidaCCIA in '..\fonte\USaidaCCIA.pas' {frmSaidaCCIA},
+  UTipoVendaCCIA in '..\fonte\UTipoVendaCCIA.pas' {frmTipoVendaCCIA},
+  UDadosReaisVeiculosCCIA in '..\fonte\UDadosReaisVeiculosCCIA.pas' {FrmDadosReaisVeiculosCCIA},
+  UImpressaoContratosCCIA in '..\fonte\UImpressaoContratosCCIA.pas' {frmImpressaoContratosCCIA},
+  uCadEstMotosOutrasEmpCCIA in '..\fonte\uCadEstMotosOutrasEmpCCIA.pas' {frmEstMotosOutrasEmpCCIA},
+  UVisualizarContratosCCIA in '..\fonte\UVisualizarContratosCCIA.pas' {FrmVisualizarContratosCCIA},
+  UTipoSaidaCCIA in '..\fonte\UTipoSaidaCCIA.pas' {FrmTipoSaidaCCIA},
+  uCadNFTransitoCCIA in '..\fonte\uCadNFTransitoCCIA.pas' {frmCadNFTransitoCCIA},
+  UTransitoVeiculosCCIA in '..\fonte\UTransitoVeiculosCCIA.pas' {FrmTransitoVeiculosCCIA},
+  uCadFilaReservaCCIA in '..\fonte\uCadFilaReservaCCIA.pas' {frmCadFilaReservaCCIA},
+  UAvariaCCIA in '..\fonte\UAvariaCCIA.pas' {frmAvariaCCIA},
+  UCompraContratoVeiculosCCIA in '..\fonte\UCompraContratoVeiculosCCIA.pas' {FrmCompraContratoVeiculosCCIA},
+  UReciboVeiculosCCIA in '..\fonte\UReciboVeiculosCCIA.pas' {frmReciboVeiculosCCIA},
+  UImprimirReciboVeiculosCCIA in '..\fonte\UImprimirReciboVeiculosCCIA.pas' {frmImprimirReciboVeiculosCCIA},
+  UConfirmarReciboVeiculosCCIA in '..\fonte\UConfirmarReciboVeiculosCCIA.pas' {frmConfirmarReciboVeiculosCCIA},
+  uReservasVencidas in '..\fonte\uReservasVencidas.pas' {frmReservasVencidas};
+
+end.
+
+

@@ -1,0 +1,83 @@
+package pkBalcao;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+{%TogetherDiagram 'ModelSupport_pkbalcao\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UPendBalcao\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UPendOficina\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UVendaVeiculo\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UClassesPend\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UPendVeiculos\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UPendVeic\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UIncLancAv\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UDetContrl\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UpendRec\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UFecDia\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UResumoCXL\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\ULancCxl\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UDtmBalcao\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UClassesPend\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UpendRec\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UVendaVeiculo\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UIncLancAv\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UDtmBalcao\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\ULancCxl\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UDetContrl\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UResumoCXL\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UPendBalcao\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UFecDia\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UPendVeic\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UPendOficina\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_pkbalcao\UPendVeiculos\default.txvpck'}
+
+requires
+  rtl,
+  vcl,
+  dbrtl,
+  vcldb,
+  pkAtivos,
+  pkFormPag,
+  PkFormularios,
+  pkPedidoVenda,
+  pkNF;
+
+contains
+  UPendBalcao in '..\fonte\UPendBalcao.pas' {FrmPendBalcao},
+  UDtmBalcao in '..\fonte\UDtmBalcao.pas' {DtmBalcao: TDataModule},
+  UPendOficina in '..\fonte\UPendOficina.pas' {FrmPendOficina},
+  UClassesPend in '..\fonte\UClassesPend.pas',
+  UPendVeiculos in '..\fonte\UPendVeiculos.pas' {FrmPendVeic},
+  UPendVeic in '..\fonte\UPendVeic.pas' {FrmPendCcia},
+  UpendRec in '..\fonte\UpendRec.pas' {FrmPendRec},
+  UFecDia in '..\fonte\UFecDia.pas' {FrmFecDia},
+  UResumoCXL in '..\fonte\UResumoCXL.pas' {FrmResumoCXL},
+  ULancCxl in '..\fonte\ULancCxl.pas' {frmLancCXL},
+  UIncLancAv in '..\fonte\UIncLancAv.pas' {FrmincLancAv},
+  UDetContrl in '..\fonte\UDetContrl.pas' {FrmDetContrl},
+  UVendaVeiculo in '..\fonte\UVendaVeiculo.pas' {FrmVendaMoto},
+  UMensagens in '..\fonte\UMensagens.pas' {FrmMensagem};
+
+end.

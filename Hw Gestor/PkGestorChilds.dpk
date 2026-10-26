@@ -1,0 +1,106 @@
+package PkGestorChilds;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UClassesGestor\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UMetas\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UdtmGestorHw\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\Ufinanceiros\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UvisualizadorOLAP\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UCustosGestor\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UPainelControl\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\Ufinanceiros\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UMetas\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UClassesGestor\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UPainelControl\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UdtmGestorHw\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UvisualizadorOLAP\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UCustosGestor\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\Udepreciacao\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UEnsaiosDescontos\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UVisualizavinculosDpto\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UCotacaoCompraVenda\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UCtSalGestor\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UFopag\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\URelatorio\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UcadDNAEmpresa\default.txaPackage'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UVisualizavinculosDpto\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UCotacaoCompraVenda\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UCtSalGestor\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UFopag\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\URelatorio\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UcadDNAEmpresa\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\Udepreciacao\default.txvpck'}
+{%TogetherDiagram 'ModelSupport_PkGestorChilds\UEnsaiosDescontos\default.txvpck'}
+
+requires
+  rtl,
+  pkAtivos,
+  PkFormularios,
+  vcl,
+  tee,
+  xhCntrls100,
+  xhChart100,
+  xhStd100,
+  vclx,
+  dbrtl,
+  vcldb,
+  ibxpress,
+  dsnap,
+  xhDsgn100,
+  dcldb,
+  vcldesigner,
+  designide,
+  xmlrtl,
+  vclactnband,
+  dclstd,
+  xhExport100,
+  QR5RunD2006,
+  vcljpg,
+  bdertl,
+  pkEquipamentos,
+  pkMargem;
+
+contains
+  UMetas in 'fontes\UMetas.pas' {FrmMetas},
+  UdtmGestorHw in 'fontes\UdtmGestorHw.pas' {DtmGestorHw: TDataModule},
+  UClassesGestor in 'fontes\UClassesGestor.pas',
+  UCustosGestor in 'fontes\UCustosGestor.pas' {FrmCustos},
+  UPainelControl in 'fontes\UPainelControl.pas' {FrmPainelControl},
+  Ufinanceiros in 'fontes\Ufinanceiros.pas' {FrmFinanceiros},
+  URelatorio in 'fontes\URelatorio.pas' {FrmRelatorio},
+  UFopag in 'fontes\UFopag.pas' {FrmFopag},
+  UCtSalGestor in 'fontes\UCtSalGestor.pas' {FrmContasSalario},
+  Udepreciacao in 'fontes\Udepreciacao.pas' {FrmDepreciacao},
+  UEnsaiosDescontos in 'fontes\UEnsaiosDescontos.pas' {FrmEnsaiosDescontos},
+  UCotacaoCompraVenda in 'fontes\UCotacaoCompraVenda.pas' {FrmSugestCompraVenda},
+  UVisualizavinculosDpto in 'fontes\UVisualizavinculosDpto.pas' {FrmVisualDpto},
+  uCadListaCotacao in 'fontes\uCadListaCotacao.pas' {frmCadListaCotacao},
+  uCadAtributos in 'fontes\uCadAtributos.pas' {frmCadAtributos},
+  uRelDREComparativo in 'fontes\uRelDREComparativo.pas' {frmRelDREComparativo};
+
+end.

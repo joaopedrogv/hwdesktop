@@ -1,0 +1,908 @@
+inherited frmManutencaoInventario: TfrmManutencaoInventario
+  Caption = 
+    'Manuten'#231#227'o do Invent'#225'rio para o SPED Fiscal (Bloco H) e/ou Sinte' +
+    'gra(Tipo 88 STES e STITNF)'
+  ClientHeight = 552
+  ClientWidth = 856
+  Font.Name = 'Tahoma'
+  Position = poScreenCenter
+  OnClose = FormClose
+  ExplicitWidth = 872
+  ExplicitHeight = 590
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Panel1: TPanel
+    Left = 0
+    Top = 0
+    Width = 856
+    Height = 511
+    Align = alClient
+    BevelOuter = bvNone
+    BorderWidth = 6
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 0
+    object Splitter1: TSplitter
+      Left = 6
+      Top = 113
+      Width = 844
+      Height = 3
+      Cursor = crVSplit
+      Align = alTop
+      ExplicitWidth = 304
+    end
+    object Splitter2: TSplitter
+      Left = 6
+      Top = 397
+      Width = 844
+      Height = 3
+      Cursor = crVSplit
+      Align = alBottom
+      ExplicitTop = 116
+      ExplicitWidth = 284
+    end
+    object GroupBox1: TGroupBox
+      Left = 6
+      Top = 6
+      Width = 844
+      Height = 107
+      Align = alTop
+      Caption = 'Consulta'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 0
+      object Panel3: TPanel
+        Left = 2
+        Top = 15
+        Width = 840
+        Height = 26
+        Align = alTop
+        BevelOuter = bvNone
+        TabOrder = 0
+        object Label1: TLabel
+          Left = 16
+          Top = 8
+          Width = 76
+          Height = 13
+          Caption = 'Data Inventario'
+        end
+        object Label3: TLabel
+          Left = 197
+          Top = 8
+          Width = 102
+          Height = 13
+          Caption = 'Descri'#231#227'o do Produto'
+        end
+        object edDataInventario: TMaskEdit
+          Left = 95
+          Top = 5
+          Width = 73
+          Height = 21
+          EditMask = '!99/99/0000;1;_'
+          MaxLength = 10
+          TabOrder = 0
+          Text = '31/12/2016'
+        end
+        object edDescricaoProduto: TEdit
+          Left = 306
+          Top = 5
+          Width = 311
+          Height = 21
+          TabOrder = 1
+          Text = 'edDescricaoProduto'
+        end
+        object BitBtn4: TBitBtn
+          Left = 707
+          Top = 1
+          Width = 106
+          Height = 25
+          Hint = 'Consultar Invent'#225'rio - [SPED107]'
+          Caption = 'Consultar'
+          TabOrder = 2
+          OnClick = BitBtn4Click
+          Glyph.Data = {
+            36050000424D3605000000000000360400002800000010000000100000000100
+            08000000000000010000320B0000320B000000010000000100005A6B7300AD7B
+            73004A637B00EFBD8400B58C8C00A5948C00C6948C00B59C8C00BD9C8C00F7BD
+            8C00BD949400C6949400CE949400C69C9400CEAD9400F7CE9400C6A59C00CEA5
+            9C00D6A59C00C6AD9C00CEAD9C00D6AD9C00F7CE9C00F7D69C004A7BA500CEAD
+            A500D6B5A500DEBDA500F7D6A500DEBDAD00DEC6AD00E7C6AD00FFDEAD00FFE7
+            AD00CEB5B500F7DEB500F7E7B500FFE7B500FFEFB500D6BDBD00DED6BD00E7DE
+            BD00FFE7BD006B9CC600EFDEC600FFEFC600FFF7C600F7E7CE00FFF7CE00F7EF
+            D600F7F7D600FFF7D600FFFFD6002184DE00F7F7DE00FFFFDE001884E700188C
+            E700FFFFE700188CEF00218CEF00B5D6EF00F7F7EF00FFF7EF00FFFFEF00FFFF
+            F700FF00FF004AB5FF0052B5FF0052BDFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0042020A424242
+            424242424242424242422B39180B42424242424242424242424243443C180B42
+            4242424242424242424242444438180B42424242424242424242424244433918
+            0A424242424242424242424242444335004201101A114242424242424242453D
+            05072F343434291942424242424242221A2D34343437403E0442424242424206
+            231C303437404146284242424242421B210F30373A414140310D42424242421F
+            20032434373A3A37321342424242421D25030F2D37373737311042424242420D
+            2D2D1C162430333429424242424242421E463F0F0316252E0842424242424242
+            4227312D21252314424242424242424242420E141B1B42424242}
+        end
+      end
+      object Panel4: TPanel
+        Left = 2
+        Top = 41
+        Width = 840
+        Height = 64
+        Align = alClient
+        BevelOuter = bvNone
+        BorderWidth = 6
+        TabOrder = 1
+        object edListaNCM: TMemo
+          Left = 95
+          Top = 6
+          Width = 739
+          Height = 52
+          Align = alClient
+          Lines.Strings = (
+            'Memo1')
+          TabOrder = 0
+        end
+        object Panel5: TPanel
+          Left = 6
+          Top = 6
+          Width = 89
+          Height = 52
+          Align = alLeft
+          BevelOuter = bvNone
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 1
+          object Label2: TLabel
+            Left = 34
+            Top = 3
+            Width = 47
+            Height = 13
+            Caption = 'Lista NCM'
+          end
+        end
+      end
+    end
+    object GroupBox2: TGroupBox
+      Left = 6
+      Top = 116
+      Width = 844
+      Height = 281
+      Align = alClient
+      Caption = 'Mercadorias do Invent'#225'rio'
+      TabOrder = 1
+      object DBGrid1: TDBGrid
+        Left = 2
+        Top = 42
+        Width = 840
+        Height = 237
+        Align = alClient
+        DataSource = dtmSPED.dsManutInv
+        Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit]
+        PopupMenu = PopupMenu1
+        TabOrder = 0
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -11
+        TitleFont.Name = 'Tahoma'
+        TitleFont.Style = []
+        OnCellClick = DBGrid1CellClick
+        OnDrawColumnCell = DBGrid1DrawColumnCell
+        OnDblClick = DBGrid1DblClick
+        OnKeyDown = DBGrid1KeyDown
+        OnMouseUp = DBGrid1MouseUp
+        OnTitleClick = DBGrid1TitleClick
+        Columns = <
+          item
+            Expanded = False
+            FieldName = 'NUM_FAB_PROD'
+            Width = 100
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'DESCR_PROD'
+            Width = 300
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'QUANTIDADE'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'VALOR_PROD'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'CUSTO_TOTAL'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'NCM'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'TP_ARQ_FISCAL'
+            Width = 64
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'H020_CST'
+            Width = 64
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'H020_BC_ICMS'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'H020_VL_ICMS'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'GRUPO_PROD'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'COD_PROD'
+            Width = 64
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'SEL'
+            Width = 64
+            Visible = True
+          end>
+      end
+      object Panel6: TPanel
+        Left = 2
+        Top = 15
+        Width = 840
+        Height = 27
+        Align = alTop
+        BevelOuter = bvNone
+        TabOrder = 1
+        object SpeedButton1: TSpeedButton
+          Left = 6
+          Top = 1
+          Width = 23
+          Height = 22
+          Hint = 'Selecionar registro'
+          Glyph.Data = {
+            92010000424D9201000000000000920000002800000010000000100000000100
+            08000000000000010000120B0000120B0000170000001700000000000000FFFF
+            FF00FF00FF00004B0000098611000C9C19000A8615000C9518000D931A000F9E
+            1C000F991C000E9D1D000F9D1E0011A4220011A02100139224001CB135001CA1
+            340024BC430029B548002EC6520035CA5E0039D4650002020202020202020202
+            0202020202020202020202020202020202020202020202020202020303020202
+            0202020202020202020203090C03020202020202020202020203100D050E0302
+            02020202020202020314120F03080B030202020202020203151611030203060A
+            0302020202020202031303020202020307030202020202020203020202020202
+            0304030202020202020202020202020202020303020202020202020202020202
+            0202020303020202020202020202020202020202020202020202020202020202
+            0202020202020202020202020202020202020202020202020202020202020202
+            02020202020202020202020202020202020202020202}
+          OnClick = SpeedButton1Click
+        end
+        object SpeedButton2: TSpeedButton
+          Left = 35
+          Top = 1
+          Width = 23
+          Height = 22
+          Hint = 'Remover sele'#231#227'o'
+          Glyph.Data = {
+            86010000424D8601000000000000860000002800000010000000100000000100
+            08000000000000010000120B0000120B0000140000001400000000000000FFFF
+            FF00FF00FF00CACACA00C4C4C400BFBFBF00B5B5B500ABABAB00A5A5A5009E9E
+            9E009C9C9C009A9A9A0099999900989898009797970094949400939393008C8C
+            8C008A8A8A006565650002020202020202020202020202020202020202020202
+            020202020202020202020202020202131302020202020202020202020202130B
+            0B1302020202020202020202021307090E0A130202020202020202021305060D
+            130F0C130202020202020213040308130213110D130202020202020213061302
+            0202021310130202020202020213020202020202131213020202020202020202
+            0202020202021313020202020202020202020202020202131302020202020202
+            0202020202020202020202020202020202020202020202020202020202020202
+            0202020202020202020202020202020202020202020202020202020202020202
+            02020202020202020202}
+          OnClick = SpeedButton2Click
+        end
+        object SpeedButton3: TSpeedButton
+          Left = 80
+          Top = 1
+          Width = 23
+          Height = 22
+          Hint = 'Selecionar todos os registros'
+          Glyph.Data = {
+            CE010000424DCE01000000000000CE0000002800000010000000100000000100
+            08000000000000010000120B0000120B0000260000002600000000000000FFFF
+            FF00FF00FF00A4262600BA414100BB444400BD4A4A00BD4B4B00BF4E4E00C050
+            5000C0515100C1535300C1545400C55C5C00CB6C6C00CF777700D17D7D00D483
+            8300004B0000098611000C9C19000A8615000C9518000D931A000F9E1C000F99
+            1C000E9D1D000F9D1E0011A4220011A02100139224001CB135001CA1340024BC
+            430029B548002EC6520035CA5E0039D465000202020202020202020202020202
+            0202020202020202020202020202020202020202020202021212020202020202
+            0202020202020212181B120202020202020202020202121F1C141D1202020202
+            02020202021223211E12171A1202020202020202122425201202121519120202
+            02020202021222120A03020212161202020202020203120C080B030202121312
+            02020202030F0E0803070903020202121202020310110D030203050803020202
+            12120202030E0302020202030603020202020202020302020202020203040302
+            0202020202020202020202020202030302020202020202020202020202020203
+            030202020202020202020202020202020202}
+          OnClick = SpeedButton3Click
+        end
+        object SpeedButton4: TSpeedButton
+          Left = 109
+          Top = 1
+          Width = 23
+          Height = 22
+          Hint = 'Remover todas as sele'#231#245'es'
+          Glyph.Data = {
+            AA010000424DAA01000000000000AA0000002800000010000000100000000100
+            08000000000000010000120B0000120B00001D0000001D00000000000000FFFF
+            FF00FF00FF00CACACA00C4C4C400BFBFBF00BCBCBC00B8B8B800B5B5B500AEAE
+            AE00ABABAB00A5A5A500A4A4A4009F9F9F009E9E9E009D9D9D009C9C9C009B9B
+            9B009A9A9A009999990098989800979797009494940093939300929292008C8C
+            8C008A8A8A007A7A7A0065656500020202020202020202020202020202020202
+            02020202020202020202020202020202020202021C1C02020202020202020202
+            0202021C12121C02020202020202020202021C0A0E15101C0202020202020202
+            021C0508141C16131C020202020202021C04030B1C021C19141C020202020202
+            021C081C0F1B02021C171C0202020202021B1C0D110E1B02021C1A1C02020202
+            1B0809111B13101B0202021C1C02021B07060C1B021B16111B0202021C1C0202
+            1B091B020202021B141B020202020202021B0202020202021B181B0202020202
+            020202020202020202021B1B0202020202020202020202020202021B1B020202
+            0202020202020202020202020202}
+          OnClick = SpeedButton4Click
+        end
+        object DBText1: TDBText
+          Left = 143
+          Top = 4
+          Width = 87
+          Height = 17
+          DataField = 'DATA_INV'
+          DataSource = dtmSPED.dsManutInv
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object Label7: TLabel
+          Left = 236
+          Top = 4
+          Width = 29
+          Height = 13
+          Caption = 'Filtros'
+        end
+        object Label9: TLabel
+          Left = 479
+          Top = 4
+          Width = 23
+          Height = 13
+          Caption = 'CST:'
+        end
+        object ckF02: TCheckBox
+          Left = 271
+          Top = 4
+          Width = 34
+          Height = 17
+          Caption = '02'
+          TabOrder = 0
+          OnClick = ckF02Click
+        end
+        object ckF03: TCheckBox
+          Left = 311
+          Top = 3
+          Width = 34
+          Height = 17
+          Caption = '03'
+          TabOrder = 1
+          OnClick = ckF02Click
+        end
+        object ckF04: TCheckBox
+          Left = 351
+          Top = 3
+          Width = 34
+          Height = 17
+          Caption = '04'
+          TabOrder = 2
+          OnClick = ckF02Click
+        end
+        object ckF05: TCheckBox
+          Left = 391
+          Top = 3
+          Width = 34
+          Height = 17
+          Caption = '05'
+          TabOrder = 3
+          OnClick = ckF02Click
+        end
+        object ckF88: TCheckBox
+          Left = 431
+          Top = 3
+          Width = 34
+          Height = 17
+          Caption = '88'
+          TabOrder = 4
+          OnClick = ckF02Click
+        end
+        object edFCST: TEdit
+          Left = 508
+          Top = 0
+          Width = 29
+          Height = 21
+          TabOrder = 5
+          Text = 'edFCST'
+          OnChange = edFCSTChange
+        end
+        object ckFCondicional: TCheckBox
+          Left = 551
+          Top = 4
+          Width = 114
+          Height = 17
+          Caption = 'Condicional OU'
+          TabOrder = 6
+          OnClick = ckF02Click
+        end
+      end
+    end
+    object GroupBox3: TGroupBox
+      Left = 6
+      Top = 400
+      Width = 844
+      Height = 105
+      Align = alBottom
+      Caption = 'Altera'#231#245'es'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 2
+      ExplicitLeft = 4
+      ExplicitTop = 401
+      object Label4: TLabel
+        Left = 331
+        Top = 16
+        Width = 47
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'CST ICMS'
+      end
+      object Label5: TLabel
+        Left = 285
+        Top = 36
+        Width = 93
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Base de Calc. ICMS'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+      end
+      object Label6: TLabel
+        Left = 326
+        Top = 56
+        Width = 52
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Valor ICMS'
+      end
+      object Bevel1: TBevel
+        Left = 275
+        Top = 16
+        Width = 15
+        Height = 80
+        Shape = bsLeftLine
+      end
+      object Label8: TLabel
+        Left = 333
+        Top = 75
+        Width = 45
+        Height = 13
+        Hint = 
+          'Aliquota para calcular o Valor do ICMS quando usar o Custo como ' +
+          'Base de Calculo'
+        Alignment = taRightJustify
+        Caption = 'Aliq ICMS'
+      end
+      object ckTp88: TCheckBox
+        Left = 9
+        Top = 81
+        Width = 98
+        Height = 17
+        Caption = 'Tipo 88 Sintegra'
+        TabOrder = 4
+      end
+      object ckTp02: TCheckBox
+        Left = 9
+        Top = 16
+        Width = 144
+        Height = 17
+        Caption = 'Tipo 02 H005 Sped Fiscal'
+        TabOrder = 0
+      end
+      object ckTp03: TCheckBox
+        Left = 9
+        Top = 32
+        Width = 144
+        Height = 17
+        Caption = 'Tipo 03 H005 Sped Fiscal'
+        TabOrder = 1
+      end
+      object ckTp04: TCheckBox
+        Left = 9
+        Top = 48
+        Width = 144
+        Height = 17
+        Caption = 'Tipo 04 H005 Sped Fiscal'
+        TabOrder = 2
+      end
+      object ckTp05: TCheckBox
+        Left = 9
+        Top = 64
+        Width = 144
+        Height = 17
+        Caption = 'Tipo 05 H005 Sped Fiscal'
+        TabOrder = 3
+      end
+      object edCST: TEdit
+        Left = 384
+        Top = 13
+        Width = 57
+        Height = 19
+        Ctl3D = False
+        ParentCtl3D = False
+        TabOrder = 6
+        Text = 'edCST'
+      end
+      object edBaseICMS: TEditHw
+        Left = 384
+        Top = 33
+        Width = 57
+        Height = 19
+        Ctl3D = False
+        ParentCtl3D = False
+        TabOrder = 7
+        Text = '         0,00'
+        OnExit = edAliqICMSExit
+        Formato = fNumber
+        FormatSize = '0.2'
+      end
+      object edValorICMS: TEditHw
+        Left = 384
+        Top = 53
+        Width = 57
+        Height = 19
+        Ctl3D = False
+        ParentCtl3D = False
+        TabOrder = 8
+        Text = '         0,00'
+        OnExit = edAliqICMSExit
+        Formato = fNumber
+        FormatSize = '0.2'
+      end
+      object BitBtn1: TBitBtn
+        Left = 159
+        Top = 16
+        Width = 106
+        Height = 80
+        Hint = 'Alterar dados do Invent'#225'rio - [SPED108]'
+        Caption = 'Aplicar Tipos'
+        TabOrder = 5
+        OnClick = BitBtn1Click
+        Glyph.Data = {
+          F6060000424DF606000000000000360000002800000018000000180000000100
+          180000000000C0060000C40E0000C40E00000000000000000000FF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF50A75B5C8E62
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF1B
+          B33009A41C00B71776917AFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FF44B5531BB73122B2351CAC2F10AE26AD9DABFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FFFF00FF6BB57429CF4331C2462DBF4329BA3E1DBF33509259FF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FF83B58A33E14D40D2573ED0543CCD5137C94C
+          32C3461AC634B1A3AFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF89AF8D3CEB584CDE6349DC6048
+          DC5F31D74C43D3593ED05438D350399E48FF00FFFF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF70A87647F76455E8
+          6E53E66C51E96B3FD155C5D3C63AE45346D85D44D55B33E44D818E83FF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF54B260
+          53FE715AEB7259EB7158F0723EDD56FF00FFFF00FF67DA774CE5654CE0644BDF
+          622EC045AD9DABFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FF8DC5944FF96C59EB7259EC7259F47441D959FF00FFFF00FFFF00FFFF00FF
+          3DE75954E76C51E46A4DF469528D5AFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FF4FF96C31DC4C4BE4664BF0664CC85EFF00FFFF00FFFF
+          00FFFF00FFFF00FF89DA9553F26F56EA6E55E76F3EEA58A297A1FF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF4FF96C69CF7598C49CFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF46E15D59EE7359EC725CF67639
+          AD4AAD9DABFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFBADFBE4AF1
+          665AED735AEC7355FF726B856CFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FF63D47353EC6D58EB715CEF753EE459AD9DABFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FF38D8504FE16854E56B5AF4753EAB4D
+          AD9DABFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFBBDEBF2ED44948
+          D95F4DDD654CF768608564FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FF6DCA793FCD553BCD5243D35B35DE4F9D929AFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FF3EBF5051C96442C7563ACE5227B23BCDB8
+          C9FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF32BC4632BC464FC460
+          52C7644CD66240914AAD9DABFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FF8FCD9535B84A48BE584AC15C45D45B628565FF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FF50BA5D3AB34C42B85345BB5636C74B879088FF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF2BAB3B37AF493DB2
+          4E3DB75047A352FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+          32BC4620A63121A73429AA3A32BC46FF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FF32BC46FF00FFFF00FFFF00FF}
+        Layout = blGlyphTop
+      end
+      object BitBtn2: TBitBtn
+        Left = 709
+        Top = 16
+        Width = 106
+        Height = 80
+        Hint = 'Alterar dados do Invent'#225'rio - [SPED108]'
+        Caption = 'Aplicar ICMS'
+        TabOrder = 16
+        OnClick = BitBtn2Click
+        Glyph.Data = {
+          F6060000424DF606000000000000360000002800000018000000180000000100
+          180000000000C0060000C40E0000C40E00000000000000000000FF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF50A75B5C8E62
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF1B
+          B33009A41C00B71776917AFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FF44B5531BB73122B2351CAC2F10AE26AD9DABFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FFFF00FF6BB57429CF4331C2462DBF4329BA3E1DBF33509259FF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FF83B58A33E14D40D2573ED0543CCD5137C94C
+          32C3461AC634B1A3AFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF89AF8D3CEB584CDE6349DC6048
+          DC5F31D74C43D3593ED05438D350399E48FF00FFFF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF70A87647F76455E8
+          6E53E66C51E96B3FD155C5D3C63AE45346D85D44D55B33E44D818E83FF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF54B260
+          53FE715AEB7259EB7158F0723EDD56FF00FFFF00FF67DA774CE5654CE0644BDF
+          622EC045AD9DABFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FF8DC5944FF96C59EB7259EC7259F47441D959FF00FFFF00FFFF00FFFF00FF
+          3DE75954E76C51E46A4DF469528D5AFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FF4FF96C31DC4C4BE4664BF0664CC85EFF00FFFF00FFFF
+          00FFFF00FFFF00FF89DA9553F26F56EA6E55E76F3EEA58A297A1FF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF4FF96C69CF7598C49CFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF46E15D59EE7359EC725CF67639
+          AD4AAD9DABFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFBADFBE4AF1
+          665AED735AEC7355FF726B856CFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FF63D47353EC6D58EB715CEF753EE459AD9DABFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FF38D8504FE16854E56B5AF4753EAB4D
+          AD9DABFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFBBDEBF2ED44948
+          D95F4DDD654CF768608564FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FF6DCA793FCD553BCD5243D35B35DE4F9D929AFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FF3EBF5051C96442C7563ACE5227B23BCDB8
+          C9FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF32BC4632BC464FC460
+          52C7644CD66240914AAD9DABFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FF8FCD9535B84A48BE584AC15C45D45B628565FF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FF50BA5D3AB34C42B85345BB5636C74B879088FF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+          FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF2BAB3B37AF493DB2
+          4E3DB75047A352FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+          32BC4620A63121A73429AA3A32BC46FF00FFFF00FFFF00FFFF00FFFF00FFFF00
+          FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+          00FFFF00FFFF00FFFF00FFFF00FF32BC46FF00FFFF00FFFF00FF}
+        Layout = blGlyphTop
+      end
+      object ckCustoComoBase: TCheckBox
+        Left = 454
+        Top = 27
+        Width = 185
+        Height = 17
+        Caption = 'Usar Custo como Base de Calculo'
+        TabOrder = 11
+        OnClick = ckCustoComoBaseClick
+      end
+      object edAliqICMS: TEditHw
+        Left = 384
+        Top = 73
+        Width = 57
+        Height = 19
+        Hint = 
+          'Aliquota para calcular o Valor do ICMS quando usar o Custo como ' +
+          'Base de Calculo'
+        Ctl3D = False
+        ParentCtl3D = False
+        TabOrder = 9
+        Text = '         0,00'
+        OnExit = edAliqICMSExit
+        Formato = fNumber
+        FormatSize = '0.2'
+      end
+      object ckFatorConversao: TCheckBox
+        Left = 454
+        Top = 43
+        Width = 185
+        Height = 17
+        Caption = 'Usar fator de conversao para BC'
+        Ctl3D = True
+        ParentCtl3D = False
+        TabOrder = 12
+        OnClick = ckFatorConversaoClick
+      end
+      object edFatorConversao: TEditHw
+        Left = 637
+        Top = 42
+        Width = 61
+        Height = 19
+        Hint = 
+          'Fator de convers'#227'o que ser'#225' multipicado ao custo para obter a ba' +
+          'se de ICMS'
+        Ctl3D = False
+        ParentCtl3D = False
+        TabOrder = 13
+        Text = '          0,00'
+        OnExit = edAliqICMSExit
+        Formato = fNumber
+        FormatSize = '0.2'
+      end
+      object ckMVAConversao: TCheckBox
+        Left = 454
+        Top = 59
+        Width = 177
+        Height = 17
+        Caption = 'Usar MVA para conversao da BC'
+        Ctl3D = True
+        ParentCtl3D = False
+        TabOrder = 14
+        OnClick = ckMVAConversaoClick
+      end
+      object ckUsarAliquotaInternaProd: TCheckBox
+        Left = 454
+        Top = 74
+        Width = 227
+        Height = 17
+        Caption = 'Usar Aliquota da mercadoria para calculo'
+        Ctl3D = True
+        ParentCtl3D = False
+        TabOrder = 15
+        OnClick = ckCustoComoBaseClick
+      end
+      object ckUsarCSTDoCadastro: TCheckBox
+        Left = 454
+        Top = 12
+        Width = 227
+        Height = 17
+        Caption = 'Usar CST do cadastro da mercadoria'
+        Ctl3D = True
+        ParentCtl3D = False
+        TabOrder = 10
+        OnClick = ckCustoComoBaseClick
+      end
+    end
+  end
+  object Panel2: TPanel
+    Left = 0
+    Top = 511
+    Width = 856
+    Height = 41
+    Align = alBottom
+    BevelKind = bkTile
+    BevelOuter = bvNone
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 1
+    object BitBtn3: TBitBtn
+      Left = 715
+      Top = 6
+      Width = 106
+      Height = 25
+      Caption = 'Sair'
+      TabOrder = 0
+      OnClick = BitBtn3Click
+      Glyph.Data = {
+        2E020000424D2E020000000000002E0100002800000010000000100000000100
+        08000000000000010000120B0000120B00003E0000003E00000000000000FFFF
+        FF00FF00FF00BB410000BB420000FFF6EF00E69C5900E69D5900E9A36200FFF4
+        EA00FFF8F200FECA9500FFCE9C00FFD4A900FEEBD800FEF0E200FFF2E500FFF3
+        E700FFFBF700FECE9C00FED3A500FED5AA00FEDAB400FFDCB600FEDDB800FEDD
+        BA00FFE3C500FEE2C400FFE5C900FFE6CA00FEE5CA00FFEBD500FEF3E700FFDA
+        AD00FFEAD100FFFAF400FFD8A700FFD9A900FFDAAB00FFE1B800FFE7C700FEEE
+        D900FFFBF600FFDCAC00FFE1B500FFE7C400FFEFD700FFEAC200FFFAEA00FFFE
+        FB00FFFFFA00FFFFFE00315EFF002A56FF00123BFF00153DFF001841FF001A44
+        FF001D47FF00072BFF00001EFF00000D66000202020202020202020202020202
+        0202020202020202020202020202020202020204040404040404040404040402
+        020202040132302E28272125242F04020202020401050F221B1614130B260402
+        0202020401310A101F1A170D0C2B04020202020401013323110E1C18152C0402
+        02020204010101332A20291D192D040202020204010101010112093D1E2E043D
+        020202040101010101013D363D013D3C3D020204080606060606073D373D3B3D
+        0202020203040404040404043D383D0202020202020202020202023D353D393D
+        020202020202020202023D343D023D3A3D020202020202020202023D0202023D
+        020202020202020202020202020202020202}
+    end
+  end
+  object PopupMenu1: TPopupMenu
+    Left = 704
+    Top = 352
+    object ExportarparaoExcel1: TMenuItem
+      Caption = 'Exportar para o Excel'
+      OnClick = ExportarparaoExcel1Click
+    end
+  end
+end

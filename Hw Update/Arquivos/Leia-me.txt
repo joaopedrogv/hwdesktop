@@ -1,0 +1,80 @@
+Este arquivo possui as instruções para uso do HwUpdate.
+
+Estrutura do Hw Update
+
+	1 - O arquivo modelo.zip possui um modelo dos diretórios que o HwUpdate pode atualizar, e um arquivo de texto "versao.hw" que tem a versão e data do sistema
+
+	2 - Colocar os arquivos nos diretorios especificos que o HwUpdate irá copiar os mesmo para o diretório instalado no computador do cliente.
+
+	3 - O arquivo "reg.txt" serve para o HwUpdate registrar as dll's que nele estiverem descritas, após a cópia dos arquivos, o sistema irá ler em cada diretório
+		este arquivo "reg.txt" está e para cada linha encontrada no arquivo o sistema tentará efetuar o registro da dll. 
+		Veja como preencher o arquivo no exemplo "reg.txt" no mesmo diretório deste arquivo
+
+	4 - O arquivo "exec.txt" serve para o HwUpdate executar arquivos específicos que nele estiverem descritos, após o registro das dll's o sistema irá ler em cada
+		diretório este arquivo "exec.txt" está e para cada linha encontrada o sistema irá executar o arquivo descrito. Este arquivo serve para chamar xuxadores, etC
+		Veja como preencher o arquivo no exemplo "exec.txt" no mesmo diretório deste arquivo
+	
+	5 - Para atualizar o HwUpdate colocar o novo executavel "HwUpdate", dll "cons40Up.dll", e demais arquivos que forem necessários dentro da pasta "atualizador"
+
+	6 - Para compactar o arquivo com as atualizações utilizar um compactador que use a encriptação AES 256, por exemplo o 7-zip, sempre compactar de dentro da pasta onde
+		estão os aquivos.
+
+Funcionamento
+
+	1 - Apenas uma instancia do HwUpdate é executada por vez
+	2 - O HwGuardUp.exe serve para deixar o HwUpdate sempre funcionando e atualiza-lo quando necessário
+	3 - O HwUpdate fica na barra de tarefas próximo ao relógio podendo ser chamado sem necessidade da Suite Hw.
+	4 - O sistema HW comunica-se com o HwUpdate passando a versão atual do sistema em execução
+	5 - O HwUpdate na sua tela principal contém:
+		Situação da atualização, versões e datas
+		Opção para configuração, Esta pode ser feita de duas formas:
+			1 - Stand Alone: Cada computador deverá efetuar sua própria atualização. Dados das versoes salvas no registro do windows
+			2 - Não Stand Alone: Apenas um computador irá fazer o download e extração de arquivos, deixando assim disponível para instalação. Dados das versoes em banco de dados
+
+		Opção para atualizar a qualquer momento via internet caso tenha nova versão disponível
+		Opção para atualizar a qualquer momento via arquivo zip no formato acima
+		Opção para instalar o sistema disponível
+		Opção para montar arquivo para instalação offline, caso algum computador não tenha internet para baixar sua própria instalação
+		Opção para visualizar o histórico de atualização de toda a empresa
+	
+	6 - Todo dia o HwUpdate efetua uma consulta no webservice da Hw a procura de uma nova versão
+	7 - Sempre após uma atualização 1 dia depois é enviado um status da atualização para o web service da Hw
+	8 - O log de cada atualização é salva em banco de dados no registro de cada versao.
+	9 - O arquivo zip de atualização aceita senhas no padrão das senhas da Hw sistemas de ate 32 caracteres
+	10 - A versao do arquivo deve sempre conter 4 digitos, zeros a esquerda, salvo quando forem feitas correções dentro da própria versão colocar o caracter 
+		underline "_". Ex: "0401", correção da versao anterior: "0401_1", "0401_2". O próprio sistema faz a formatação. Ex: 4.0.1, 4.0.1.1, 4.0.1.2
+	11 - Sempre vai existir 1 computador responsavel pela verificação da versão no webservice da Hw. Caso tenha dado a hora de verificar a versao e este computador
+		não o faça, qualquer computador depois de 2 horas poderá fazer a consulta e o download.
+	12 - O HwUpdate utiliza a tabela CONFIG_HWUPDATE para armazenar suas configurações, quando configurado como Stand Alone no registro fica salvo apenas versao e status
+	13 - O HwUpdate utiliza a tabela VERSAO_HW para armazernar os dados de cada versao do sistema que foi atualizada, quando configurado como Stand Alone estes dados ficam
+		no registro do windows por computador
+
+
+Futuramente
+        Possibilidade de executar arquivos com a extensao .reg, para registrar varias chaves no registro do windows,
+        verificar necessidade.
+
+        ShellExecute(Handle, nil, PChar('C:\file.reg'), nil, nil,SW_SHOWNORMAL)
+
+procedure ExecFile(F: String);
+var
+ r: String;
+begin
+ case ShellExecute(Handle, nil, PChar(F), nil, nil,SW_SHOWNORMAL) of
+  ERROR_FILE_NOT_FOUND: r := 'O arquivo especificado não foi encontrado ou não existe. (CD-ROM ERROR)';
+  ERROR_PATH_NOT_FOUND: r := 'O Caminho é inválido ou não existe. (CD-ROM ERROR)';
+  ERROR_BAD_FORMAT: r := 'O Aplicativo está corrompido ou não é um Aplicativo Win32 válido. (POWERPNT.EXE ERROR)';
+  SE_ERR_ACCESSDENIED: r := 'O sistema negou acesso a este arquivo por algum motivo desconhecido. (Bloqueio de Compartilhamento do sistema NTFS do WinNT)';
+  SE_ERR_ASSOCINCOMPLETE: r := 'Este arquivo tem uma associação inválida ou incompleta a ele. (Erro de Registro do Windows)';
+  SE_ERR_DDEBUSY: r := 'A transação DDE não pode ser efetuada por já haver outra Transação DDE em andamento. (Feche todos os arquivos PowerPoint, e execute novamente)';
+  SE_ERR_DDEFAIL: r := 'Não foi possível efetuar a transação DDE. (Reinstale o PowerPoint)';
+  SE_ERR_DDETIMEOUT: r := 'A transação DDE não pode ser efetuada porque o tempo requerido expirou. (Reinicie o Computador)';
+  SE_ERR_DLLNOTFOUND: r := 'Uma Biblioteca DLL necessária ào aplicativo associado não foi encontrada. (Reinstale o PowerPoint)';
+  SE_ERR_NOASSOC: r := 'Este arquivo não tem nenhum aplicativo associado à ele. (Reinstale o PowerPoint)';
+  SE_ERR_OOM: r := 'memória insuficiente para prosseguir com esta operação. (Feche um ou mais aplicativos e tente novamente)';
+  SE_ERR_SHARE: r := 'Ocorreu uma violação de compartilhamento ao efetuar esta operação.';
+ else
+  Exit;
+end;
+ ShowMessage(r);
+end;

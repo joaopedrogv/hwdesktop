@@ -1,0 +1,68 @@
+Duvidas
+1) ( X ) - O barramento automatico no cheque testa antes de incluir um novo. Testar tambem no Credito?
+        R: Sim
+2) ( X ) - Pode melhorar este controle de barramento automatico. Parece meios esquesito. Pode causar erro caso no config
+        a variavel dos controle de barramento esteja errada.
+        R: Sim. Colocar campo no cadastro da empresa(Funcionalidade 4) e no cadastro do controle (Funcionalidade 3)
+3) ( X ) - Como funciona esta negativação automatica. Em todo novo cadastro é feita a negativação. ( É criado um controle
+        de inadimplentes e quando utilizado o cliente será barrado automaticamente?)
+        R: Sim. É criado o controle. Ex:(Juridico, Cheques Devolvidos). Quando é feito o cadastro o cliente é barrado
+        automaticamente. E quando é feito outro cadastro de creditos ou cheques e o cliente nao possuir nenhum cadastro
+        em um dos controles barrados o mesmo é automaticamente desbarrado
+4) ( X ) - Pode selecionar apenas os Controles S1 para cheques e S2 para creditos, ou tem alguma outra finalidade poder
+        selecionar outro tipo de controle.
+        R: Selecionar apenas os S1 para cheques e S2 para creditos
+5) ( X ) - Deixar o cliente alterar o nome do cliente que tenha codigo informado?
+        R: Se informar o codigo nao deixar alterar
+6) ( X ) - Porque o campo de numero da venda é desabilitado na inserção do credito e fica habilitado na edição?
+        R: Deixar o campo alterado tambem na inserção
+7) (   ) - Quando usar a baixa com o valor_C. Nao seria interessante jogar o a diferenca do valor_corr no desconto.
+8) (   ) - Ver este valor corrigido, pois nas baixa parciais o valor fica acumulando maior que o credito quando o valor
+        corrigido maior que o credito
+9) (   ) - Qual a finalidade de marcar o registro para devolução? Pesquisa ou quando for receber avisar?
+
+Funcionalidades de outros pacotes
+1) ( X ) - Chamar a inclusão das contas bancarias direto do pacote de seu cadastro. Passar como parametro o codigo do
+        cheque para que a propria classe faça a validação e inclusão.
+2) ( X ) - Talvez fazer um metodo que receba como parametro o dataset ou atributos para pesquisa da conta bancaria. Talvez
+        seja desnecessário pois existe a pesquisa rápida que é usada.
+3) ( X ) - No cadastro de controles criar o campo de barramento Automatico
+        (BARRAR_AUTOMATICO CHAR(1) DEFAULT 'N')
+4) ( X ) - No cadastro da empresa criar o campo para ativar o barramento automatico
+        (USAR_BARRAMENTO_AUTOMATICO CHAR(1) DEFAULT 'N')
+
+Pendencias
+1) ( X ) - Ver o funcionamento da mudança da propriedade transaction do componente quer da classe de lancamentos do
+        pkImport... Criei um metodo que altera o transaction dos componentes.
+2) ( X ) - Fazer o lançamento de Juros e Descontos
+3) ( X ) - Fazer os lançamentos e baixas de recibos.
+4) ( X ) - Fazer o estorno de creditos.
+5) ( X ) - Valor_C = 0 . Valor_CORR > 0 . Quando faz a baixa parcial no valor_CORR nao esta quitando o documento, ficando tudo zerado.
+6) ( X ) - Criar campo de valor original do credito para nunca ser alterado
+7) ( X ) - Colocar botao Selecionar todos e desmarcar todos.
+8) ( X ) - Fazer a impressao de recibos
+9) ( X ) - Fazer a replicacao dos creditos no momento do cadastro e da baixa dos creditos.
+10)( X ) - Colocar o campo valor_liquido. que sera o valor do credito. quando for cartao sera o valor do credito menos a taxa
+11)( X ) - Colocar percentual do cartao no controle. para fazer o calculo acima
+12)( X ) - No processamento ja fazer o calculo do valor_liquido
+13)( X ) - Definir lotes como no recebimento para as transferencias de controles e para as voltas para o ativo (ver se tem como)
+14)( X ) - No cancelamento da baixa de recibos esta cancelando os primeiros registros, ficando o recibo com o valor errado.
+15)( X ) - Fazer a volta de valor do recibo no hist_rec e zerar o valor do recibo quando a baixa for total.
+16)( X ) - Colocar o numero do recibo na visualizacao do dos detalhes da forma de pagamento que é aberta pela venda.
+17)( X ) - Ver na mudanca de controle ou volta para o ativo para nao jogar o valor_liquido
+18)( X ) - Testar o recebimento no cxl quando for estornar o lote de creditos.
+19)( X ) - Ao mudar de ch F11 para cr F12 ou vice versao as vezes o grid fica errado.
+20)( X ) - Conferir todas as pendenicias das folhas ( status no relatorio ).
+21)( X ) - Fazer os testes gerais, lembrar da devolucao
+22)( X ) - Fazer os testes de cobertura do AQTime.
+
+
+Idéias
+1) - Talvez deixa um lugar no formulário para o usuário definir se vai deixar o campo de pesquisa sendo o ultimo informado
+        ou o padrão definido no cadastro da empresa
+
+Novidades
+
+1) ( X ) - No apagamento de contas, gravar no historico da auditoria o numero do documento
+
+

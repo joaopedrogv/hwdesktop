@@ -1,0 +1,44 @@
+package pkProducao;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+{%File 'pkProducao_INFO.txt'}
+
+requires
+  rtl,
+  pkAtivos,
+  pkClientes,
+  vcl,
+  vcldb,
+  dbrtl,
+  PkFormularios;
+
+contains
+  UCadProducao in '..\fonte\UCadProducao.pas' {frmCadProducao},
+  UDtmProducao in '..\fonte\UDtmProducao.pas' {dtmProducao: TDataModule},
+  UClassesProducao in '..\fonte\UClassesProducao.pas',
+  uCadFormulaProd in '..\fonte\uCadFormulaProd.pas' {frmCadFormulaProd};
+
+end.

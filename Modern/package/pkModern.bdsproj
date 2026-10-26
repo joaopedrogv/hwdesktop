@@ -1,0 +1,889 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Delphi.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{D58C71EA-96DE-4310-93FC-DAC3A60616D5}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Delphi.Personality>
+		<Source>
+			<Source Name="MainSource">pkModern.dpk</Source>
+		</Source>
+		<FileVersion>
+			<FileVersion Name="Version">7.0</FileVersion>
+		</FileVersion>
+		<Compiler>
+			<Compiler Name="A">8</Compiler>
+			<Compiler Name="B">0</Compiler>
+			<Compiler Name="C">1</Compiler>
+			<Compiler Name="D">1</Compiler>
+			<Compiler Name="E">0</Compiler>
+			<Compiler Name="F">0</Compiler>
+			<Compiler Name="G">1</Compiler>
+			<Compiler Name="H">1</Compiler>
+			<Compiler Name="I">1</Compiler>
+			<Compiler Name="J">0</Compiler>
+			<Compiler Name="K">0</Compiler>
+			<Compiler Name="L">1</Compiler>
+			<Compiler Name="M">0</Compiler>
+			<Compiler Name="N">1</Compiler>
+			<Compiler Name="O">1</Compiler>
+			<Compiler Name="P">1</Compiler>
+			<Compiler Name="Q">0</Compiler>
+			<Compiler Name="R">0</Compiler>
+			<Compiler Name="S">0</Compiler>
+			<Compiler Name="T">0</Compiler>
+			<Compiler Name="U">0</Compiler>
+			<Compiler Name="V">1</Compiler>
+			<Compiler Name="W">0</Compiler>
+			<Compiler Name="X">1</Compiler>
+			<Compiler Name="Y">1</Compiler>
+			<Compiler Name="Z">1</Compiler>
+			<Compiler Name="ShowHints">True</Compiler>
+			<Compiler Name="ShowWarnings">True</Compiler>
+			<Compiler Name="UnitAliases">WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;</Compiler>
+			<Compiler Name="NamespacePrefix"></Compiler>
+			<Compiler Name="GenerateDocumentation">False</Compiler>
+			<Compiler Name="DefaultNamespace"></Compiler>
+			<Compiler Name="SymbolDeprecated">True</Compiler>
+			<Compiler Name="SymbolLibrary">True</Compiler>
+			<Compiler Name="SymbolPlatform">True</Compiler>
+			<Compiler Name="SymbolExperimental">True</Compiler>
+			<Compiler Name="UnitLibrary">True</Compiler>
+			<Compiler Name="UnitPlatform">True</Compiler>
+			<Compiler Name="UnitDeprecated">True</Compiler>
+			<Compiler Name="UnitExperimental">True</Compiler>
+			<Compiler Name="HResultCompat">True</Compiler>
+			<Compiler Name="HidingMember">True</Compiler>
+			<Compiler Name="HiddenVirtual">True</Compiler>
+			<Compiler Name="Garbage">True</Compiler>
+			<Compiler Name="BoundsError">True</Compiler>
+			<Compiler Name="ZeroNilCompat">True</Compiler>
+			<Compiler Name="StringConstTruncated">True</Compiler>
+			<Compiler Name="ForLoopVarVarPar">True</Compiler>
+			<Compiler Name="TypedConstVarPar">True</Compiler>
+			<Compiler Name="AsgToTypedConst">True</Compiler>
+			<Compiler Name="CaseLabelRange">True</Compiler>
+			<Compiler Name="ForVariable">True</Compiler>
+			<Compiler Name="ConstructingAbstract">True</Compiler>
+			<Compiler Name="ComparisonFalse">True</Compiler>
+			<Compiler Name="ComparisonTrue">True</Compiler>
+			<Compiler Name="ComparingSignedUnsigned">True</Compiler>
+			<Compiler Name="CombiningSignedUnsigned">True</Compiler>
+			<Compiler Name="UnsupportedConstruct">True</Compiler>
+			<Compiler Name="FileOpen">True</Compiler>
+			<Compiler Name="FileOpenUnitSrc">True</Compiler>
+			<Compiler Name="BadGlobalSymbol">True</Compiler>
+			<Compiler Name="DuplicateConstructorDestructor">True</Compiler>
+			<Compiler Name="InvalidDirective">True</Compiler>
+			<Compiler Name="PackageNoLink">True</Compiler>
+			<Compiler Name="PackageThreadVar">True</Compiler>
+			<Compiler Name="ImplicitImport">True</Compiler>
+			<Compiler Name="HPPEMITIgnored">True</Compiler>
+			<Compiler Name="NoRetVal">True</Compiler>
+			<Compiler Name="UseBeforeDef">True</Compiler>
+			<Compiler Name="ForLoopVarUndef">True</Compiler>
+			<Compiler Name="UnitNameMismatch">True</Compiler>
+			<Compiler Name="NoCFGFileFound">True</Compiler>
+			<Compiler Name="ImplicitVariants">True</Compiler>
+			<Compiler Name="UnicodeToLocale">True</Compiler>
+			<Compiler Name="LocaleToUnicode">True</Compiler>
+			<Compiler Name="ImagebaseMultiple">True</Compiler>
+			<Compiler Name="SuspiciousTypecast">True</Compiler>
+			<Compiler Name="PrivatePropAccessor">True</Compiler>
+			<Compiler Name="UnsafeType">False</Compiler>
+			<Compiler Name="UnsafeCode">False</Compiler>
+			<Compiler Name="UnsafeCast">False</Compiler>
+			<Compiler Name="OptionTruncated">True</Compiler>
+			<Compiler Name="WideCharReduced">True</Compiler>
+			<Compiler Name="DuplicatesIgnored">True</Compiler>
+			<Compiler Name="UnitInitSeq">True</Compiler>
+			<Compiler Name="LocalPInvoke">True</Compiler>
+			<Compiler Name="MessageDirective">True</Compiler>
+			<Compiler Name="CodePage"></Compiler>
+		</Compiler>
+		<Linker>
+			<Linker Name="MapFile">0</Linker>
+			<Linker Name="OutputObjs">0</Linker>
+			<Linker Name="GenerateHpps">False</Linker>
+			<Linker Name="ConsoleApp">1</Linker>
+			<Linker Name="DebugInfo">False</Linker>
+			<Linker Name="RemoteSymbols">False</Linker>
+			<Linker Name="GenerateDRC">False</Linker>
+			<Linker Name="MinStackSize">16384</Linker>
+			<Linker Name="MaxStackSize">1048576</Linker>
+			<Linker Name="ImageBase">4194304</Linker>
+			<Linker Name="ExeDescription"></Linker>
+		</Linker>
+		<Directories>
+			<Directories Name="OutputDir"></Directories>
+			<Directories Name="UnitOutputDir">..\..\dcu</Directories>
+			<Directories Name="PackageDLLOutputDir">..\..\bpl</Directories>
+			<Directories Name="PackageDCPOutputDir">..\..\dcp</Directories>
+			<Directories Name="SearchPath"></Directories>
+			<Directories Name="Packages"></Directories>
+			<Directories Name="Conditionals">ZDB_OFF;INTF_OFF</Directories>
+			<Directories Name="DebugSourceDirs"></Directories>
+			<Directories Name="UsePackages">False</Directories>
+		</Directories>
+		<Parameters>
+			<Parameters Name="RunParams">pkAutomacao TfrmPrincipalS</Parameters>
+			<Parameters Name="HostApplication">..\..\bpl\HwSistemas.exe</Parameters>
+			<Parameters Name="Launcher"></Parameters>
+			<Parameters Name="UseLauncher">False</Parameters>
+			<Parameters Name="DebugCWD"></Parameters>
+			<Parameters Name="Debug Symbols Search Path"></Parameters>
+			<Parameters Name="LoadAllSymbols">True</Parameters>
+			<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+		</Parameters>
+		<Language>
+			<Language Name="ActiveLang"></Language>
+			<Language Name="ProjectLang">$00000000</Language>
+			<Language Name="RootDir"></Language>
+		</Language>
+		<VersionInfo>
+			<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+			<VersionInfo Name="AutoIncBuild">False</VersionInfo>
+			<VersionInfo Name="MajorVer">1</VersionInfo>
+			<VersionInfo Name="MinorVer">0</VersionInfo>
+			<VersionInfo Name="Release">0</VersionInfo>
+			<VersionInfo Name="Build">0</VersionInfo>
+			<VersionInfo Name="Debug">False</VersionInfo>
+			<VersionInfo Name="PreRelease">False</VersionInfo>
+			<VersionInfo Name="Special">False</VersionInfo>
+			<VersionInfo Name="Private">False</VersionInfo>
+			<VersionInfo Name="DLL">False</VersionInfo>
+			<VersionInfo Name="Locale">1046</VersionInfo>
+			<VersionInfo Name="CodePage">1252</VersionInfo>
+		</VersionInfo>
+		<VersionInfoKeys>
+			<VersionInfoKeys Name="CompanyName"></VersionInfoKeys>
+			<VersionInfoKeys Name="FileDescription"></VersionInfoKeys>
+			<VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+			<VersionInfoKeys Name="InternalName"></VersionInfoKeys>
+			<VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys>
+			<VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys>
+			<VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys>
+			<VersionInfoKeys Name="ProductName"></VersionInfoKeys>
+			<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+			<VersionInfoKeys Name="Comments"></VersionInfoKeys>
+		</VersionInfoKeys>
+	</Delphi.Personality>
+	<CheckinList>
+    ..\Adapters\Secondary\Database\BaseDatabaseConnectionUnit.pas;
+    ..\Adapters\Secondary\Database\DatabaseConnectionFactoryUnit.pas;
+    ..\Adapters\Secondary\Database\Firebird\IBXDatabaseConnectionUnit.pas;
+    ..\Adapters\Secondary\Database\Firebird\IBXTransactionUnit.pas;
+    ..\Core\Application\OutputPorts\Shared\ValidacaoOutputUnit.pas;
+    ..\Core\Domain\Types\Shared\BooleanNullableUnit.pas;
+    ..\Core\Domain\Types\Shared\DateAndTimeNullableUnit.pas;
+    ..\Core\Domain\Types\Shared\DoubleNullableUnit.pas;
+    ..\Core\Domain\Types\Shared\IntegerNullableUnit.pas;
+    ..\Core\Domain\Types\Shared\StringNullableUnit.pas;
+    ..\Core\Domain\Types\Shared\TipoComunsUnit.pas;
+    ..\Core\Infrastructure\SetupUnit.pas;
+    ..\Core\Infrastructure\Base\BaseRepositoryUnit.pas;
+    ..\Core\Infrastructure\Base\CacheableRepositoryUnit.pas;
+    ..\Core\Infrastructure\Base\EntityBaseUnit.pas;
+    ..\Core\Infrastructure\Cache\ObjectCacheUnit.pas;
+    ..\Core\Infrastructure\Cache\SimpleRecordCacheUnit.pas;
+    ..\Core\Infrastructure\Config\FileConfigUnit.pas;
+    ..\Core\Infrastructure\Config\SetupConfigUnit.pas;
+    ..\Core\Infrastructure\Data\ParameterValueUnit.pas;
+    ..\Core\Infrastructure\Data\QueryResultUnit.pas;
+    ..\Core\Infrastructure\Data\ScalarResultUnit.pas;
+    ..\Core\Infrastructure\Interfaces\IDatabaseConnectionFactoryUnit.pas;
+    ..\Core\Infrastructure\Interfaces\IDataBaseConnectionUnit.pas;
+    ..\Core\Infrastructure\Interfaces\IObjectCacheUnit.pas;
+    ..\Core\Infrastructure\Interfaces\IProgressObserverUnit.pas;
+    ..\Core\Infrastructure\Interfaces\IRecordCacheUnit.pas;
+    ..\Core\Infrastructure\Interfaces\ISqlLoggerUnit.pas;
+    ..\Core\Infrastructure\Interfaces\ITransactionUnit.pas;
+    ..\Core\Infrastructure\Logging\BaseSqlLoggerUnit.pas;
+    ..\Core\Infrastructure\Logging\SqlConsoleLoggerUnit.pas;
+    ..\Core\Infrastructure\Logging\SqlFileLoggerUnit.pas;
+    ..\Core\Infrastructure\Logging\UIProgressObserverUnit.pas;
+    ..\Core\Infrastructure\Services\DateTimeServiceUnit.pas;
+    ..\Core\Infrastructure\Services\NumberServiceUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\AliquotaAdRemProdutoRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\AliquotaAdValoremProdutoRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\AliquotaAdValoremServicoRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\AliquotaPadraoRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\AliquotaReferenciaRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\ClassificacaoTributariaRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\FundamentacaoClassificacaoRepositoryUnit.pas;
+    ..\Adapters\Secondary\Repositories\MunicipiosRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\NbsAplicavelRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\NbsRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\NcmAplicavelRepositoryUnit.pas;
+    ..\Adapters\Secondary\Repositories\NcmsRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\PercentualReducaoRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\RedutorCompraGovernamentalRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\TransferenciaCBSRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\IndicadorOperacaoRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\TratamentoClassificacaoRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\TributoSituacaoTributariaRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\InputPorts\Calculo\CalcularTributoInputUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\InputPorts\Calculo\CompraGovernamentalInputUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\InputPorts\Calculo\ImpostoSeletivoInputUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\InputPorts\Calculo\ItemCalculoInputUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\InputPorts\Calculo\TributacaoRegularInputUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\CBSTotalUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\IBSCBSTotalUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\IBSMunTotalUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\IBSTotalUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\IBSUFTotalUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\ImpostoSeletivoTotalUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\MonofasiaTotalUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\OperacaoConsumoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\ROCItemDomainUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\ROCDomainUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\TributosTotaisUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo\ValoresTotaisDomainUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\UseCases\CalcularTributo\CalculaTributoUseCaseUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\UseCases\ValidarTributacaoItem\ValidarTributacaoUseCaseUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Constants\CodigosErroValidacao.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\AliquotaAdRemEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\AliquotaAdRemProdutoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\AliquotaAdRemServicoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\AliquotaAdValoremEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\AliquotaAdValoremProdutoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\AliquotaAdValoremServicoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\AliquotaPadraoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\AliquotaReferenciaEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\AnexoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\ClassificacaoTributariaEtdUnit.pas;
+    ..\Core\Domain\Entities\Shared\EstadoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\ExcecaoAdRemProdutoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\ExcecaoAdRemServicoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\ExcecaoAdValoremProdutoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\ExcecaoAdValoremServicoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\ExcecaoNbsAplicavelEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\ExcecaoNcmAplicavelEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\FundamentacaoClassificacaoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\FundamentacaoLegalEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\ModalidadeTributoEnumUnit.pas;
+    ..\Core\Domain\Entities\Shared\MunicipioEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\NbsAplicavelEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\NbsEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\NcmAplicavelEtdUnit.pas;
+    ..\Core\Domain\Entities\Shared\NcmEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\PercentualReducaoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\RedutorCompraGovernamentalEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\IndicadorOperacaoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\IndicadorOpNbsClassificacaoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\ListaServicosLC116EtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\SituacaoTributariaEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\TipoDfeClassificacaoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\TipoDfeEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\TipoEnteGovernamentalEnumUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\TipoOperacaoGovernamentalEnumUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\TipoTributoEnumUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\TomadorEspecificoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\TransferenciaCBSEnteGovEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\TratamentoClassificacaoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\TratamentoTributarioEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\TributoSituacaoTributariaEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\UnidadeMedidaEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Ports\IAliquotaAdRemProdutoRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Ports\IAliquotaAdValoremProdutoRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Ports\IAliquotaAdValoremServicoRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Ports\IAliquotaPadraoRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Ports\IAliquotaReferenciaRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Ports\IClassificacaoTributariaRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Ports\IFundamentacaoClassificacaoRepositoryUnit.pas;
+    ..\Core\Domain\Ports\Shared\IMunicipiosRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Ports\INbsAplicavelRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Ports\INbsRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Ports\INcmAplicavelRepositoryUnit.pas;
+    ..\Core\Domain\Ports\Shared\INcmsRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Ports\IPercentualReducaoRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Ports\IRedutorCompraGovernamentalRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Ports\ITransferenciaCBSRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Ports\IIndicadorOperacaoRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Ports\ITratamentoClassificacaoRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Ports\ITributoSituacaoTributariaRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\CalculoCbsIbsServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\CalculoImpostoSeletivoServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\CalculoTributoServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\MemoriaCalculoServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\NbsAplicavelServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\NcmAplicavelServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\SimpleStringDictionaryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\TemplateTokenizerServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\TokenCacheServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\TokenizerServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\AjusteCompetenciaModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\AliquotaImpostoSeletivoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\CBSModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\ClassificacaoTributariaModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\CompraGovernamentalModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\CreditoPresumidoIBSZFMModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\CreditoPresumidoOperacaoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\DevolucaoTributosModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\DiferimentoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\EstornoCreditoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\GrupoIBSCBSModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\IBSCBSCreditoPresumidoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\IBSCBSModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\IBSMunModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\IBSUFModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\ImpostoSeletivoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\MonofasiaDiferimentoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\MonofasiaModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\MonofasiaPadraoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\MonofasiaRetencaoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\MonofasiaRetidoAnteriormenteModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\OperacaoTributacaoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\PreparacaoResultadoUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\ReducaoAliquotaModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\ResultadoCbsIbsUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\ResultadoGrupoDiferimentoMonofasiaUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\ResultadoGrupoEtapaMonofasiaUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\ResultadoGrupoMonofasiaUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\ResultadoTributacaoRegularUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\TextTokenModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\TransferenciaCreditoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\TratamentoClassificacaoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\TratamentoOperacaoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\TributacaoCompraGovernamentalModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\TributacaoRegularModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\TributosModelUnit.pas;
+    ..\Core\Domain\Types\Shared\StatusRegistroEnumUnit.pas;
+    ..\Core\Domain\Types\Shared\TipoTributoFiscalEnumUnit.pas;
+    ..\Core\Application\OutputPorts\Shared\ValidationEntityOutputUnit.pas;
+    ..\Core\Infrastructure\Services\EntityValidatorFactoryUnit.pas;
+    ..\Core\Infrastructure\Interfaces\IEntityValidatorUnit.pas;
+    ..\Core\Infrastructure\Interfaces\IErrorLoggerUnit.pas;
+    ..\Core\Infrastructure\Logging\FileErrorLoggerUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\GrupoFiscalEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\IGruposFiscaisRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\CreateEntityUseCaseOutputUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\GruposFiscaisRepositoryUnit.pas;
+    ..\UI\Forms\GruposFiscais\UCadGruposFiscais.pas;
+    ..\UI\Forms\GruposFiscais\UCadGruposFiscais.dfm;
+    ..\UI\Utils\UIUtilsUnit.pas;
+    ..\UI\Infrastructure\Components\UIFormValidatorFactoryUnit.pas;
+    ..\UI\Infrastructure\Interfaces\IUIFormValidatorUnit.pas;
+    PackageSetuptUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\GruposFiscais\SalvarGrupoFiscalUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\GruposFiscais\RemoverGrupoFiscalUseCaseUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\CheckListBoxEmpresasFrameUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\CheckListBoxEmpresasFrameUnit.dfm;
+    ..\ERP.Features\Core\Application\UseCases\GruposFiscais\ObterGruposFiscaisUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\EmpresaEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\IEmpresasRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\Empresas\ListarEmpresasUseCaseUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\EmpresasRepositoryUnit.pas;
+    ..\Core\Infrastructure\DI\IServiceFactoryUnit.pas;
+    ..\Fiscal.Calculos\Infrastructure\FiscalCalculosFactoryUnit.pas;
+    ..\Fiscal.Calculos\Infrastructure\FiscalRepoContainerUnit.pas;
+    ..\Core\Infrastructure\DI\ContainerUnit.pas;
+    ..\ERP.Features\Infrastructure\ErpFeaturesFactoryUnit.pas;
+    ..\ERP.Features\Infrastructure\ErpFeaturesRepoContainerUnit.pas;
+    ..\Core\Infrastructure\Services\StringServiceUnit.pas;
+    ..\Core\Infrastructure\Services\ArrayServiceUnit.pas;
+    ..\Core\Infrastructure\Exceptions\EValidacaoNegocioUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\OperacaoInternaEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\IOperacoesInternasRepositoryUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\OperacoesInternasRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\OperacoesInternas\ObterOperacaoInternaPorIdUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\OperacoesInternas\SalvarOperacaoInternaUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\OperacoesInternas\RemoverOperacaoInternaUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\RegraFiscalIbsCbsEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\IRegrasFiscaisIbsCbsRepositoryUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\RegrasFiscaisIbsCbsRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\RegrasFiscais\ObterRegraFiscalIbsCbsPorIdUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\RegrasFiscais\RemoverRegraFiscalIbsCbsUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\RegrasFiscais\SalvarRegraFiscalIbsCbsUseCaseUnit.pas;
+    ..\UI\Forms\OperacoesInternas\UCadOperacoesInternas.pas;
+    ..\UI\Forms\OperacoesInternas\UCadOperacoesInternas.dfm;
+    ..\UI\Forms\RegrasFiscaisIbsCbs\UCadRegrasFiscaisIbsCbs.pas;
+    ..\UI\Forms\RegrasFiscaisIbsCbs\UCadRegrasFiscaisIbsCbs.dfm;
+    ..\UI\Frames\Contextos\Fiscal.RTC\ComboBoxClassTribFrameUnit.pas;
+    ..\UI\Frames\Contextos\Fiscal.RTC\ComboBoxClassTribFrameUnit.dfm;
+    ..\Fiscal.Calculos\Core\Application\UseCases\ClassificacoesTributarias\ListarClassificacoesTributariasUseCaseUnit.pas;
+    ..\UI\Frames\Componentes\Inputs\EditHwNullableFrameUnit.pas;
+    ..\UI\Frames\Componentes\Inputs\EditHwNullableFrameUnit.dfm;
+    ..\UI\Frames\Componentes\Inputs\MaskEditNullableFrameUnit.pas;
+    ..\UI\Frames\Componentes\Inputs\MaskEditNullableFrameUnit.dfm;
+    ..\Core\Domain\Constants\Shared\LimitesBasicosUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\OperacaoFiscalIbsCbsEtdUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\OperacoesFiscaisIbsCbsRepositoryUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\IOperacoesFiscaisIbsCbsRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\OperacoesFiscais\ObterOperacaoFiscalIbsCbsPorIdUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\OperacoesFiscais\RemoverOperacaoFiscalIbsCbsUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\OperacoesFiscais\SalvarOperacaoFiscalIbsCbsUseCaseUnit.pas;
+    ..\UI\Forms\OperacoesFiscaisIbsCbs\UCadOperacoesFiscaisIbsCbs.pas;
+    ..\UI\Forms\OperacoesFiscaisIbsCbs\UCadOperacoesFiscaisIbsCbs.dfm;
+    ..\UI\Frames\Componentes\Selecoes\ComboboxEntityPickerFrameUnit.pas;
+    ..\UI\Frames\Componentes\Selecoes\ComboboxEntityPickerFrameUnit.dfm;
+    ..\ERP.Features\Core\Application\UseCases\OperacoesInternas\ListarOperacoesInternasUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\GruposFiscais\ListarGruposFiscaisUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\RegrasFiscais\ListarRegrasFiscaisUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\OpInternasComTpVendas\ListarOpIntComTpVendasUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\OpInternaComTpVendaEtdUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\OpInternasComTpVendasRepositoryUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\IOpInternasComTpVendasRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\OpInternasComTpVendas\VincularTiposVendasAOpInternaUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\InputPorts\VincularTiposVendasAOpInternaInputUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\TipoVendaEtdUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\TiposVendas\ListarTiposVendasUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\ITiposVendasRepositoryUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\TiposVendasRepositoryUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\OpInternaTpVendaVinculoModelUnit.pas;
+    ..\ERP.Features\Core\Application\InputPorts\VincularOpInternasATipoVendaInputUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\OpInternasComTpVendas\VincularOpInternasATipoVendaUseCaseUnit.pas;
+    ..\UI\Frames\Componentes\Selecoes\CheckListBoxEntityPickerFrameUnit.pas;
+    ..\UI\Frames\Componentes\Selecoes\CheckListBoxEntityPickerFrameUnit.dfm;
+    ..\UI\Forms\OpInternasComTiposVendas\UCadOpInternasComTiposVendas.pas;
+    ..\UI\Forms\OpInternasComTiposVendas\UCadOpInternasComTiposVendas.dfm;
+    ..\ERP.Features\Core\Application\UseCases\TiposVendas\ObterTiposVendasUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\RegrasFiscais\ResolverRegraFiscalIbsCbsUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\InputPorts\ResolverRegraFiscalIbsCbsTypesUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\OperacaoFiscalIbsCbsCondicaoEtdUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\UseCases\BaseDeCalculo\CalcularBCImpostoSeletivoUseCaseUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\CalculoBaseCalculoServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\CalcularBaseCalculoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\UseCases\BaseDeCalculo\CalcularBCIbsCbsUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeTransfCredIbsCbsEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeAjusteCompetIbsCbsEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeContextEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeCredPresOpIbsCbsEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeCredPresZfmIbsCbsEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeGrupoIbsCbsEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeIbsCbsCompraGovEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeIbsCbsTribRegEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeIbsCbsEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeImpostoSeletivoEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeMonofasiaIbsCbsEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\ITributosDFeRepositoryUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\IRemoverTributoDFeUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\ISalvarTributoDFeUseCaseUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\TributosDFeRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\TributosDFe\SalvarTributoDFeUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\TributosDFe\ListarTributosDFePorDocFiscalUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\TributosDFe\RemoverTributoDFeUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Types\TipoRegraTributoDFeEnumUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\TributosDFe\TributosDFeServiceTypes.pas;
+    ..\ERP.Features\Core\Domain\Services\TributosDFe\TributosDFeSerivceUnit.pas;
+    ..\Core\Infrastructure\Services\GuidServiceUnit.pas;
+    ..\Adapters\Secondary\Database\Firebird\IBXTransactionBaseUnit.pas;
+    ..\Adapters\Secondary\Database\Firebird\IBXTransactionLegacyUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\UseCases\TratamentoClassificacoes\ObterTratamentoClassificacaoUseCaseUnit.pas;
+    ..\UI\Infrastructure\Types\MessageTransferType.pas;
+    ..\Fiscal.Calculos\Core\Application\UseCases\PercentuaisDeReducao\ObterPercentualDeReducaoUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\RegrasFiscais\SalvarRegraFiscalIbsCbsTypesUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\ComboBoxRegrasFiscaisFrameUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\ComboBoxRegrasFiscaisFrameUnit.dfm;
+    ..\Fiscal.Calculos\Core\Application\UseCases\ClassificacoesTributarias\ObterClassificacaoTributariaIbsCbsUseCaseUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ValidarIndicadorOperacaoUseCaseUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocalOperacaoUseCaseUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarIndicadorOperacaoUseCaseUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarSituacoesClassificacoesPorNbsUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Types\TributoDFeOrigemEnumUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\ComboBoxMunicipiosFrameUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\ComboBoxMunicipiosFrameUnit.dfm;
+    ..\Core\Infrastructure\SharedRepoContainerUnit.pas;
+    ..\Core\Infrastructure\SharedFactoryContainerUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\Municipios\ListarMunicipiosUseCaseUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\ComboBoxOpInternasFrameUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\ComboBoxOpInternasFrameUnit.dfm;
+    ..\Core\Infrastructure\Base\BaseUseCaseUnit.pas;
+    ..\Core\Infrastructure\Base\BaseClassUnit.pas;
+    ..\UI\Forms\CentralDadosFiscais\UCentralDadosFiscais.pas;
+    ..\UI\Forms\CentralDadosFiscais\UCentralDadosFiscais.dfm;
+    ..\ERP.Features\Core\Domain\Entities\ConfiguracaoEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Types\ConfiguracaoTipoEnumUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\IConfiguracoesRepositoryUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\ConfiguracoesRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\VersaoSerproEtdUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\CentralDadosFiscais\ObterVersaoDadosFiscaisUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\VersaoDadosFiscaisOutputUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\CentralDadosFiscais\ObterResumoDadosFiscaisUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\ObterResumoDadosFiscaisOutputUnit.pas;
+    ..\Core\Domain\Ports\Shared\IAnexosRepositoryUnit.pas;
+    ..\Adapters\Secondary\Repositories\AnexosRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\GruposFiscais\CriarGruposFiscaisDeAnexosUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\CentralDadosFiscais\AnexosServiceUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\GruposFiscais\CriarGruposFiscaisDeAnexosTypes.pas;
+    ..\Core\Infrastructure\Services\EnumServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\ProdutoEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\IProdutosRepositoryUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\ProdutosRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\InputPorts\ObterResumoDadosFiscaisInputUnit.pas;
+    ..\UI\Forms\CentralDadosFiscais\UResumoProdutosGruposFiscais.pas;
+    ..\UI\Forms\CentralDadosFiscais\UResumoProdutosGruposFiscais.dfm;
+    ..\UI\Frames\Contextos\Fiscal.RTC\MultiSelectAnexosFrameUnit.pas;
+    ..\UI\Frames\Contextos\Fiscal.RTC\MultiSelectAnexosFrameUnit.dfm;
+    ..\UI\Forms\CentralDadosFiscais\UCriarGruposFiscaisDeAnexos.pas;
+    ..\UI\Forms\CentralDadosFiscais\UCriarGruposFiscaisDeAnexos.dfm;
+    ..\ERP.Features\Core\Application\UseCases\Anexos\ListarAnexosUseCaseUnit.pas;
+    ..\UI\Forms\CentralDadosFiscais\UVincularProdutosGruposFiscais.pas;
+    ..\UI\Forms\CentralDadosFiscais\UVincularProdutosGruposFiscais.dfm;
+    ..\ERP.Features\Core\Domain\Services\CentralDadosFiscais\TiposTributosServiceUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\Produtos\AtualizarGruposFiscaisNoProdutoEmLoteUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\Produtos\ProdutoGrupoFiscalUpdateModelUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\CentralDadosFiscais\DbGridNcmsGrupoFiscalVincularFrameUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\CentralDadosFiscais\DbGridNcmsGrupoFiscalVincularFrameUnit.dfm;
+    ..\UI\Frames\Contextos\ERP.Features\CentralDadosFiscais\DBGridProdutosGrupoFiscalVincularFrameUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\CentralDadosFiscais\DBGridProdutosGrupoFiscalVincularFrameUnit.dfm;
+    ..\UI\Utils\DbGridConfigUtilsUnit.pas;
+    ..\UI\Utils\UIProgressObserverFormUnit.pas;
+    ..\UI\Frames\Componentes\Progress\ProgressWithLogFrameUnit.pas;
+    ..\UI\Frames\Componentes\Progress\ProgressWithLogFrameUnit.dfm;
+    ..\ERP.Features\Core\Domain\ValueObjects\Produtos\ProdutoNcmGrupoFiscalUpdateModelUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\Produtos\ProdutoAnexoResumoModelUnit.pas;
+    ..\UI\Frames\Componentes\DbGrid\DBGridFrameUnit.pas;
+    ..\UI\Frames\Componentes\DbGrid\DBGridFrameUnit.dfm;
+    ..\UI\Frames\Contextos\ERP.Features\ComboBoxGruposFiscaisFrameUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\ComboBoxGruposFiscaisFrameUnit.dfm;
+    ..\UI\Forms\CentralDadosFiscais\UCorrelacaoNcmProdutos.pas;
+    ..\UI\Forms\CentralDadosFiscais\UCorrelacaoNcmProdutos.dfm;
+    ..\UI\Forms\CentralDadosFiscais\USubstituirNCMs.pas;
+    ..\UI\Forms\CentralDadosFiscais\USubstituirNCMs.dfm;
+    ..\UI\DataSets\CentralDadosFiscais\NCMsCDFDataSet.pas;
+    ..\UI\Infrastructure\DataSet\DataSetGrid.pas;
+    ..\UI\DataSets\CentralDadosFiscais\ProdutosCDFDataSet.pas;
+    ..\ERP.Features\Core\Application\UseCases\NCMs\ObterNcmUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\NFSe\NFSeEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeTypesUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\DFeTypesUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\NFSe\NFSeParticipanteEtdUnit.pas;
+    ..\UI\Forms\NFSe\UCadNFSe.pas;
+    ..\UI\Forms\NFSe\UCadNFSe.dfm;
+    ..\UI\DataSets\NFSe\NFSeDataSet.pas;
+    ..\UI\Frames\Contextos\ERP.Features\NFSe\NFSeFrameUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\NFSe\NFSeFrameUnit.dfm;
+    ..\ERP.Features\Core\Domain\Entities\TipoServicoEtdUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\IniciarDpsVazioUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\Configuracao\IConfigReaderAndWriterUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\Configuracao\IniConfigReaderAndWriterUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\Configuracao\ConfigFactoryUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\Configuracoes\ConfigLegacyTypes.pas;
+    ..\Core\Domain\Ports\Shared\IItensIbptRepositoryUnit.pas;
+    ..\Core\Domain\Entities\Shared\ItemIbptEtdUnit.pas;
+    ..\Adapters\Secondary\Repositories\ItensIbptRepositoryUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\ClienteEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\IClientesRepositoryUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\ClientesRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\Clientes\ObterClienteUseCaseUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\NFSe\NFSeParticipanteFrameUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\NFSe\NFSeParticipanteFrameUnit.dfm;
+    ..\UI\Utils\UIMasksUtilsUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\NFSe\NFSeParticipanteFactoryUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\TiposServicos\ObterTipoServicoUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\ITiposServicosRepositoryUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\TiposServicosRepositoryUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\NFSe\NFSeIbsCbsFactoryUnit.pas;
+    ..\Core\Domain\Types\Shared\CurrencyNullableUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\CalculoTributos\CalcularISSQNServiceUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\CalcularTributosNFSeUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\CalculoTributos\CalculoISSQNResultUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\CalculoTributos\ICalcularISSQNServiceUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\NFSe\TributoNFSeIssQnOutputUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\CalculoTributos\ICalcularPisCofinsServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\CalculoTributos\CalculoPisCofinsResultUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\CalculoTributos\CalcularPisCofinsServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\CalculoTributos\CalculoPisCofinsInputUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\NFSe\TributoNFSePisCofinsOutputUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\CalculoTributos\CalculoRetenFederalResultUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\CalculoTributos\ICalcularRetenFederalServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\CalculoTributos\CalculoRetenFederalInputUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\CalculoTributos\CalcularRetenFederalServiceUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\NFSe\TributoNFSeRetenFederalOutputUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\SalvarNFSeUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\INFSeRepositoryUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\NFSeRepositoryUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\TiposServicos\TipoServicoFactoryUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\ObterNFSeUseCaseUnit.pas;
+    ..\Core\Infrastructure\Config\MasksConstsUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\NFSe\ConfiguracaoNFSeServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\ConfiguracaoNFSeModelUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\NFSe\NFSeDocEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeResponseTypesUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\EmitirNFSeUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\ValidacaoNFSeFactoryUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeAtualizarSituacaoTypesUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\DFeDLL\DFeDLLAdapterUnit.pas;
+    ..\UI\Infrastructure\Services\ResultadoOperacaoDFeUIMessagesUnit.pas;
+    ..\ERP.Features\Core\Domain\Types\DFe\ResultadoOperacaoDFeUnit.pas;
+    ..\UI\Forms\NFSe\UCadNFSeHistorico.pas;
+    ..\UI\Forms\NFSe\UCadNFSeHistorico.dfm;
+    ..\UI\DataSets\NFSe\NFSeHistoricoDataSet.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\NFSe\ResultadoNFSeOutputUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\Configuracoes\SalvarConfiguracaoNFSeUseCaseUnit.pas;
+    ..\UI\Forms\NFSe\UCadNFSeConfig.pas;
+    ..\UI\Forms\NFSe\UCadNFSeConfig.dfm;
+    ..\ERP.Features\Core\Application\InputPorts\Configuracoes\SalvarConfigNFSeInputUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\NFSe\NFSeEventoEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeEventoModelUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeDocModelUnit.pas;
+    ..\UI\Forms\NFSe\UCadNFSeCancelamento.pas;
+    ..\UI\Forms\NFSe\UCadNFSeCancelamento.dfm;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\CancelarNFSeUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\InputPorts\NFSe\CancelarNFSeInputUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeResumoModelUnit.pas;
+    ..\Core\Domain\Constants\Shared\VersaoAplicacaoUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeEventoResumoModelUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\ObterNFSeEventoUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\ReverterCancelamentoPortalNFSeUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\ExcluirCancelamentoNFSeUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeAtualizarSituacaoEventoTypesUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\IniciarSubstuicaoNFSeUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\NFSe\NFSeSubstEtdUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\DFeDLL\DFeDLLHeader.pas;
+    ..\Core\Domain\ValueObjects\Shared\EmailConfigModelUnit.pas;
+    ..\Core\Domain\Types\Shared\EmailConfigRemetenteEnumUnit.pas;
+    ..\UI\Infrastructure\Services\NFSeTypesDisplayUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\NFSe\ICalculoTotaisNFSeServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\NFSe\CalculoTotaisNFSeServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeModelUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\TributosDFe\TribDFeIbsCbsGrupoValoresFrameUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\TributosDFe\TribDFeIbsCbsGrupoValoresFrameUnit.dfm;
+    ..\UI\Frames\Contextos\ERP.Features\TributosDFe\TribDFeIbsCbsGrupoTribRegularFrameUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\TributosDFe\TribDFeIbsCbsGrupoTribRegularFrameUnit.dfm;
+    ..\UI\Frames\Contextos\ERP.Features\TributosDFe\TribDFeIbsCbsGrupoCompraGovFrameUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\TributosDFe\TribDFeIbsCbsGrupoCompraGovFrameUnit.dfm;
+    ..\UI\Frames\Contextos\ERP.Features\TributosDFe\TribDFeIbsCbsGrupoFrameUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\TributosDFe\TribDFeIbsCbsGrupoFrameUnit.dfm;
+    ..\UI\Frames\Contextos\ERP.Features\NFSe\NFSeTributosDFeFrameUnit.pas;
+    ..\UI\Frames\Contextos\ERP.Features\NFSe\NFSeTributosDFeFrameUnit.dfm;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\DpsEmitirIbsCbsNacionalModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\IPreparacaoCalculoServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\ICalculoTributoServiceUnit.pas;
+    ..\Core\Domain\Ports\Services\Shared\ICalculadorROCServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\PreparacaoCalculoServiceInterUnit.pas;
+    ..\Core\Infrastructure\ISharedFactoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\CalculadorROCServiceUnit.pas;
+    ..\Core\Domain\Services\Shared\EstadosServiceUnit.pas;
+    ..\Core\Domain\Ports\Services\Shared\ICalculadorBaseCalculoServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\ICalculoBaseCalculoServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\RegrasFiscais\IResolverRegraFiscalIbsCbsServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\RegrasFiscais\ResolverRegraFiscalIbsCbsServiceUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\ConcluirDoPortalNFSeUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\InputPorts\NFSe\ConluirNFSeInputUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\NFSe\IFinalizarNFSeServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\NFSe\FinalizarNFSeServiceUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\ReverterAutorizacaoPortalNFSeUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\CalcularTotaisNFSeUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\ExcluirRascunhoNFSeUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\CalculoTributos\CalcularTributosAproximadosServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\CalculoTributos\ICalcularTributosAproximadosServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\CalculoTributos\CalcularTributosAproximadosTypesUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\NFSe\TributoNFSeAproximadosOutputUnit.pas;
+    ..\UI\DataSets\FiscalNFSe\CorrelacaoCodigosFiscaisDataSet.pas;
+    ..\UI\Forms\FiscalNFSe\UCorrelFiscalNFSe.pas;
+    ..\UI\Forms\FiscalNFSe\UCorrelFiscalNFSe.dfm;
+    ..\UI\Frames\Componentes\DbGrid\FilterConditionFrameUnit.pas;
+    ..\UI\Frames\Componentes\DbGrid\FilterConditionFrameUnit.dfm;
+    ..\UI\Frames\Componentes\DbGrid\FilterContainerFrameUnit.pas;
+    ..\UI\Frames\Componentes\DbGrid\FilterContainerFrameUnit.dfm;
+    ..\UI\Forms\FiscalNFSe\UAlterarFiscalNFSe.pas;
+    ..\UI\Forms\FiscalNFSe\UAlterarFiscalNFSe.dfm;
+    ..\ERP.Features\Core\Domain\ValueObjects\TipoServico\AlteracaoFiscalNFSeModelUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\TiposServicos\AtualizarFiscalNFSeUseCaseUnit.pas;
+    ..\UI\Forms\NFSe\UCadNFSeEncontrarOS.pas;
+    ..\UI\Forms\NFSe\UCadNFSeEncontrarOS.dfm;
+    ..\UI\DataSets\NFSe\NFSeEncontrarOSDataSet.pas;
+    ..\UI\Forms\NFSe\UCadNFSeCriarAPartirDeOS.pas;
+    ..\UI\Forms\NFSe\UCadNFSeCriarAPartirDeOS.dfm;
+    ..\UI\DataSets\NFSe\NFSeCriarAPartirDeOSDataSet.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\CriarEmitirNFSeAgrupadasUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\IPedVendaRepositoryUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\PedVenda\OSItemFiscalEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\NFSe\INFSeAgrupamentoServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\NFSe\NFSeAgrupamentoServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\InicializarDpsModelUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\NFSe\CalcularTributosNFSeServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\NFSe\ICalcularTributosNFSeServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\CalculoTributosNFSeOutputUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\CalculoTributosNFSeInputUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\NFSe\CalculoTotaisNFSeTypes.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\PedVendaRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\Configuracoes\ObterConfiguracaoNFSeUseCaseUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\TradutorErrosRtcUnit.pas;
+    ..\Core\Domain\ValueObjects\Shared\ValidacaoItemOutputUnit.pas;
+    ..\Core\Domain\Services\Shared\ITradutorErrosRtcUnit.pas;
+    ..\ERP.Features\Core\Application\Services\NFSe\EmitirNFSeServiceUnit.pas;
+    ..\ERP.Features\Core\Application\Services\NFSe\IEmitirNFSeServiceUnit.pas;
+    ..\UI\Forms\NFSe\UCadNFSeVinculosOS.pas;
+    ..\UI\Forms\NFSe\UCadNFSeVinculosOS.dfm;
+    ..\UI\DataSets\NFSe\NFSeVinculosOSDataSet.pas;
+    ..\ERP.Features\Core\Domain\Services\NFSe\INFSeCalculoAplicadorServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\NFSe\NFSeCalculoAplicadorServiceUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\Models\PedVenda\UpdatePedvendaVinculoNFSeCommandsUnit.pas;
+    ..\ERP.Features\Core\Application\Services\NFSe\AtualizarSituacaoNFSeServiceUnit.pas;
+    ..\ERP.Features\Core\Application\Services\NFSe\IAtualizarSituacaoNFSeServiceUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\RemoverNFSeOSUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\Services\NFSe\Commands\EmitirNFSeCommandUnit.pas;
+    ..\ERP.Features\Core\Application\Services\NFSe\Commands\EmitirLoteNFSeCommandUnit.pas;
+    ..\ERP.Features\Core\Application\InputPorts\NFSe\CriarNFSeAgrupadasInputUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\NFSe\EmissaoLoteNFSeOutputUnit.pas;
+    ..\Core\Infrastructure\Data\DataMatrixUnit.pas;
+    ..\ERP.Features\Core\Domain\Metadata\NFSeMetadataUnit.pas;
+    ..\Core\Infrastructure\Base\EntityMetadataUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\NFSe\NFSeOSEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Metadata\NFSeOSMetadataUnit.pas;
+    ..\ERP.Features\Core\Domain\Metadata\NFSeSubstMetadataUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\Models\PedVenda\UpdatePedvendaEmissaoNFSeCommandsUnit.pas;
+    ..\ERP.Features\Core\Application\InputPorts\NFSe\EmitirNFSeInputUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\DFeDLL\LegacyDFeDLLAdapterUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\INFSExecutorUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Executors\NFSExecutorLegadoUnit.pas;
+    ..\ERP.Features\Core\Application\Executors\NFSExecutorNovoUnit.pas;
+    ..\ERP.Features\Core\Application\Services\NFSe\NFSExecutorCoordinatorUnit.pas;
+    ..\Core\Domain\Ports\Shared\ISessionContextUnit.pas;
+    ..\Core\Application\Contexts\SessionContextUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\ICriarEmitirNFSeAgrupadasUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\CriarAnexosEmailUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\ICriarAnexosEmailUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\Services\NFSe\IInicializarDpsServiceUnit.pas;
+    ..\ERP.Features\Core\Application\Services\NFSe\InicializarDpsServiceUnit.pas;
+    ..\ERP.Features\Core\Application\Services\NFSe\IPrepararNFSeParaEmissaoServiceUnit.pas;
+    ..\ERP.Features\Core\Application\Services\NFSe\PrepararNFSeParaEmissaoServiceUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\ConsultarEmissaoNFSeUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\Models\PedVenda\UpdatePedvendaVinculoDpsNFSeCommandUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\Models\PedVenda\UpdatePedvendaVinculoNFSeSubstituidaCommandUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\IFormasPagamentoRepositoryUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\FormaPagamento\FormaPagamentoEtdUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\FormasPagamentoRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\Models\FormasPagamento\UpdateFormaPagamentoVincularNFCommandsUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\ControleCreditos\ControleCreditoEtdUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\IControleCreditosRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\Models\ControleCreditos\UpdateControleCreditoNumDocumentoCommandUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\ControleCreditosRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\Services\NFSe\IParametrosFiscaisNFSeServiceUnit.pas;
+    ..\ERP.Features\Core\Application\Services\NFSe\Commands\ParametrosFiscaisNFSeCommandUnit.pas;
+    ..\ERP.Features\Core\Application\Services\NFSe\ParametrosFiscaisNFSeServiceUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\ChecarPossivelRetencaoNFSeUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Types\TipoRetencaoFederalPJEnumUnit.pas;
+    ..\ERP.Features\Core\Application\Services\NFSe\IAplicarRegrasTributosNFSeServiceUnit.pas;
+    ..\ERP.Features\Core\Application\Services\NFSe\AplicarRegrasTributosNFSeServiceUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\ObterNFSeOSsUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\NFSe\NFSeHistoricoEtdUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\PedVenda\ObterSituacaoEmissaoNFSeDeOrdemServUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\NFSeHistoricoTypesUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\IConfiguracaoNFSeServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\NFSe\IRatearRetencoesNFSeOSServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\NFSe\RatearRetencoesNFSeOSServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\CertificadoDigitalConfigUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\WebServiceDFeModelUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\AlternarNaturezaEmissaoPropiaNFSeUseCaseUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\IClassificacaoTributariaServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\ClassificacaoTributariaCalculoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\ClassificacaoTributariaServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\AliquotaResultadoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\FundamentacaoClassificacaoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\AliquotaAdRemModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\OutputPorts\ITratamentosTributariosRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\TratamentosTributariosRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\IAvaliadorExpressaoAritmeticaServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\AvaliadorExpressaoAritmeticaServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\RedBenefPC\RegraRedBenefPcEtdUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\RedBenefPC\SalvarRegraRedBenefPcUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\IRegrasRedBenefPcRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\RedBenefPC\RegraRedBenefPcValidacaoFactoryUnit.pas;
+    ..\ERP.Features\Core\Domain\Metadata\RedBenefPC\RegraRedBenefPcMetadataUnit.pas;
+    ..\UI\DataSets\RedBenefPC\RegrasRedBenefPcDataSet.pas;
+    ..\UI\Forms\RedBenefPC\UCadRegrasRedBenefPC.pas;
+    ..\UI\Forms\RedBenefPC\UCadRegrasRedBenefPC.dfm;
+    ..\ERP.Features\Adapters\Secondary\Repositories\RegrasRedBenefPcRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\RedBenefPC\ObterRegraRedBenefPcUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\RedBenefPC\RemoverRegraRedBenefPcUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\DFe\ContextoDocTribPcModelUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\RedBenefPC\AjusteRedBenefPcEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Metadata\RedBenefPC\AjusteRedBenefPcMetadataUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\IAjustesRedBenefPcRepositoryUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\AjustesRedBenefPcRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\RedBenefPC\RegistrarAjusteRedBenefPcUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\FiscalDFe\InfComplementarDFeEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\IInfComplementarDFeRepositoryUnit.pas;
+    ..\ERP.Features\Core\Domain\Types\DFe\TipoInfComplementarEnumUnit.pas;
+    ..\ERP.Features\Core\Application\Services\RedBenefPC\IConsolidadorContextoFiscalPcServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\RedBenefPC\AplicadorRedBenefPcServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\RedBenefPC\CalcularAjusteRedBenefPcServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\RedBenefPC\IAplicadorRedBenefPcServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\Services\RedBenefPC\ICalcularAjusteRedBenefPcServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\INotasFiscaisRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\Models\DFe\UpdateDFeRedBenefPcCalcCommandsUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\INotasConsumidorRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\Services\RedBenefPC\ConsolidadorContextoFiscalPcServiceUnit.pas;
+    ..\ERP.Features\Core\Domain\Types\DFe\ModelosDFeEnumUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\NotasFiscaisRepositoryUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\NotasConsumidorRepositoryUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\InfComplementarDFeRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\FiscalDFe\ListarInfComplPorTipoPcUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Models\RedBenefPC\AjusteRedBenefPcModelUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\PeriodoEmpresaVOUnit.pas;
+    ..\ERP.Features\Core\Domain\ValueObjects\PeriodoMultiEmpresaVOUnit.pas;
+    ..\UI\Forms\RedBenefPC\UCadAjustesRedBenefPC.pas;
+    ..\UI\Forms\RedBenefPC\UCadAjustesRedBenefPC.dfm;
+    ..\UI\DataSets\RedBenefPC\AjustesRedBenefPcDataSet.pas;
+    ..\ERP.Features\Core\Application\UseCases\RedBenefPC\SalvarAjusteRedBenefPcUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\RedBenefPC\AjusteRedBenefPcValidacaoFactoryUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\RedBenefPC\ObterAjusteRedBenefPcPorIdUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\RedBenefPC\RemoverAjusteRedBenefPcUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\RedBenefPC\IRegistrarAjusteRedBenefPcUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\RedBenefPC\IOperacaoPassivelDeRedBenefPcUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\RedBenefPC\ListarRegrasRedBenefPcUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\RedBenefPC\OperacaoPassivelDeRedBenefPcUseCaseUnit.pas;
+    ..\UI\Forms\NFSe\UCadNFSeEnviarEmail.pas;
+    ..\UI\Forms\NFSe\UCadNFSeEnviarEmail.dfm;
+    ..\ERP.Features\Core\Domain\Entities\FiscalDFe\DFeAlertaEdtUnit.pas;
+    ..\ERP.Features\Core\Domain\Metadata\DFeAlertaMetadataUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\IDFeAlertasRepositoryUnit.pas;
+    ..\ERP.Features\Adapters\Secondary\Repositories\DFeAlertasRepositoryUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\DFe\ListarDFeAlertasUseCaseUnit.pas;
+    ..\ERP.Features\Core\Domain\Types\NotaFiscal\SituacaoNFeEnumUnit.pas;
+    ..\ERP.Features\Core\Domain\Models\NotaFiscal\NotaFiscalResumoModelUnit.pas;
+    ..\ERP.Features\Core\Domain\Types\NotaFiscal\FormatoImpressaoDANFeEnumUnit.pas;
+    ..\ERP.Features\Core\Domain\Types\NotaFiscal\TipoEmissaoNFeEnumUnit.pas;
+    ..\ERP.Features\Core\Domain\Types\NotaFiscal\NaturezaNfEnumUnit.pas;
+    ..\ERP.Features\Core\Domain\Types\NotaFiscal\TipoNfEnumUnit.pas;
+    ..\ERP.Features\Core\Domain\Types\NotaFiscal\StatusNfEnumUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\NotaFiscal\NotaFiscalPendenciaSefEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Types\NotaFiscal\StatusResolucaoNFeSefEnumUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\Models\NotaFiscal\UpdateNotaFiscalConverterParaContingenciaCommandUnit.pas;
+    ..\ERP.Features\Core\Domain\Types\NotaFiscal\TipoAmbienteNFeEnumUnit.pas;
+    ..\ERP.Features\Core\Domain\Ports\IDocumentosEletronicosRepositoryUnit.pas;
+    ..\ERP.Features\Core\Domain\Entities\DocEletronico\DocumentoEletronicoEtdUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\Models\NotaFiscal\ConverterParaContingenciaResultUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\Models\NotaFiscal\UpdatePendenciaSefazAvancoCommandUnit.pas;
+    ..\UI\DataSets\NotasFiscais\NFePendentesSefazDataSet.pas;
+    ..\ERP.Features\Core\Domain\Metadata\NotasFiscais\NotaFiscalPendenciaSefMetadataUnit.pas;
+    ..\UI\Forms\NotasFiscais\UNotasFiscaisPendentesSEFAZ.pas;
+    ..\UI\Forms\NotasFiscais\UNotasFiscaisPendentesSEFAZ.dfm;
+    ..\ERP.Features\Core\Domain\Models\NotaFiscal\NotaFiscalItemContextoRtcModelUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\Models\NotaFiscal\UpdateNotaFiscalItemContextoRtcCommandUnit.pas;
+    ..\ERP.Features\Core\Domain\Models\NotaFiscal\NotaFiscalPendenciaSefModelUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NotaFiscal\ResolverManualmentePendenciaSefazUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NotaFiscal\ObterQuantidadePendenciasSefazUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\UseCases\NFSe\ObterRetencoesNFSeDaOSUseCaseUnit.pas;
+    ..\ERP.Features\Core\Application\OutputPorts\NFSe\RetencoesNFSeDaOSOutputUnit.pas;
+    ..\Core\Infrastructure\Services\ArredondamentoUtilsUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\SituacaoTributariaServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\ISituacaoTributariaServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\ProcessamentoItemServiceNovoUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\RedutorCompraGovernamentalServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\TransferenciaCBSServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Infrastructure\Exceptions\EValidacaoRTCUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Ports\ISituacaoTributariaRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\SituacaoTributariaRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Ports\IVersaoBaseDadosRepositoryUnit.pas;
+    ..\Fiscal.Calculos\Adapters\Secondary\Repositories\VersaoBaseDadosRepositoryUnit.pas;
+    ..\Core\Domain\Ports\Services\Shared\ITokenDecryptorUnit.pas;
+    ..\Core\Domain\Ports\Services\Shared\ITokenEncryptorUnit.pas;
+    ..\ERP.Features\Infrastructure\ErpFeaturesFactoryBaseUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\LocalIncidenciaEnumUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Entities\LocalFornecimentoEnumUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocaisFornecimentoUseCaseUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocaisIncidenciaUseCaseUnit.pas;
+    pkModern.bdsproj;
+    pkModern.dpk;
+    pkModern.res
+  </CheckinList>
+</BorlandProject>

@@ -1,0 +1,921 @@
+object formVeiculosZeroEntradaEstoque: TformVeiculosZeroEntradaEstoque
+  Left = 0
+  Top = 0
+  ActiveControl = page
+  Caption = 'Estoque Renave ve'#237'culo zero KM'
+  ClientHeight = 455
+  ClientWidth = 864
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 13
+  object page: TPageControl
+    Left = 0
+    Top = 0
+    Width = 864
+    Height = 455
+    ActivePage = ts_estoque
+    Align = alClient
+    Style = tsFlatButtons
+    TabOrder = 0
+    object ts_estoque: TTabSheet
+      Caption = 'ts_estoque'
+      object pn_estoque: TPanel
+        Left = 0
+        Top = 0
+        Width = 856
+        Height = 424
+        Align = alClient
+        BevelOuter = bvNone
+        BorderWidth = 6
+        TabOrder = 0
+        object Panel2: TPanel
+          Left = 6
+          Top = 377
+          Width = 844
+          Height = 41
+          Align = alBottom
+          BevelKind = bkTile
+          BevelOuter = bvNone
+          TabOrder = 0
+          object bt_check_all: TSpeedButton
+            Left = 36
+            Top = 7
+            Width = 23
+            Height = 22
+            Flat = True
+            Glyph.Data = {
+              CE010000424DCE01000000000000CE0000002800000010000000100000000100
+              08000000000000010000120B0000120B0000260000002600000000000000FFFF
+              FF00FF00FF00A4262600BA414100BB444400BD4A4A00BD4B4B00BF4E4E00C050
+              5000C0515100C1535300C1545400C55C5C00CB6C6C00CF777700D17D7D00D483
+              8300004B0000098611000C9C19000A8615000C9518000D931A000F9E1C000F99
+              1C000E9D1D000F9D1E0011A4220011A02100139224001CB135001CA1340024BC
+              430029B548002EC6520035CA5E0039D465000202020202020202020202020202
+              0202020202020202020202020202020202020202020202021212020202020202
+              0202020202020212181B120202020202020202020202121F1C141D1202020202
+              02020202021223211E12171A1202020202020202122425201202121519120202
+              02020202021222120A03020212161202020202020203120C080B030202121312
+              02020202030F0E0803070903020202121202020310110D030203050803020202
+              12120202030E0302020202030603020202020202020302020202020203040302
+              0202020202020202020202020202030302020202020202020202020202020203
+              030202020202020202020202020202020202}
+            OnClick = bt_check_allClick
+          end
+          object bt_uncheck_all: TSpeedButton
+            Left = 65
+            Top = 7
+            Width = 23
+            Height = 22
+            Flat = True
+            Glyph.Data = {
+              AA010000424DAA01000000000000AA0000002800000010000000100000000100
+              08000000000000010000120B0000120B00001D0000001D00000000000000FFFF
+              FF00FF00FF00CACACA00C4C4C400BFBFBF00BCBCBC00B8B8B800B5B5B500AEAE
+              AE00ABABAB00A5A5A500A4A4A4009F9F9F009E9E9E009D9D9D009C9C9C009B9B
+              9B009A9A9A009999990098989800979797009494940093939300929292008C8C
+              8C008A8A8A007A7A7A0065656500020202020202020202020202020202020202
+              02020202020202020202020202020202020202021C1C02020202020202020202
+              0202021C12121C02020202020202020202021C0A0E15101C0202020202020202
+              021C0508141C16131C020202020202021C04030B1C021C19141C020202020202
+              021C081C0F1B02021C171C0202020202021B1C0D110E1B02021C1A1C02020202
+              1B0809111B13101B0202021C1C02021B07060C1B021B16111B0202021C1C0202
+              1B091B020202021B141B020202020202021B0202020202021B181B0202020202
+              020202020202020202021B1B0202020202020202020202020202021B1B020202
+              0202020202020202020202020202}
+            OnClick = bt_uncheck_allClick
+          end
+          object bt_actions: TSpeedButton
+            Left = 7
+            Top = 7
+            Width = 23
+            Height = 22
+            Flat = True
+            Glyph.Data = {
+              36030000424D3603000000000000360000002800000010000000100000000100
+              1800000000000003000000000000000000000000000000000000FF00FFFF00FF
+              FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+              FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+              00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+              FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+              FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+              00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+              FF00FFFF00FFFF00FFFF00FFFF00FF000000000000FF00FFFF00FFFF00FFFF00
+              FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF00
+              0000000000FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+              FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+              FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF00
+              0000000000FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+              FF00FFFF00FFFF00FFFF00FFFF00FF000000000000FF00FFFF00FFFF00FFFF00
+              FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+              00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+              FF00FFFF00FFFF00FFFF00FFFF00FF000000000000FF00FFFF00FFFF00FFFF00
+              FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF00
+              0000000000FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+              FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+              FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+              00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+              FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+              FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+              00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF}
+            OnClick = bt_actionsClick
+          end
+          object btEntrarComEstoque: TBitBtn
+            Left = 110
+            Top = 6
+            Width = 179
+            Height = 25
+            Caption = 'Entrar com estoque RENAVE'
+            TabOrder = 0
+            OnClick = btEntrarComEstoqueClick
+          end
+          object btSairComEstoque: TBitBtn
+            Left = 720
+            Top = 4
+            Width = 179
+            Height = 25
+            Caption = 'Sair com estoque RENAVE'
+            TabOrder = 1
+            OnClick = btSairComEstoqueClick
+          end
+          object BitBtn1: TBitBtn
+            Left = 295
+            Top = 6
+            Width = 107
+            Height = 25
+            Caption = 'PDF ATPV'
+            TabOrder = 2
+            OnClick = BitBtn1Click
+          end
+          object btDevolucaoMontadora: TBitBtn
+            Left = 408
+            Top = 6
+            Width = 153
+            Height = 25
+            Caption = 'Devolver a montadora'
+            TabOrder = 3
+            OnClick = btDevolucaoMontadoraClick
+          end
+        end
+        object Panel3: TPanel
+          Left = 6
+          Top = 6
+          Width = 844
+          Height = 371
+          Align = alClient
+          BevelOuter = bvNone
+          BorderWidth = 6
+          Caption = 'Aguarde... Procurando dados'
+          TabOrder = 1
+          object Splitter1: TSplitter
+            Left = 6
+            Top = 206
+            Width = 832
+            Height = 3
+            Cursor = crVSplit
+            Align = alBottom
+            ExplicitLeft = 0
+            ExplicitTop = 243
+            ExplicitWidth = 840
+          end
+          object grid_est: TDBGrid
+            Left = 6
+            Top = 6
+            Width = 832
+            Height = 200
+            Align = alClient
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = []
+            Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+            ParentFont = False
+            TabOrder = 0
+            TitleFont.Charset = DEFAULT_CHARSET
+            TitleFont.Color = clWindowText
+            TitleFont.Height = -11
+            TitleFont.Name = 'Tahoma'
+            TitleFont.Style = []
+            Visible = False
+            OnCellClick = grid_estCellClick
+            OnDrawColumnCell = grid_estDrawColumnCell
+            OnDblClick = grid_estDblClick
+            OnKeyDown = grid_estKeyDown
+            OnMouseUp = grid_estMouseUp
+          end
+          object pnProgress: TPanel
+            Left = 6
+            Top = 324
+            Width = 832
+            Height = 41
+            Align = alBottom
+            BevelOuter = bvNone
+            TabOrder = 1
+            Visible = False
+            object lbProgress: TLabel
+              Left = 0
+              Top = 0
+              Width = 832
+              Height = 24
+              Align = alClient
+              AutoSize = False
+              Caption = 'lbProgress'
+              Layout = tlCenter
+              ExplicitLeft = 1
+              ExplicitTop = 1
+              ExplicitWidth = 838
+              ExplicitHeight = 16
+            end
+            object ProgressBar1: TProgressBar
+              Left = 0
+              Top = 24
+              Width = 832
+              Height = 17
+              Align = alBottom
+              TabOrder = 0
+            end
+          end
+          object pn_error: TPanel
+            Left = 6
+            Top = 209
+            Width = 832
+            Height = 115
+            Align = alBottom
+            BevelOuter = bvNone
+            Caption = 'pn_error'
+            Padding.Top = 3
+            Padding.Bottom = 3
+            TabOrder = 2
+            Visible = False
+            object memoLog: TMemo
+              Left = 0
+              Top = 3
+              Width = 808
+              Height = 109
+              Align = alClient
+              Lines.Strings = (
+                'memoLog')
+              ReadOnly = True
+              ScrollBars = ssVertical
+              TabOrder = 0
+              OnChange = memoLogChange
+            end
+            object Panel1: TPanel
+              Left = 808
+              Top = 3
+              Width = 24
+              Height = 109
+              Align = alRight
+              BevelOuter = bvNone
+              TabOrder = 1
+              object bt_close_pnerro: TSpeedButton
+                Left = 0
+                Top = 0
+                Width = 24
+                Height = 22
+                Align = alTop
+                Flat = True
+                Glyph.Data = {
+                  2E020000424D2E020000000000002E0100002800000010000000100000000100
+                  08000000000000010000120B0000120B00003E0000003E00000000000000FFFF
+                  FF00FF00FF00BB410000BB420000FFF6EF00E69C5900E69D5900E9A36200FFF4
+                  EA00FFF8F200FECA9500FFCE9C00FFD4A900FEEBD800FEF0E200FFF2E500FFF3
+                  E700FFFBF700FECE9C00FED3A500FED5AA00FEDAB400FFDCB600FEDDB800FEDD
+                  BA00FFE3C500FEE2C400FFE5C900FFE6CA00FEE5CA00FFEBD500FEF3E700FFDA
+                  AD00FFEAD100FFFAF400FFD8A700FFD9A900FFDAAB00FFE1B800FFE7C700FEEE
+                  D900FFFBF600FFDCAC00FFE1B500FFE7C400FFEFD700FFEAC200FFFAEA00FFFE
+                  FB00FFFFFA00FFFFFE00315EFF002A56FF00123BFF00153DFF001841FF001A44
+                  FF001D47FF00072BFF00001EFF00000D66000202020202020202020202020202
+                  0202020202020202020202020202020202020204040404040404040404040402
+                  020202040132302E28272125242F04020202020401050F221B1614130B260402
+                  0202020401310A101F1A170D0C2B04020202020401013323110E1C18152C0402
+                  02020204010101332A20291D192D040202020204010101010112093D1E2E043D
+                  020202040101010101013D363D013D3C3D020204080606060606073D373D3B3D
+                  0202020203040404040404043D383D0202020202020202020202023D353D393D
+                  020202020202020202023D343D023D3A3D020202020202020202023D0202023D
+                  020202020202020202020202020202020202}
+                OnClick = bt_close_pnerroClick
+                ExplicitLeft = 6
+                ExplicitTop = 3
+              end
+            end
+          end
+        end
+      end
+    end
+    object ts_renave: TTabSheet
+      Caption = 'ts_renave'
+      ImageIndex = 1
+      object Panel4: TPanel
+        Left = 0
+        Top = 0
+        Width = 856
+        Height = 424
+        Align = alClient
+        BevelOuter = bvNone
+        BorderWidth = 6
+        TabOrder = 0
+        object Panel5: TPanel
+          Left = 6
+          Top = 377
+          Width = 844
+          Height = 41
+          Align = alBottom
+          BevelKind = bkTile
+          BevelOuter = bvNone
+          TabOrder = 0
+          object Panel11: TPanel
+            Left = 736
+            Top = 0
+            Width = 104
+            Height = 37
+            Align = alRight
+            BevelOuter = bvNone
+            TabOrder = 0
+            object bt_voltar_para_estoque: TBitBtn
+              Left = 14
+              Top = 6
+              Width = 75
+              Height = 25
+              Caption = 'Voltar'
+              Glyph.Data = {
+                36050000424D3605000000000000360400002800000010000000100000000100
+                08000000000000010000D30E0000D30E00000001000000010000AD4A0000B54A
+                0000B5520000BD520000BD5A0000C65A0000C6630000CE630000CE6B0000D673
+                0000DE730000DE7B0000E77B0000E7840000F7940000CE6B0800FF9C0800A542
+                1000AD4A1000B5521000C6631000B55A2100CE732100B55A3100BD633100FFAD
+                3100CE7B3900BD6B4200C6734200CE844200CE844A00BD735200BD7B5200C67B
+                5200C6845A00C6846300FFBD6300C68C7300CE947B00CE9C8400FF00FF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00282828282828
+                2828281F05002828282828282828282828282817050713282828282828282828
+                2828282817060715282828282828282828282828281507062328280004040404
+                040404232828000701282802090807070707061B28282706062328040B090711
+                2727272828282800071328060D070A07232828282828281C070128070E13020B
+                082028282828281C0701280F101D28020D0818282828280107132816191E2828
+                140D0C03212513060623281A2421282828150C0D0B0908061228282622282828
+                282827140808041B282828282828282828282828282828282828282828282828
+                2828282828282828282828282828282828282828282828282828}
+              TabOrder = 0
+              OnClick = bt_voltar_para_estoqueClick
+            end
+          end
+          object btCancelarEntrada: TBitBtn
+            Left = 16
+            Top = 6
+            Width = 121
+            Height = 25
+            Caption = 'Cancelar entrada'
+            TabOrder = 1
+            OnClick = btCancelarEntradaClick
+          end
+          object btCancelarSaida: TBitBtn
+            Left = 143
+            Top = 6
+            Width = 121
+            Height = 25
+            Caption = 'Cancelar sa'#237'da'
+            TabOrder = 2
+            OnClick = btCancelarSaidaClick
+          end
+        end
+        object Panel6: TPanel
+          Left = 6
+          Top = 6
+          Width = 844
+          Height = 371
+          Align = alClient
+          BevelOuter = bvNone
+          BorderWidth = 6
+          Caption = 'Aguarde... Procurando dados'
+          TabOrder = 1
+          object grid_est_renave: TDBGrid
+            Left = 6
+            Top = 6
+            Width = 832
+            Height = 359
+            Align = alClient
+            Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+            TabOrder = 0
+            TitleFont.Charset = DEFAULT_CHARSET
+            TitleFont.Color = clWindowText
+            TitleFont.Height = -11
+            TitleFont.Name = 'Tahoma'
+            TitleFont.Style = []
+          end
+        end
+      end
+    end
+    object ts_cidade: TTabSheet
+      Caption = 'ts_cidade'
+      ImageIndex = 2
+      object Panel7: TPanel
+        Left = 0
+        Top = 0
+        Width = 856
+        Height = 424
+        Align = alClient
+        BevelOuter = bvNone
+        BorderWidth = 6
+        TabOrder = 0
+        object Panel8: TPanel
+          Left = 6
+          Top = 377
+          Width = 844
+          Height = 41
+          Align = alBottom
+          BevelKind = bkTile
+          BevelOuter = bvNone
+          TabOrder = 0
+          object btConfirmarMunicipio: TBitBtn
+            Left = 11
+            Top = 6
+            Width = 91
+            Height = 25
+            Caption = 'Confirmar'
+            Glyph.Data = {
+              36050000424D3605000000000000360400002800000010000000100000000100
+              08000000000000010000D30E0000D30E00000001000000010000008C00000094
+              0000009C000000A5000000940800009C100000AD100000AD180000AD210000B5
+              210000BD210018B5290000C62900319C310000CE310029AD390031B5420018C6
+              420000D6420052A54A0029AD4A0029CE5A006BB5630000FF63008CBD7B00A5C6
+              94005AE7A500FF00FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF001B1B1B1B1B13
+              04161B1B1B1B1B1B1B1B1B1B1B1B1B0B0A01181B1B1B1B1B1B1B1B1B1B1B160A
+              0C030D1B1B1B1B1B1B1B1B1B1B1B050E0C0601191B1B1B1B1B1B1B1B1B130E0C
+              170E02001B1B1B1B1B1B1B1B1B0B1517170A0C01181B1B1B1B1B1B1B1B111717
+              13130C030D1B1B1B1B1B1B1B1B1B08081B1B070C01191B1B1B1B1B1B1B1B1B1B
+              1B1B100C02001B1B1B1B1B1B1B1B1B1B1B1B1B090C01181B1B1B1B1B1B1B1B1B
+              1B1B1B130C0F101B1B1B1B1B1B1B1B1B1B1B1B1B141A0F181B1B1B1B1B1B1B1B
+              1B1B1B1B1012181B1B1B1B1B1B1B1B1B1B1B1B1B1B191B1B1B1B1B1B1B1B1B1B
+              1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B}
+            TabOrder = 0
+            OnClick = btConfirmarMunicipioClick
+          end
+          object Panel10: TPanel
+            Left = 736
+            Top = 0
+            Width = 104
+            Height = 37
+            Align = alRight
+            BevelOuter = bvNone
+            Caption = 'Panel10'
+            TabOrder = 1
+            object BitBtn3: TBitBtn
+              Left = 14
+              Top = 6
+              Width = 75
+              Height = 25
+              Caption = 'Voltar'
+              Glyph.Data = {
+                36050000424D3605000000000000360400002800000010000000100000000100
+                08000000000000010000D30E0000D30E00000001000000010000AD4A0000B54A
+                0000B5520000BD520000BD5A0000C65A0000C6630000CE630000CE6B0000D673
+                0000DE730000DE7B0000E77B0000E7840000F7940000CE6B0800FF9C0800A542
+                1000AD4A1000B5521000C6631000B55A2100CE732100B55A3100BD633100FFAD
+                3100CE7B3900BD6B4200C6734200CE844200CE844A00BD735200BD7B5200C67B
+                5200C6845A00C6846300FFBD6300C68C7300CE947B00CE9C8400FF00FF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00282828282828
+                2828281F05002828282828282828282828282817050713282828282828282828
+                2828282817060715282828282828282828282828281507062328280004040404
+                040404232828000701282802090807070707061B28282706062328040B090711
+                2727272828282800071328060D070A07232828282828281C070128070E13020B
+                082028282828281C0701280F101D28020D0818282828280107132816191E2828
+                140D0C03212513060623281A2421282828150C0D0B0908061228282622282828
+                282827140808041B282828282828282828282828282828282828282828282828
+                2828282828282828282828282828282828282828282828282828}
+              TabOrder = 0
+              OnClick = bt_voltar_para_estoqueClick
+            end
+          end
+        end
+        object Panel9: TPanel
+          Left = 6
+          Top = 6
+          Width = 844
+          Height = 371
+          Align = alClient
+          BevelOuter = bvNone
+          BorderWidth = 6
+          TabOrder = 1
+          object Label1: TLabel
+            Left = 24
+            Top = 16
+            Width = 130
+            Height = 13
+            Caption = 'Cadastro munic'#237'po ERP HW'
+          end
+          object lb_mun_renave: TLabel
+            Left = 24
+            Top = 35
+            Width = 206
+            Height = 13
+            Caption = '345 - GOVERNADOR VALADARES - MG'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object Label3: TLabel
+            Left = 24
+            Top = 78
+            Width = 135
+            Height = 13
+            Caption = 'Munic'#237'pios cadastro RENAVE'
+          end
+          object combo_cidades: TComboBox
+            Left = 24
+            Top = 97
+            Width = 335
+            Height = 21
+            Style = csDropDownList
+            TabOrder = 0
+          end
+        end
+      end
+    end
+    object ts_solicitacao_saida: TTabSheet
+      Caption = 'ts_solicitacao_saida'
+      ImageIndex = 3
+      object Panel12: TPanel
+        Left = 0
+        Top = 0
+        Width = 856
+        Height = 424
+        Align = alClient
+        BevelOuter = bvNone
+        BorderWidth = 6
+        TabOrder = 0
+        object Panel13: TPanel
+          Left = 6
+          Top = 377
+          Width = 844
+          Height = 41
+          Align = alBottom
+          BevelKind = bkTile
+          BevelOuter = bvNone
+          TabOrder = 0
+          object BitBtn2: TBitBtn
+            Left = 11
+            Top = 6
+            Width = 91
+            Height = 25
+            Caption = 'Confirmar'
+            Glyph.Data = {
+              36050000424D3605000000000000360400002800000010000000100000000100
+              08000000000000010000D30E0000D30E00000001000000010000008C00000094
+              0000009C000000A5000000940800009C100000AD100000AD180000AD210000B5
+              210000BD210018B5290000C62900319C310000CE310029AD390031B5420018C6
+              420000D6420052A54A0029AD4A0029CE5A006BB5630000FF63008CBD7B00A5C6
+              94005AE7A500FF00FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+              FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF001B1B1B1B1B13
+              04161B1B1B1B1B1B1B1B1B1B1B1B1B0B0A01181B1B1B1B1B1B1B1B1B1B1B160A
+              0C030D1B1B1B1B1B1B1B1B1B1B1B050E0C0601191B1B1B1B1B1B1B1B1B130E0C
+              170E02001B1B1B1B1B1B1B1B1B0B1517170A0C01181B1B1B1B1B1B1B1B111717
+              13130C030D1B1B1B1B1B1B1B1B1B08081B1B070C01191B1B1B1B1B1B1B1B1B1B
+              1B1B100C02001B1B1B1B1B1B1B1B1B1B1B1B1B090C01181B1B1B1B1B1B1B1B1B
+              1B1B1B130C0F101B1B1B1B1B1B1B1B1B1B1B1B1B141A0F181B1B1B1B1B1B1B1B
+              1B1B1B1B1012181B1B1B1B1B1B1B1B1B1B1B1B1B1B191B1B1B1B1B1B1B1B1B1B
+              1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B}
+            TabOrder = 0
+            OnClick = btConfirmarMunicipioClick
+          end
+          object Panel14: TPanel
+            Left = 736
+            Top = 0
+            Width = 104
+            Height = 37
+            Align = alRight
+            BevelOuter = bvNone
+            Caption = 'Panel10'
+            TabOrder = 1
+            object BitBtn4: TBitBtn
+              Left = 14
+              Top = 6
+              Width = 75
+              Height = 25
+              Caption = 'Voltar'
+              Glyph.Data = {
+                36050000424D3605000000000000360400002800000010000000100000000100
+                08000000000000010000D30E0000D30E00000001000000010000AD4A0000B54A
+                0000B5520000BD520000BD5A0000C65A0000C6630000CE630000CE6B0000D673
+                0000DE730000DE7B0000E77B0000E7840000F7940000CE6B0800FF9C0800A542
+                1000AD4A1000B5521000C6631000B55A2100CE732100B55A3100BD633100FFAD
+                3100CE7B3900BD6B4200C6734200CE844200CE844A00BD735200BD7B5200C67B
+                5200C6845A00C6846300FFBD6300C68C7300CE947B00CE9C8400FF00FF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00282828282828
+                2828281F05002828282828282828282828282817050713282828282828282828
+                2828282817060715282828282828282828282828281507062328280004040404
+                040404232828000701282802090807070707061B28282706062328040B090711
+                2727272828282800071328060D070A07232828282828281C070128070E13020B
+                082028282828281C0701280F101D28020D0818282828280107132816191E2828
+                140D0C03212513060623281A2421282828150C0D0B0908061228282622282828
+                282827140808041B282828282828282828282828282828282828282828282828
+                2828282828282828282828282828282828282828282828282828}
+              TabOrder = 0
+              OnClick = bt_voltar_para_estoqueClick
+            end
+          end
+        end
+        object Panel15: TPanel
+          Left = 6
+          Top = 6
+          Width = 844
+          Height = 371
+          Align = alClient
+          BevelOuter = bvNone
+          BorderWidth = 6
+          TabOrder = 1
+          object Label2: TLabel
+            Left = 512
+            Top = 208
+            Width = 130
+            Height = 13
+            Caption = 'Cadastro munic'#237'po ERP HW'
+          end
+          object Label4: TLabel
+            Left = 512
+            Top = 227
+            Width = 206
+            Height = 13
+            Caption = '345 - GOVERNADOR VALADARES - MG'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object Label5: TLabel
+            Left = 512
+            Top = 270
+            Width = 135
+            Height = 13
+            Caption = 'Munic'#237'pios cadastro RENAVE'
+          end
+          object Label6: TLabel
+            Left = 24
+            Top = 16
+            Width = 53
+            Height = 13
+            Caption = 'Chave NFe'
+          end
+          object Label7: TLabel
+            Left = 24
+            Top = 62
+            Width = 81
+            Height = 13
+            Caption = 'Nome comprador'
+          end
+          object Label8: TLabel
+            Left = 24
+            Top = 108
+            Width = 78
+            Height = 13
+            Caption = 'Email comprador'
+          end
+          object Label9: TLabel
+            Left = 24
+            Top = 154
+            Width = 78
+            Height = 13
+            Caption = 'Email comprador'
+          end
+          object ComboBox1: TComboBox
+            Left = 512
+            Top = 289
+            Width = 335
+            Height = 21
+            Style = csDropDownList
+            TabOrder = 0
+          end
+          object MaskEdit1: TMaskEdit
+            Left = 24
+            Top = 35
+            Width = 345
+            Height = 21
+            EditMask = '0000-0000-0000-0000-0000-0000-0000-0000-0000-0000-0000;0;_'
+            MaxLength = 54
+            TabOrder = 1
+            Text = ''
+          end
+          object MaskEdit2: TMaskEdit
+            Left = 24
+            Top = 81
+            Width = 345
+            Height = 21
+            TabOrder = 2
+            Text = 'MaskEdit2'
+          end
+          object MaskEdit3: TMaskEdit
+            Left = 24
+            Top = 127
+            Width = 345
+            Height = 21
+            TabOrder = 3
+            Text = 'MaskEdit2'
+          end
+          object MaskEdit4: TMaskEdit
+            Left = 24
+            Top = 173
+            Width = 345
+            Height = 21
+            TabOrder = 4
+            Text = 'MaskEdit2'
+          end
+        end
+      end
+    end
+  end
+  object TimerEstoque: TTimer
+    Enabled = False
+    Interval = 500
+    OnTimer = TimerEstoqueTimer
+    Left = 32
+    Top = 16
+  end
+  object popMenu: TPopupMenu
+    Left = 64
+    Top = 16
+    object Meusdadosecertificado1: TMenuItem
+      Caption = 'Meus dados e certificado'
+      OnClick = Meusdadosecertificado1Click
+    end
+    object Configuraoresponsvel1: TMenuItem
+      Caption = 'Configura'#231#227'o respons'#225'vel'
+      OnClick = Configuraoresponsvel1Click
+    end
+    object N3: TMenuItem
+      Caption = '-'
+    end
+    object VeculosZeropendentesdeentrada1: TMenuItem
+      Caption = 'Ve'#237'culos Zero pendentes de entrada'
+      OnClick = VeculosZeropendentesdeentrada1Click
+    end
+    object N2: TMenuItem
+      Caption = '-'
+    end
+    object Ajustardadoshodometro1: TMenuItem
+      Caption = 'Ajustar dados hodometro(selecionados)'
+      OnClick = Ajustardadoshodometro1Click
+    end
+    object Atualizarestoquerenave1: TMenuItem
+      Caption = 'Atualizar estoque renave(selecionados)'
+      OnClick = Atualizarestoquerenave1Click
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object AjustarcidadeRENAVEdocliente1: TMenuItem
+      Caption = 'Ajustar cidade RENAVE do registro'
+      OnClick = AjustarcidadeRENAVEdocliente1Click
+    end
+    object VisualizarestoqueRENAVEdoitem1: TMenuItem
+      Caption = 'Visualizar estoque RENAVE do registro'
+      OnClick = VisualizarestoqueRENAVEdoitem1Click
+    end
+  end
+end

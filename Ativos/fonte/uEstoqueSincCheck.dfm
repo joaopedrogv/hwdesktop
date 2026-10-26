@@ -1,0 +1,321 @@
+inherited frmEstoqueSincCheck: TfrmEstoqueSincCheck
+  Caption = 'frmEstoqueSincCheck'
+  ClientHeight = 467
+  ClientWidth = 776
+  ExplicitWidth = 784
+  ExplicitHeight = 501
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Panel1: TPanel
+    Left = 0
+    Top = 0
+    Width = 776
+    Height = 467
+    Align = alClient
+    BevelOuter = bvNone
+    BorderWidth = 8
+    TabOrder = 0
+    ExplicitLeft = 304
+    ExplicitTop = 232
+    ExplicitWidth = 185
+    ExplicitHeight = 41
+    object Panel2: TPanel
+      Left = 8
+      Top = 8
+      Width = 760
+      Height = 41
+      Align = alTop
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      Caption = 
+        'A grade 0 (SEM GRADE) n'#227'o deve ser utilizada, escolha alternativ' +
+        'a para ajustar'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 0
+      ExplicitLeft = 0
+      ExplicitWidth = 768
+    end
+    object Panel3: TPanel
+      Left = 8
+      Top = 49
+      Width = 760
+      Height = 369
+      Align = alClient
+      BevelEdges = [beLeft, beRight]
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      TabOrder = 1
+      ExplicitWidth = 768
+      ExplicitHeight = 366
+      object Splitter1: TSplitter
+        Left = 0
+        Top = 192
+        Width = 756
+        Height = 3
+        Cursor = crVSplit
+        Align = alBottom
+        ExplicitTop = 0
+        ExplicitWidth = 192
+      end
+      object Panel5: TPanel
+        Left = 0
+        Top = 195
+        Width = 756
+        Height = 174
+        Align = alBottom
+        BevelEdges = [beTop]
+        BevelKind = bkTile
+        BevelOuter = bvNone
+        TabOrder = 0
+        ExplicitTop = 186
+        ExplicitWidth = 764
+        object Splitter2: TSplitter
+          Left = 209
+          Top = 0
+          Height = 172
+          ExplicitLeft = 384
+          ExplicitTop = 40
+          ExplicitHeight = 100
+        end
+        object Panel6: TPanel
+          Left = 0
+          Top = 0
+          Width = 209
+          Height = 172
+          Align = alLeft
+          BevelOuter = bvNone
+          TabOrder = 0
+          object DBGrid2: TDBGrid
+            Left = 0
+            Top = 0
+            Width = 209
+            Height = 143
+            Align = alClient
+            TabOrder = 0
+            TitleFont.Charset = DEFAULT_CHARSET
+            TitleFont.Color = clWindowText
+            TitleFont.Height = -11
+            TitleFont.Name = 'Tahoma'
+            TitleFont.Style = []
+          end
+          object Panel7: TPanel
+            Left = 0
+            Top = 143
+            Width = 209
+            Height = 29
+            Align = alBottom
+            BevelEdges = [beRight]
+            BevelOuter = bvNone
+            Caption = 'Estoque Hist'#243'rico 1,000'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clBlue
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+            TabOrder = 1
+          end
+        end
+        object Panel8: TPanel
+          Left = 212
+          Top = 0
+          Width = 544
+          Height = 172
+          Align = alClient
+          BevelOuter = bvNone
+          TabOrder = 1
+          ExplicitLeft = 215
+          ExplicitTop = -4
+          ExplicitWidth = 552
+          object Panel9: TPanel
+            Left = 0
+            Top = 0
+            Width = 544
+            Height = 41
+            Align = alTop
+            BevelKind = bkTile
+            BevelOuter = bvNone
+            Caption = 'A grade 0 (SEM GRADE) poss'#250'i X itens em estoque?'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clBlue
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+            TabOrder = 0
+            ExplicitWidth = 552
+          end
+          object BitBtn1: TBitBtn
+            Left = 32
+            Top = 47
+            Width = 473
+            Height = 33
+            Caption = 'N'#227'o, n'#227'o possui!'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clMaroon
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+            TabOrder = 1
+          end
+          object BitBtn2: TBitBtn
+            Left = 32
+            Top = 86
+            Width = 473
+            Height = 33
+            Caption = 'Sim possui, direcionar para a grade abaixo'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clGreen
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentFont = False
+            TabOrder = 2
+          end
+          object DBLookupComboBox1: TDBLookupComboBox
+            Left = 32
+            Top = 125
+            Width = 473
+            Height = 21
+            TabOrder = 3
+          end
+        end
+      end
+      object DBGrid1: TDBGrid
+        Left = 0
+        Top = 0
+        Width = 756
+        Height = 192
+        Align = alClient
+        TabOrder = 1
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -11
+        TitleFont.Name = 'Tahoma'
+        TitleFont.Style = []
+      end
+    end
+    object Panel4: TPanel
+      Left = 8
+      Top = 418
+      Width = 760
+      Height = 41
+      Align = alBottom
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      TabOrder = 2
+      ExplicitTop = 419
+      ExplicitWidth = 768
+      object confirmarBtn: TBitBtn
+        Left = 328
+        Top = 6
+        Width = 89
+        Height = 25
+        Caption = 'Confirmar'
+        TabOrder = 0
+        OnClick = confirmarBtnClick
+        Glyph.Data = {
+          36050000424D3605000000000000360400002800000010000000100000000100
+          08000000000000010000D30E0000D30E00000001000000010000008C00000094
+          0000009C000000A5000000940800009C100000AD100000AD180000AD210000B5
+          210000BD210018B5290000C62900319C310000CE310029AD390031B5420018C6
+          420000D6420052A54A0029AD4A0029CE5A006BB5630000FF63008CBD7B00A5C6
+          94005AE7A500FF00FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF001B1B1B1B1B13
+          04161B1B1B1B1B1B1B1B1B1B1B1B1B0B0A01181B1B1B1B1B1B1B1B1B1B1B160A
+          0C030D1B1B1B1B1B1B1B1B1B1B1B050E0C0601191B1B1B1B1B1B1B1B1B130E0C
+          170E02001B1B1B1B1B1B1B1B1B0B1517170A0C01181B1B1B1B1B1B1B1B111717
+          13130C030D1B1B1B1B1B1B1B1B1B08081B1B070C01191B1B1B1B1B1B1B1B1B1B
+          1B1B100C02001B1B1B1B1B1B1B1B1B1B1B1B1B090C01181B1B1B1B1B1B1B1B1B
+          1B1B1B130C0F101B1B1B1B1B1B1B1B1B1B1B1B1B141A0F181B1B1B1B1B1B1B1B
+          1B1B1B1B1012181B1B1B1B1B1B1B1B1B1B1B1B1B1B191B1B1B1B1B1B1B1B1B1B
+          1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B}
+      end
+      object exitBtn: TBitBtn
+        Left = 642
+        Top = 6
+        Width = 75
+        Height = 25
+        Caption = 'Voltar'
+        ModalResult = 2
+        TabOrder = 1
+        Glyph.Data = {
+          36050000424D3605000000000000360400002800000010000000100000000100
+          08000000000000010000D30E0000D30E00000001000000010000AD4A0000B54A
+          0000B5520000BD520000BD5A0000C65A0000C6630000CE630000CE6B0000D673
+          0000DE730000DE7B0000E77B0000E7840000F7940000CE6B0800FF9C0800A542
+          1000AD4A1000B5521000C6631000B55A2100CE732100B55A3100BD633100FFAD
+          3100CE7B3900BD6B4200C6734200CE844200CE844A00BD735200BD7B5200C67B
+          5200C6845A00C6846300FFBD6300C68C7300CE947B00CE9C8400FF00FF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00282828282828
+          2828281F05002828282828282828282828282817050713282828282828282828
+          2828282817060715282828282828282828282828281507062328280004040404
+          040404232828000701282802090807070707061B28282706062328040B090711
+          2727272828282800071328060D070A07232828282828281C070128070E13020B
+          082028282828281C0701280F101D28020D0818282828280107132816191E2828
+          140D0C03212513060623281A2421282828150C0D0B0908061228282622282828
+          282827140808041B282828282828282828282828282828282828282828282828
+          2828282828282828282828282828282828282828282828282828}
+      end
+    end
+  end
+end

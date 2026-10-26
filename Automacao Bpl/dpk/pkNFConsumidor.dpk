@@ -1,0 +1,51 @@
+package pkNFConsumidor;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  pkAtivos,
+  PkFormularios,
+  vcl,
+  vcldb,
+  pkFiscal,
+  dbrtl;
+
+contains
+  uDtmNFConsumidor in '..\fonte\uDtmNFConsumidor.pas' {dtmNFConsumidor: TDataModule},
+  uCadNFCe in '..\fonte\uCadNFCe.pas' {frmCadNFCe},
+  uCadNFC_Emissor in '..\fonte\uCadNFC_Emissor.pas' {frmCadNFC_Emissor},
+  uClassesNFConsumidor in '..\fonte\uClassesNFConsumidor.pas',
+  uNFCeConfig in '..\fonte\uNFCeConfig.pas' {frmNFCeConfig},
+  uNFCeDadosEmissao in '..\fonte\uNFCeDadosEmissao.pas' {frmNFCeDadosEmissao},
+  uCadNFCe_StatusServico in '..\fonte\uCadNFCe_StatusServico.pas' {frmCadNFCe_StatusServico},
+  uCadNFCe_RelMovOperador in '..\fonte\uCadNFCe_RelMovOperador.pas' {frmCadNFCe_RelMovOperador},
+  uCadNFCe_MovOperador in '..\fonte\uCadNFCe_MovOperador.pas' {frmCadNFCe_MovOperador},
+  uCadNFCe_ConfService in '..\fonte\uCadNFCe_ConfService.pas' {frmCadNFCe_ConfService},
+  uCadNFCe_VendasSelect in '..\fonte\uCadNFCe_VendasSelect.pas' {frmCadNFCe_VendasSelect},
+  uClassesNFConsumidor_ProdutoInput in '..\fonte\uClassesNFConsumidor_ProdutoInput.pas';
+
+end.

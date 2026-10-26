@@ -1,0 +1,4 @@
+Para usar apenas método para gerar valores de PIS/COFINS em cupons e notas fiscais ainda nao gerados.
+        Usar esta função
+        function definirPISCOFINSCuponsPorPeriodo(pCodEmpresa, pEndereco, pDataIni, pDataFim: PChar): Boolean; stdcall;
+          external 'SPEDPISCOFINS.dll';

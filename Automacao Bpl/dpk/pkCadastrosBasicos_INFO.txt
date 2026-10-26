@@ -1,0 +1,15 @@
+--REUTILIZÁVEIS--
+ÍNDICES - 2;
+
+-- ÍNDICE --
+1 - CEP
+        1.1 - TRAZER INFORAÇÕES DO CEP
+        1.2 - GRAVAR CEP AUTOMATICO
+2 - EDITOR - Editor de texto
+
+
+-- TEXTO --
+1 - CEP
+        1.1 - Utilizar a função _TrazerCodigosEst0Cid1Bai2NomesEnd3Est4Cid5Bai6 da classe TCEP em UClassesCadastrosBasicos; ex:. PKClientes -> UCadClientes
+        2.2 - Utilizar função _GravarCEPAutomatico da classe TCEP em UClassesCadastrosBasicos; ex:. PKClientes -> UCadClientes
+2 - Se precisar de editor de texto, utilizar UEditor.

@@ -1,0 +1,110 @@
+-- ÍNDICE --
+1 - DOCUMENTAÇÃO
+        1.1 - FORMULÁRIOS
+                1.1.1 - Processar arquivo de retorno
+                        1.1.1.1 - CAMPOS DO FORMULÁRIO | CAMPOS DO BANCO DE DADOS
+                        1.1.1.1 - BOTÕES,AÇÕES,PROCESSOS E FUNCIONALIDADES
+        1.2 - Tópicos relacionados
+                                               
+2 - INFORMAÇÕES
+        2.1 - Erros
+
+-- TEXTO --
+1 - DOCUMENTAÇÃO
+        1.1 - FORMULÁRIOS
+                1.1.1 - Processar arquivo de retorno
+                        1.1.1.1 - CAMPOS DO FORMULÁRIO | CAMPOS DO BANCO DE DADOS
+                                - 1 - Controle bancário: | CODIGO_CTRL (obs:. Tabela : Controles) - Em qual banco será feito o lançamento de entrada no caixa
+                                - 2 - Arquivo de retorno:
+                                        - Caminho do arquivo informado pelo usuário(Não é vinculado a campo no banco)
+                                        - Quando o caminho é carregado se tiver tarifa bancária ele soma e exibe no campo
+                                        Total tarifa bancária para ser lançado no caixa
+                                - 3 - Total de ocorrências no arquivo:
+                                        - Total de boletos que tem no arquivo de retorno (Não é vinculado a campo no banco)
+                                - 4 - Total tarifa bancária
+                                        - Total da tarifa bancaria que está no arquivo de retorno (aparece se não foi lançado no caixa)
+                                - 5 - Total do arquivo de retorno
+                                        - Total de ocorrências para baixa que estão no arquivo de retorno
+                                - 6 - Crédito(s) para quitar
+                                        - Total de créditos para serem quitados do sistema
+                                - 7 - Crédito(s) quitados
+                                        - Total de créditos quitados do sistema
+                        1.1.1.2 - BOTÕES,AÇÕES,PROCESSOS E FUNCIONALIDADES
+                                - 1 - Processar arquivo (IFI002)
+                                        - Preenche a aba "Créditos - Processamento" com os créditos
+                                        referentes aos boletos do arquivo de retorno que foram quitados
+                                        pelos clientes, e insere nos boletos e nos créditos as observações
+                                        do banco de todos os boletos que vieram no arquivo de retorno.
+                                        (obs:. Se o boleto não tiver crédito viculado
+                                        ao mesmo, ele exibe uma mensagem para o usuário informando caso o
+                                        usuário deseje inserir a informação bancaria mesmo assim)
+                                        Preenche na aba "Histórico - Log Arquivo", todos os boletos que vieram
+                                        no arquivo de retorno.
+                                        - Se o campo "Lançar tarifa bancária referente aos boletos no caixa durante o processamento do arquivo"
+                                        estiver marcado lança a tarifa bancária que está no arquivo de retorno referente aos boletos no caixa.
+                                POP-UP
+                                     - 1 - Verificar Crédito - Aparece caso tenha o mesmo Nosso Número
+                                     em dois ou mais créditos que não estejam quitados, para seleção
+                                     do crédito que desejar quitar.
+
+                                - 2 - Processamento
+                                        - Passa para aba "Créditos - Processamento"
+                                - 3 - Log Arquivo
+                                        - Passa para aba "Histórico - Log Arquivo"
+                                - 4 - Créditos - Processamento
+                                        - Exibe os créditos dos boletos que vierem no arquivo de retorno
+                                        que os clientes quitaram.
+                                - 5 - Histórico - Log Arquivo
+                                        - Exibe todos os créditos dos boletos que vierem no arquivo de retorno        
+                                - 6 - Total de ocorrencia no arquivo:
+                                        - Quantidade de boletos no arquivo de retorno
+                                - 7 - Imprimir créditos quitados pelo arquivo de retorno (IFI003)
+                                        - Imprime pela data todos os créditos que foram quitados
+                                        pelo arquivo de retorno.
+                                - 8 - Quitar Créditos Selecionados (IFI001)
+                                        - Realiza a baixa no crédito.
+                                        obs:. As contas de ligação devem estar
+                                        certamente configuados senão apresentará erros.
+                                - 9 - Total subtraído do juros cobrado
+                                        - Soma do total subtraído do juros cobrado dos créditos selecionados
+                                - 10 - Total
+                                        - Soma total mais o juros cobrado dos créditos selecionados
+                                - 11 - Somar selecionados
+                                        - Executa a soma que é exibida nos campos "Total" e "Total subtraído do juros cobrado".
+                                - 12 - Lançar tarifa bancária referente aos boletos no caixa durante o processamento do arquivo
+                                        - Seleção para lançar a taxa bancária no caixa
+        1.2 - Tópicos relacionados
+                3.2.1 - Cobrebem
+                        - Configuração do boleto
+                3.2.2 - Crédito
+                        - Baixa
+                        - Insere a ocorrencia bancária
+                3.2.3 - Controle
+                        - Código
+                3.2.4 - Boleto
+                        - Caixa :. Insere a ocorrencia bancária no boleto
+                3.2.5 - Contas de ligação
+                        - Configuração para lancamentos nos campos:
+                        - 1 - Conta Desc. Prest. : (NCON_D_PREST)
+                        - 2 - Conta Juros Prest. : (NCON_J_PREST)
+                        - 3 - Conta da tarifa bancária. : (NCON_TARIFABANCARIA)
+        1.3 - Campos de configuração
+                1.3.1 - Empresa
+                        (Tela : Configurações do sistema -> Venda)
+                        - 1 - Quitar Boleto pelo sitema
+                                - Se esta opção na empresa não estiver
+                                selecionada ele não exibe
+                                o formulário Processar arquivo de retorno.
+                        (Tela : Contas de ligação)
+                        - 1 - Conta Desc. Prest. : (NCON_D_PREST)
+                        - 2 - Conta Juros Prest. : (NCON_J_PREST)
+                        - 3 - Conta da tarifa bancária. : (NCON_TARIFABANCARIA)
+2 - INFORMAÇÕES
+        2.1 - Erros
+                - Na configuração do Cobrebem se for colocado um arquivo de licença
+                diferente do arquivo de retorno da empresa que é processada
+                o processamento de arquivos ao buscar algumas informações depois
+                se processar novamente vai buscar informações diferentes,
+                assim sucessivamente.
+
+

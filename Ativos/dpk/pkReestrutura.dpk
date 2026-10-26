@@ -1,0 +1,89 @@
+package pkReestrutura;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+{%File '..\..\scripts\tarefas_jp_001.sql'}
+{%File '..\..\scripts\tarefas_jp_002.sql'}
+{%File '..\..\scripts\tarefas_jp_003.sql'}
+{%File '..\..\scripts\tarefas_jp_005.sql'}
+{%File '..\..\scripts\tarefas_jp_006.sql'}
+{%File '..\..\scripts\tarefas_odilon_001.sql'}
+{%File '..\..\scripts\tarefas_odilon_003.sql'}
+{%File '..\..\scripts\tarefas_odilon_004.sql'}
+{%File '..\..\scripts\tarefas_odilon_007.sql'}
+{%File '..\..\scripts\tarefas_odilon_008.sql'}
+{%File '..\..\scripts\tarefas_odilon_comercio_aberto.sql'}
+{%File '..\..\scripts\tarefas_odilon_010.sql'}
+{%File '..\..\scripts\tarefas_odilon_011.sql'}
+{%File '..\..\scripts\tarefas_odilon_013.sql'}
+{%File '..\..\scripts\tarefas_jp_rest_compl_icmsst_efd.sql'}
+{%File '..\..\scripts\tarefas_jp_010.sql'}
+{%File '..\..\scripts\nfe_nfce_intermediador.sql'}
+
+requires
+  rtl,
+  vcl,
+  dbrtl,
+  dsnap,
+  vcldb,
+  ibxpress;
+
+  {$R RecursosSQL.RES}
+
+contains
+  uReestrutura_Classes in '..\fonte\uReestrutura_Classes.pas',
+  uReestrutura_Aplicar in '..\fonte\uReestrutura_Aplicar.pas' {frmReestrutura_Aplicar},
+  uReestrutura_Aplicar_View in '..\fonte\uReestrutura_Aplicar_View.pas' {frmReestrutura_Aplicar_View},
+  uReestrutura_Manutencao in '..\fonte\uReestrutura_Manutencao.pas' {frmReestrutura_Manutencao},
+  uReestrutura_Versao in '..\fonte\uReestrutura_Versao.pas' {frmReestruturaVersao},
+  uReestrutura_Versao1 in '..\fonte\uReestrutura_Versao1.pas' {frmReestruturaVersao1},
+  uReestrutura_HwSenha in '..\fonte\uReestrutura_HwSenha.pas' {frmReestrutura_HwSenha},
+  uReestrutura_Versao2 in '..\fonte\uReestrutura_Versao2.pas' {frmReestruturaVersao2},
+  uReestrutura_Versao3 in '..\fonte\uReestrutura_Versao3.pas' {frmReestruturaVersao3},
+  uReestrutura_Versao4 in '..\fonte\uReestrutura_Versao4.pas' {frmReestruturaVersao4},
+  uReestrutura_Versao5 in '..\fonte\uReestrutura_Versao5.pas' {frmReestruturaVersao5},
+  uReestrutura_Versao6 in '..\fonte\uReestrutura_Versao6.pas' {frmReestruturaVersao6},
+  uReestrutura_Versao7 in '..\fonte\uReestrutura_Versao7.pas' {frmReestruturaVersao7},
+  uReestrutura_Versao8 in '..\fonte\uReestrutura_Versao8.pas' {frmReestruturaVersao8},
+  uReestrutura_Versao9 in '..\fonte\uReestrutura_Versao9.pas' {frmReestruturaVersao9},
+  uReestrutura_Versao10 in '..\fonte\uReestrutura_Versao10.pas' {frmReestruturaVersao10},
+  uReestrutura_Versao11 in '..\fonte\uReestrutura_Versao11.pas' {frmReestruturaVersao11},
+  uReestrutura_Versao12 in '..\fonte\uReestrutura_Versao12.pas' {frmReestruturaVersao12},
+  uReestrutura_Versao13 in '..\fonte\uReestrutura_Versao13.pas' {frmReestruturaVersao13},
+  uReestrutura_Versao14 in '..\fonte\uReestrutura_Versao14.pas' {frmReestruturaVersao14},
+  uReestrutura_Versao15 in '..\fonte\uReestrutura_Versao15.pas' {frmReestruturaVersao15},
+  uReestrutura_Versao16 in '..\fonte\uReestrutura_Versao16.pas' {frmReestruturaVersao16},
+  uReestrutura_Versao17 in '..\fonte\uReestrutura_Versao17.pas' {frmReestruturaVersao17},
+  uReestrutura_Versao18 in '..\fonte\uReestrutura_Versao18.pas' {frmReestruturaVersao18},
+  uReestrutura_Versao19 in '..\fonte\uReestrutura_Versao19.pas' {frmReestruturaVersao19},
+  uReestrutura_Versao20 in '..\fonte\uReestrutura_Versao20.pas' {frmReestruturaVersao20},
+  uReestrutura_Versao21 in '..\fonte\uReestrutura_Versao21.pas' {frmReestruturaVersao21},
+  uReestrutura_Versao22 in '..\fonte\uReestrutura_Versao22.pas' {frmReestruturaVersao22},
+  uReestrutura_Versao23 in '..\fonte\uReestrutura_Versao23.pas' {frmReestruturaVersao23},
+  uReestrutura_Versao24 in '..\fonte\uReestrutura_Versao24.pas' {frmReestruturaVersao24},
+  uReestrutura_Versao25 in '..\fonte\uReestrutura_Versao25.pas' {frmReestruturaVersao25},
+  uReestrutura_Versao26 in '..\fonte\uReestrutura_Versao26.pas' {frmReestruturaVersao26};
+
+end.

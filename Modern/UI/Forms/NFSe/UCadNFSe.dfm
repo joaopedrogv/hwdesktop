@@ -1,0 +1,1393 @@
+inherited FrmCadNFSe: TFrmCadNFSe
+  Caption = 'Cadastro de NFSe'
+  ClientWidth = 845
+  ExplicitWidth = 853
+  ExplicitHeight = 598
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited PanelFundo: TPanel
+    Width = 845
+    BevelOuter = bvNone
+    ExplicitWidth = 845
+    inherited Splitter2: TSplitter
+      Left = 0
+      Top = 0
+      Height = 545
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitHeight = 545
+    end
+    inherited PanelLeft: TPanel
+      Left = 3
+      Top = 0
+      Width = 842
+      Height = 545
+      BevelOuter = bvNone
+      ExplicitLeft = 3
+      ExplicitTop = 0
+      ExplicitWidth = 842
+      ExplicitHeight = 545
+      inherited PageControl1: TPageControl
+        Left = 0
+        Top = 0
+        Width = 842
+        Height = 545
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 842
+        ExplicitHeight = 545
+        inherited TabSheet1: TTabSheet
+          ExplicitLeft = 4
+          ExplicitTop = 27
+          ExplicitWidth = 834
+          ExplicitHeight = 514
+          inherited ScrollBox1: TScrollBox
+            Width = 834
+            Height = 514
+            ExplicitWidth = 834
+            ExplicitHeight = 514
+            inherited PageControl3: TPageControl
+              Width = 834
+              Height = 466
+              ActivePage = tabCadastro
+              ExplicitWidth = 834
+              ExplicitHeight = 466
+              inherited TabSheet3: TTabSheet
+                ExplicitLeft = 4
+                ExplicitTop = 27
+                ExplicitWidth = 826
+                ExplicitHeight = 435
+                inherited ScrollBox3: TScrollBox
+                  Width = 826
+                  Height = 435
+                  ExplicitWidth = 826
+                  ExplicitHeight = 435
+                  inherited GroupBox1: TGroupBox
+                    Width = 822
+                    ExplicitWidth = 822
+                  end
+                end
+              end
+              object tabCadastro: TTabSheet
+                Caption = 'Cadastro'
+                ImageIndex = 1
+                inline NFSeFrame1: TNFSeFrame
+                  Left = 0
+                  Top = 0
+                  Width = 826
+                  Height = 343
+                  Align = alTop
+                  TabOrder = 0
+                  TabStop = True
+                  ExplicitWidth = 826
+                  inherited pnContent: TPanel
+                    Width = 820
+                    ExplicitWidth = 820
+                    inherited pageDPS: TPageControl
+                      Width = 820
+                      ExplicitWidth = 820
+                      inherited tabResumo: TTabSheet
+                        ExplicitLeft = 4
+                        ExplicitTop = 27
+                        ExplicitWidth = 815
+                        ExplicitHeight = 273
+                      end
+                      inherited tabPart: TTabSheet
+                        ExplicitLeft = 4
+                        ExplicitTop = 27
+                        ExplicitWidth = 815
+                        ExplicitHeight = 273
+                      end
+                      inherited tabServ: TTabSheet
+                        ExplicitLeft = 4
+                        ExplicitTop = 27
+                        ExplicitWidth = 815
+                        ExplicitHeight = 273
+                      end
+                      inherited tabValores: TTabSheet
+                        ExplicitLeft = 4
+                        ExplicitTop = 27
+                        ExplicitWidth = 812
+                        ExplicitHeight = 273
+                        inherited pageValores: TPageControl
+                          Width = 812
+                          ExplicitWidth = 812
+                          inherited tabISS: TTabSheet
+                            ExplicitLeft = 4
+                            ExplicitTop = 27
+                            ExplicitWidth = 807
+                            ExplicitHeight = 203
+                          end
+                          inherited tabPISCOFINS: TTabSheet
+                            ExplicitLeft = 4
+                            ExplicitTop = 27
+                            ExplicitWidth = 807
+                            ExplicitHeight = 203
+                          end
+                          inherited tabRetencoes: TTabSheet
+                            ExplicitLeft = 4
+                            ExplicitTop = 27
+                            ExplicitWidth = 804
+                            ExplicitHeight = 203
+                            inherited Panel11: TPanel
+                              Width = 798
+                              ExplicitWidth = 798
+                              inherited edret_vpis: TEditHw
+                                ExplicitTop = 3
+                              end
+                            end
+                            inherited pnRetencoesComboNacional: TPanel
+                              Width = 798
+                              ExplicitWidth = 798
+                            end
+                            inherited Panel18: TPanel
+                              Width = 798
+                              ExplicitWidth = 798
+                              inherited ckRetIss: TCheckBox
+                                ExplicitLeft = 3
+                              end
+                            end
+                          end
+                          inherited tabTotTrib: TTabSheet
+                            ExplicitLeft = 4
+                            ExplicitTop = 27
+                            ExplicitWidth = 807
+                            ExplicitHeight = 203
+                          end
+                        end
+                        inherited PanelValores1: TPanel
+                          Width = 806
+                          ExplicitWidth = 806
+                        end
+                      end
+                      inherited tabIbsCbsNac: TTabSheet
+                        ExplicitLeft = 4
+                        ExplicitTop = 27
+                        ExplicitWidth = 815
+                        ExplicitHeight = 273
+                      end
+                    end
+                    inherited pnTopResumo: TPanel
+                      Width = 814
+                      ExplicitWidth = 814
+                    end
+                  end
+                end
+              end
+            end
+            inherited Panel3: TPanel
+              Top = 466
+              Width = 834
+              ExplicitTop = 466
+              ExplicitWidth = 834
+              inherited LabelSeq: TLabel
+                Left = 823
+                Top = 2
+                Visible = False
+                ExplicitLeft = 823
+                ExplicitTop = 2
+              end
+              object btMaisOpcoesInternas: TSpeedButton [1]
+                Left = 17
+                Top = 11
+                Width = 23
+                Height = 22
+                Cursor = crHandPoint
+                Hint = 'Mais op'#231#245'es'
+                Flat = True
+                Glyph.Data = {
+                  36030000424D3603000000000000360000002800000010000000100000000100
+                  18000000000000030000120B0000120B00000000000000000000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  C57C25BA6806B86706B76606B56507B36407B26307B06208AE6108AD6009AB5F
+                  09B47329FFFFFFFFFFFFFFFFFFFFFFFFBD6A05BC6905BA6806B86706B76606B3
+                  6407B16307B26307B06208AE6108AD6009AB5F09FFFFFFFFFFFFFFFFFFFFFFFF
+                  BF6B04BD6A05BC6905BA6806B66606E9D8C4E9D8C4B16307B26307B06208AE61
+                  08AD6009FFFFFFFFFFFFFFFFFFFFFFFFC16C04BF6B04BD6A05BC6905B86706EA
+                  DAC6E9D8C4B36407B36407B26307B06208AE6108FFFFFFFFFFFFFFFFFFFFFFFF
+                  C26D04C16C04BF6B04BD6A05BC6905B66606B46506B76606B56507B36407B263
+                  07B06208FFFFFFFFFFFFFFFFFFFFFFFFC46E03C26D04C16C04BF6B04BB6905EB
+                  D9C4EAD8C3B66606B76606B56507B36407B26307FFFFFFFFFFFFFFFFFFFFFFFF
+                  C66F03C46E03C26D04C16C04BD6A04EBDBC6EBD9C4B86706B86706B76606B565
+                  07B36407FFFFFFFFFFFFFFFFFFFFFFFFC77002C66F03C46E03C26D04C16C04BB
+                  6904B96805BC6905BA6806B86706B76606B56507FFFFFFFFFFFFFFFFFFFFFFFF
+                  C97102C77002C66F03C46E03BF6C04EBDAC4EBD9C3BB6905BC6905BA6806B867
+                  06B76606FFFFFFFFFFFFFFFFFFFFFFFFCB7202C97102C77002C66F03C16D03EC
+                  DBC6EBDAC4BD6A04BD6A05BC6905BA6806B86706FFFFFFFFFFFFFFFFFFFFFFFF
+                  CC7301CB7202C97102C77002C66F03C16D03BF6C04C16C04BF6B04BD6A05BC69
+                  05BA6806FFFFFFFFFFFFFFFFFFFFFFFFD48622CC7301CB7202C97102C77002C6
+                  6F03C46E03C26D04C16C04BF6B04BD6A05C57C25FFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+                OnClick = btMaisOpcoesInternasClick
+              end
+              inherited BitBtn4: TBitBtn
+                Left = 539
+                Top = 11
+                Caption = 'C&oncluir'
+                TabOrder = 4
+                Visible = False
+                Glyph.Data = {
+                  36030000424D3603000000000000360000002800000010000000100000000100
+                  18000000000000030000C40E0000C40E00000000000000000000FF00FFFF00FF
+                  FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+                  FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+                  00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+                  FF00FFFF00FFFF00FF466D12466D12FF00FFFF00FFFF00FFFF00FFFF00FFFF00
+                  FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF4D6A193677003577004C
+                  6A19FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+                  FF00FF586227357800456F0E456F0E357800586327FF00FFFF00FFFF00FFFF00
+                  FFFF00FFFF00FFFF00FFFF00FFFF00FF596328347800456F0E3B74013A740145
+                  6F0E347800566426FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF596228
+                  337900456F0F33780073534A75524C337800456F0F347900566427FF00FFFF00
+                  FFFF00FFFF00FFFF00FF8D4371297F00466E0F337900586327FF00FFFF00FF58
+                  6228337900456F0F347800566426FF00FFFF00FFFF00FFFF00FFFF00FF3D7204
+                  297F00586326FF00FFFF00FFFF00FFFF00FF596328347800456F0F3479005664
+                  27FF00FFFF00FFFF00FFFF00FFFF00FF784F56FF00FFFF00FFFF00FFFF00FFFF
+                  00FFFF00FF586228337900456F0F347800566426FF00FFFF00FFFF00FFFF00FF
+                  FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF596328347800456F
+                  0F347900566327FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+                  00FFFF00FFFF00FFFF00FF586227337900466E0F297F008D4370FF00FFFF00FF
+                  FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF5962
+                  28297E003C7304FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+                  00FFFF00FFFF00FFFF00FFFF00FFFF00FF794F56FF00FFFF00FFFF00FFFF00FF
+                  FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+                  FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+                  00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF}
+                ExplicitLeft = 539
+                ExplicitTop = 11
+              end
+              inherited BitBtn5: TBitBtn
+                Left = 458
+                Top = 11
+                TabOrder = 3
+                ExplicitLeft = 458
+                ExplicitTop = 11
+              end
+              inherited BitBtn6: TBitBtn
+                Left = 742
+                Top = 11
+                TabOrder = 5
+                ExplicitLeft = 742
+                ExplicitTop = 11
+              end
+              inherited CheckCadSeq: TCheckBox
+                Left = 807
+                Top = 2
+                Visible = False
+                ExplicitLeft = 807
+                ExplicitTop = 2
+              end
+              object btSalvar: TBitBtn
+                Left = 296
+                Top = 11
+                Width = 75
+                Height = 25
+                Caption = 'S&alvar'
+                TabOrder = 1
+                OnClick = btSalvarClick
+                Glyph.Data = {
+                  36050000424D3605000000000000360400002800000010000000100000000100
+                  08000000000000010000220B0000220B00000001000000010000942929009431
+                  31009C3131009C393900A53939009C4242009C4A4A00A54A4A00B54A4A00AD52
+                  4A00B5524A00A5525200AD525200B5525200B55A5200AD525A00AD5A5A00B55A
+                  5A00BD5A5A00C65A5A00CE5A5A00CE636300CE6B6B00D66B6B00B5737300BD7B
+                  73009C7B7B009C848400AD848400B5848400C6848400AD8C8C00B58C8C00C694
+                  8C00AD949400C6949400A59C9C00B59C9C00D69C9C00BDA5A500D6A5A500D6AD
+                  A500CEADAD00D6ADAD00DEADAD00CEB5B500D6B5B500CEBDBD00DEBDBD00E7BD
+                  BD00E7C6C600C6CEC600CECEC600C6CECE00CECECE00D6CECE00E7CECE00E7D6
+                  CE00D6D6D600DED6D600EFD6D600DEDED600D6DEDE00DEDEDE00E7DEDE00E7E7
+                  E700EFEFEF00F7EFEF00F7F7EF00F7F7F700FFF7F700FFFFF700FF00FF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF004848100C0722
+                  33343433332505050B4848191516111B27384647452D0002131048191515111A
+                  05184046492E0102121048191515111C03032F42493200011210481915151120
+                  0601243A493200011210481915151221231D1F27322C04041310481915151515
+                  1515151313151515160F48190D111E282B292B2828292B26150C481909384544
+                  4545454545454530130F48190A3C46434343434343434530130F48190A3C423A
+                  3A3A3A3A3A3A4230130F48190A3C423B3F3F3F3F3F3B4230130F48190A3C4440
+                  4040404040404230130F48190A3C423A3A3A3A3A3A3A4230130F48190A394643
+                  4343434343434630130F4848092D3A363636363636363A2A0748}
+              end
+              object btEnviarConsultar: TBitBtn
+                Left = 377
+                Top = 11
+                Width = 75
+                Height = 25
+                Caption = '&Emitir'
+                TabOrder = 2
+                OnClick = btEnviarConsultarClick
+                Glyph.Data = {
+                  36030000424D3603000000000000360000002800000010000000100000000100
+                  18000000000000030000C30E0000C30E00000000000000000000FFFFFFCCDCBE
+                  65953E66963FCADBBDFFFFFFFDFEFCFFFFFFFDFEFDFFFFFFBBD0A96E9C496F9C
+                  4977A254E7EFE1FFFFFFFFFFFFB7CEA54F8621508723B6CDA3FFFFFFFCFDFCFE
+                  FEFDFFFFFFDDE8D5598D2E578B2B5B8F314C841EC4D6B5FFFFFFFFFFFFBBD0A9
+                  538926548928B9CFA7FFFFFFFCFDFCFEFEFDFFFFFF8AAE6C5288265F92375F91
+                  35528826C6D8B8FFFFFFFFFFFFBAD0A8528825538927B9CFA7FFFFFFFBFCFAFF
+                  FFFFD3E1C7568B2A5D90345D8E2F5E9035518825C6D8B7FFFFFFFFFFFFBAD0A8
+                  528825538927B9CFA6FFFFFFFCFDFBFFFFFF82A961548A295E90335894475E91
+                  36518824C6D8B7FFFFFFFFFFFFBAD0A8528825538927B9CFA7FFFFFFFFFFFFC9
+                  DABB5389285F8F2F57944741AB9F608F2E518826C6D8B7FFFFFFFFFFFFBAD0A8
+                  528825538927B8CEA6FFFFFFFBFCFA79A357548B2D628C2340AB9D38B3BC628C
+                  25518827C6D8B7FFFFFFFFFFFFBAD0A8528825538927B6CDA4FFFFFFBDD1AC51
+                  88265F903159923D28C2F63CAFAC628D26518828C6D8B7FFFFFFFFFFFFBAD0A8
+                  528825538926BACFA8FFFFFF6F9C49568C2F618C2542A99721C9FF3DADA6628D
+                  27518828C6D8B7FFFFFFFFFFFFBAD0A8528825518724C2D5B3C2D5B24E862260
+                  90305794472BBFEB24C6FF3CAEA9628D27518828C6D8B7FFFFFFFFFFFFBAD0A8
+                  518825558A29B3CBA07AA458548B2C618C263EADA425C4FF27C3FD3FACA5628C
+                  28518828C6D8B7FFFFFFFFFFFFBAD0A85086225E903580A85F5C90345E8D2B55
+                  964F2AC0F228C2F51ECEFF39B3A8608F26518828C6D8B7FFFFFFFFFFFFBAD0A8
+                  4F86225F91365B8E315B90355F8C263CAEAE21C9FF2DBDEB4B95B3647E6D6C82
+                  304E8B26C6D8B7FFFFFFFFFFFFBACFA85188246092375D9137608E2A56985527
+                  C6FD31BAE77D594E94371796442B9D53426D6B29C3DBB7FFFFFFFFFFFFBAD0A8
+                  488119578C2D558A295689252FAFBC15CAFF616D70922D0C843C258A442B964E
+                  38894126CFCAB6FFFFFFFFFFFFEAF1E58DB06F86AC6889AD6877BDA960D4FD61
+                  D4FA9A8077A96A54A56D5AA9715FAF7C6BA96F5CE3CBC5FFFFFF}
+              end
+            end
+          end
+        end
+        inherited TabSheet2: TTabSheet
+          ExplicitLeft = 4
+          ExplicitTop = 27
+          ExplicitWidth = 834
+          ExplicitHeight = 514
+          inherited GroupBox3: TGroupBox
+            Width = 834
+            ExplicitWidth = 834
+            inherited Label1: TLabel
+              Enabled = False
+              Visible = False
+            end
+            inherited Label2: TLabel
+              Enabled = False
+              Visible = False
+            end
+            inherited Label3: TLabel
+              Enabled = False
+            end
+            inherited Label4: TLabel
+              Enabled = False
+              Visible = False
+            end
+            inherited Label5: TLabel
+              Enabled = False
+              Visible = False
+            end
+            inherited imgInformation: TImage
+              Left = 808
+              ExplicitLeft = 761
+            end
+            object btMaisOpcoesConsulta: TSpeedButton [6]
+              Left = 656
+              Top = 45
+              Width = 23
+              Height = 22
+              Cursor = crHandPoint
+              Hint = 'Mais op'#231#245'es'
+              Flat = True
+              Glyph.Data = {
+                36030000424D3603000000000000360000002800000010000000100000000100
+                18000000000000030000120B0000120B00000000000000000000FFFFFFFFFFFF
+                FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                C57C25BA6806B86706B76606B56507B36407B26307B06208AE6108AD6009AB5F
+                09B47329FFFFFFFFFFFFFFFFFFFFFFFFBD6A05BC6905BA6806B86706B76606B3
+                6407B16307B26307B06208AE6108AD6009AB5F09FFFFFFFFFFFFFFFFFFFFFFFF
+                BF6B04BD6A05BC6905BA6806B66606E9D8C4E9D8C4B16307B26307B06208AE61
+                08AD6009FFFFFFFFFFFFFFFFFFFFFFFFC16C04BF6B04BD6A05BC6905B86706EA
+                DAC6E9D8C4B36407B36407B26307B06208AE6108FFFFFFFFFFFFFFFFFFFFFFFF
+                C26D04C16C04BF6B04BD6A05BC6905B66606B46506B76606B56507B36407B263
+                07B06208FFFFFFFFFFFFFFFFFFFFFFFFC46E03C26D04C16C04BF6B04BB6905EB
+                D9C4EAD8C3B66606B76606B56507B36407B26307FFFFFFFFFFFFFFFFFFFFFFFF
+                C66F03C46E03C26D04C16C04BD6A04EBDBC6EBD9C4B86706B86706B76606B565
+                07B36407FFFFFFFFFFFFFFFFFFFFFFFFC77002C66F03C46E03C26D04C16C04BB
+                6904B96805BC6905BA6806B86706B76606B56507FFFFFFFFFFFFFFFFFFFFFFFF
+                C97102C77002C66F03C46E03BF6C04EBDAC4EBD9C3BB6905BC6905BA6806B867
+                06B76606FFFFFFFFFFFFFFFFFFFFFFFFCB7202C97102C77002C66F03C16D03EC
+                DBC6EBDAC4BD6A04BD6A05BC6905BA6806B86706FFFFFFFFFFFFFFFFFFFFFFFF
+                CC7301CB7202C97102C77002C66F03C16D03BF6C04C16C04BF6B04BD6A05BC69
+                05BA6806FFFFFFFFFFFFFFFFFFFFFFFFD48622CC7301CB7202C97102C77002C6
+                6F03C46E03C26D04C16C04BF6B04BD6A05C57C25FFFFFFFFFFFFFFFFFFFFFFFF
+                FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+              OnClick = btMaisOpcoesConsultaClick
+            end
+            inherited MaskEdit3: TMaskEdit
+              Enabled = False
+              Visible = False
+            end
+            inherited MaskEdit1: TMaskEdit
+              Enabled = False
+              Visible = False
+            end
+            inherited MaskEdit2: TMaskEdit
+              Enabled = False
+              Visible = False
+            end
+            inherited ComboBox1: TComboBox
+              Enabled = False
+              TabOrder = 11
+              Visible = False
+            end
+            inherited ComboBox2: TComboBox
+              Enabled = False
+            end
+            inherited CheckBox3: TCheckBox
+              Left = 691
+              Top = 23
+              Visible = False
+              ExplicitLeft = 691
+              ExplicitTop = 23
+            end
+            inherited CheckBox1: TCheckBox
+              Left = 685
+              Top = 46
+              Visible = False
+              ExplicitLeft = 685
+              ExplicitTop = 46
+            end
+            inherited ComboBox3: TComboBox
+              Enabled = False
+              Visible = False
+            end
+            inline FilterFramePadrao1: TFilterFramePadrao
+              Left = 3
+              Top = 11
+              Width = 407
+              Height = 54
+              TabOrder = 0
+              TabStop = True
+              ExplicitLeft = 3
+              ExplicitTop = 11
+              inherited pnCondicao: TPanel
+                inherited edCondicao: TComboBox
+                  ExplicitLeft = 64
+                  ExplicitWidth = 127
+                end
+              end
+              inherited pnConteudos: TPanel
+                inherited pnConteudo1: TPanel
+                  inherited edConteudo1: TMaskEdit
+                    ExplicitLeft = 64
+                    ExplicitWidth = 140
+                  end
+                end
+                inherited pnConteudo2: TPanel
+                  inherited edConteudo2: TMaskEdit
+                    ExplicitLeft = 64
+                    ExplicitWidth = 72
+                  end
+                end
+              end
+            end
+          end
+          inherited Panel1: TPanel
+            Width = 834
+            Height = 441
+            ExplicitWidth = 834
+            ExplicitHeight = 441
+            inherited Splitter1: TSplitter
+              Height = 380
+              ExplicitHeight = 380
+            end
+            inherited DBGrid1: TDBGrid
+              Width = 541
+              Height = 380
+              OnDrawColumnCell = DBGrid1DrawColumnCell
+              OnKeyDown = DBGrid1KeyDown
+            end
+            inherited Panel2: TPanel
+              Width = 830
+              ExplicitWidth = 830
+              inherited SpeedButton1: TSpeedButton
+                Cursor = crHandPoint
+              end
+              inherited SpeedButton2: TSpeedButton
+                Cursor = crHandPoint
+                OnClick = SpeedButton2Click
+              end
+              inherited SpeedButton3: TSpeedButton
+                Left = 691
+                Visible = False
+                ExplicitLeft = 691
+              end
+              inherited SpeedButton4: TSpeedButton
+                Left = 691
+                Visible = False
+                ExplicitLeft = 691
+              end
+              inherited SpeedButton5: TSpeedButton
+                Left = 691
+                Visible = False
+                ExplicitLeft = 691
+              end
+              inherited SpeedButton6: TSpeedButton
+                Left = 691
+                Visible = False
+                ExplicitLeft = 691
+              end
+              inherited SpeedButton7: TSpeedButton
+                Left = 691
+                Visible = False
+                ExplicitLeft = 691
+              end
+              inherited SpeedButton8: TSpeedButton
+                Left = 691
+                Visible = False
+                ExplicitLeft = 691
+              end
+              inherited SpeedButton11: TSpeedButton
+                Left = 691
+                Visible = False
+                ExplicitLeft = 691
+              end
+              inherited SpeedButton12: TSpeedButton
+                Left = 691
+                Visible = False
+                ExplicitLeft = 691
+              end
+              inherited SpeedButton23: TSpeedButton
+                Left = 691
+                Visible = False
+                ExplicitLeft = 691
+              end
+              inherited SpeedButton24: TSpeedButton
+                Left = 691
+                Visible = False
+                ExplicitLeft = 691
+              end
+              inherited SpeedButton25: TSpeedButton
+                Left = 691
+                Visible = False
+                ExplicitLeft = 691
+              end
+              inherited SpeedButton26: TSpeedButton
+                Top = 6
+                Visible = False
+                ExplicitTop = 6
+              end
+              object SpeedButton9: TSpeedButton
+                Left = 406
+                Top = 4
+                Width = 51
+                Height = 45
+                Cursor = crHandPoint
+                Hint = 'Hist'#243'rico de ocorr'#234'ncias'
+                Flat = True
+                Glyph.Data = {
+                  F6060000424DF606000000000000360000002800000018000000180000000100
+                  180000000000C0060000120B0000120B00000000000000000000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD6853BD37B
+                  2AD6863AFFFFFFFFFFFFEFCA93EBC07DEBC07DEBC07DEBC07DEBC07DEBC07DEB
+                  C07DEBC07DEBC07DEBC07DEBC07DEFCA93FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFD47A2DD47B2DD47B2CFFFFFFFFFFFFE29C1AE29C1AE29C1AE29C1AE29C
+                  1AE29C1AE29C1AE29C1AE29C1AE29C1AE29C1AE29C1AE29C1AFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFD8823ED57A2FD8843EFFFFFFFFFFFFF6DEA6F5DA9B
+                  F5DA9BF5DA9BF5DA9BF5DA9BF5DA9BF5DA9BF5DA9BF5DA9BF5DA9BF5DA9BF6DE
+                  A7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFD6853BD37B2AD6863AFFFFFFFFFFFFEFCA93EBC07DEBC07DEBC07DEBC0
+                  7DEBC07DEBC07DEBC07DEBC07DEBC07DEBC07DEBC07DEFCA93FFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFD47A2DD47A2DD47B2CFFFFFFFFFFFFE29C1AE29C1A
+                  E29C1AE29C1AE29C1AE29C1AE29C1AE29C1AE29C1AE29C1AE29C1AE29C1AE29C
+                  1AFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD8823ED57A2FD8843EFFFFFFFF
+                  FFFFF6DEA6F5DA9BF5DA9BF5DA9BF5DA9BF5DA9BF5DA9BF5DA9BF5DA9BF5DA9B
+                  F5DA9BF5DA9BF6DEA7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFD6853BD37B2AD6863AFFFFFFFFFFFFEFCA93EBC07D
+                  EBC07DEBC07DEBC07DEBC07DEBC07DEBC07DEBC07DEBC07DEBC07DEBC07DEFCA
+                  93FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD47A2DD47A2DD47B2CFFFFFFFF
+                  FFFFE29C1AE29C1AE29C1AE29C1AE29C1AE29C1AE29C1AE29C1AE29C1AE29C1A
+                  E29C1AE29C1AE29C1AFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD8823ED57A
+                  2FD8843EFFFFFFFFFFFFF6DEA6F5DA9BF5DA9BF5DA9BF5DA9BF5DA9BF5DA9BF5
+                  DA9BF5DA9BF5DA9BF5DA9BF5DA9BF6DEA7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD6853BD37B2AD6863AFFFFFFFF
+                  FFFFEFCA93EBC07DEBC07DEBC07DEBC07DEBC07DEBC07DEBC07DEBC07DEBC07D
+                  EBC07DEBC07DEFCA93FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD47A2DD47A
+                  2DD47B2CFFFFFFFFFFFFE29C1AE29C1AE29C1AE29C1AE29C1AE29C1AE29C1AE2
+                  9C1AE29C1AE29C1AE29C1AE29C1AE29C1AFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFD8823ED57A2FD8843EFFFFFFFFFFFFF6DEA6F5DA9BF5DA9BF5DA9BF5DA
+                  9BF5DA9BF5DA9BF5DA9BF5DA9BF5DA9BF5DA9BF5DA9BF6DEA7FFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+                ParentShowHint = False
+                ShowHint = True
+                OnClick = SpeedButton9Click
+              end
+              object SpeedButton10: TSpeedButton
+                Left = 178
+                Top = 4
+                Width = 51
+                Height = 45
+                Cursor = crHandPoint
+                Hint = 'Imprimir NFS-e'
+                Flat = True
+                Glyph.Data = {
+                  F6060000424DF606000000000000360000002800000018000000180000000100
+                  180000000000C0060000120B0000120B00000000000000000000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDF3FFF3AAFF
+                  F2A2FFF2A2FFF2A2FFF2A2FFF2A2FFF2A2FFF2A2FFF2A2FFF2A2FFF2A2FFF3AA
+                  FFFDF3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFF3ACFFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FF
+                  E650FFE650FFE650FFF3ADFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  7774714D49454D4945A6974AFFE650FFE650FFE650FFE650FFE650FFE650FFE6
+                  50FFE650FFE650FFE650FFE650FFE650A6974A4D49454D4945787571FFFFFFFF
+                  FFFFFFFFFFFFFFFF82786D82786D82786DC1AF5EFFE650FFE650FFE650FFE650
+                  FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650C1AF5E82786D8278
+                  6D82786DFFFFFFFFFFFFFFFFFFFFFFFF82786D82786D82786DC1AF5EFFE650FF
+                  E650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650
+                  C1AF5E82786D82786D82786DFFFFFFFFFFFFFFFFFFFFFFFF82786D82786D615B
+                  54A8994BFFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FF
+                  E650FFE650FFE650A8994B615B5482786D82786DFFFFFFFFFFFFFFFFFFFFFFFF
+                  82786D82786D353331825F1FE09A19E09A19E09A19E09A19E09A19E09A19E09A
+                  19E09A19E09A19E09A19E09A19E09A19825F1F35333182786D82786DFFFFFFFF
+                  FFFFFFFFFFFFFFFF82786D82786D82786D82786D82786D82786D82786D82786D
+                  82786D82786D82786D82786D82786D82786D82786D82786D82786D82786D8278
+                  6D82786DFFFFFFFFFFFFFFFFFFFFFFFF82786D82786D82786D82786D82786D82
+                  786D82786D82786D82786D82786D82786D82786D82786D82786D82786D82786D
+                  82786D82786D82786D82786DFFFFFFFFFFFFFFFFFFFFFFFF82786D82786D8278
+                  6D82786D82786D82786D82786D82786D82786D82786D82786D82786D82786D82
+                  786D82786D82786D82786D82786D82786D82786DFFFFFFFFFFFFFFFFFFFFFFFF
+                  82786D82786D82786D82786D82786D82786D82786D82786D82786D82786D8278
+                  6D82786D82786D82786D82786D82786DDED2B5D9CCAF82786D82786DFFFFFFFF
+                  FFFFFFFFFFFFFFFF82786D82786D82786D82786D82786D82786D82786D82786D
+                  82786D82786D82786D82786D82786D82786D82786D82786DDED2B6D8CCAF8278
+                  6D82786DFFFFFFFFFFFFFFFFFFFFFFFF82786D82786D82786D82786D82786D82
+                  786D82786D82786D82786D82786D82786D82786D82786D82786D82786D82786D
+                  82786D82786D82786D82786DFFFFFFFFFFFFFFFFFFFFFFFF857C7182786D8278
+                  6D82786D82786D82786D82786D82786D82786D82786D82786D82786D82786D82
+                  786D82786D82786D82786D82786D82786D857C71FFFFFFFFFFFFFFFFFFFFFFFF
+                  DAD7D3C5C0BBCF9957DCAD55E9C254E9C254E9C254E9C254E9C254E9C254E9C2
+                  54E9C254E9C254E9C254E9C254E9C254DCAD55CF9957C5C0BBDAD7D4FFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFD77600EBAE28FFE650FFE650FFE650FFE650
+                  FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650EBAE28D77600FFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDA8012EBAE28FFE650FF
+                  E650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650
+                  EBAE28DA8013FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFF2A7FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FF
+                  E650FFE650FFE650FFF2A7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFF3ACFFE650FFE650FFE650FFE650FFE650FFE650FFE6
+                  50FFE650FFE650FFE650FFE650FFE650FFF3ADFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDF2FFF4AFFFF3ADFFF3ADFFF3AD
+                  FFF3ADFFF3ADFFF3ADFFF3ADFFF3ADFFF3ADFFF3ADFFF4AFFFFDF3FFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+                ParentShowHint = False
+                ShowHint = True
+                OnClick = SpeedButton10Click
+              end
+              object btEmitirOuConsultar2: TSpeedButton
+                Left = 121
+                Top = 4
+                Width = 51
+                Height = 45
+                Cursor = crHandPoint
+                Hint = 'Emitir ou Consultar Emiss'#227'o'
+                Flat = True
+                Glyph.Data = {
+                  B6070000424DB607000000000000360000002800000020000000140000000100
+                  18000000000080070000C30E0000C30E00000000000000000000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FA57C749E71
+                  E8EEE7FFFFFFFFFFFFFFFFFFE8EFE883A8806F9A6CA5BFA3FFFFFFC8D8C66693
+                  628AAD87FBFCFAFFFFFFFFFFFFFFFFFFFCFDFCC4D5C286A9816894636793617D
+                  A378B7CCB5FDFFFEFFFBFCB78D84935245945447AA776DD1B5B0578A53548750
+                  DAE5DAFFFFFFFFFFFFFFFFFF7FA57C4D824852854E6E996AFFFFFFB0C7AE477D
+                  42679463F7FAF6FFFFFFFFFFFFFFFFFFD8E3D653854D67936183A77F84A88068
+                  94635D8D5893B793A56F649E6256ECE2E0F5EFEDC19C959454475D8E59598B55
+                  DCE7DCFFFFFFFFFFFFC8D8C651854D5E8D56578953759E71FFFFFFB4CAB24C81
+                  476D9869F8FAF7FFFFFFFFFFFFFFFFFFDFE8DEA0BC9DE2EBE1FDFEFDFEFEFECE
+                  DCCC6E996A61925E755438F3E3E4FFFFFFFFFFFFFFFFFFFFFFFF5D8E59598B55
+                  DCE7DCFFFFFFFBFCFB739C6F57874E5D9469578B57759E71FFFFFFB4CAB24C81
+                  476E996AFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFF78A07361915D7E7C5BFFFFFFBC958D9D6256C09A92CEB0AA5D8E59598B55
+                  DCE7DBFFFFFFB8CDB65083495D905F4DACAC578A55759E71FFFFFFB4CAB24D82
+                  486A9666DAE5D9E0E9DFDEE8DEE5EDE5FFFFFFFFFFFFFFFFFFFFFFFFE8EEE79A
+                  B8976B966662925E766041FEF6F9CDB0AABA9088C29D968E4A3C5D8E59598B55
+                  E2EAE1F9FBF96895655B864850A59942B9D059874D759E71FFFFFFB4CAB25185
+                  4C5D8D5951854D51854C4B8147608F5CF6F8F6FFFFFFE7EEE69EBA9B6F996A63
+                  915E61905C86AE869B6759AC776DF9F7F6FCFAF9A67066C09B935D8E59598B55
+                  EAF0EAB0C7AE5083485E8F5D3EBFE144B6C959874D759E71FFFFFFB4CAB25084
+                  4B62915E88AB858AAD8786AA8397B594FDFDFDD8E3D66D9869618F5B618F5B6E
+                  9869A0BB9CF3F9F5FBF3F4AC7B719D62569D6256B58980FDFDFD5D8D5960905C
+                  CCDBCA6995655D87494FA69D38CAFE46B4C159874C759E71FFFFFFB4CAB24C81
+                  476E996AFFFFFFFFFFFFFFFFFFFFFFFFFCFDFC83A77F63915E6E9868A9C2A6E7
+                  EEE6FFFFFFFFFFFFFFFFFFFFFFFFF7F3F2F8F4F3FFFFFFFFFFFF5D8D59689564
+                  87AA8458884E5C91633EC0E135D0FF40BDCC558A4C759E71FFFFFFB4CAB24C81
+                  476E986AFFFFFFFFFFFFFFFFFFFFFFFFEFF4EF70996B628F5CB5CAB2FFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5E8E5A5F8F5B
+                  5C8D5961894C4CACAA37CCFC539AB26F76746D784C73A173FFFFFFB4CAB24D82
+                  486A9666DDE7DCE3ECE3E2EBE2E5ECE4F5F8F47AA175608E5AA8C1A5FCFDFCFE
+                  FEFEDDE7DCBCD0BAFEFFFEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF548750568952
+                  57854951926B2FC8F35981928C2A158E35248F43378C7E64FFFFFFAFC6AD487F
+                  4356885255875155875153864F50844BE2EAE1C3D4C15E8D5963915E81A67D83
+                  A77F5E8D58759D71FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA4BFA283A77E
+                  88AC8775CAD66BD6F89B7B76A4685CA3736AA9776DBB8F87FFFFFFD6E3D682A7
+                  7E86AB8385AA8285AA8284A98183A880E7EEE7FFFFFFCEDDCD8DAE896C96666D
+                  97688FB08BD5E1D3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+                ParentShowHint = False
+                ShowHint = True
+                OnClick = btEmitirOuConsultar2Click
+              end
+              object btCancelar: TSpeedButton
+                Left = 292
+                Top = 4
+                Width = 51
+                Height = 45
+                Cursor = crHandPoint
+                Hint = 'Cancelar NFS-e'
+                Flat = True
+                Glyph.Data = {
+                  F6060000424DF606000000000000360000002800000018000000180000000100
+                  180000000000C0060000120B0000120B00000000000000000000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFCBC8FB7B72F35346EF4E40ED7167F0C6C1F9FFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA7A1F85145F16358EF8D85EC867DEB564A
+                  EC3C2DE99891F3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDF3FFF3AAFFF2A2FF
+                  F2A2FFF2A2FFF2A2FFF2A2FFF2A2FFF2A2FEF1A1BEB3B15549F25145F1938DEF
+                  ECECECEAEAEAE3E3E87D73E93728E7C3BEF8FFFFFFFFFFFFFFFFFFFFFFFFFFF3
+                  ACFFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650F2DA4C7466C567
+                  5BEA9891F24D41EF928BEEEEEEEEECECECE5E4EA4F42E8675CECFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFF2A7FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE6
+                  50E7D0485D51EB9891EFF5F5F59B95F14A3DEE9189EEEFEFEFEDEDED7E75E93D
+                  2FE7FFFFFFFFFFFFFFFFFFFFFFFFFFF2A7FFE650FFE650FFE650FFE650FFE650
+                  FFE650FFE650FFE650E7D0485D51EB958EF0F7F7F7F6F6F69993F14537EC8F87
+                  EFF1F1F1867DEB3C2EE7FFFFFFFFFFFFFFFFFFFFFFFFFFF2A7FFE650CAAB2AE6
+                  CB3FE6CB3FC5A728C5A728C5A728C5A728BA9E26685ABE665AEAF4F3F9F8F8F8
+                  F7F7F7938BF04032EB8C83EE5144E9675CECFFFFFFFFFFFFFFFFFFFFFFFFFFF2
+                  A7FFE650CFB22FE8CD40E8CD40CDAF2DCDAF2DCDAF2DCDAF2DCCAE2D937E6455
+                  49F28E86EEF4F4F9F9F9F9F8F8F89088F13C2DE93728E7C2BDF8FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFF2A7FFE650CAAB2AE6CB3FE6CB3FC5A728C5A728C5A728C5A7
+                  28C5A728BA9E2679678E5145F15F53E78E87EF9189EF584CED3C2DE99790F3FF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2A7FFE650CFB22FE8CD40E8CD40CDAF2D
+                  CDAF2DCDAF2DCDAF2DCDAF2DCDAF2DC3A72B917D646354BC4F42E74C3EE87166
+                  F0C5C0F8FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2A7FFE650CAAB2AE6
+                  CB3FE6CB3FC5A728C5A728C5A728C5A728C5A728C5A728C5A728C5A728C2A428
+                  EDD64AF6E9A1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2
+                  A7FFE650CFB22FE8CD40E8CD40CDAF2DCDAF2DCDAF2DCDAF2DCDAF2DCDAF2DCD
+                  AF2DCDAF2DCFB22FFFE650FFF2A7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFF2A7FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE6
+                  50FFE650FFE650FFE650FFE650FFE650FFE650FFF2A7FFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2A7FFE650CAAB2AC5A728C5A728C5A728
+                  C5A728C5A728C5A728C5A728C5A728C5A728C5A728CAAB2AFFE650FFF2A7FFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2A7FFE650CFB22FCD
+                  AF2DCDAF2DCDAF2DCDAF2DCDAF2DCDAF2DCDAF2DCDAF2DCDAF2DCDAF2DCFB22F
+                  FFE650FFF2A7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2
+                  A7FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FF
+                  E650FFE650FFE650FFE650FFF2A7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFF2A7FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE6
+                  50FFE650E09337D57A2ED47A2DD37B2BD88932F9ECD0FFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2A7FFE650FFE650FFE650FFE650FFE650
+                  FFE650FFE650FFE650FFE650D57A2ED47A2DD37B2BD78831F9EBCEFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2A7FFE650FFE650FF
+                  E650FFE650FFE650FFE650FFE650FFE650FFE650D47A2DD37B2BD78831F9EBCE
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2
+                  A7FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650D37B2BD7
+                  8831F9EBCEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFF3ACFFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE6
+                  50FFE650D78831F9EBCFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDF2FFF4AFFFF3ADFFF3ADFFF3ADFFF3AD
+                  FFF3ADFFF3ADFFF3ADFFF3ADF9ECD1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+                ParentShowHint = False
+                ShowHint = True
+                OnClick = btCancelarClick
+              end
+              object btSubstituicao: TSpeedButton
+                Left = 349
+                Top = 4
+                Width = 51
+                Height = 45
+                Cursor = crHandPoint
+                Hint = 'Substituir NFSe'
+                Flat = True
+                Glyph.Data = {
+                  F6060000424DF606000000000000360000002800000018000000180000000100
+                  180000000000C0060000120B0000120B00000000000000000000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFEC79FFE650FFE650FFE650FFE650FFE650FFE650FFE650
+                  FFE650FFE650FFEC7AFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE650FFE650FFE650FFE650FFE650FF
+                  E650FFE650FFE650FFE650FFE650FFE650FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE650FFE650FFE6
+                  50C8B27D6757C94233E15F4EC7C3AC7BFFE650FFE650FFE650FFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFE650FFE650CAB57E473AED4335EB3E30EA392AE83425E7C3AC7BFFE650FFE6
+                  50FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFE650FFE6507364CF4C3FEFC9C5FA6E64EFC6C2F9392AE8
+                  5F4EC7FFE650FFE650FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE650FFE6505C4FE94F43F0746AF3F3
+                  F3FE7166F03E30EA4334E0FFE650FFE650FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFEC79FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650796B
+                  D15347F1CBC8FB756BF3C9C5FA4335EB6757C9FFE650FFE650FFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFE650FFE650FFE650FFE650FFE650FFE650FFE650
+                  FFE650FFE650CEB981574BF35347F14F43F04C3FEF473AEDC4AF81FFE650FFE6
+                  50FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE650FFE650FFE650FFE650FF
+                  E650FFE650FFE650FFE650FFE650FFE650CEB9817A6BD15A4EEA7465CFCAB57E
+                  FFE650FFE650FFE650FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE650FFE6
+                  50FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FF
+                  E650FFE650FFE650FFE650FFE650FFE650FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFE650FFE650FFE650FFE650FCD65FEA6EC0E766C8E76EC0FFE650FFE6
+                  50FFE650FFE650FFE650FFE650DF9336D57A2ED47A2DE9B767FFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFE650FFE650FFE650FFE650FFE650F0949DE766C8
+                  E667C7FFE650FFE650FFE650FFE650FFE650FFE650D57A2ED47A2DE8B363FFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE650FFE650FFE650FFE650F3
+                  9F92E866C8F0949DE86FBFFFE650FFE650FFE650FFE650FFE650FFE650D47A2D
+                  E8B363FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE650FFE6
+                  50FFE650F39F92E966C8F29F92FFE650FCD75EFFE650FFE650FFE650FFE650FF
+                  E650FFE650E8B365FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFE650FFE650FFE650F29799F3A092FFE650FFE650FFE650FFE650FFE6
+                  50FFE650FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFE650FFE650FFE650FFE650FFE650FFE650FFE650
+                  FFE650FFE650FFE650FFE650FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE650FFE650FFE650FFE650FF
+                  E650FFE650FFE650DF9337D47A2DD37B2BE8B766FFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE650FFE6
+                  50FFE650FFE650FFE650FFE650FFE650D47A2DD37B2BE7B362FFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFE650FFE650FFE650FFE650FFE650FFE650FFE650D37B2BE7B362FFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFEC78FFE650FFE650FFE650FFE650FFE650FFE650
+                  E7B364FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+                ParentShowHint = False
+                PopupMenu = popMenuNova
+                ShowHint = True
+                OnClick = btSubstituicaoClick
+              end
+              object btEmail: TSpeedButton
+                Left = 235
+                Top = 4
+                Width = 51
+                Height = 45
+                Cursor = crHandPoint
+                Hint = 'Enviar email NFS-e'
+                Flat = True
+                Glyph.Data = {
+                  F6060000424DF606000000000000360000002800000018000000180000000100
+                  180000000000C0060000120B0000120B00000000000000000000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF9D5F0F094D8FEFBFDFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7CCEDE966
+                  C8EF91D8FEFAFDFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF9DCF2F7CCECF7CCED
+                  F7CCEDF2AAE1E966C8E966C8F092D9FEFBFEFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE6
+                  6BC8E667C7E766C8E766C8E866C8E966C8E966C8EA65C9F29DDCFFFFFFF8E5BE
+                  E7A726E5A31FE4A21EE4A01DE39E1CE39D1AE29B19E19A18E19817E09616DF95
+                  14DF9313D68C12E568C2E667C7E766C8E766C8E866C8E966C8E966C8EA65C9F2
+                  9DDCFFFFFFF3D390E6A621E6A420E5A31FE4A11EE49F1CE39E1BE29C1AE29B19
+                  E19918E09716E09615DF9414DC9113D48039D57A4BD4794CD4794BD97074E966
+                  C8E966C8E77FB4FEFBFEFFFFFFF3D391E7A722E6A521E5A420E5A21EE4A01DE3
+                  9F1CE39D1BE29C1AE19A18E19817E09716DF9515DF9314DE9212DD9011DD8F10
+                  DD9112D77F50E966C8E07096E8C288FFFFFFFFFFFFF3D491E7A823E6A621E6A5
+                  20E5A31FE4A11EE4A01DE39E1BE29D1AE29B19E19918E09817E09615DF9414DE
+                  9313DE9113E09817E29C1AD8844BDF7193DA931BEFCB8BFFFFFFFFFFFFF3D492
+                  E7A923E7A722E6A621E5A420E5A21FE4A11DE39F1CE39E1BE29C1AE29A19E199
+                  17E09716E09515E09816E39E1BE39E1CE39D1BDE991ADC9819E19A19F0CC8BFF
+                  FFFFFFFFFFF4D592E8AA24E7A823E7A722E6A521E5A31FE5A21EE4A01DE39F1C
+                  E39D1BE29B19E19A18E29918E39E1CE5A21EE4A11DE4A01DE39F1CE39E1BE39D
+                  1AE29C1AF0CD8CFFFFFFFFFFFFF4D592E8AB25E8A924E7A822E6A621E6A420E5
+                  A31FE4A11EE4A01DE09C1BDB9719DC991AE2A11FE6A420E5A31FE5A21FE4A11E
+                  E4A01DE49F1CE39E1CE39D1BF0CD8CFFFFFFFFFFFFF4D693E9AC26E8AA24E7A9
+                  23E7A722E6A521E5A420E5A21EDE9C1CD3981EE4B935E5BB36D69F23DFA020E6
+                  A520E5A420E5A31FE5A21EE4A11DE4A01DE39F1CF1CE8DFFFFFFFFFFFFF4D693
+                  E9AD26E8AB25E8AA24E7A823E6A622E5A420DA9B1EDBAB2DFADE4BFFE650FFE6
+                  50FADE4CDEAF2EDB9D1FE5A421E6A420E5A31FE5A21FE4A11EE4A01DF1CF8DFF
+                  FFFFFFFFFFF4D793EAAE27E9AC26E8AB25E8A924E4A522D9A228F0D666FFE651
+                  FFE650FFE650FFE650FFE650FFE650EECB3FD89F23E3A421E6A520E5A420E5A3
+                  1FE5A21EF1D08EFFFFFFFFFFFFF4D793EAAF28E9AD27E9AC25E2A623DFB84DFB
+                  E460FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650F9DD4BDDAC2B
+                  DFA120E6A521E6A420E5A31FF2D08FFFFFFFFFFFFFF4D793EAAF28E9AD27E0A9
+                  2CEED66BFFE651FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FF
+                  E650FFE650FFE650EBC63CDEA222E5A521E6A520F2D18FFFFFFFFFFFFFF4D793
+                  E8AE28E4BD4BFAE461FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE6
+                  50FFE650FFE650FFE650FFE650FFE650FFE650F9DC4BDFAD2BE4A521F2D290FF
+                  FFFFFFFFFFF0D493EED367FFE652FFE650FFE650FFE650FFE650FFE650FFE650
+                  FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE6
+                  50EECE52EECF8CFFFFFFFFFFFFFAEEA5FFE650FFE650FFE650FFE650FFE650FF
+                  E650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650
+                  FFE650FFE650FFE650FFE650FAEDA3FFFFFFFFFFFFFFF8CBFFE755FFE650FFE6
+                  50FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FF
+                  E650FFE650FFE650FFE650FFE650FFE650FFE755FFF8CCFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+                ParentShowHint = False
+                ShowHint = True
+                OnClick = btEmailClick
+              end
+              object btEmitirDaOS: TSpeedButton
+                Left = 463
+                Top = 4
+                Width = 51
+                Height = 45
+                Cursor = crHandPoint
+                Hint = 'Encontrar Ordens de Servi'#231'o para Emitir'
+                Flat = True
+                Glyph.Data = {
+                  F6060000424DF606000000000000360000002800000018000000180000000100
+                  180000000000C0060000C40E0000C40E00000000000000000000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDF3FFF3AAFFF2A2FF
+                  F2A2FFF2A2FFF2A2FFF2A2FFF2A2FFF2A2FFF2A2FFF2A2FFF2A2FFF2A2FFF2A2
+                  FFF3AAFFFDF3FFFFFFFDF8EEE8B14CF8E8CBFFFFFFFFFFFFFFFFFFFFFFFFFFF3
+                  ACFFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FF
+                  E650FFE650FFE650FFE650FFF3ADFDF8F0E8AF48E7AD43FDF7EDFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFF2A7FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE6
+                  50FEE550F5DD50F4E05EF4E066F4DF5EF5DD4FF9E593E9B141E7AD43FDF8EEFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2A7FFE650FFE650FFE650FFE650FFE650
+                  FFE650FFE650FDE44FF2E060FDF189FFF38EFFF18BFFEE87FDEA7EE1C254F1C3
+                  49FDF8EEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2A7FFE650FFE650FF
+                  E650FFE650FFE650FFE650FFE650E8D054DDBF65DDBF64DDBE63DDBD61DFC163
+                  FFEE87FEEC82FDF6D8FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2
+                  A7FFE650E4C83DC9AB2BC9AB2BC9AB2BC9AB2BC6A82AC8A147BF8F3BBF8F3BBF
+                  8F3BBF8F3BC1933DFFF18BFFEE87FFF2ACFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFF2A7FFE650E4C83DC9AB2BC9AB2BC9AB2BC9AB2BC2A529FAF5
+                  95FFFB9DFFF99AFFF897FFF694FFF491FFF38EFFF18BFFF092FFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2A7FFE650FFE650FFE650FFE650FFE650
+                  FFE650F6DD4DD9C264D2BB5DCFB857CCB553C9B24DCAB34EFFF491FFF38EFFF2
+                  94FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2A7FFE650C9AB2B93
+                  7005937005937005937005906F05B79437AB8123A57D1B9F791499740D96740B
+                  FFF694FFF491FFF6AFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2
+                  A7FFE650FFE650FFE650FFE650FFE650FFE650FFE650F3E15CFFFE9FFFFDA0FF
+                  FC9EFFFB9DFFF99AFFF897FFF694FFFDE9FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFF2A7FFE650E6CB3FC5A728C5A728C5A728C5A728C5A728C3A6
+                  28CCBA4AF9F698FFFDA0FFFC9EFFFB9DFCF591F9EE9FFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2A7FFE650E8CD40CDAF2DCDAF2DCDAF2D
+                  CDAF2DCDAF2DCDAF2DCCAE2DC8AC31D5C251E6D866F4E265F6DE52FEF1A6FFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2A7FFE650FFE650FF
+                  E650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650
+                  FFE650FFF2A7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2
+                  A7FFE650C8AA2A937005937005937005937005937005FFE650FFE650FFE650FF
+                  E650FFE650FFE650FFE650FFF2A7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFF2A7FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE6
+                  50FFE650E09337D57A2ED47A2DD37B2BD88932F9ECD0FFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2A7FFE650E3C83DC9AB2BC9AB2BC9AB2B
+                  C9AB2BC9AB2BFFE650FFE650D57A2ED47A2DD37B2BD78831F9EBCEFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2A7FFE650E3C83DC9
+                  AB2BC9AB2BC9AB2BC9AB2BC9AB2BFFE650FFE650D47A2DD37B2BD78831F9EBCE
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2
+                  A7FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650D37B2BD7
+                  8831F9EBCEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFF3ACFFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE6
+                  50FFE650D78831F9EBCFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDF3FFF4AFFFF3ADFFF3ADFFF3ADFFF3AD
+                  FFF3ADFFF3ADFFF3ADFFF3ADF9ECD1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+                ParentShowHint = False
+                ShowHint = True
+                OnClick = btEmitirDaOSClick
+              end
+              object btNFSeOS: TSpeedButton
+                Left = 520
+                Top = 4
+                Width = 51
+                Height = 45
+                Cursor = crHandPoint
+                Hint = 'Rela'#231#227'o de Ordens de Servi'#231'os'
+                Flat = True
+                Glyph.Data = {
+                  F6060000424DF606000000000000360000002800000018000000180000000100
+                  180000000000C0060000C40E0000C40E00000000000000000000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE9B34FE29B19E29B19E2
+                  9B19E29B19E29B19E29B19E29B19E29B19E29B19E29B19E29B19E29B19E9B350
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE29B
+                  19DE9919D39117CF8F17CF8F17CF8F17CF8F17CF8F17CF8F17CF8F17CF8F17CF
+                  8F17CF8F17CF8F17FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFE29B19D29017F2D042FFE650FFE650FFE650FFE650FFE650FFE6
+                  50FFE650FFE650FFE650FFE650FFE650FFE650FFEC7AFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFE29B19CF8F17FFE650FFE650FFE650FFE650
+                  FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE29B19CF8F17FFE650FF
+                  E650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650
+                  FFE650FFE650FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE29B
+                  19CF8F17FFE650FFE650FFE650A38110937005937005937005937005937005A3
+                  8110FFE650FFE650FFE650FFE650FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFE29B19CF8F17FFE650FFE650FFE650FFE650FFE650FFE650FFE6
+                  50FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFE29B19CF8F17FFE650FFE650FFE650A38110
+                  937005937005937005937005937005937005937005D9BD36FFE650FFE650FFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE29B19CF8F17FFE650FF
+                  E650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650
+                  FFE650FFE650FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE29B
+                  19CF8F17FFE650FFE650FFE650A38110937005937005937005937005937005A3
+                  8110FFE650FFE650FFE650FFE650FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFE29B19CF8F17FFE650FFE650FFE650FFE650FFE650FFE650FFE6
+                  50FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFE29B19CF8F17FFE650FFE650FFE650A38110
+                  937005937005937005937005937005937005937005D9BD36FFE650FFE650FFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE29B19CF8F17FFE650FF
+                  E650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650
+                  FFE650FFE650FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE29B
+                  19CF8F17FFE650FFE650FFE650A38110937005937005937005937005937005A3
+                  8110FFE650FFE650FFE650FFE650FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFE29B19CF8F17FFE650FFE650FFE650FFE650FFE650FFE650FFE6
+                  50FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFE29B19CF8F17FFE650FFE650FFE650A38110
+                  937005937005937005937005937005937005937005D9BD36FFE650FFE650FFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE29B19CF8F17FFE650FF
+                  E650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650
+                  FFE650FFE650FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE9B2
+                  4DCF8F17FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FF
+                  E650FFE650FFE650FFE650FFE650FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFE650FFE650FFE650FFE650FFE650FFE650FFE6
+                  50FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEC78FFE650FFE650FFE650
+                  FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFEC79FFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+                ParentShowHint = False
+                ShowHint = True
+                OnClick = btNFSeOSClick
+              end
+            end
+            inherited GroupBox2: TGroupBox
+              Height = 380
+              ExplicitHeight = 380
+              inherited ScrollBox2: TScrollBox
+                Height = 363
+                ExplicitHeight = 363
+              end
+            end
+          end
+        end
+        inherited tsMemo: TTabSheet
+          ExplicitLeft = 4
+          ExplicitTop = 27
+          ExplicitWidth = 834
+          ExplicitHeight = 514
+        end
+      end
+    end
+    inherited PanelFlash: TPanel
+      Top = -5000
+      ExplicitTop = -5000
+    end
+  end
+  inherited StatusBar1: TStatusBar
+    Width = 845
+    ExplicitWidth = 845
+  end
+  inherited pnStatusProcessamento: TPanel
+    Top = -5000
+    ExplicitTop = -5000
+  end
+  object popMenuNova: TPopupMenu
+    Images = ImageList1
+    OnPopup = popMenuNovaPopup
+    Left = 8
+    Top = 72
+    object EmissaoPropriaViaWebService1: TMenuItem
+      Caption = 'Presta'#231#227'o de Servi'#231'o  - Transmitir via Sistema'
+      ImageIndex = 1
+      OnClick = EmissaoPropriaViaWebService1Click
+    end
+    object EmissaoPropriaViaPortal1: TMenuItem
+      Caption = 'Presta'#231#227'o de Servi'#231'o  - Emitida no Portal'
+      ImageIndex = 0
+      OnClick = EmissaoPropriaViaPortal1Click
+    end
+    object N2: TMenuItem
+      Caption = '-'
+    end
+    object EmissaoTerceiros1: TMenuItem
+      Caption = 'Servi'#231'o Tomado - Emiss'#227'o de Terceiros'
+      ImageIndex = 0
+      OnClick = EmissaoTerceiros1Click
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object ReverterAutorizacao1: TMenuItem
+      Caption = 'Reverter Autoriza'#231#227'o informada indevidamente'
+      Hint = 'Reverter Autoriza'#231#227'o informada indevidamente - [NFS021]'
+      ImageIndex = 2
+      OnClick = ReverterAutorizacao1Click
+    end
+    object ConsultarSituacaoNFSe1: TMenuItem
+      Caption = 'Consultar Situa'#231#227'o da NFSe no WebService'
+      Hint = 'Consultar Situa'#231#227'o da NFSe no WebService - [NFS024]'
+      ImageIndex = 1
+      OnClick = ConsultarSituacaoNFSe1Click
+    end
+    object AlterarNaturezaEmissaoPortal1: TMenuItem
+      Caption = 'Alterar NFSe para Emiss'#227'o no Portal'
+      Hint = 'Alterar NFSe para Emiss'#227'o no Portal - [NFS025]'
+      ImageIndex = 0
+      OnClick = AlterarNaturezaEmissaoPortal1Click
+    end
+    object AlterarNaturezaEmissaoWS1: TMenuItem
+      Caption = 'Alterar NFSe para Emiss'#227'o no WebService'
+      Hint = 'Alterar NFSe para Emiss'#227'o no WebService - [NFS025]'
+      ImageIndex = 1
+      OnClick = AlterarNaturezaEmissaoPortal1Click
+    end
+    object N3: TMenuItem
+      Caption = '-'
+    end
+    object ConfiguracoesNFSe1: TMenuItem
+      Caption = 'Configura'#231#227'o NFSe - [NFS039]'
+      OnClick = ConfiguracoesNFSe1Click
+    end
+    object ModuloNFSeAntigo1: TMenuItem
+      Caption = 'M'#243'dulo NFSe antigo - [NF0108]'
+      OnClick = ModuloNFSeAntigo1Click
+    end
+  end
+  object ImageList1: TImageList
+    Left = 8
+    Top = 40
+    Bitmap = {
+      494C010103000400040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      0000000000003600000028000000400000001000000001002000000000000010
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000CCDCBE0065953E006696
+      3F00CADBBD0000000000FDFEFC0000000000FDFEFD0000000000BBD0A9006E9C
+      49006F9C490077A25400E7EFE100000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000D650AF00D650AF000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000F6F6F600E2E2E200FDFD
+      FD00000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000B7CEA5004F8621005087
+      2300B6CDA30000000000FCFDFC00FEFEFD0000000000DDE8D500598D2E00578B
+      2B005B8F31004C841E00C4D6B500000000000000000000000000000000000000
+      000000000000EBEAE800C5C0BA00B0AAA300AFA9A100C3BEB900E8CBDE00F1A7
+      E0000000000000000000CA3FA100CA3FA1000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000E2E2E2006F6F6F007474
+      7400B2B2B100EFEEEC00F8F7F600000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000BBD0A900538926005489
+      2800B9CFA70000000000FCFDFC00FEFEFD00000000008AAE6C00528826005F92
+      37005F91350052882600C6D8B80000000000000000000000000000000000F8F8
+      F700B2ABA4008D867A00A7A09800B6B1A900B6B0A900AB8C9900E068C100DF6C
+      C100ED96D600F099DA00EA81CF00E995D3000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000FDFDFD007C7C7C008B8B
+      8A00DBD9D600DEDCD800DCD9D500DCD9D500B1DDEC0000000000000000000000
+      00000000000000000000000000000000000000000000BAD0A800528825005389
+      2700B9CFA70000000000FBFCFA0000000000D3E1C700568B2A005D9034005D8E
+      2F005E90350051882500C6D8B700000000000000000000000000F9F8F8009F97
+      8E00AAA39A00D5D2CD00D9D6D200D1D0D200D1D0D200D39EC400E667C700E567
+      C600E267C300EA74CC00F3A9E100FEFAFD000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000BBBBBA00E1E0
+      DD00E4E2DF00E1DFDC00BED6DB0043BAE20002A5E80050C8F200000000000000
+      00000000000000000000000000000000000000000000BAD0A800528825005389
+      2700B9CFA60000000000FCFDFB000000000082A96100548A29005E9033005894
+      47005E91360051882400C6D8B700000000000000000000000000B5AFA900ACA6
+      9E00DBD8D400DCD9D500DDD9D600A6B2D600A6B2D600DCD8D500D69BC500DB86
+      C400A0999000AAA39B0000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000F6F5F500E9E7
+      E500E6E5E200E4E2DF0079D0E40002AEE70003A1E50002A4E8004CC6F2000000
+      00000000000000000000000000000000000000000000BAD0A800528825005389
+      2700B9CFA7000000000000000000C9DABB00538928005F8F2F005794470041AB
+      9F00608F2E0051882600C6D8B7000000000000000000EDECEA00958D8600D8D5
+      D300DEDBD700DFDCD900E0DDDA00A8B5D900A8B5D900E0DDDA00DEDBD800D7C5
+      CE00D8D5D100887D7200EBE9E700000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000FCFBFB00EBEA
+      E800C7E2E7007CD3E7000DC1ED0000BEED0002AEE70003A1E50002A4E8004CC6
+      F2000000000000000000000000000000000000000000BAD0A800528825005389
+      2700B8CEA60000000000FBFCFA0079A35700548B2D00628C230040AB9D0038B3
+      BC00628C250051882700C6D8B7000000000000000000CAC7C200B1ACA500DFDC
+      D900E1DEDB00E2DFDC00E3E0DE00ABB8DC00ABB8DC00E3E0DD00E2DFDC00E1DE
+      DB00DFDCD900A7A19900C2BDB700000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000000000000000000000EFEE
+      ED0047D6F30000CDF50000BEED0000BEED0000BEED0002AEE70003A1E50002A4
+      E8004CC6F20000000000000000000000000000000000BAD0A800528825005389
+      2700B6CDA40000000000BDD1AC00518826005F90310059923D0028C2F6003CAF
+      AC00628D260051882800C6D8B7000000000000000000BBB7B100C2BDB700E2DF
+      DC00E4E1DE00E5E3E000E6E4E10071768700757D9000E6E4E100E5E3E000E4E1
+      DE00E2DFDC00BBB5AF00B1ABA300000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000000000000000000000B8ED
+      F70000D5FE0000D8FE0000CDF50000BEED0000BEED0000BEED0002AEE70003A1
+      E50002A4E8004CC6F200000000000000000000000000BAD0A800528825005389
+      2600BACFA800000000006F9C4900568C2F00618C250042A9970021C9FF003DAD
+      A600628D270051882800C6D8B7000000000000000000BCB7B200C4C0BB00E5E2
+      DF00E7E4E200C1BEBC0076736F005C5A570063626000DFDEDB00E8E6E400E7E4
+      E200E4E2DF00BDB7B100B1ABA400000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00004FDBFB0000D5FF0000D8FE0000CDF60000BEED0000BEED0000BEED0002AE
+      E70003A1E50002A4E80049C5F2000000000000000000BAD0A800528825005187
+      2400C2D5B300C2D5B2004E86220060903000579447002BBFEB0024C6FF003CAE
+      A900628D270051882800C6D8B7000000000000000000CCC9C500B7B2AC00E7E5
+      E200E9E7E50093908C00CFCDCB00EDECEA00E4E1E0008F8C8900DFDEDC00E9E7
+      E500E7E4E200AEA79F00C4BFBA00000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000004EDBFB0000D5FF0000D8FE0000CDF60000BEED0000BEED0000BE
+      ED0002AEE70003A1E50033BCEE000000000000000000BAD0A80051882500558A
+      2900B3CBA0007AA45800548B2C00618C26003EADA40025C4FF0027C3FD003FAC
+      A500628C280051882800C6D8B7000000000000000000EEEDEB009D978E00E6E4
+      E200ECEAE800EEECEB00F0EEED00F1EFEE00F1EFEE00E6E4E200918D8A00E8E6
+      E500E5E3DF008F877C00EBEAE800000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000004FDBFB0000D5FF0000D8FE0000CDF60000BEED0000BE
+      ED0000BEED0052CAF000FEFFFF000000000000000000BAD0A800508622005E90
+      350080A85F005C9034005E8D2B0055964F002AC0F20028C2F5001ECEFF0039B3
+      A800608F260051882800C6D8B700000000000000000000000000BBB6B100BAB6
+      B000EEECEA00F0EFED00F3F1F000F4F3F200F4F2F200F3F1F000EDEBEA00EDEB
+      EA00B1ABA400B2ACA50000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000000000004FDBFB0000D5FF0000D8FE0000CDF60000BE
+      ED0070DBF50000000000000000000000000000000000BAD0A8004F8622005F91
+      36005B8E31005B9035005F8C26003CAEAE0021C9FF002DBDEB004B95B300647E
+      6D006C8230004E8B2600C6D8B700000000000000000000000000F9F8F800A8A2
+      9C00BCB7B200EEEDEC00F5F4F300F7F6F600F7F6F500F5F3F300EEECEB00B5AE
+      A9009F978E00F8F8F70000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000004FDAFB0000D5FF0000D8FE0051DB
+      F8000000000000000000000000000000000000000000BACFA800518824006092
+      37005D913700608E2A005698550027C6FD0031BAE7007D594E00943717009644
+      2B009D5342006D6B2900C3DBB70000000000000000000000000000000000F9F8
+      F800BBB6B1009F998F00BFBBB500D2CFCC00D2CFCB00BCB8B20098908900B5AF
+      A900F9F8F8000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000004FDBFB0032D8FB000000
+      00000000000000000000000000000000000000000000BAD0A80048811900578C
+      2D00558A2900568925002FAFBC0015CAFF00616D7000922D0C00843C25008A44
+      2B00964E380089412600CFCAB600000000000000000000000000000000000000
+      000000000000EEEDEB00CDC9C500BCB7B200BBB6B000CBC7C300EDECEA000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000EAF1E5008DB06F0086AC
+      680089AD680077BDA90060D4FD0061D4FA009A807700A96A5400A56D5A00A971
+      5F00AF7C6B00A96F5C00E3CBC500000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000424D3E000000000000003E000000
+      2800000040000000100000000100010000000000800000000000000000000000
+      000000000000000000000000FFFFFF00FFFF8541FFFC00008FFF8481F80C0000
+      81FF8481E0000000807F8501C0000000C03F8501C0030000C01F860180010000
+      C00F840180010000E007840180010000E003840180010000F001800180010000
+      F801800180010000FC018001C0030000FE078001C0030000FF0F8001E0070000
+      FF9F8001F81F0000FFFF8001FFFF000000000000000000000000000000000000
+      000000000000}
+  end
+end

@@ -1,0 +1,120 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{4224BA71-0F71-4449-9D81-0E3169197208}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="hw.nfe.dx.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\EFD\hw.efd.dx.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\Utilitario\HW.UTILS.DX\hw.utils.dx.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\auditoria dx\hw.auditoria.dx.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\Utilitario\md5XE3\MD5XE3.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ArqsHw\PrTesteDll.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\EFD\PrTeste\hw.efd.dx.teste.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="NFC\Servico\HWNFCServiceLess.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="hw_nfe_dx">
+        <MSBuild Projects="hw.nfe.dx.dproj"/>
+    </Target>
+    <Target Name="hw_nfe_dx:Clean">
+        <MSBuild Projects="hw.nfe.dx.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="hw_nfe_dx:Make">
+        <MSBuild Projects="hw.nfe.dx.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="hw_efd_dx">
+        <MSBuild Projects="..\EFD\hw.efd.dx.dproj"/>
+    </Target>
+    <Target Name="hw_efd_dx:Clean">
+        <MSBuild Projects="..\EFD\hw.efd.dx.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="hw_efd_dx:Make">
+        <MSBuild Projects="..\EFD\hw.efd.dx.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="hw_utils_dx">
+        <MSBuild Projects="..\Utilitario\HW.UTILS.DX\hw.utils.dx.dproj"/>
+    </Target>
+    <Target Name="hw_utils_dx:Clean">
+        <MSBuild Projects="..\Utilitario\HW.UTILS.DX\hw.utils.dx.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="hw_utils_dx:Make">
+        <MSBuild Projects="..\Utilitario\HW.UTILS.DX\hw.utils.dx.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="hw_auditoria_dx">
+        <MSBuild Projects="..\auditoria dx\hw.auditoria.dx.dproj"/>
+    </Target>
+    <Target Name="hw_auditoria_dx:Clean">
+        <MSBuild Projects="..\auditoria dx\hw.auditoria.dx.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="hw_auditoria_dx:Make">
+        <MSBuild Projects="..\auditoria dx\hw.auditoria.dx.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="MD5XE3">
+        <MSBuild Projects="..\Utilitario\md5XE3\MD5XE3.dproj"/>
+    </Target>
+    <Target Name="MD5XE3:Clean">
+        <MSBuild Projects="..\Utilitario\md5XE3\MD5XE3.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MD5XE3:Make">
+        <MSBuild Projects="..\Utilitario\md5XE3\MD5XE3.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="PrTesteDll">
+        <MSBuild Projects="ArqsHw\PrTesteDll.dproj"/>
+    </Target>
+    <Target Name="PrTesteDll:Clean">
+        <MSBuild Projects="ArqsHw\PrTesteDll.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PrTesteDll:Make">
+        <MSBuild Projects="ArqsHw\PrTesteDll.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="hw_efd_dx_teste">
+        <MSBuild Projects="..\EFD\PrTeste\hw.efd.dx.teste.dproj"/>
+    </Target>
+    <Target Name="hw_efd_dx_teste:Clean">
+        <MSBuild Projects="..\EFD\PrTeste\hw.efd.dx.teste.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="hw_efd_dx_teste:Make">
+        <MSBuild Projects="..\EFD\PrTeste\hw.efd.dx.teste.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="HWNFCServiceLess">
+        <MSBuild Projects="NFC\Servico\HWNFCServiceLess.dproj"/>
+    </Target>
+    <Target Name="HWNFCServiceLess:Clean">
+        <MSBuild Projects="NFC\Servico\HWNFCServiceLess.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="HWNFCServiceLess:Make">
+        <MSBuild Projects="NFC\Servico\HWNFCServiceLess.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="hw_nfe_dx;hw_efd_dx;hw_utils_dx;hw_auditoria_dx;MD5XE3;PrTesteDll;hw_efd_dx_teste;HWNFCServiceLess"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="hw_nfe_dx:Clean;hw_efd_dx:Clean;hw_utils_dx:Clean;hw_auditoria_dx:Clean;MD5XE3:Clean;PrTesteDll:Clean;hw_efd_dx_teste:Clean;HWNFCServiceLess:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="hw_nfe_dx:Make;hw_efd_dx:Make;hw_utils_dx:Make;hw_auditoria_dx:Make;MD5XE3:Make;PrTesteDll:Make;hw_efd_dx_teste:Make;HWNFCServiceLess:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

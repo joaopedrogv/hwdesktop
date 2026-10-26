@@ -1,0 +1,47 @@
+package pkCIAP;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  PkFormularios,
+  pkAtivos,
+  vcl,
+  vcldb,
+  dbrtl,
+  pkEditHw,
+  pkEquipamentos;
+
+contains
+  uCIAP in '..\fonte\uCIAP.pas' {frmCIAP},
+  uCadPlContasContabil in '..\fonte\uCadPlContasContabil.pas' {frmPlContasContabil},
+  uClassesCIAP in '..\fonte\uClassesCIAP.pas',
+  uDtmCIAP in '..\fonte\uDtmCIAP.pas' {dtmCIAP: TDataModule},
+  uCadCentroCustos in '..\fonte\uCadCentroCustos.pas' {frmCadCentroCustos},
+  uCadMovimentacaoBem in '..\fonte\uCadMovimentacaoBem.pas' {frmMovimentacaoBem},
+  uCadContCredSped in '..\fonte\uCadContCredSped.pas' {frmCadContSped};
+
+end.

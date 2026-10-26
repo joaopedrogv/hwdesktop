@@ -1,0 +1,40 @@
+# ==========================================
+# Git Attributes - Projeto_Fiscal40 (Delphi 2006)
+# Encoding: ANSI (Windows-1252) | Line Endings: CRLF
+# ==========================================
+
+# 📜 Código Delphi (Texto, CRLF)
+*.pas    text eol=crlf
+*.dpr    text eol=crlf
+*.dpk    text eol=crlf
+*.inc    text eol=crlf
+*.dfm    text eol=crlf
+*.xfm    text eol=crlf
+
+# ⚙️ Configurações e Projeto
+*.dof    text eol=crlf
+*.cfg    text eol=crlf
+*.txt    text eol=crlf
+*.ini    text eol=crlf
+*.sql    text eol=crlf
+
+# 🌐 Docs & CI/CD (LF para compatibilidade cross-platform)
+*.md     text eol=lf
+*.yml    text eol=lf
+*.yaml   text eol=lf
+*.json   text eol=lf
+
+# 🗑️ Binários e Gerados (Não tratar como texto)
+*.exe    binary
+*.dll    binary
+*.dcu    binary
+*.bpl    binary
+*.res    binary
+*.dsk    binary
+*.identcache binary
+*.local  binary
+*.stat   binary
+*.map    binary
+*.tds    binary
+*.~*     binary
+*.bak    binary

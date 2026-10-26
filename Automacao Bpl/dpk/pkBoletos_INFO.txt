@@ -1,0 +1,292 @@
+-- ÍNDICE --
+0 - INSTALAÇÃO
+        0.0 - INFORMAÇÕES (ATENÇÃO!!!)
+                0.0.0 - CONFIGURAÇÃO
+1 - COBREBEMX
+        1.1 - INFORMAÇÕES
+                1.1.1 - INSTALAÇÃO DE USO
+                1.1.2 - GERAR ARQUIVO .CONF - CONFIGURAÇÃO DA EMPRESA EMISSORA DO BOLETO (CEDENTE)
+2 - BOLETO
+        2.1 - INFORMAÇÕES
+                2.1.1 - EXIBIR FORMULÁRIO NOVO DO BOLETO
+                2.1.2 - EXIBIR FORMULÁRIO DE QUITAR BOLETOS PELO ARQUIVO DE
+                RETORNO E TRATAMENDO DO NOSSO NÚMERO
+                2.1.3 - EMITIR BOLETOS NA NOTA FISCAL OU ORDEM DE SERVICO
+        2.2 - FUNÇÃO PARA EMITIR BOLETOS NA NOTA FISCAL OU ORDEM DE SERVICO
+3 - DOCUMENTAÇÃO (30/09/2011)
+        3.1 - FORMULÁRIOS
+                3.1.1 - Cadastro de Boletos (CTRL + B)
+                        3.1.1.1 - Tela : Consulta
+                                3.1.1.1.1 - BOTÕES,AÇÕES,PROCESSOS E FUNCIONALIDADES
+                        3.1.1.2 - Tela : Cadastro
+                                3.1.1.2.1 - CAMPOS DO FORMULÁRIO | CAMPOS DO BANCO DE DADOS
+                                3.1.1.2.2 - BOTÕES,AÇÕES,PROCESSOS E FUNCIONALIDADES
+                        3.1.1.3 - Tela : Pré Impresso
+                                3.1.1.3.1 - CAMPOS DO FORMULÁRIO | CAMPOS DO BANCO DE DADOS
+                                3.1.1.3.2 - BOTÕES,AÇÕES,PROCESSOS E FUNCIONALIDADES
+                        3.1.1.4 - Tela : Cobrebem(tabsheet6)
+                                3.1.1.4.1 - CAMPOS DO FORMULÁRIO | CAMPOS DO BANCO DE DADOS
+                                3.1.1.4.2 - BOTÕES,AÇÕES,PROCESSOS E FUNCIONALIDADES
+                        3.1.1.5 - Tela : Remover dados "Selecione os Dados que deseja remover"(tabsheet6)
+                                3.1.1.5.1 - BOTÕES,AÇÕES,PROCESSOS E FUNCIONALIDADES
+                        3.1.1.6 - Tela : Controles (tabsheet_Controles)
+                                3.1.1.6.1 - BOTÕES,AÇÕES,PROCESSOS E FUNCIONALIDADES
+                3.1.2 - Cadastro de Cobrebem (Configuração do boleto)
+                        3.1.2.1 - Tela : Consulta
+                                3.1.2.2.1 - BOTÕES,AÇÕES,PROCESSOS E FUNCIONALIDADES
+                        3.1.1.2 - Tela : Cadastro
+                                3.1.1.2.1 - CAMPOS DO FORMULÁRIO | CAMPOS DO BANCO DE DADOS
+                                3.1.2.2.2 - BOTÕES,AÇÕES,PROCESSOS E FUNCIONALIDADES
+        3.2 - Tópicos Relacionados
+        3.3 - Campos de configuração
+                3.3.1 - Config
+                3.3.2 - Empresa
+-- TEXTO --
+0 - INSTALAÇÃO
+        - INFORMAÇÕES
+                0.0.0 - SEGUIR A SEQUENCIA DO NOSSO NUMERO E DO ARQUIVO DE REMESSA
+1 - COBREBEMX
+        1.1 - INFORMAÇÕES
+                1.1.1 - [INSTALAÇÃO] - A INSTALAÇÃO DO COBREBEMX FICA NA PASTA
+                HWSISTEMAS/COBREBEMX UM ARQUIVO INSTALA UM REMOVE E A DLL E
+                TAMBÉM UMA DLL NA PASTA DO PROGRAMA, É PRECISO EXECUTAR O
+                ARQUIVO INSTALAR PARA REGISTRAR A DLL
+                1.1.2 - Ir no site http://www.cobrebem.com/cgi-bin/CCAL/CCAL
+                ,pegar a chave na pasta \\192.168.254.51\sys\CobreBem
+                , no arquivo Chaves de Licença do CobreBemX.txt e inserir
+                as outras informações que precisarem consultar no banco antes.
+2 - BOLETO
+        2.1 - INFORMAÇÕES
+                2.1.1 - CONFIGURAR PROCESSO HW544 DE ACORDO COM O NÍVEL DO USUÁRIO
+                PARA INICIAR A NOVA TELA DO BOLETO SENÃO IRÁ APRESENTAR A TELA
+                DO BOLETO ANTIGO.
+                2.1.2 - SE A OPÇÃO QUITAR BOLETOS PELO SISTEMA NA EMPRESA
+                ESTIVER MARCADO "SIM" QUANDO TIVER UM NOSSO NUMERO REPETIDO
+                ELE EXIBE UMA TELA PARA O USARIO INFORMAR O QUE ELE DESEJA
+                FAZER, SE ESTIVER MARCADO "NÃO" ELE VERIFICASE A DATA DE
+                VENCIMENTO É SUPERIOR A 1 ANO E INATIVA O BOLETO AUTOMATICO.
+
+                2.1.3 -  SE A OPÇÃO IMPRIMIR BOLETOS NA NOTA FISCAL NA EMPRESA
+                ESTIVER MARCADA QUANDO ESTIVER EMITINDO A NOTA ELE PERGUNDA SE DESEJA
+                EMITIR OS BOLETOS. E SE A OPÇÃO IMPRIMIR BOLETOS NA ORDEM DE SERVIÇO
+                NA EMPRESA ESTIVER MARCADA QUANDO ESTIVER EMITINDO A OS ELE
+                PERGUNDA SE DESEJA EMITIR OS BOLETOS.
+
+        2.2 - Para emitir boletos na nota fiscal ou Ordem de serviço utilizar
+              função _BoletosNFOS da da classe TBoleto em UClassesBoleto - parametros:
+              (NUMERO DA NOTA OU ORDEM DE SERVIÇO),
+              (SUBSERIE DA NF "OBS:. SE FOR OS DEIXAR '0'")
+              E O TIPO DE EMISSÃO ('NF' OU 'OS');
+3 - DOCUMENTAÇÃO
+        3.1 - CAMPOS DO FORMULÁRIO
+                3.1.1 - Cadastro de Boletos (CTRL + B)
+                         3.1.1.1 - Tela : Consulta
+                                 3.1.1.1.1 - BOTÕES,AÇÕES,PROCESSOS E FUNCIONALIDADES
+                                        - 1 - Procurar (BOL001)
+                                        - 2 - Novo (BOL002)
+                                        - 3 - Editar Registro (BOL003)
+                                        - 4 - Apagar Registro (BOL005)
+                                        - 5 - Imprimir (BOL010)
+                                                - Se no config.ini estiver marcado Cobrebem=S no sistema velho variável fica no [AUTOMACAO],
+                                                no novo fica no [Sistema]  ele vai para aba Cobrebem, se estiver marcado Cobrebem=N
+                                                vai para tela Pré Impresso
+                                        - 6 - Ver registros da lixeira (BOL007)
+                                        - 7 - Recuperar registro (BOL006)
+                                        - 8 - Gerar arquivo remessa (BOL013)
+                                                - Gera o arquivo de remessa com todos os boletos selecionados que já foram impressos(contém o Nosso Numero).
+                                        - 9 - Relatório (BOL011)
+                                                - Imprime o relatório dos boletos que estiverem na tela
+                                        - 10 - Limpar dados da impressão do boleto e dados do crédito (BOL014)
+                                                - Segue para Tela de Limpar Dados "Selecione os Dados que deseja remover"(tabsheet6)
+                                        - 11 - Imprime Fatura de NF (Limitado: Imprime até os dois primeiros boletos selecionados) (BOL025)
+                                                - Imprime a fatura de Nota fiscal
+                                        - 12 - Emitir Promissórias do Boletos Selecionados (BOL026)
+                                                - Emitir promissórias dos boletos
+                                        - 13 - Reativar boleto (Retirar boleto do status inativo ou cancelado) (BOL018)
+                                                - Reativar o boleto se ele estiver sido inativado "ex:. Quando o Nosso Numero repetir
+                                                a uma pergunta se o usuário deseja inativar o boleto ou passar para
+                                                o proximo nosso numero(essa opção aparece se a empresa realizar a quitação
+                                                de boletos pelo sistema, no cadastro de empresa tem a opção: Quitar Boleto pelo sitema)
+                                                , se a opção na empresa não estiver selecionada ele realiza a inativação automatica dos que
+                                                tiverem data de vencimento superior a 1 ano". E a reativação do cancelamento
+                                                (o cancelamento é feito pelo proprio usuário no botão cancelar boleto).
+                                        - 14 - Parar processamento  (BOL019)
+                                                - Durante a geração de arquivo de remessa ou do reativamento do boleto,
+                                                esta opção aparece se o usuário desejar abordar ele para o que estava
+                                                sendo feito.
+                                        - 15 - Cancelar boleto (BOL020)
+                                                - Colocar status de cancelado no boleto.
+                                        - 16 - Vincular boleto ao crédito (BOL021)
+                                                - Inserir o Nosso Numero do boleto no crédito
+                                                (Quando não é utilizado o processamento do caixa,
+                                                 e as contas a receber são lançadas direto no caixa)
+                        3.1.1.2 - Tela : Cadastro
+                                3.1.1.2.1 - CAMPOS DO FORMULÁRIO | CAMPOS DO BANCO DE DADOS
+                                       (obs:. Tabela: BOLETAS )
+                                        - 1 - Código: | N_SEQ_BOL
+                                        - 2 - Data de emissão: | DATA_EM_BOL
+                                        - 3 - Data de vencimento: | DATA_VEN_BOL
+                                        - 4 - Número do documento: | N_DOC_BOL
+                                        - 5 - Valor total: | VL_DOC_BOL
+                                        - 6 - Mora diária: | M_DIA_BOL
+                                        - 7 -  Multa  (%) | MULT_ATR_BOL
+                                        - 8 - Código cliente: | COD_CLIENTE | NOME_CLIENTE (obs:. Tabela: CLIENTES)
+                                        - 9 - Razão social: | RAZAO (obs:. Tabela: CLIENTES)
+                                        - 10 - Local de pagamento: | LOCALPAG
+                                        - 11 - Obs. 1 (Demonstrativo) | OBS_BOL
+                                        - 12 - Obs. 2 (Instruções p/ Caixa) | OBS_BOL1
+                                3.1.1.2.2 - BOTÕES,AÇÕES,PROCESSOS E FUNCIONALIDADES
+                                        - 1 - OK (BOL008)
+                                        - 2 - CANCELAR (BOL009)
+                        3.1.1.3 - Tela : Pré Impresso
+                                         (obs:. A tela é exibida e se tiver somente um banco
+                                          a impressão é feita diretamente,
+                                        não sendo preciso do usuário clicar no botão)
+                                3.1.1.3.1 - CAMPOS DO FORMULÁRIO | CAMPOS DO BANCO DE DADOS
+                                        - 1 - Banco : | COD_BANCO | DESC_BANCO (obs:. Tabela: CODIGO_BANCO)       
+                                3.1.1.3.2 - BOTÕES,AÇÕES,PROCESSOS E FUNCIONALIDADES
+                                        - 1 - Imprimir (BOL010)
+                                                - Imprime o boleto pré impresso de acordo com o banco selecionado
+                        3.1.1.4 - Tela : Cobrebem
+                                3.1.1.4.1 - CAMPOS DO FORMULÁRIO | CAMPOS DO BANCO DE DADOS
+                                        (obs:. A tela é exibida e se tiver somente uma configuração de
+                                        boleto a impressão é feita diretamente,
+                                        não sendo preciso do usuário clicar no botão)
+                                        - 1 - Selecione a configuração desejada (Cobrebem): | COD_COBREBEM
+                                3.1.1.4.2 - BOTÕES E FUNCIONALIDADES
+                                        - 1 - OK (BOL015)
+                                                - Imprime o boleto e insere na forma de pagamento o número do boleto
+                                        ou se já tiver gerado o crédito do boleto insere no crédito.
+
+                                        2 e 3 - (Somente visivel se o Nosso Número já estiver em outro boleto e se a configuração
+                                        no cadastro da empresa Quitar Boleto pelo sitema estiver selecionado "Sim")
+                                        - 2 - INATIVAR BOLETO(S) (BOL016)
+                                                - Inativa o(s) boleto(s) que estão com o Nosso
+                                                Número que será impresso pelo boleto que está sendo impresso.
+                                        - 3 - PROXÍMO NOSSO NÚMERO (BOL017)
+                                                - Gera outro nosso número para o boleto que está
+                                                sendo impresso.
+                        3.1.1.5 - Tela : Remover dados "Selecione os Dados que deseja remover"(tabsheet6)
+                                3.1.1.5.1 - BOTÕES,AÇÕES,PROCESSOS E FUNCIONALIDADES
+                                        - 1 - Nosso Número (NOSSO_NUMERO_BANCO) (COD_COBREBEM)
+                                                - Retira o nosso numero do boleto
+                                        - 2 - Remessa enviada  (REMESSA_ENVIADA) (DATA_REMESSA)(COD_SEQ_REMESSA)
+                                                - Retira o idicativo a data o codigo e o indicativo se a remessa foi enviada.
+                                        - 3 - Retirar Nosso Número do crédito (BOL022) (NOSSO_NUMERO_BANCO tabela CONTROLE_CREDITOS)
+                                                - retira o nosso número do crédito referente ao boleto
+                                        - 4 - OK (BOL015)
+                        3.1.1.6 - Tela : Controles (tabsheet_Controles)
+                                3.1.1.6.1 - BOTÕES,AÇÕES,PROCESSOS E FUNCIONALIDADES
+                                        - 1 - OK (BOL023)
+                                                - Insere o Nosso Número do boleto selecionado no crédito.
+                                        - 2 - CANCELA (BOL024)
+                3.1.2 - Cadastro de Cobrebem (Configuração do boleto)
+                        3.1.2.1 - Tela : Consulta
+                                3.1.2.2.1 - BOTÕES,AÇÕES,PROCESSOS E FUNCIONALIDADES
+                                        - 1 - Procurar (COB001)
+                                        - 2 - Novo (COB002)
+                                        - 3 - Editar Registro (COB003)
+                                        - 4 - Apagar Registro (COB005)
+                                        - 6 - Ver registros da lixeira (COB007)
+                                        - 7 - Recuperar registro (COB006)
+                        3.1.2.2 - Tela : Cadastro
+                                -> Configurações
+                                3.1.2.2.2 - CAMPOS DO FORMULÁRIO | CAMPOS DO BANCO DE DADOS
+                                        (obs:. Tabela: Cobrebem)
+                                        - 1 - Código: | COD_COBREBEM
+                                        - 2 - Código Cedente: | CODIGOCEDENTE
+                                        - 3 - Arquivo Licença : | ARQUIVOLICENCA
+                                        - 4 - Banco: | BANCO
+                                        - 5 - Agencia: | CODIGOAGENCIA
+                                        - 6 - Conta Corrente : | NUMEROCONTACORRENTE
+                                        - 7 - Início Nosso Número : | INICIONOSSONUMERO
+                                        - 8 - Fim Nosso Número : | FIMNOSSONUMERO
+                                        - 9 - Próximo Nosso Número: | PROXIMONOSSONUMERO
+                                        - 10 - Dias Protesto : | DIASPROTESTO
+                                        - 11 - Número Sequencia Remessa : | SEQUENCIA_REMESSA
+                                        - 12 - Tipo documento : | TIPODOCUMENTOCOBRANCA
+                                        - 13 - Código Baixa : | CODIGO_BAIXA
+                                        - 14 - Código Recusa : | CODIGO_RECUSA
+                                        - 15 - Código Controle : | CODIGO_CTRL | NOME_CTRL (Tabela:. Controles)
+                                        - 16 - 1º Identificação Cedente : | IDENTIFICACAOCEDENTE
+                                        - 17 - 2º Identificação Cedente : | IDENTIFICACAOCEDENTE1
+                                        - 18 - Endereço Remessa/Retorno : | ENDERECOREMESSARETORNO
+                                        - 19 - Imagens Código de Barras : | IMAGENSBOLETO
+                                        - 20 - Imagem Logotipo : | IMAGENSLOGOTIPO
+                                        - 21 - Dados Configuração 1 : | OUTRODADOCONFIGURACAO1
+                                        - 21 - Dados Configuração 2 : | OUTRODADOCONFIGURACAO2
+                                -> Layouts
+                                        - 1 - Layout Boleto Impresso : | LAYOUTBOLETOIMPRESSO
+                                        - 2 - Layout Boleto por E-mail : | LAYOUTBOLETOSEMAIL
+                                        - 3 - Layout Arquivo Remessa : | LAYOUTARQUIVOREMESSA
+                                        - 4 - Layout Arquivo Retorno : | LAYOUTARQUIVORETORNO
+                                        - 5 - Html Boleto : | HTMLBOLETO
+                                -> Outros Dados
+                                        - 1 - Dígitos Nosso Número: | QTDEDIGNOSSONUMERO
+                                3.1.2.2.2 - BOTÕES,AÇÕES,PROCESSOS E FUNCIONALIDADES
+                                        - 1 - OK (COB008)
+                                        - 2 - CANCELA (COB009)
+
+
+        3.2 - Topicos Relacionados
+                3.2.1 - Cobrebem
+                        - Configuração do boleto
+                3.2.2 - Crédito
+                        - Nosso Numero
+                3.2.3 - Forma de Pagamento
+                        - Nosso Numero
+                3.2.4 - Processar arquivo de retorno (Quitar Crédito pelo arquivo de retorno)
+                        - Caixa :. Insere a ocorrencia bancária no boleto
+                3.2.5 - Nota fiscal
+                        - A impressão do boleto durante a emissão da nota fiscal.
+        3.3 - Campos de configuração
+                3.3.1 - Config
+                        - 1 - COBREBEM
+                                - Se estiver marcado Cobrebem=S no sistema velho
+                                variável fica no [AUTOMACAO], no novo fica no
+                                [Sistema] na Tela de consulta do boleto no botão
+                                imprimir ele vai para tela Cobrebem. E o formulário
+                                na configuração do boleto "Cobrebem"
+                                (Menu: Configuração->Boleto->Cobrebem) e exibido, se estiver
+                                marcado Cobrebem=N vaí para pré-impresso. E o formulário
+                                na configuração do boleto "Pré-impresso"(Menu: Configuração->Boleto->Cobrebem)
+                                é exibido.
+                3.3.2 - Empresa
+                        (Tela : Configurações do sistema -> Venda)
+                        - 2 - Quitar Boleto pelo sitema
+                                - Se a opção na empresa não estiver selecionada
+                                ele realiza a inativação automatica dos boletos que
+                                tiverem data de vencimento superior a 1 ano, se
+                                estiver "Sim" quando é realizado a impressão do
+                                boleto ele pergunta se deseja inativar o boleto
+                                antigo ou passar para o proximo nosso número.
+                        - 3 - IMPRIMIR BOLETOS NA NOTA FISCAL
+                                - QUANDO ESTIVER EMITINDO A NOTA ELE PERGUNDA SE DESEJA IMPRIMIR O BOLETO.
+                        (Tela: Complemento)
+                        - 4 - Taxa Juros (TX_JUROS) - Pega este campo como padrão em
+                        "Mora diária" do boleto e divide por 30, quando realiza a emissão.
+                        - 5 - Multas (MULTAS) - Pega este campo como padrão em
+                        "Multa(%)" do boleto, quando realiza a emissão.
+                        (Tela: Campos Padrões de Pesquisa/Etc)
+                        - 6 - Local Pagamento (LOCAL_PAG) - Pega este campo como padrão em
+                        "Local de pagamento" do boleto, quando realiza a emissão.
+                        - 7 - Obs. Protesto (OBS_BOL) - Pega este campo como padrão em
+                        "Obs. 1 (Demonstrativo)" do boleto, quando realiza a emissão.
+                EMITIR OS BOLETOS.
+                        - 4 - IMPRIMIR BOLETOS NA ORDEM DE SERVIÇO
+                                - QUANDO ESTIVER EMITINDO A OS ELE
+                PERGUNDA SE DESEJA EMITIR OS BOLETOS.
+
+                        5 - (Tela : Dados da empresa)
+                        - 5 - Mensagem
+                                - Quando o boleto é impresso ele insere a mensagem nas
+                                observações(Nome do registro no boleto impresso "Demonstrativo").
+
+                        6 - (Tela : Campos Padrões de Pesquisa/Etc)
+                        - 6 - Local Pagamento
+                                - Quando o boleto é impresso ele insere este local de
+                                pagamento
+                        - 7 - Obs. Protesto
+                                - Quando o boleto é impresso ele insere a mensagem nas
+                                observações(Nome do registro no boleto impresso "Demonstrativo"),
+                                nome do campo na Tela de Boletos: Obs. 1 (Demonstrativo).

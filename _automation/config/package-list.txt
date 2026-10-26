@@ -1,0 +1,51 @@
+# Formato: NomeDoPacote;CaminhoRelativoDoDPK;TipoDeBuild
+# Tipos de Build: NORMAL (padrao) ou SQL_RES (apenas para pkReestrutura)
+# Linhas iniciadas com # sao ignoradas.
+
+pkReestrutura;..\Ativos\dpk;SQL_RES
+pkFormularios;..\Automacao Bpl;NORMAL
+pkAtivos;..\Ativos\dpk;NORMAL
+pkModern;..\Modern\package;NORMAL
+pkFiscal;..\Ativos\dpk;NORMAL
+pkEntrada;..\entrada Bpl\dpk;NORMAL
+pkBoletos;..\Automacao Bpl\dpk;NORMAL
+pkFormPag;..\Form Pag\dpk;NORMAL
+pkCadastrosBasicos;..\Automacao Bpl\dpk;NORMAL
+pkClientes;..\Automacao Bpl\dpk;NORMAL
+pkVeiculos;..\Automacao Bpl\dpk;NORMAL
+pkSugestaoCompras;..\Automacao Bpl\dpk;NORMAL
+pkProdutos;..\Automacao Bpl\dpk;NORMAL
+pkEquipamentos;..\Automacao Bpl\dpk;NORMAL
+pkNfSerieD;..\Automacao Bpl\dpk;NORMAL
+pkMargem;..\Automacao Bpl\dpk;NORMAL
+pkPAF;..\Fiscal Bpl\dpk;NORMAL
+pkPedidoVenda;..\Automacao Bpl\dpk;NORMAL
+pkConfig;..\Automacao Bpl\dpk;NORMAL
+pkColaborador;..\Automacao Bpl\dpk;NORMAL
+pkMvaAjustada;..\Automacao Bpl\dpk;NORMAL
+pkRecibo;..\Automacao Bpl\dpk;NORMAL
+PkGestorChilds;..\Hw Gestor;NORMAL
+pkGestor;..\Hw Gestor;NORMAL
+pkSPED;..\SPED\dpk;NORMAL
+pkNF;..\Automacao Bpl\dpk;NORMAL
+pkbalcao;..\Cxl Bpl\dpk;NORMAL
+pkOficina;..\Cxl Bpl\dpk;NORMAL
+pkPrestacoes;..\Cxl Bpl\dpk;NORMAL
+pkImportFinanceiro;..\Caixa Bpl\dpk;NORMAL
+pkEstoqueECF;..\Automacao Bpl\dpk;NORMAL
+pkDevolucao;..\Automacao Bpl\dpk;NORMAL
+pkVeiculosCCIA;..\Automacao Bpl\dpk;NORMAL
+pkCadastrosBasicosCx;..\Caixa Bpl\dpk;NORMAL
+pkRelatorios;..\Automacao Bpl\dpk;NORMAL
+pkCalculoComissao;..\Automacao Bpl\dpk;NORMAL
+pkLancamentos;..\Caixa Bpl\dpk;NORMAL
+pkContasAPagar;..\Caixa Bpl\dpk;NORMAL
+pkContasAReceber;..\Caixa Bpl\dpk;NORMAL
+pkProducao;..\Automacao Bpl\dpk;NORMAL
+pkOrdemCarregamento;..\Automacao Bpl\dpk;NORMAL
+pkMobile;..\Automacao Bpl\dpk;NORMAL
+pkFabrica;..\Automacao Bpl\dpk;NORMAL
+pkNFConsumidor;..\Automacao Bpl\dpk;NORMAL
+pkConsultasOLAP;..\Hw Gestor\ConsultasGerais\dpk;NORMAL
+pkAutomacao;..\Automacao Bpl\dpk;NORMAL
+pkCxlAuxiliar;..\Cxl Bpl\dpk;NORMAL

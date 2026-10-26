@@ -1,0 +1,6 @@
+SQL_027 RCDATA "..\..\scripts\versoes\027.zip" 
+SQL_028 RCDATA "..\..\scripts\versoes\028.zip" 
+SQL_029 RCDATA "..\..\scripts\versoes\029.zip" 
+SQL_030 RCDATA "..\..\scripts\versoes\030.zip" 
+MANIFEST RCDATA "manifest.txt" 
+MANIFEST_CRC RCDATA "manifest_crc.txt" 

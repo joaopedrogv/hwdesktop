@@ -1,0 +1,95 @@
+package pkFiscal;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  vcl,
+  rtl,
+  pkEditHw,
+  pkEntradaF,
+  pkTef,
+  pkConfigF,
+  pkDavF,
+  vcldb,
+  dbrtl,
+  dsnap,
+  ibxpress,
+  PkArquivosDig,
+  PkTerminaisFF,
+  pkNfSerieDF,
+  vclx;
+
+contains
+  uPrincipalF in '..\fonte\uPrincipalF.pas' {frmPrincipalFiscal},
+  funcoesF in '..\fonte\funcoesF.pas',
+  uHwF in '..\fonte\uHwF.pas',
+  UImpressoras in '..\fonte\UImpressoras.pas',
+  uCupom in '..\fonte\uCupom.pas',
+  unMensagemGerais in '..\fonte\unMensagemGerais.pas' {frmMensagemGe},
+  uDtmFiscalHwF in '..\fonte\uDtmFiscalHwF.pas' {DtmFiscalHwF: TDataModule},
+  uDtmFiscal in '..\fonte\uDtmFiscal.pas' {DtmFiscal: TDataModule},
+  uPesqClientesF in '..\fonte\uPesqClientesF.pas' {frmPesqClientes},
+  uThOpenTable in '..\fonte\uThOpenTable.pas',
+  uPesqProdutosF in '..\fonte\uPesqProdutosF.pas' {frmPesqProdutos},
+  uPesqServicosF in '..\fonte\uPesqServicosF.pas',
+  uComandosPDV in '..\fonte\uComandosPDV.pas' {frmComandosPDV},
+  uSangSup in '..\fonte\uSangSup.pas' {frmSangSup},
+  uDadosIniFiscal in '..\fonte\uDadosIniFiscal.pas',
+  uEscTpPrec in '..\fonte\uEscTpPrec.pas' {frmEscPolPreco},
+  uDescItem in '..\fonte\uDescItem.pas' {frmDescItem},
+  uCancelarItens in '..\fonte\uCancelarItens.pas' {frmCancelarItens},
+  uFechamento in '..\fonte\uFechamento.pas' {frmFechamento},
+  uEmpresa in '..\fonte\uEmpresa.pas' {frmEmpresa},
+  uDadosAvulso in '..\fonte\uDadosAvulso.pas' {frmDadosAvulso},
+  uCondPagF in '..\fonte\uCondPagF.pas' {frmCondPagF},
+  uLerDavRet in '..\fonte\uLerDavRet.pas' {frmLerDavRet},
+  uRelPeriodo in '..\fonte\uRelPeriodo.pas' {frmRelPeriodo},
+  uManutencaoHw in '..\fonte\uManutencaoHw.pas' {frmManutencaoHw},
+  uPrestacoesF in '..\fonte\uPrestacoesF.pas' {frmPrestacoesF},
+  uClasseSincF in '..\fonte\uClasseSincF.pas',
+  uDtmSincF in '..\fonte\uDtmSincF.pas',
+  uAlteraPrecoDescricao in '..\fonte\uAlteraPrecoDescricao.pas',
+  uClasseExterna in '..\fonte\uClasseExterna.pas' {frmSegundoPlano},
+  uMenuFiscal in '..\fonte\uMenuFiscal.pas',
+  uDeclaracaoSweda in '..\fonte\uDeclaracaoSweda.pas',
+  uDeclaracaoBematech in '..\fonte\uDeclaracaoBematech.pas',
+  uValor in '..\fonte\uValor.pas' {frmValor},
+  uDeclaracaoEpson in '..\fonte\uDeclaracaoEpson.pas',
+  uDeclaracaoElgin in '..\fonte\uDeclaracaoElgin.pas',
+  uDeclaracaoDaruma in '..\fonte\uDeclaracaoDaruma.pas',
+  uMensagemRetornoImpressora in '..\fonte\uMensagemRetornoImpressora.pas' {frmMensagemRetornoImpressora},
+  uDadosReducaoZ in '..\fonte\uDadosReducaoZ.pas' {frmConferenciaDadosReducaoZ},
+  uRecebimentoNaoFiscalCxl in '..\fonte\uRecebimentoNaoFiscalCxl.pas' {frmRecebNaoFiscalCxl},
+  uCancelarNaoFiscal in '..\fonte\uCancelarNaoFiscal.pas' {frmCancelamentoNaoFiscal},
+  MD5 in '..\fonte\MD5.pas',
+  uLerPreVendaRet in '..\fonte\uLerPreVendaRet.pas' {frmLerPreVendaRet},
+  uClassesRetaguarda in '..\fonte\uClassesRetaguarda.pas',
+  uthreadSincronizacao in '..\fonte\uthreadSincronizacao.pas',
+  uMovimentoOperador in '..\fonte\uMovimentoOperador.pas' {frmMovimentoOperador},
+  uImpressaoNaECF in '..\fonte\uImpressaoNaECF.pas' {frmImpressaoNaECF},
+  uTabelaDePreco in '..\fonte\uTabelaDePreco.pas' {frmTabelaDePreco};
+
+end.

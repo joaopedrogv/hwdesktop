@@ -1,0 +1,535 @@
+object frmSpedPISCOFINS: TfrmSpedPISCOFINS
+  Left = 0
+  Top = 0
+  Caption = 'SPED PIS/COFINS'
+  ClientHeight = 332
+  ClientWidth = 599
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  Menu = MainMenu1
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnCreate = FormCreate
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Panel3: TPanel
+    Left = 0
+    Top = 0
+    Width = 599
+    Height = 332
+    Align = alClient
+    BevelOuter = bvNone
+    BorderWidth = 6
+    TabOrder = 0
+    object GroupBox2: TGroupBox
+      Left = 6
+      Top = 175
+      Width = 587
+      Height = 110
+      Align = alBottom
+      Caption = 'Status da Montagem'
+      TabOrder = 1
+      object lbBloco: TLabel
+        Left = 16
+        Top = 40
+        Width = 59
+        Height = 13
+        Caption = 'N'#227'o Iniciada'
+      end
+      object lbTempo: TLabel
+        Left = 537
+        Top = 40
+        Width = 32
+        Height = 13
+        Alignment = taRightJustify
+        Caption = 'Tempo'
+      end
+      object lbCupons: TLabel
+        Left = 242
+        Top = 40
+        Width = 44
+        Height = 13
+        Caption = 'lbCupons'
+      end
+      object lbStatus: TLabel
+        Left = 89
+        Top = 40
+        Width = 99
+        Height = 13
+        Caption = 'Aguardando Inicio...'
+      end
+      object lbEmpresa: TLabel
+        Left = 16
+        Top = 21
+        Width = 41
+        Height = 13
+        Caption = 'Empresa'
+      end
+      object ProgressBar1: TProgressBar
+        Left = 16
+        Top = 59
+        Width = 553
+        Height = 17
+        TabOrder = 0
+      end
+      object ProgressBar2: TProgressBar
+        Left = 16
+        Top = 82
+        Width = 553
+        Height = 17
+        TabOrder = 1
+      end
+    end
+    object Panel1: TPanel
+      Left = 6
+      Top = 285
+      Width = 587
+      Height = 41
+      Align = alBottom
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      TabOrder = 2
+      object SpeedButton59: TSpeedButton
+        Left = 6
+        Top = 8
+        Width = 23
+        Height = 22
+        Flat = True
+        Glyph.Data = {
+          36050000424D3605000000000000360400002800000010000000100000000100
+          08000000000000010000D30E0000D30E00000001000000010000007B00000084
+          0000008C00000094000008940800009C0800089C080008A50800008C1000088C
+          100008A5100010A5100018731800318C180021941800109C180010A5180018A5
+          180010AD1800317B21005A8421001894210018B52100217B2900399429005294
+          2900299C29004AA5290052A5290018AD290018B5290021B52900428C3100399C
+          310031A5310021B5310031B5310021BD3100218C390018A5390039A5390029C6
+          39006B844200188C4200319C4200399C420042B5420029C642005A944A00429C
+          4A007B9C4A0073AD4A008CB54A0052BD4A0031CE4A00525252006B63520039CE
+          520031D6520039D652005A5A5A007B735A0018A55A0063A55A008CA55A0021AD
+          5A004ACE5A0039D65A0063636300736B6300847363008C73630063C6630073C6
+          630042D66300214A6B006B6B6B006B736B0063D66B0042DE6B004ADE6B0042E7
+          6B004AE76B00295A73004AE77300294A7B00316B7B00426B7B0073737B00B59C
+          7B0084BD7B00B5C67B007BCE7B005AE77B0063E77B0052EF7B00104284002952
+          84005263840018848400CEAD840073B5840073D6840052EF84005AEF84000042
+          8C00295A8C00426B8C008C8C8C00B5A58C00214A940000529400215294002163
+          94006BF7940029639C004A849C0073849C009C9C9C009CA59C0031AD9C00C6B5
+          9C000063A5000863A500006BA5001873A5004A94A500A5A5A50094E7A500006B
+          AD00086BAD001873AD002173AD009CEFAD008CF7AD001073B500007BB500217B
+          B500297BB500218CB5003194B50039A5B500C6BDB500ADEFB500007BBD001884
+          BD002184BD00188CBD0063ADBD0073ADBD00A5C6BD00008CC600108CC600298C
+          C6001094C60042A5C6009CC6C6000894CE001094CE002994CE00009CCE00089C
+          CE00109CCE00189CCE00CECECE00CED6CE00089CD60010A5D60018A5D60029A5
+          D60021ADD60039ADD6005AADD60063C6D6009CCED600D6D6D600DEDED60018A5
+          DE0021A5DE0029A5DE0042A5DE0031ADDE004AADDE0042B5DE0042BDDE00BDD6
+          DE00DEDEDE00E7EFDE0029ADE70039ADE70042ADE70031B5E70039B5E70042B5
+          E70052B5E70063BDE7006BC6E70039B5EF004AB5EF0042BDEF004ABDEF0052C6
+          EF005AC6EF006BC6EF004ABDF7004AC6F70052C6F700FF00FF005AC6FF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00CFCFCFCFCFCF
+          CFCFCFCFCFCFCFCFCFCFCFCFCFCFCFCFCFCFCF7569CFCFCFCFCFCFCFCFCFCFCF
+          8483618AA96A6F7BCFCFCFCFCFCFCFCFB6C17B9FB5829A9ECFCFCFCFCFCFCF70
+          99C8C7C1B5B3A89A6962CFCFCFCFCF6EBECEC8C3747D9E9A7C71CFCFCFCFCFC4
+          C9C8CBBA4C539A9DA294CFCFCFCFCF268DC8CBBA4C56A8A3A3CFCF3F09001839
+          78B7ADAF4457A9A9CFCFCF1A50231D39273E2E7937479BA3CFCFCF0D50544339
+          2F25110E2ACFCFCFCFCF2823545466651510100619CFCFCFCFCF80725F50AF7F
+          17040A1049CFCFCFCFCFCF4A5050AF7F2D25111BCFCFCFCFCFCFCFCF5D50A46C
+          303548CFCFCFCFCFCFCFCFCFCF4A6D45341FCFCFCFCFCFCFCFCF}
+        OnClick = SpeedButton59Click
+      end
+      object btIniciar: TBitBtn
+        Left = 213
+        Top = 6
+        Width = 75
+        Height = 25
+        Hint = 'Iniciar montagem do Arquivo SPED'
+        Caption = 'Iniciar'
+        Glyph.Data = {
+          36050000424D3605000000000000360400002800000010000000100000000100
+          08000000000000010000130B0000130B00000001000000010000004A00000052
+          000000630000089C2100109C210010A5290010AD390039AD390010B5390018B5
+          4A004ABD520052BD52005ABD52005AC65A0063C663006BC663006BC66B007BD6
+          7B008CD68C00FF00FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+          FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00131313131313
+          1313131313131313131313131313131313131313131313131313131313131300
+          0200131313131313131313131313130203020013131313131313131313131302
+          0403020013131313131313131313130205050302001313131313131313131302
+          0805030302001313131313131313130209060606050201131313131313131302
+          0B0C0A0A0A02011313131313131313020D100F0A020013131313131313131302
+          101111020013131313131313131313020E120200131313131313131313131302
+          0702001313131313131313131313130002001313131313131313131313131313
+          1313131313131313131313131313131313131313131313131313}
+        TabOrder = 0
+        OnClick = btIniciarClick
+      end
+      object btSair: TBitBtn
+        Left = 294
+        Top = 6
+        Width = 75
+        Height = 25
+        Caption = 'Sair'
+        Glyph.Data = {
+          2E020000424D2E020000000000002E0100002800000010000000100000000100
+          08000000000000010000120B0000120B00003E0000003E00000000000000FFFF
+          FF00FF00FF00BB410000BB420000FFF6EF00E69C5900E69D5900E9A36200FFF4
+          EA00FFF8F200FECA9500FFCE9C00FFD4A900FEEBD800FEF0E200FFF2E500FFF3
+          E700FFFBF700FECE9C00FED3A500FED5AA00FEDAB400FFDCB600FEDDB800FEDD
+          BA00FFE3C500FEE2C400FFE5C900FFE6CA00FEE5CA00FFEBD500FEF3E700FFDA
+          AD00FFEAD100FFFAF400FFD8A700FFD9A900FFDAAB00FFE1B800FFE7C700FEEE
+          D900FFFBF600FFDCAC00FFE1B500FFE7C400FFEFD700FFEAC200FFFAEA00FFFE
+          FB00FFFFFA00FFFFFE00315EFF002A56FF00123BFF00153DFF001841FF001A44
+          FF001D47FF00072BFF00001EFF00000D66000202020202020202020202020202
+          0202020202020202020202020202020202020204040404040404040404040402
+          020202040132302E28272125242F04020202020401050F221B1614130B260402
+          0202020401310A101F1A170D0C2B04020202020401013323110E1C18152C0402
+          02020204010101332A20291D192D040202020204010101010112093D1E2E043D
+          020202040101010101013D363D013D3C3D020204080606060606073D373D3B3D
+          0202020203040404040404043D383D0202020202020202020202023D353D393D
+          020202020202020202023D343D023D3A3D020202020202020202023D0202023D
+          020202020202020202020202020202020202}
+        TabOrder = 1
+        OnClick = btSairClick
+      end
+    end
+    object Panel2: TPanel
+      Left = 415
+      Top = 280
+      Width = 585
+      Height = 153
+      BevelKind = bkTile
+      BevelOuter = bvNone
+      TabOrder = 3
+      Visible = False
+      OnExit = Panel2Exit
+      object GroupBox5: TGroupBox
+        Left = 14
+        Top = 30
+        Width = 553
+        Height = 57
+        Caption = 'N'#250'mero do Recibo da Escritura'#231#227'o anterior a ser retificada'
+        TabOrder = 0
+        object Edit1: TEdit
+          Left = 57
+          Top = 24
+          Width = 467
+          Height = 21
+          TabOrder = 0
+        end
+      end
+      object BitBtn1: TBitBtn
+        Left = 253
+        Top = 103
+        Width = 75
+        Height = 25
+        Caption = 'Continuar'
+        Glyph.Data = {
+          36030000424D3603000000000000360000002800000010000000100000000100
+          18000000000000030000C40E0000C40E00000000000000000000FFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00A211149525FF
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+          FFFFFFFFFFFF21B93620B3350FB224449E50FFFFFFFFFFFFFFFFFFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF42C95637D04F37CB4D31C34518
+          B52FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+          54CD6548E46247E06040D05640D75837D44F56A561FFFFFFFFFFFFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFFFFFFFF4BD46055F16F52EE6D50D965FFF4FF4ADF6149
+          DD6033DE4DFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF70D6804BED66
+          4EF06A59D96DFFF3FFFFFFFFFFFFFF44EB6051E86A3EBC51FFFFFFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFFFFFFFF5BD36D89D193FFFCFFFFFFFFFFFFFFFFFFFF6A
+          E47C55EC6F51F86C79A37FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF41E75D5BEF7443E45D449E50FFFF
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+          FFFF43E35E43E35E56F0714AB85BFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF51CE643ED45644EA6077A0
+          7BFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+          FFFFFFFFFFFFFFFF37C14B40C95628CD4228CD42FFFFFFFFFFFFFFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF37C14B36BC4A4FC8
+          6138B44A449E50FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFFFF72C57C36B44844C257449E50FFFFFFFFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF40B2
+          4E29A83C1AAE2EFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF449E50FFFFFFFFFFFF}
+        TabOrder = 1
+        OnClick = BitBtn1Click
+      end
+    end
+    object GroupBox3: TGroupBox
+      Left = 6
+      Top = 6
+      Width = 587
+      Height = 171
+      Align = alTop
+      Caption = 'Dados para Montagem do Arquivo'
+      TabOrder = 0
+      object Label3: TLabel
+        Left = 16
+        Top = 21
+        Width = 59
+        Height = 13
+        Caption = 'Per'#237'odo  De:'
+      end
+      object Label4: TLabel
+        Left = 160
+        Top = 21
+        Width = 16
+        Height = 13
+        Caption = 'at'#233
+      end
+      object Label1: TLabel
+        Left = 16
+        Top = 146
+        Width = 51
+        Height = 13
+        Caption = 'Salvar em:'
+      end
+      object SpeedButton1: TSpeedButton
+        Left = 546
+        Top = 137
+        Width = 23
+        Height = 22
+        OnClick = SpeedButton1Click
+      end
+      object Label2: TLabel
+        Left = 446
+        Top = 21
+        Width = 44
+        Height = 13
+        Caption = 'Tipo Arq:'
+      end
+      object dtIni: TMaskEdit
+        Left = 81
+        Top = 16
+        Width = 73
+        Height = 21
+        EditMask = '!99/99/0000;1;_'
+        MaxLength = 10
+        TabOrder = 0
+        Text = '  /  /    '
+        OnExit = dtIniExit
+      end
+      object dtFim: TMaskEdit
+        Left = 182
+        Top = 16
+        Width = 73
+        Height = 21
+        EditMask = '!99/99/0000;1;_'
+        MaxLength = 10
+        TabOrder = 1
+        Text = '  /  /    '
+        OnExit = dtFimExit
+      end
+      object GroupBox4: TGroupBox
+        Left = 16
+        Top = 64
+        Width = 553
+        Height = 37
+        Caption = 'Blocos'
+        TabOrder = 3
+        object ckBloco0: TCheckBox
+          Left = 21
+          Top = 16
+          Width = 32
+          Height = 17
+          Caption = '0'
+          Checked = True
+          Enabled = False
+          State = cbChecked
+          TabOrder = 0
+        end
+        object ckBlocoA: TCheckBox
+          Left = 89
+          Top = 16
+          Width = 32
+          Height = 17
+          Caption = 'A'
+          Checked = True
+          State = cbChecked
+          TabOrder = 1
+        end
+        object ckBlocoC: TCheckBox
+          Left = 158
+          Top = 16
+          Width = 32
+          Height = 17
+          Caption = 'C'
+          Checked = True
+          State = cbChecked
+          TabOrder = 2
+        end
+        object ckBlocoM: TCheckBox
+          Left = 363
+          Top = 17
+          Width = 32
+          Height = 17
+          Caption = 'M'
+          Checked = True
+          State = cbChecked
+          TabOrder = 5
+        end
+        object ckBlocoD: TCheckBox
+          Left = 226
+          Top = 16
+          Width = 32
+          Height = 17
+          Caption = 'D'
+          Checked = True
+          State = cbChecked
+          TabOrder = 3
+        end
+        object ckBloco1: TCheckBox
+          Left = 432
+          Top = 16
+          Width = 32
+          Height = 17
+          Caption = '1'
+          Checked = True
+          State = cbChecked
+          TabOrder = 6
+        end
+        object ckBlocoF: TCheckBox
+          Left = 295
+          Top = 16
+          Width = 32
+          Height = 17
+          Caption = 'F'
+          Checked = True
+          State = cbChecked
+          TabOrder = 4
+        end
+        object ckBloco9: TCheckBox
+          Left = 501
+          Top = 16
+          Width = 32
+          Height = 17
+          Caption = '9'
+          Checked = True
+          Enabled = False
+          State = cbChecked
+          TabOrder = 7
+        end
+      end
+      object edDestino: TEdit
+        Left = 73
+        Top = 138
+        Width = 467
+        Height = 21
+        TabOrder = 4
+        Text = 'C:\SpedPISCOFINS.txt'
+        OnExit = edDestinoExit
+      end
+      object ComboBox1: TComboBox
+        Left = 496
+        Top = 16
+        Width = 73
+        Height = 21
+        Style = csDropDownList
+        ItemIndex = 0
+        TabOrder = 2
+        Text = 'Original'
+        Items.Strings = (
+          'Original'
+          'Substituto')
+      end
+      object ckRefazerCalculoPISCOFINS: TCheckBox
+        Left = 261
+        Top = 17
+        Width = 164
+        Height = 17
+        Caption = 'Refazer c'#225'lculos PIS e COFINS'
+        TabOrder = 5
+        OnClick = ckRefazerCalculoPISCOFINSClick
+      end
+      object ckAltCST4998: TCheckBox
+        Left = 261
+        Top = 40
+        Width = 308
+        Height = 17
+        Caption = 'Alterar CST para 49 e 98 nas opera'#231#245'es de transferencias'
+        TabOrder = 6
+      end
+      object ck_0900: TCheckBox
+        Left = 37
+        Top = 107
+        Width = 97
+        Height = 17
+        Hint = 
+          'Registro 0900: Composi'#231#227'o das Receitas do Per'#237'odo '#8211' Receita Brut' +
+          'a e Demais Receitas'
+        Caption = '0900 - Receitas'
+        TabOrder = 7
+      end
+    end
+  end
+  object PopupMenu1: TPopupMenu
+    Left = 464
+    Top = 232
+    object SalvarLogSpedFiscal1: TMenuItem
+      Caption = 'Salvar Log SpedFiscal'
+    end
+  end
+  object SaveDialog1: TSaveDialog
+    DefaultExt = 'txt'
+    Filter = 'Texto(*.txt)|*.txt'
+    Title = 'Salvar como'
+    Left = 528
+    Top = 232
+  end
+  object Timer1: TTimer
+    Enabled = False
+    OnTimer = Timer1Timer
+    Left = 496
+    Top = 232
+  end
+  object XPManifest1: TXPManifest
+    Left = 552
+    Top = 232
+  end
+  object MainMenu1: TMainMenu
+    Left = 296
+    Top = 208
+    object CreditosAnteriores1: TMenuItem
+      Caption = 'Creditos Anteriores'
+      OnClick = CreditosAnteriores1Click
+    end
+    object RetencoesAnteriores1: TMenuItem
+      Caption = 'Retencoes Anteriores'
+      OnClick = RetencoesAnteriores1Click
+    end
+  end
+end

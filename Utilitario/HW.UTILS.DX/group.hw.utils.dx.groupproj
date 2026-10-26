@@ -1,0 +1,96 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{0602AFBE-49E8-44CC-97E9-7EDD3EA0F3BD}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="hw.utils.dx.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="hw.utils.dx.teste\hw.utils.dx.teste.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\auditoria dx\hw.auditoria.dx.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\HWNFeDX\NFC\Servico\HWNFCServiceLess.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\HWNFeDX\NFC\Servico\HWNFCoffline.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\DllExecScript_XEX\HwScript.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="hw_utils_dx">
+        <MSBuild Projects="hw.utils.dx.dproj"/>
+    </Target>
+    <Target Name="hw_utils_dx:Clean">
+        <MSBuild Projects="hw.utils.dx.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="hw_utils_dx:Make">
+        <MSBuild Projects="hw.utils.dx.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="hw_utils_dx_teste">
+        <MSBuild Projects="hw.utils.dx.teste\hw.utils.dx.teste.dproj"/>
+    </Target>
+    <Target Name="hw_utils_dx_teste:Clean">
+        <MSBuild Projects="hw.utils.dx.teste\hw.utils.dx.teste.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="hw_utils_dx_teste:Make">
+        <MSBuild Projects="hw.utils.dx.teste\hw.utils.dx.teste.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="hw_auditoria_dx">
+        <MSBuild Projects="..\..\auditoria dx\hw.auditoria.dx.dproj"/>
+    </Target>
+    <Target Name="hw_auditoria_dx:Clean">
+        <MSBuild Projects="..\..\auditoria dx\hw.auditoria.dx.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="hw_auditoria_dx:Make">
+        <MSBuild Projects="..\..\auditoria dx\hw.auditoria.dx.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="HWNFCServiceLess">
+        <MSBuild Projects="..\..\HWNFeDX\NFC\Servico\HWNFCServiceLess.dproj"/>
+    </Target>
+    <Target Name="HWNFCServiceLess:Clean">
+        <MSBuild Projects="..\..\HWNFeDX\NFC\Servico\HWNFCServiceLess.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="HWNFCServiceLess:Make">
+        <MSBuild Projects="..\..\HWNFeDX\NFC\Servico\HWNFCServiceLess.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="HWNFCoffline">
+        <MSBuild Projects="..\..\HWNFeDX\NFC\Servico\HWNFCoffline.dproj"/>
+    </Target>
+    <Target Name="HWNFCoffline:Clean">
+        <MSBuild Projects="..\..\HWNFeDX\NFC\Servico\HWNFCoffline.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="HWNFCoffline:Make">
+        <MSBuild Projects="..\..\HWNFeDX\NFC\Servico\HWNFCoffline.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="HwScript">
+        <MSBuild Projects="..\DllExecScript_XEX\HwScript.dproj"/>
+    </Target>
+    <Target Name="HwScript:Clean">
+        <MSBuild Projects="..\DllExecScript_XEX\HwScript.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="HwScript:Make">
+        <MSBuild Projects="..\DllExecScript_XEX\HwScript.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="hw_utils_dx;hw_utils_dx_teste;hw_auditoria_dx;HWNFCServiceLess;HWNFCoffline;HwScript"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="hw_utils_dx:Clean;hw_utils_dx_teste:Clean;hw_auditoria_dx:Clean;HWNFCServiceLess:Clean;HWNFCoffline:Clean;HwScript:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="hw_utils_dx:Make;hw_utils_dx_teste:Make;hw_auditoria_dx:Make;HWNFCServiceLess:Make;HWNFCoffline:Make;HwScript:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

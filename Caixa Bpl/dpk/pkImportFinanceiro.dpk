@@ -1,0 +1,57 @@
+package pkImportFinanceiro;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+{%File 'pkImportFinanceiro_INFO.txt'}
+
+requires
+  rtl,
+  vcl,
+  dbrtl,
+  vcldb,
+  pkAtivos,
+  pkEditHw,
+  dsnap,
+  ibxpress,
+  DelPrint2006,
+  VclSmp,
+  vclx,
+  designide,
+  xmlrtl,
+  vclactnband,
+  pkEditMoeda;
+
+contains
+  uDtmImportPDVFinan in '..\fonte\uDtmImportPDVFinan.pas' {dtmImportPDVFinan},
+  uImportFinanceiro in '..\fonte\uImportFinanceiro.pas' {frmImportacaoFinanceiro},
+  UImportRetorno in '..\fonte\UImportRetorno.pas' {frmImportRetorno},
+  uClassesImportacaoFinanceiro in '..\fonte\uClassesImportacaoFinanceiro.pas',
+  UVerificaControle in '..\fonte\UVerificaControle.pas' {frmVerificaControle},
+  UDatasRelatorioImportacao in '..\fonte\UDatasRelatorioImportacao.pas' {FrmDatasRelatorioImportacao},
+  uImpAuto in '..\fonte\uImpAuto.pas' {frmImpAuto},
+  uDetalhesRecebimentoModalidade in '..\fonte\uDetalhesRecebimentoModalidade.pas' {frmDetalhesRecebimentoModalidade},
+  UUnificarEmpresas in '..\fonte\UUnificarEmpresas.pas' {FrmUnificarEmpresas};
+
+end.

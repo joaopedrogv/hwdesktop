@@ -1,0 +1,140 @@
+CREATE OR ALTER VIEW TP_RECFINCONTAB(
+    NOME_CTRL,
+    NUM_NF,
+    DATA_LANC,
+    NCUPOM,
+    N_NF_SERV,
+    DATA_NF_SERV,
+    VALOR_NF_SERV,
+    NOME_CLIENTE,
+    N_DOC,
+    NOME_TERC,
+    VALOR_DOC,
+    HISTORICO_BAIXA,
+    DATA_BAIXA,
+    NRECIBO,
+    COD_EMPRESA,
+    SEQCREDITO,
+    DATA_REAL_BX,
+    DATA_VENC,
+    TP_BAIXA)
+AS
+/* direto dos creditos para o pedvenda */
+select ctrl.nome_contabil,pd.num_nf,pd.data_nf,pd.ncupom,cast(pd.num_nfeext as integer),pd.data_nfext,pd.valor_nfext,
+cr.nome_c,cr.n_doc_c,cr.nome_terc,cr.valor_c,(select first 1 l.historico_l from
+lancamentos l where l.lote_ent = cr.lote_quit and l.codigo_emp = cr.codigo_emp order by l.lote_ent desc) as historico_baixa,
+cr.datq_c,0 as nrecibo,cr.codigo_emp,cr.cod_cred,cr.data_baixa,cr.data_venc_c,coalesce(cr.tip_baixa,'') from controle_creditos cr
+inner join pedvenda pd on rtrim(cr.tp_doc_v) = rtrim(pd.tipo) and cr.N_DOC_V =
+pd.nped and cr.codigo_emp = pd.cod_empresa
+inner join controles ctrl on cr.codigo_ctrl = ctrl.codigo_ctrl and cr.codigo_emp = ctrl.codigo_emp
+where
+cr.data_venc_c >= '01/01/2011' and (not cr.datq_c is null) and rtrim(cr.tp_doc_v) in ('OS','REQ')
+union
+select ctrl.nome_contabil,pd.num_nota_v,pd.data_ven,0 as ncupom,0 as num_nfeext,null as data_nfext,0 as valor_nfext,
+cr.nome_c,cr.n_doc_c,cr.nome_terc,cr.valor_c,(select first 1 l.historico_l from
+lancamentos l where l.lote_ent = cr.lote_quit and l.codigo_emp = cr.codigo_emp order by l.lote_ent desc) as historico_baixa,
+cr.datq_c,0 as nrecibo,cr.codigo_emp,cr.cod_cred,cr.data_baixa,cr.data_venc_c,coalesce(cr.tip_baixa,'') from controle_creditos cr
+inner join com_fat pd on cr.N_DOC_V = pd.n_comando and cr.codigo_emp = pd.cod_empresa
+inner join controles ctrl on cr.codigo_ctrl = ctrl.codigo_ctrl and cr.codigo_emp = ctrl.codigo_emp
+where
+cr.data_venc_c >= '01/01/2011' and (not cr.datq_c is null) and rtrim(cr.tp_doc_v) = 'MOT'
+and ((not pd.num_nota_v is null) or pd.num_nota_v <> 0)
+union
+select ctrl.nome_contabil,pd.num_nf,pd.data_nf,pd.ncupom,cast(pd.num_nfeext as integer),pd.data_nfext,pd.valor_nfext,
+cr.nome_ch,cr.n_ch,cr.nome_terc,cr.valor_ch,(select first 1 l.historico_l from
+lancamentos l where l.lote_ent = cr.lote_quit and l.codigo_emp = cr.codigo_emp order by l.lote_ent desc) as historico_baixa,
+cr.datq_ch,0 as nrecibo,cr.codigo_emp,cr.codigo_ch,cr.datq_ch,cr.data_venc,coalesce(cr.tip_baixa,'') from controle_cheque cr
+inner join pedvenda pd on rtrim(cr.tp_doc_v) = rtrim(pd.tipo) and cr.N_DOC_V =
+pd.nped and cr.codigo_emp = pd.cod_empresa
+inner join controles ctrl on cr.codigo_ctrl = ctrl.codigo_ctrl and cr.codigo_emp = ctrl.codigo_emp
+where
+cr.data_venc >= '01/01/2011' and (not cr.datq_ch is null) and rtrim(cr.tp_doc_v) in ('OS','REQ')
+union
+select ctrl.nome_contabil,pd.num_nota_v,pd.data_ven,0 as ncupom,0 as num_nfeext,null as data_nfext,0 as valor_nfext,
+cr.nome_ch,cr.n_ch,cr.nome_terc,cr.valor_ch,(select first 1 l.historico_l from
+lancamentos l where l.lote_ent = cr.lote_quit and l.codigo_emp = cr.codigo_emp order by l.lote_ent desc) as historico_baixa,
+cr.datq_ch,0 as nrecibo,cr.codigo_emp,cr.codigo_ch,cr.datq_ch,cr.data_venc,coalesce(cr.tip_baixa,'') from controle_cheque cr
+inner join com_fat pd on cr.N_DOC_V = pd.n_comando and cr.codigo_emp = pd.cod_empresa
+inner join controles ctrl on cr.codigo_ctrl = ctrl.codigo_ctrl and cr.codigo_emp = ctrl.codigo_emp
+where
+cr.data_venc >= '01/01/2011' and (not cr.datq_ch is null) and rtrim(cr.tp_doc_v) = 'MOT'
+and ((not pd.num_nota_v is null) or pd.num_nota_v <> 0)
+union
+select ctrl.nome_contabil,
+case when (select first 1 pd.num_nf from hist_rec h inner join pedvenda pd on h.tp_doc_baixa = pd.tipo
+and h.ndocant = pd.nped and h.cod_empresa = pd.cod_empresa where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc) is null then
+(select first 1 pd.num_nota_v from hist_rec h inner join com_fat pd on
+h.ndocant = pd.n_comando and h.cod_empresa = pd.cod_empresa and pd.situacao_nfe = 'Autorizada' where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc)
+else
+(select first 1 pd.num_nf from hist_rec h inner join pedvenda pd on h.tp_doc_baixa = pd.tipo
+and h.ndocant = pd.nped and h.cod_empresa = pd.cod_empresa where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc) end  as num_nf,
+case when (select first 1 pd.data_nf from hist_rec h inner join pedvenda pd on h.tp_doc_baixa = pd.tipo
+and h.ndocant = pd.nped and h.cod_empresa = pd.cod_empresa where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc) is null then
+(select first 1 pd.data_ven from hist_rec h inner join com_fat pd on
+h.ndocant = pd.n_comando and h.cod_empresa = pd.cod_empresa and pd.situacao_nfe = 'Autorizada' where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc) else
+(select first 1 pd.data_nf from hist_rec h inner join pedvenda pd on h.tp_doc_baixa = pd.tipo
+and h.ndocant = pd.nped and h.cod_empresa = pd.cod_empresa where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc) end as data_nf,
+(select first 1 pd.ncupom from hist_rec h inner join pedvenda pd on h.tp_doc_baixa = pd.tipo
+and h.ndocant = pd.nped and h.cod_empresa = pd.cod_empresa where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc) as ncupom,
+cast((select first 1 pd.num_nfeext from hist_rec h inner join pedvenda pd on h.tp_doc_baixa = pd.tipo
+and h.ndocant = pd.nped and h.cod_empresa = pd.cod_empresa where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc) as integer) as num_nfeext,
+(select first 1 pd.data_nfext from hist_rec h inner join pedvenda pd on h.tp_doc_baixa = pd.tipo
+and h.ndocant = pd.nped and h.cod_empresa = pd.cod_empresa where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc) as data_nfext,
+(select first 1 pd.valor_nfext from hist_rec h inner join pedvenda pd on h.tp_doc_baixa = pd.tipo
+and h.ndocant = pd.nped and h.cod_empresa = pd.cod_empresa where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc) as valor_nfext,
+cr.nome_ch,cr.n_ch,cr.nome_terc,cr.valor_ch,(select first 1 l.historico_l from
+lancamentos l where l.lote_ent = cr.lote_quit and l.codigo_emp = cr.codigo_emp order by l.lote_ent desc) as historico_baixa,cr.datq_ch,
+cr.n_doc_v as nrecibo,cr.codigo_emp,cr.codigo_ch,cr.datq_ch,cr.data_venc,coalesce(cr.tip_baixa,'')
+from controle_cheque cr inner join controles ctrl on cr.codigo_ctrl = ctrl.codigo_ctrl and cr.codigo_emp = ctrl.codigo_emp
+where cr.data_venc >= '01/01/2011' and (not cr.datq_ch is null) and rtrim(cr.TP_DOC_V) = 'REC' and
+(cr.tip_baixa is null or cr.tip_baixa = '')
+union
+select ctrl.nome_contabil,
+case when (select first 1 pd.num_nf from hist_rec h inner join pedvenda pd on h.tp_doc_baixa = pd.tipo
+and h.ndocant = pd.nped and h.cod_empresa = pd.cod_empresa where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc) is null then
+(select first 1 pd.num_nota_v from hist_rec h inner join com_fat pd on
+h.ndocant = pd.n_comando and h.cod_empresa = pd.cod_empresa and pd.situacao_nfe = 'Autorizada' where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc)
+else
+(select first 1 pd.num_nf from hist_rec h inner join pedvenda pd on h.tp_doc_baixa = pd.tipo
+and h.ndocant = pd.nped and h.cod_empresa = pd.cod_empresa where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc) end  as num_nf,
+case when (select first 1 pd.data_nf from hist_rec h inner join pedvenda pd on h.tp_doc_baixa = pd.tipo
+and h.ndocant = pd.nped and h.cod_empresa = pd.cod_empresa where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc) is null then
+(select first 1 pd.data_ven from hist_rec h inner join com_fat pd on
+h.ndocant = pd.n_comando and h.cod_empresa = pd.cod_empresa and pd.situacao_nfe = 'Autorizada' where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc) else
+(select first 1 pd.data_nf from hist_rec h inner join pedvenda pd on h.tp_doc_baixa = pd.tipo
+and h.ndocant = pd.nped and h.cod_empresa = pd.cod_empresa where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc) end as data_nf,
+(select first 1 pd.ncupom from hist_rec h inner join pedvenda pd on h.tp_doc_baixa = pd.tipo
+and h.ndocant = pd.nped and h.cod_empresa = pd.cod_empresa where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc) as ncupom,
+cast((select first 1 pd.num_nfeext from hist_rec h inner join pedvenda pd on h.tp_doc_baixa = pd.tipo
+and h.ndocant = pd.nped and h.cod_empresa = pd.cod_empresa where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc) as integer) as num_nfeext,
+(select first 1 pd.data_nfext from hist_rec h inner join pedvenda pd on h.tp_doc_baixa = pd.tipo
+and h.ndocant = pd.nped and h.cod_empresa = pd.cod_empresa where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc) as data_nfext,
+(select first 1 pd.valor_nfext from hist_rec h inner join pedvenda pd on h.tp_doc_baixa = pd.tipo
+and h.ndocant = pd.nped and h.cod_empresa = pd.cod_empresa where h.nrecibo = cr.N_DOC_V
+and h.cod_empresa = cr.codigo_emp order by valor_baixa desc) as valor_nfext,
+cr.nome_c,cr.n_doc_c,cr.nome_terc,cr.valor_c,(select first 1 l.historico_l from
+lancamentos l where l.lote_ent = cr.lote_quit and l.codigo_emp = cr.codigo_emp order by l.lote_ent desc) as historico_baixa,cr.datq_c,
+cr.n_doc_v as nrecibo,cr.codigo_emp,cr.cod_cred,cr.data_baixa,cr.data_venc_c,coalesce(cr.tip_baixa,'')
+from controle_creditos cr inner join controles ctrl on cr.codigo_ctrl = ctrl.codigo_ctrl and cr.codigo_emp = ctrl.codigo_emp
+where cr.data_venc_c >= '01/01/2011' and (not cr.datq_c is null) and rtrim(cr.TP_DOC_V) = 'REC'
+and (cr.tip_baixa is null or cr.tip_baixa = '')
+;

@@ -1,0 +1,153 @@
+inherited frmReestruturaVersao12: TfrmReestruturaVersao12
+  Caption = 'frmReestruturaVersao12'
+  ExplicitWidth = 1076
+  ExplicitHeight = 600
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited Panel1: TPanel
+    inherited Label1: TLabel
+      Width = 1054
+    end
+    inherited sqlFiscal: TMemo
+      ExplicitTop = 16
+    end
+  end
+  inherited Panel2: TPanel
+    inherited Label2: TLabel
+      Width = 1054
+    end
+  end
+  inherited Panel3: TPanel
+    inherited Label3: TLabel
+      Width = 1054
+    end
+    inherited sqlHwauto: TMemo
+      Lines.Strings = (
+        
+          'CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA' +
+          ', NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRA' +
+          'VAR_AUDITORIA, DATA_MOD_CAD) VALUES ('#39'CFG052'#39', :COD_EMPRESA, '#39'BT' +
+          ' VISUALIZAR EXCECOES DE PROCESSO POR USUARIO'#39', 10, '#39'FRMCADPROCES' +
+          'SOS'#39', 1, '#39'N'#39', '#39'S'#39', CURRENT_TIMESTAMP);'
+        
+          'CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA' +
+          ', NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRA' +
+          'VAR_AUDITORIA, DATA_MOD_CAD) VALUES ('#39'CFG053'#39', :COD_EMPRESA, '#39'BT' +
+          ' IMPRIMIR EXCECOES DE PROCESSO'#39', 10, '#39'FRMCADPROCESSOS'#39', 1, '#39'N'#39', ' +
+          #39'S'#39', CURRENT_TIMESTAMP);'
+        ''
+        
+          'CMD:REPL|UPDATE ESTADOS SET MASCARA_FONE = '#39'(99) 99999-9999;0;_'#39 +
+          ';'
+        
+          'CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA' +
+          ', NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRA' +
+          'VAR_AUDITORIA, DATA_MOD_CAD) VALUES ('#39'VND238'#39', :COD_EMPRESA, '#39'AL' +
+          'TERAR CLIENTE EM FORMAPAGAMENTO E CREDITOS'#39', 11, '#39'FRMCADPEDVENDA' +
+          #39', 1, '#39'N'#39', '#39'S'#39', CURRENT_TIMESTAMP);'
+        
+          'CMD:REPL|UPDATE TABELA_PROCESSOS SET NOME_PROCESSO = '#39'ALTERAR VE' +
+          'NDEDOR/CLIENTE EM CREDITOS JA RECEBIDOS'#39' WHERE COD_PROCESSO = '#39'V' +
+          'ND161'#39';'
+        ''
+        
+          'CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA' +
+          ', NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRA' +
+          'VAR_AUDITORIA, DATA_MOD_CAD) VALUES ('#39'VND239'#39', :COD_EMPRESA, '#39'RE' +
+          'ABRIR/CANCELAR REQ/OS COM DEVOLUCAO'#39', 11, '#39'FRMCADPEDVENDA'#39', 1, '#39 +
+          'S'#39', '#39'S'#39', CURRENT_TIMESTAMP);'
+        ''
+        
+          'CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA' +
+          ', NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRA' +
+          'VAR_AUDITORIA, DATA_MOD_CAD) VALUES ('#39'REL048'#39', :COD_EMPRESA, '#39'BT' +
+          ' CONFIRMAR REL RECEBIMENTO FINANCEIRO'#39', 3, '#39'FRMRELATORIOS'#39', 1, '#39 +
+          'N'#39', '#39'N'#39', CURRENT_TIMESTAMP);'
+        
+          'CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA' +
+          ', NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRA' +
+          'VAR_AUDITORIA, DATA_MOD_CAD) VALUES ('#39'REL049'#39', :COD_EMPRESA, '#39'BT' +
+          ' CONFIRMAR REL SAIDAS/BALCAO PARTICIPANTE'#39', 10, '#39'FRMRELATORIOS'#39',' +
+          ' 1, '#39'N'#39', '#39'S'#39', CURRENT_TIMESTAMP);'
+        
+          'CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA' +
+          ', NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRA' +
+          'VAR_AUDITORIA, DATA_MOD_CAD) VALUES ('#39'REL050'#39', :COD_EMPRESA, '#39'BT' +
+          ' CONFIRMAR REL VENDAS MOD PAGAMENTO'#39', 10, '#39'FRMRELATORIOS'#39', 1, '#39'N' +
+          #39', '#39'S'#39', CURRENT_TIMESTAMP);'
+        ''
+        'ALTER TABLE CONT_LIG ADD NCON_S_VALE T_N_GERAL2;'
+        
+          'CMD:REPL|UPDATE CONT_LIG SET NCON_S_VALE = NCON_S_CRD WHERE NCON' +
+          '_S_VALE IS NULL;'
+        ''
+        '|BLOCO|'
+        
+          'CREATE INDEX IDX_CONTROLE_CREDITOS_PEDVENDA ON CONTROLE_CREDITOS' +
+          ' (N_DOC_V, TP_DOC_V, CODIGO_EMP);'
+        '|/BLOCO|'
+        ''
+        '|BLOCO|'
+        'CREATE OR ALTER VIEW KITS_PROD_TOT('
+        '    CODIGO_KIT,'
+        '    COD_EMPRESA,'
+        '    QUANT_PROD_KIT,'
+        '    PREC_CUS_PROD,'
+        '    PREC_CUSM_PROD,'
+        '    PREC_TAB_PROD,'
+        '    PREC_PUBLICO,'
+        '    PREC_30_PROD,'
+        '    PREC_60_PROD,'
+        '    PREC_90_PROD,'
+        '    EST_F)'
+        'AS'
+        'SELECT KITS_PROD_KITS.CODIGO_KIT,'
+        'KITS_PROD_KITS.COD_EMPRESA,'
+        
+          'COALESCE(SUM(COALESCE(KITS_PROD_KITS.QUANT_PROD_KIT, 0)), 0) QUA' +
+          'NT_PROD_KIT,'
+        
+          'COALESCE(SUM(COALESCE(KITS_PROD_KITS.QUANT_PROD_KIT, 0) * COALES' +
+          'CE(PRODUTOS.PREC_CUS_PROD, 0)), 0) PREC_CUS_PROD,'
+        
+          'COALESCE(SUM(COALESCE(KITS_PROD_KITS.QUANT_PROD_KIT, 0) * COALES' +
+          'CE(PRODUTOS.PREC_CUSM_PROD, 0)), 0) PREC_CUSM_PROD,'
+        
+          'COALESCE(SUM(COALESCE(KITS_PROD_KITS.QUANT_PROD_KIT, 0) * COALES' +
+          'CE(PRODUTOS.PREC_TAB_PROD, 0)), 0) PREC_TAB_PROD,'
+        
+          'COALESCE(SUM(COALESCE(KITS_PROD_KITS.QUANT_PROD_KIT, 0) * COALES' +
+          'CE(PRODUTOS.PREC_PUBLICO, 0)), 0) PREC_PUBLICO,'
+        
+          'COALESCE(SUM(COALESCE(KITS_PROD_KITS.QUANT_PROD_KIT, 0) * COALES' +
+          'CE(PRODUTOS.PREC_30_PROD, 0)), 0) PREC_30_PROD,'
+        
+          'COALESCE(SUM(COALESCE(KITS_PROD_KITS.QUANT_PROD_KIT, 0) * COALES' +
+          'CE(PRODUTOS.PREC_60_PROD, 0)), 0) PREC_60_PROD,'
+        
+          'COALESCE(SUM(COALESCE(KITS_PROD_KITS.QUANT_PROD_KIT, 0) * COALES' +
+          'CE(PRODUTOS.PREC_90_PROD, 0)), 0) PREC_90_PROD,'
+        
+          'COALESCE(SUM(COALESCE(PRODUTOS.EST_F, 0)), 0) EST_F FROM KITS_PR' +
+          'OD_KITS'
+        
+          'LEFT JOIN PRODUTOS ON PRODUTOS.GRUPO_PROD = KITS_PROD_KITS.GRUPO' +
+          '_PROD AND PRODUTOS.COD_PROD = KITS_PROD_KITS.COD_PROD'
+        '    AND PRODUTOS.COD_EMPRESA = KITS_PROD_KITS.COD_EMPRESA'
+        
+          '--WHERE KITS_PROD_KITS.CODIGO_KIT = :CODIGO_KIT AND KITS_PROD_KI' +
+          'TS.COD_EMPRESA = :COD_EMPRESA'
+        'GROUP BY 1, 2'
+        ';'
+        '|/BLOCO|'
+        ''
+        
+          'CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA' +
+          ', NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRA' +
+          'VAR_AUDITORIA, DATA_MOD_CAD) VALUES ('#39'VND240'#39', :COD_EMPRESA, '#39'LI' +
+          'BER PERC/VALOR DESCONTO ACIMA DO PERM POR ITEM'#39', 100, '#39'FRMCADPED' +
+          'VENDA'#39', 1, '#39'S'#39', '#39'S'#39', CURRENT_TIMESTAMP);'
+        '')
+    end
+  end
+end

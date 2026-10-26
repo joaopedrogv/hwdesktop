@@ -1,0 +1,7 @@
+#### Aqui ficam os arquivos que devem ser registrados depois da copia
+#### Cada diretorio se necessario devera ter um arquivo deste
+#### pois o sistema vai procurar no diretorio em questao
+#### Ao montar este arquivo remova estas linhas de comentario
+#### Exemplo abaixo
+ExportModeller.dll
+Cons40.dll

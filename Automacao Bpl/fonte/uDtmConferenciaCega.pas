@@ -1,0 +1,295 @@
+unit uDtmConferenciaCega;
+
+interface
+
+uses
+  SysUtils, Classes, DB, IBCustomDataSet, IBQuery, IBDatabase, DBClient,
+  Provider, IBStoredProc;
+
+type
+  TdtmConferenciaCega = class(TDataModule)
+    transacao: TIBTransaction;
+    qrBuscas: TIBQuery;
+    qrConfCegaCabecalho: TIBQuery;
+    dspConfCegaCabecalho: TDataSetProvider;
+    cdsConfCegaCabecalho: TClientDataSet;
+    dsConfCegaCabecalho: TDataSource;
+    cdsCargaVenda: TClientDataSet;
+    dsCargaVenda: TDataSource;
+    qrCargaVenda: TIBQuery;
+    dspCargaVenda: TDataSetProvider;
+    cdsCargaVendaNPED: TIntegerField;
+    cdsCargaVendaTIPO: TStringField;
+    cdsCargaVendaCOD_EMPRESA: TIntegerField;
+    cdsCargaVendaCOD_CLIENTE: TIntegerField;
+    cdsCargaVendaCOD_VENDEDOR: TIntegerField;
+    cdsCargaVendaCOD_COND_PAG: TIntegerField;
+    cdsCargaVendaDATA_FECH: TDateTimeField;
+    cdsCargaVendaVALOR_TOTAL: TFloatField;
+    cdsCargaVendaOBS_PED: TStringField;
+    cdsCargaVendaSTATUS_PED: TStringField;
+    cdsCargaVendaTIPV: TStringField;
+    cdsCargaVendaNCUPOM: TIntegerField;
+    cdsCargaVendaNUM_NF: TIntegerField;
+    cdsCargaVendaSERIE_NF: TStringField;
+    cdsCargaVendaATIVO: TIntegerField;
+    cdsCargaVendaCOD_CARGA: TIntegerField;
+    cdsCargaVendaIDMOBILE: TIntegerField;
+    cdsCargaVendaCOD_CONTROLE: TIntegerField;
+    cdsCargaVendaSEL: TStringField;
+    cdsCargaVendaNOME_CLIENTE: TStringField;
+    SpIncCodigo: TIBStoredProc;
+    qrConfCegaItens: TIBQuery;
+    dspConfCegaItens: TDataSetProvider;
+    cdsConfCegaItens: TClientDataSet;
+    cdsConfCegaItensCOD_CONFERENCIA: TIntegerField;
+    cdsConfCegaItensCOD_EMPRESA: TIntegerField;
+    cdsConfCegaItensNITEM: TIntegerField;
+    cdsConfCegaItensGRUPO_PROD: TIntegerField;
+    cdsConfCegaItensCOD_PROD: TStringField;
+    cdsConfCegaItensUN_NF: TStringField;
+    cdsConfCegaItensUN_PRODUTO: TStringField;
+    cdsConfCegaItensQUANT: TFloatField;
+    cdsConfCegaItensPRIMEIRA_CONTAGEM: TFloatField;
+    cdsConfCegaItensPRIMEIRA_CONTAGEM_DIF: TFloatField;
+    cdsConfCegaItensSEGUNDA_CONTAGEM: TFloatField;
+    cdsConfCegaItensSEGUNDA_CONTAGEM_DIF: TFloatField;
+    cdsConfCegaItensTERCEIRA_CONTAGEM: TFloatField;
+    cdsConfCegaItensATIVO: TIntegerField;
+    cdsConfCegaCabecalhoCOD_CONFERENCIA: TIntegerField;
+    cdsConfCegaCabecalhoCOD_EMPRESA: TIntegerField;
+    cdsConfCegaCabecalhoCOD_CLIENTE: TIntegerField;
+    cdsConfCegaCabecalhoTIPO_CONFERENCIA: TStringField;
+    cdsConfCegaCabecalhoSTATUS: TStringField;
+    cdsConfCegaCabecalhoNUM_DOC: TIntegerField;
+    cdsConfCegaCabecalhoDATA_DOC: TDateTimeField;
+    cdsConfCegaCabecalhoDATA_INCLUSAO: TDateTimeField;
+    cdsConfCegaCabecalhoCOD_USUARIO: TIntegerField;
+    cdsConfCegaCabecalhoATIVO: TIntegerField;
+    cdsConfCegaCabecalhoCONTAGEM: TStringField;
+    cdsConfCegaCabecalhoNOME_CLIENTE: TStringField;
+    cdsConfCegaCabecalhoSTATUS_CONTAGEM_ATUAL: TStringField;
+    cdsConfCegaCabecalhoDATA_FECHAMENTO: TDateTimeField;
+    cdsConfCegaCabecalhoDATA_HORA_FECHAMENTO: TDateTimeField;
+    cdsConfCegaCabecalhoDATA_HORA_INCLUSAO: TDateTimeField;
+    cdsConfCegaCabecalhoDATA_FECHAMENTO_PRIMEIRA: TDateTimeField;
+    cdsConfCegaCabecalhoDATA_HORA_FECHAMENTO_PRIMEIRA: TDateTimeField;
+    cdsConfCegaCabecalhoDATA_FECHAMENTO_SEGUNDA: TDateTimeField;
+    cdsConfCegaCabecalhoDATA_HORA_FECHAMENTO_SEGUNDA: TDateTimeField;
+    cdsConfCegaCabecalhoDATA_FECHAMENTO_TERCEIRA: TDateTimeField;
+    cdsConfCegaCabecalhoDATA_HORA_FECHAMENTO_TERCEIRA: TDateTimeField;
+    cdsConfCegaCabecalhoCOD_USUARIO_PRIMEIRA: TIntegerField;
+    cdsConfCegaCabecalhoCOD_USUARIO_SEGUNDA: TIntegerField;
+    cdsConfCegaCabecalhoCOD_USUARIO_TERCEIRA: TIntegerField;
+    cdsConfCegaCabecalhoCONTAR_DIVERGENTES: TStringField;
+    cdsConfCegaItensTERCEIRA_CONTAGEM_DIF: TFloatField;
+    cdsConfCegaCabecalhoOBSERVACAO: TMemoField;
+    qrINf: TIBQuery;
+    dspINf: TDataSetProvider;
+    cdsINf: TClientDataSet;
+    cdsINfCOD_NF: TIntegerField;
+    cdsINfNITEM: TIntegerField;
+    cdsINfGRUPO_PROD: TIntegerField;
+    cdsINfCOD_PROD: TStringField;
+    cdsINfCOD_SERVICO: TIntegerField;
+    cdsINfCHASSI: TStringField;
+    cdsINfCODIGO_NOP: TFloatField;
+    cdsINfDESC_NATOP: TStringField;
+    cdsINfCST: TStringField;
+    cdsINfCSOSN: TStringField;
+    cdsINfREFERENCIA: TStringField;
+    cdsINfNUM_FAB_PROD: TStringField;
+    cdsINfDESCRICAO_ITEM: TStringField;
+    cdsINfNCM: TStringField;
+    cdsINfDATA_VALIDADE: TDateTimeField;
+    cdsINfQUANTIDADE: TFloatField;
+    cdsINfVALOR_UNITARIO: TFloatField;
+    cdsINfVALOR_TOTAL: TFloatField;
+    cdsINfALIQ_ICM: TFloatField;
+    cdsINfBASE_ICM: TFloatField;
+    cdsINfVALOR_ICM: TFloatField;
+    cdsINfALIQ_ICMSUB: TFloatField;
+    cdsINfBASE_ICMSUB: TFloatField;
+    cdsINfVALOR_ICMSUB: TFloatField;
+    cdsINfPERC_RED_PROD_SUB: TFloatField;
+    cdsINfBASE_ICMANT_SUB: TFloatField;
+    cdsINfVALOR_ICMANT_SUB: TFloatField;
+    cdsINfALIQ_IPI: TFloatField;
+    cdsINfVALOR_IPI: TFloatField;
+    cdsINfPERC_RED_PROD: TFloatField;
+    cdsINfPERC_DESCONTO: TFloatField;
+    cdsINfVALOR_DESCONTO_PERC: TFloatField;
+    cdsINfRATEIO_DESCONTO: TFloatField;
+    cdsINfMVA: TFloatField;
+    cdsINfRATEIO_SEGURO: TFloatField;
+    cdsINfRATEIO_OUTDESP: TFloatField;
+    cdsINfRATEIO_FRETE: TFloatField;
+    cdsINfRATEIO_ACRES_FIN: TFloatField;
+    cdsINfRATEIO_DESP_PF: TFloatField;
+    cdsINfPERC_FRETE: TFloatField;
+    cdsINfPRCTB_ITEM: TFloatField;
+    cdsINfPRCTB_ITEMA: TFloatField;
+    cdsINfPREC_CUS_CNT: TFloatField;
+    cdsINfPREC_VND_PROD: TFloatField;
+    cdsINfPREC_VND_PRODA: TFloatField;
+    cdsINfPREC_CUS_REP: TFloatField;
+    cdsINfPREC_CUSM_PROD: TFloatField;
+    cdsINfPMARGFIM: TFloatField;
+    cdsINfPMARGFIM_A: TFloatField;
+    cdsINfQTDEMB: TFloatField;
+    cdsINfQTDEMBREC: TFloatField;
+    cdsINfVLREMBNF: TFloatField;
+    cdsINfVLBRUREAL: TFloatField;
+    cdsINfPDESC_R: TFloatField;
+    cdsINfVLREMBNFR: TFloatField;
+    cdsINfVLUN_B_NFE: TFloatField;
+    cdsINfVLISENTO: TFloatField;
+    cdsINfVLOUTRAS: TFloatField;
+    cdsINfVLN_TRIB: TFloatField;
+    cdsINfCAMP_ENTEST: TStringField;
+    cdsINfSEQ_DEVOLUCAO: TIntegerField;
+    cdsINfMNF: TStringField;
+    cdsINfALTERA_ESTOQUE_CFOP: TStringField;
+    cdsINfNPED: TIntegerField;
+    cdsINfTIPO_PED: TStringField;
+    cdsINfTIPO_ITEM: TStringField;
+    cdsINfNITEM_PED: TIntegerField;
+    cdsINfCOD_EMPRESA: TIntegerField;
+    cdsINfBASE_IPI: TFloatField;
+    cdsINfPERC_RED_IPI: TFloatField;
+    cdsINfPERMITIR_DESCONTO: TStringField;
+    cdsINfALIQ_ICM_SIMPLES: TFloatField;
+    cdsINfBASE_ICM_SIMPLES: TFloatField;
+    cdsINfVALOR_ICM_SIMPLES: TFloatField;
+    cdsINfALIQ_ISS: TFloatField;
+    cdsINfBASE_ISS: TFloatField;
+    cdsINfVALOR_ISS: TFloatField;
+    cdsINfTERMINAL: TIntegerField;
+    cdsINfNCUPOM: TIntegerField;
+    cdsINfNSERIEECF: TStringField;
+    cdsINfALTERA_CUSTO_CFOP: TStringField;
+    cdsINfDESCRICAO_ITEM_OUTRAS: TMemoField;
+    cdsINfECF: TStringField;
+    cdsINfPESO_B: TFloatField;
+    cdsINfPESO_L: TFloatField;
+    cdsINfDATA_CUPOM: TDateTimeField;
+    cdsINfVALOR_DIF: TFloatField;
+    cdsINfINDTOT: TSmallintField;
+    cdsINfMODBCST: TIntegerField;
+    cdsINfMODBC: TIntegerField;
+    cdsINfVALOR_ICM_STDES: TFloatField;
+    cdsINfVL_MULTP: TFloatField;
+    cdsINfPR_CUSC_PROD: TFloatField;
+    cdsINfPREC_CUS_R: TFloatField;
+    cdsINfCST_PIS: TStringField;
+    cdsINfALIQ_PIS: TFloatField;
+    cdsINfVALOR_PIS: TFloatField;
+    cdsINfCST_COFINS: TStringField;
+    cdsINfALIQ_COFINS: TFloatField;
+    cdsINfVALOR_COFINS: TFloatField;
+    cdsINfNUM_FAB_FORNECEDOR: TStringField;
+    cdsINfCONSUMO: TStringField;
+    cdsINfPISCOFINS: TFloatField;
+    cdsINfCST_IPI: TStringField;
+    cdsINfBASE_ICMSUB_ANT: TFloatField;
+    cdsINfVALOR_ICMSUB_ANT: TFloatField;
+    cdsINfIMPORT_XML: TStringField;
+    cdsINfBASE_PIS: TFloatField;
+    cdsINfBASE_COFINS: TFloatField;
+    cdsINfQUANT_BC_PIS: TFloatField;
+    cdsINfALIQ_PIS_QUANT: TFloatField;
+    cdsINfQUANT_BC_COFINS: TFloatField;
+    cdsINfALIQ_COFINS_QUANT: TFloatField;
+    cdsINfANTEC_TRIB: TStringField;
+    cdsINfPREC_30_PROD: TFloatField;
+    cdsINfPREC_60_PROD: TFloatField;
+    cdsINfPREC_90_PROD: TFloatField;
+    cdsINfSELG: TStringField;
+    cdsINfNAT_REC: TStringField;
+    cdsINfCOD_NF_DEV: TIntegerField;
+    cdsINfNITEM_DEV: TSmallintField;
+    cdsINfBASE_II: TFloatField;
+    cdsINfVALOR_DESPADU_II: TFloatField;
+    cdsINfVALOR_II: TFloatField;
+    cdsINfVALOR_IOF_II: TFloatField;
+    cdsINfALIQ_PIS_ST: TFloatField;
+    cdsINfALIQ_COFINS_ST: TFloatField;
+    cdsINfBASE_PIS_ST: TFloatField;
+    cdsINfBASE_COFINS_ST: TFloatField;
+    cdsINfVALOR_PIS_ST: TFloatField;
+    cdsINfVALOR_COFINS_ST: TFloatField;
+    cdsINfSEQID_DEVOLUCAO: TIntegerField;
+    cdsINfNITEM_REM_VFE: TIntegerField;
+    cdsINfCOD_GRADE: TIntegerField;
+    cdsINfCOMB_CPRODANP: TStringField;
+    cdsINfCOMB_CODIF: TStringField;
+    cdsINfCOMB_QTEMP: TFloatField;
+    cdsINfCOMB_UFCONS: TStringField;
+    cdsINfCOMB_CIDE_QBCPROD: TFloatField;
+    cdsINfCOMB_CIDE_VALIQPROD: TFloatField;
+    cdsINfCOMB_CIDE_VCIDE: TFloatField;
+    cdsINfVTOTTRIB: TFloatField;
+    cdsINfXPED_COMPRA: TStringField;
+    cdsINfNITEMPED_COMPRA: TIntegerField;
+    dsProd: TDataSource;
+    cdsProd: TClientDataSet;
+    dspProd: TDataSetProvider;
+    qrProd: TIBQuery;
+    dsCodBarra: TDataSource;
+    cdsCodBarra: TClientDataSet;
+    dspCodBarra: TDataSetProvider;
+    qrCodBarra: TIBQuery;
+    dspCodigoFornecedor: TDataSetProvider;
+    qrCodigoFornecedor: TIBQuery;
+    cdsCodigoFornecedor: TClientDataSet;
+    cdsCodigoFornecedorCOD_FORNECEDOR: TIntegerField;
+    cdsCodigoFornecedorGRUPO_PROD: TIntegerField;
+    cdsCodigoFornecedorCOD_PROD: TStringField;
+    cdsCodigoFornecedorCOD_EMPRESA: TIntegerField;
+    cdsCodigoFornecedorNUM_FAB_FORNECEDOR: TStringField;
+    cdsCodigoFornecedorATIVO: TIntegerField;
+    cdsCodigoFornecedorDATA_CADASTRO: TDateTimeField;
+    cdsCodigoFornecedorDATA_MODIFICACAO: TDateTimeField;
+    cdsCodigoFornecedorCOD_GRADE: TIntegerField;
+    cdsConfCegaItensDESCR_PROD: TStringField;
+    cdsConfCegaItensNUM_FAB_FORNECEDOR: TStringField;
+    cdsConfCegaItensEAN13: TStringField;
+    cdsINfUNIDADE_NF: TStringField;
+    cdsINfEAN13: TStringField;
+    qrBuscas2: TIBQuery;
+    cdsConfCegaCabecalhoIDENTIFICACAO: TStringField;
+    cdsConfCegaCabecalhoCONFERINDO: TStringField;
+    dsLoteNF: TDataSource;
+    cdsCodigoFornecedorSEQID: TIntegerField;
+    procedure cdsConfCegaCabecalhoOBSERVACAOGetText(Sender: TField;
+      var Text: string; DisplayText: Boolean);
+    procedure cdsCargaVendaBeforeOpen(DataSet: TDataSet);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  dtmConferenciaCega: TdtmConferenciaCega;
+
+implementation
+
+uses
+  uDtmAtivo;
+
+{$R *.dfm}
+
+procedure TdtmConferenciaCega.cdsCargaVendaBeforeOpen(DataSet: TDataSet);
+begin
+	dtmAtivo.mudaSelect(TClientDataSet(DataSet), self);
+end;
+
+procedure TdtmConferenciaCega.cdsConfCegaCabecalhoOBSERVACAOGetText(
+  Sender: TField; var Text: string; DisplayText: Boolean);
+begin
+	if not cdsConfCegaCabecalhoOBSERVACAO.IsNull then
+    Text := Copy(cdsConfCegaCabecalhoOBSERVACAO.AsString, 1, 7) + '...';
+end;
+
+end.

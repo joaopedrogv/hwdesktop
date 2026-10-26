@@ -1,0 +1,25 @@
+--REUTILIZÁVEIS--
+ÍNDICES - 1;
+
+-- ÍNDICE --
+1 - REGISTRO
+        1.1 - GRAVAR INFORMAÇÕES NO REGITRO DO WINDOWS
+2 - FLASH
+        2.1 - INFORMAÇÃO (ERRO: CLASSE NÃO REGISTRADA)
+-- TEXTO --
+1 - REGISTRO
+        1.1 - Funções para gravar no registro do windows em todos os formulários padrões:
+                procedure _GravaConfiguracoesString(NomeVariavel,Valor : string);
+                procedure _GravaConfiguracoesDouble(NomeVariavel : string; Valor : Double);
+                procedure _GravaConfiguracoesBoolean(NomeVariavel : string; Valor : Boolean);
+                procedure _GravaConfiguracoesInteger(NomeVariavel : string; Valor : Integer);
+                function _LerConfiguracoesRegistroString(NomeVariavel : string) : string;
+                function _LerConfiguracoesRegistroDouble(NomeVariavel : string) : Double;
+                //Se de erro ao retornar do regitro ele retorna falso
+                function _LerConfiguracoesRegistroBoolean(NomeVariavel : string) : Boolean;
+                function _LerConfiguracoesRegistroInteger(NomeVariavel : string) : Integer;
+2 - FLASH
+        2.1 - Para o flash funcionar tem que ter instalado na maquina o flashplayer
+              do internet explorer, para retirar o erro de classe não registrada
+              quando o formulário é executado
+

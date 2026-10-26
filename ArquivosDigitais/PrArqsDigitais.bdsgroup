@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{5434C0B9-9F2D-4EF7-8D47-D223EC1D3661}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  <Projects>
+      <Projects Name="PkFormularios.bpl">..\Automacao Bpl\PkFormularios.bdsproj</Projects>
+      <Projects Name="PkArquivosDig.bpl">PkArquivosDig.bdsproj</Projects>
+      <Projects Name="HwSistemas.exe">..\HwSistemas.bdsproj</Projects>
+      <Projects Name="pkAtivos.bpl">..\Ativos\dpk\pkAtivos.bdsproj</Projects>
+      <Projects Name="Targets">PkFormularios.bpl PkArquivosDig.bpl HwSistemas.exe pkAtivos.bpl</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+	<StarTeamAssociation></StarTeamAssociation>
+	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+</BorlandProject>

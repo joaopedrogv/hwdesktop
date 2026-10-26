@@ -1,0 +1,52 @@
+package pkCadastrosBasicosCx;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  vcl,
+  vclx,
+  dbrtl,
+  dsnap,
+  vcldb,
+  ibxpress,
+  QR5RunD2006,
+  vcljpg,
+  bdertl,
+  pkAtivos;
+
+contains
+  UDtmCadastrosBasicosCx in '..\fonte\UDtmCadastrosBasicosCx.pas' {DtmCadBasicosCx},
+  UCadControles in '..\fonte\UCadControles.pas' {frmCadControles},
+  UClassesCadastrosBasicosCx in '..\fonte\UClassesCadastrosBasicosCx.pas',
+  uEscolhaHistoricoPadrao in '..\fonte\uEscolhaHistoricoPadrao.pas' {frmEscolhaHistoricoPadrao},
+  UcadPlanoContas in '..\fonte\UcadPlanoContas.pas' {frmCadPlanoContas},
+  uCadAdmCartao in '..\fonte\uCadAdmCartao.pas' {frmCadAdmCartao},
+  uCadOcorrenciaAdm in '..\fonte\uCadOcorrenciaAdm.pas' {frmCadOcorrenciaAdm},
+  uCadAdmCartao_RedesTEF in '..\fonte\uCadAdmCartao_RedesTEF.pas' {frmCadAdmCartao_RedesTEF},
+  uCadPlanoContasRel in '..\fonte\uCadPlanoContasRel.pas' {frmCadPlanoContasRel};
+
+end.

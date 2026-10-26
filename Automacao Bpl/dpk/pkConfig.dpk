@@ -1,0 +1,66 @@
+package pkConfig;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  PkFormularios,
+  pkAtivos,
+  vcl,
+  vcldb,
+  dbrtl,
+  VclSmp,
+  vclx,
+  inet,
+  dsnap,
+  ibxpress,
+  QR5RunD2006,
+  vcljpg,
+  bdertl,
+  pkEditHw;
+
+contains
+  UDtmConfig in '..\fonte\UDtmConfig.pas' {dtmConfig: TDataModule},
+  UClassesConfig in '..\fonte\UClassesConfig.pas',
+  uCadMenusAuto in '..\fonte\uCadMenusAuto.pas' {frmMenusAuto},
+  UClassesProcesso in '..\fonte\UClassesProcesso.pas',
+  UCadProcessos in '..\fonte\UCadProcessos.pas' {frmCadProcessos},
+  UcadConfigini in '..\fonte\UcadConfigini.pas' {frmCadConfigini},
+  uConfiguracaoServico in '..\fonte\uConfiguracaoServico.pas' {frmConfiguracaoServico},
+  uCadConfigWS in '..\fonte\uCadConfigWS.pas' {frmCadConfigWS},
+  uClassesConfigWS in '..\fonte\uClassesConfigWS.pas',
+  uVisualizarWS in '..\fonte\uVisualizarWS.pas' {frmVisualizarWs},
+  uLiberarAcesso in '..\fonte\uLiberarAcesso.pas' {frmLiberarAcesso},
+  uCadRegrasProgramasFidelidade in '..\fonte\uCadRegrasProgramasFidelidade.pas' {frmCadRegrasProgramaFidelidade},
+  uCadRegrasValeTrocaProgFid in '..\fonte\uCadRegrasValeTrocaProgFid.pas' {frmCadRegrasValeTrocaProgFid},
+  uCadConfigAPI in '..\fonte\uCadConfigAPI.pas' {frmCadConfigAPI},
+  uBuscaAuditoria_V2 in '..\fonte\uBuscaAuditoria_V2.pas' {frmBuscaAudtioria_V2},
+  uClassesAuditoria_V2 in '..\fonte\uClassesAuditoria_V2.pas',
+  uTipoContatoOrigem in '..\fonte\uTipoContatoOrigem.pas' {frmTipoContatoOrigem},
+  uTipoContatoOrigemPlataforma in '..\fonte\uTipoContatoOrigemPlataforma.pas' {frmTipoContatoOrigemPlataforma},
+  uModeloCartasOrigem in '..\fonte\uModeloCartasOrigem.pas' {TfrmModcartasOrigem};
+
+end.

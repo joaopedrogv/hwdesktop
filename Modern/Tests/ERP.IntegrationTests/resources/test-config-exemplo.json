@@ -1,0 +1,19 @@
+{
+    "databaseName": "note-jp:D:\\Hw\\bases\\producao\\Hwauto.fdb",
+    "databaseNameSinc": "note-jp:D:\\Hw\\bases\\producao\\HwautoTestModern.fdb",
+    "userSession": {
+        "empresaId": 1,
+        "empresaNome": "HW",
+        "empresaCnpj": "03530705000109",
+        "usuarioId": 1,
+        "usuarioNome": "HW",
+        "usuarioEmail": "joaopedrogv@gmail.com",
+        "caixaUnificado": false,
+        "unificadoraId": 0
+    },
+    "customTests": {
+        "sincronizacaoTotal": false,
+        "sincronizacaoApiCalculadora": false,
+        "rtcApiToken": "token_criptografado_api_datasette_hw"
+    }
+}

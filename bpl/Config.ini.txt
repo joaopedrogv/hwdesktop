@@ -1,0 +1,300 @@
+################################################ Arquivo de configuração ###########################################
+## Linhas iniciadas com o caracter # (comentário) não serão identificadas pelo sistema
+## Por padrão os valores Sim e Não correspondem a S e N respectivamente
+
+[Banco]
+## Endereço do banco de dados principal: IP ou nome do computador mais o endereço fisico na maquina de destino
+HW=127.0.0.1:C:\BasesAuto\Hw.fdb
+## Endereço do banco de dados do PAF-ECF: Para o PAF-ECF o banco deve estar na mesma maquina onde esta instalado o ECF
+Fiscal=127.0.0.1:C:\BasesAuto\Fiscal.fdb
+## Endereço do banco de dados de consulta do PAF-ECF: O banco HWF possui tabelas de consulta do retaguarda, caso a rede fique inacessivel.
+HWF=127.0.0.1:C:\BasesAuto\HwF.fdb
+Ccia=127.0.0.1:C:\BasesAuto\Ccia.gdb
+## Caso o usuario do servidor firebird seja diferente de SYSDBA	colocar aqui o usuário criptografado
+FBU=
+## Caso a senha do usuario do servidor firebird seja diferente da senha padrão colocar aqui o senha criptografada
+FBP=
+## Endereço do banco de dados(log) webservices
+LogWs=
+
+[Sistema]
+## Código do cliente padrão utilizado em situações sincronização do PAF com Retaguarda em que o mesmo não tenha sido informado. (CONSUMIDOR, BALCAO, PADRAO, etc.)
+ClientePadrao=1
+## Código do vendedor padrão utilizado em situações sincronização do PAF com Retaguarda em que o mesmo não tenha sido informado
+VendedorPadrao=1
+## Endereço completo da pasta onde estão os relatórios Crystal (*.rpt)
+PastaRel=C:\BasesAuto\Multi\Relatorios
+## Uso em modo de compatibilidade com as vendas do sistema 3. Agrupa os produtos repetidos em um mesmo cupom para uma requisicao
+ModoCompatibilidade=S
+## Variavel não usada
+FormPagamentoAtivado=N
+## Chave para gerar o EAD dos arquivos digitais do PAF-ECF. Valor = HW ou o nome da chave localizada na mesma pasta do executavel. Exemplo: ChaveML.pem
+ChaveEmpresa=HW
+## Usar o Plano de pagamento antes da forma de pagamento. S: Plano definido nos controles; 2: Plano definido pelas tabelas de juros
+UsarPlanoDePagamento=N
+## Usado no Plano versão 2. Define um dia base para vencimento das parcelas. Valores: S ou N
+PlanoDiaBase=
+##As cores para definir, ir no formulario colocar um componente chart, e modificar as cores
+##depois entrar no dfm e localizar as variaveis conforme abaixo, copiar o valor numerico.
+## Desativa a exibição do Splash antes da senha
+ExibirSplash=S
+## Definição de cor inicial do degrade de senha
+StartColor=32896
+## Definição de cor final do degrade de senha
+EndColor=8404992
+## S Indica o uso do cobrebem para impressao e controle de boletos, ou N indica o uso dos boletos Pré impresso
+CobreBem=N
+## Ativa o Botao de Pendencias Oficina no caixa auxiliar
+poficina=N
+## Ativa o Botao de Pendencias Balcao no caixa auxiliar
+pbalcao=N
+## Ativa o Botao de Pendencias Veículos no caixa auxiliar
+pveic=N
+## Ativa o Botao de Pendencias Ecommerce no caixa auxiliar
+pecommerce=N
+## Ativa a regra peps, ao realizar a venda de veículo o sistema trabalha da seguinte maneira, o primeiro veículo que entra no estoque deve ser o primeiro a ser vendido.
+peps=S
+## Ativa a listagem dos veículos em demonstração ao entrar no sistema
+atvDemo=S
+## Ativa o envio de email dos veículos em demonstração
+emailDemo=S
+## Para o visualizar o formulario de demonstração é necessário informar a data da ultima visualização da demonstração, caso nunca tenha visualizado informar a data do dia anterior
+dtdemo=05/08/2013
+## Mostrar o valor em Dinheiro na Previsão de Saldo
+MostrarSaldoDinheiro=S
+## Mostrar ou não as contas a receber vencidas até o dia de uso do sistema na abertura do sistema
+verReceber=S
+## Mostrar ou não as contas a pagar vencidas até o dia de uso do sistema na abertura do sistema
+verContas=S
+## Mostrar os aniversariantes do dia na abertura do sistema
+aniversariantesDia=S
+## Tipo de Parcelamento da Forma de Pagamento e do Prazo no PAF. I: Indica parcelas Iguais. T1: Indica truncamento das parcelas com 1° parcela com centavos. TN: Indica truncamento das parcelas com a última parcela com centavos
+TipoParcelamento=TN
+## Define o dia base de vencimento das parcelas. Ex: 31/11 em 3x. vence todo dia 31. 1º 31/12, 2º 31/01, 3º 28 ou 29/02. Onde o dia nao existir no mes o sistema deixa o ultimo dia do mes. exemplo fevereiro e meses de 30 dias.
+## Caso não habilitado o sistema soma 30 dias a cada nova parcela
+ParcelamentoDiaBase=S
+## 
+TipoProc=Loja1
+## Abir relatorios pelo OpenOffice Calc, por padrão os relatório são abertos pelo Office Excel
+OpenOfficeExportRel=S
+## Desativar verificação do backup
+VerificarBackup=N
+## Habilita configuracoes do TsPlus
+TsPlus=S
+
+[Automacao]
+## Habilita o campo de descricao do item na venda para digitacao da cor
+Tintas=N
+## Habilita campos de item na Venda (N Serie, Ano\Fabricação, Modelo, Cor, Nat Operacao,  )
+DadosAdicionaisNoRecebimento=N
+## Valor igual a "S" ativa a validação do CPF ou CNPJ no cadastro do cliente/fornecedor
+ConfCPF=S
+## Ativa o uso do SubGrupo vinculado com o grupo
+SubGrupoVinc=N
+## Quantidade de dígitos no cadastro do produto para o campo cod_prod. Deve ser de 3 a 6 dígitos. Não se refere a codigo de barras
+DigitosProd=5
+## Variavel não usada
+ProdTerc=N
+## Variavel que armazena a mascara da locação do produto
+MascaraLoc=99-L-999;0;_
+## Valor igual a "1" ou "U" faz com que o sistema importe o Orçamento para uma venda apenas uma vez
+ConfigImportOrcam=2
+## Valor igual a "S" faz com que o sistema trabalhe com mais de um Mecanico/Tecnico por Serviço na OS
+MecanicosServicoOS=N
+##Variavel para possibilitar explicitamente marcar os DAVs ORC convertidos em Venda.(Por padrão o valor será sempre N caso não tenha essa variável no config)
+VerORCConvertidoVenda=N
+## Indica o local do arquivo de pedido do fabricante
+PedHonda=c:\PedHonda.txt
+## Ativa o recebimento de embalagens na nota fiscal; No cupom fiscal ativa o codigo de barras com 13 digitos
+Supermercado=N
+## Campo não usado
+CamposNotaFiscal=
+## Qtde de CFOP's que serão impressos no cabeçalho da nota fiscal de saida nos modelos diferentes de 55. Os CFOP's impressos serão aqueles dos itens
+## da nota fiscal. Caso a nota fiscal so tenha 1 item, será impresso apenas  CFOP no cabeçalho
+QtdeCFOPNotaFiscal=3
+## Impressão de aplicação na nota fiscal: Valor "S" Imprime a aplicação na frente da descricao do item, valor "N" imprime o numero de fabricante,
+## Valor "" em branco não imprime nada
+Aplic=
+## Variavel que informa a quantidade de numero de fab do ecf que será impresso por linha na nota fiscal
+QtdeImpressaoNSerieFabEcfNF=3
+## Data inicial de travamento das vendas
+usdtvervnd=
+## Data inicial de travamento das vendas no carrinho de venda(Estoque Fechado)
+usdtvervndEstFech=
+## Imprimir a locação do produto na REQ/OS
+locReq=N
+## Imprimir Aplicação e Marca na Requisição
+AplicMarcaReq=N
+## Imprimir Marca na Requisição
+MarcaReq=N
+## Opcao de imprimir ou não o valor de desconto e acrescimo na requisicao e orcamento
+ImpDescReqOrc=
+## Opcao de imprimir ou não o valor bruto no orcamento e os, habilitada somente se a tag "ImpDescReqOrc" esta configurada como "S"
+ImpBrutoReqOrc=
+## Campo usado para calculo de Comissão 2 (Predileta)
+UsarCommissao2=
+## Permite indicar se a empresa irá trabalhar com minuta de entrega ao emitir requisição.(aparecerá a opção para cadastrar o endereço da entrega)
+MinutaEntrega=
+## S: Indica que o sistema irá gerar um Recibo antecipado para cada devolução de mercadoria feita.
+usRecDev=S
+## -- Utilizados no balanço (Supermercado,AUTOINC,AUTOINCGRADE,SUBOUSOMA,DIFERENCAESTOQUE)
+## Utilizado no balanço: Indica que será inserido mais 1 quando passar o produto
+AUTOINC=S
+## Utilizado no balanço: Indica que será inserido mais 1 quando passar o produto com grade
+AUTOINCGRADE=S
+## Utilizado no balanço: "N" indica que será acrescentado ao valor que está contado, e "S" indica que será substituído do valor que está contado 
+SUBOUSOMA=N
+## Utilizado no balanço: "S" indica que o estoque será feito pela diferença da quantidade que está no estoque, e "N" indica que será feita a substuíção do valor que está em estoque
+DIFERENCAESTOQUE=S
+## Abre a tela da grade ao clicar no botao OK do cadastro do produto
+AbrirGradeProduto=N
+## Na entrada de Nota fiscal, no momento de informar as grades de estoque quando habilitado o sistema apresenta todas as grades do cadastro e nao apenas as vinculadas ao produto
+MostrarTodasGradesEntradaNF=S
+## Quando S, ao abrir a tela de definição de preço o sistema já efetua o calculo do preço de 30, 60, 90 com base nos campos de percentuais: PERC_AD_30, PERC_AD_60 e PERC_AD_90
+UsarPercentualAdicinalProdEntrada=N
+## Usa o campo MAX_DESC_ITEM do cadastro do produto como Percentual de desconto do preço a prazo para encontrar o preço a vista.
+UsarMaxDescCalcPrecoAVista=N
+## Ativa a alteração do preço de venda automaticamente nas entradas de notas fiscais.
+AlterarPrecoAutomaticoVendaEntradaNF=S
+## Ativa o usu do csosn 300 quando for cst 41, quando desativado usa o csosn 400
+UsarCSOSN300Para041=N
+## Dertima o tamanho padrão da requisição que pode ser 33 linhas (em meia folha) ou 66 linhas (folha inteira)
+QtdLinhasReq=33
+## Dertima o tamanho padrão do recibo em impressão matricial, que pode ser 33 linhas (em meia folha) ou 66 linhas (folha inteira)
+QtdLinhasRecibo=33
+## Variavel usada quando dentro da empresa vendedores efetuam venda de tipos diferentes: Exemplo (varejo e atacado). Usado geralmente para o televenda. 
+## Quando em branco o sistema utiliza a configuração do cadastro da empresa
+TipoVendaPadrao=
+##
+MNF=N
+## Serve para indicar ao sistema para abrir a impressao de etiquetas ao fechamento da NF
+EtiquetaNF=N
+
+[Configuracao]
+## "S" Indica que o sistema retaguarda (Venda) ou caixa auxiliar deve se comunicar com o ECF instalado no mesmo computador.
+TerminalFiscal=N
+## Variavel não usada
+GravaLogErros=S
+## Valor igual a N desativa a propaganda em Flash do cadastros quando maximizados
+PropagandaFlash=
+
+[PortaImpressora]
+## Porta de Impressão das impressoras Térmicas
+Dados=
+
+[Fiscal]
+## Variavel não usada ainda no PAF-ECF. Será usada para desabilitar a imagem logo na tela de venda. S ou N
+Propaganda=S
+## Variavel usada para identificar quando usar impressora YANCO
+ModeloImp=BEMATECH
+## Variavel nao usada ainda. Será usada para definir onde (está o Conf da Dll do ECF ou onde serao gravados os arquivos de retorno)
+EndConfigDll=C:\WINDOWS\SYSTEM32\
+## Variavel nao usada
+Fech9000=
+## Variavel nao usada
+QtdP9000=
+## Variavel nao usada
+TituloSang=
+## Variavel nao usada
+legSang=
+## Variavel nao usada
+TituloSup=
+## Variavel nao usada
+legSup=
+## Ativa o uso do TEF Discado TECBAN. S ou N
+tefdisc=N
+## Ativa o uso do TEF Discado Cielo, RedeCard e Amex. S ou N
+tefdial=N
+## Ativa a impressao da descricao reduzida no Cupom Fiscal. S ou N
+itred=S
+## Variavel não usada
+SufixoLeitor=
+## Variavel não usada
+ModoConsulta=P
+## Variavel não usada
+PausaAposFormaPag=
+## Porta de Comunicação com a balança
+PortaBalanca=
+## Rate de comunicação com a balança
+BaudRateBalanca=
+## Quando é dado o desconto por item, o sistema armazena em cache o valor ou percentual do desconto aplicado, e nas vendas seguintes o mesmo desconto
+## é aplicado. Por padrão o sistema zera os valores a cada nova venda. Caso nao queira zerar a cada venda colocar o valor N. S ou N
+ZerarDescontoItem=
+## Imprimir uma unica via do comprovante TEF na reimpressão. S ou N
+ImprimirUnicaViaReimpressao=S
+## Ler venda bruta atravéz de um espelho e não do Resumo. Os valores podem ser: COO (Espelho por COO) ou Data (Espelho por data) ou N (Sem espelho). 
+## Apenas impressoras Bematech
+LerVendaBruta=N
+## Ativa o cancelamento ou montagem do cupom quando o sistema for fechado no meio de uma impressao. Valor "C" cancela o cupom, outro valor monta o 
+## cupom.
+CancelarCupomOuMontarCupom=M
+## Desativa a leitura automatica do indice de arredondamento ou truncamento apénas para impressoras fiscais Daruma. S ou N
+DarumaObterIndiceATImpressora=N
+## Tempo de espera antes de abrir porta de comunicação com ECF em milisegundos. EX: 2 s = 2000
+SleepInicioDepoisAbrePortas=0
+## Ativa impressao do Codigo de barras padrão GTIN no cupom Fiscal. Valores
+## GTIN: Imprime padrao GTIN configurado no codigo de barras
+## N: Imprime o numero de fabricante
+## GC: Imprime a junção do grupo e codigo do produto.
+## Outro valor qualquer imprime o codigo que foi digitado para consulta
+ImpressaoCodigoCupom=N
+## TEF Dedicado. Quantidade de linhas necessárias para impressão antes do posicionamento correto da guilhotina para corte de papel
+QtdeLinhasCortePapelTEF=4
+## TEF Dedicado. Tempo de espera para resposta do ClientSitef. 
+TempoEsperaCLientSitef=20
+## Utilizado para acertar o valor da balanca Filizola BP que nao apresenta casas decimais. Colocar valores Inteiros. Ex: 1 ou 100
+DividirValorBalancaPor=1
+## Utilizado para nao tentar obter os dados do espelho pra ECF's EPSON (DFA) pela demora da resposta, ficando o usuario responsavel pela digitação dos dados que faltam na redução Z
+DigitarDadosReducaoZ=N
+## Campo utilizado para definir como será a conexão do PAF-ECF, sempre online (conectado com Hwauto.fdb sempre) conectando com HwF somente se necessário, 
+##   ou sempre offline (conectado com HwF.fdb sempre), apenas a sincronização conecta no Hwauto para enviar os dados de cupons e estoque
+## Valores: on= sempre online (Hwauto); off= sempre offline (HwF), Outro valor diferente o sistema desconsidera e atribui a configuração sempre online
+TipoConexao=on
+
+
+[Veiculos]
+## Campo responsável por ativar o uso do plano de pagamento: comando de faturamento e contratos de venda
+UsarPlanoDePagamentoVeic=S
+## Campo responsável por ativar a Regra PEPS (Primeiro que entra e o primeiro que sai)
+peps=S
+## Campo responsável por ativar a consulta dos veículos em demontração ao entrar no sistema
+atvDemo=S
+## Data da ultima consulta dos veículos em demontração, a consulta é realizada quando o usuário entra no sistema
+dtdemo=06/08/2014
+## Email onde será enviado a lista dos veículos em demonstração
+emaildemo=odilon@hwsistemas.com.br
+## Endereço completo da pasta onde se encontra os arquivo de processamento fabrica
+PastaArqHonda=C:\temp1
+
+[Despachante]
+## Nome do despachante impresso nos contratos de veículos
+Nome=Silma Despachante
+## Endereço do despachante impresso nos contratos de veículos
+Endereco=Rua parajara dos Santos, 110 - Vila Bretas
+## Telefone do despachante impresso nos contratos de veículos
+Fone=(33)3221-5565
+
+[Gerente]
+## Nome do Socio Gerente impresso nos contratos de veículos
+Nome=Roberto Girelli Mol
+## Nacionalidade do Socio Gerente impresso nos contratos de veículos
+Nacionalidade=Brasileira
+## Estado Civil do Socio Gerente impresso nos contratos de veículos
+EstadoCivil=Casado
+## Profissão do Socio Gerente impresso nos contratos de veículos
+Profissao=Empresário
+## CEP do Socio Gerente impresso nos contratos de veículos
+CPF=546.018.006-68
+## RG do Socio Gerente impresso nos contratos de veículos
+RG=624292 SSPES - OK
+
+[Pacote]
+filename=pkFiscal
+formName=TFrmPrincipalFiscal
+
+#filename=pkFiscal
+#formName=TFrmSegundoPlano
+
+#filename=pkAutomacao
+#formName=TFrmPrincipalS
+###########################################################################################################

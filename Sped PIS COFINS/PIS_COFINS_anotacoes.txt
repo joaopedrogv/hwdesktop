@@ -1,0 +1,360 @@
+SPED PIS/COFINS
+
+Registro 0140 corresponde pessoas juridicas, matriz e filiais.
+
+Bloco A - Notas Fiscais de Serviço (Nao sujeitos a ICMS). Eletronica ou Em Papel
+	Talvez seja interessaonte fazer uma VIEW.
+	Entradas apenas as que dão direito a crédito
+	Saídas são todas as notas
+
+Bloco C - Adicionados registros C180, C190 Apenas NF-e ( modelo 55 )
+	C180 - Operacoes de Vendas somente NF-e por Item.
+		C181 - Analitico com CST, CFOP e Aliquota - PIS
+		C185 - Analitico com CST, CFOP e Aliquota - COFINS
+	C190 - Operacoes de Aquisicao somente NF-e por Item.
+		C191 - Analitico com CST, CFOP e Aliquota - PIS
+		C195 - Analitico com CST, CFOP e Aliquota - COFINS
+	C188 e C198 - Processos referenciados
+	C199 - Complemento do Documento - Importacao
+	C380, C381(PIS), C385(COFINS) - Nota Fiscal Série D - Consolidado, apenas totais - PIS
+	C395 - Aquisicoes com Credito de Nota Fiscal Serie D e Cupons ( modelos 02, 2D, 2E e 59)
+		C396 - Consolidados, Somatorios
+	C481 - Consolidado de Cupons Fiscais - PIS
+	C485 - Consolidado de Cupons Fiscais - COFINS
+	C491 - Consolidado de cupons Fiscais por Item, CST, etc PIS
+	C495 - Consolidado de cupons Fiscais por Item, CST, etc COFINS
+	C501 - Despesas Modelo 06, 28 e 29 - PIS
+	C505 - Despesas Modelo 06, 28 e 29 - COFINS
+
+Bloco D - Serviços com ICMS
+	D101 - Serviço de Transporte - PIS
+	D105 - Serviço de Transporte - COFINS
+	D501 - Despesas Modelo 21, 22 - PIS
+	D505 - Despesas Modelo 21, 22 - COFINS
+
+Bloco F - Demais documentos e Operações
+	Nao existe tabelas especificas no banco de dados para este bloco, será necessário partir do zero.
+	F200, F205 e F210 somente para empresas com atividade imobiliaria para venda. nao necessario para o nosso caso
+	F500, F509, F510. F519, F525, F550, F559, F560, F569, 
+		Nao existe tabelas especificas - Lucro Presumido
+	F600, F700 ( fazer) , F800
+		Nao existe tabelas especificas - 
+
+Bloco M - Apuração do PIS/COFINS
+
+Bloco 1 - Complemento de Escrituração
+	1010 = Processo referenciado - Acao Judicial
+	1020 - Processo referenciado - Processo Administrativo
+	1100 - COntrole de Creditos Fiscais - PIS
+	1200 - Contribuição Social Extemporanea - PIS
+	1300 - Controle dos Valores Retidos na Fonte - PIS
+	1500 - COntrole de Creditos Fiscais - COFINS
+	1600 - Contribuição Social Extemporanea - COFINS
+	1700 - Controle dos Valores Retidos na Fonte - COFINS
+	1800 - Incorporacao Imobiliaria
+
+==================================================================================================
+Observaçoes para desenvolvimento
+--------------------------------------------------------------------------------------------------
+Bloco 0
+* Parece que o metodo de apropriacao campo 03 0110 é definido em janeiro e valido para o ano inteiro:
+	link: http://www.spedbrasil.net/xn/detail/2159846:Comment:159632
+* Na tela de gerar nova escrituracao, quando selecionar Retificação, habilitar campo para Numero recibo
+* Adicionar outras atividades de acordo registro 0000 campo 14, no cadastro da empresa, campos ja existe.
+* Adicionar novo campo IND_NAT_PJ char(2) no cadastro da empresa. Combobox Fixo.
+* Adicionar novo campo COD_INC_TRIB smallint no cadastro da empresa. RadioGroup
+* Adicionar novo campo IND_APRO_CRED smallint no cadastro da empresa. RadioGroup, somente será habilitado
+	caso o campo COD_INC_TRIB seja igual a 1 ou 3. Este campo irá definir como a apuracao sera feita
+* Adicionar novo campo COD_TIPO_CONT smallint no cadastro da empresa. RadioGroup	
+* Criar tabela SPED_PC_0111. Para quando o campo IND_APRO_CRED do registro 0110 = 2
+
+Bloco A
+* Aguardar definicao da nota de serviço eletronica com a nota fiscal impressa.
+* As operacoes de serviços sao obrigatórias para o SPEDPISCONFIS. Portanto tem de estar digitada em algum lugar
+	(NFS-e, NF ou Cupons).
+
+
+Bloco C
+* Opção para gerar as NF-e e ECF: Consolidada ou Individual
+* O registro C100 e filhos não é obrigatório para NF-e (modelo 55), porem o registro C180 deve ser gerado
+* Para os registros de Itens, Notas Fiscais modelos (1,4,55) ja exites o cst do pis/cofins na nota,
+	ja na nota fiscal serie D e cupons  (modelo 02, 2D) buscar esta informacao na tabela de produtos?
+* Os registrso de notas fiscais e cupons podem ser gerados de forma consolidada, registro C400 e filhos
+	nao se faz necessário quando gerado o registro C490
+* O tomador do frete é aquele que fica com o Onus do Frete e consequentemente o ICMS nele integrado
+	POrtanto se for entrada, somente se for frete por conta do destinatario, logo
+	na saida somente quando o frete for por conta do emitente.
+	Ver entao como ficará os registros, gerar ou nao, entrada e/ou saida. Ver descricao do Campo 17
+	do registro D100. Parece que os registros filhos servem justamente para isso, campo 02
+* Registro 0111: Validar no PVA para saber se os valores serão digitados ou totalizados
+* Registro 0140: Obrigatorio para a Matriz. Para filiais caso tenha movimento
+* Registro 0110: Quando preencher 
+* Documentos emitidos por cnpj diferente daquele que informado no cabecalho de cada bloco, sao documentos de terceiros
+	ainda que seja filial ou matriz.
+
+--------------------------------- No sistema fazer o calculo pelas aliq e cst do produto.
+/////////////////////////    DUVIDAS    //////////////////////////////////
+cfop interferem no PIS/COFINS? Sim
+
+NCM interfere? Para o regime nao-cumulativo, nas entradas tambem interfere?
+
+Notas de remessa, para demostracao ou conserto, notas que nao tenham pagamento incidem PIS/COFINS?
+
+Produto que tem saida isenta. Regime não-cumulativo a Entrada tambem é isenta?
+
+* 
+
+
+==================================================================================================
+
+
+
+Saida de notas fiscais - PIS/COFINS
+
+	Produtos
+		Verificar CST no cadastro do produto
+			cst = 01, utilizar a aliquota no cadastro da empresa
+			cst = 02, utilizar a aliquota diferenciada no cadastro do produto
+			cst = 03, utilizar a aliquota diferenciada no cadastro do produto, armazenar o campo no novo campo para este fim, QUANT_BC_PIS, ALIQ_PIS_QUANT, QUANT_BC_COFINS, ALIQ_COFINS_QUANT 
+			cst = 04, aliquota zero, bases zeradas
+			cst = 05, nao temos no sistema
+			demais cst's sem aliquotas e bases
+			verificar o isento_pis
+	Serviços
+		Verificar CST no cadastro dos servicos
+			verificar o campo isento_pis
+			cst = 01, utilizar a aliquota no cadastro da empresa
+			nao aceitar cst 02, 03.
+			demais cst's sem aliquotas e bases
+
+Escrituracao de PIS/COFINS
+	Verificar regime, regime CUMULATIVO nao tem creditos nao tem credito na entrada.
+	Regime NAO-CUMULARIVO tem credito na entrada 
+	Normalmente as entradas/aquisicoes o cst deve ser preenchido com valores de 50 a 56, 70 a 75 ou 98 ou 99
+	Modulo para escrituacao de PIS/COFINS nas nota fiscais de entrada.
+
+	Produtos
+		
+
+
+
++++++++++++++++++++++++++++++++++++++++++Orientações Futuras+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+* Ao adquirir mercadorias a serem incorporadas ao ativo imobilizado, efetuar a escrituração no F120 e F130, e na nota fiscal
+	colocar o CST 98 ou 99.
+
+
++++++++++++++++++++++++++++++++++++++++++Alterações a serem feitas no Sistema++++++++++++++++++++++++++++++++++++++++++++++
+
+* Entrada - Devolução de Venda. O valor (PIS/COFINS) que esta sendo devolvido deve ser excluido da nota fiscal de venda apenas se for no 
+	mesmo período de apuração. Pode usar a tabela NOTAFISCAL_SPED_C113 que contem a NF referenciada. No momento de confirmação da NF.
+	(Mais facil desenvolver) Ou então quando fazer a nota fiscal de devolução efetuar o ajuste no bloco M
+
+* Criar campo que referencia os processos referenciados (COD_ACAO_JUDICIAL, COD_ADM);
+	ALTER TABLE NOTAFISCAL_SPED_C111 ADD COD_ACAO_JUDICIAL INTEGER;
+	ALTER TABLE NOTAFISCAL_SPED_C111 ADD COD_ADM INTEGER;
+
+OK - * Criar campo na tabela nat_op_descricao, Para diferenciar as descrições do CFOP no registro 0400. 
+	
+	ALTER TABLE NAT_OP_DESCRICAO ADD NITEM_NOP_DESC SMALLINT DEFAULT 1;
+	UPDATE NAT_OP_DESCRICAO SET NITEM_NOP_DESC = 1 WHERE NITEM_NOP_DESC IS NULL;
+
+* Pacote Sped, para cadastrar informações necessárias para escrituração.
+	Processos Referenciados 
+		Ação Judicial		(SPED_PROC_REF_ACAO_JUDICIAL)
+		Administrativos		(SPED_PROC_REF_ADMINISTRATIVO)
+		Fazer na nota fiscal a pesquisa para informar os campos no registro c111
+
+OK - * Adaptar o novo campo do registro 0110.
+
+* Modulo de manutenção de dados do SPED.
+	Refazer os cálculos do PIS COFINS dos cupons fiscais
+
+* Novos campos no Serviço de transporte
+	ALTER TABLE SERVICO_TRANSPORTE ADD IND_NAT_FRT SMALLINT;
+	ALTER TABLE SERVICO_TRANSPORTE ADD NAT_BC_CRED CHAR(2);   
+	ALTER TABLE SERVICO_TRANSPORTE ADD CST_PIS CHAR(2);
+	ALTER TABLE SERVICO_TRANSPORTE ADD CST_COFINS CHAR(2);
+	ALTER TABLE SERVICO_TRANSPORTE ADD ALIQ_PIS T_N_GERAL;
+	ALTER TABLE SERVICO_TRANSPORTE ADD ALIQ_COFINS T_N_GERAL;
+	ALTER TABLE SERVICO_TRANSPORTE ADD BASE_PIS T_VL_TODOS;
+	ALTER TABLE SERVICO_TRANSPORTE ADD BASE_COFINS T_VL_TODOS;
+	ALTER TABLE SERVICO_TRANSPORTE ADD VALOR_PIS T_VL_TODOS;
+	ALTER TABLE SERVICO_TRANSPORTE ADD VALOR_COFINS T_VL_TODOS;
+
+* Ver se o valor e ICMS ST esta compondo a base do PIS e da COFINS. O ICMS ST não deve compor a base
+
+* Indices
+	CREATE INDEX IDX_PEDVENDA_SERV_DTEMISS_NFE ON PEDVENDA_SERV (EMISSAO_NFSE,COD_EMPRESA,STATUS_NFSE);
+
+* Ver quando for informar os itens não podem existir crédito para aqueles itens que a nat_bc_cred conter um valor
+
+* Montar select dos itens de notas fiscais com o CFOP de devolucao de venda e compra para regime cumulativo. 
+	
+	
+
+
+CFOP's
+	Aquisição de Bens para Revenda - Código 01:
+		1102, 1113, 1117, 1118, 1121, 1251, 1403, 1652, 2102, 2113, 2117, 2118, 2121, 2251, 2403, 2652, 3102 , 3251, 3652
+
+	Aquisição de Bens Utilizados como Insumo - Código 02:
+		1101, 1111, 1116, 1120, 1122, 1126, 1128, 1401, 1407, 1556, 1651, 1653, 2101, 2111, 2116, 2120, 2122, 2126, 2128, 2401, 2407, 2556, 2651,
+		2653, 3101, 3126, 3128, 3556, 3651, 3653 
+
+	Aquisição de Serviços Utilizados como Insumo - Código 03:
+		1124, 1125, 1933, 2124, 2125, 2933
+
+	Devolução de Vendas Sujeitas à Incidência Não-Cumulativa - Código 12:
+		1201, 1202, 1203, 1204, 1410, 1411, 1660, 1661, 1662, 2201, 2202, 2410, 2411, 2660, 2661, 2662
+
+	Outras Operações com Direito a Crédito - Código 13:
+		1922, 2922
+
+	Devolução de Compras
+		5205, 5206, 5207, 6205, 6206, 6207, 7205, 7206, 7207, 5201, 5202, 5210, 5410, 5411, 5413, 5660, 6201, 6202, 6210, 6410, 6411, 6413, 6660, 
+		7201, 7202, 7210
+
+	CFOP Créditos
+		1102, 1113, 1117, 1118, 1121, 1251, 1403, 1652, 2102, 2113, 2117, 2118, 2121, 2251, 2403, 2652, 3102, 3251, 3652, 1101, 1111, 1116, 1120, 
+		1122, 1126, 1128, 1401, 1407, 1556, 1651, 1653, 2101, 2111, 2116, 2120, 2122, 2126, 2128, 2401, 2407, 2556, 2651, 2653, 3101, 3126, 3128, 
+		3556, 3651, 3653, 1124, 1125, 1933, 2124, 2125, 2933, 1201, 1202, 1203, 1204, 1410, 1411, 1660, 1661, 1662, 2201, 2202, 2410, 2411, 2660, 
+		2661, 2662
+
+	CFOP Receitas
+		5101, 5102, 5103, 5104, 5105, 5106, 5109, 5110, 5111, 5112, 5113, 5114, 5115, 5116, 5117, 5118, 5119, 5120, 5122, 5123, 5124, 5125, 5151,
+		5152, 5153, 5155, 5156, 5201, 5202, 5205, 5206, 5207, 5208, 5209, 5210, 5251, 5252, 5253, 5254, 5255, 5256, 5257, 5258, 5301, 5302, 5303,
+		5304, 5305, 5306, 5307, 5351, 5352, 5353, 5354, 5355, 5356, 5357, 5359, 5360, 5401, 5402, 5403, 5405, 5408, 5409, 5410, 5411, 5412, 5413,
+		5414, 5415, 5451, 5501, 5502, 5503, 5504, 5505, 5551, 5552, 5553, 5554, 5555, 5556, 5557, 5601, 5602, 5603, 5605, 5606, 5651, 5652, 5653,
+		5654, 5655, 5656, 5657, 5658, 5659, 5660, 5661, 5662, 5663, 5664, 5665, 5666, 5667, 5901, 5902, 5903, 5904, 5905, 5906, 5907, 5908, 5909,
+		5910, 5911, 5912, 5913, 5914, 5915, 5916, 5917, 5918, 5919, 5920, 5921, 5922, 5923, 5924, 5925, 5926, 5927, 5928, 5929, 5931, 5932, 5933,
+		5949, 6101, 6102, 6103, 6104, 6105, 6106, 6107, 6108, 6109, 6110, 6111, 6112, 6113, 6114, 6115, 6116, 6117, 6118, 6119, 6120, 6122, 6123,
+		6124, 6125, 6151, 6152, 6153, 6155, 6156, 6201, 6202, 6205, 6206, 6207, 6208, 6209, 6210, 6251, 6252, 6253, 6254, 6255, 6256, 6257, 6258,
+		6301, 6302, 6303, 6304, 6305, 6306, 6307, 6351, 6352, 6353, 6354, 6355, 6356, 6357, 6359, 6360, 6401, 6402, 6403, 6404, 6408, 6409, 6410,
+		6411, 6412, 6413, 6414, 6415, 6501, 6502, 6503, 6504, 6505, 6551, 6552, 6553, 6554, 6555, 6556, 6557, 6603, 6651, 6652, 6653, 6654, 6655,
+		6656, 6657, 6658, 6659, 6660, 6661, 6662, 6663, 6664, 6665, 6666, 6667, 6901, 6902, 6903, 6904, 6905, 6906, 6907, 6908, 6909, 6910, 6911,
+		6912, 6913, 6914, 6915, 6916, 6917, 6918, 6919, 6920, 6921, 6922, 6923, 6924, 6925, 6929, 6931, 6932, 6933, 6949, 7101, 7102, 7105, 7106,
+		7127, 7201, 7202, 7205, 7206, 7207, 7210, 7211, 7251, 7301, 7358, 7501, 7551, 7553, 7556, 7651, 7654, 7667, 7930, 7949, 5923, 5934, 6923,
+		6934
+
+	CFOP's referentes a operações com o Ativo Imobilizado
+		1406, 1551, 1552, 1553, 1554, 1604, 2406, 2551, 2552, 2553, 2554, 3551, 3553, 5412, 5551, 5552, 5553, 5554, 6412, 6551, 6552, 6553, 6554, 
+		7551, 7553,
+		1555, 2555, 5555, 6555
+
+
+Problemas ACBrPISCOFINS
+
+Erro: Registro 1010. O campo de Indicador da Natureza da Ação Judicial esta sendo reconhecido como data na funcao LFill.
+	Registro gerado: |1010|A2S1D2212|1211|01|08041900|DESCRIÇÃO DA ACAO JUDICIAL|10102011|
+
+Unit: 	ACBrEPCBloco_1_Class
+Linha Erro: 387
+               LFill( IND_NAT_ACAO ) + //Verificar criação da tabela no ACBrEPCBlocos
+Linha Corrigida: 387
+               LFill( IntToStr( (IND_NAT_ACAO ) ), 2, '0') + //Verificar criação da tabela no ACBrEPCBlocos
+------
+
+Erro: Registro 1020. O campo de Indicador da Natureza da Ação decorrente de Processo Administrativo esta sendo reconhecido como data na funcao LFill.
+	Registro gerado: |1020|33S6622D|01011900|05102011|
+
+Unit: 	ACBrEPCBloco_1_Class
+Linha Erro: 412
+               LFill( IND_NAT_ACAO ) + //Verificar criação da tabela no ACBrEPCBlocos
+Linha Corrigida: 412
+               LFill( IntToStr ( IND_NAT_ACAO ), 2, '0') + //Verificar criação da tabela no ACBrEPCBlocos
+------
+
+Erro: Registro F111. Esta gravando valores inválidos ( 0, 1, 9). Valores Corretos. ( 1, 3, 9)
+
+Unit: 	ACBrEPCBloco_F_Class
+Linha Erro: 580,0581
+          opJusticaFederal : strIND_PROC := '0';
+          opSecexRFB       : strIND_PROC := '1';
+Linha Corrigida: 580, 581
+          opJusticaFederal : strIND_PROC := '1';
+          opSecexRFB       : strIND_PROC := '3';
+------
+
+Erro: Registro F129. Esta gravando valores inválidos ( 0, 1, 9). Valores Corretos. ( 1, 3, 9)
+
+Unit: 	ACBrEPCBloco_F_Class
+Linha Erro: 748, 749
+          opJusticaFederal : strIND_PROC := '0';
+          opSecexRFB       : strIND_PROC := '1';
+Linha Corrigida: 748, 749
+          opJusticaFederal : strIND_PROC := '1';
+          opSecexRFB       : strIND_PROC := '3';
+
+------
+
+Erro: Registro F130. O campo Indicador do Número de Parcelas a serem apropriadas esta sendo reconhecido como data na funcao LFill.
+
+Unit: 	ACBrEPCBloco_F_Class
+Linha Erro: 882
+               LFill( IND_NR_PARC )               +
+Linha Corrigida: 882
+               LFill( IND_NR_PARC, 1 )            +
+
+------
+
+Erro: Registro F139. Esta gravando valores inválidos ( 0, 1, 9). Valores Corretos. ( 1, 3, 9)
+
+Unit: 	ACBrEPCBloco_F_Class
+Linha Erro: 918, 919
+          opJusticaFederal : strIND_PROC := '0';
+          opSecexRFB       : strIND_PROC := '1';
+Linha Corrigida: 918, 919
+          opJusticaFederal : strIND_PROC := '1';
+          opSecexRFB       : strIND_PROC := '3';
+
+------
+
+Erro: Registro F150. Campo Inteiro quando deveria ser Float
+
+Unit: 	ACBrEPCBloco_F
+Linha Erro: 390, 404
+    FEST_IMP                : integer;                          //Parcela do estoque de abertura referente a bens, produtos e mercadorias importados, ou adquiridas no mercado interno sem direito ao crédito
+    property EST_IMP        : integer                 read FEST_IMP        write FEST_IMP;
+Linha Corrigida: 390, 404
+    FEST_IMP                : currency;                         //Parcela do estoque de abertura referente a bens, produtos e mercadorias importados, ou adquiridas no mercado interno sem direito ao crédito
+    property EST_IMP        : currency                read FEST_IMP        write FEST_IMP;
+
+----
+Erro: Registro M500. Acusa um erro
+
+Unit: 	ACBrEPCBloco_M_Class
+Linha Erro: 1012
+               LFill( ALIQ_COFINS_QUANT,0,2,True ) +
+Linha Corrigida: 1012
+               LFill( ALIQ_COFINS_QUANT,0,2 ) +
+
+----
+Erro: Registro M100. Acusa um erro
+
+Unit: 	ACBrEPCBloco_M_Class
+Linha Erro: 462
+               LFill( ALIQ_PIS_QUANT,0,2, True ) +
+Linha Corrigida: 462
+               LFill( ALIQ_PIS_QUANT,0,2, ) +
+
+----
+Erro: Registro C381. Quanto a base e aliquota estao zerados nao esta gravando nada no campo, deveria gravar pelo menos o valor zerado
+
+Unit: 	ACBrEPCBloco_C_Class
+Linha Erro: 1629, 1630
+             LFill(VL_BC_PIS,0,2, True)      +
+             LFill(ALIQ_PIS,8,4, True)       +
+Linha Corrigida: 1629, 1630
+             LFill(VL_BC_PIS,0,2)            +
+             LFill(ALIQ_PIS,8,4)             +
+
+----
+Erro: Registro C385. Quanto a base e aliquota estao zerados nao esta gravando nada no campo, deveria gravar pelo menos o valor zerado
+
+Unit: 	ACBrEPCBloco_C_Class
+Linha Erro: 1695, 1696
+             LFill(VL_BC_COFINS,0,2, True)      +
+             LFill(ALIQ_COFINS,8,4, True)       +
+Linha Corrigida: 1629, 1630
+             LFill(VL_BC_COFINS,0,2)            +
+             LFill(ALIQ_COFINS,8,4)             +

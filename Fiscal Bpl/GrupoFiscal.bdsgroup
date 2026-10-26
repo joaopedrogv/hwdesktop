@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{47B312F4-7D57-4ADB-8D50-ACB4002D3523}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  <Projects>
+      <Projects Name="Fiscal.exe">..\Fiscal.bdsproj</Projects>
+      <Projects Name="PkFormularios.bpl">..\Automacao Bpl\PkFormularios.bdsproj</Projects>
+      <Projects Name="pkAtivos.bpl">..\Ativos\dpk\pkAtivos.bdsproj</Projects>
+      <Projects Name="pkFormPag.bpl">..\Form Pag\dpk\pkFormPag.bdsproj</Projects>
+      <Projects Name="pkEntrada.bpl">..\entrada Bpl\dpk\pkEntrada.bdsproj</Projects>
+      <Projects Name="pkConfigF.bpl">dpk\pkConfigF.bdsproj</Projects>
+      <Projects Name="PkTerminaisF.bpl">..\Automacao Bpl\PkTerminaisF.bdsproj</Projects>
+      <Projects Name="pkTEF.bpl">dpk\pkTEF.bdsproj</Projects>
+      <Projects Name="pkDavF.bpl">dpk\pkDavF.bdsproj</Projects>
+      <Projects Name="PkArquivosDig.bpl">..\ArquivosDigitais\PkArquivosDig.bdsproj</Projects>
+      <Projects Name="pkNfSerieD.bpl">..\Automacao Bpl\dpk\pkNfSerieD.bdsproj</Projects>
+      <Projects Name="pkFiscal.bpl">dpk\pkFiscal.bdsproj</Projects>
+      <Projects Name="Targets">Fiscal.exe PkFormularios.bpl pkAtivos.bpl pkFormPag.bpl pkEntrada.bpl pkConfigF.bpl PkTerminaisF.bpl pkTEF.bpl pkDavF.bpl PkArquivosDig.bpl pkNfSerieD.bpl pkFiscal.bpl</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+	<StarTeamAssociation></StarTeamAssociation>
+	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+</BorlandProject>

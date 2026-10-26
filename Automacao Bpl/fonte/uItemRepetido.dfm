@@ -1,0 +1,432 @@
+object frmItemRepetido: TfrmItemRepetido
+  Left = 0
+  Top = 0
+  BorderIcons = [biMinimize, biMaximize]
+  Caption = 'Item j'#225' incluso'
+  ClientHeight = 198
+  ClientWidth = 503
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poMainFormCenter
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Label1: TLabel
+    Left = 8
+    Top = 8
+    Width = 431
+    Height = 36
+    Caption = 
+      'Deseja alterar o item j'#225' existente ou informar quantidade adicio' +
+      'nal?'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -15
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+    WordWrap = True
+  end
+  object Label195: TLabel
+    Left = 8
+    Top = 75
+    Width = 40
+    Height = 13
+    Caption = 'Grupo: '
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label197: TLabel
+    Left = 8
+    Top = 96
+    Width = 118
+    Height = 13
+    BiDiMode = bdLeftToRight
+    Caption = 'Num Fab / Cod Barra:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentBiDiMode = False
+    ParentFont = False
+  end
+  object Label3: TLabel
+    Left = 50
+    Top = 75
+    Width = 37
+    Height = 13
+    Caption = 'Label3'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlue
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label5: TLabel
+    Left = 132
+    Top = 96
+    Width = 37
+    Height = 13
+    Caption = 'Label5'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlue
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label196: TLabel
+    Left = 160
+    Top = 75
+    Width = 44
+    Height = 13
+    Caption = 'C'#243'digo: '
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label4: TLabel
+    Left = 205
+    Top = 75
+    Width = 37
+    Height = 13
+    Caption = 'Label4'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlue
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label2: TLabel
+    Left = 8
+    Top = 52
+    Width = 37
+    Height = 13
+    Caption = 'Label2'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlue
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label6: TLabel
+    Left = 336
+    Top = 96
+    Width = 47
+    Height = 13
+    BiDiMode = bdLeftToRight
+    Caption = 'N'#186' Item:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentBiDiMode = False
+    ParentFont = False
+  end
+  object Label7: TLabel
+    Left = 389
+    Top = 96
+    Width = 37
+    Height = 13
+    Caption = 'Label7'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlue
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label8: TLabel
+    Left = 8
+    Top = 119
+    Width = 30
+    Height = 13
+    BiDiMode = bdLeftToRight
+    Caption = 'Qtde:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentBiDiMode = False
+    ParentFont = False
+  end
+  object Label9: TLabel
+    Left = 43
+    Top = 119
+    Width = 37
+    Height = 13
+    Caption = 'Label9'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlue
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label10: TLabel
+    Left = 151
+    Top = 119
+    Width = 53
+    Height = 13
+    BiDiMode = bdLeftToRight
+    Caption = 'Valor Uni:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentBiDiMode = False
+    ParentFont = False
+  end
+  object Label11: TLabel
+    Left = 209
+    Top = 119
+    Width = 44
+    Height = 13
+    Caption = 'Label11'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlue
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label12: TLabel
+    Left = 331
+    Top = 119
+    Width = 54
+    Height = 13
+    BiDiMode = bdLeftToRight
+    Caption = 'Valor Tot:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentBiDiMode = False
+    ParentFont = False
+  end
+  object Label13: TLabel
+    Left = 389
+    Top = 119
+    Width = 44
+    Height = 13
+    Caption = 'Label13'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlue
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label14: TLabel
+    Left = 353
+    Top = 75
+    Width = 30
+    Height = 13
+    BiDiMode = bdLeftToRight
+    Caption = 'Qtde:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentBiDiMode = False
+    ParentFont = False
+  end
+  object Label15: TLabel
+    Left = 389
+    Top = 75
+    Width = 37
+    Height = 13
+    Caption = 'Label9'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlue
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Panel3: TPanel
+    Left = 0
+    Top = 150
+    Width = 503
+    Height = 48
+    Align = alBottom
+    BevelKind = bkTile
+    BevelOuter = bvNone
+    TabOrder = 0
+    object BitBtn6: TBitBtn
+      Left = 604
+      Top = 13
+      Width = 75
+      Height = 25
+      Caption = '&Sair'
+      TabOrder = 3
+      Glyph.Data = {
+        2E020000424D2E020000000000002E0100002800000010000000100000000100
+        08000000000000010000120B0000120B00003E0000003E00000000000000FFFF
+        FF00FF00FF00BB410000BB420000FFF6EF00E69C5900E69D5900E9A36200FFF4
+        EA00FFF8F200FECA9500FFCE9C00FFD4A900FEEBD800FEF0E200FFF2E500FFF3
+        E700FFFBF700FECE9C00FED3A500FED5AA00FEDAB400FFDCB600FEDDB800FEDD
+        BA00FFE3C500FEE2C400FFE5C900FFE6CA00FEE5CA00FFEBD500FEF3E700FFDA
+        AD00FFEAD100FFFAF400FFD8A700FFD9A900FFDAAB00FFE1B800FFE7C700FEEE
+        D900FFFBF600FFDCAC00FFE1B500FFE7C400FFEFD700FFEAC200FFFAEA00FFFE
+        FB00FFFFFA00FFFFFE00315EFF002A56FF00123BFF00153DFF001841FF001A44
+        FF001D47FF00072BFF00001EFF00000D66000202020202020202020202020202
+        0202020202020202020202020202020202020204040404040404040404040402
+        020202040132302E28272125242F04020202020401050F221B1614130B260402
+        0202020401310A101F1A170D0C2B04020202020401013323110E1C18152C0402
+        02020204010101332A20291D192D040202020204010101010112093D1E2E043D
+        020202040101010101013D363D013D3C3D020204080606060606073D373D3B3D
+        0202020203040404040404043D383D0202020202020202020202023D353D393D
+        020202020202020202023D343D023D3A3D020202020202020202023D0202023D
+        020202020202020202020202020202020202}
+    end
+    object BitBtn18: TBitBtn
+      Left = 0
+      Top = 0
+      Width = 170
+      Height = 44
+      Hint = 'Alterar - [VND011]'
+      Align = alLeft
+      Caption = 'Alterar'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 0
+      OnClick = BitBtn18Click
+      Glyph.Data = {
+        6E030000424D6E030000000000006E0200002800000010000000100000000100
+        08000000000000010000120B0000120B00008E0000008E00000000000000FFFF
+        FF00FF00FF0062555D00745D65006B5D62008C6D7300A4676900A0656700925C
+        5E00764C4E007D525400633B3C0081535400865151008E575700865252008753
+        5300B6757500B4767600B8797900B2757500B07474008A5B5B0097666600CA8B
+        8B00CE8F8F00CF909000CC8E8E00EFAAA900E2A1A100E1A1A100E6A6A600302D
+        2D007E444200875958008C5E5D00DD908C00E9A4A1009E5D5800D8C2C000DCC7
+        C500955F5600A0675B00A56B5F005B3D37005E3F3900A7756B00583C35005C3F
+        3800DAC1BA00C1836C00BC826800CFB5AA00F8F2EF00D7C1B500FBF4F000FAF3
+        EF00D1926D00F7F2EF00DA9D7500E1CEC000FEF7F200FBF4EF00E7AB7900FAEF
+        E600EBDCCE00FAEFE500D1914F00F8EADC00FAF0E600FEF7F000FCF6F000EEDD
+        CA00DCC1A000F6E0C6009C8F8000F7E5CF00F8EADA00FCF6EF00DCB27A00DCB5
+        8100C2A07400AD926F00917B5E0086725800BFA4800099846800C4AA8900F0D8
+        BA00FFF4E500E9BD7F00E7BC7E00E2B87E00D1AB7400B5976C009A815D00A78C
+        6600CFAF82007D6B51007A695000FEEFDA004B474100F0E5D500FCF3E600FCF7
+        F000E9BF7D00EFC48100CEAA7300FCEACE00FFFEFC00FFFBF000FFFEFB00FFFE
+        F700FFFFFC008F9F9D003745460006BBF0000C98BD00068FC1001E799F002D84
+        A70022576C000393DE00036292000D4663000B3B5400165E820021252700008E
+        DE000263BF003E4145001031D3000320BA000318B200000F95002F45ED000C19
+        B400010B9900010A95002732D000000081000202020202020202020202020202
+        020207070707070707070707070707020202076D594A585662515D5C5B6B0702
+        02022B654B218074575352505C6B070202022B5A4D4C7D7C7E66545F5E6A0702
+        02022F6F45497A7F040B2E55616C080202022F72464E730325140F2D63600902
+        020234013E416705261B151130640D02020234016E484142241E1A1310310A02
+        02023A01016E47433D231F1C160E0C0202023A0101016E694337172019122283
+        02023C010101016E4F6835181D06787676023C01010101017071322A27797581
+        878D4001010101010101292C44777B85868A40383F3939363B3B282C33028288
+        848B403A3A3A3A3A3A3A3A2C0202028C8902}
+    end
+    object BitBtn1: TBitBtn
+      Left = 170
+      Top = 0
+      Width = 170
+      Height = 44
+      Hint = 'Adicionar quantidade ao item'
+      Align = alLeft
+      Caption = 'Adicionar'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 1
+      OnClick = BitBtn1Click
+      Glyph.Data = {
+        7A030000424D7A030000000000007A0200002800000010000000100000000100
+        08000000000000010000120B0000120B0000910000009100000000000000FFFF
+        FF00FF00FF00FBF9F500E5E5DE00F2F2ED00F9F9F700FAFBF900FCFDFF00FBFC
+        FE005B72B1006780C700798BBD007D8EBD009AA5C300738EE300667EC50094A9
+        EB0094A9E6007484B3008FA2DC008192C300F7F9FF00002ED4000231DC000331
+        D8000535E6000734D9001E49E6001E45D00017349B00224CE5001D40BF001939
+        A700244AD700244BD7003159EA003258E6003B64FC004B71FD005075FB005073
+        F500587BFB005B7EFB005C7EFC006283FB005674DE006384FA006B8AFC006F8E
+        FF007694FF00839BF3007E94E5008CA4FA00859AE70099AFFF0095ACF90090A6
+        F0009CB1FF009BB0FB00AABCFD00B3C3FC00B3C3F800B4C3F500BBC9FD00C6CF
+        ED00F1F4FF00EBEEF8000032FE00002DD9000632EA000631DA000C34DF000C34
+        D0000D34D8000D34D700092799001040FF001040FE001B46F5001E4BFE001D47
+        F5001D49F3001E46E600224EFF00224FFD00234CEC002249E1002955FD002A55
+        FF003B62FC003C63FE003D62EE004367F0004B70FC00496AE900496AE6005679
+        FF00587AFB005A7BFD005A7CFD005D7EFD006182FE006685FD006A89FE007491
+        FE007994FE007792F9007891EF008CA4FF0092A8FF0094AAFD00A5B7FF00C3CF
+        FD00D4DDFF00C9D1F000D7DFFF00D6DEFE00D2DAF900D8E0FF00D2D9F700DCE3
+        FF00ECF0FF00DCDFEB00EEF1FD00FAFBFF000029F9000028F3000027D9000023
+        CE000024CE000B37FE00224BFE00E4E7F4000024FB000025F4000025ED000025
+        E600001ED500001EE6000019BD000000990000009500FCFCFF00FEFEFF000202
+        0202028D8D8D8D8D8D02020202020202028C8C2010150D0A1E8E8E0202020202
+        8C4911068573417B04134C8E0202028C4A3F016C5745172234030E4C8E02028C
+        38905D891A5F601B812E070C8E0244567D6B877F5201161C80823605218E4432
+        7A5083845A01015C534723430B8E446E724E61010101010101251978148E4437
+        775868010101010101241876128E446D42645E636701015B51461F7C0F8E4427
+        8F3C6228650101547E8833091D8E024440013B2F2A69664D862908398C020244
+        2B75013D302655596A013E4B8C020202442D71014279747A0135488C02020202
+        0244442C6F703A314F8C8C0202020202020202444444448B8A0202020202}
+    end
+    object BitBtn19: TBitBtn
+      Left = 340
+      Top = 0
+      Width = 159
+      Height = 44
+      Hint = 'Cancelar'
+      Align = alClient
+      Caption = 'Cancelar'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 2
+      OnClick = BitBtn19Click
+      Glyph.Data = {
+        12020000424D1202000000000000120100002800000010000000100000000100
+        08000000000000010000120B0000120B0000370000003700000000000000FFFF
+        FF00FF00FF001442E4001645EB001C4BE7000430EB000C35E4000E3CEB001037
+        DB000027EB00002AEB000027E400012CEB00052BDC00062DE300092ED9000022
+        EB000021E7000020E200001FDC000022DC000020D900001EEB00001FEB000020
+        EB00001DE800001BE300001EE200001FE200001BDF00001CDF00001AEB00001A
+        E2000017DF000019DF00001ADF000011EB000016EB000012E6000010DC000013
+        DC000010D9000009EB00000BEB000008EA000008E700000ADF000004E2000005
+        E2000004DF000005DF000003DB000004DA0000006E0002020202020202020202
+        0202020202020202020202020202020202020202020202020236360202020202
+        0236360202020202361A28360202020236302E36020202023621182A36020236
+        332B34360202020202362419293636312C353602020202020202361E11272D2B
+        3236020202020202020202361B26252F36020202020202020202023612172022
+        36020202020202020202360F06131C0A2336020202020202023607080E363614
+        0B1F3602020202023603041036020236160D1D36020202023605093602020202
+        36150C3602020202023636020202020202363602020202020202020202020202
+        02020202020202020202020202020202020202020202}
+    end
+  end
+end

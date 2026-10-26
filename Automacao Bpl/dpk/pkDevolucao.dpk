@@ -1,0 +1,39 @@
+package pkDevolucao;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  pkAtivos,
+  vcl,
+  pkEditHw;
+
+contains
+  UDevolucao in '..\fonte\UDevolucao.pas' {frmDevolucao},
+  UClassesDevolucao in '..\fonte\UClassesDevolucao.pas',
+  Udtmdevolucao in '..\fonte\Udtmdevolucao.pas' {dtmDevolucao: TDataModule};
+
+end.

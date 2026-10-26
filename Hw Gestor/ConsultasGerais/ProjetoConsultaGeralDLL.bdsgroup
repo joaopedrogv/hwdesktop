@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{C4C1EF42-54AF-49D2-9453-B58BD6896E80}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  <Projects>
+      <Projects Name="PrChamarDLL.exe">PrChamarDLL.bdsproj</Projects>
+      <Projects Name="DLLConsGeral.dll">DLLConsGeral.bdsproj</Projects>
+      <Projects Name="Targets">PrChamarDLL.exe DLLConsGeral.dll</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+</BorlandProject>

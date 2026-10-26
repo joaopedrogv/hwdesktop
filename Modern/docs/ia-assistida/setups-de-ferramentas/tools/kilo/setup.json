@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "tool": "Kilo",
+  "toolRoot": ".kilo",
+  "stateFile": ".kilo/.modern-ai-setup.json",
+  "renderer": "kilo-agents",
+  "agentDestination": ".kilo/agents",
+  "staticFiles": [
+    {
+      "source": "commands/implement-erp-feature.md",
+      "destination": ".kilo/commands/implement-erp-feature.md"
+    },
+    {
+      "source": "commands/manage-ai-tool-setup.md",
+      "destination": ".kilo/commands/manage-ai-tool-setup.md"
+    },
+    {
+      "source": "commands/update-fiscal-calculos.md",
+      "destination": ".kilo/commands/update-fiscal-calculos.md"
+    }
+  ],
+  "disposablePaths": [
+    ".kilo/.gitignore",
+    ".kilo/agent-manager.json",
+    ".kilo/package.json",
+    ".kilo/package-lock.json",
+    ".kilo/node_modules"
+  ],
+  "requiresShared": true
+}

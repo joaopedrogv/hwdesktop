@@ -1,0 +1,69 @@
+object frmGuardUp: TfrmGuardUp
+  Left = 0
+  Top = 0
+  BorderIcons = []
+  BorderStyle = bsNone
+  Caption = 'frmGuardUp'
+  ClientHeight = 42
+  ClientWidth = 463
+  Color = clWhite
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Panel1: TPanel
+    Left = 0
+    Top = 0
+    Width = 463
+    Height = 42
+    Align = alClient
+    BevelOuter = bvNone
+    BorderWidth = 2
+    Color = clBlack
+    ParentBackground = False
+    TabOrder = 0
+    object lbl1: TLabel
+      Left = 2
+      Top = 2
+      Width = 459
+      Height = 17
+      Align = alTop
+      AutoSize = False
+      Caption = 'Status do Sistema'
+      Color = clSilver
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentColor = False
+      ParentFont = False
+      Transparent = False
+      Layout = tlCenter
+      ExplicitWidth = 477
+    end
+    object lblStatus: TLabel
+      Left = 2
+      Top = 19
+      Width = 333
+      Height = 18
+      Align = alClient
+      Caption = 'Hw Update est'#225' sendo atualizado. Aguarde...'
+      Color = clGray
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -15
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+      Layout = tlCenter
+    end
+  end
+end

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "tool": "Shared",
+  "toolRoot": ".agents",
+  "stateFile": ".agents/.modern-ai-setup.json",
+  "renderer": "shared",
+  "staticFiles": [
+    {
+      "source": "rules/00-canonical-routing.md",
+      "destination": ".agents/rules/00-canonical-routing.md"
+    },
+    {
+      "source": "workflows/implement-erp-feature.md",
+      "destination": ".agents/workflows/implement-erp-feature.md"
+    },
+    {
+      "source": "workflows/update-fiscal-calculos.md",
+      "destination": ".agents/workflows/update-fiscal-calculos.md"
+    }
+  ],
+  "skillWrapperDestination": ".agents/skills",
+  "commandSkillWrapperDestination": ".agents/skills"
+}

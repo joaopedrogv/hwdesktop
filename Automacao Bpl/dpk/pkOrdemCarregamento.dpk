@@ -1,0 +1,47 @@
+package pkOrdemCarregamento;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  pkAtivos,
+  vcl,
+  vcldb,
+  dbrtl,
+  PkFormularios,
+  pkEditHw;
+
+contains
+  uDtmOrdemCarregamento in '..\fonte\uDtmOrdemCarregamento.pas' {dtmOrdemCarregamento: TDataModule},
+  uCadSetor in '..\fonte\uCadSetor.pas' {frmCadSetor},
+  uClassesOrdemCarregamento in '..\fonte\uClassesOrdemCarregamento.pas',
+  uCadLocalidade in '..\fonte\uCadLocalidade.pas' {frmCadLocalidade},
+  uCadVeiculoTransporte in '..\fonte\uCadVeiculoTransporte.pas' {frmCadVeicTransp},
+  uCadOrdemCarregamento in '..\fonte\uCadOrdemCarregamento.pas' {frmCadOrdemCarregamento},
+  uMontaOrdemCarregamento in '..\fonte\uMontaOrdemCarregamento.pas' {frmMontaOrdemCarregamento},
+  uHistoricoEntregas in '..\fonte\uHistoricoEntregas.pas' {frmHistoricoEntregas};
+
+end.

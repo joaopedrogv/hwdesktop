@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{047D3506-1E45-4F7F-A269-BE6707A826E0}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  <Projects>
+      <Projects Name="HwSistemas.exe">..\HwSistemas.bdsproj</Projects>
+      <Projects Name="pkPedidoVenda.bpl">..\Automacao Bpl\dpk\pkPedidoVenda.bdsproj</Projects>
+      <Projects Name="pkAutomacao.bpl">..\Automacao Bpl\dpk\pkAutomacao.bdsproj</Projects>
+      <Projects Name="PkFormularios.bpl">..\Automacao Bpl\PkFormularios.bdsproj</Projects>
+      <Projects Name="pkAtivos.bpl">..\Ativos\dpk\pkAtivos.bdsproj</Projects>
+      <Projects Name="pkEntrada.bpl">..\entrada Bpl\dpk\pkEntrada.bdsproj</Projects>
+      <Projects Name="pkFormPag.bpl">..\Form Pag\dpk\pkFormPag.bdsproj</Projects>
+      <Projects Name="pkbalcao.bpl">dpk\pkbalcao.bdsproj</Projects>
+      <Projects Name="PkOficina.bpl">dpk\PkOficina.bdsproj</Projects>
+      <Projects Name="PkPrestacoes.bpl">dpk\PkPrestacoes.bdsproj</Projects>
+      <Projects Name="pkCxlAuxiliar.bpl">dpk\pkCxlAuxiliar.bdsproj</Projects>
+      <Projects Name="Targets">HwSistemas.exe pkPedidoVenda.bpl pkAutomacao.bpl PkFormularios.bpl pkAtivos.bpl pkEntrada.bpl pkFormPag.bpl pkbalcao.bpl PkOficina.bpl PkPrestacoes.bpl pkCxlAuxiliar.bpl</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+	<StarTeamAssociation></StarTeamAssociation>
+	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+</BorlandProject>

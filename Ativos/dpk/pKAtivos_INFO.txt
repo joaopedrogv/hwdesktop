@@ -1,0 +1,25 @@
+-- REUTILIZÁVEIS --
+ÍNDICES - 1;
+
+-- ÍNDICE --
+1 - RELATÓRIOS COM GRID     
+2 - RESTRUTURAÇÃO
+        2.1 - UTILIZAÇÃO
+
+
+
+
+-- TEXTO --
+1 - Para relatórios que utilizem DBGRID utilizar UGridPesquisa. ex:. ULocalizar
+2 - RESTRUTURAÇÃO
+        2.1 - Antes de colocar o código verificar a versão no formulário uRestruturacao.pas
+        e colocar no início do código a versão, menos na aba tsHwF e na
+        aba tsOutros pois estes são atualizados tudo sempre que ocorre uma atualização.
+        Colocar em uma linha campos,tabelas,fk,pk, indices, etc...,
+        nas abas de alteração no banco utilizar as abas tshw, tshwf,tsfiscal.
+        Para processos a aba tsprocessos  e no código da empresa colocar :COD_EMPRESA
+        Utilizar tsOutros para triggers e procedures views, colocar 'inicio' (código)  'fim'
+        Na aba tsoutros e na aba tshw modificar versão no procedimento do formulário
+        uRestruturacao.pas setVariaveisVersao na variável pVersaoBancoHw,
+        os demais nas respectivas variáveis.
+

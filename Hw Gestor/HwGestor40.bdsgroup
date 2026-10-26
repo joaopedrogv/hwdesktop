@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{48B6459B-42E2-4C05-AE5D-CA39BB29E148}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  <Projects>
+      <Projects Name="HwSistemas.exe">..\HwSistemas.bdsproj</Projects>
+      <Projects Name="pkAtivos.bpl">..\Ativos\dpk\pkAtivos.bdsproj</Projects>
+      <Projects Name="PkFormularios.bpl">..\Automacao Bpl\PkFormularios.bdsproj</Projects>
+      <Projects Name="pkMargem.bpl">..\Automacao Bpl\dpk\pkMargem.bdsproj</Projects>
+      <Projects Name="PkGestorChilds.bpl">PkGestorChilds.bdsproj</Projects>
+      <Projects Name="pkGestor.bpl">pkGestor.bdsproj</Projects>
+      <Projects Name="PkprovisVeic.bpl">PkprovisVeic.bdsproj</Projects>
+      <Projects Name="pkEquipamentos.bpl">..\Automacao Bpl\dpk\pkEquipamentos.bdsproj</Projects>
+      <Projects Name="Targets">HwSistemas.exe pkAtivos.bpl PkFormularios.bpl pkMargem.bpl PkGestorChilds.bpl pkGestor.bpl PkprovisVeic.bpl pkEquipamentos.bpl</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+	<StarTeamAssociation></StarTeamAssociation>
+	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+</BorlandProject>

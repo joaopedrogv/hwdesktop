@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{FF7071BF-9114-4EA2-B9EB-D2CCF5D12900}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  <Projects>
+      <Projects Name="cons40.dll">..\Registro40\cons40.bdsproj</Projects>
+      <Projects Name="HwSistemas.exe">..\HwSistemas.bdsproj</Projects>
+      <Projects Name="pkReestrutura.bpl">..\Ativos\dpk\pkReestrutura.bdsproj</Projects>
+      <Projects Name="PkFormularios.bpl">PkFormularios.bdsproj</Projects>
+      <Projects Name="pkAtivos.bpl">..\Ativos\dpk\pkAtivos.bdsproj</Projects>
+      <Projects Name="pkModern.bpl">..\Modern\package\pkModern.bdsproj</Projects>
+      <Projects Name="pkFiscal.bpl">..\Ativos\dpk\pkFiscal.bdsproj</Projects>
+      <Projects Name="pkEntrada.bpl">..\entrada Bpl\dpk\pkEntrada.bdsproj</Projects>
+      <Projects Name="pkBoletos.bpl">dpk\pkBoletos.bdsproj</Projects>
+      <Projects Name="pkFormPag.bpl">..\Form Pag\dpk\pkFormPag.bdsproj</Projects>
+      <Projects Name="pkCadastrosBasicos.bpl">dpk\pkCadastrosBasicos.bdsproj</Projects>
+      <Projects Name="pkClientes.bpl">dpk\pkClientes.bdsproj</Projects>
+      <Projects Name="pkVeiculos.bpl">dpk\pkVeiculos.bdsproj</Projects>
+      <Projects Name="pkSugestaoCompras.bpl">dpk\pkSugestaoCompras.bdsproj</Projects>
+      <Projects Name="pkProdutos.bpl">dpk\pkProdutos.bdsproj</Projects>
+      <Projects Name="pkEquipamentos.bpl">dpk\pkEquipamentos.bdsproj</Projects>
+      <Projects Name="pkNfSerieD.bpl">dpk\pkNfSerieD.bdsproj</Projects>
+      <Projects Name="pkMargem.bpl">dpk\pkMargem.bdsproj</Projects>
+      <Projects Name="pkPAF.bpl">..\Fiscal Bpl\dpk\pkPAF.bdsproj</Projects>
+      <Projects Name="pkPedidoVenda.bpl">dpk\pkPedidoVenda.bdsproj</Projects>
+      <Projects Name="pkConfig.bpl">dpk\pkConfig.bdsproj</Projects>
+      <Projects Name="pkColaborador.bpl">dpk\pkColaborador.bdsproj</Projects>
+      <Projects Name="pkMvaAjustada.bpl">dpk\pkMvaAjustada.bdsproj</Projects>
+      <Projects Name="pkRecibo.bpl">dpk\pkRecibo.bdsproj</Projects>
+      <Projects Name="PkGestorChilds.bpl">..\Hw Gestor\PkGestorChilds.bdsproj</Projects>
+      <Projects Name="pkGestor.bpl">..\Hw Gestor\pkGestor.bdsproj</Projects>
+      <Projects Name="pkSPED.bpl">..\SPED\dpk\pkSPED.bdsproj</Projects>
+      <Projects Name="pkNF.bpl">dpk\pkNF.bdsproj</Projects>
+      <Projects Name="pkbalcao.bpl">..\Cxl Bpl\dpk\pkbalcao.bdsproj</Projects>
+      <Projects Name="PkOficina.bpl">..\Cxl Bpl\dpk\PkOficina.bdsproj</Projects>
+      <Projects Name="PkPrestacoes.bpl">..\Cxl Bpl\dpk\PkPrestacoes.bdsproj</Projects>
+      <Projects Name="pkImportFinanceiro.bpl">..\Caixa Bpl\dpk\pkImportFinanceiro.bdsproj</Projects>
+      <Projects Name="pkEstoqueECF.bpl">dpk\pkEstoqueECF.bdsproj</Projects>
+      <Projects Name="pkDevolucao.bpl">dpk\pkDevolucao.bdsproj</Projects>
+      <Projects Name="pkVeiculosCCIA.bpl">dpk\pkVeiculosCCIA.bdsproj</Projects>
+      <Projects Name="pkCadastrosBasicosCx.bpl">..\Caixa Bpl\dpk\pkCadastrosBasicosCx.bdsproj</Projects>
+      <Projects Name="pkRelatorios.bpl">dpk\pkRelatorios.bdsproj</Projects>
+      <Projects Name="pkCalculoComissao.bpl">dpk\pkCalculoComissao.bdsproj</Projects>
+      <Projects Name="pkLancamentos.bpl">..\Caixa Bpl\dpk\pkLancamentos.bdsproj</Projects>
+      <Projects Name="pkContasAPagar.bpl">..\Caixa Bpl\dpk\pkContasAPagar.bdsproj</Projects>
+      <Projects Name="pkContasAReceber.bpl">..\Caixa Bpl\dpk\pkContasAReceber.bdsproj</Projects>
+      <Projects Name="pkProducao.bpl">dpk\pkProducao.bdsproj</Projects>
+      <Projects Name="pkOrdemCarregamento.bpl">dpk\pkOrdemCarregamento.bdsproj</Projects>
+      <Projects Name="pkMobile.bpl">dpk\pkMobile.bdsproj</Projects>
+      <Projects Name="pkFabrica.bpl">dpk\pkFabrica.bdsproj</Projects>
+      <Projects Name="pkNFConsumidor.bpl">dpk\pkNFConsumidor.bdsproj</Projects>
+      <Projects Name="pkConsultasOLAP.bpl">..\Hw Gestor\ConsultasGerais\dpk\pkConsultasOLAP.bdsproj</Projects>
+      <Projects Name="pkAutomacao.bpl">dpk\pkAutomacao.bdsproj</Projects>
+      <Projects Name="pkCxlAuxiliar.bpl">..\Cxl Bpl\dpk\pkCxlAuxiliar.bdsproj</Projects>
+      <Projects Name="Targets">cons40.dll HwSistemas.exe pkReestrutura.bpl PkFormularios.bpl pkAtivos.bpl pkModern.bpl pkFiscal.bpl pkEntrada.bpl pkBoletos.bpl pkFormPag.bpl pkCadastrosBasicos.bpl pkClientes.bpl pkVeiculos.bpl pkSugestaoCompras.bpl pkProdutos.bpl pkEquipamentos.bpl pkNfSerieD.bpl pkMargem.bpl pkPAF.bpl pkPedidoVenda.bpl pkConfig.bpl pkColaborador.bpl pkMvaAjustada.bpl pkRecibo.bpl PkGestorChilds.bpl pkGestor.bpl pkSPED.bpl pkNF.bpl pkbalcao.bpl PkOficina.bpl PkPrestacoes.bpl pkImportFinanceiro.bpl pkEstoqueECF.bpl pkDevolucao.bpl pkVeiculosCCIA.bpl pkCadastrosBasicosCx.bpl pkRelatorios.bpl pkCalculoComissao.bpl pkLancamentos.bpl pkContasAPagar.bpl pkContasAReceber.bpl pkProducao.bpl pkOrdemCarregamento.bpl pkMobile.bpl pkFabrica.bpl pkNFConsumidor.bpl pkConsultasOLAP.bpl pkAutomacao.bpl pkCxlAuxiliar.bpl</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+	<StarTeamAssociation></StarTeamAssociation>
+	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+</BorlandProject>

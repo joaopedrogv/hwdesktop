@@ -1,0 +1,61 @@
+package pkFabrica;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  vcl,
+  vcldb,
+  dbrtl,
+  vclx,
+  BarcodeRunD2006,
+  QRBarcodeRunD2006,
+  dcl7cr10,
+  dsnap,
+  ibxpress,
+  DelPrint2006,
+  vcljpg,
+  designide,
+  xmlrtl,
+  vclactnband,
+  QR5RunD2006,
+  bdertl,
+  pkEditMoeda,
+  pkContasAPagar,
+  pkProdutos,
+  pkAtivos;
+
+contains
+  uDtmFabrica in '..\fonte\uDtmFabrica.pas' {dtmFabrica},
+  URelHonda in '..\fonte\URelHonda.pas' {frmRelHonda},
+  UClassesFabrica in '..\fonte\UClassesFabrica.pas',
+  UintegraHonda in '..\fonte\UintegraHonda.pas' {FrmIntegraHonda},
+  UFabrica in '..\fonte\UFabrica.pas' {FrmFabrica},
+  UAcompanhaEnvAssohonda in '..\fonte\UAcompanhaEnvAssohonda.pas' {FrmEnvAssoHonda},
+  UcadintegraAssohonda in '..\fonte\UcadintegraAssohonda.pas' {FrCadIntegraAssoHonda},
+  UIntegraYamaha in '..\fonte\UIntegraYamaha.pas' {FrmIntegraYamaha};
+
+end.

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "tool": "AiderDesk",
+  "toolRoot": ".aider-desk",
+  "stateFile": ".aider-desk/.modern-ai-setup.json",
+  "renderer": "aider-desk-agents",
+  "agentDestination": ".aider-desk/agents",
+  "presetFile": "presets.json",
+  "staticFiles": [
+    {
+      "source": "commands/implement-erp-feature.md",
+      "destination": ".aider-desk/commands/implement-erp-feature.md"
+    },
+    {
+      "source": "commands/manage-ai-tool-setup.md",
+      "destination": ".aider-desk/commands/manage-ai-tool-setup.md"
+    },
+    {
+      "source": "commands/update-fiscal-calculos.md",
+      "destination": ".aider-desk/commands/update-fiscal-calculos.md"
+    }
+  ],
+  "skillWrapperDestination": ".aider-desk/skills",
+  "requiresShared": true
+}

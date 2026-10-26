@@ -1,0 +1,5 @@
+# Formato: NomeDoPacote;CaminhoRelativoDoDPK;TipoDeBuild
+# Tipos de Build: NORMAL (padrao) ou SQL_RES (apenas para pkReestrutura)
+# Linhas iniciadas com # sao ignoradas.
+
+pkReestrutura;..\Ativos\dpk;SQL_RES

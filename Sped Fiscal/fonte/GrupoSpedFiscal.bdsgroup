@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{9379DC76-E358-4CC4-A29E-0D1FF4E4852E}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  <Projects>
+      <Projects Name="PrTesteSpedFiscal.exe">PrTesteSpedFiscal.bdsproj</Projects>
+      <Projects Name="SpedFiscal.dll">SpedFiscal.bdsproj</Projects>
+      <Projects Name="Targets">PrTesteSpedFiscal.exe SpedFiscal.dll</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+</BorlandProject>

@@ -1,0 +1,111 @@
+package pkCadastrosBasicos;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+{%File 'pkCadastrosBasicos_INFO.txt'}
+
+requires
+  rtl,
+  vcl,
+  vcldb,
+  dbrtl,
+  pkAtivos,
+  PkFormularios,
+  bdertl,
+  QR5RunD2006,
+  vcljpg,
+  vclx,
+  pkSugestaoCompras,
+  dsnap,
+  ibxpress,
+  DelPrint2006,
+  VclSmp,
+  designide,
+  xmlrtl,
+  vclactnband,
+  pkFiscal,
+  pkEditHw;
+
+contains
+  UDtmCadastrosBasicos in '..\fonte\UDtmCadastrosBasicos.pas' {DtmCadBasicos: TDataModule},
+  UCadDepartamentos in '..\fonte\UCadDepartamentos.pas' {FrmCadDepartamento},
+  UClassesCadastrosBasicos in '..\fonte\UClassesCadastrosBasicos.pas',
+  UCadMarcas in '..\fonte\UCadMarcas.pas' {FrmCadMarcas},
+  UCadPpsProduto in '..\fonte\UCadPpsProduto.pas' {FrmCadPpsProduto},
+  UcadNaturezaOperacao in '..\fonte\UcadNaturezaOperacao.pas' {frmCadNaturezaOperacao},
+  UCadCondicaoPagamento in '..\fonte\UCadCondicaoPagamento.pas' {frmCondicaoPagamento},
+  UcadControleFaturamento in '..\fonte\UcadControleFaturamento.pas' {frmControleFaturamento},
+  UcadTransportador in '..\fonte\UcadTransportador.pas' {frmCadTransportador},
+  UcadPerfil in '..\fonte\UcadPerfil.pas' {frmCadPerfil},
+  UcadSenha in '..\fonte\UcadSenha.pas' {frmCadSenha},
+  UcadContador in '..\fonte\UcadContador.pas' {frmCadContador},
+  UcadEmpresa in '..\fonte\UcadEmpresa.pas' {frmCadEmpresa},
+  UCadImpressoras_CNIEE in '..\fonte\UCadImpressoras_CNIEE.pas' {frmCadImpressoras},
+  UCadEstados in '..\fonte\UCadEstados.pas' {FrmCadEstados},
+  UCadBairros in '..\fonte\UCadBairros.pas' {FrmCadBairros},
+  UCadCidades in '..\fonte\UCadCidades.pas' {FrmCadCidades},
+  uCSTMudGeral in '..\fonte\uCSTMudGeral.pas' {FrmCSTMudGeral},
+  UMudCFOP in '..\fonte\UMudCFOP.pas' {FrmMudCFOP},
+  UcadDNAEmpresa in '..\fonte\UcadDNAEmpresa.pas' {FrmcadDNAEmpresa},
+  UCadCores in '..\fonte\UCadCores.pas' {frmCadCores},
+  UCadCombustivel in '..\fonte\UCadCombustivel.pas' {frmCadCombustivel},
+  UCadTipoPendencia in '..\fonte\UCadTipoPendencia.pas' {frmCadTipoPendencia},
+  UCadEspecie in '..\fonte\UCadEspecie.pas' {frmCadEspecie},
+  UCadTipoDespesa in '..\fonte\UCadTipoDespesa.pas' {frmCadTipoDespesa},
+  UCadCEP in '..\fonte\UCadCEP.pas' {frmCadCEP},
+  UCadTAG in '..\fonte\UCadTAG.pas' {frmCadTAG},
+  UCadContrato in '..\fonte\UCadContrato.pas' {frmCadContrato},
+  UEditor in '..\fonte\UEditor.pas' {frmEditor},
+  UListar in '..\fonte\UListar.pas' {frmListar},
+  UCadOpcionais in '..\fonte\UCadOpcionais.pas' {frmCadOpcionais},
+  UCadKitsOpcionais in '..\fonte\UCadKitsOpcionais.pas' {frmCadKitsOpcionais},
+  uCadBox in '..\fonte\uCadBox.pas' {frmCadBox},
+  uCadFeriado in '..\fonte\uCadFeriado.pas' {frmCadFeriado},
+  uCadModeloCartas in '..\fonte\uCadModeloCartas.pas' {frmCadModeloCartas},
+  ucadTipoVendas in '..\fonte\ucadTipoVendas.pas' {frmCadTipoVendas},
+  uCadMetasComissao in '..\fonte\uCadMetasComissao.pas' {frmCadMetasComissao},
+  uCadMetasVendas in '..\fonte\uCadMetasVendas.pas' {frmCadMetasVendas},
+  uCadPerfisMetas in '..\fonte\uCadPerfisMetas.pas' {frmCadMetasPerfis},
+  UEditorCartas in '..\fonte\UEditorCartas.pas' {frmEditorCartas},
+  uCadRegrasVendas in '..\fonte\uCadRegrasVendas.pas' {FrmCadRegrasVendas},
+  uCadTipoReserva in '..\fonte\uCadTipoReserva.pas' {frmCadTipoReserva},
+  uCadRegrasSugestao in '..\fonte\uCadRegrasSugestao.pas' {frmCadRegrasSugestao},
+  uSugestaoServico in '..\fonte\uSugestaoServico.pas' {frmSugestaoServico},
+  UCondPagParcelamento in '..\fonte\UCondPagParcelamento.pas' {frmCondPagParcelamento},
+  uCadEmpresa_RepInterna in '..\fonte\uCadEmpresa_RepInterna.pas' {frmCadEmpresaRepInterna},
+  uClassesReplicaoInterna in '..\fonte\uClassesReplicaoInterna.pas',
+  uCadComissaoFaixaDesconto in '..\fonte\uCadComissaoFaixaDesconto.pas' {frmCadComissaoFaixaDesconto},
+  uCadRegrasTravOsReq in '..\fonte\uCadRegrasTravOsReq.pas' {frmCadRegrasTravReqOS},
+  uCadOperacaoFiscal in '..\fonte\uCadOperacaoFiscal.pas' {frmCadOperacaoFiscal},
+  uClassesOperacaoFiscal in '..\fonte\uClassesOperacaoFiscal.pas',
+  uImagensDoc in '..\fonte\uImagensDoc.pas' {frmImagensDoc},
+  uCadConciliacaoEventosDescr in '..\fonte\uCadConciliacaoEventosDescr.pas' {frmCadConciliacaoEventosDescr},
+  uCadEmpresaAdq in '..\fonte\uCadEmpresaAdq.pas' {frmCadEmpresaAdq},
+  uCadConciliacaoTipoLanc in '..\fonte\uCadConciliacaoTipoLanc.pas' {frmCadConciliacaoTipoLanc},
+  uCadPerfilHorasTrabalho in '..\fonte\uCadPerfilHorasTrabalho.pas' {frmCadPerfilHorasTrabalho},
+  uProdutosEC_CA in '..\fonte\uProdutosEC_CA.pas' {frmProdutosEC_CA},
+  UListaCamposSql in '..\fonte\UListaCamposSql.pas' {frmListarCamposSql};
+
+end.

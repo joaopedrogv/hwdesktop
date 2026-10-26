@@ -1,0 +1,108 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{C6C6EE56-88E7-4330-9E05-86DF339D84C3}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="..\..\Utilitario\Criptografia\CriptografiaUtils.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\package\MirrorPacote.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\EFD\hw.efd.dx.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\HWNFeDX\hw.nfe.dx.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ERP.UnitTests\ERPUnitTests.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ERP.IntegrationTests\ERPIntegrationTests.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Fiscal.Calculos.Tests\FiscalCalculosTests.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="CriptografiaUtils">
+        <MSBuild Projects="..\..\Utilitario\Criptografia\CriptografiaUtils.dproj"/>
+    </Target>
+    <Target Name="CriptografiaUtils:Clean">
+        <MSBuild Projects="..\..\Utilitario\Criptografia\CriptografiaUtils.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CriptografiaUtils:Make">
+        <MSBuild Projects="..\..\Utilitario\Criptografia\CriptografiaUtils.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="MirrorPacote">
+        <MSBuild Projects="..\package\MirrorPacote.dproj"/>
+    </Target>
+    <Target Name="MirrorPacote:Clean">
+        <MSBuild Projects="..\package\MirrorPacote.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MirrorPacote:Make">
+        <MSBuild Projects="..\package\MirrorPacote.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="hw_efd_dx">
+        <MSBuild Projects="..\..\EFD\hw.efd.dx.dproj"/>
+    </Target>
+    <Target Name="hw_efd_dx:Clean">
+        <MSBuild Projects="..\..\EFD\hw.efd.dx.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="hw_efd_dx:Make">
+        <MSBuild Projects="..\..\EFD\hw.efd.dx.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="hw_nfe_dx">
+        <MSBuild Projects="..\..\HWNFeDX\hw.nfe.dx.dproj"/>
+    </Target>
+    <Target Name="hw_nfe_dx:Clean">
+        <MSBuild Projects="..\..\HWNFeDX\hw.nfe.dx.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="hw_nfe_dx:Make">
+        <MSBuild Projects="..\..\HWNFeDX\hw.nfe.dx.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ERPUnitTests">
+        <MSBuild Projects="ERP.UnitTests\ERPUnitTests.dproj"/>
+    </Target>
+    <Target Name="ERPUnitTests:Clean">
+        <MSBuild Projects="ERP.UnitTests\ERPUnitTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ERPUnitTests:Make">
+        <MSBuild Projects="ERP.UnitTests\ERPUnitTests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ERPIntegrationTests">
+        <MSBuild Projects="ERP.IntegrationTests\ERPIntegrationTests.dproj"/>
+    </Target>
+    <Target Name="ERPIntegrationTests:Clean">
+        <MSBuild Projects="ERP.IntegrationTests\ERPIntegrationTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ERPIntegrationTests:Make">
+        <MSBuild Projects="ERP.IntegrationTests\ERPIntegrationTests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="FiscalCalculosTests">
+        <MSBuild Projects="Fiscal.Calculos.Tests\FiscalCalculosTests.dproj"/>
+    </Target>
+    <Target Name="FiscalCalculosTests:Clean">
+        <MSBuild Projects="Fiscal.Calculos.Tests\FiscalCalculosTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FiscalCalculosTests:Make">
+        <MSBuild Projects="Fiscal.Calculos.Tests\FiscalCalculosTests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="CriptografiaUtils;MirrorPacote;hw_efd_dx;hw_nfe_dx;ERPUnitTests;ERPIntegrationTests;FiscalCalculosTests"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="CriptografiaUtils:Clean;MirrorPacote:Clean;hw_efd_dx:Clean;hw_nfe_dx:Clean;ERPUnitTests:Clean;ERPIntegrationTests:Clean;FiscalCalculosTests:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="CriptografiaUtils:Make;MirrorPacote:Make;hw_efd_dx:Make;hw_nfe_dx:Make;ERPUnitTests:Make;ERPIntegrationTests:Make;FiscalCalculosTests:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

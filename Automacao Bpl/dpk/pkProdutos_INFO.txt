@@ -1,0 +1,44 @@
+ -- ÍNDICE --
+1 - CONFIGURAÇÃO DO BALANÇO
+        1.1 - CONFIG.INI - [Automacao]
+                1.1.0 - SUPERMECADO
+                1.1.1 - AUTOINC
+                1.1.2 - AUTOINCGRADE
+                1.1.3 - SUBOUSOMA
+        1.2 - EMPRESA
+                1.2.0 - MASCARA DE DIGITOS
+                1.2.1 - IDENTIFICAÇÃO DE EMPRESA QUE UTILIZA PEDIDO DE PRODUÇÃO
+        1.2 - CRIAR ATALHO .EXE
+
+-- TEXTO --
+1 - CONFIGURAÇÃO DO BALANÇO
+        1.1 - CONFIG.INI  - [Automacao]
+                1.1.0 - SUPERMECADO
+                        - Informa se a empresa a qual que está realizando o
+                        balanço é um supermecado.
+                1.1.1 - AUTOINC
+                        - Indica que será inserido mais 1 quando passar o produto
+                1.1.2 - AUTOINCGRADE
+                        - Indica que será inserido mais 1 quando passar o produto com grade
+                1.1.3 - SUBOUSOMA
+                        - "N" indica que será acrescentado ao valor que está contado,
+                         e "S" indica que será substituído do valor que está contado
+                1.1.4 - DIFERENCAESTOQUE
+                        - "S" indica que o estoque será
+                        feito pela diferença da quantidade que está no
+                        estoque, e "N" indica que será feita a substuíção
+                        do valor que está em estoque
+        1.2 - CRIAR ATALHO .EXE
+                - C:\Projeto_Fiscal40\bpl\HwSistemas.exe pkIntegracao TfrmIntegracao -aBALANCO
+        1.2 - EMPRESA
+                (Tela: Configurações do sistema -> Venda)
+                1.2.0 - MASCARA DE DIGITOS
+                        - Máscara para o código de grupo no cadastro de número
+                        de fabricação. Quando um produto tiver grade o produto
+                        poderá ser localizado pela composição:
+                        'G-'+'CodEmpresa'+'Grupo'+'Codigo'+'Grade'
+                1.2.1 - TRANSFORMAÇÃO PRODUÇÃO
+                        - No cadastro do produto, se a empresa utilizar
+                        indice técnico para produção, no cadastro do produto
+                        ele exige que o campo tipo de item na guia Informações
+                        fiscais seja informado.

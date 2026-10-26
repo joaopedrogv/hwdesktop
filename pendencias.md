@@ -1,0 +1,24 @@
+-P-001: Remover dos fontes/instaladores/hwupdate.
+    - AsstHW.dll
+    - BemaFI32.dll
+    - BemaMFD.dll
+    - BemaMFD2.dll
+    - CONVECF.dll
+    - Daruma32.dll
+    - DLLConsGeral.dll
+    - Elgin.dll
+    - InterfaceEpson.dll
+    - lfdHW.dll
+    - Mp20fi32.dll
+    - NFSe_Util.dll
+    - NFSe_Util.tlb
+    - SpedFiscal.dll
+    - SPEDPISCOFINS.dll
+    - SWecf.dll
+    - SWMFD.DLL
+
+-P-002: uDataSet_OOP.TManutencaoAlteracoesArquivosPAF, remover.
+-P-003: Remover referencia SincDocHW.
+-P-004: Remover referencias vDadosIni.Sign_RSA_MD5_SomenteTexto
+-P-005: Certificar que BCLW32.DLL, borlndmm.dll estão direcionadas para System32.
+-P-006: Limpar 

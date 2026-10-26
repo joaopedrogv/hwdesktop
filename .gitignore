@@ -1,0 +1,83 @@
+# Ignorar as entradas da raiz
+/*
+
+# Acompanhar o próprio filtro
+!/.gitignore
+
+# Descartáveis dentro das áreas liberadas
+.svn/
+_history/
+*.res
+*.dcu
+*.identcache
+*.local
+*.~*
+
+# Remoção recursiva para adição individual posterior
+bpl/*
+scripts/*
+Utilitario/*
+
+# Diretórios versionados
+!/_automation
+!/Cxl Bpl
+!/ArquivosDigitais
+!/Ativos
+# !/Auditoria DLL
+# !/auditoria dx
+!/Automacao Bpl
+!/bpl
+!/Caixa Bpl
+# !/CapturarFoto DLL
+# !/COMPACTA DLL
+# !/Compatibilidade
+!/EFD
+!/entrada Bpl
+!/Fiscal Bpl
+!/Form Pag
+# !/graphic32
+!/Hw Gestor
+!/Hw Update
+!/HWNFeDX
+# !/HwPosPrinter
+# !/HWSDK # O projeto ficou com muitas dependencias
+!/lib
+!/Modern
+!/Relatorios
+!/scripts
+!/SPED
+!/Sped Fiscal
+!/Sped PIS COFINS
+!/Utilitario
+!/Utils
+
+# Remoções especificas
+Hw Gestor/Documentação/
+HWNFeDX/ERP-ACBr-*.groupproj
+Automacao Bpl/ERP-*.bdsgroup
+
+# Permite Bpl - Diretório de saída de compilacao
+!/bpl/*.rpt
+!/bpl/Config.ini.txt
+!/bpl/resourceshw*.*
+
+# Permite em Scripts
+!/scripts/versoes/
+
+# Permite em Utilitario
+!/Utilitario/HW.UTILS.DX
+!/Utilitario/md5XE3
+
+# Exclusões especificas
+_automation/config/config-paths.bat
+_automation/config/segredos.md
+_automation/temp/
+
+### Exclusivo para RAIZ, arquivos e extensoes
+!/*.pas
+!/*.dfm
+!/HwSistemas.bdsproj
+!/HwSistemas.dpr
+!/HwSistemas.cfg
+!/HwSistemas.res
+!/pendencias.md

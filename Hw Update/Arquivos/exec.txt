@@ -1,0 +1,8 @@
+#### Aqui ficam os arquivos que devem ser executados depois da copia e depois dos registros
+#### O parametro "A" antes do nome do arquivo indica que deve aguardar o termino da execucao ou nao
+#### Cada diretorio se necessario devera ter um arquivo deste
+#### pois o sistema vai procurar no diretorio em questao
+#### Ao montar este arquivo remova estas linhas de comentario
+#### Exemplo abaixo
+A xuxador.exe
+  xuxador2.exe

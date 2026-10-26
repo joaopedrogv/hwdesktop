@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{1E1060E2-73F3-4946-9202-F2A531C049C3}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  <Projects>
+      <Projects Name="SPEDPISCOFINS.dll">SPEDPISCOFINS.bdsproj</Projects>
+      <Projects Name="prTesteSPEDPISCOFINS.exe">prTesteSPEDPISCOFINS.bdsproj</Projects>
+      <Projects Name="SPEDPisCofins.exe">..\..\..\func\acbrnfe\Exemplos\ACBrSPED\Delphi\PisCofins\SPEDPisCofins.bdsproj</Projects>
+      <Projects Name="Targets">SPEDPISCOFINS.dll prTesteSPEDPISCOFINS.exe SPEDPisCofins.exe</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+	<StarTeamAssociation></StarTeamAssociation>
+	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+</BorlandProject>

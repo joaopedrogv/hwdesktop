@@ -1,0 +1,110 @@
+package pkPedidoVenda;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  pkAtivos,
+  pkEntrada,
+  vcl,
+  vcldb,
+  dbrtl,
+  dsnap,
+  ibxpress,
+  bdertl,
+  vcldbx,
+  PkFormularios,
+  vclx,
+  pkClientes,
+  DelPrint2006,
+  VclSmp,
+  designide,
+  xmlrtl,
+  vclactnband,
+  pkPAF,
+  pkFormPag,
+  pkProdutos,
+  pkEditMoeda,
+  pkVeiculos,
+  pkEquipamentos,
+  pkMargem,
+  pkFiscal,
+  pkEditHw;
+
+contains
+  UClassesPedVenda in '..\fonte\UClassesPedVenda.pas',
+  uDtmPedVenda in '..\fonte\uDtmPedVenda.pas' {DtmPedVenda: TDataModule},
+  uImpPedVenda in '..\fonte\uImpPedVenda.pas' {frmImpPedVenda},
+  uFichaVeicApar in '..\fonte\uFichaVeicApar.pas' {frmFichaVeicApar},
+  UFechOS in '..\fonte\UFechOS.pas' {frmFechOs},
+  uCadPedVenda in '..\fonte\uCadPedVenda.pas' {FrmCadPedVenda},
+  uCadVendaPerdida in '..\fonte\uCadVendaPerdida.pas' {frmCadVendaPerdida},
+  uClassesVendaPerdida in '..\fonte\uClassesVendaPerdida.pas',
+  uDtmVendaPerdida in '..\fonte\uDtmVendaPerdida.pas' {DtmVendaPerdida: TDataModule},
+  uCadTipoVendaPerdida in '..\fonte\uCadTipoVendaPerdida.pas' {frmCadTipoVendaPerdida},
+  uBaixaGrade in '..\fonte\uBaixaGrade.pas' {frmBaixaGrade},
+  uClassesAlmoxarifado in '..\fonte\uClassesAlmoxarifado.pas',
+  uDtmAlmoxarifado in '..\fonte\uDtmAlmoxarifado.pas' {DtmAlmoxarifado: TDataModule},
+  uAlmoxarifado in '..\fonte\uAlmoxarifado.pas' {frmAlmoxarifado},
+  uAtestado_ECF in '..\fonte\uAtestado_ECF.pas' {frmAtestado_ECF},
+  uDtmInterventor in '..\fonte\uDtmInterventor.pas' {DtmInterventor: TDataModule},
+  uClassesInterventor_ECF in '..\fonte\uClassesInterventor_ECF.pas',
+  uDadosAdicionaisEntrega in '..\fonte\uDadosAdicionaisEntrega.pas' {frmDadosAdicionaisEntrega},
+  uRelLivroRegistroEntrada in '..\fonte\uRelLivroRegistroEntrada.pas' {frmRelLivroRegistroEntrada},
+  uClassesTMO in '..\fonte\uClassesTMO.pas',
+  udtmTMO in '..\fonte\udtmTMO.pas' {DtmTMO: TDataModule},
+  uTMO in '..\fonte\uTMO.pas' {frmTMO},
+  USelGradeProd in '..\fonte\USelGradeProd.pas' {FrmSelGradeProd},
+  UObsCxl in '..\fonte\UObsCxl.pas' {FrmobsCxl},
+  UOSHonda in '..\fonte\UOSHonda.pas' {FrmOSHonda},
+  uFechamentoReqNF in '..\fonte\uFechamentoReqNF.pas' {frmFechamentoReqNF},
+  uCadAgenda in '..\fonte\uCadAgenda.pas' {frmCadAgenda},
+  uClassesAgenda in '..\fonte\uClassesAgenda.pas',
+  uDtmAgenda in '..\fonte\uDtmAgenda.pas' {DtmAgenda: TDataModule},
+  uServicosMecanicos in '..\fonte\uServicosMecanicos.pas' {frmAgendaMecanico},
+  uClassesEstoqueFechado in '..\fonte\uClassesEstoqueFechado.pas',
+  uDtmEstoqueFechado in '..\fonte\uDtmEstoqueFechado.pas' {DtmEstoqueFechado: TDataModule},
+  UControleAlmoxarifado in '..\fonte\UControleAlmoxarifado.pas' {frmControleAlmoxarifado},
+  uAutorizacaoFinanceiro in '..\fonte\uAutorizacaoFinanceiro.pas' {frmAutorizacaoFinanceiro},
+  uSituacaoPedido in '..\fonte\uSituacaoPedido.pas' {frmSituacaoPedido},
+  uAbrirPedVenda in '..\fonte\uAbrirPedVenda.pas' {frmAbrirPedVenda},
+  uSelecionarServico in '..\fonte\uSelecionarServico.pas' {FrmSelecionarServico},
+  uServSugeridos in '..\fonte\uServSugeridos.pas' {frmServSugeridos},
+  uItemRepetido in '..\fonte\uItemRepetido.pas' {frmItemRepetido},
+  uComissaoPorVenda in '..\fonte\uComissaoPorVenda.pas' {frmComissaoPorVenda},
+  UConfirmCancelamento in '..\fonte\UConfirmCancelamento.pas' {FrmConfirmCancelamento},
+  uCadPedVenda_NotasVinculadas in '..\fonte\uCadPedVenda_NotasVinculadas.pas' {frmCadPedVenda_NotasVinculadas},
+  uEscolhaProdutoPedvenda in '..\fonte\uEscolhaProdutoPedvenda.pas' {frmEscolhaProdutoPedvenda},
+  uCadPedVenda_ValoresNF in '..\fonte\uCadPedVenda_ValoresNF.pas' {frmCadPedVenda_ValoresNF},
+  uCadPedVenda_Cliente in '..\fonte\uCadPedVenda_Cliente.pas' {frmCadPedVendaCliente},
+  uMontarPedidos in '..\fonte\uMontarPedidos.pas' {frmMontarPedidos},
+  uPrecoPorQtde in '..\fonte\uPrecoPorQtde.pas' {frmPrecoPorQtde},
+  uCadPedVenda_DescricaoNFSe in '..\fonte\uCadPedVenda_DescricaoNFSe.pas' {frmCadPedVenda_DescricaoNFSe};
+
+//,
+  //pedvenda_hw_class in '..\fonte\pedvenda_hw_class.pas';
+
+end.

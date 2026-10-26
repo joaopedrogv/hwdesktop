@@ -1,0 +1,186 @@
+unit Hw.Tray.Api;
+
+interface
+
+uses
+  Hw.Api,
+  Hw.Api.Rest,
+  Hw.Tray.Api.Rest;
+
+type
+  THwTrayApi = class(THwApi)
+  private
+    FApi: TTrayRestApi;
+    FToken: TTrayTokenApi;
+    FReq: TRestApiReq;
+    FConsumerKey: string;
+    FConsumerSecret: string;
+    FCode: string;
+  protected
+    //procedure RetornoResolverErro(retorno: TTrayComercioRetorno);
+    function ReqWithParams(controller: string; params: TArray<string>): TRestApiReq;
+  public
+    destructor Destroy; override;
+
+    procedure InitApi(URL: string); override;
+    function ConcederAcesso: Integer; override;
+
+    property Api           : TTrayRestApi  read FApi            write FApi;
+    property Token         : TTrayTokenApi read FToken          write FToken;
+    property ConsumerKey   : string        read FConsumerKey    write FConsumerKey;
+    property ConsumerSecret: string        read FConsumerSecret write FConsumerSecret;
+    property Code          : string        read FCode           write FCode;
+  end;
+
+implementation
+
+uses
+  System.SysUtils, HW.Utils.Classes.Funcoes_DX, REST.Json, REST.Types, System.StrUtils;
+
+{ THwTrayApi }
+
+function THwTrayApi.ConcederAcesso: Integer;
+var
+  Logar: Boolean;
+  hours, minutes, seconds: Integer;
+  dataLimite: TDateTime;
+  DoAfterLogin: Boolean;
+begin
+  Result := 0;
+  FLastError.Msg := '';
+  FLastError.Local := '';
+  FLastError.Exception := '';
+  DoAfterLogin := False;
+
+  try
+
+    if Assigned(FLogEvent) then
+      Api.OnLog := FLogEvent;
+
+    Logar := not Assigned(Token);
+    if not Logar then
+    begin
+      Logar := Token.date_expiration_access_token > Now;
+
+      if (Logar) and (Token.date_expiration_refresh_token < Now) then
+      begin
+        Api.restRequest.Params.Clear;
+        with Api.restRequest.Params.AddItem do
+        begin
+          Options := [];
+          Kind := pkURLSEGMENT;
+          name := 'refresh_token';
+          Value := Token.refresh_token;
+        end;
+
+        if Api.Get( TRestApiReq.New('auth')) = 200 then
+        begin
+          FToken := TJson.JsonToObject<TTrayTokenApi>(Api.JSONReponse);
+
+          if not Assigned(FToken) then
+          begin
+            FLastError.Msg := 'Token de usuário não veio como esperado';
+            FLastError.Exception := FLastError.Msg;
+            Exit;
+          end;
+          DoAfterLogin := True;
+          Logar := False;
+
+        end;
+      end;
+    end;
+
+    if Logar then
+    begin
+
+      Api.restRequest.ClearBody;
+      Api.restRequest.Params.Clear;
+      with Api.restRequest.Params.AddItem do
+      begin
+        Kind := pkGETorPOST;
+        name := 'consumer_key';
+        Value := FConsumerKey;
+      end;
+      with Api.restRequest.Params.AddItem do
+      begin
+        Kind := pkGETorPOST;
+        name := 'consumer_secret';
+        Value := FConsumerSecret;
+      end;
+      with Api.restRequest.Params.AddItem do
+      begin
+        Kind := pkGETorPOST;
+        name := 'code';
+        Value := FCode;
+      end;
+
+      if Api.Post( TRestApiReq.New('auth')) = 200 then
+      begin
+        FToken := TJson.JsonToObject<TTrayTokenApi>(Api.JSONReponse);
+
+        if not Assigned(FToken) then
+        begin
+          FLastError.Msg := 'Token de usuário não veio como esperado';
+          FLastError.Exception := FLastError.Msg;
+          Exit;
+        end;
+        DoAfterLogin := True;
+      end
+      else if Assigned(api.ErroApi) then
+      begin
+        FLastError.Msg := 'Api: ' + IntToStr(Api.ErroApi.code);
+        FLastError.Exception := Api.ErroApi.name + ' - ' + System.String.Join(', ', Api.ErroApi.causes);
+        Exit;
+      end
+      else
+      begin
+        FLastError.Msg := Api.LastError.Msg;
+        FLastError.Exception := Api.LastError.Exception;
+      end;
+    end;
+
+    Api.AssignTokenAuthorization(Token);
+
+    Result := 1;
+
+  finally
+    if not FLastError.Msg.Trim.IsEmpty then
+      FLastError.Local := 'THwTrayApi.ConcederAcesso';
+    if DoAfterLogin  then
+      if Assigned(AfterLogin) then
+        AfterLogin(Token);
+  end;
+end;
+
+destructor THwTrayApi.Destroy;
+begin
+  if Assigned(FApi) then
+    FreeAndNil(FApi);
+  inherited;
+end;
+
+procedure THwTrayApi.InitApi(URL: string);
+begin
+  inherited;
+  if not Assigned(Api) then
+    Api := TTrayRestApi.Create(URL, True, not URL.Trim.ToLower.StartsWith('https'));
+  Api.OnLog := OnLog;
+end;
+
+function THwTrayApi.ReqWithParams(controller: string;
+  params: TArray<string>): TRestApiReq;
+begin
+  params := ['?access_token=' + Token.access_token] + params;
+
+  if FReq = nil then
+    FReq := TRestApiReq.New(controller, System.string.Join('&', params))
+  else
+  begin
+    FReq.Controller := controller;
+    FReq.ParamsURL  := System.string.Join('&', params);
+  end;
+
+  Result := FReq;
+end;
+
+end.

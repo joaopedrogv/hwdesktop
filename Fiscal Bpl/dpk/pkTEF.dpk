@@ -1,0 +1,51 @@
+package pkTEF;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  vcl,
+  vclx,
+  pkAtivos,
+  dbrtl,
+  pkEditHw;
+
+contains
+  unFuncoesTEF in '..\Fonte\unFuncoesTEF.pas',
+  unMensagGerais in '..\Fonte\unMensagGerais.pas',
+  unImpressao in '..\Fonte\unImpressao.pas',
+  unMensagem in '..\Fonte\unMensagem.pas',
+  unMensagGc in '..\Fonte\unMensagGc.pas',
+  uDtmTef in '..\Fonte\uDtmTef.pas' {dtmTef: TDataModule},
+  uTransTef in '..\Fonte\uTransTef.pas',
+  uFileList in '..\fonte\uFileList.pas' {frmFileList},
+  UCancTransTef in '..\fonte\UCancTransTef.pas' {frmCancTransTef},
+  unFuncoesTEFDedicado in '..\fonte\unFuncoesTEFDedicado.pas',
+  unFuncoesTEFDiscado in '..\fonte\unFuncoesTEFDiscado.pas',
+  uPOSVirtualTEF in '..\fonte\uPOSVirtualTEF.pas' {frmPOSVirtualTEF},
+  uTransacoesTEF in '..\fonte\uTransacoesTEF.pas' {frmTransacoesTEF};
+
+end.

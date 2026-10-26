@@ -1,0 +1,91 @@
+package pkClientes;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  PkFormularios,
+  pkAtivos,
+  vcl,
+  vcldb,
+  dbrtl,
+  vclx,
+  VclSmp,
+  DelPrint2006,
+  bdertl,
+  vcldbx,
+  dsnap,
+  pkCadastrosBasicos,
+  pkEditHw,
+  teedb,
+  IndyCore,
+  IndySystem,
+  IndyProtocols,
+  QR5RunD2006,
+  vcljpg,
+  ibxpress;
+
+contains
+  uCadClientes in '..\fonte\uCadClientes.pas' {FrmCadClientes},
+  UClassesClientes in '..\fonte\UClassesClientes.pas',
+  UDtmClientes in '..\fonte\UDtmClientes.pas' {DtmClientes: TDataModule},
+  UCadTipoFaturamento in '..\fonte\UCadTipoFaturamento.pas' {FrmCadTipoFaturamento},
+  UFichaFinanceiraCli in '..\fonte\UFichaFinanceiraCli.pas' {FrmFichaFinanceiraCli},
+  USelEtiquetaCli in '..\fonte\USelEtiquetaCli.pas' {FrmSelEtiquetaCli},
+  UCadCstMudCliente in '..\fonte\UCadCstMudCliente.pas' {FrmCadCstMudCliente},
+  uCadPossiveisClientes in '..\fonte\uCadPossiveisClientes.pas' {FrmCadPossiveisCliente},
+  UCadTipoCliente in '..\fonte\UCadTipoCliente.pas' {FrmCadTipoCliente},
+  UDetalheRec in '..\fonte\UDetalheRec.pas' {FrmDetalheRec},
+  UDetalheRecMod in '..\fonte\UDetalheRecMod.pas' {FrmDetalheRecMod},
+  uSituacaoCaixa in '..\fonte\uSituacaoCaixa.pas' {FrmSituacaoCx},
+  uCrm40 in '..\fonte\uCrm40.pas' {frmCrm40},
+  uAgendamentos in '..\fonte\uAgendamentos.pas' {FrmAgendamentos},
+  uClassesCRM in '..\fonte\uClassesCRM.pas',
+  uDtmCRM in '..\fonte\uDtmCRM.pas' {dtmCRM: TDataModule},
+  uCadFlwGrupos in '..\fonte\uCadFlwGrupos.pas' {frmCadFlwGrupos},
+  uClassesFollowUpPosAtendimento in '..\fonte\uClassesFollowUpPosAtendimento.pas',
+  uDtmFollowUpPosAtendimento in '..\fonte\uDtmFollowUpPosAtendimento.pas' {dtmFollowUpPosAtendimento: TDataModule},
+  uCadFlwPerfil in '..\fonte\uCadFlwPerfil.pas' {frmCadFlwPerfil},
+  uCadFlwPergunta in '..\fonte\uCadFlwPergunta.pas' {frmCadFlwPergunta},
+  uCadFlwAtendimento in '..\fonte\uCadFlwAtendimento.pas' {frmCadFlwAtendimentos},
+  uCadFlwPesquisa in '..\fonte\uCadFlwPesquisa.pas' {frmCadFlwPesquisa},
+  uFlwPesquisa in '..\fonte\uFlwPesquisa.pas' {frmFlwPesquisa},
+  uClassesGraficosFollowUp in '..\fonte\uClassesGraficosFollowUp.pas',
+  uCadAnotacoes in '..\fonte\uCadAnotacoes.pas' {frmCadAnotacoes},
+  uCheckCheck in '..\fonte\uCheckCheck.pas' {frmCheckCheck},
+  uGeradorOSFormasBoletas in '..\fonte\uGeradorOSFormasBoletas.pas' {frmGeradorOSFormasBoletas},
+  uCadContratosClientes in '..\fonte\uCadContratosClientes.pas' {frmCadContratosClientes},
+  uEnviarContratosClientes in '..\fonte\uEnviarContratosClientes.pas' {frmEnviarContratosClientes},
+  uValeResgateTroca in '..\fonte\uValeResgateTroca.pas' {frmValeResgateTroca},
+  uCadRotasEntrega in '..\fonte\uCadRotasEntrega.pas' {frmCadRotasEntrega},
+  uClassesRotasEntrega in '..\fonte\uClassesRotasEntrega.pas',
+  uCadRotasEntrega_Clientes in '..\fonte\uCadRotasEntrega_Clientes.pas' {frmCadRotasEntrega_Clientes},
+  uCadFinalidade in '..\fonte\uCadFinalidade.pas' {frmCadFinalidade},
+  uClassesFinalidade in '..\fonte\uClassesFinalidade.pas',
+  uCadPedidoCompraClienteNfe in '..\fonte\uCadPedidoCompraClienteNfe.pas' {frmCadPedidoCompraClienteNfe},
+  UConsultarDocumento in '..\fonte\UConsultarDocumento.pas' {FrmConsultarDocumento};
+
+end.

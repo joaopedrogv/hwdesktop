@@ -1,0 +1,54 @@
+package pkFormPag;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  vcl,
+  rtl,
+  dbrtl,
+  dsnap,
+  vcldb,
+  ibxpress,
+  VclSmp,
+  pkAtivos,
+  pkEditHw,
+  pkBoletos;
+
+contains
+  uDtmFormPag in '..\fonte\uDtmFormPag.pas' {dtmFP: TDataModule},
+  uClasseFP in '..\fonte\uClasseFP.pas',
+  uValorRecibo in '..\fonte\uValorRecibo.pas' {frmValorRecibo},
+  uParcela in '..\fonte\uParcela.pas' {frmParcela},
+  uDetalhamento in '..\fonte\uDetalhamento.pas' {frmDetalhamento},
+  uFormPag2 in '..\fonte\uFormPag2.pas' {frmFormPag2},
+  uPlanoPag in '..\fonte\uPlanoPag.pas' {frmPlanoPagamento},
+  uGerarPlanoV2 in '..\fonte\uGerarPlanoV2.pas' {frmPlanoPagamentoV2},
+  uTaxasPlano2 in '..\fonte\uTaxasPlano2.pas' {frmTaxasPlano2},
+  uCadIntermediadoresPag in '..\fonte\uCadIntermediadoresPag.pas' {frmCadIntermediadoresPag},
+  uVincIntermPag in '..\fonte\uVincIntermPag.pas' {frmVincIntermPag},
+  uSelectControle in '..\fonte\uSelectControle.pas' {TfrmSelectControle};
+
+end.

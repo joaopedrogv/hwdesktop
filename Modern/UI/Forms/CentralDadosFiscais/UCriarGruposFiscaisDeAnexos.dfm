@@ -1,0 +1,182 @@
+inherited FrmCriarGruposFiscaisDeAnexos: TFrmCriarGruposFiscaisDeAnexos
+  Left = 0
+  Top = 0
+  Caption = 'Configurar Grupos Fiscais dos Anexos'
+  ClientHeight = 474
+  ClientWidth = 860
+  Position = poScreenCenter
+  ExplicitWidth = 868
+  ExplicitHeight = 508
+  PixelsPerInch = 96
+  TextHeight = 13
+  object ScrollBox1: TScrollBox
+    AlignWithMargins = True
+    Left = 3
+    Top = 3
+    Width = 854
+    Height = 421
+    Align = alClient
+    BorderStyle = bsNone
+    TabOrder = 0
+    object pnTop: TPanel
+      AlignWithMargins = True
+      Left = 3
+      Top = 3
+      Width = 848
+      Height = 22
+      Align = alTop
+      AutoSize = True
+      BevelOuter = bvNone
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 0
+      object Label1: TLabel
+        AlignWithMargins = True
+        Left = 3
+        Top = 3
+        Width = 842
+        Height = 16
+        Align = alTop
+        Alignment = taCenter
+        Caption = 
+          'Configurar cria'#231#227'o dos Grupos Fiscais a partir dos Anexos da LC ' +
+          '214 de 2025'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ParentFont = False
+        Layout = tlCenter
+        ExplicitWidth = 495
+      end
+    end
+    object pnLog: TPanel
+      AlignWithMargins = True
+      Left = 3
+      Top = 377
+      Width = 848
+      Height = 41
+      Align = alBottom
+      BevelOuter = bvNone
+      TabOrder = 1
+      object BitBtn1: TBitBtn
+        Left = 4
+        Top = 3
+        Width = 293
+        Height = 25
+        Caption = 'Criar Grupos a partir dos Anexos da LC 214 de 2025'
+        TabOrder = 0
+        OnClick = BitBtn1Click
+      end
+    end
+    inline MultiSelectAnexosFrame1: TMultiSelectAnexosFrame
+      Left = 0
+      Top = 28
+      Width = 854
+      Height = 346
+      Align = alClient
+      TabOrder = 2
+      TabStop = True
+      ExplicitTop = 28
+      ExplicitWidth = 854
+      ExplicitHeight = 346
+      inherited checkListAnexos: TCheckListBox
+        Width = 848
+        Height = 309
+        ExplicitWidth = 848
+        ExplicitHeight = 309
+      end
+      inherited Panel1: TPanel
+        Width = 854
+        ExplicitWidth = 854
+        inherited lbDataReferencia: TLabel
+          Height = 19
+        end
+        inherited Label2: TLabel
+          Height = 19
+        end
+        inherited alr: TLabel
+          Height = 19
+        end
+        inherited lbModoExibicao: TLabel
+          Height = 19
+        end
+      end
+    end
+  end
+  object Panel3: TPanel
+    AlignWithMargins = True
+    Left = 3
+    Top = 430
+    Width = 854
+    Height = 41
+    Align = alBottom
+    BevelEdges = [beTop]
+    BevelKind = bkTile
+    BevelOuter = bvNone
+    BorderWidth = 1
+    TabOrder = 1
+    object btSair: TBitBtn
+      AlignWithMargins = True
+      Left = 7
+      Top = 7
+      Width = 79
+      Height = 25
+      Margins.Left = 6
+      Margins.Top = 6
+      Margins.Right = 6
+      Margins.Bottom = 6
+      Align = alLeft
+      Caption = ' Sair'
+      TabOrder = 0
+      Glyph.Data = {
+        36050000424D3605000000000000360400002800000010000000100000000100
+        08000000000000010000D30E0000D30E00000001000000010000AD4A0000B54A
+        0000B5520000BD520000BD5A0000C65A0000C6630000CE630000CE6B0000D673
+        0000DE730000DE7B0000E77B0000E7840000F7940000CE6B0800FF9C0800A542
+        1000AD4A1000B5521000C6631000B55A2100CE732100B55A3100BD633100FFAD
+        3100CE7B3900BD6B4200C6734200CE844200CE844A00BD735200BD7B5200C67B
+        5200C6845A00C6846300FFBD6300C68C7300CE947B00CE9C8400FF00FF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00282828282828
+        2828281F05002828282828282828282828282817050713282828282828282828
+        2828282817060715282828282828282828282828281507062328280004040404
+        040404232828000701282802090807070707061B28282706062328040B090711
+        2727272828282800071328060D070A07232828282828281C070128070E13020B
+        082028282828281C0701280F101D28020D0818282828280107132816191E2828
+        140D0C03212513060623281A2421282828150C0D0B0908061228282622282828
+        282827140808041B282828282828282828282828282828282828282828282828
+        2828282828282828282828282828282828282828282828282828}
+    end
+  end
+end

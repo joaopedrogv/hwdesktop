@@ -1,0 +1,120 @@
+inherited FrmCadNFSeEnviarEmail: TFrmCadNFSeEnviarEmail
+  Caption = 'Envio de email'
+  ClientHeight = 148
+  ClientWidth = 463
+  Position = poScreenCenter
+  ExplicitWidth = 471
+  ExplicitHeight = 182
+  PixelsPerInch = 96
+  TextHeight = 13
+  object pnContent: TPanel
+    Left = 0
+    Top = 0
+    Width = 463
+    Height = 107
+    Align = alClient
+    BevelOuter = bvNone
+    TabOrder = 0
+    object lbCaption: TLabel
+      AlignWithMargins = True
+      Left = 74
+      Top = 15
+      Width = 356
+      Height = 14
+      Margins.Left = 115
+      Margins.Top = 9
+      Margins.Right = 9
+      Margins.Bottom = 9
+      AutoSize = False
+      Caption = 'Notas fiscais selecionadas: 32'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      WordWrap = True
+    end
+    object Label1: TLabel
+      AlignWithMargins = True
+      Left = 44
+      Top = 75
+      Width = 24
+      Height = 13
+      Alignment = taRightJustify
+      Caption = 'Email'
+      Layout = tlCenter
+    end
+    object ckUnicoEmail: TCheckBox
+      Left = 74
+      Top = 49
+      Width = 140
+      Height = 17
+      Caption = 'Enviar em 1 '#250'nico email'
+      TabOrder = 0
+      OnClick = ckUnicoEmailClick
+    end
+    object ckAnexarPDF: TCheckBox
+      Left = 308
+      Top = 49
+      Width = 122
+      Height = 17
+      Caption = 'Anexar PDF DANFSe'
+      TabOrder = 1
+    end
+    object edEmail: TMaskEdit
+      AlignWithMargins = True
+      Left = 74
+      Top = 72
+      Width = 356
+      Height = 21
+      TabOrder = 2
+      Text = 'edEmail'
+    end
+  end
+  object pnBtns: TPanel
+    Left = 0
+    Top = 107
+    Width = 463
+    Height = 41
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 1
+    object btEnviarEmail: TBitBtn
+      Left = 179
+      Top = 8
+      Width = 105
+      Height = 25
+      Caption = 'Enviar Email'
+      TabOrder = 0
+      OnClick = btEnviarEmailClick
+      Glyph.Data = {
+        36030000424D3603000000000000360000002800000010000000100000000100
+        18000000000000030000120B0000120B00000000000000000000FFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFEF90D7FCECF8FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFBE6F6FAE0F4FAE0F4EB73CDED79D0FDECF8FFFFFFF9EACC
+        F6E0B4F0CA82F0C981EFC980EFC87FEFC67EEDC57EEBC17DE668C6E766C8E866
+        C8E966C8EA65C9EF84D4FFFFFFE7A826E5A41FE4A11EE39F1CE29C1AE19A18E0
+        9717DF9515DB9113D87669D97371D97171E767BFE965C6F8CBEDFFFFFFE7A722
+        E6A521E5A31FE4A01DE39E1BE29B19E19918E09716DF9414DE9212DD9011DC91
+        15E56BB3DA7F55FFFFFFFFFFFFE8A924E7A722E6A420E5A21EE49F1CE39D1BE2
+        9A19E19817E09615E09716E39C1AE19C1ADA8D31E09918FFFFFFFFFFFFE8AA25
+        E7A823E6A621E5A31FE4A11DE39E1CE19B1AE19A19E39E1CE5A21EE4A01DE39F
+        1CE39D1BE29C1AFFFFFFFFFFFFE9AC26E8AA24E7A722E6A520E5A21FDD9B1CDB
+        A428DDA829DFA120E6A420E5A31FE4A11EE4A01DE39E1BFFFFFFFFFFFFE9AD27
+        E8AB25E7A923E5A521DCA42AEDCC4CFFE650FFE650EFCB3FDCA124E5A420E5A3
+        1FE5A21EE4A01DFFFFFFFFFFFFEAAF28E9AD26E5A824E5BD51FBE55DFFE650FF
+        E650FFE650FFE650FADE4BE0B02EE2A321E6A420E5A31FFFFFFFFFFFFFEAAF28
+        E5AE2EF0D769FFE651FFE650FFE650FFE650FFE650FFE650FFE650FFE650EEC9
+        3FE0A523E6A520FFFFFFFFFFFFE9C154FBE461FFE650FFE650FFE650FFE650FF
+        E650FFE650FFE650FFE650FFE650FFE650FAE157E6B83FFFFFFFFFFFFFFFE755
+        FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE650FFE6
+        50FFE650FFE755FFFFFFFFFFFFFFF9D7FFF7C5FFF7C5FFF7C5FFF7C5FFF7C5FF
+        F7C5FFF7C5FFF7C5FFF7C5FFF7C5FFF7C5FFF7C5FFF9D7FFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+    end
+  end
+end

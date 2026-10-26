@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "tool": "Codex",
+  "toolRoot": ".codex",
+  "stateFile": ".codex/.modern-ai-setup.json",
+  "renderer": "codex-agents",
+  "agentDestination": ".codex/agents",
+  "staticFiles": [],
+  "requiresShared": true
+}

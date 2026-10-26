@@ -1,0 +1,57 @@
+package pkFiscal;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+{%File 'todo.md'}
+
+requires
+  rtl,
+  pkAtivos,
+  pkModern,
+  ibxpress,
+  dbrtl,
+  dsnap,
+  vcldb,
+  vcl;
+
+contains
+  CestVarianteMvaNcmUf_Model in '..\fonte\CestVarianteMvaNcmUf_Model.pas',
+  opfiscal_confs in '..\fonte\opfiscal_confs.pas',
+  opfiscal_hw in '..\fonte\opfiscal_hw.pas',
+  opfiscal_model in '..\fonte\opfiscal_model.pas',
+  faturamento_hw_class in '..\fonte\faturamento_hw_class.pas',
+  efd_ajustes in '..\fonte\efd_ajustes.pas',
+  gs1prefix in '..\fonte\gs1prefix.pas',
+  hw_pedido_cliente in '..\fonte\hw_pedido_cliente.pas',
+  TributosDFeInMemoryHandler in '..\fonte\Fiscal\TributosDFe\TributosDFeInMemoryHandler.pas',
+  TributosDFePersistentHandler in '..\fonte\Fiscal\TributosDFe\TributosDFePersistentHandler.pas',
+  ConfigGlobalNF_RTC in '..\fonte\Fiscal\TributosDFe\ConfigGlobalNF_RTC.pas',
+  CallerNFSeFeaturesUnit in '..\fonte\DLLNFe\CallerNFSeFeaturesUnit.pas',
+  DFeEnums in '..\fonte\Fiscal\Tipos\DFeEnums.pas',
+  DFeNTManageUnit in '..\fonte\Fiscal\Utils\DFeNTManageUnit.pas',
+  AlertasDFeUtils in '..\fonte\Fiscal\Utils\AlertasDFeUtils.pas',
+  CriadorCompraGovernamentalUtilsUnit in '..\fonte\Fiscal\Utils\CriadorCompraGovernamentalUtilsUnit.pas';
+
+end.

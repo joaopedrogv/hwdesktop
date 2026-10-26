@@ -1,0 +1,80 @@
+package pkAutomacao;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  vcl,
+  dbrtl,
+  dsnap,
+  vcldb,
+  ibxpress,
+  pkAtivos,
+  pkEntrada,
+  PkFormularios,
+  pkClientes,
+  pkPedidoVenda,
+  dcl7cr10,
+  designide,
+  xmlrtl,
+  vclactnband,
+  vclx,
+  bdertl,
+  VclSmp,
+  pkVeiculos,
+  pkCadastrosBasicos,
+  pkEquipamentos,
+  pkConfig,
+  pkColaborador,
+  pkNF,
+  pkRecibo,
+  pkMvaAjustada,
+  PkGestorChilds,
+  pkBoletos,
+  pkEstoqueECF,
+  pkDevolucao,
+  pkImportFinanceiro,
+  pkVeiculosCCIA,
+  pkCadastrosBasicosCx,
+  pkRelatorios,
+  pkCalculoComissao,
+  pkLancamentos,
+  pkContasAReceber,
+  pkContasAPagar,
+  pkSPED,
+  pkOrdemCarregamento,
+  pkMobile,
+  pkProducao,
+  vclie,
+  pkNfSerieD;
+
+contains
+  uPrincipalS in '..\fonte\uPrincipalS.pas' {frmPrincipalS},
+  URelCrystal in '..\fonte\URelCrystal.pas' {FrRelCrystal},
+  uSuporteOnline in '..\fonte\uSuporteOnline.pas' {frmSuporteOnline},
+  uNewHw in '..\fonte\uNewHw.pas' {frmNews};
+
+end.

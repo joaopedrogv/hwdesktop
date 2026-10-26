@@ -1,0 +1,89 @@
+package pkAtivosF;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  vcl,
+  dbrtl,
+  dsnap,
+  ibxpress,
+  PkFormulariosF,
+  vcldb,
+  VclSmp,
+  DelPrint2006,
+  pkEditMoeda,
+  bdertl,
+  QR5RunD2006,
+  vcljpg,
+  vclx,
+  tee,
+  xhCntrls100,
+  dclstd,
+  designide,
+  xmlrtl,
+  vclactnband,
+  vcldesigner,
+  dcldb,
+  xhStd100,
+  xhChart100,
+  xhDsgn100,
+  xhExport100,
+  dclOfficeXP,
+  dclIndyCore,
+  IndyCore,
+  IndySystem,
+  IndyProtocols,
+  pkEditHw;
+
+contains
+  uDataSet_OOP in '..\..\..\Ativos\fonte\uDataSet_OOP.pas',
+  uDadosIni in '..\..\..\Ativos\fonte\uDadosIni.pas',
+  funcoes in '..\..\..\Ativos\fonte\funcoes.pas',
+  UPesqCXL in '..\..\..\Ativos\fonte\UPesqCXL.pas' {FrmPesqCxl},
+  ConsultasUCxl in '..\..\..\Ativos\fonte\ConsultasUCxl.pas',
+  uImpressoraF in '..\..\..\Ativos\fonte\uImpressoraF.pas',
+  uDtmAtivo in '..\..\..\Ativos\fonte\uDtmAtivo.pas' {dtmAtivo: TDataModule},
+  UPesPros in '..\..\..\Ativos\fonte\UPesPros.pas',
+  uRecord in '..\..\..\Ativos\fonte\uRecord.pas',
+  ConsultasU in '..\..\..\Ativos\fonte\ConsultasU.pas',
+  uDtmConsultas in '..\..\..\Ativos\fonte\uDtmConsultas.pas' {dtmConsultas: TDataModule},
+  uLocalizar in '..\..\..\Ativos\fonte\uLocalizar.pas' {frmLocalizar},
+  uModImpG in '..\..\..\Ativos\fonte\uModImpG.pas' {FrModImpG},
+  uProgresso in '..\..\..\Ativos\fonte\uProgresso.pas' {frmProgresso},
+  UqrBuscaDlg in '..\..\..\Ativos\fonte\UqrBuscaDlg.pas',
+  UqrVisualizar in '..\..\..\Ativos\fonte\UqrVisualizar.pas',
+  UInputValorReal in '..\..\..\Ativos\fonte\UInputValorReal.pas' {FrmInputValorReal},
+  uRestruturacao in '..\..\..\Ativos\fonte\uRestruturacao.pas' {frmReestruturacao},
+  uStatusProcessamento in '..\..\..\Ativos\fonte\uStatusProcessamento.pas' {frmStatusProcessamento},
+  UExibirGrades in '..\..\..\Ativos\fonte\UExibirGrades.pas' {frmExibirGrades},
+  UGridPesquisa in '..\..\..\Ativos\fonte\UGridPesquisa.pas' {frmGridPesquisa},
+  uClasseConexao in '..\..\..\Automacao Bpl\fonte\uClasseConexao.pas',
+  uPOSVirtualDados in '..\..\..\Ativos\fonte\uPOSVirtualDados.pas',
+  uSetConfiguracaoSistema in '..\..\..\Ativos\fonte\uSetConfiguracaoSistema.pas',
+  uClassesMigRegistros in '..\..\..\Ativos\fonte\uClassesMigRegistros.pas';
+
+end.
