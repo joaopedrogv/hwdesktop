@@ -1,4 +1,6 @@
-# Sincronização da integração
+# Scripts do fluxo de demandas
+
+## Sincronizar integração
 
 Requer PowerShell 7.5+, Git e SVN no PATH. Abra **Sincronizar integração** no menu ou execute:
 
@@ -10,7 +12,7 @@ pwsh -NoLogo -NoProfile -File D:\Hw\ERP-Master\_automation\workflow\sync-integra
 
 ## Configuração individual
 
-O modelo é `config/workflow.exemplo.psd1`. A configuração de uso é `config/workflow.local.psd1`, excluída do Git. Caminhos relativos são resolvidos a partir da pasta dessa configuração. `WorkPath` fica reservado às próximas etapas e não é utilizado aqui.
+O modelo é `config/workflow.exemplo.psd1`. A configuração de uso é `config/workflow.local.psd1`, excluída do Git. Caminhos relativos são resolvidos a partir da pasta dessa configuração. `WorkPath` não é utilizado pela sincronização; deve apontar para o clone de desenvolvimento existente ao usar `start-demand.ps1`.
 
 `SecretsFile` aponta para o arquivo individual existente, com `SVN_USER=...` e `SVN_PASS=...`, uma chave por linha. O script não altera esse arquivo nem verifica suas regras de exclusão. As credenciais SVN são passadas ao cliente, sem impressão da senha. O cliente SVN instalado recebe a senha como argumento do processo; ela pode ser inspecionada por ferramentas locais com acesso ao processo. A autenticação Git é a já configurada na máquina; não há usuário/senha Git neste arquivo.
 
@@ -29,6 +31,35 @@ O modelo é `config/workflow.exemplo.psd1`. A configuração de uso é `config/w
 
 O script não troca branches, não aplica arquivos Git sobre a pasta SVN, não resolve conflitos e não executa limpeza, revert, reset hard, merge, rebase ou push forçado. Não verifica autoria Git previamente. Não altera o clone de desenvolvimento, não compila, não entrega commit SVN e não obtém dependências.
 
+## Iniciar demanda
+
+Execute primeiro a sincronização da integração pelo comando anterior. Depois, abra **Iniciar demanda** no menu ou execute:
+
+```powershell
+.\_automation\workflow\start-demand.ps1 -Branch 'nome-da-demanda'
+# Também aceita outra configuração pessoal:
+.\_automation\workflow\start-demand.ps1 -Branch 'nome-da-demanda' -ConfigPath 'D:\minhas-configuracoes\workflow.local.psd1'
+```
+
+Preencha `WorkPath` na configuração pessoal com o clone Git de desenvolvimento, diferente de `IntegrationPath`. O comando não cria o clone. Usa somente `WorkPath`, `IntegrationPath` e `GitBranch`; não lê segredos nem executa SVN.
+
+Sem `-Branch`, solicita o nome completo no terminal. Enter vazio cancela antes de qualquer operação Git. Em execução com entrada redirecionada, informe o parâmetro explicitamente.
+
+O comando:
+
+1. Confere `git --version`, raiz Git, ausência de alterações pendentes e operações em andamento, nome válido e ainda não existente localmente, branch principal local e remoto `origin`.
+2. Executa `git fetch origin`; rejeita nome já existente no remoto e interrompe se a main local tiver commits ausentes da main remota, inclusive em caso de divergência.
+3. Executa `git switch main` e atualização por `git merge --ff-only` até o commit remoto capturado no fetch. Não cria commit de merge. Os arquivos são conferidos novamente antes da troca para evitar carregar mudanças feitas durante o fetch.
+4. Cria e seleciona a nova branch com `git switch --no-track -c <nome>`. Informa pasta, branch e commit da base.
+
+Arquivos não rastreados e não ignorados bloqueiam. Arquivos ignorados, como binários locais, permanecem; se uma troca ou atualização precisasse sobrescrevê-los, ela para com erro. Para isso, as chamadas utilizam `--no-overwrite-ignore`. A atualização também desabilita autostash, preservando a regra de não guardar ou retirar mudanças automaticamente.
+
+Não publica a branch, não cria commits, não executa reset, stash, limpeza, exclusão de branches ou preparação de dependências. A main precisa alcançar a base publicada somente por fast-forward. Branch anterior com trabalho commitado permanece disponível. Branch de demanda existente é motivo de parada, não de retomada automática.
+
+Em falha, informa a etapa e a última operação concluída. Se a main já tiver sido selecionada ou atualizada, ela permanece nesse estado; não há rollback automático. Código de saída: `0` para sucesso/cancelamento pelo nome vazio, `1` para erro.
+
 ## Testes isolados
 
 `tests/verify.ps1` usa repositórios Git temporários, com remoto local e SVN simulado. Não utiliza a configuração pessoal, os segredos ou os remotos reais do ERP.
+
+`tests/verify-start-demand.ps1` usa clones e remoto Git locais temporários. Testa início de demanda, preservação de commits e arquivos, validações e falhas. Não utiliza a configuração pessoal nem acessa SVN ou GitHub.

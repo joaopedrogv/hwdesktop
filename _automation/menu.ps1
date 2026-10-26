@@ -143,6 +143,10 @@ function Invoke-MenuCommand {
             $commandArguments = @()
             $scriptPath = Join-Path $PSScriptRoot 'workflow\sync-integration.ps1'
         }
+        elseif ($Item.Id -eq 'start') {
+            $commandArguments = @()
+            $scriptPath = Join-Path $PSScriptRoot 'workflow\start-demand.ps1'
+        }
         else {
             $commandArguments = @('-ProjectRoot', $ProjectRoot)
             $scriptPath = Join-Path $PSScriptRoot "build\$($Item.ScriptName)"
@@ -169,7 +173,7 @@ function Invoke-AutomationMenu {
     $mainItems = @(
         [pscustomobject]@{ Label = 'Build / Deploy'; Description = 'Compilar, limpar e publicar BPLs.'; Status = 'Disponível'; Id = 'build' }
         [pscustomobject]@{ Label = 'Sincronizar integração'; Description = 'Atualizar pelo SVN e publicar seu estado no Git.'; Status = 'Disponível'; Id = 'sync' }
-        [pscustomobject]@{ Label = 'Iniciar demanda'; Description = 'Preparar a base SVN/Git e o ambiente de trabalho.'; Status = 'Planejado'; Id = 'start' }
+        [pscustomobject]@{ Label = 'Iniciar demanda'; Description = 'Atualizar a base Git e criar a branch de trabalho.'; Status = 'Disponível'; Id = 'start' }
         [pscustomobject]@{ Label = 'Integrar demanda'; Description = 'Preparar a integração do trabalho concluído.'; Status = 'Planejado'; Id = 'integrate' }
         [pscustomobject]@{ Label = 'Preparar dependências'; Description = 'Obter os conjuntos de binários no Nextcloud.'; Status = 'Planejado'; Id = 'dependencies' }
         [pscustomobject]@{ Label = 'Informações do ambiente'; Description = 'Consultar caminhos e a versão do PowerShell.'; Status = 'Disponível'; Id = 'environment' }
@@ -248,7 +252,7 @@ function Invoke-AutomationMenu {
             $selectedIndex = $transition.SelectedIndex
             if ($transition.Action -eq 'Exit') { return 0 }
             if ($transition.Action -eq 'Open') {
-                if ($Section -eq 'Build' -or $items[$selectedIndex].Id -eq 'sync') {
+                if ($Section -eq 'Build' -or $items[$selectedIndex].Id -in @('sync', 'start')) {
                     Invoke-MenuCommand -Item $items[$selectedIndex] -ProjectRoot $projectRoot
                     $selectedIndex = -1
                 }

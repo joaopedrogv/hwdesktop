@@ -1,7 +1,8 @@
 @{
     # Copie para workflow.local.psd1 e ajuste os caminhos pessoais.
     IntegrationPath = 'C:\Projeto_Fiscal40'
-    # Reservado às próximas etapas; não é utilizado na sincronização.
+    # Clone Git de desenvolvimento existente, diferente da integração.
+    # Obrigatório em start-demand.ps1; não é utilizado por sync-integration.ps1.
     WorkPath = ''
     GitBranch = 'main'
     SvnUrlSuffix = '/svn/hwsistemas/Projeto_Fiscal40'

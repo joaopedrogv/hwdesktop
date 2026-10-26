@@ -24,9 +24,11 @@ O Windows PowerShell 5.1 (`powershell.exe`) não atende ao requisito. O lançado
 
 ## Operações disponíveis
 
-As áreas de início/integração de demandas e dependências continuam **Planejadas**. A opção **Informações do ambiente** consulta somente os caminhos locais e a versão do PowerShell.
+As áreas de integração de demandas e dependências continuam **Planejadas**. A opção **Informações do ambiente** consulta somente os caminhos locais e a versão do PowerShell.
 
 **Sincronizar integração**, segundo item do menu, atualiza a área de integração pelo SVN e publica esse estado no Git. Usa a configuração individual `config/workflow.local.psd1` e o arquivo de segredos existente. Instruções em [workflow/README.md](workflow/README.md).
+
+**Iniciar demanda**, terceiro item, solicita o nome da nova branch, atualiza a main do clone de desenvolvimento e cria a branch local. Preencha `WorkPath` em `config/workflow.local.psd1`. A sincronização SVN anterior permanece uma chamada separada; este comando não publica a branch nem obtém binários. Instruções e uso independente em [workflow/README.md](workflow/README.md#iniciar-demanda).
 
 **Build / Deploy**, primeiro item do menu, abre seis comandos PS1 independentes em `build/`: compilar todos, compilar selecionados, compilar reestruturação, limpar, publicar e compilar/publicar. Selecionar uma ação e pressionar Enter chama seu comando diretamente. Não há pergunta adicional de limpeza, destino ou escolha de modo. As interações próprias dos originais permanecem: seleção gráfica de pacotes e confirmação S/N de compilar/publicar. O destino vem de `config/deploy.psd1`. Exemplos e parâmetros estão em [build/README.md](build/README.md).
 
