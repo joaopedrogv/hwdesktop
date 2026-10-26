@@ -45,8 +45,6 @@ inherited FrmCadClientes: TFrmCadClientes
         ExplicitHeight = 608
         inherited TabSheet1: TTabSheet
           OnShow = TabSheet1Show
-          ExplicitLeft = 4
-          ExplicitTop = 27
           ExplicitWidth = 888
           ExplicitHeight = 577
           inherited ScrollBox1: TScrollBox
@@ -253,7 +251,7 @@ inherited FrmCadClientes: TFrmCadClientes
                           CharCase = ecUpperCase
                           DataField = 'TIPO'
                           DataSource = DtmClientes.dsClientes
-                          ItemHeight = 0
+                          ItemHeight = 13
                           Items.Strings = (
                             'CLIENTE'
                             'FORNECEDOR'
@@ -518,7 +516,7 @@ inherited FrmCadClientes: TFrmCadClientes
                           Style = csDropDownList
                           DataField = 'SEXO'
                           DataSource = DtmClientes.dsClientes
-                          ItemHeight = 0
+                          ItemHeight = 13
                           Items.Strings = (
                             'M'
                             'F')
@@ -863,7 +861,7 @@ inherited FrmCadClientes: TFrmCadClientes
                           Hint = 'Situa'#231#227'o do Fornecedor junto '#224' AF'
                           DataField = 'CDMICROEPP'
                           DataSource = DtmClientes.dsClientes
-                          ItemHeight = 0
+                          ItemHeight = 13
                           Items.Strings = (
                             '0 - Opera'#231#245'es Internas'
                             '1 - Inter.ME/EPP'
@@ -1165,7 +1163,7 @@ inherited FrmCadClientes: TFrmCadClientes
                           CharCase = ecUpperCase
                           DataField = 'REC_MAIL_MARK'
                           DataSource = DtmClientes.dsClientes
-                          ItemHeight = 0
+                          ItemHeight = 13
                           Items.Strings = (
                             'N - N'#195'O'
                             'S - SIM')
@@ -2304,7 +2302,7 @@ inherited FrmCadClientes: TFrmCadClientes
                         CharCase = ecUpperCase
                         DataField = 'CATEGORIA'
                         DataSource = DtmClientes.dsClientes
-                        ItemHeight = 0
+                        ItemHeight = 13
                         Items.Strings = (
                           'CCJ'
                           'CCF'
@@ -2358,7 +2356,7 @@ inherited FrmCadClientes: TFrmCadClientes
                         CharCase = ecUpperCase
                         DataField = 'TIPVCLIENTE'
                         DataSource = DtmClientes.dsClientes
-                        ItemHeight = 0
+                        ItemHeight = 13
                         Items.Strings = (
                           'V - VAREJO'
                           'A - ATACADO'
@@ -2473,7 +2471,7 @@ inherited FrmCadClientes: TFrmCadClientes
                         CharCase = ecUpperCase
                         DataField = 'USAR_LIBERACAO_FINANCEIRO'
                         DataSource = DtmClientes.dsClientes
-                        ItemHeight = 0
+                        ItemHeight = 13
                         Items.Strings = (
                           'SIM'
                           'NAO')
@@ -2487,7 +2485,7 @@ inherited FrmCadClientes: TFrmCadClientes
                         CharCase = ecUpperCase
                         DataField = 'DESB_CL_CONTAS_QUIT'
                         DataSource = DtmClientes.dsClientes
-                        ItemHeight = 0
+                        ItemHeight = 13
                         Items.Strings = (
                           'SIM'
                           'NAO')
@@ -2531,7 +2529,7 @@ inherited FrmCadClientes: TFrmCadClientes
                         CharCase = ecUpperCase
                         DataField = 'RAMO_ATIVIDADE'
                         DataSource = DtmClientes.dsClientes
-                        ItemHeight = 0
+                        ItemHeight = 13
                         TabOrder = 9
                       end
                       object DBComboBox17: TDBComboBox
@@ -2543,7 +2541,7 @@ inherited FrmCadClientes: TFrmCadClientes
                         CharCase = ecUpperCase
                         DataField = 'INF_DESC_BOL'
                         DataSource = DtmClientes.dsClientes
-                        ItemHeight = 0
+                        ItemHeight = 13
                         Items.Strings = (
                           'N'
                           'S')
@@ -2575,7 +2573,7 @@ inherited FrmCadClientes: TFrmCadClientes
                         CharCase = ecUpperCase
                         DataField = 'BARRAMENTO_AUTOMATICO'
                         DataSource = DtmClientes.dsClientes
-                        ItemHeight = 0
+                        ItemHeight = 13
                         Items.Strings = (
                           'SIM'
                           'NAO')
@@ -2626,7 +2624,7 @@ inherited FrmCadClientes: TFrmCadClientes
                         Height = 21
                         DataField = 'ACEITA_CONTATO_TLV'
                         DataSource = DtmClientes.dsClientes
-                        ItemHeight = 0
+                        ItemHeight = 13
                         Items.Strings = (
                           'SIM'
                           'NAO')
@@ -3739,7 +3737,7 @@ inherited FrmCadClientes: TFrmCadClientes
                         CharCase = ecUpperCase
                         DataField = 'CONVENIADO'
                         DataSource = DtmClientes.dsClientes
-                        ItemHeight = 0
+                        ItemHeight = 13
                         Items.Strings = (
                           'N'#195'O'
                           'SIM')
@@ -10638,7 +10636,7 @@ inherited FrmCadClientes: TFrmCadClientes
                           Style = csDropDownList
                           DataField = 'DESCONTO_EM'
                           DataSource = DtmClientes.dsCupomDescontoEC
-                          ItemHeight = 0
+                          ItemHeight = 13
                           Items.Strings = (
                             'PERCENTUAL'
                             'VALOR')
@@ -10924,8 +10922,6 @@ inherited FrmCadClientes: TFrmCadClientes
         end
         inherited TabSheet2: TTabSheet
           OnShow = TabSheet2Show
-          ExplicitLeft = 4
-          ExplicitTop = 27
           ExplicitWidth = 888
           ExplicitHeight = 577
           object Panel7: TPanel [0]
@@ -11395,7 +11391,7 @@ inherited FrmCadClientes: TFrmCadClientes
                 Width = 205
                 Height = 21
                 Hint = 'Campo filtro da pesquisa adicional. Informe o campo desejado'
-                ItemHeight = 13
+                ItemHeight = 0
                 TabOrder = 0
                 Text = 'ComboBox11'
                 OnExit = ComboBox11Exit
@@ -11506,7 +11502,7 @@ inherited FrmCadClientes: TFrmCadClientes
                 Width = 205
                 Height = 21
                 Hint = 'Status Contrato'
-                ItemHeight = 13
+                ItemHeight = 0
                 TabOrder = 0
                 Text = 'ComboBox14'
                 OnExit = ComboBox14Exit
@@ -18929,7 +18925,7 @@ inherited FrmCadClientes: TFrmCadClientes
                       Height = 21
                       DataField = 'RAMO_ATIVIDADE'
                       DataSource = DtmClientes.dsClientes
-                      ItemHeight = 0
+                      ItemHeight = 13
                       TabOrder = 3
                     end
                   end
@@ -19654,8 +19650,6 @@ inherited FrmCadClientes: TFrmCadClientes
           end
         end
         inherited tsMemo: TTabSheet
-          ExplicitLeft = 4
-          ExplicitTop = 27
           ExplicitWidth = 888
           ExplicitHeight = 577
         end
@@ -20613,7 +20607,7 @@ inherited FrmCadClientes: TFrmCadClientes
                   CharCase = ecUpperCase
                   DataField = 'REC_MAIL_MARK'
                   DataSource = DtmClientes.dsCliAdicional
-                  ItemHeight = 0
+                  ItemHeight = 13
                   Items.Strings = (
                     'N - N'#195'O'
                     'S - SIM')
@@ -25970,7 +25964,7 @@ inherited FrmCadClientes: TFrmCadClientes
               Width = 143
               Height = 21
               Style = csDropDownList
-              ItemHeight = 0
+              ItemHeight = 13
               ItemIndex = 0
               TabOrder = 1
               Text = 'Todos'
@@ -26870,7 +26864,7 @@ inherited FrmCadClientes: TFrmCadClientes
               Width = 145
               Height = 21
               Style = csDropDownList
-              ItemHeight = 0
+              ItemHeight = 13
               TabOrder = 12
               Items.Strings = (
                 'Ativo'
@@ -27429,7 +27423,7 @@ inherited FrmCadClientes: TFrmCadClientes
                 Top = 181
                 Width = 145
                 Height = 21
-                ItemHeight = 0
+                ItemHeight = 13
                 ItemIndex = 1
                 TabOrder = 6
                 Text = 'Normal'
@@ -27626,7 +27620,7 @@ inherited FrmCadClientes: TFrmCadClientes
                 Height = 21
                 Style = csDropDownList
                 Enabled = False
-                ItemHeight = 0
+                ItemHeight = 13
                 TabOrder = 12
                 OnExit = ComboBoxModeloCartaExit
                 Items.Strings = (
@@ -29836,7 +29830,7 @@ inherited FrmCadClientes: TFrmCadClientes
                     Width = 60
                     Height = 21
                     Style = csDropDownList
-                    ItemHeight = 0
+                    ItemHeight = 13
                     ItemIndex = 1
                     TabOrder = 0
                     Text = '25'
@@ -30188,7 +30182,7 @@ inherited FrmCadClientes: TFrmCadClientes
                       Font.Height = -11
                       Font.Name = 'MS Sans Serif'
                       Font.Style = []
-                      ItemHeight = 0
+                      ItemHeight = 13
                       Items.Strings = (
                         'CR'#201'DITO'
                         'D'#201'BITO')
@@ -30477,7 +30471,7 @@ inherited FrmCadClientes: TFrmCadClientes
                     Width = 145
                     Height = 21
                     Style = csDropDownList
-                    ItemHeight = 0
+                    ItemHeight = 13
                     ItemIndex = 0
                     TabOrder = 0
                     Text = 'Num Fabricante'
@@ -31941,10 +31935,6 @@ inherited FrmCadClientes: TFrmCadClientes
     Top = 470
     ExplicitLeft = 824
     ExplicitTop = 470
-    inherited lbTextoProcessamento: TLabel
-      Width = 477
-      Height = 21
-    end
   end
   inherited PopupMenu1: TPopupMenu
     Left = 692

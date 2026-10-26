@@ -21,8 +21,12 @@ implementation
 
 class function CalcUtils.MargemLucro(preco, custo: Double;
   const ADigit: TRoundToRange): Double;
+var
+  resultado: Double;
 begin
-  if (preco <= 0) or (custo <= 0) then
+  resultado := preco - custo;
+
+  if (preco <= 0) or (custo <= 0) or (resultado <= 0) then
     Result := 0
   else
     Result := RoundTo(((preco - custo) / preco) * 100, ADigit);

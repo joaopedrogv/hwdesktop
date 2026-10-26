@@ -274,6 +274,62 @@ type
     EditDataCadImg: TEdit;
     Label559: TLabel;
     EditDataErroImg: TEdit;
+    tsAlterDadosKit: TTabSheet;
+    Panel52: TPanel;
+    btVoltarDadosKit: TBitBtn;
+    GroupBox79: TGroupBox;
+    DBText7: TDBText;
+    btVoltarDadosKit2: TBitBtn;
+    Panel128: TPanel;
+    pnCenterAlterDadosProd: TPanel;
+    SpeedButtonAlterarKit: TSpeedButton;
+    SpeedBSelTodos: TSpeedButton;
+    SpeedBDesmarcarTodos: TSpeedButton;
+    SpeedButtonAlterarProduto2: TSpeedButton;
+    lbCorLote: TLabel;
+    btExcluirRegistro: TSpeedButton;
+    btLixeiraVazia: TSpeedButton;
+    btRestaurarRegistro: TSpeedButton;
+    btLixeiraCheia: TSpeedButton;
+    SpeedButton68: TSpeedButton;
+    btSincronizarServicos: TSpeedButton;
+    pnCorLote: TPanel;
+    ckPermOpcaoMarcadas: TCheckBox;
+    tsAlterDadosLote: TTabSheet;
+    ScrollBox6: TScrollBox;
+    GroupBox9: TGroupBox;
+    Panel119: TPanel;
+    btSalvarServLote: TBitBtn;
+    btnCancServLote: TBitBtn;
+    btSairServLote: TBitBtn;
+    ckLixeira: TCheckBox;
+    SpeedButton59: TSpeedButton;
+    Label473: TLabel;
+    Label158: TLabel;
+    DBComboBox22: TDBComboBox;
+    pnSomenteKitTodo: TPanel;
+    lbSomenteKitTodo: TLabel;
+    CheckBox22: TCheckBox;
+    ckSomenteKitTodo: TCheckBox;
+    cbSomenteKitTodo: TComboBox;
+    pnVendaOnline: TPanel;
+    lbVendaOnline: TLabel;
+    CheckBox4: TCheckBox;
+    ckVendaOnline: TCheckBox;
+    cbVendaOnline: TComboBox;
+    procedure btSincronizarServicosClick(Sender: TObject);
+    procedure btSalvarServLoteClick(Sender: TObject);
+    procedure ckVendaOnlineClick(Sender: TObject);
+    procedure ckSomenteKitTodoClick(Sender: TObject);
+    procedure SpeedButtonAlterarProduto2Click(Sender: TObject);
+    procedure SpeedButtonAlterarKitClick(Sender: TObject);
+    procedure ckLixeiraClick(Sender: TObject);
+    procedure btVoltarDadosKit2Click(Sender: TObject);
+    procedure btVoltarDadosKitClick(Sender: TObject);
+    procedure SpeedButton7Click(Sender: TObject);
+    procedure SpeedBDesmarcarTodosClick(Sender: TObject);
+    procedure SpeedBSelTodosClick(Sender: TObject);
+    procedure ckPermOpcaoMarcadasClick(Sender: TObject);
     procedure pnImagemKitEnter(Sender: TObject);
     procedure btImagemKitFecharClick(Sender: TObject);
     procedure DesmarcarTodosKitsProdutosClickClick(Sender: TObject);
@@ -655,25 +711,49 @@ end;
 procedure TFrmCadKits.BitBtn1Click(Sender: TObject);
 begin
   SpeedButton2.Hint := 'Enviar para Lixeira -  [PRO114]';
-  if vDadosIni.PesqPros('PRO110', 'PESQUISAR', '','KITS_PROD_KITS','', kit.buscas, true) then
-//  if vDadosIni.PesqPros('PRO110', '', Kit.buscas, true) then
-  begin
-    try
-      Screen.Cursor := crHourGlass;
-      inherited;
-      Kit.rKit.vCampo := ComboBox1.Text;
-      Kit.rKit.vCondicao := ComboBox3.Text;
-      Kit.rKit.vValor := trim(MaskEdit3.Text);
-//      Kit.rKit.vCampoAd := ComboBox11.Text;
-//      Kit.rKit.vValorAd := trim(MaskEdit7.Text);
-//      Kit.rKit.vDataIniAd := MaskEdit9.Text;
-//      Kit.rKit.vDataFimAd := MaskEdit8.Text;
-//      Kit.rKit.vCondicaoAd := ComboBox12.Text;
-//      Kit.rKit.vPorDataAd := MaskEdit9.Visible;
-      Kit.rKit.vAdicional := CheckBox1.Checked;
-      Kit._defineSqlAdicional;
+  if not vDadosIni.PesqPros('PRO110', 'PESQUISAR', '','KITS_PROD_KITS','', kit.buscas, true) then
+    Exit;
 
-      if MaskEdit2.Visible then
+  try
+    Screen.Cursor := crHourGlass;
+    inherited;
+    Kit.rKit.vCampo := ComboBox1.Text;
+    Kit.rKit.vCondicao := ComboBox3.Text;
+    Kit.rKit.vValor := trim(MaskEdit3.Text);
+    Kit.rKit.vAdicional := CheckBox1.Checked;
+    Kit._defineSqlAdicional;
+
+    if MaskEdit2.Visible then
+    begin
+      if (ckLixeira.Checked) and (ckLixeira.Visible) then
+      begin
+        if not Kit.ConsultaCamposLixeira('KITS_PROD', ComboBox1.Text,
+          'CODIGO_KIT', maskedit1.text, maskedit2.text, vDadosIni.codEmpresa, 1,
+          ' KITS_PROD.*, ' +
+          ' COALESCE(KITS_PROD_TOT.REGRA_PESO_DIM, '''') REGRA_PESO_DIM, ' +
+          ' COALESCE(KITS_PROD_TOT.QUANT_PROD_KIT, 0) QUANT_PROD_KIT, ' +
+          ' COALESCE(KITS_PROD_TOT.PREC_CUS_PROD, 0) PREC_CUS_PROD, ' +
+          ' COALESCE(KITS_PROD_TOT.PREC_CUSM_PROD, 0) PREC_CUSM_PROD, ' +
+          ' COALESCE(KITS_PROD_TOT.PREC_TAB_PROD, 0) PREC_TAB_PROD, ' +
+          ' COALESCE(KITS_PROD_TOT.PREC_PUBLICO, 0) PREC_PUBLICO, ' +
+          ' COALESCE(KITS_PROD_TOT.PREC_30_PROD, 0) PREC_30_PROD, ' +
+          ' COALESCE(KITS_PROD_TOT.PREC_60_PROD, 0) PREC_60_PROD, ' +
+          ' COALESCE(KITS_PROD_TOT.PREC_90_PROD, 0) PREC_90_PROD, ' +
+          ' COALESCE(KITS_PROD_TOT.PESO_BRUT_PROD, 0) PESO_BRUT_PROD, ' +
+          ' COALESCE(KITS_PROD_TOT.COMPRIMENTO_PROD, 0) COMPRIMENTO_PROD, ' +
+          ' COALESCE(KITS_PROD_TOT.LARGURA_PROD, 0) LARGURA_PROD, ' +
+             ' COALESCE(KITS_PROD_TOT.ALTURA_PROD, 0) ALTURA_PROD, ' +
+          ' COALESCE(KITS_PROD_TOT.EST_F, 0) EST_F, ' +
+          ' COALESCE(KITS_PROD_TOT.VALOR_TAB_PROKIT, 0) VALOR_TAB_PROKIT, ' +
+          ' COALESCE(KITS_PROD_TOT.DESCONTO_VALOR, 0) DESCONTO_VALOR, ' +
+          ' COALESCE(KITS_PROD_TOT.DESCONTO_PERC, 0) DESCONTO_PERC,  ' +
+          ' COALESCE(KITS_PROD_TOT.VALOR_DESC_TAB_PROKIT, 0) VALOR_DESC_TAB_PROKIT ',
+          ' LEFT JOIN KITS_PROD_TOT ON KITS_PROD_TOT.CODIGO_KIT = KITS_PROD.CODIGO_KIT AND KITS_PROD_TOT.COD_EMPRESA = KITS_PROD.COD_EMPRESA ',
+          Kit.rKit.vSqlAdicional) then
+            if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
+              combobox1.setfocus;
+      end
+      else
       begin
         if not Kit.ConsultaCampos('KITS_PROD', ComboBox1.Text,
           'CODIGO_KIT', maskedit1.text, maskedit2.text, vDadosIni.codEmpresa, 1,
@@ -690,7 +770,7 @@ begin
           ' COALESCE(KITS_PROD_TOT.PESO_BRUT_PROD, 0) PESO_BRUT_PROD, ' +
           ' COALESCE(KITS_PROD_TOT.COMPRIMENTO_PROD, 0) COMPRIMENTO_PROD, ' +
           ' COALESCE(KITS_PROD_TOT.LARGURA_PROD, 0) LARGURA_PROD, ' +
-			    ' COALESCE(KITS_PROD_TOT.ALTURA_PROD, 0) ALTURA_PROD, ' +
+             ' COALESCE(KITS_PROD_TOT.ALTURA_PROD, 0) ALTURA_PROD, ' +
           ' COALESCE(KITS_PROD_TOT.EST_F, 0) EST_F, ' +
           ' COALESCE(KITS_PROD_TOT.VALOR_TAB_PROKIT, 0) VALOR_TAB_PROKIT, ' +
           ' COALESCE(KITS_PROD_TOT.DESCONTO_VALOR, 0) DESCONTO_VALOR, ' +
@@ -700,6 +780,37 @@ begin
           Kit.rKit.vSqlAdicional) then
             if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
               combobox1.setfocus;
+      end;
+    end
+    else
+    begin
+      if (ckLixeira.Checked) and (ckLixeira.Visible) then
+      begin
+        if not Kit.ConsultaCamposLixeira('KITS_PROD', Kit.rKit.vValor, ComboBox1.Text,
+          combobox3.Text, 'CODIGO_KIT', true, vDadosIni.codEmpresa,
+          ' KITS_PROD.*, ' +
+          ' COALESCE(KITS_PROD_TOT.REGRA_PESO_DIM, '''') REGRA_PESO_DIM, ' +
+          ' COALESCE(KITS_PROD_TOT.QUANT_PROD_KIT, 0) QUANT_PROD_KIT, ' +
+          ' COALESCE(KITS_PROD_TOT.PREC_CUS_PROD, 0) PREC_CUS_PROD, ' +
+          ' COALESCE(KITS_PROD_TOT.PREC_CUSM_PROD, 0) PREC_CUSM_PROD, ' +
+          ' COALESCE(KITS_PROD_TOT.PREC_TAB_PROD, 0) PREC_TAB_PROD, ' +
+          ' COALESCE(KITS_PROD_TOT.PREC_PUBLICO, 0) PREC_PUBLICO, ' +
+          ' COALESCE(KITS_PROD_TOT.PREC_30_PROD, 0) PREC_30_PROD, ' +
+          ' COALESCE(KITS_PROD_TOT.PREC_60_PROD, 0) PREC_60_PROD, ' +
+          ' COALESCE(KITS_PROD_TOT.PREC_90_PROD, 0) PREC_90_PROD, ' +
+          ' COALESCE(KITS_PROD_TOT.PESO_BRUT_PROD, 0) PESO_BRUT_PROD, ' +
+          ' COALESCE(KITS_PROD_TOT.COMPRIMENTO_PROD, 0) COMPRIMENTO_PROD, ' +
+          ' COALESCE(KITS_PROD_TOT.LARGURA_PROD, 0) LARGURA_PROD, ' +
+             ' COALESCE(KITS_PROD_TOT.ALTURA_PROD, 0) ALTURA_PROD, ' +
+          ' COALESCE(KITS_PROD_TOT.EST_F, 0) EST_F, ' +
+          ' COALESCE(KITS_PROD_TOT.VALOR_TAB_PROKIT, 0) VALOR_TAB_PROKIT, ' +
+          ' COALESCE(KITS_PROD_TOT.DESCONTO_VALOR, 0) DESCONTO_VALOR, ' +
+          ' COALESCE(KITS_PROD_TOT.DESCONTO_PERC, 0) DESCONTO_PERC,  ' +
+          ' COALESCE(KITS_PROD_TOT.VALOR_DESC_TAB_PROKIT, 0) VALOR_DESC_TAB_PROKIT ',
+          ' LEFT JOIN KITS_PROD_TOT ON KITS_PROD_TOT.CODIGO_KIT = KITS_PROD.CODIGO_KIT AND KITS_PROD_TOT.COD_EMPRESA = KITS_PROD.COD_EMPRESA ',
+          Kit.rKit.vSqlAdicional) then
+            if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
+              ComboBox1.SetFocus;
       end
       else
       begin
@@ -718,7 +829,7 @@ begin
           ' COALESCE(KITS_PROD_TOT.PESO_BRUT_PROD, 0) PESO_BRUT_PROD, ' +
           ' COALESCE(KITS_PROD_TOT.COMPRIMENTO_PROD, 0) COMPRIMENTO_PROD, ' +
           ' COALESCE(KITS_PROD_TOT.LARGURA_PROD, 0) LARGURA_PROD, ' +
-			    ' COALESCE(KITS_PROD_TOT.ALTURA_PROD, 0) ALTURA_PROD, ' +
+             ' COALESCE(KITS_PROD_TOT.ALTURA_PROD, 0) ALTURA_PROD, ' +
           ' COALESCE(KITS_PROD_TOT.EST_F, 0) EST_F, ' +
           ' COALESCE(KITS_PROD_TOT.VALOR_TAB_PROKIT, 0) VALOR_TAB_PROKIT, ' +
           ' COALESCE(KITS_PROD_TOT.DESCONTO_VALOR, 0) DESCONTO_VALOR, ' +
@@ -729,22 +840,32 @@ begin
             if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
               ComboBox1.SetFocus;
       end;
-      Kit.ultimasql := Kit.dataSet.CommandText;
-      SpeedButton1.Visible := true;
-      SpeedButton5.Visible := false;
+    end;
+    Kit.ultimasql := Kit.dataSet.CommandText;
+    if ckLixeira.Checked then
+    begin
+      SpeedButton1.Visible := false;
+      SpeedButton5.Visible := true;
+      SpeedButton6.Visible := false;
+
+      SpeedButtonECommerce.Visible := false;
+      SpeedButton7.Visible := false;
+    end
+    else
+    begin
       SpeedButton1.Visible := true;
       SpeedButton5.Visible := false;
       SpeedButton6.Visible := true;
-      if Kit.StatusLixeira then
-        SpeedButton25.Visible := true
-      else
-        SpeedButton25.Visible := false;
-      Screen.Cursor := crDefault;
-      if (Self.Enabled) and (Self.Visible) and (DBGrid1.CanFocus) then
-      	DBGrid1.SetFocus;
-    finally
-      Screen.Cursor := crDefault;
+
+      SpeedButtonECommerce.Visible := true;
+      SpeedButton7.Visible := true;
     end;
+
+    Screen.Cursor := crDefault;
+    if (Self.Enabled) and (Self.Visible) and (DBGrid1.CanFocus) then
+       DBGrid1.SetFocus;
+  finally
+    Screen.Cursor := crDefault;
   end;
 end;
 
@@ -780,6 +901,10 @@ begin
     tsECommerce.TabVisible := False;
     PageControl3.ActivePage := TabSheet3;
     TabSheet3.Show;
+
+    Label158.Visible := vDadosIni.vHwCloudIA.vUsarVendaOnline = 'S';
+    DBComboBox22.Visible := vDadosIni.vHwCloudIA.vUsarVendaOnline = 'S';
+
     DBEdit1.Enabled:=true;
     MontarImagem;
     Kit.PreencheCampos;
@@ -1224,6 +1349,41 @@ begin
   end;
 end;
 
+procedure TFrmCadKits.btSalvarServLoteClick(Sender: TObject);
+begin
+  inherited;
+  try
+  	 Screen.Cursor := crHourGlass;
+    FrmCadKits.Enabled := false;
+    DBGrid1.Visible := false;
+
+    Kit.vAtualizarKit.vHabSomenteKitTodo := ckSomenteKitTodo.Checked;
+    Kit.vAtualizarKit.vHabVendaOnline := ckVendaOnline.Checked;
+
+    Kit.vAtualizarKit.vSomenteKitTodo := Trim(cbSomenteKitTodo.Text);
+    Kit.vAtualizarKit.vVendaOnline := Trim(cbVendaOnline.Text);
+
+    if not Kit.AtualizarKitsEmLote then
+	 begin
+      setFocusCampoErro(Kit.vNomeCampoErro, Kit.vMensagemErro);
+      exit;
+    end;
+  finally
+    _GravaConfiguracoesInteger(cbSomenteKitTodo.Name, cbSomenteKitTodo.ItemIndex);
+    _GravaConfiguracoesInteger(cbVendaOnline.Name, cbVendaOnline.ItemIndex);
+
+    _GravaConfiguracoesBoolean(ckSomenteKitTodo.Name, ckSomenteKitTodo.Checked);
+    _GravaConfiguracoesBoolean(ckVendaOnline.Name, ckVendaOnline.Checked);
+
+    FrmCadKits.Enabled := true;
+    DBGrid1.Visible := true;
+    Screen.Cursor := crDefault;
+  end;
+
+  PageControl1.ActivePage := tsAlterDadosKit;
+  tsAlterDadosKit.Show;
+end;
+
 procedure TFrmCadKits.btSelectAllClick(Sender: TObject);
 begin
   inherited;
@@ -1238,6 +1398,22 @@ begin
   end;
 end;
 
+procedure TFrmCadKits.btSincronizarServicosClick(Sender: TObject);
+begin
+  inherited;
+  try
+  	 Screen.Cursor := crHourGlass;
+    FrmCadKits.Enabled := false;
+    DBGrid1.Visible := false;
+  	 if not Kit.sincronizarKitsEmLote then
+      exit;
+  finally
+  	 FrmCadKits.Enabled := true;
+    DBGrid1.Visible := true;
+    Screen.Cursor := crDefault;
+  end;
+end;
+
 procedure TFrmCadKits.btUnSelectAllClick(Sender: TObject);
 begin
   inherited;
@@ -1249,6 +1425,63 @@ begin
   finally
     Screen.Cursor := crDefault;
     DBGrid1.Visible := true;
+  end;
+end;
+
+procedure TFrmCadKits.btVoltarDadosKit2Click(Sender: TObject);
+begin
+  inherited;
+  try
+    inherited;
+    ckLixeira.Visible := True;
+    ckLixeira.Checked := False;
+
+    if ckLixeira.Checked then
+      FrmCadKits.Caption := 'Kits de Produtos (Lixeira)'
+    else
+      FrmCadKits.Caption := 'Kits de Produtos';
+
+    Panel2.Visible := true;
+
+    GroupBox3.Parent := TabSheet2;
+
+    btVoltarDadosKit.Parent := Panel52;
+    BitBtn2.Visible := True;
+	 BitBtn3.Visible := True;
+    Panel1.Parent := TabSheet2;
+    PageControl1.ActivePage := TabSheet2;
+    TelaCadastro := 0;
+    Self.fechar  := False;
+  finally
+
+  end;
+end;
+
+procedure TFrmCadKits.btVoltarDadosKitClick(Sender: TObject);
+begin
+  try
+    inherited;
+    ckLixeira.Visible := True;
+    ckLixeira.Checked := False;
+
+    if ckLixeira.Checked then
+      FrmCadKits.Caption := 'Kits de Produtos (Lixeira)'
+    else
+      FrmCadKits.Caption := 'Kits de Produtos';
+
+    Panel2.Visible := true;
+
+    GroupBox3.Parent := TabSheet2;
+
+    btVoltarDadosKit.Parent := Panel52;
+    BitBtn2.Visible := True;
+	 BitBtn3.Visible := True;
+    Panel1.Parent := TabSheet2;
+    PageControl1.ActivePage := TabSheet2;
+    TelaCadastro := 0;
+    Self.fechar  := False;
+  finally
+
   end;
 end;
 
@@ -1307,6 +1540,93 @@ begin
     Label14.Font.Color := clTeal;
     CheckBox2.Font.Color := clTeal;
   end;
+end;
+
+procedure TFrmCadKits.ckLixeiraClick(Sender: TObject);
+begin
+  inherited;
+  if not ckLixeira.Visible then
+    exit;
+
+  if not ckLixeira.Enabled then
+  begin
+  	 if ckLixeira.Checked then
+    begin
+      SpeedButton2.Hint := 'Excluir registro permanentemente - [PRO113]';
+      btExcluirRegistro.Hint := 'Excluir registro permanentemente - [PRO113]';
+    end
+    else
+    begin
+      SpeedButton2.Hint := 'Enviar para Lixeira - [PRO114]';
+      btExcluirRegistro.Hint := 'Enviar para Lixeira - [PRO114]';
+    end;
+  	exit;
+  end;
+
+  if ckLixeira.Checked then
+  	 SpeedButton2.Hint := 'Excluir registro permanentemente - [PRO113]'
+  else
+ 	 SpeedButton2.Hint := 'Enviar para Lixeira - [PRO114]';
+
+  if (PageControl1.ActivePage = tsAlterDadosKit) then
+  begin
+    if ckLixeira.Checked then
+      FrmCadKits.Caption := 'Alteração Kits de Produtos em Lote (Lixeira)'
+    else
+      FrmCadKits.Caption := 'Alteração Kits de Produtos em Lote';
+  end
+  else
+  begin
+    if ckLixeira.Checked then
+    	FrmCadKits.Caption := 'Kits de Produtos (Lixeira)'
+    else
+      FrmCadKits.Caption := 'Kits de Produtos';
+  end;
+  BitBtn1Click(Sender);
+end;
+
+procedure TFrmCadKits.ckPermOpcaoMarcadasClick(Sender: TObject);
+begin
+  inherited;
+  _GravaConfiguracoesBoolean(ckPermOpcaoMarcadas.Name, ckPermOpcaoMarcadas.Checked);
+end;
+
+procedure TFrmCadKits.ckSomenteKitTodoClick(Sender: TObject);
+begin
+  inherited;
+  cbSomenteKitTodo.Enabled := ckSomenteKitTodo.Checked;
+  if ckSomenteKitTodo.Checked then
+  begin
+  	 pnSomenteKitTodo.ParentBackground := False;
+	 pnSomenteKitTodo.Color := clYellow;
+  end
+  else
+  begin
+  	 pnSomenteKitTodo.ParentBackground := True;
+  	 pnSomenteKitTodo.Color := clBtnFace;
+  end;
+
+  if (Self.Enabled) and (Self.Visible) and (cbSomenteKitTodo.CanFocus) then
+  	cbSomenteKitTodo.SetFocus;
+end;
+
+procedure TFrmCadKits.ckVendaOnlineClick(Sender: TObject);
+begin
+  inherited;
+  cbVendaOnline.Enabled := ckVendaOnline.Checked;
+  if ckVendaOnline.Checked then
+  begin
+  	 pnVendaOnline.ParentBackground := False;
+	 pnVendaOnline.Color := clYellow;
+  end
+  else
+  begin
+  	 pnVendaOnline.ParentBackground := True;
+  	 pnVendaOnline.Color := clBtnFace;
+  end;
+
+  if (Self.Enabled) and (Self.Visible) and (cbVendaOnline.CanFocus) then
+  	cbVendaOnline.SetFocus;
 end;
 
 procedure TFrmCadKits.Configurarcolunas1Click(Sender: TObject);
@@ -1849,8 +2169,10 @@ begin
   TabSheetEC4.TabVisible := false;
   TabSheetEC5.TabVisible := false;
   tsImagemKit.TabVisible := false;
+  tsAlterDadosKit.TabVisible := false;
+  tsAlterDadosLote.TabVisible := false;
   PageControl1.ActivePage := TabSheet2;
-	PageControl3.ActivePage := TabSheet3;
+  PageControl3.ActivePage := TabSheet3;
 
   if vDadosIni.vModalOuChild <> 'M' then
     FormStyle := fsMDIChild;
@@ -1927,8 +2249,11 @@ begin
         ListPositions2, nomeDTSEt2, PrimeiraPesquisa2, vCamposPadraoRegistro2, usuario2);
     end;
   end;
+
   if TelaCadastro = 1 then
     BitBtn3Click(Sender);
+
+  lixeiraVazia(not Kit.StatusLixeira);
 
   if PrimeiraPesquisa2 then
   begin
@@ -2244,6 +2569,34 @@ begin
   vDadosIni.SomarvaloresdacolunaCadPadraoClick(DBGrid2, lbStatusProcessamento, lbTextoProcessamento, pnStatusProcessamento);
 end;
 
+procedure TFrmCadKits.SpeedBDesmarcarTodosClick(Sender: TObject);
+begin
+  inherited;
+  try
+    Screen.Cursor := crHourGlass;
+    DBGrid1.Visible := false;
+    Kit._desmarcarTodos;
+
+  finally
+    Screen.Cursor := crDefault;
+    DBGrid1.Visible := true;
+  end;
+end;
+
+procedure TFrmCadKits.SpeedBSelTodosClick(Sender: TObject);
+begin
+  inherited;
+  try
+    Screen.Cursor := crHourGlass;
+    DBGrid1.Visible := false;
+    Kit._marcarTodos;
+
+  finally
+    Screen.Cursor := crDefault;
+    DBGrid1.Visible := true;
+  end;
+end;
+
 procedure TFrmCadKits.SpeedButton10Click(Sender: TObject);
 begin
   inherited;
@@ -2405,6 +2758,10 @@ begin
     PageControl1.ActivePage := TabSheet1;
     TabSheet1.Show;
     TabSheet3.TabVisible := true;
+
+    Label158.Visible := vDadosIni.vHwCloudIA.vUsarVendaOnline = 'S';
+    DBComboBox22.Visible := vDadosIni.vHwCloudIA.vUsarVendaOnline = 'S';
+
     tsECommerce.TabVisible := (vDadosIni.vEcommerce.vHabilitarEcommerce)
     	and (trim(vDadosIni.vEcommerce.vEcommerceIntegrado) = 'TRAY');
     PageControl3.ActivePage := TabSheet3;
@@ -2429,6 +2786,11 @@ begin
       SpeedButton6.Visible := true;
       SpeedButtonECommerce.Visible := (vDadosIni.vEcommerce.vHabilitarEcommerce)
     		and (trim(vDadosIni.vEcommerce.vEcommerceIntegrado) = 'TRAY');
+      SpeedButton7.Visible := true;
+
+      ckLixeira.Enabled := false;
+      ckLixeira.Checked := false;
+      ckLixeira.Enabled := true;
     end
     else
     begin
@@ -2437,6 +2799,11 @@ begin
       SpeedButton5.Visible := true;
       SpeedButton6.Visible := false;
       SpeedButtonECommerce.Visible := false;
+      SpeedButton7.Visible := false;
+
+      ckLixeira.Enabled := false;
+      ckLixeira.Checked := true;
+      ckLixeira.Enabled := true;
     end;
   end;
 end;
@@ -3032,6 +3399,54 @@ begin
     end;
 end;
 
+procedure TFrmCadKits.SpeedButton7Click(Sender: TObject);
+begin
+  inherited;
+  try
+    Screen.Cursor := crHourGlass;
+    GroupBox3.Parent := Panel52;
+    BitBtn2.Visible := False;
+	 BitBtn3.Visible := False;
+    btVoltarDadosKit.Parent := GroupBox3;
+    Panel1.Visible := true;
+    Panel1.Parent := Panel128;
+	 Panel2.Visible := False;
+
+    Panel52.Visible := false;
+    Panel52.Align := alNone;
+
+    GroupBox79.Visible := false;
+    GroupBox79.Align := alNone;
+
+    Panel52.Visible := True;
+    Panel52.Align := alTop;
+
+//    GroupBox79.Visible := True;
+//    GroupBox79.Align := alTop;
+
+    Panel52.Height := GroupBox3.Height;
+
+    _LerConfiguracoesRegistroBoolean(ckPermOpcaoMarcadas.Name, False);
+
+    PageControl1.ActivePage := tsAlterDadosKit;
+
+    lbCorLote.Visible := false;
+    pnCorLote.Visible := false;
+
+    TelaCadastro := 5;
+
+    ckPermOpcaoMarcadas.Visible := true;
+    
+    ckLixeira.Visible    := True;
+    if ckLixeira.Checked then
+      FrmCadKits.Caption := 'Alteração Kits de Produtos em Lote (Lixeira)'
+    else
+      FrmCadKits.Caption := 'Alteração Kits de Produtos em Lote';
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
+
 procedure TFrmCadKits.SpeedButton9Click(Sender: TObject);
 begin
 	if not Kit.vKitEC.checarCamposEcommerce(Kit, Kit.vItKit) then
@@ -3067,6 +3482,90 @@ begin
 	HTMLDocument := WebBrowserEC.Document as IHTMLDocument2;
   carregarwebbrownser(WebBrowserEC, vDadosIni.abreFormEditorHtml(HTMLDocument.body.innerHTML, '', false));
   Kit.vKitEC.dataSet.FieldByName('DESCR_KIT_COMPL').AsString := HTMLDocument.body.innerHTML;
+end;
+
+procedure TFrmCadKits.SpeedButtonAlterarKitClick(Sender: TObject);
+begin
+  inherited;
+  SpeedButton1Click(Sender);
+
+  if (Kit.dataSet.State in [dsInsert, dsEdit]) then
+  begin
+  	 if Kit.dataSet.FieldByName('ativo').AsInteger <> 1 then
+     	Kit.dataSet.FieldByName('ativo').AsInteger := 1;
+  end;
+end;
+
+procedure TFrmCadKits.SpeedButtonAlterarProduto2Click(Sender: TObject);
+var
+  I: Integer;
+  vIndexFieldNames: string;
+  vIndexName: string;
+  vRecNo: Integer;
+begin
+  inherited;
+  if not vDadosIni.PesqPros('PRO460', 'ALTERAR', '', 'KITS_PROD', '', Kit.buscas, true) then
+	 Exit;
+
+  for I := 0 to ComponentCount - 1 do
+    if (Components[I] is TScrollBox) then
+      TScrollBox(Components[I]).VertScrollBar.Position := 0;
+
+  pnVendaOnline.Visible := vDadosIni.vHwCloudIA.vUsarVendaOnline = 'S';
+
+  cbSomenteKitTodo.ItemIndex := _LerConfiguracoesRegistroInteger(cbSomenteKitTodo.Name);
+  cbVendaOnline.ItemIndex := _LerConfiguracoesRegistroInteger(cbVendaOnline.Name);
+
+  if ckPermOpcaoMarcadas.Checked then
+	ckSomenteKitTodo.Checked := _LerConfiguracoesRegistroBoolean(ckSomenteKitTodo.Name)
+  else
+  	ckSomenteKitTodo.Checked := false;
+  ckSomenteKitTodoClick(Sender);
+
+  if not pnVendaOnline.Visible then
+   ckVendaOnline.Checked := False
+  else if ckPermOpcaoMarcadas.Checked then
+	ckVendaOnline.Checked := _LerConfiguracoesRegistroBoolean(ckVendaOnline.Name)
+  else
+  	ckVendaOnline.Checked := false;
+  ckVendaOnlineClick(Sender);
+
+  try
+  	 vIndexFieldNames := Kit.dataSet.IndexFieldNames;
+    vIndexName       := Kit.dataSet.IndexName;
+    vRecNo           := Kit.dataSet.RecNo;
+
+    for I := 0 to Kit.dataSet.Fields.Count - 1 do
+    begin
+    	if trim(Kit.dataSet.Fields[I].DisplayName) = trim(ComboBox2.text) then
+      begin
+      	vIndexFieldNames := Kit.dataSet.Fields[I].FieldName;
+        break;
+      end;
+    end;
+
+    Kit.dataSet.DisableControls;
+    Kit.dataSet.Filtered := false;
+    Kit.dataSet.Filter := 'sel = ''S'' ';
+    Kit.dataSet.Filtered := true;
+
+    if Kit.dataSet.IsEmpty then
+    begin
+      Application.MessageBox('Nenhum produto selecionado.', 'Atenção',
+        MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
+      exit;
+    end;
+  finally
+  	 Kit.dataSet.Filtered        := false;
+    Kit.dataSet.IndexName       := vIndexName;
+    Kit.dataSet.IndexFieldNames := vIndexFieldNames;
+    if Kit.dataSet.RecordCount >= vRecNo then
+	   Kit.dataSet.RecNo         := vRecNo;
+    Kit.dataSet.EnableControls;
+  end;
+
+  PageControl1.ActivePage := tsAlterDadosLote;
+  tsAlterDadosLote.Show;
 end;
 
 procedure TFrmCadKits.TabSheet4Show(Sender: TObject);

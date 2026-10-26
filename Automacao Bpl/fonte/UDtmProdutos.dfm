@@ -3359,6 +3359,14 @@ object dtmProdutos: TdtmProdutos
       FieldName = 'DESCRICAO_EC1'
       Size = 100
     end
+    object cdsGradeDATA_CAD_GR: TDateTimeField
+      DisplayLabel = 'Data Cadastro'
+      FieldName = 'DATA_CAD_GR'
+    end
+    object cdsGradeDATA_MOD_GR: TDateTimeField
+      DisplayLabel = 'Data Modificac'#227'o'
+      FieldName = 'DATA_MOD_GR'
+    end
   end
   object dsGrade: TDataSource
     AutoEdit = False
@@ -4315,6 +4323,19 @@ object dtmProdutos: TdtmProdutos
       ReadOnly = True
       DisplayFormat = '##0.000'
     end
+    object cdsKitsSINC_HW_CLOUD: TStringField
+      DisplayLabel = 'Venda Online'
+      FieldName = 'SINC_HW_CLOUD'
+      Size = 1
+    end
+    object cdsKitsDATA_CAD_KIT: TDateTimeField
+      DisplayLabel = 'Data Cadastro'
+      FieldName = 'DATA_CAD_KIT'
+    end
+    object cdsKitsDATA_MOD_KIT: TDateTimeField
+      DisplayLabel = 'Data Modificac'#227'o'
+      FieldName = 'DATA_MOD_KIT'
+    end
   end
   object dsKits: TDataSource
     DataSet = cdsKits
@@ -5122,6 +5143,7 @@ object dtmProdutos: TdtmProdutos
     object cdsTipoServNFS_SERVICO: TStringField
       DisplayLabel = 'LC 116/03'
       FieldName = 'NFS_SERVICO'
+      EditMask = '99.99;1;_'
       FixedChar = True
       Size = 5
     end

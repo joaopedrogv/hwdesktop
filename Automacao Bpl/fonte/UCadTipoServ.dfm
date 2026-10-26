@@ -26,7 +26,6 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
       inherited PageControl1: TPageControl
         Width = 896
         Height = 618
-        ActivePage = tsAlterDadosLote
         ExplicitWidth = 896
         ExplicitHeight = 618
         inherited TabSheet1: TTabSheet
@@ -42,7 +41,6 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
             inherited PageControl3: TPageControl
               Width = 888
               Height = 539
-              ActivePage = tsPadNacional
               OnChange = PageControl3Change
               ExplicitWidth = 888
               ExplicitHeight = 539
@@ -1823,6 +1821,7 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                   Font.Name = 'Tahoma'
                   Font.Style = []
                   ParentFont = False
+                  Visible = False
                   OnClick = linkVerCorrelFiscalClick
                 end
                 object lbCIndOp: TLabel
@@ -1892,16 +1891,17 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                   TabOrder = 3
                 end
                 object DBLookupComboBox3: TDBLookupComboBox
-                  Left = 171
+                  Left = 308
                   Top = 151
-                  Width = 520
+                  Width = 383
                   Height = 21
                   DataField = 'NFS_SERVICO'
                   DataSource = dtmProdutos.dsTipoServ
                   KeyField = 'COD_TPSERVICO'
                   ListField = 'COD_TPSERVICO;DESC_TPSERVICO'
                   ListSource = dtmProdutos.DtTipoServicoLC
-                  TabOrder = 4
+                  TabOrder = 6
+                  Visible = False
                   OnExit = DBLookupComboBox3Exit
                 end
                 object DBEdit9: TDBEdit
@@ -1911,17 +1911,18 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                   Height = 21
                   DataField = 'ISS_RETIDO'
                   DataSource = dtmProdutos.dsTipoServ
-                  TabOrder = 5
+                  TabOrder = 7
                 end
                 object DBComboBox12: TDBComboBox
                   Left = 171
                   Top = 205
                   Width = 520
                   Height = 21
+                  Style = csDropDownList
                   DataField = 'CST_PIS'
                   DataSource = dtmProdutos.dsTipoServ
                   ItemHeight = 13
-                  TabOrder = 6
+                  TabOrder = 8
                   OnExit = DBComboBox12Exit
                 end
                 object DBComboBox11: TDBComboBox
@@ -1929,6 +1930,7 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                   Top = 232
                   Width = 520
                   Height = 21
+                  Style = csDropDownList
                   DataField = 'CST_PIS_ENT'
                   DataSource = dtmProdutos.dsTipoServ
                   ItemHeight = 13
@@ -1985,7 +1987,7 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                     '75 - Opera'#231#227'o de Aquisi'#231#227'o por Substitui'#231#227'o Tribut'#225'ria'
                     '98 - Outras Opera'#231#245'es de Entrada'
                     '99 - Outras Opera'#231#245'es')
-                  TabOrder = 7
+                  TabOrder = 9
                   OnExit = DBComboBox11Exit
                 end
                 object DBComboBox15: TDBComboBox
@@ -1996,7 +1998,7 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                   DataField = 'NAT_REC'
                   DataSource = dtmProdutos.dsTipoServ
                   ItemHeight = 13
-                  TabOrder = 8
+                  TabOrder = 10
                   OnEnter = DBComboBox15Enter
                 end
                 object edCIndOp: TDBEdit
@@ -2006,7 +2008,16 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                   Height = 21
                   DataField = 'CINDOP'
                   DataSource = dtmProdutos.dsTipoServ
-                  TabOrder = 9
+                  TabOrder = 4
+                end
+                object DBEdit17: TDBEdit
+                  Left = 171
+                  Top = 151
+                  Width = 82
+                  Height = 21
+                  DataField = 'NFS_SERVICO'
+                  DataSource = dtmProdutos.dsTipoServ
+                  TabOrder = 5
                 end
               end
               object TabSheet6: TTabSheet
@@ -2320,8 +2331,6 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
           end
         end
         inherited TabSheet2: TTabSheet
-          ExplicitLeft = 4
-          ExplicitTop = 27
           ExplicitWidth = 888
           ExplicitHeight = 587
           inherited GroupBox3: TGroupBox
@@ -3176,8 +3185,6 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
           end
         end
         inherited tsMemo: TTabSheet
-          ExplicitLeft = 4
-          ExplicitTop = 27
           ExplicitWidth = 888
           ExplicitHeight = 587
         end
@@ -5139,6 +5146,188 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                   303548CFCFCFCFCFCFCFCFCFCF4A6D45341FCFCFCFCFCFCFCFCF}
                 OnClick = SpeedButton68Click
               end
+              object btSincronizarServicos: TSpeedButton
+                Left = 269
+                Top = 2
+                Width = 51
+                Height = 45
+                Hint = 'Sincronizar servi'#231'os - [BAS562]'
+                Flat = True
+                Glyph.Data = {
+                  36150000424D361500000000000036000000280000002A0000002A0000000100
+                  18000000000000150000C40E0000C40E00000000000000000000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFAFAFAA7A1A45D555C443A
+                  4140363C40363C40363C40363C40363C40363C40363C40363C40363C40363C40
+                  363C40363C40363C40363C40363C40363C443A415D555DA7A2A5FAFAFAFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE5E4E44D454C6554868971D5977D
+                  F1987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF398
+                  7EF3987EF3987EF3987EF3987EF3987EF3977DF18871D462538550464CE6E5E5
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF9F9F94D444B7E68BE987EF3856DCD6955
+                  966B589B6C599E6C599E6C599E6C599E6C599E6C599E6C599E6C599E6C599E6C
+                  599E6C599E6C599E6C599E6C599E6B589B695596856ECD987EF37D67BD50464C
+                  FAFAFAFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA6A1A3635487987EF3715EA8715CA5987E
+                  F3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF398
+                  7EF3987EF3987EF3987EF3987EF3987EF3987EF3705CA4735EAA987EF3625385
+                  A7A2A5FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5C53598972D6836CCB715CA5987EF3987E
+                  F3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF398
+                  7EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3705CA4856DCD8871D4
+                  5D555DFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF483C43977DF1695596987EF3987EF3987E
+                  F3987EF3987EF3987EF3987EF3987EF3947BEC816AC47A69AC7969A9816CC195
+                  7CED987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3695596977DF1
+                  483C43FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF453B42987EF36A5799987EF3987EF3987E
+                  F3987EF3987EF3987EF38F76DE756A929291A1C4CCCFD0D9DACFD8D9C8D1D394
+                  91A2786D958C75DA987EF3987EF3987EF3987EF3987EF3987EF36A5799987EF3
+                  453B42FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF453B42987EF36A5799987EF3987EF38C75
+                  D9786D939178E67F6DB49290A0C4CBCE857F99776A9A7A69AB7B6AAE76699A82
+                  7B96C2CACE9897A67F6EB4987EF3987EF3987EF3987EF3987EF36A5799987EF3
+                  453B42FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF453B42987EF36A5799987EF3987EF37668
+                  A0CFD8D960537CB2B6C09795A57E6DB6987EF3987EF3987EF3987EF3987EF398
+                  7EF37E6DB6908E9FB3B6C17F6DB4987EF3987EF3987EF3987EF36A5799987EF3
+                  453B42FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF453B42987EF36A5799987EF3987EF37667
+                  9FD7E2E393929C9795A58A73D4987EF3987EF3987EF3987EF3987EF3987EF398
+                  7EF3987EF38B75D59290A19796A58D76DB987EF3987EF3987EF36A5799987EF3
+                  453B42FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF453B42987EF36A5799987EF3987EF37667
+                  9FEAF8F9E8F4F576717F787090937AE9987EF3987EF3987EF3987EF3987EF398
+                  7EF3987EF3987EF3806DB8C1C8CD786E96987EF3987EF3987EF36A5799987EF3
+                  453B42FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF453B42987EF36A5799987EF3987EF37B6A
+                  AE8E8AA08F8CA28F8CA27E78919077E3987EF3987EF3987EF3987EF3987EF398
+                  7EF3987EF3987EF3987EF3827C979492A3947AEA987EF3987EF36A5799987EF3
+                  453B42FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF453B42987EF36A5799987EF3987EF3987E
+                  F3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF398
+                  7EF3987EF3987EF3987EF3776A9BC6CED0826DC3987EF3987EF36A5799987EF3
+                  453B42FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF453B42987EF36A5799987EF3987EF3987E
+                  F3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF398
+                  7EF3987EF3987EF3987EF38671CC7D798A8671CC987EF3987EF36A5799987EF3
+                  453B42FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF453B42987EF36A5799987EF3987EF38672
+                  CD7D798B8671CC987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF398
+                  7EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF36A5799987EF3
+                  453B42FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF453B42987EF36A5799987EF3987EF3816D
+                  C2C7D0D1776A9C987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF398
+                  7EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF38870D3987EF3
+                  453B42FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF453B42987EF36A5799987EF3987EF3937A
+                  EA9594A3827C98987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF398
+                  7EF39077E47E78918F8CA28F8CA28E8AA17B6BAE987EF3987EF36A5799987EF3
+                  453B42FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF453B42987EF36A5799987EF3987EF3987E
+                  F3796E95C0C5CB816EBA987EF3987EF3987EF3987EF3987EF3987EF3987EF398
+                  7EF3937AE978709076717FE8F4F5EBF9FA76689F987EF3987EF37863B6987EF3
+                  453B42FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF453B42987EF36A5799987EF3987EF3987E
+                  F38C75DA999AA88F8E9F8C74D8987EF3987EF3987EF3987EF3987EF3987EF398
+                  7EF3987EF38A73D49694A494949ED7E2E376689F987EF3987EF37863B5987EF3
+                  453B42FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF453B42987EF36A5799987EF3987EF3987E
+                  F3987EF37E6DB3B4B9C28F8E9F806DBA987EF3987EF3987EF3987EF3987EF398
+                  7EF37E6DB69492A3B3B7C160537CCFD8D97668A0987EF3987EF38770D4987EF3
+                  453B42FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF453B42987EF36A5799987EF3987EF3987E
+                  F3987EF3987EF37E6DB39A99A7C0C6CB817B9776689A7B6AB07B6AAC776A9A84
+                  7E98C2CACE9491A27E6CB39178E6786E938C75D9987EF3987EF3987EF3987EF3
+                  453B42FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF453B42987EF36A5799987EF3987EF3987E
+                  F3987EF3987EF3987EF38C73D8786D949493A3C8D1D3D0D9DAD0D9DAC5CECF93
+                  90A2766B938F76DE987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3
+                  453B42FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF483C43977DF1695596987EF3987EF3987E
+                  F3987EF3987EF3987EF3987EF3987EF3947BEC7F6BC07A6AA97A69AC816BC394
+                  7BEC987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3977DF1
+                  483C43FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5C535A8A71D7836CCA715DA6987EF3987E
+                  F3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF398
+                  7EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF38971D5
+                  5D545CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA5A0A265558A987EF3715DA6715DA6987E
+                  F3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF398
+                  7EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3655486
+                  A7A1A4FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF8F8F84D444A7D68BF987EF3836CCA6956
+                  976B589B6C599E6C599E6C599E6C599E6C599E6C599E6C599E6C599E6C599E6C
+                  599E6C599E6C599E6C599E6D599F967DEF987EF3987EF3987EF37E68BE4D444B
+                  F9F9F9FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE4E3E34D434A65558A8972D6977E
+                  F2987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF3987EF398
+                  7EF3987EF3987EF3987EF3987EF3987EF3977EF28971D56354874D454CE5E4E4
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF8F8F8A39FA15A5159443A
+                  4140363C40363C40363C40363C40363C40363C40363C40363C40363C40363C40
+                  363C40363C40363C40363C40363C40363C443A415C5359A6A1A3F9F9F9FFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000}
+                ParentShowHint = False
+                ShowHint = True
+                OnClick = btSincronizarServicosClick
+              end
               object pnCorLote: TPanel
                 Left = 614
                 Top = 4
@@ -5199,14 +5388,14 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
               object Label473: TLabel
                 Left = 8
                 Top = 13
-                Width = 881
+                Width = 856
                 Height = 13
                 Caption = 
-                  'Dados  do Produto        -                    -                 ' +
-                  '   -                    -                    -                  ' +
-                  '  -                    -                    -                   ' +
-                  ' -                    -                    -                    ' +
-                  '-                    '
+                  'Dados  do Tipo de Servi'#231'o        -                    -         ' +
+                  '           -                    -                    -          ' +
+                  '          -                    -                    -           ' +
+                  '         -                    -                    -            ' +
+                  '        -'
                 Font.Charset = DEFAULT_CHARSET
                 Font.Color = clBlue
                 Font.Height = -11
@@ -5970,7 +6159,7 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
               object pnLc116: TPanel
                 Left = 1
                 Top = 288
-                Width = 562
+                Width = 280
                 Height = 28
                 TabOrder = 18
                 object lbLc116: TLabel
@@ -5995,15 +6184,16 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                   TabOrder = 0
                   OnClick = ckLc116Click
                 end
-                object DBLLc116: TDBLookupComboBox
+                object edLc116: TMaskEdit
+                  AlignWithMargins = True
                   Left = 188
-                  Top = 4
-                  Width = 362
+                  Top = 2
+                  Width = 61
                   Height = 21
-                  KeyField = 'COD_TPSERVICO'
-                  ListField = 'COD_TPSERVICO;DESC_TPSERVICO'
-                  ListSource = dtmProdutos.DtTipoServicoLC
+                  EditMask = '99.99;1;_'
+                  MaxLength = 5
                   TabOrder = 1
+                  Text = '  .  '
                 end
               end
               object pnTribNac: TPanel
@@ -6086,8 +6276,8 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                 end
               end
               object pnNbs: TPanel
-                Left = 1
-                Top = 316
+                Left = 283
+                Top = 288
                 Width = 280
                 Height = 28
                 TabOrder = 19
@@ -6126,8 +6316,8 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                 end
               end
               object pnIndOp: TPanel
-                Left = 283
-                Top = 316
+                Left = 565
+                Top = 288
                 Width = 280
                 Height = 28
                 TabOrder = 20
@@ -6166,7 +6356,7 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
               end
               object pnIssRetido: TPanel
                 Left = 1
-                Top = 344
+                Top = 316
                 Width = 280
                 Height = 28
                 TabOrder = 21
@@ -6219,7 +6409,7 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
               end
               object pnCstPisCofins: TPanel
                 Left = 1
-                Top = 400
+                Top = 372
                 Width = 844
                 Height = 28
                 TabOrder = 22
@@ -6250,14 +6440,14 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                   Top = 4
                   Width = 644
                   Height = 21
+                  Style = csDropDownList
                   ItemHeight = 13
                   TabOrder = 1
-                  Text = 'cbCstPisCofins'
                 end
               end
               object pnCstPisCofinsEnt: TPanel
                 Left = 1
-                Top = 372
+                Top = 344
                 Width = 844
                 Height = 28
                 TabOrder = 23
@@ -6288,9 +6478,46 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                   Top = 4
                   Width = 644
                   Height = 21
+                  Style = csDropDownList
                   ItemHeight = 13
                   TabOrder = 1
-                  Text = 'cbCstPisCofinsEnt'
+                end
+              end
+              object pnNatRecPisCofins: TPanel
+                Left = 1
+                Top = 400
+                Width = 844
+                Height = 28
+                TabOrder = 24
+                object lbNatRecPisCofins: TLabel
+                  Left = 42
+                  Top = 7
+                  Width = 140
+                  Height = 13
+                  Alignment = taRightJustify
+                  Caption = 'Natureza Receita PISCOFINS'
+                  Font.Charset = DEFAULT_CHARSET
+                  Font.Color = clWindowText
+                  Font.Height = -11
+                  Font.Name = 'Tahoma'
+                  Font.Style = []
+                  ParentFont = False
+                end
+                object ckNatRecPisCofins: TCheckBox
+                  Left = 21
+                  Top = 6
+                  Width = 19
+                  Height = 17
+                  TabOrder = 0
+                  OnClick = ckNatRecPisCofinsClick
+                end
+                object cbNatRecPisCofins: TComboBox
+                  Left = 188
+                  Top = 4
+                  Width = 644
+                  Height = 21
+                  ItemHeight = 13
+                  TabOrder = 1
                 end
               end
             end
@@ -6443,10 +6670,6 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
     inherited lbStatusProcessamento: TLabel
       ExplicitLeft = 10
       ExplicitTop = 26
-    end
-    inherited lbTextoProcessamento: TLabel
-      Width = 477
-      Height = 21
     end
   end
   inherited PopupMenu1: TPopupMenu

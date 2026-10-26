@@ -71,7 +71,8 @@ type
     vHabEspecieVap, vHabUnidade, vHabVendaOnline: boolean;
     vHabCnaeServ, vHabLc116, vHabTribNac: boolean;
     vHabTribMun, vHabNbs, vHabIndOp: boolean;
-    vHabIssRetido, vHabCstPisCofins, vHabCstPisCofinsEnt: boolean;
+    vHabIssRetido: boolean;
+    vHabCstPisCofins, vHabCstPisCofinsEnt, vHabNatRecPisCofins: boolean;
 
     vCodCfopLote, vAliqIss: Double; vServIsento: string;
     vNaoIncidencia, vTmoSimult: string; vTmo: Double;
@@ -80,7 +81,20 @@ type
     vCodEspecieVap: Integer; vUnidade: string; vVendaOnline: string;
     vCnaeServ, vLc116, vTribNac: string;
     vTribMun, vNbs, vIndOp: string;
-    vIssRetido, vCstPisCofins, vCstPisCofinsEnt: string;
+    vIssRetido: string;
+    vCstPisCofins, vCstPisCofinsEnt, vNatRecPisCofins: string;
+  end;
+
+  RAtualizarKit = record
+    vHabSomenteKitTodo, vHabVendaOnline: boolean;
+
+    vSomenteKitTodo, vVendaOnline: string;
+  end;
+
+  RAtualizarGrade = record
+    vHabTipo1, vHabTipo2: boolean;
+
+    vTipo1, vTipo2: string;
   end;
 
   TOpfProduto = (opfIcms, opfPISCOFINS, opfRetencao);
@@ -1804,6 +1818,8 @@ type
     procedure _marcarTodos;
     procedure _desmarcarTodos;
     procedure _marcaDesmarcaLinha;
+    function AtualizarKitsEmLote: boolean;
+    function sincronizarKitsEmLote: boolean;
   var
   	vItKit: TItKitsProdutos;
   	vKitCons: TKitsCons;
@@ -1814,6 +1830,8 @@ type
     rKit: RConsultaKit;
     ultimasql, campoComErro: string;
     montarTreeViewEC: boolean;
+    vAtualizarKit: RAtualizarKit;
+    oldCodKit: string;
   end;
 
   TConsCategoriasKit = class(TDataSet_OOP)
@@ -1969,10 +1987,6 @@ type
   TGrade = class(TDataSet_OOP)
   private
     fOldCodGrade: Integer;
-    fTIPO1: string;
-    fTIPO2: string;
-    fHAB_TIPO1: boolean;
-    fHAB_TIPO2: boolean;
     procedure renconciliaErro(DataSet: TCustomClientDataSet;
       E: EReconcileError; UpdateKind: TUpdateKind; var Action: TReconcileAction);
     function replicaGrade: boolean;
@@ -1996,15 +2010,13 @@ type
     procedure _marcarTodos;
     procedure _desmarcarTodos;
     function atualizarGradesEmLote: boolean;
+    function sincronizarGradesEmLote: boolean;
     function _abreFormGradesAlteracaoEmLote: Boolean;
-
-    property vTIPO1: string read fTIPO1 write fTIPO1;
-    property vTIPO2: string read fTIPO2 write fTIPO2;
-    property vHAB_TIPO1: boolean read fHAB_TIPO1 write fHAB_TIPO1;
-    property vHAB_TIPO2: boolean read fHAB_TIPO2 write fHAB_TIPO2;
   var
   	FTipoGrade: TTipoGrade;
     ultimasql: string;
+    vAtualizarGrade: RAtualizarGrade;
+    oldCodGrade: string;
   end;
 
   TGradeEstoque = class(TDataSet_OOP)
@@ -2346,6 +2358,7 @@ type
     function _replicarTipoServ: Boolean;
     procedure verificarTipoServEmpresas;
     function AtualizarTiposServicosEmLote: boolean;
+    function sincronizarTiposServicosEmLote: boolean;
     function buscasCfop(pCfop: Integer): boolean;
   var
   	 TipoTipoServ: TTipoTipoServ;
@@ -5441,7 +5454,7 @@ begin
 		  dataSet.CommandText := vSQL;
 		  dataSet.Open;
 
-        vDadosIni.GravaAuditoria('PRO362', vtempMensagem,	'SUCESSO', 'PRODUTOS', '', buscas);
+        vDadosIni.GravaAuditoria('PRO362', vtempMensagem, 'SUCESSO', 'PRODUTOS', '', buscas);
       end;
 
       Result := true;
@@ -5453,18 +5466,17 @@ begin
       dataSet.IndexName       := vIndexName;
       dataSet.IndexFieldNames := vIndexFieldNames;
       if dataSet.RecordCount >= vRecNo then
-	      dataSet.RecNo           := vRecNo;
+	     dataSet.RecNo           := vRecNo;
       dataSet.EnableControls;
 
       if Assigned(buscas2) then
-      	FreeAndNil(buscas2);
+        FreeAndNil(buscas2);
 
       if Assigned(buscasU) then
-      	FreeAndNil(buscasU);
+        FreeAndNil(buscasU);
 
       vDadosIni.fechaStatusProcessamento;
     end;
-
   except
     on e: exception do
     begin
@@ -14419,7 +14431,7 @@ end;
 
 function TProdutos.sincronizarProdutosEmLote: boolean;
 var
-	fTempListaProdutos: TClientDataSet;
+  fTempListaProdutos: TClientDataSet;
   vIndexFieldNames: string;
   vIndexName: string;
   vRecNo: Integer;
@@ -14430,7 +14442,7 @@ var
   vinc_a_cada_reg: Integer;
   vsalvar_a_cada_reg: Integer;
 begin
-	Result := false;
+  Result := false;
   vSQL := '';
   vtempMensagem := 'SALVAR';
 
@@ -20606,21 +20618,55 @@ end;
 
 function TGrade.atualizarGradesEmLote: boolean;
 var
-	vIndexFieldNames: string;
-	vIndexName: string;
+  vIndexFieldNames: string;
+  vIndexName: string;
   vRecNo: Integer;
-	vCodigo: Integer;
+  vCodigo: Integer;
+  vtempMensagem: string;
+  I: Integer;
   vSQL: string;
+  vUpdate: string;
+  buscas2: TIBQuery;
+  buscasU: TIBQuery;
   fTempListaGrades: TClientDataSet;
-begin
-	vSQL := '';
+  campo: CampoServInput;
+  campos: CamposServInput;
+  vinc_a_cada_reg: Integer;
+  vsalvar_a_cada_reg: Integer;
 
-	if not vDadosIni.PesqPros('PRO454', 'ATUALIZAR', '', 'GRADE', '', buscas, False) then
+  procedure AddCampoValue(pNomeCampo: string; pValorCampo: Variant);
+  begin
+  	 vUpdate := vUpdate + ', ' + pNomeCampo + ' = :' + pNomeCampo;
+
+  	 SetLength(campos, Length(campos) + 1);
+
+    campo.NomeCampo  := pNomeCampo;
+    campo.ValorCampo := pValorCampo;
+
+    campos[High(campos)] := campo;
+  end;
+begin
+  Result := false;
+  vSQL := '';
+  vUpdate := '';
+
+  vtempMensagem := 'SALVAR';
+
+  if not vDadosIni.PesqPros('PRO454', vtempMensagem, '', 'GRADE', '', buscas, False) then
     Exit;
 
-	try
+  try
+    buscas2 := TIBQuery.Create(nil);
+    buscasU := TIBQuery.Create(nil);
+
     try
-    	vIndexFieldNames := dataSet.IndexFieldNames;
+    	buscas2.Database := buscas.Database;
+      buscas2.Transaction := buscas.Transaction;
+
+      buscasU.Database := buscas.Database;
+      buscasU.Transaction := buscas.Transaction;
+
+      vIndexFieldNames := dataSet.IndexFieldNames;
     	vIndexName       := dataSet.IndexName;
       vRecNo           := dataSet.RecNo;
 
@@ -20631,11 +20677,18 @@ begin
 
         if dataSet.IsEmpty then
         begin
-          Application.MessageBox('Nenhum contrato selecionado.', 'Atenção',
+          Application.MessageBox('Nenhum grade selecionada.', 'Atenção',
             MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
-          dataSet.Refresh;
           exit;
         end;
+
+        with vAtualizarGrade do
+        begin
+        	 if (not vHabTipo1)
+      		and (not vHabTipo2) then
+          		raiseExceptionCreate('Nenhum opção selecionada!', '');
+        end;
+
 
         fTempListaGrades := TClientDataSet.Create(nil);
         fTempListaGrades.Close;
@@ -20671,89 +20724,111 @@ begin
         dataSet.Filtered := False;
       end;
 
-      if vHAB_TIPO1 then
+      vDadosIni.vDataHora := vDadosIni.getDataHoraBanco(buscas);
+      
+      vsalvar_a_cada_reg := vDadosIni.getConfSisInt('grade_alt_lote_reg', buscas);
+
+      with vAtualizarGrade do
       begin
-      	if (vDadosIni.vEcommerce.vHabilitarEcommerce) then
-          if trim(vTIPO1) = '' then
+        if vHabTipo1 then
+      	 if trim(vTIPO1) = '' then
             raiseExceptionCreate('Tipo 1 deve ser informado', 'cbTipo1');
-			end;
 
-//      if vHAB_TIPO2 then
-//      begin
-//        if trim(vTIPO2) = '' then
-//          raiseExceptionCreate('Tipo 2 deve ser informado', 'cbTipo2');
-//      end;
-
-     if (not vHAB_TIPO1)
-      and (not vHAB_TIPO2) then
-      	raiseExceptionCreate('Nenhum opção selecionada!', '');
-
-      try
-        fTempListaGrades.DisableControls;
-        fTempListaGrades.First;
-        while not fTempListaGrades.Eof do
-        begin
-          vDadosIni.abreStatusProcessamento('', 'Atualizando dados dos contratos (' +
-            IntToStr(fTempListaGrades.RecNo) + '/' + IntToStr(fTempListaGrades.RecordCount) + ')');
-
-          abreGrade(fTempListaGrades.FieldByName('COD_GRADE').AsInteger);
-
-          if not dataSet.IsEmpty then
+        try
+          fTempListaGrades.DisableControls;
+          fTempListaGrades.First;
+          while not fTempListaGrades.Eof do
           begin
-            vCodigo := dataSet.FieldByName('COD_GRADE').AsInteger;
+            vDadosIni.abreStatusProcessamento('', 'Atualizando dados grade (' +
+              IntToStr(fTempListaGrades.RecNo) + '/' + IntToStr(fTempListaGrades.RecordCount) + ')');
 
-            dataSet.Edit;
+            vUpdate := 'UPDATE GRADE SET ATIVO = 1 ';
 
-            if vHAB_TIPO1 then
-              dataSet.FieldByName('TIPO_EC').AsString := trim(vTIPO1);
+            SetLength(campos, 0);
 
-            if vHAB_TIPO2 then
-              dataSet.FieldByName('TIPO_EC1').AsString := trim(vTIPO2);
+            oldCodGrade := IntToStr(fTempListaGrades.FieldByName('COD_GRADE').AsInteger); 
 
-            dataSet.Post;
+            AddCampoValue('DATA_MOD_GR', DateOf(vDadosIni.vDataHora));
 
-            if (not Apply) and (dataSet.ChangeCount > 0) then
-            begin
-              dataSet.CancelUpdates;
-              RollBackTransacao;
-              Result := False;
+            if vHabTipo1 then
+              if fTempListaGrades.FieldByName('COD_GRADE').AsInteger <= 0 then
+                AddCampoValue('TIPO_EC', Null)
+              else
+              	 AddCampoValue('TIPO_EC', trim(vTipo1));
 
-              dataSet.Close;
-              dataSet.CommandText := vSQL;
-              dataSet.Open;
+            if vHabTipo2 then
+              if fTempListaGrades.FieldByName('COD_GRADE').AsInteger <= 0 then
+                AddCampoValue('TIPO_EC1', Null)
+              else
+              	 AddCampoValue('TIPO_EC1', trim(vTipo2));
 
-              Exit;
-            end;
+            vUpdate := vUpdate +
+              ' WHERE COD_GRADE = :PCOD_GRADE ' +
+              ' AND COD_EMPRESA = :PCOD_EMPRESA ';
+
+            buscasU.Close;
+            buscasU.SQL.Text := vUpdate;
+
+            for I := Low(campos) to High(campos) do
+              buscasU.ParamByName(campos[I].NomeCampo).Value := campos[I].ValorCampo;
+
+            buscasU.ParamByName('PCOD_GRADE').AsInteger := fTempListaGrades.FieldByName('COD_GRADE').AsInteger;
+            buscasU.ParamByName('PCOD_EMPRESA').AsInteger  := StrToInt(vDadosIni.codEmpresa);
+            buscasU.ExecSQL;
 
             vDadosIni.GravaAuditoria('PRO454', 'ATUALIZAR', '', 'GRADE', IntToStr(vCodigo), buscas);
-          end;
 
-          fTempListaGrades.Next;
+            Inc(vinc_a_cada_reg);
+
+            if (vsalvar_a_cada_reg > 0) and (vinc_a_cada_reg >= vsalvar_a_cada_reg) then
+            begin
+              Application.ProcessMessages;
+              vDadosIni.abreStatusProcessamento('', 'Salvando dados grade (' +
+                IntToStr(fTempListaGrades.RecNo) + '/' + IntToStr(fTempListaGrades.RecordCount) + ')');
+
+              vinc_a_cada_reg := 0;
+
+              CommitaTransacao;
+            end;
+
+            fTempListaGrades.Next;
+          end;
+        finally
+          fTempListaGrades.First;
+          fTempListaGrades.EnableControls;
         end;
-      finally
-        fTempListaGrades.EnableControls;
+
+        Application.ProcessMessages;
+        vDadosIni.abreStatusProcessamento('', 'Atualizando dados grade (' +
+        IntToStr(fTempListaGrades.RecordCount) + '/' + IntToStr(fTempListaGrades.RecordCount) + ')');
+
+        CommitaTransacao;
+
+        dataSet.Close;
+        dataSet.CommandText := vSQL;
+        dataSet.Open;
+
+        vDadosIni.GravaAuditoria('PRO454', vtempMensagem, 'SUCESSO', 'GRADE', '', buscas);
       end;
 
       Result := True;
 
-      CommitaTransacao;
-
       if Result then
-      	vDadosIni.GravaAuditoria('PRO454', 'ATUALIZAR',	'SUCESSO', 'GRADE', '', buscas);
-
-      dataSet.Close;
-      dataSet.CommandText := vSQL;
-      dataSet.Open;
-
-      if Result then
-      	dataSet.Refresh;
+        dataSet.Refresh;
     finally
     	dataSet.Filtered        := false;
       dataSet.IndexName       := vIndexName;
       dataSet.IndexFieldNames := vIndexFieldNames;
       if dataSet.RecordCount >= vRecNo then
-	      dataSet.RecNo           := vRecNo;
+	     dataSet.RecNo           := vRecNo;
       dataSet.EnableControls;
+
+      if Assigned(buscas2) then
+        FreeAndNil(buscas2);
+
+      if Assigned(buscasU) then
+        FreeAndNil(buscasU);
+        
       vDadosIni.fechaStatusProcessamento;
     end;
   except
@@ -21016,6 +21091,9 @@ begin
   if inherited Edit then
   begin
     Result := True;
+    if dataSet.FieldByName('DATA_CAD_GR').IsNull then
+      dataSet.FieldByName('DATA_CAD_GR').AsDateTime := vDadosIni.getDataBanco(buscas);
+    dataSet.FieldByName('DATA_MOD_GR').AsDateTime := vDadosIni.getDataBanco(buscas);
     dataSet.FieldByName('DESCRICAO').AsString := trim(dataSet.FieldByName('DESCRICAO').AsString);
     dataSet.FieldByName('DESCRICAO1').AsString := trim(dataSet.FieldByName('DESCRICAO1').AsString);
   end;
@@ -21053,7 +21131,11 @@ function TGrade.insert: boolean;
 begin
   Result := inherited insert;
   if Result then
-    dataSet.FieldByName('cod_empresa').AsString := vDadosIni.codEmpresa;
+  begin
+    dataSet.FieldByName('DATA_CAD_GR').AsDateTime := vDadosIni.getDataBanco(buscas);
+    dataSet.FieldByName('DATA_MOD_GR').AsDateTime := vDadosIni.getDataBanco(buscas);
+    dataSet.FieldByName('COD_EMPRESA').AsString := vDadosIni.codEmpresa;
+  end;
 end;
 
 function TGrade.post: boolean;
@@ -21370,6 +21452,176 @@ begin
       vDadosIni.fechaStatusProcessamento;
       Result := false;
       Application.MessageBox(pchar('Erro: ' + e.Message), 'Atenção', MB_ICONERROR + MB_OK);
+      registraErro(e.Message);
+    end;
+  end;
+end;
+
+function TGrade.sincronizarGradesEmLote: boolean;
+var
+  fTempListaGrades: TClientDataSet;
+  vIndexFieldNames: string;
+  vIndexName: string;
+  vRecNo: Integer;
+  vSQL: string;
+  buscasU: TIBQuery;
+  vtempMensagem: string;
+  vinc_a_cada_reg: Integer;
+  vsalvar_a_cada_reg: Integer;
+begin
+  Result := false;
+  vSQL := '';
+  vtempMensagem := 'SALVAR';
+
+  if not vDadosIni.PesqPros('PRO463', vtempMensagem, '', 'GRADE', '', buscas, False) then
+  	Exit;
+	try
+  	buscasU := TIBQuery.Create(nil);
+
+  	try
+      buscasU.Database := buscas.Database;
+      buscasU.Transaction := buscas.Transaction;
+
+      vIndexFieldNames := dataSet.IndexFieldNames;
+    	vIndexName       := dataSet.IndexName;
+      vRecNo           := dataSet.RecNo;
+
+    	try
+        dataSet.Filtered := false;
+        dataSet.Filter := 'sel = ''S'' ';
+        dataSet.Filtered := true;
+
+        if dataSet.IsEmpty then
+        begin
+          Application.MessageBox('Nenhum grade selecionada.', 'Atenção',
+            MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
+          exit;
+        end;
+
+        if Application.MessageBox('Deseja sincronizar as grade selecionadas?',
+        	'Confirmação', MB_YESNO + MB_ICONQUESTION + MB_DEFBUTTON2) <> mrYES then
+          	exit;
+
+        vDadosIni.vDataHora := vDadosIni.getDataHoraBanco(buscas);
+
+        vsalvar_a_cada_reg := vDadosIni.getConfSisInt('grade_alt_lote_reg', buscas);
+
+        fTempListaGrades := TClientDataSet.Create(nil);
+        fTempListaGrades.Close;
+        fTempListaGrades.FieldDefs.Clear;
+        fTempListaGrades.FieldDefs.Add('COD_GRADE', ftInteger, 0, false);
+        fTempListaGrades.close;
+        fTempListaGrades.CreateDataSet;
+        fTempListaGrades.EmptyDataSet;
+
+        try
+          dataSet.DisableControls;
+          dataSet.First;
+          while not dataSet.Eof do
+          begin
+          	Application.ProcessMessages;
+            vDadosIni.abreStatusProcessamento('', 'Lendo dados grade (' +
+              IntToStr(dataSet.RecNo) + '/' + IntToStr(dataSet.RecordCount) + ')');
+
+            if dataSet.FieldByName('sel').AsString = 'S' then
+            begin
+              fTempListaGrades.Insert;
+              fTempListaGrades.FieldByName('COD_GRADE').AsInteger := dataSet.FieldByName('COD_GRADE').AsInteger;
+              fTempListaGrades.Post;
+            end;
+
+            dataSet.Next;
+          end;
+        finally
+          dataSet.EnableControls;
+        end;
+
+        vSQL := dataSet.CommandText;
+      finally
+        dataSet.Filtered := false;
+      end;
+
+      vinc_a_cada_reg := 0;
+
+      try
+        fTempListaGrades.DisableControls;
+        fTempListaGrades.First;
+        while not fTempListaGrades.Eof do
+        begin
+          Application.ProcessMessages;
+          vDadosIni.abreStatusProcessamento('', 'Sincronizando grade (' +
+            IntToStr(fTempListaGrades.RecNo) + '/' + IntToStr(fTempListaGrades.RecordCount) + ')');
+
+          buscasU.Close;
+          buscasU.SQL.Text := ' UPDATE GRADE SET ' +
+          	' DATA_MOD_GR = :DATA_MOD_GR ' +
+          	' WHERE COD_GRADE = :PCOD_GRADE ' +
+            ' AND COD_EMPRESA = :PCOD_EMPRESA ';
+          buscasU.ParamByName('PCOD_GRADE').AsInteger := fTempListaGrades.FieldByName('COD_GRADE').AsInteger;
+          buscasU.ParamByName('PCOD_EMPRESA').AsInteger  := StrToInt(vDadosIni.codEmpresa);
+          buscasU.ParamByName('DATA_MOD_GR').AsDateTime := vDadosIni.vDataHora;
+          buscasU.ExecSQL;
+          
+          vDadosIni.GravaAuditoria('PRO463', vtempMensagem, '', 'GRADE',
+            IntToStr(fTempListaGrades.FieldByName('COD_GRADE').AsInteger), buscas);
+
+          Inc(vinc_a_cada_reg);
+
+          if (vsalvar_a_cada_reg > 0) and (vinc_a_cada_reg >= vsalvar_a_cada_reg) then
+          begin
+            Application.ProcessMessages;
+            vDadosIni.abreStatusProcessamento('', 'Salvando dados grade (' +
+              IntToStr(fTempListaGrades.RecNo) + '/' + IntToStr(fTempListaGrades.RecordCount) + ')');
+
+            vinc_a_cada_reg := 0;
+
+            CommitaTransacao;
+          end;
+
+          fTempListaGrades.Next;
+        end;
+      finally
+      	fTempListaGrades.First;
+      	fTempListaGrades.EnableControls;
+      end;
+
+      Application.ProcessMessages;
+      vDadosIni.abreStatusProcessamento('', 'Atualizando dados grade (' +
+        IntToStr(fTempListaGrades.RecordCount) + '/' + IntToStr(fTempListaGrades.RecordCount) + ')');
+
+      CommitaTransacao;
+
+      dataSet.Close;
+      dataSet.CommandText := vSQL;
+      dataSet.Open;
+
+      vDadosIni.GravaAuditoria('PRO463', vtempMensagem,	'SUCESSO', 'GRADE', '', buscas);
+
+      Result := true;
+
+      if Result then
+      	dataSet.Refresh;
+    finally
+      dataSet.Filtered        := false;
+      dataSet.IndexName       := vIndexName;
+      dataSet.IndexFieldNames := vIndexFieldNames;
+      if dataSet.RecordCount >= vRecNo then
+	      dataSet.RecNo           := vRecNo;
+      dataSet.EnableControls;
+
+      if Assigned(buscasU) then
+      	FreeAndNil(buscasU);
+
+      vDadosIni.fechaStatusProcessamento;
+    end;
+
+  except
+    on e: exception do
+    begin
+      Result := false;
+      RollBackTransacao;
+      vDadosIni.GravaAuditoria('PRO463', vtempMensagem,	'FALHA', 'GRADE', '', buscas);
+      Application.MessageBox(pchar(e.Message), 'Atenção', MB_ICONERROR + MB_OK);
       registraErro(e.Message);
     end;
   end;
@@ -23125,6 +23377,241 @@ begin
      ' AND KITS_PROD.ATIVO = 0');
 end;
 
+function TKitsProdutos.AtualizarKitsEmLote: boolean;
+var
+  fTempListaKits: TClientDataSet;
+  vIndexFieldNames: string;
+  vIndexName: string;
+  vRecNo: Integer;
+  vMensagemTmp: string;
+  vmensagemP, vmensagem: string;
+  vtempMensagem: string;
+  vSQL: string;
+  vUpdate: string;
+  buscas2: TIBQuery;
+  buscasU: TIBQuery;
+  I: Integer;
+  campo: CampoServInput;
+  campos: CamposServInput;
+  vinc_a_cada_reg: Integer;
+  vsalvar_a_cada_reg: Integer;
+
+  procedure AddCampoValue(pNomeCampo: string; pValorCampo: Variant);
+  begin
+  	 vUpdate := vUpdate + ', ' + pNomeCampo + ' = :' + pNomeCampo;
+
+  	 SetLength(campos, Length(campos) + 1);
+
+    campo.NomeCampo  := pNomeCampo;
+    campo.ValorCampo := pValorCampo;
+
+    campos[High(campos)] := campo;
+  end;
+begin
+  Result := false;
+  vSQL := '';
+  vUpdate := '';
+
+  vtempMensagem := 'SALVAR';
+
+  if not vDadosIni.PesqPros('PRO461', vtempMensagem, '', 'KITS_PROD', '', buscas, False) then
+  	 Exit;
+
+  try
+    buscas2 := TIBQuery.Create(nil);
+    buscasU := TIBQuery.Create(nil);
+
+  	 try
+      buscas2.Database := buscas.Database;
+      buscas2.Transaction := buscas.Transaction;
+
+      buscasU.Database := buscas.Database;
+      buscasU.Transaction := buscas.Transaction;
+
+      vIndexFieldNames := dataSet.IndexFieldNames;
+    	vIndexName       := dataSet.IndexName;
+      vRecNo           := dataSet.RecNo;
+
+      try
+        dataSet.Filtered := false;
+        dataSet.Filter := 'sel = ''S'' ';
+        dataSet.Filtered := true;
+
+        if dataSet.IsEmpty then
+        begin
+          Application.MessageBox('Nenhum kit selecionado.', 'Atenção',
+            MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
+          exit;
+        end;
+
+        with vAtualizarKit do
+        begin
+          if (not vHabSomenteKitTodo)
+          	and (not vHabVendaOnline) then
+              raiseExceptionCreate('Nenhum opção selecionada!', '');
+        end;
+
+        fTempListaKits := TClientDataSet.Create(nil);
+        fTempListaKits.Close;
+        fTempListaKits.FieldDefs.Clear;
+        for I := 0 to dataSet.Fields.Count - 1 do
+        	fTempListaKits.FieldDefs.Add(
+          dataSet.Fields[i].FieldName,
+          dataSet.Fields[i].DataType,
+          dataSet.Fields[i].Size, false);
+        fTempListaKits.close;
+        fTempListaKits.CreateDataSet;
+        fTempListaKits.EmptyDataSet;
+
+        try
+          dataSet.DisableControls;
+          dataSet.First;
+          while not dataSet.Eof do
+          begin
+          	Application.ProcessMessages;
+            vDadosIni.abreStatusProcessamento('', 'Lendo dados kits (' +
+              IntToStr(dataSet.RecNo) + '/' + IntToStr(dataSet.RecordCount) + ')');
+
+            if dataSet.FieldByName('sel').AsString = 'S' then
+            begin
+              fTempListaKits.Insert;
+              for I := 0 to dataSet.Fields.Count - 1 do
+              	fTempListaKits.FieldByName(dataSet.Fields[I].FieldName).Value := dataSet.Fields[I].Value;
+              fTempListaKits.Post;
+            end;
+
+            dataSet.Next;
+          end;
+
+        finally
+        	 vDadosIni.fechaStatusProcessamento;
+          dataSet.EnableControls;
+        end;
+
+        vSQL := dataSet.CommandText;
+      finally
+        dataSet.Filtered := false;
+      end;
+
+      vDadosIni.vDataHora := vDadosIni.getDataHoraBanco(buscas);
+      
+      vsalvar_a_cada_reg := vDadosIni.getConfSisInt('kit_cad_alt_lote_reg', buscas);
+
+      with vAtualizarKit do
+      begin
+        try
+           fTempListaKits.DisableControls;
+           fTempListaKits.First;
+           while not fTempListaKits.Eof do
+           begin
+             Application.ProcessMessages;
+             vDadosIni.abreStatusProcessamento('', 'Atualizando dados kit (' +
+               IntToStr(fTempListaKits.RecNo) + '/' + IntToStr(fTempListaKits.RecordCount) + ')');
+
+             vUpdate := 'UPDATE KITS_PROD SET ATIVO = 1 ';
+
+             SetLength(campos, 0);
+
+             oldCodKit := IntToStr(fTempListaKits.FieldByName('CODIGO_KIT').AsInteger);
+
+             AddCampoValue('DATA_MOD_KIT', DateOf(vDadosIni.vDataHora));
+
+             if vHabSomenteKitTodo then
+               AddCampoValue('KIT_TODO', vSomenteKitTodo);
+
+             if vHabVendaOnline then
+               AddCampoValue('SINC_HW_CLOUD', vVendaOnline);
+
+             vUpdate := vUpdate +
+               ' WHERE CODIGO_KIT = :PCODIGO_KIT ' +
+               ' AND COD_EMPRESA = :PCOD_EMPRESA ';
+
+             buscasU.Close;
+             buscasU.SQL.Text := vUpdate;
+
+             for I := Low(campos) to High(campos) do
+               buscasU.ParamByName(campos[I].NomeCampo).Value := campos[I].ValorCampo;
+
+             buscasU.ParamByName('PCODIGO_KIT').AsInteger := fTempListaKits.FieldByName('CODIGO_KIT').AsInteger;
+             buscasU.ParamByName('PCOD_EMPRESA').AsInteger  := StrToInt(vDadosIni.codEmpresa);
+             buscasU.ExecSQL;
+
+             vDadosIni.GravaAuditoria('PRO461', vtempMensagem, '',
+               'TIPO_SERVICO', oldCodKit, buscas);
+
+             Inc(vinc_a_cada_reg);
+
+             if (vsalvar_a_cada_reg > 0) and (vinc_a_cada_reg >= vsalvar_a_cada_reg) then
+             begin
+               Application.ProcessMessages;
+               vDadosIni.abreStatusProcessamento('', 'Salvando dados kit (' +
+                 IntToStr(fTempListaKits.RecNo) + '/' + IntToStr(fTempListaKits.RecordCount) + ')');
+
+               vinc_a_cada_reg := 0;
+
+               CommitaTransacao;
+             end;
+
+             fTempListaKits.Next;
+           end;
+        finally
+          fTempListaKits.First;
+          fTempListaKits.EnableControls;
+        end;
+
+        Application.ProcessMessages;
+        vDadosIni.abreStatusProcessamento('', 'Atualizando dados kit (' +
+        IntToStr(fTempListaKits.RecordCount) + '/' + IntToStr(fTempListaKits.RecordCount) + ')');
+
+        CommitaTransacao;
+
+        dataSet.Close;
+        dataSet.CommandText := vSQL;
+        dataSet.Open;
+
+        vDadosIni.GravaAuditoria('PRO461', vtempMensagem, 'SUCESSO', 'KITS_PROD', '', buscas);
+      end;
+
+      Result := true;
+
+      if Result then
+        dataSet.Refresh;   
+    finally
+      dataSet.Filtered        := false;
+      dataSet.IndexName       := vIndexName;
+      dataSet.IndexFieldNames := vIndexFieldNames;
+      if dataSet.RecordCount >= vRecNo then
+        dataSet.RecNo           := vRecNo;
+      dataSet.EnableControls;
+
+      if Assigned(buscas2) then
+        FreeAndNil(buscas2);
+
+      if Assigned(buscasU) then
+        FreeAndNil(buscasU);
+
+      vDadosIni.fechaStatusProcessamento;
+    end;
+  except
+    on e: exception do
+    begin
+      Result := false;
+      RollBackTransacao;
+
+      if trim(vSQL) <> '' then
+      begin
+	      dataSet.Close;
+  	    dataSet.CommandText := vSQL;
+    	  dataSet.Open;
+      end;
+
+      vDadosIni.GravaAuditoria('PRO461', vtempMensagem,	'FALHA', 'KITS_PROD', '', buscas);
+      Application.MessageBox(pchar(e.Message), 'Atenção', MB_ICONERROR + MB_OK);
+      registraErro(e.Message);
+    end;
+  end;
+end;
+
 procedure TKitsProdutos.CadKits(TipoForm: integer);
 begin
 	try
@@ -23330,6 +23817,10 @@ begin
 	Result := inherited edit;
   if Result then
   begin
+   if dataSet.FieldByName('DATA_CAD_KIT').IsNull then
+     dataSet.FieldByName('DATA_CAD_KIT').AsDateTime := vDadosIni.getDataBanco(buscas);
+   dataSet.FieldByName('DATA_MOD_KIT').AsDateTime := vDadosIni.getDataBanco(buscas);
+
   	montarTreeViewEC := true;
 
   	dataset.FieldByName('DESCRICAO_KIT').AsString := trim(dataset.FieldByName('DESCRICAO_KIT').AsString);
@@ -23346,6 +23837,8 @@ begin
 	Result := inherited Insert;
   if Result then
   begin
+   dataSet.FieldByName('DATA_CAD_KIT').AsDateTime := vDadosIni.getDataBanco(buscas);
+   dataSet.FieldByName('DATA_MOD_KIT').AsDateTime := vDadosIni.getDataBanco(buscas);
   	montarTreeViewEC := false;
 
   	vCategorias.abreCategorias(dataSet);
@@ -24093,7 +24586,7 @@ begin
     else
     begin
     	RollBackTransacao;
-    	vDadosIni.GravaAuditoria('PRO115', 'RESTAURAR', 'FALHA', 'COND_PAG',
+    	vDadosIni.GravaAuditoria('PRO115', 'RESTAURAR', 'FALHA', 'KITS_PROD',
         vDadosIni.IfThen(trim(vCodKit) <> '', vCodKit, ''), buscas);
     end;
 
@@ -24106,6 +24599,176 @@ begin
       vDadosIni.fechaStatusProcessamento;
       Result := false;
       Application.MessageBox(pchar('Erro: ' + e.Message), 'Atenção', MB_ICONERROR + MB_OK);
+      registraErro(e.Message);
+    end;
+  end;
+end;
+
+function TKitsProdutos.sincronizarKitsEmLote: boolean;
+var
+  fTempListaKits: TClientDataSet;
+  vIndexFieldNames: string;
+  vIndexName: string;
+  vRecNo: Integer;
+  vSQL: string;
+  buscasU: TIBQuery;
+  vtempMensagem: string;
+  vinc_a_cada_reg: Integer;
+  vsalvar_a_cada_reg: Integer;
+begin
+  Result := false;
+  vSQL := '';
+  vtempMensagem := 'SALVAR';
+
+  if not vDadosIni.PesqPros('PRO462', vtempMensagem, '', 'KITS_PROD', '', buscas, False) then
+  	Exit;
+	try
+  	buscasU := TIBQuery.Create(nil);
+
+  	try
+      buscasU.Database := buscas.Database;
+      buscasU.Transaction := buscas.Transaction;
+
+      vIndexFieldNames := dataSet.IndexFieldNames;
+    	vIndexName       := dataSet.IndexName;
+      vRecNo           := dataSet.RecNo;
+
+    	try
+        dataSet.Filtered := false;
+        dataSet.Filter := 'sel = ''S'' ';
+        dataSet.Filtered := true;
+
+        if dataSet.IsEmpty then
+        begin
+          Application.MessageBox('Nenhum kit selecionado.', 'Atenção',
+            MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
+          exit;
+        end;
+
+        if Application.MessageBox('Deseja sincronizar os kits selecionados?',
+        	'Confirmação', MB_YESNO + MB_ICONQUESTION + MB_DEFBUTTON2) <> mrYES then
+          	exit;
+
+        vDadosIni.vDataHora := vDadosIni.getDataHoraBanco(buscas);
+
+        vsalvar_a_cada_reg := vDadosIni.getConfSisInt('kit_cad_alt_lote_reg', buscas);
+
+        fTempListaKits := TClientDataSet.Create(nil);
+        fTempListaKits.Close;
+        fTempListaKits.FieldDefs.Clear;
+        fTempListaKits.FieldDefs.Add('COD_SERVICO', ftInteger, 0, false);
+        fTempListaKits.close;
+        fTempListaKits.CreateDataSet;
+        fTempListaKits.EmptyDataSet;
+
+        try
+          dataSet.DisableControls;
+          dataSet.First;
+          while not dataSet.Eof do
+          begin
+          	Application.ProcessMessages;
+            vDadosIni.abreStatusProcessamento('', 'Lendo dados kits (' +
+              IntToStr(dataSet.RecNo) + '/' + IntToStr(dataSet.RecordCount) + ')');
+
+            if dataSet.FieldByName('sel').AsString = 'S' then
+            begin
+              fTempListaKits.Insert;
+              fTempListaKits.FieldByName('COD_SERVICO').AsInteger := dataSet.FieldByName('COD_SERVICO').AsInteger;
+              fTempListaKits.Post;
+            end;
+
+            dataSet.Next;
+          end;
+        finally
+          dataSet.EnableControls;
+        end;
+
+        vSQL := dataSet.CommandText;
+      finally
+        dataSet.Filtered := false;
+      end;
+
+      vinc_a_cada_reg := 0;
+
+      try
+        fTempListaKits.DisableControls;
+        fTempListaKits.First;
+        while not fTempListaKits.Eof do
+        begin
+          Application.ProcessMessages;
+          vDadosIni.abreStatusProcessamento('', 'Sincronizando kits (' +
+            IntToStr(fTempListaKits.RecNo) + '/' + IntToStr(fTempListaKits.RecordCount) + ')');
+
+          buscasU.Close;
+          buscasU.SQL.Text := ' UPDATE KITS_PROD SET ' +
+          	' DATA_MOD_KIT = :DATA_MOD_KIT ' +
+          	' WHERE CODIGO_KIT = :PCODIGO_KIT ' +
+            ' AND COD_EMPRESA = :PCOD_EMPRESA ';
+          buscasU.ParamByName('PCODIGO_KIT').AsInteger := fTempListaKits.FieldByName('COD_SERVICO').AsInteger;
+          buscasU.ParamByName('PCOD_EMPRESA').AsInteger  := StrToInt(vDadosIni.codEmpresa);
+          buscasU.ParamByName('DATA_MOD_KIT').AsDateTime := vDadosIni.vDataHora;
+          buscasU.ExecSQL;
+          
+          vDadosIni.GravaAuditoria('PRO462', vtempMensagem, '', 'KITS_PROD',
+            IntToStr(fTempListaKits.FieldByName('COD_SERVICO').AsInteger), buscas);
+
+          Inc(vinc_a_cada_reg);
+
+          if (vsalvar_a_cada_reg > 0) and (vinc_a_cada_reg >= vsalvar_a_cada_reg) then
+          begin
+            Application.ProcessMessages;
+            vDadosIni.abreStatusProcessamento('', 'Salvando dados kit (' +
+              IntToStr(fTempListaKits.RecNo) + '/' + IntToStr(fTempListaKits.RecordCount) + ')');
+
+            vinc_a_cada_reg := 0;
+
+            CommitaTransacao;
+          end;
+
+          fTempListaKits.Next;
+        end;
+      finally
+      	fTempListaKits.First;
+      	fTempListaKits.EnableControls;
+      end;
+
+      Application.ProcessMessages;
+      vDadosIni.abreStatusProcessamento('', 'Atualizando dados kit (' +
+        IntToStr(fTempListaKits.RecordCount) + '/' + IntToStr(fTempListaKits.RecordCount) + ')');
+
+      CommitaTransacao;
+
+      dataSet.Close;
+      dataSet.CommandText := vSQL;
+      dataSet.Open;
+
+      vDadosIni.GravaAuditoria('PRO462', vtempMensagem,	'SUCESSO', 'KITS_PROD', '', buscas);
+
+      Result := true;
+
+      if Result then
+      	dataSet.Refresh;
+    finally
+      dataSet.Filtered        := false;
+      dataSet.IndexName       := vIndexName;
+      dataSet.IndexFieldNames := vIndexFieldNames;
+      if dataSet.RecordCount >= vRecNo then
+	      dataSet.RecNo           := vRecNo;
+      dataSet.EnableControls;
+
+      if Assigned(buscasU) then
+      	FreeAndNil(buscasU);
+
+      vDadosIni.fechaStatusProcessamento;
+    end;
+
+  except
+    on e: exception do
+    begin
+      Result := false;
+      RollBackTransacao;
+      vDadosIni.GravaAuditoria('PRO462', vtempMensagem,	'FALHA', 'KITS_PROD', '', buscas);
+      Application.MessageBox(pchar(e.Message), 'Atenção', MB_ICONERROR + MB_OK);
       registraErro(e.Message);
     end;
   end;
@@ -25917,7 +26580,9 @@ end;
 function TLocCFOP.abreCFOP: boolean;
 begin
   buscas.Close;
-  buscas.SQL.Text := 'select CODIGO_NOP,DESCRICAO_NOP from nat_op where ativo=1';
+  buscas.SQL.Text := 'select CODIGO_NOP, DESCRICAO_NOP from nat_op ' +
+  	' where CODIGO_NOP > 999 ' +
+   ' and ATIVO = 1 ';
   buscas.Open;
 end;
 
@@ -25991,8 +26656,8 @@ begin
   end
   else
     result := montaSelect('SELECT * FROM TIPO_SERVICO' +
-                          ' where coalesce(cod_empresa, %d) = %d and ativo = 0',
-                          [vDadosIni.cod_empresa, vDadosIni.cod_empresa]);
+       ' where coalesce(cod_empresa, %d) = %d and ativo = 0',
+       [vDadosIni.cod_empresa, vDadosIni.cod_empresa]);
 end;
 
 function TTipoServ.atribuiIBGE: boolean;
@@ -26075,7 +26740,7 @@ begin
 
         if dataSet.IsEmpty then
         begin
-          Application.MessageBox('Nenhum produto selecionado.', 'Atenção',
+          Application.MessageBox('Nenhum tipo de serviço selecionado.', 'Atenção',
             MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
           exit;
         end;
@@ -26105,7 +26770,8 @@ begin
             and (not vHabIndOp)
             and (not vHabIssRetido)
             and (not vHabCstPisCofins)
-            and (not vHabCstPisCofinsEnt) then
+            and (not vHabCstPisCofinsEnt)
+            and (not vHabNatRecPisCofins) then
               raiseExceptionCreate('Nenhum opção selecionada!', '');
         end;
 
@@ -26127,7 +26793,7 @@ begin
           while not dataSet.Eof do
           begin
           	Application.ProcessMessages;
-            vDadosIni.abreStatusProcessamento('', 'Lendo dados tipo serviço (' +
+            vDadosIni.abreStatusProcessamento('', 'Lendo dados tipos serviços (' +
               IntToStr(dataSet.RecNo) + '/' + IntToStr(dataSet.RecordCount) + ')');
 
             if dataSet.FieldByName('sel').AsString = 'S' then
@@ -26294,13 +26960,13 @@ begin
             		AddCampoValue('CINDOP', vDadosIni.apenasNumeros(Trim(vIndOp)));
 
             if vHabIssRetido then
-               if trim(vIssRetido) = '' then
+               if Trim(vIssRetido) = '' then
                   AddCampoValue('ISS_RETIDO', Null)
                else
                   AddCampoValue('ISS_RETIDO', StrToInt(trim(vIssRetido)));
 
             if vHabCstPisCofins then
-               if trim(vCstPisCofins) = '' then
+               if Trim(vCstPisCofins) = '' then
                begin
                   AddCampoValue('CST_PIS', Null);
                   AddCampoValue('CST_COFINS', Null);
@@ -26312,7 +26978,7 @@ begin
                end;
 
             if vHabCstPisCofinsEnt then
-               if trim(vCstPisCofinsEnt) = '' then
+               if Trim(vCstPisCofinsEnt) = '' then
                begin
                   AddCampoValue('CST_PIS_ENT', Null);
                   AddCampoValue('CST_COFINS_ENT', Null)
@@ -26322,6 +26988,12 @@ begin
                   AddCampoValue('CST_PIS_ENT', Copy(trim(vCstPisCofinsEnt), 1, 2));
                   AddCampoValue('CST_COFINS_ENT', Copy(trim(vCstPisCofinsEnt), 1, 2));
                end;
+
+            if vHabNatRecPisCofins then
+               if Trim(vNatRecPisCofins) = '' then
+                  AddCampoValue('NAT_REC', Null)
+               else   
+              	   AddCampoValue('NAT_REC', Trim(vNatRecPisCofins));
 
             vUpdate := vUpdate +
               ' WHERE COD_SERVICO = :PCOD_SERVICO ';
@@ -26368,7 +27040,7 @@ begin
         dataSet.CommandText := vSQL;
         dataSet.Open;
 
-        vDadosIni.GravaAuditoria('BAS561', vtempMensagem,	'SUCESSO', 'TIPO_SERVICO', '', buscas);
+        vDadosIni.GravaAuditoria('BAS561', vtempMensagem, 'SUCESSO', 'TIPO_SERVICO', '', buscas);
       end;
 
       Result := true;
@@ -26391,7 +27063,6 @@ begin
 
       vDadosIni.fechaStatusProcessamento;
     end;
-    
   except
     on e: exception do
     begin
@@ -26932,8 +27603,9 @@ function TTipoServ.buscasCfop(pCfop: Integer): boolean;
 begin
   buscas.Close;
   buscas.SQL.Text := 'select CODIGO_NOP, DESCRICAO_NOP from nat_op ' +
-  	' where CODIGO_NOP = ' + IntToStr(pCfop) +
-   ' and ativo = 1';
+  	' where CODIGO_NOP > 999 ' +
+   ' and CODIGO_NOP = ' + IntToStr(pCfop) +
+   ' and ATIVO = 1';
   buscas.Open;
 
   Result := not buscas.IsEmpty;
@@ -27321,6 +27993,174 @@ begin
       vDadosIni.fechaStatusProcessamento;
       Result := false;
       Application.MessageBox(pchar('Erro: ' + e.Message), 'Atenção', MB_ICONERROR + MB_OK);
+      registraErro(e.Message);
+    end;
+  end;
+end;
+
+function TTipoServ.sincronizarTiposServicosEmLote: boolean;
+var
+  fTempListaTiposServicos: TClientDataSet;
+  vIndexFieldNames: string;
+  vIndexName: string;
+  vRecNo: Integer;
+  vSQL: string;
+  buscasU: TIBQuery;
+  vtempMensagem: string;
+  vinc_a_cada_reg: Integer;
+  vsalvar_a_cada_reg: Integer;
+begin
+  Result := false;
+  vSQL := '';
+  vtempMensagem := 'SALVAR';
+
+  if not vDadosIni.PesqPros('BAS562', vtempMensagem, '', 'TIPO_SERVICO', '', buscas, False) then
+  	Exit;
+	try
+  	buscasU := TIBQuery.Create(nil);
+
+  	try
+      buscasU.Database := buscas.Database;
+      buscasU.Transaction := buscas.Transaction;
+
+      vIndexFieldNames := dataSet.IndexFieldNames;
+    	vIndexName       := dataSet.IndexName;
+      vRecNo           := dataSet.RecNo;
+
+    	try
+        dataSet.Filtered := false;
+        dataSet.Filter := 'sel = ''S'' ';
+        dataSet.Filtered := true;
+
+        if dataSet.IsEmpty then
+        begin
+          Application.MessageBox('Nenhum produto selecionado.', 'Atenção',
+            MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
+          exit;
+        end;
+
+        if Application.MessageBox('Deseja sincronizar os tipos de serviços selecionados?',
+        	'Confirmação', MB_YESNO + MB_ICONQUESTION + MB_DEFBUTTON2) <> mrYES then
+          	exit;
+
+        vDadosIni.vDataHora := vDadosIni.getDataHoraBanco(buscas);
+
+        vsalvar_a_cada_reg := vDadosIni.getConfSisInt('tpserv_alt_lote_reg', buscas);
+
+        fTempListaTiposServicos := TClientDataSet.Create(nil);
+        fTempListaTiposServicos.Close;
+        fTempListaTiposServicos.FieldDefs.Clear;
+        fTempListaTiposServicos.FieldDefs.Add('COD_SERVICO', ftInteger, 0, false);
+        fTempListaTiposServicos.close;
+        fTempListaTiposServicos.CreateDataSet;
+        fTempListaTiposServicos.EmptyDataSet;
+
+        try
+          dataSet.DisableControls;
+          dataSet.First;
+          while not dataSet.Eof do
+          begin
+          	Application.ProcessMessages;
+            vDadosIni.abreStatusProcessamento('', 'Lendo dados tipos serviços (' +
+              IntToStr(dataSet.RecNo) + '/' + IntToStr(dataSet.RecordCount) + ')');
+
+            if dataSet.FieldByName('sel').AsString = 'S' then
+            begin
+              fTempListaTiposServicos.Insert;
+              fTempListaTiposServicos.FieldByName('COD_SERVICO').AsInteger := dataSet.FieldByName('COD_SERVICO').AsInteger;
+              fTempListaTiposServicos.Post;
+            end;
+
+            dataSet.Next;
+          end;
+        finally
+          dataSet.EnableControls;
+        end;
+
+        vSQL := dataSet.CommandText;
+      finally
+        dataSet.Filtered := false;
+      end;
+
+      vinc_a_cada_reg := 0;
+
+      try
+        fTempListaTiposServicos.DisableControls;
+        fTempListaTiposServicos.First;
+        while not fTempListaTiposServicos.Eof do
+        begin
+          Application.ProcessMessages;
+          vDadosIni.abreStatusProcessamento('', 'Sincronizando tipos serviços (' +
+            IntToStr(fTempListaTiposServicos.RecNo) + '/' + IntToStr(fTempListaTiposServicos.RecordCount) + ')');
+
+          buscasU.Close;
+          buscasU.SQL.Text := ' UPDATE TIPO_SERVICO SET ' +
+          	' DATA_MOD_TIPO = :DATA_MOD_TIPO ' +
+          	' WHERE COD_SERVICO = :PCOD_SERVICO ';
+          buscasU.ParamByName('PCOD_SERVICO').AsInteger := fTempListaTiposServicos.FieldByName('COD_SERVICO').AsInteger;
+          buscasU.ParamByName('DATA_MOD_TIPO').AsDateTime := vDadosIni.vDataHora;
+          buscasU.ExecSQL;
+          
+          vDadosIni.GravaAuditoria('BAS562', vtempMensagem, '', 'TIPO_SERVICO',
+            IntToStr(fTempListaTiposServicos.FieldByName('COD_SERVICO').AsInteger), buscas);
+
+          Inc(vinc_a_cada_reg);
+
+          if (vsalvar_a_cada_reg > 0) and (vinc_a_cada_reg >= vsalvar_a_cada_reg) then
+          begin
+            Application.ProcessMessages;
+            vDadosIni.abreStatusProcessamento('', 'Salvando dados tipo serviço (' +
+              IntToStr(fTempListaTiposServicos.RecNo) + '/' + IntToStr(fTempListaTiposServicos.RecordCount) + ')');
+
+            vinc_a_cada_reg := 0;
+
+            CommitaTransacao;
+          end;
+
+          fTempListaTiposServicos.Next;
+        end;
+      finally
+      	fTempListaTiposServicos.First;
+      	fTempListaTiposServicos.EnableControls;
+      end;
+
+      Application.ProcessMessages;
+      vDadosIni.abreStatusProcessamento('', 'Atualizando dados tipo serviço (' +
+        IntToStr(fTempListaTiposServicos.RecordCount) + '/' + IntToStr(fTempListaTiposServicos.RecordCount) + ')');
+
+      CommitaTransacao;
+
+      dataSet.Close;
+      dataSet.CommandText := vSQL;
+      dataSet.Open;
+
+      vDadosIni.GravaAuditoria('BAS562', vtempMensagem,	'SUCESSO', 'TIPO_SERVICO', '', buscas);
+
+      Result := true;
+
+      if Result then
+      	dataSet.Refresh;
+    finally
+      dataSet.Filtered        := false;
+      dataSet.IndexName       := vIndexName;
+      dataSet.IndexFieldNames := vIndexFieldNames;
+      if dataSet.RecordCount >= vRecNo then
+	      dataSet.RecNo           := vRecNo;
+      dataSet.EnableControls;
+
+      if Assigned(buscasU) then
+      	FreeAndNil(buscasU);
+
+      vDadosIni.fechaStatusProcessamento;
+    end;
+
+  except
+    on e: exception do
+    begin
+      Result := false;
+      RollBackTransacao;
+      vDadosIni.GravaAuditoria('BAS562', vtempMensagem,	'FALHA', 'TIPO_SERVICO', '', buscas);
+      Application.MessageBox(pchar(e.Message), 'Atenção', MB_ICONERROR + MB_OK);
       registraErro(e.Message);
     end;
   end;

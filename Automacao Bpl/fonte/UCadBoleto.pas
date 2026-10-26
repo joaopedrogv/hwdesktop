@@ -2478,11 +2478,8 @@ begin
   end;
   SpeedButton7.Enabled := vDadosIni.vBoletos.ExisteConvenio;
   SpeedButton8.Enabled := vDadosIni.vBoletos.ExisteConvenio;
-  if ObBoleto.StatusLixeira then
-    lixeiraVazia(false)
-  else
-    lixeiraVazia(true);
-
+  lixeiraVazia(ObBoleto.StatusLixeira);
+  
   SpeedButton20.Hint := 'Enviar mensagem - [BOL038]';
 
   imgInformation.Hint := imgInformation.Hint + #13 + #13 +

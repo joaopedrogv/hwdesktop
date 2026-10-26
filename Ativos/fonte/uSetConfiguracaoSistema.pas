@@ -5404,6 +5404,20 @@ begin
         'Caso informe 0 será salvo somente após o termino da alteração/sincronização em lote');
     end;
 
+    if VersaoBancoMenor(25.61) then
+    begin
+      setConfSisInt('kit_cad_alt_lote_reg', 100, buscas,
+        'Salvar no banco de dados a cada x registros.',
+        'Caso informe 0 será salvo somente após o termino da alteração/sincronização em lote');
+    end;
+
+    if VersaoBancoMenor(25.62) then
+    begin
+      setConfSisInt('grade_alt_lote_reg', 100, buscas,
+        'Salvar no banco de dados a cada x registros.',
+        'Caso informe 0 será salvo somente após o termino da alteração/sincronização em lote');
+    end;
+
   except
     on e: exception do
     begin

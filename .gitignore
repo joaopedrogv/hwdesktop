@@ -71,6 +71,7 @@ Automacao Bpl/ERP-*.bdsgroup
 # Exclusões especificas
 _automation/config/config-paths.bat
 _automation/config/segredos.md
+_automation/config/workflow.local.psd1
 _automation/temp/
 
 ### Exclusivo para RAIZ, arquivos e extensoes

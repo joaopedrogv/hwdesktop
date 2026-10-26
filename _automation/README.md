@@ -15,7 +15,7 @@ O Windows PowerShell 5.1 (`powershell.exe`) não atende ao requisito. O lançado
 
 ## Navegação
 
-- **Setas para cima/baixo**, **Home/End** ou **1 a 5** selecionam uma opção.
+- **Setas para cima/baixo**, **Home/End** ou **1 a 6** selecionam uma opção.
 - **Enter** abre a opção selecionada. Ao abrir o menu, nenhuma opção está selecionada; Enter sozinho não inicia uma ação.
 - **Esc**, **0** ou **Q** encerram o menu na tela inicial.
 - Nos detalhes, **Esc/Backspace** retornam à tela inicial, novamente sem seleção; **0/Q** encerram.
@@ -26,9 +26,11 @@ O Windows PowerShell 5.1 (`powershell.exe`) não atende ao requisito. O lançado
 
 As áreas de início/integração de demandas e dependências continuam **Planejadas**. A opção **Informações do ambiente** consulta somente os caminhos locais e a versão do PowerShell.
 
+**Sincronizar integração**, segundo item do menu, atualiza a área de integração pelo SVN e publica esse estado no Git. Usa a configuração individual `config/workflow.local.psd1` e o arquivo de segredos existente. Instruções em [workflow/README.md](workflow/README.md).
+
 **Build / Deploy**, primeiro item do menu, abre seis comandos PS1 independentes em `build/`: compilar todos, compilar selecionados, compilar reestruturação, limpar, publicar e compilar/publicar. Selecionar uma ação e pressionar Enter chama seu comando diretamente. Não há pergunta adicional de limpeza, destino ou escolha de modo. As interações próprias dos originais permanecem: seleção gráfica de pacotes e confirmação S/N de compilar/publicar. O destino vem de `config/deploy.psd1`. Exemplos e parâmetros estão em [build/README.md](build/README.md).
 
-Os scripts antigos da raiz continuam nos caminhos atuais, sem alterações. Os novos comandos compartilham `core/Build.Automation.psm1`, e a compilação de cada pacote ainda usa `core/build-package.bat`, preservando a lógica especial `SQL_RES`. Nenhuma rotina Git/SVN ou acesso ao Nextcloud foi conectado nesta etapa. A proteção do novo menu não altera o comportamento dos BATs antigos abertos diretamente.
+Os scripts antigos foram movidos pelo responsável para `legados`. Os comandos de compilação compartilham `core/Build.Automation.psm1`, e a compilação de cada pacote ainda usa `core/build-package.bat`, preservando a lógica especial `SQL_RES`. O acesso ao Nextcloud permanece planejado. A proteção do menu não altera o comportamento dos BATs antigos abertos diretamente.
 
 ## Opções de execução
 

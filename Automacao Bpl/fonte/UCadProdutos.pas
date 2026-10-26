@@ -19403,6 +19403,8 @@ begin
       PostMessage(FrmCadProdutos.Handle, WM_CLOSE, 0, 0)
     end;
 
+    lixeiraVazia(not Produto.StatusLixeira);
+
     if vCriou = 0 then
     begin
       Produto.verificarSubGrupoZero;
@@ -23144,7 +23146,7 @@ end;
 
 procedure TFrmCadProdutos.SpeedButton2Click(Sender: TObject);
 var
-	vStatusLixeira: boolean;
+  vStatusLixeira: boolean;
 begin
   inherited;
   if not vDadosIni.validarAcessoCadastrosEmpresas('PRODUTOS', 'E', Produto.buscas) then

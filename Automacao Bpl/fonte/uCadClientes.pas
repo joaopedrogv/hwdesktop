@@ -8865,6 +8865,8 @@ begin
     'TRF - Transferência de saldo entre empresas';{ + #13 +
     'REC - Vale Compra';}
 
+  lixeiraVazia(not Cliente.StatusLixeira);
+
   if vCriou = 0 then
   	vDadosIni.configuraItensTipovenda(DBComboBox6,'REQ',Cliente.buscas,false);
 
@@ -10540,15 +10542,16 @@ begin
 end;
 
 procedure TFrmCadClientes.SpeedButton2Click(Sender: TObject);
+var
+  vStatusLixeira: boolean;
 begin
   inherited;
   if not vDadosIni.validarAcessoCadastrosEmpresas('CLIENTES', 'E', Cliente.buscas) then
     Exit;
   Cliente.Delete;
-  if Cliente.StatusLixeira then
-    SpeedButton25.Visible := true
-  else
-    SpeedButton25.Visible := false;
+  vStatusLixeira := Cliente.StatusLixeira;
+  lixeiraVazia(not vStatusLixeira);
+  
 end;
 
 procedure TFrmCadClientes.SpeedButton30Click(Sender: TObject);

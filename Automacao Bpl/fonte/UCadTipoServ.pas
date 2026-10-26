@@ -354,7 +354,15 @@ type
     ckCstPisCofinsEnt: TCheckBox;
     cbCstPisCofinsEnt: TComboBox;
     SpeedButton68: TSpeedButton;
-    DBLLc116: TDBLookupComboBox;
+    DBEdit17: TDBEdit;
+    edLc116: TMaskEdit;
+    pnNatRecPisCofins: TPanel;
+    lbNatRecPisCofins: TLabel;
+    ckNatRecPisCofins: TCheckBox;
+    cbNatRecPisCofins: TComboBox;
+    btSincronizarServicos: TSpeedButton;
+    procedure btSincronizarServicosClick(Sender: TObject);
+    procedure ckNatRecPisCofinsClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure SpeedButton68Click(Sender: TObject);
     procedure ckCstPisCofinsEntClick(Sender: TObject);
@@ -1024,6 +1032,7 @@ begin
     TipoServ.vAtualizarServ.vHabIssRetido := ckIssRetido.Checked;
     TipoServ.vAtualizarServ.vHabCstPisCofins := ckCstPisCofins.Checked;
     TipoServ.vAtualizarServ.vHabCstPisCofinsEnt := ckCstPisCofinsEnt.Checked;
+    TipoServ.vAtualizarServ.vHabNatRecPisCofins := ckNatRecPisCofins.Checked;
 
     TipoServ.vAtualizarServ.vCodCfopLote := Trunc(EdCodCFOP.AsValue);
     TipoServ.vAtualizarServ.vAliqIss := EdAliqIss.AsValue;
@@ -1040,7 +1049,7 @@ begin
     TipoServ.vAtualizarServ.vUnidade := Trim(EdUnidade.Text);
     TipoServ.vAtualizarServ.vVendaOnline := Trim(cbVendaOnline.Text);
     TipoServ.vAtualizarServ.vCnaeServ := Trim(edCnaeServ.Text);
-    TipoServ.vAtualizarServ.vLc116 := Trim(vDadosIni.IfThen(DBLLc116.KeyValue = Null, '', DBLLc116.KeyValue));
+    TipoServ.vAtualizarServ.vLc116 := Trim(edLc116.Text);
     TipoServ.vAtualizarServ.vTribNac := Trim(edTribNac.Text);
     TipoServ.vAtualizarServ.vTribMun := Trim(edTribMun.Text);
     TipoServ.vAtualizarServ.vNbs := Trim(edNBS.Text);
@@ -1048,6 +1057,7 @@ begin
     TipoServ.vAtualizarServ.vIssRetido := Trim(edIssRetido.Text);
     TipoServ.vAtualizarServ.vCstPisCofins := Trim(cbCstPisCofins.Text);
     TipoServ.vAtualizarServ.vCstPisCofinsEnt := Trim(cbCstPisCofinsEnt.Text);
+    TipoServ.vAtualizarServ.vNatRecPisCofins := Trim(cbNatRecPisCofins.Text);
 
     if not TipoServ.AtualizarTiposServicosEmLote then
 	 begin
@@ -1070,14 +1080,15 @@ begin
     _GravaConfiguracoesString(EdUnidade.Name, EdUnidade.Text);
     _GravaConfiguracoesInteger(cbVendaOnline.Name, cbVendaOnline.ItemIndex);
     _GravaConfiguracoesString(edCnaeServ.Name, edCnaeServ.Text);
-    _GravaConfiguracoesString(DBLLc116.Name, Trim(vDadosIni.IfThen(DBLLc116.KeyValue = Null, '', DBLLc116.KeyValue)));
+    _GravaConfiguracoesString(edLc116.Name, Trim(edLc116.Text));
     _GravaConfiguracoesString(edTribNac.Name, edTribNac.Text);
     _GravaConfiguracoesString(edTribMun.Name, edTribMun.Text);
     _GravaConfiguracoesString(edNBS.Name, edNBS.Text);
     _GravaConfiguracoesString(edIndOp.Name, edIndOp.Text);
     _GravaConfiguracoesString(edIssRetido.Name, edIssRetido.Text);
-    _GravaConfiguracoesInteger(cbCstPisCofins.Name, cbCstPisCofins.ItemIndex);
-    _GravaConfiguracoesInteger(cbCstPisCofinsEnt.Name, cbCstPisCofinsEnt.ItemIndex);
+    _GravaConfiguracoesString(cbCstPisCofins.Name, cbCstPisCofins.Text);
+    _GravaConfiguracoesString(cbCstPisCofinsEnt.Name, cbCstPisCofinsEnt.Text);
+    _GravaConfiguracoesString(cbNatRecPisCofins.Name, cbNatRecPisCofins.Text);
 
     _GravaConfiguracoesBoolean(ckCFOP.Name, ckCFOP.Checked);
     _GravaConfiguracoesBoolean(ckAliqIss.Name, ckAliqIss.Checked);
@@ -1123,6 +1134,22 @@ begin
   finally
     Screen.Cursor := crDefault;
     DBGrid1.Visible := true;
+  end;
+end;
+
+procedure TFrmCadTipoServ.btSincronizarServicosClick(Sender: TObject);
+begin
+  inherited;
+  try
+  	 Screen.Cursor := crHourGlass;
+    FrmCadTipoServ.Enabled := false;
+    DBGrid1.Visible := false;
+  	 if not TipoServ.sincronizarTiposServicosEmLote then
+      exit;
+  finally
+  	 FrmCadTipoServ.Enabled := true;
+    DBGrid1.Visible := true;
+    Screen.Cursor := crDefault;
   end;
 end;
 
@@ -1407,7 +1434,7 @@ end;
 procedure TFrmCadTipoServ.ckLc116Click(Sender: TObject);
 begin
   inherited;
-  DBLLc116.Enabled := ckLc116.Checked;
+  edLc116.Enabled := ckLc116.Checked;
   if ckLc116.Checked then
   begin
   	 pnLc116.ParentBackground := False;
@@ -1419,8 +1446,8 @@ begin
   	 pnLc116.Color := clBtnFace;
   end;
 
-  if (Self.Enabled) and (Self.Visible) and (DBLLc116.CanFocus) then
-  	DBLLc116.SetFocus;
+  if (Self.Enabled) and (Self.Visible) and (edLc116.CanFocus) then
+  	edLc116.SetFocus;
 end;
 
 procedure TFrmCadTipoServ.ckLixeiraClick(Sender: TObject);
@@ -1483,6 +1510,25 @@ begin
 
   if (Self.Enabled) and (Self.Visible) and (cbNaoIncidencia.CanFocus) then
   	cbNaoIncidencia.SetFocus;
+end;
+
+procedure TFrmCadTipoServ.ckNatRecPisCofinsClick(Sender: TObject);
+begin
+  inherited;
+  cbNatRecPisCofins.Enabled := ckNatRecPisCofins.Checked;
+  if ckNatRecPisCofins.Checked then
+  begin
+  	 pnNatRecPisCofins.ParentBackground := False;
+	 pnNatRecPisCofins.Color := clYellow;
+  end
+  else
+  begin
+  	 pnNatRecPisCofins.ParentBackground := True;
+  	 pnNatRecPisCofins.Color := clBtnFace;
+  end;
+
+  if (Self.Enabled) and (Self.Visible) and (cbNatRecPisCofins.CanFocus) then
+  	cbNatRecPisCofins.SetFocus;
 end;
 
 procedure TFrmCadTipoServ.ckNbsClick(Sender: TObject);
@@ -2116,6 +2162,7 @@ begin
   PageControl1.ActivePage := TabSheet2;
 
   DBComboBox12.Clear;
+  DBComboBox12.Items.Add('');
   DBComboBox12.Items.Add('01 - Operação Tributável com Alíquota Básica');
   DBComboBox12.Items.Add('02 - Operação Tributável com Alíquota Diferenciada');
   DBComboBox12.Items.Add('03 - Operação Tributável com Alíquota por Unidade de Medida de Produto');
@@ -2133,6 +2180,7 @@ begin
   	CbCstPisCofins.Items.Add(DBComboBox12.Items[I]);
 
   DBComboBox11.Clear;
+  DBComboBox11.Items.Add('');
   DBComboBox11.Items.Add('50 - Operação com Direito a Crédito - Vinculada Exclusivamente a Receita Tributada no Mercado Interno');
   DBComboBox11.Items.Add('51 - Operação com Direito a Crédito - Vinculada Exclusivamente a Receita Não Tributada no Mercado Interno');
   DBComboBox11.Items.Add('52 - Operação com Direito a Crédito - Vinculada Exclusivamente a Receita de Exportação');
@@ -2200,8 +2248,11 @@ begin
   DBGrid1.DataSource := dtmProdutos.dsTipoServ;
   inherited;
   setTClientDataSet(vDadosIni.dataSetCol, vDadosIni.vNomeUsuario, vDadosIni.transacaoCol);
+
   if TelaCadastro = 1 then
     BitBtn3Click(Sender);
+
+  lixeiraVazia(not TipoServ.StatusLixeira);
 
   if Assigned(TipoServ) then
   begin
@@ -2782,6 +2833,7 @@ begin
         ckLixeira.Checked := true;
         ckLixeira.Enabled := true;
       end;
+      TipoServ.ultimasql := TipoServ.dataSet.CommandText;
     finally
       Screen.Cursor := crDefault;
     end;
@@ -2962,15 +3014,15 @@ begin
   cbTmoSimultaneo.ItemIndex := _LerConfiguracoesRegistroInteger(cbTmoSimultaneo.Name);
   EdTmo.AsValue := _LerConfiguracoesRegistroDouble(EdTmo.Name);
   cbAltValorCupom.ItemIndex := _LerConfiguracoesRegistroInteger(cbAltValorCupom.Name);
-  cbAltDescricao.ItemHeight := _LerConfiguracoesRegistroInteger(cbAltDescricao.Name);
-  cbServicoGarantia.ItemHeight := _LerConfiguracoesRegistroInteger(cbServicoGarantia.Name);
+  cbAltDescricao.ItemIndex := _LerConfiguracoesRegistroInteger(cbAltDescricao.Name);
+  cbServicoGarantia.ItemIndex := _LerConfiguracoesRegistroInteger(cbServicoGarantia.Name);
   DbLOrigemServ.KeyValue := _LerConfiguracoesRegistroString(DbLOrigemServ.Name);
   EdSeqRevisao.AsValue := _LerConfiguracoesRegistroDouble(EdSeqRevisao.Name);
   cbServPropTerc.ItemIndex := _LerConfiguracoesRegistroInteger(cbServPropTerc.Name);
   EdUnidade.Text := _LerConfiguracoesRegistroString(EdUnidade.Name);
   cbVendaOnline.ItemIndex := _LerConfiguracoesRegistroInteger(cbVendaOnline.Name);
   edCnaeServ.Text := _LerConfiguracoesRegistroString(edCnaeServ.Name);
-  DBLLc116.KeyValue := _LerConfiguracoesRegistroString(DBLLc116.Name);
+  edLc116.Text := _LerConfiguracoesRegistroString(edLc116.Name);
   edTribNac.Text := _LerConfiguracoesRegistroString(edTribNac.Name);
   edTribMun.Text := _LerConfiguracoesRegistroString(edTribMun.Name);
   edNBS.Text := _LerConfiguracoesRegistroString(edNBS.Name);
@@ -2978,6 +3030,7 @@ begin
   edIssRetido.Text := _LerConfiguracoesRegistroString(edIssRetido.Name);
   cbCstPisCofins.ItemIndex := _LerConfiguracoesRegistroInteger(cbCstPisCofins.Name);
   cbCstPisCofinsEnt.ItemIndex := _LerConfiguracoesRegistroInteger(cbCstPisCofinsEnt.Name);
+  cbNatRecPisCofins.Text := _LerConfiguracoesRegistroString(cbNatRecPisCofins.Name);
 
   if ckPermOpcaoMarcadas.Checked then
 	ckCFOP.Checked := _LerConfiguracoesRegistroBoolean(ckCFOP.Name)
@@ -3118,6 +3171,12 @@ begin
   else
    ckCstPisCofinsEnt.Checked := False;
   ckCstPisCofinsEntClick(Sender);
+
+  if ckPermOpcaoMarcadas.Checked then
+	ckNatRecPisCofins.Checked := _LerConfiguracoesRegistroBoolean(ckNatRecPisCofins.Name)
+  else
+  	ckNatRecPisCofins.Checked := false;
+  ckNatRecPisCofinsClick(Sender);
 
   try
   	 vIndexFieldNames := TipoServ.dataSet.IndexFieldNames;

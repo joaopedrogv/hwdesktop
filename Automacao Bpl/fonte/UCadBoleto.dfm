@@ -5,8 +5,8 @@ inherited frmCadBoletos: TfrmCadBoletos
   ClientHeight = 636
   ClientWidth = 795
   Scaled = False
-  ExplicitWidth = 803
-  ExplicitHeight = 670
+  ExplicitWidth = 811
+  ExplicitHeight = 675
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelFundo: TPanel
@@ -29,8 +29,6 @@ inherited frmCadBoletos: TfrmCadBoletos
         ExplicitWidth = 788
         ExplicitHeight = 608
         inherited TabSheet1: TTabSheet
-          ExplicitLeft = 4
-          ExplicitTop = 27
           ExplicitWidth = 780
           ExplicitHeight = 577
           inherited ScrollBox1: TScrollBox
@@ -682,8 +680,6 @@ inherited frmCadBoletos: TfrmCadBoletos
           end
         end
         inherited TabSheet2: TTabSheet
-          ExplicitLeft = 4
-          ExplicitTop = 27
           ExplicitWidth = 780
           ExplicitHeight = 577
           inherited GroupBox3: TGroupBox
@@ -855,7 +851,7 @@ inherited frmCadBoletos: TfrmCadBoletos
                 Width = 145
                 Height = 21
                 Hint = 'Campo filtro da pesquisa adicional. Informe o campo desejado'
-                ItemHeight = 0
+                ItemHeight = 13
                 TabOrder = 0
                 Text = 'ComboBox11'
                 OnEnter = ComboBox1Enter
@@ -2117,18 +2113,12 @@ inherited frmCadBoletos: TfrmCadBoletos
           end
         end
         inherited tsMemo: TTabSheet
-          ExplicitLeft = 4
-          ExplicitTop = 27
           ExplicitWidth = 780
           ExplicitHeight = 577
         end
         object ts_outros: TTabSheet
           Caption = 'ts_outros'
           ImageIndex = 12
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object PageControl2: TPageControl
             Left = 0
             Top = 0

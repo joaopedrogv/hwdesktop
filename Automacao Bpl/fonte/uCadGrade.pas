@@ -78,6 +78,16 @@ type
     btUnSelectAll: TSpeedButton;
     MarcarTodasGradesClick: TMenuItem;
     DesmarcarTodasGradesClick: TMenuItem;
+    btLixeiraCheia: TSpeedButton;
+    btRestaurarRegistro: TSpeedButton;
+    ckLixeira: TCheckBox;
+    btSincronizarServicos: TSpeedButton;
+    SpeedBSelTodos: TSpeedButton;
+    SpeedBDesmarcarTodos: TSpeedButton;
+    procedure btSincronizarServicosClick(Sender: TObject);
+    procedure SpeedBDesmarcarTodosClick(Sender: TObject);
+    procedure SpeedBSelTodosClick(Sender: TObject);
+    procedure ckLixeiraClick(Sender: TObject);
     procedure DesmarcarTodasGradesClickClick(Sender: TObject);
     procedure MarcarTodasGradesClickClick(Sender: TObject);
     procedure DBGrid1CellClick(Column: TColumn);
@@ -205,23 +215,52 @@ begin
   inherited;
   if MaskEdit2.Visible then
   begin
-    if not obGrade.ConsultaCampos('GRADE', ComboBox1.Text,
-      ComboBox2.text, maskedit1.text, maskedit2.text, vDadosIni.codEmpresa) then
-      	if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
-      		combobox1.setfocus;
+    if (ckLixeira.Checked) and (ckLixeira.Visible) then
+    begin
+      if not obGrade.ConsultaCamposLixeira('GRADE', ComboBox1.Text,
+        ComboBox2.text, maskedit1.text, maskedit2.text, vDadosIni.codEmpresa) then
+           if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
+              combobox1.setfocus;
+    end
+    else
+    begin
+      if not obGrade.ConsultaCampos('GRADE', ComboBox1.Text,
+        ComboBox2.text, maskedit1.text, maskedit2.text, vDadosIni.codEmpresa) then
+           if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
+              combobox1.setfocus;
+    end;
   end
-  else if not obGrade.ConsultaCampos('GRADE', MaskEdit3.text, ComboBox1.Text,
-    combobox3.Text, ComboBox2.text, true, vDadosIni.codEmpresa) then
-    	if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
-    		ComboBox1.SetFocus;
-
-  SpeedButton1.Visible := true;
-  SpeedButton5.Visible := false;
-  SpeedButton6.Visible := vDadosIni.vEcommerce.vHabilitarEcommerce;
-  if obGrade.StatusLixeira then
-    SpeedButton25.Visible := true
   else
-    SpeedButton25.Visible := false;
+  begin
+    if (ckLixeira.Checked) and (ckLixeira.Visible) then
+    begin
+      if not obGrade.ConsultaCamposLixeira('GRADE', MaskEdit3.text, ComboBox1.Text,
+        combobox3.Text, ComboBox2.text, true, vDadosIni.codEmpresa) then
+          if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
+             ComboBox1.SetFocus;
+    end
+    else
+    begin
+      if not obGrade.ConsultaCampos('GRADE', MaskEdit3.text, ComboBox1.Text,
+        combobox3.Text, ComboBox2.text, true, vDadosIni.codEmpresa) then
+          if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
+             ComboBox1.SetFocus;
+    end;
+  end;
+
+  if ckLixeira.Checked then
+  begin
+    SpeedButton1.Visible := false;
+    SpeedButton5.Visible := true;
+    SpeedButton6.Visible := false;
+  end
+  else
+  begin
+    SpeedButton1.Visible := true;
+    SpeedButton5.Visible := false;
+    SpeedButton6.Visible := vDadosIni.vEcommerce.vHabilitarEcommerce;
+  end;
+
   obGrade.ultimasql := obGrade.dataSet.CommandText;
   if (Self.Enabled) and (Self.Visible) and (DBGrid1.CanFocus) then
   	DBGrid1.SetFocus;
@@ -375,11 +414,11 @@ begin
 	try
   	if (Self.Enabled) and (Self.Visible) and (btnOKAlteracaoEmLote.CanFocus) then
       btnOKAlteracaoEmLote.SetFocus;
-    obGrade.vTIPO1 := trim(cbTipo1.Text);
-    obGrade.vTIPO2 := trim(cbTipo2.Text);
+    obGrade.vAtualizarGrade.vTipo1 := trim(cbTipo1.Text);
+    obGrade.vAtualizarGrade.vTipo2 := trim(cbTipo2.Text);
 
-    obGrade.vHAB_TIPO1 := ckTipo1.Checked;
-    obGrade.vHAB_TIPO2 := ckTipo2.Checked;
+    obGrade.vAtualizarGrade.vHabTipo1 := ckTipo1.Checked;
+    obGrade.vAtualizarGrade.vHabTipo2 := ckTipo2.Checked;
 
     if not obGrade.atualizarGradesEmLote then
     begin
@@ -436,6 +475,22 @@ begin
   finally
     Screen.Cursor := crDefault;
     DBGrid1.Visible := true;
+  end;
+end;
+
+procedure TfrmCadGrade.btSincronizarServicosClick(Sender: TObject);
+begin
+  inherited;
+  try
+  	 Screen.Cursor := crHourGlass;
+    frmCadGrade.Enabled := false;
+    DBGrid1.Visible := false;
+  	 if not obGrade.sincronizarGradesEmLote then
+      exit;
+  finally
+  	 frmCadGrade.Enabled := true;
+    DBGrid1.Visible := true;
+    Screen.Cursor := crDefault;
   end;
 end;
 
@@ -502,6 +557,49 @@ begin
 
   if (Self.Enabled) and (Self.Visible) and (DBComboBox2.CanFocus) then
   	DBComboBox2.SetFocus;
+end;
+
+procedure TfrmCadGrade.ckLixeiraClick(Sender: TObject);
+begin
+  inherited;
+  if not ckLixeira.Visible then
+    exit;
+
+  if not ckLixeira.Enabled then
+  begin
+  	 if ckLixeira.Checked then
+    begin
+      SpeedButton2.Hint := 'Excluir registro permanentemente - [PRO098]';
+      btExcluirRegistro.Hint := 'Excluir registro permanentemente - [PRO098]';
+    end
+    else
+    begin
+      SpeedButton2.Hint := 'Enviar para Lixeira - [PRO099]';
+      btExcluirRegistro.Hint := 'Enviar para Lixeira - [PRO099]';
+    end;
+  	exit;
+  end;
+
+  if ckLixeira.Checked then
+  	 SpeedButton2.Hint := 'Excluir registro permanentemente - [PRO098]'
+  else
+ 	 SpeedButton2.Hint := 'Enviar para Lixeira - [PRO099]';
+
+  if (PageControl1.ActivePage = tsAlterDadosProc) then
+  begin
+    if ckLixeira.Checked then
+      frmCadGrade.Caption := 'Alteração Grades de Estoque em Lote (Lixeira)'
+    else
+      frmCadGrade.Caption := 'Alteração Grades de Estoque em Lote';
+  end
+  else
+  begin
+    if ckLixeira.Checked then
+    	frmCadGrade.Caption := 'Grades de Estoque (Lixeira)'
+    else
+      frmCadGrade.Caption := 'Grades de Estoque';
+  end;
+  BitBtn1Click(Sender);
 end;
 
 procedure TfrmCadGrade.ckPermOpcaoMarcadasClick(Sender: TObject);
@@ -906,7 +1004,7 @@ begin
     setTClientDataSet(vDadosIni.dataSetCol, vDadosIni.vNomeUsuario, vDadosIni.transacaoCol);
   end;
 
-	CheckBox3.Enabled := false;
+  CheckBox3.Enabled := false;
   CheckBox1.Enabled := false;
 
   AtualizarListaTipoGrade(false);
@@ -915,6 +1013,8 @@ begin
   DBComboBox2.Text := DBComboBox1.Text;
   if TelaCadastro = 1 then
     BitBtn3Click(Sender);
+
+  lixeiraVazia(not obGrade.StatusLixeira);
 end;
 
 procedure TfrmCadGrade.LabelSeqECClick(Sender: TObject);
@@ -960,6 +1060,34 @@ begin
   TForm(pnGradeEC).OnKeyDown := FormGradeKeyDown;  
   if (Self.Enabled) and (Self.Visible) and (DBEdit2.CanFocus) then
     DBEdit2.SetFocus;
+end;
+
+procedure TfrmCadGrade.SpeedBDesmarcarTodosClick(Sender: TObject);
+begin
+  inherited;
+  try
+    Screen.Cursor := crHourGlass;
+    DBGrid1.Visible := false;
+    obGrade._desmarcarTodos;
+
+  finally
+    Screen.Cursor := crDefault;
+    DBGrid1.Visible := true;
+  end;
+end;
+
+procedure TfrmCadGrade.SpeedBSelTodosClick(Sender: TObject);
+begin
+  inherited;
+  try
+    Screen.Cursor := crHourGlass;
+    DBGrid1.Visible := false;
+    obGrade._marcarTodos;
+
+  finally
+    Screen.Cursor := crDefault;
+    DBGrid1.Visible := true;
+  end;
 end;
 
 procedure TfrmCadGrade.SpeedButton1Click(Sender: TObject);
@@ -1062,6 +1190,10 @@ begin
         SpeedButton1.Visible := true;
         SpeedButton5.Visible := false;
         SpeedButton6.Visible := vDadosIni.vEcommerce.vHabilitarEcommerce;
+
+        ckLixeira.Enabled := false;
+        ckLixeira.Checked := false;
+        ckLixeira.Enabled := true;
       end
       else
       begin
@@ -1069,6 +1201,10 @@ begin
         SpeedButton1.Visible := false;
         SpeedButton5.Visible := true;
         SpeedButton6.Visible := false;
+
+        ckLixeira.Enabled := false;
+        ckLixeira.Checked := true;
+        ckLixeira.Enabled := true;
       end;
       obGrade.ultimasql := obGrade.dataSet.CommandText;
     finally
@@ -1110,8 +1246,8 @@ begin
   if not obGrade.RestaurarRegistro then
   	Exit;
 
-  if not obGrade.StatusLixeira then
-  	lixeiraVazia(false)
+  if obGrade.StatusLixeira then
+  	 lixeiraVazia(false)
   else
     lixeiraVazia(true);
 end;
@@ -1219,7 +1355,12 @@ end;
 procedure TfrmCadGrade.SpeedButtonAlterarProdutoClick(Sender: TObject);
 begin
   inherited;
-	TelaCadastro := 5;
+  TelaCadastro := 5;
+  if (obGrade.dataSet.State in [dsInsert, dsEdit]) then
+  begin
+  	 if obGrade.dataSet.FieldByName('ativo').AsInteger <> 1 then
+     	obGrade.dataSet.FieldByName('ativo').AsInteger := 1;
+  end;
   SpeedButton1Click(Sender);
 end;
 

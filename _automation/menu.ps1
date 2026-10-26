@@ -132,15 +132,21 @@ function Write-MenuScreen {
     [Console]::WriteLine(" $($palette.Accent)$($border.BottomLeft)$($border.Horizontal * ($width - 2))$($border.BottomRight)$($palette.Reset)")
 }
 
-function Invoke-MenuBuildCommand {
+function Invoke-MenuCommand {
     param([Parameter(Mandatory)] $Item, [Parameter(Mandatory)] [string] $ProjectRoot)
     [Console]::CursorVisible = $true
     [Console]::TreatControlCAsInput = $false
     $previousNativePreference = $PSNativeCommandUseErrorActionPreference
     try {
         [Console]::Write("$([char]27)[2J$([char]27)[H")
-        $commandArguments = @('-ProjectRoot', $ProjectRoot)
-        $scriptPath = Join-Path $PSScriptRoot "build\$($Item.ScriptName)"
+        if ($Item.Id -eq 'sync') {
+            $commandArguments = @()
+            $scriptPath = Join-Path $PSScriptRoot 'workflow\sync-integration.ps1'
+        }
+        else {
+            $commandArguments = @('-ProjectRoot', $ProjectRoot)
+            $scriptPath = Join-Path $PSScriptRoot "build\$($Item.ScriptName)"
+        }
         $engine = (Get-Process -Id $PID).Path
         $PSNativeCommandUseErrorActionPreference = $false
         & $engine -NoLogo -NoProfile -File $scriptPath @commandArguments | Out-Host
@@ -162,6 +168,7 @@ function Invoke-AutomationMenu {
     $projectRoot = Split-Path -Parent $PSScriptRoot
     $mainItems = @(
         [pscustomobject]@{ Label = 'Build / Deploy'; Description = 'Compilar, limpar e publicar BPLs.'; Status = 'Disponível'; Id = 'build' }
+        [pscustomobject]@{ Label = 'Sincronizar integração'; Description = 'Atualizar pelo SVN e publicar seu estado no Git.'; Status = 'Disponível'; Id = 'sync' }
         [pscustomobject]@{ Label = 'Iniciar demanda'; Description = 'Preparar a base SVN/Git e o ambiente de trabalho.'; Status = 'Planejado'; Id = 'start' }
         [pscustomobject]@{ Label = 'Integrar demanda'; Description = 'Preparar a integração do trabalho concluído.'; Status = 'Planejado'; Id = 'integrate' }
         [pscustomobject]@{ Label = 'Preparar dependências'; Description = 'Obter os conjuntos de binários no Nextcloud.'; Status = 'Planejado'; Id = 'dependencies' }
@@ -241,8 +248,8 @@ function Invoke-AutomationMenu {
             $selectedIndex = $transition.SelectedIndex
             if ($transition.Action -eq 'Exit') { return 0 }
             if ($transition.Action -eq 'Open') {
-                if ($Section -eq 'Build') {
-                    Invoke-MenuBuildCommand -Item $items[$selectedIndex] -ProjectRoot $projectRoot
+                if ($Section -eq 'Build' -or $items[$selectedIndex].Id -eq 'sync') {
+                    Invoke-MenuCommand -Item $items[$selectedIndex] -ProjectRoot $projectRoot
                     $selectedIndex = -1
                 }
                 elseif ($items[$selectedIndex].Id -eq 'build') {

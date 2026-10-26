@@ -2254,6 +2254,11 @@ type
     cdsIndiceTecProdSEL: TStringField;
     CdsProdutosSINC_HW_CLOUD: TStringField;
     cdsTipoServSINC_HW_CLOUD: TStringField;
+    cdsKitsSINC_HW_CLOUD: TStringField;
+    cdsKitsDATA_CAD_KIT: TDateTimeField;
+    cdsKitsDATA_MOD_KIT: TDateTimeField;
+    cdsGradeDATA_CAD_GR: TDateTimeField;
+    cdsGradeDATA_MOD_GR: TDateTimeField;
     procedure cdsCodBarraCOD_GRADEGetText(Sender: TField; var Text: string;
       DisplayText: Boolean);
     procedure CdsProdutosUSAR_DEBCREDGetText(Sender: TField; var Text: string;
