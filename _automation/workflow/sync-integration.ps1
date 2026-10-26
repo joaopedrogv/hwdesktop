@@ -17,7 +17,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 function Invoke-SyncProcess {
-    param([string] $Tool, [string[]] $Arguments, [string] $Directory)
+    param([string] $Tool, [string[]] $Arguments, [string] $Directory, [string] $InputText = '')
 
     $start = [Diagnostics.ProcessStartInfo]::new()
     $start.FileName = $Tool
@@ -26,6 +26,8 @@ function Invoke-SyncProcess {
     $start.CreateNoWindow = $true
     $start.RedirectStandardOutput = $true
     $start.RedirectStandardError = $true
+    $start.RedirectStandardInput = $InputText.Length -gt 0
+    if ($start.RedirectStandardInput) { $start.StandardInputEncoding = [Text.UTF8Encoding]::new($false) }
     foreach ($argument in $Arguments) { $start.ArgumentList.Add($argument) }
     $process = [Diagnostics.Process]::new()
     $process.StartInfo = $start
@@ -33,6 +35,10 @@ function Invoke-SyncProcess {
         [void] $process.Start()
         $outputTask = $process.StandardOutput.ReadToEndAsync()
         $errorTask = $process.StandardError.ReadToEndAsync()
+        if ($start.RedirectStandardInput) {
+            $process.StandardInput.Write($InputText)
+            $process.StandardInput.Close()
+        }
         $process.WaitForExit()
         [pscustomobject]@{
             ExitCode = $process.ExitCode
@@ -113,10 +119,10 @@ function Invoke-SyncIntegration {
         }
 
         function Invoke-Client {
-            param([string] $Tool, [string[]] $Arguments, [int[]] $AllowedCodes = @(0), [switch] $ShowOutput)
+            param([string] $Tool, [string[]] $Arguments, [int[]] $AllowedCodes = @(0), [switch] $ShowOutput, [string] $InputText = '')
             $result = $null
-            if ($null -ne $CommandRunner) { $result = & $CommandRunner $Tool $Arguments $root }
-            if ($null -eq $result) { $result = Invoke-SyncProcess $Tool $Arguments $root }
+            if ($null -ne $CommandRunner) { $result = & $CommandRunner $Tool $Arguments $root $InputText }
+            if ($null -eq $result) { $result = Invoke-SyncProcess $Tool $Arguments $root $InputText }
             if ($ShowOutput) {
                 foreach ($content in @($result.Output, $result.Error)) {
                     if (-not [string]::IsNullOrWhiteSpace($content)) { Write-Host (Protect-Text $content.TrimEnd()) }
@@ -130,7 +136,9 @@ function Invoke-SyncIntegration {
         }
 
         function Get-SvnInfo {
-            [xml] $info = (Invoke-Client svn @('info', '--xml', '.')).Output
+            param([switch] $IncludeFiles)
+            $arguments = if ($IncludeFiles) { @('info', '--xml', '--depth', 'infinity', '.') } else { @('info', '--xml', '.') }
+            [xml] $info = (Invoke-Client svn $arguments).Output
             $entry = $info.SelectSingleNode('/info/entry')
             if ($null -eq $entry) { throw 'svn info não retornou os dados do diretório de integração.' }
             $url = $entry.SelectSingleNode('url').InnerText.TrimEnd('/')
@@ -139,7 +147,17 @@ function Invoke-SyncIntegration {
             }
             $revision = $entry.GetAttribute('revision')
             if ($revision -notmatch '^\d+$') { throw 'svn info não retornou um número de revisão válido.' }
-            [pscustomobject]@{ Url = $url; Revision = $revision }
+            $files = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+            if ($IncludeFiles) {
+                foreach ($file in $info.SelectNodes('/info/entry[@kind="file"]')) {
+                    $path = [IO.Path]::GetFullPath([IO.Path]::Combine($root, $file.GetAttribute('path')))
+                    if (-not $path.StartsWith($root + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+                        throw "svn info retornou arquivo fora da integração: $path"
+                    }
+                    [void] $files.Add([IO.Path]::GetRelativePath($root, $path).Replace('\', '/'))
+                }
+            }
+            [pscustomobject]@{ Url = $url; Revision = $revision; Files = $files }
         }
 
         $phase = 'Conferir contexto'
@@ -176,8 +194,10 @@ function Invoke-SyncIntegration {
         Write-Host "`nAtualizando SVN..."
         [void] (Invoke-Client svn @('update', '--non-interactive', '--username', $secrets.SVN_USER, '--password', $password, '.') -ShowOutput)
         Assert-SyncSvnStatus ([xml] (Invoke-Client svn @('status', '--xml', '.')).Output)
-        $svnInfo = Get-SvnInfo
+        $phase = 'Obter revisão e arquivos versionados pelo SVN'
+        $svnInfo = Get-SvnInfo -IncludeFiles
         Write-Host "Revisão SVN após o update: $($svnInfo.Revision)"
+        Write-Host "Arquivos versionados pelo SVN: $($svnInfo.Files.Count)"
 
         $phase = 'Obter referência Git remota'
         Write-Host "`nObtendo origin/$branch (fetch)..."
@@ -198,6 +218,18 @@ function Invoke-SyncIntegration {
         $phase = 'Registrar estado SVN no Git'
         Write-Host "`nPreparando o estado atual dos arquivos (git add .)..."
         [void] (Invoke-Client git @('add', '--', '.') -ShowOutput)
+        # O estado físico da pasta pode incluir arquivos que nunca pertenceram ao SVN.
+        # Retirá-los somente do índice registra a exclusão sem apagar arquivos locais.
+        $outsideSvn = [Collections.Generic.List[string]]::new()
+        $indexedFiles = (Invoke-Client git @('ls-files', '-z')).Output.Split([char] 0)
+        foreach ($path in $indexedFiles) {
+            if ($path.Length -gt 0 -and -not $svnInfo.Files.Contains($path)) { $outsideSvn.Add($path) }
+        }
+        if ($outsideSvn.Count -gt 0) {
+            Write-Host "`nRetirando do índice Git $($outsideSvn.Count) arquivo(s) fora do SVN; arquivos locais preservados:"
+            $paths = ($outsideSvn -join [char] 0) + [char] 0
+            [void] (Invoke-Client git @('--literal-pathspecs', 'rm', '--cached', '--pathspec-from-file=-', '--pathspec-file-nul') -InputText $paths -ShowOutput)
+        }
         [void] (Invoke-Client git @('diff', '--cached', '--stat') -ShowOutput)
         $difference = Invoke-Client git @('diff', '--cached', '--quiet') @(0, 1)
         if ($difference.ExitCode -eq 1) {

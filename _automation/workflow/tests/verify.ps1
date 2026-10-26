@@ -61,6 +61,8 @@ function New-TestArea {
         Calls = [Collections.Generic.List[object]]::new()
         AllCalls = [Collections.Generic.List[object]]::new()
         ResetPreservedFiles = $true; UpdateArguments = @()
+        AfterFiles = @('.gitignore', 'fonte.pas', 'remover.txt', 'local.ini')
+        FailInventory = $false
     }
     $runner = {
         param($Tool, $Arguments, $Directory)
@@ -85,7 +87,15 @@ function New-TestArea {
             'info' {
                 $revision = if ($state.Updated) { $state.AfterRevision } else { $state.BeforeRevision }
                 $url = [Security.SecurityElement]::Escape($state.Url)
-                $output = "<info><entry kind='dir' revision='$revision'><url>$url</url></entry></info>"
+                $entries = "<entry kind='dir' path='.' revision='$revision'><url>$url</url></entry>"
+                if ($Arguments -contains '--depth') {
+                    if ($state.FailInventory) { return [pscustomobject]@{ ExitCode = 1; Output = ''; Error = 'Inventário SVN indisponível (simulado)' } }
+                    foreach ($path in $state.AfterFiles) {
+                        $escapedPath = [Security.SecurityElement]::Escape($path)
+                        $entries += "<entry kind='file' path='$escapedPath' revision='$revision'/>"
+                    }
+                }
+                $output = "<info>$entries</info>"
             }
             'status' { $output = if ($state.Updated) { $state.AfterStatus } else { $state.BeforeStatus } }
             'update' {
@@ -127,6 +137,17 @@ function Test-Called {
 try {
     [void] [IO.Directory]::CreateDirectory($fixture)
     $area = New-TestArea 'principal'
+    # Mesmo caso relatado: arquivo local já commitado e publicado, ausente do SVN.
+    $gitOnlyFile = 'só Git [teste] com espaços.txt'
+    [IO.File]::WriteAllText((Join-Path $area.Root $gitOnlyFile), "preservar fisicamente`n")
+    [void] (Invoke-TestGit $area.Root @('add', '--', $gitOnlyFile))
+    [void] (Invoke-TestGit $area.Root @('commit', '-m', 'Arquivo somente Git, presente na integracao'))
+    [void] (Invoke-TestGit $area.Root @('push', 'origin', 'main'))
+    [IO.File]::WriteAllText((Join-Path $area.Root 'novo-local-nao-svn.txt'), "nao publicar`n")
+    [IO.File]::WriteAllText((Join-Path $area.Root 'excluido-svn-recriado.txt'), "copia local de arquivo excluido no SVN`n")
+    [void] (Invoke-TestGit $area.Root @('add', 'excluido-svn-recriado.txt'))
+    [void] (Invoke-TestGit $area.Root @('commit', '-m', 'Arquivo anteriormente sincronizado, depois excluido no SVN'))
+    [void] (Invoke-TestGit $area.Root @('push', 'origin', 'main'))
     $initialHead = Invoke-TestGit $area.Root @('rev-parse', 'HEAD')
     $development = Join-Path $area.Base 'Desenvolvimento'
     [void] (Invoke-TestGit $area.Base @('clone', $area.Origin, $development))
@@ -138,6 +159,7 @@ try {
     [void] (Invoke-TestGit $development @('commit', '-m', 'Commit remoto que deve permanecer no historico'))
     [void] (Invoke-TestGit $development @('push', 'origin', 'main'))
     $remoteHead = Invoke-TestGit $development @('rev-parse', 'HEAD')
+    $area.State.AfterFiles = @('.gitignore', 'fonte.pas', 'local.ini', 'novo-svn.txt')
     $area.State.UpdateAction = {
         param($Directory)
         [IO.File]::WriteAllText((Join-Path $Directory 'fonte.pas'), "estado SVN atualizado`n")
@@ -155,6 +177,11 @@ try {
     $files = Invoke-TestGit $area.Origin @('ls-tree', '-r', '--name-only', 'main')
     Assert-Check ($files.Contains('novo-svn.txt') -and -not $files.Contains('remover.txt') -and -not $files.Contains('somente-remoto.txt')) 'Inclusões e exclusões representam os arquivos SVN, incluindo diferença somente remota'
     Assert-Check (-not $files.Contains('config/')) 'Preparação respeita o filtro Git do fixture'
+    $publishedNames = (Invoke-TestGit $area.Origin @('ls-tree', '-r', '--name-only', '-z', 'main')).Split([char] 0)
+    Assert-Check ($gitOnlyFile -notin $publishedNames -and [IO.File]::ReadAllText((Join-Path $area.Root $gitOnlyFile)) -eq "preservar fisicamente`n") 'Arquivo já publicado somente no Git sai do commit, com nome especial e conteúdo local preservados'
+    Assert-Check ('novo-local-nao-svn.txt' -notin $publishedNames -and [IO.File]::Exists((Join-Path $area.Root 'novo-local-nao-svn.txt'))) 'Arquivo local não versionado pelo SVN não entra na publicação'
+    Assert-Check ('excluido-svn-recriado.txt' -notin $publishedNames -and [IO.File]::Exists((Join-Path $area.Root 'excluido-svn-recriado.txt'))) 'Arquivo excluído do SVN sai do Git mesmo com cópia física restante'
+    Assert-Check ('.gitignore' -in $publishedNames -and $result.Log.Contains('fora do SVN')) 'gitignore versionado pelo SVN permanece, e as retiradas são informadas'
     $passwordIndex = [Array]::IndexOf($area.State.UpdateArguments, '--password')
     Assert-Check ($passwordIndex -gt 0 -and $area.State.UpdateArguments[$passwordIndex + 1] -eq 'senha=ficticia\teste' -and -not $result.Log.Contains('senha=ficticia\teste')) 'Credenciais com igual e barra são encaminhadas sem impressão'
     Assert-Check (-not (Test-Called $area git config) -and -not (Test-Called $area git pull) -and -not (Test-Called $area git merge)) 'Não acrescenta validação de autoria, pull ou merge'
@@ -227,6 +254,10 @@ try {
     Assert-Check (-not $result.Success -and -not (Test-Called $area git reset) -and (Invoke-TestGit $area.Root @('rev-parse', 'HEAD')) -eq $head -and [IO.File]::ReadAllText((Join-Path $area.Root 'fonte.pas')) -eq "SVN atualizado antes da falha de fetch`n") 'Falha de fetch preserva o update SVN e não reposiciona a main local'
     $area.State.FailFetch = $false
     $area.State.UpdateAction = $null
+    $area.State.FailInventory = $true
+    $result = Invoke-TestSync $area
+    Assert-Check (-not $result.Success -and -not (Test-Called $area git fetch) -and -not (Test-Called $area git add)) 'Falha ao obter inventário SVN interrompe antes de preparar ou retirar arquivos Git'
+    $area.State.FailInventory = $false
     $gitDirectory = Invoke-TestGit $area.Root @('rev-parse', '--absolute-git-dir')
     $mergeMarker = Join-Path $gitDirectory 'MERGE_HEAD'
     [IO.File]::WriteAllText($mergeMarker, "$head`n")

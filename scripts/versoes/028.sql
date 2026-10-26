@@ -1700,7 +1700,7 @@ begin
       ' where formpagamento.cod_cliente = ' || :pcod_cliente;
 
   vsql = vsql ||
-    ' and formpagamento. + empresa.dias_car_juros < current_date ';
+    ' and formpagamento.data_venc + empresa.dias_car_juros < current_date ';
 
   vsql = vsql ||
     ' and formpagamento.tipdoc = ''S1'' and formpagamento.tpdocs <> ''PRE'' and formpagamento.prcss is null ';
@@ -3969,3 +3969,100 @@ INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA, NOME_PROCESSO, NIVEL_PR
 
 ALTER TABLE GRADE ADD DATA_CAD_GR TIMESTAMP;
 ALTER TABLE GRADE ADD DATA_MOD_GR TIMESTAMP;
+
+|BLOCO|
+create or alter procedure RETORNA_VL_CHQ_VENC (
+    PCOD_CLIENTE integer,
+    PCOD_EMPRESA integer,
+    PCPF_CNPJ varchar(18))
+returns (
+    VALOR_CHQ double precision)
+as
+declare variable VSQL varchar(1000);
+declare variable VFINANCEIRO_UNIFICADO char(1);
+declare variable VVALOR_CHQ double precision;
+begin
+  /* Procedure Text */
+
+  valor_chq = 0;
+
+  select empresa.financeiro_unificado from empresa where empresa.cod_empresa = :pcod_empresa into :vfinanceiro_unificado;
+
+  vsql =
+    ' select sum(coalesce(formpagamento.valordoc, 0)) soma from formpagamento
+      inner join empresa on empresa.cod_empresa = formpagamento.cod_empresa
+      inner join clientes on
+        clientes.cod_cliente = formpagamento.cod_cliente
+        and clientes.cod_empresa = formpagamento.cod_empresa
+      inner join controles on
+        controles.codigo_ctrl = formpagamento.cod_controle
+        and controles.codigo_emp = formpagamento.cod_empresa
+        and trim(coalesce(controles.exibir_doc, ''A'')) in ('''', ''A'', ''L'') ';
+
+  if ((coalesce(vfinanceiro_unificado, 'N') = 'S') and (coalesce(pcpf_cnpj, '') <> '')) then
+    vsql = vsql ||
+      ' where clientes.cpfcgc = ''' || :pcpf_cnpj || ''' ';
+  else
+    vsql = vsql ||
+      ' where formpagamento.cod_cliente = ' || :pcod_cliente;
+
+  vsql = vsql ||
+    ' and formpagamento.data_venc + empresa.dias_car_juros < current_date ';
+
+  vsql = vsql ||
+    ' and formpagamento.tipdoc = ''S1'' and formpagamento.tpdocs <> ''PRE'' and formpagamento.prcss is null ';
+
+  if ((coalesce(vfinanceiro_unificado, 'N') = 'S') and (coalesce(pcpf_cnpj, '') <> '')) then
+    vsql = vsql ||
+      ' and empresa.codigo_unificadora = ' || :pcod_empresa;
+  else
+    vsql = vsql ||
+      ' and formpagamento.cod_empresa = ' || :pcod_empresa;
+
+  vsql = vsql ||
+    ' and formpagamento.data_mov >= (current_date - 365) ';
+
+  execute statement
+    vsql into :vvalor_chq;
+
+  valor_chq = coalesce(valor_chq, 0) + coalesce(vvalor_chq, 0);
+
+  vsql =
+    ' select sum(coalesce(controle_cheque.valor_ch, 0)) soma from controle_cheque
+      inner join empresa on empresa.cod_empresa = controle_cheque .codigo_emp
+      inner join controles on
+        controles.codigo_ctrl = controle_cheque.codigo_ctrl
+        and controles.codigo_emp = controle_cheque.codigo_emp
+        and trim(coalesce(controles.exibir_doc, ''A'')) in ('''', ''A'', ''L'')
+      inner join clientes on
+        clientes.cod_cliente = controle_cheque.cod_cliente
+        and clientes.cod_empresa = controle_cheque.cod_emp_mult ';
+
+  vsql = vsql ||
+    ' where (controle_cheque.status_ch is null or controle_cheque.status_ch = '''') ';
+
+  if ((coalesce(vfinanceiro_unificado, 'N') = 'S') and (coalesce(pcpf_cnpj, '') <> '')) then
+    vsql = vsql ||
+      ' and clientes.cpfcgc = ''' || :pcpf_cnpj || ''' ';
+  else
+    vsql = vsql ||
+      ' and controle_cheque.cod_cliente = ' || :pcod_cliente;
+
+  vsql = vsql ||
+    ' and controle_cheque.data_venc + empresa.dias_car_juros < current_date ';
+
+  if ((coalesce(vfinanceiro_unificado, 'N') = 'S') and (coalesce(pcpf_cnpj, '') <> '')) then
+    vsql = vsql ||
+      ' and empresa.codigo_unificadora = ' || :pcod_empresa;
+  else
+    vsql = vsql ||
+      ' and controle_cheque.codigo_emp = ' || :pcod_empresa;
+
+  execute statement
+    vsql into :vvalor_chq;
+
+  valor_chq = coalesce(valor_chq, 0) + coalesce(vvalor_chq, 0);
+
+  suspend;
+end;
+|/BLOCO|
