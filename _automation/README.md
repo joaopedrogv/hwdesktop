@@ -24,7 +24,7 @@ O Windows PowerShell 5.1 (`powershell.exe`) não atende ao requisito. O lançado
 
 ## Operações disponíveis
 
-A área de integração de demandas continua **Planejada**. A opção **Informações do ambiente** consulta somente os caminhos locais e a versão do PowerShell.
+**Integrar demanda**, quarto item, atualiza a main do clone com pull por fast-forward e incorpora a branch da demanda. Não faz push: o resultado aguarda sua revisão e validação. Faça antes a sincronização no diretório de integração. Instruções em [workflow/README.md](workflow/README.md#integrar-demanda). A opção **Informações do ambiente** consulta somente os caminhos locais e a versão do PowerShell.
 
 **Sincronizar integração**, segundo item do menu, atualiza a área de integração pelo SVN e publica esse estado no Git. Usa a configuração individual `config/workflow.local.psd1` e o arquivo de segredos existente. Instruções em [workflow/README.md](workflow/README.md).
 
@@ -72,11 +72,11 @@ Todos os testes ficam em um único arquivo: **`tests/verify.ps1`**. Novas verifi
 # Executar todos os testes
 .\_automation\tests\verify.ps1
 
-# Opcional: executar somente uma área (Build, Sync, Start, Menu ou Dependencies)
+# Opcional: executar somente uma área (Build, Sync, Start, Merge, Menu ou Dependencies)
 .\_automation\tests\verify.ps1 -Group Start
 ```
 
-A suíte cobre compilação/publicação simuladas, sincronização, início de demanda, empacotamento e preparação de dependências, lançador e diagnósticos do menu. Usa somente pastas temporárias, remoto Git local e compilador/SVN simulados. Não lê configurações pessoais ou segredos, não compila o ERP nem publica na rede ou nos remotos reais. Os grupos ficam separados dentro do mesmo arquivo para evitar interferência entre suas funções auxiliares. O resultado mostra a contagem por área e o total; uma falha interrompe com código de saída 1.
+A suíte cobre compilação/publicação simuladas, sincronização, início e merge de demandas, empacotamento e preparação de dependências, lançador e diagnósticos do menu. Usa somente pastas temporárias, remoto Git local e compilador/SVN simulados. Não lê configurações pessoais ou segredos, não compila o ERP nem publica na rede ou nos remotos reais. Os grupos ficam separados dentro do mesmo arquivo para evitar interferência entre suas funções auxiliares. O resultado mostra a contagem por área e o total; uma falha interrompe com código de saída 1.
 
 ## Empacotar dependências
 

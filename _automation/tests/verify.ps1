@@ -6,10 +6,10 @@
     Usa somente pastas temporárias, compilador/SVN simulados e remoto Git local.
     Não lê configurações pessoais ou segredos nem opera nos projetos reais.
 .PARAMETER Group
-    All executa tudo. Opcionalmente: Build, Sync, Start, Menu ou Dependencies.
+    All executa tudo. Opcionalmente: Build, Sync, Start, Merge, Menu ou Dependencies.
 #>
 [CmdletBinding()]
-param([ValidateSet('All', 'Build', 'Sync', 'Start', 'Menu', 'Dependencies')] [string] $Group = 'All')
+param([ValidateSet('All', 'Build', 'Sync', 'Start', 'Menu', 'Dependencies', 'Merge')] [string] $Group = 'All')
 
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $false
@@ -1106,10 +1106,184 @@ function Test-PrepareDependencies {
     }
 }
 
+function Test-Merge {
+    $temporaryBase = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $fixture = Join-Path $temporaryBase ('hwdesktop-merge-' + [guid]::NewGuid().ToString('N'))
+    $scriptPath = Join-Path $automationRoot 'workflow\merge-demand.ps1'
+    . $scriptPath
+    function Invoke-TestGit {
+        param([string] $Directory, [string[]] $Arguments)
+        $result = Invoke-MergeProcess $Arguments $Directory
+        if ($result.ExitCode -ne 0) { throw "Git do teste: $($result.Error) $($result.Output)" }
+        return $result.Output.TrimEnd()
+    }
+    function Save-TestCommit {
+        param([string] $Root, [string] $Name, [string] $Content)
+        [IO.File]::WriteAllText((Join-Path $Root $Name), $Content)
+        [void] (Invoke-TestGit $Root @('add', '--', $Name))
+        [void] (Invoke-TestGit $Root @('commit', '-m', "Alterar $Name"))
+        return Invoke-TestGit $Root @('rev-parse', 'HEAD')
+    }
+    function New-MergeArea {
+        param([string] $Name)
+        $base = Join-Path $fixture $Name
+        $publisher = Join-Path $base 'Publicador'
+        $root = Join-Path $base 'Clone de trabalho'
+        $origin = Join-Path $base 'origin.git'
+        [void] [IO.Directory]::CreateDirectory($publisher)
+        [void] (Invoke-TestGit $base @('init', '--bare', '--initial-branch=main', $origin))
+        [void] (Invoke-TestGit $publisher @('init', '--initial-branch=main'))
+        [void] (Invoke-TestGit $publisher @('config', 'user.name', 'Teste merge'))
+        [void] (Invoke-TestGit $publisher @('config', 'user.email', 'teste@example.invalid'))
+        [void] (Invoke-TestGit $publisher @('remote', 'add', 'origin', $origin))
+        [IO.File]::WriteAllLines((Join-Path $publisher '.gitignore'), [string[]] @('bpl/','_automation/'))
+        [void] (Save-TestCommit $publisher 'fonte.pas' 'base')
+        [void] (Invoke-TestGit $publisher @('add', '.gitignore'))
+        [void] (Invoke-TestGit $publisher @('commit', '-m', 'Exclusoes locais'))
+        [void] (Invoke-TestGit $publisher @('push', 'origin', 'main'))
+        [void] (Invoke-TestGit $base @('clone', $origin, $root))
+        [void] (Invoke-TestGit $root @('config', 'user.name', 'Teste merge'))
+        [void] (Invoke-TestGit $root @('config', 'user.email', 'teste@example.invalid'))
+        [void] (Invoke-TestGit $root @('switch', '-c', 'demanda/local'))
+        $demand = Save-TestCommit $root 'demanda.txt' 'somente no clone'
+        $copy = Join-Path $root '_automation/workflow/merge-demand.ps1'
+        [void] [IO.Directory]::CreateDirectory((Split-Path -Parent $copy))
+        [IO.File]::Copy($scriptPath, $copy)
+        $state = @{ Calls = [Collections.Generic.List[object]]::new(); FailPull = $false; ChangeAfterPull = $false }
+        $nativeProcess = (Get-Command Invoke-MergeProcess -CommandType Function).ScriptBlock
+        $runner = {
+            param($Arguments, $Directory)
+            $state.Calls.Add([pscustomobject]@{ Arguments = @($Arguments); Directory = $Directory })
+            if ($state.FailPull -and $Arguments[0] -eq 'pull') {
+                return [pscustomobject]@{ ExitCode=1; Output=''; Error='Falha de pull simulada' }
+            }
+            if ($state.ChangeAfterPull -and $Arguments[0] -eq 'pull') {
+                $result = & $nativeProcess $Arguments $Directory
+                [IO.File]::AppendAllText((Join-Path $Directory 'fonte.pas'), 'mudou durante o pull')
+                return $result
+            }
+            return $null
+        }.GetNewClosure()
+        [pscustomobject]@{ Root=$root; Publisher=$publisher; Origin=$origin; Script=$copy; State=$state; Runner=$runner; Demand=$demand }
+    }
+    function Invoke-TestMerge {
+        param($Area, [string] $Branch = '', [string] $WorkPath = '', [string] $ConfigPath = '')
+        $Area.State.Calls.Clear()
+        $log = [Collections.Generic.List[string]]::new()
+        $failure = ''
+        . $Area.Script -Branch $Branch -WorkPath $WorkPath -ConfigPath $ConfigPath
+        try {
+            Invoke-MergeDemand -Branch $Branch -WorkPath $WorkPath -ConfigPath $ConfigPath -CommandRunner $Area.Runner 6>&1 | ForEach-Object { $log.Add([string] $_) }
+        }
+        catch { $failure = $_.Exception.Message }
+        [pscustomobject]@{ Success=($failure -eq ''); Error=$failure; Log=($log -join [Environment]::NewLine) }
+    }
+    function Test-MergeCalled {
+        param($Area, [string] $Name)
+        return @($Area.State.Calls | Where-Object { $_.Arguments[0] -eq $Name }).Count -gt 0
+    }
+
+    try {
+        $area = New-MergeArea 'principal'
+        $remote = Save-TestCommit $area.Publisher 'svn.txt' 'mudanca SVN publicada'
+        [void] (Invoke-TestGit $area.Publisher @('push', 'origin', 'main'))
+        [void] [IO.Directory]::CreateDirectory((Join-Path $area.Root 'bpl'))
+        [IO.File]::WriteAllText((Join-Path $area.Root 'bpl/local.dll'), 'binario ignorado')
+        [void] (Invoke-TestGit $area.Root @('config', 'pull.rebase', 'true'))
+        [void] (Invoke-TestGit $area.Root @('config', 'merge.ff', 'only'))
+        $result = Invoke-TestMerge $area
+        Assert-Check $result.Success 'Usa a branch atual e o próprio clone, sem configuração ou caminhos cruzados'
+        Assert-Check ((Invoke-TestGit $area.Root @('branch','--show-current')) -eq 'main' -and [IO.File]::Exists((Join-Path $area.Root 'svn.txt')) -and [IO.File]::Exists((Join-Path $area.Root 'demanda.txt'))) 'Atualiza a main com a nova base publicada e incorpora a demanda local'
+        $parents = (Invoke-TestGit $area.Root @('rev-list','--parents','-n','1','HEAD')) -split ' '
+        Assert-Check ($parents.Count -eq 3 -and $parents[1] -eq $remote -and $parents[2] -eq $area.Demand) 'Divergência entre base e demanda gera commit de merge com os dois históricos'
+        Assert-Check ((Invoke-TestGit $area.Root @('rev-parse','demanda/local')) -eq $area.Demand) 'Branch da demanda e seus commits sem push são preservados'
+        Assert-Check ((Invoke-TestGit $area.Origin @('rev-parse','main')) -eq $remote) 'Merge não publica a main nem a branch da demanda'
+        Assert-Check ((Invoke-TestGit $area.Root @('status','--porcelain')) -eq '' -and [IO.File]::ReadAllText((Join-Path $area.Root 'bpl/local.dll')) -eq 'binario ignorado') 'Conclui com worktree limpo e preserva binários ignorados sem colisão'
+        $commands = @($area.State.Calls | ForEach-Object { $_.Arguments[0] })
+        $pullCalls = @($area.State.Calls | Where-Object { $_.Arguments[0] -eq 'pull' })
+        Assert-Check ($pullCalls.Count -eq 1 -and '--ff-only' -in $pullCalls[0].Arguments -and '--no-rebase' -in $pullCalls[0].Arguments -and $pullCalls[0].Arguments[-2] -eq 'origin' -and $pullCalls[0].Arguments[-1] -eq 'main' -and 'fetch' -notin $commands) 'Usa um pull --ff-only origin main, sem fetch separado ou rebase'
+        Assert-Check (@($commands | Where-Object { $_ -in @('reset','stash','clean','push','rebase') }).Count -eq 0 -and $result.Log.Contains('Revise e valide antes de publicar')) 'Não executa recuperação ou publicação e orienta a validação manual'
+
+        $dirty = New-MergeArea 'pendencias'
+        [IO.File]::AppendAllText((Join-Path $dirty.Root 'fonte.pas'), 'pendente')
+        $result = Invoke-TestMerge $dirty
+        Assert-Check (-not $result.Success -and -not (Test-MergeCalled $dirty 'switch') -and (Invoke-TestGit $dirty.Root @('branch','--show-current')) -eq 'demanda/local' -and $result.Log.Contains('fonte.pas')) 'Mudança local bloqueia antes da troca e exibe o arquivo'
+        [void] (Invoke-TestGit $dirty.Root @('add','fonte.pas'))
+        $indexBefore = Invoke-TestGit $dirty.Root @('diff','--cached')
+        $result = Invoke-TestMerge $dirty
+        Assert-Check (-not $result.Success -and -not (Test-MergeCalled $dirty 'pull') -and (Invoke-TestGit $dirty.Root @('diff','--cached')) -eq $indexBefore) 'Índice preparado é preservado e impede atualização'
+        [void] (Invoke-TestGit $dirty.Root @('restore','--staged','--worktree','fonte.pas'))
+        [IO.File]::WriteAllText((Join-Path $dirty.Root 'novo.txt'), 'nao versionado')
+        $result = Invoke-TestMerge $dirty
+        Assert-Check (-not $result.Success -and -not (Test-MergeCalled $dirty 'switch') -and [IO.File]::Exists((Join-Path $dirty.Root 'novo.txt'))) 'Arquivo não rastreado e não ignorado bloqueia sem exclusão'
+        [IO.File]::Delete((Join-Path $dirty.Root 'novo.txt'))
+        foreach ($name in @('inexistente','@{-1}','main')) {
+            $result = Invoke-TestMerge $dirty -Branch $name
+            Assert-Check (-not $result.Success -and -not (Test-MergeCalled $dirty 'switch')) "Branch inválida ou inadequada é recusada: $name"
+        }
+        $result = Invoke-TestMerge $dirty -ConfigPath (Join-Path $dirty.Root 'ausente.psd1')
+        Assert-Check (-not $result.Success -and $dirty.State.Calls.Count -eq 0) 'Configuração explicitamente inexistente é recusada antes de executar Git'
+        [void] [IO.Directory]::CreateDirectory((Join-Path $dirty.Root '.svn'))
+        $result = Invoke-TestMerge $dirty
+        Assert-Check (-not $result.Success -and $dirty.State.Calls.Count -eq 0) 'Working copy SVN é recusada sem exigir IntegrationPath'
+        [IO.Directory]::Delete((Join-Path $dirty.Root '.svn'))
+        [void] (Invoke-TestGit $dirty.Root @('remote','remove','origin'))
+        $result = Invoke-TestMerge $dirty
+        Assert-Check (-not $result.Success -and -not (Test-MergeCalled $dirty 'switch')) 'Ausência de origin bloqueia antes da troca'
+
+        $ahead = New-MergeArea 'main-pendente'
+        [void] (Invoke-TestGit $ahead.Root @('switch','main'))
+        $pending = Save-TestCommit $ahead.Root 'main-local.txt' 'commit sem push na main'
+        [void] (Invoke-TestGit $ahead.Root @('switch','demanda/local'))
+        $result = Invoke-TestMerge $ahead
+        Assert-Check (-not $result.Success -and -not (Test-MergeCalled $ahead 'pull') -and (Invoke-TestGit $ahead.Root @('branch','--show-current')) -eq 'main' -and (Invoke-TestGit $ahead.Root @('rev-parse','main')) -eq $pending) 'Main com commit sem push é selecionada e bloqueia antes do pull, preservando o commit'
+        [void] (Invoke-TestGit $ahead.Root @('update-ref','refs/remotes/origin/main',$pending))
+        $result = Invoke-TestMerge $ahead -Branch 'demanda/local'
+        Assert-Check (-not $result.Success -and (Test-MergeCalled $ahead 'pull') -and -not (Test-MergeCalled $ahead 'merge') -and (Invoke-TestGit $ahead.Root @('rev-parse','HEAD')) -eq $pending) 'Reconferência após pull barra main ainda à frente da base efetivamente recebida'
+
+        $fail = New-MergeArea 'falha-pull'
+        $fail.State.FailPull = $true
+        $result = Invoke-TestMerge $fail
+        Assert-Check (-not $result.Success -and (Invoke-TestGit $fail.Root @('branch','--show-current')) -eq 'main' -and -not (Test-MergeCalled $fail 'merge') -and (Invoke-TestGit $fail.Root @('rev-parse','demanda/local')) -eq $fail.Demand -and $result.Error.Contains('Estado alcançado')) 'Falha de pull interrompe antes do merge e informa a main selecionada, preservando a demanda'
+        $fail.State.FailPull = $false
+        $fail.State.ChangeAfterPull = $true
+        $result = Invoke-TestMerge $fail -Branch 'demanda/local'
+        Assert-Check (-not $result.Success -and -not (Test-MergeCalled $fail 'merge') -and [IO.File]::ReadAllText((Join-Path $fail.Root 'fonte.pas')).Contains('mudou durante')) 'Mudança local durante pull é preservada e impede o merge'
+
+        $conflict = New-MergeArea 'conflito'
+        [void] (Save-TestCommit $conflict.Root 'fonte.pas' 'demanda')
+        $published = Save-TestCommit $conflict.Publisher 'fonte.pas' 'SVN'
+        [void] (Invoke-TestGit $conflict.Publisher @('push','origin','main'))
+        $result = Invoke-TestMerge $conflict
+        Assert-Check (-not $result.Success -and [IO.File]::Exists((Join-Path $conflict.Root '.git/MERGE_HEAD')) -and (Invoke-TestGit $conflict.Root @('diff','--name-only','--diff-filter=U')) -eq 'fonte.pas') 'Conflito mantém merge em andamento e arquivos para resolução manual'
+        Assert-Check ((Invoke-TestGit $conflict.Root @('branch','--show-current')) -eq 'main' -and (Invoke-TestGit $conflict.Origin @('rev-parse','main')) -eq $published -and $result.Error.Contains('Resolva os conflitos')) 'Conflito informa como continuar e não publica o resultado'
+        $result = Invoke-TestMerge $conflict -Branch 'demanda/local'
+        Assert-Check (-not $result.Success -and -not (Test-MergeCalled $conflict 'switch') -and -not (Test-MergeCalled $conflict 'pull') -and [IO.File]::Exists((Join-Path $conflict.Root '.git/MERGE_HEAD'))) 'Nova execução não interfere em merge em andamento'
+
+        $ff = New-MergeArea 'fast-forward'
+        [void] (Invoke-TestGit $ff.Root @('switch','main'))
+        $result = Invoke-TestMerge $ff -Branch 'demanda/local'
+        Assert-Check ($result.Success -and (Invoke-TestGit $ff.Root @('rev-parse','HEAD')) -eq $ff.Demand) 'Branch explícita a partir da main é incorporada por fast-forward'
+        $result = Invoke-TestMerge $ff -Branch 'demanda/local'
+        Assert-Check (-not $result.Success -and -not (Test-MergeCalled $ff 'pull')) 'Reexecução após merge não publicado reconhece a pendência da main'
+        $engine = (Get-Process -Id $PID).Path
+        $output = @(& $engine -NoLogo -NoProfile -File $ff.Script -Branch 'demanda/local' 2>&1)
+        Assert-Check ($LASTEXITCODE -eq 1 -and ($output -join ' ').Contains('commit(s)')) 'Entrada independente retorna código 1 com o motivo da interrupção'
+    }
+    finally {
+        $resolved = [IO.Path]::GetFullPath($fixture)
+        if ($resolved.StartsWith($temporaryBase, [StringComparison]::OrdinalIgnoreCase) -and (Split-Path -Leaf $resolved) -match '^hwdesktop-merge-[a-f0-9]{32}$' -and [IO.Directory]::Exists($resolved)) {
+            Remove-Item -LiteralPath $resolved -Recurse -Force
+        }
+    }
+}
+
+
 $sections = @(
     @{ Group='Build'; Title='Compilação e publicação simuladas'; Action={ Test-Build } }
     @{ Group='Sync'; Title='Sincronização SVN/Git isolada'; Action={ Test-Sync } }
     @{ Group='Start'; Title='Início de demanda em clones locais'; Action={ Test-Start } }
+    @{ Group='Merge'; Title='Merge de demandas em clones locais'; Action={ Test-Merge } }
     @{ Group='Dependencies'; Title='Empacotamento de dependências'; Action={ Test-Dependencies } }
     @{ Group='Dependencies'; Title='Preparação de dependências'; Action={ Test-PrepareDependencies } }
     @{ Group='Menu'; Title='Lançador do menu'; Action={ Test-MenuLauncher } }

@@ -104,6 +104,36 @@ Antes da cópia, guarda os arquivos que serão substituídos. Em falha durante a
 
 Códigos de saída: `0` para sucesso/cancelamento pela escolha de clone vazia, `1` para erro.
 
+## Integrar demanda
+
+Depois de concluir os commits da demanda, execute a sincronização no diretório de integração. Em seguida, no clone de trabalho, abra **Integrar demanda** no menu ou execute:
+
+~~~powershell
+.\_automation\workflow\merge-demand.ps1
+# Informar uma branch local explicitamente, inclusive quando já estiver na main:
+.\_automation\workflow\merge-demand.ps1 -Branch 'nome-da-demanda'
+~~~
+
+Sem parâmetro, usa a branch atual como demanda e guarda seu nome antes de selecionar a principal. Se já estiver na main, solicita o nome da demanda; Enter vazio cancela. Com entrada redirecionada, informe -Branch quando estiver na main. O alvo padrão é o clone do próprio script, independentemente do terminal. Aceita -WorkPath para indicar outro clone naquela execução; pastas SVN são recusadas. Não lê segredos nem exige IntegrationPath.
+
+A configuração pessoal é opcional: utiliza apenas GitBranch de config/workflow.local.psd1, com padrão main. Também aceita -ConfigPath explícito; arquivo explícito ausente ou GitBranch vazio provoca erro. Nenhuma configuração pessoal é criada ou alterada.
+
+O comando:
+
+1. Confere raiz Git, remoto origin, branch da demanda local, main e ausência de operação Git em andamento. Mudanças em arquivos rastreados, índice preparado e arquivos novos não ignorados bloqueiam antes de trocar de branch.
+2. Seleciona a main. Se ela tiver commits ausentes da referência origin/main conhecida pelo clone, interrompe antes do pull. Os commits locais da demanda são permitidos e não precisam estar publicados.
+3. Executa git pull --ff-only origin main, sem fetch separado, sem rebase ou autostash. Em erro, interrompe antes do merge. Reconferir a main contra FETCH_HEAD impede que o pull permita uma main ainda à frente da base efetivamente recebida. A referência usada antes do pull é a última conhecida localmente; ela não é uma consulta atual ao servidor.
+4. Confere novamente o worktree e a ponta da demanda. Faz git merge --no-edit, permitindo fast-forward ou criando um commit de merge quando necessário. As saídas Git são preservadas.
+5. Informa que o resultado está na main local e deve ser revisado e validado antes da publicação.
+
+O script não verifica se o SVN foi sincronizado recentemente: recebe a base publicada em origin. A sincronização continua sendo uma etapa explícita anterior.
+
+Em conflito, encerra com código 1 e mantém o merge em andamento na main para resolução, validação e conclusão do commit pelas ferramentas habituais. Não execute novamente para concluir esse merge: uma operação já em andamento é motivo de parada. Após falha do pull ou bloqueio por commits pendentes, a main pode permanecer selecionada; o diagnóstico informa o estado alcançado. Não há reset, stash, limpeza ou rollback automático.
+
+A branch da demanda permanece disponível. Não executa SVN, build, push ou exclusão de branches. Depois de um merge bem-sucedido, a main contém a entrega local ainda não publicada; uma nova execução será bloqueada pela checagem de commits pendentes até que você avalie e publique o resultado.
+
+Códigos de saída: 0 para sucesso/cancelamento pelo nome vazio; 1 para erro. Testes no arquivo único: .\_automation\tests\verify.ps1 -Group Merge.
+
 ## Testes isolados
 
 Todos os testes estão em `_automation/tests/verify.ps1`. Sem parâmetros, executa a suíte completa; `-Group Sync` seleciona a sincronização e `-Group Start` seleciona o início de demanda, no mesmo arquivo. Usa clones e remoto Git locais temporários e SVN simulado. O grupo Dependencies cobre empacotamento e preparação, usando pacotes e transporte simulados em pastas temporárias. Não utiliza configurações pessoais, segredos, servidor SVN, GitHub ou Nextcloud reais.
