@@ -926,11 +926,192 @@ function Test-Dependencies {
     }
 }
 
+function Test-PrepareDependencies {
+    $temporaryBase = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $fixture = Join-Path $temporaryBase ('hwdesktop-prepare-' + [guid]::NewGuid().ToString('N'))
+    $payload = Join-Path $fixture 'source'
+    $remote = Join-Path $fixture 'remote'
+    $pack = Join-Path $automationRoot 'dependencies\pack-dependencies.ps1'
+    $prepare = Join-Path $automationRoot 'workflow\prepare-dependencies.ps1'
+
+    function New-ClientArea {
+        param([string] $Name)
+        $root = Join-Path $fixture $Name
+        foreach ($relative in @('.git', '_automation/config', 'bpl')) { [void] [IO.Directory]::CreateDirectory((Join-Path $root $relative)) }
+        [IO.File]::WriteAllText((Join-Path $root 'bpl/preservar.rpt'), 'arquivo local fora dos pacotes')
+        $config = Join-Path $root '_automation/config/dependencies.local.psd1'
+        [IO.File]::WriteAllText($config, "@{ WebDavUrl='https://nextcloud.invalid/remote.php/dav/files/test'; RemoteDirectory='hwdesktop/dependencies'; SecretsFile='segredos.md' }")
+        [IO.File]::WriteAllText((Join-Path $root '_automation/config/segredos.md'), "NEXTCLOUD_USER=test" + [Environment]::NewLine + "NEXTCLOUD_PASS=ficticia=abc:123")
+        $state = @{ Calls = [Collections.Generic.List[string]]::new(); FailPath = ''; ChangePath = '' }
+        $remoteRoot = $remote
+        $download = {
+            param($Relative, $Destination)
+            $state.Calls.Add($Relative)
+            if ($Relative -eq $state.FailPath) { throw 'Falha simulada ficticia=abc:123' }
+            [IO.File]::Copy((Join-Path $remoteRoot $Relative), $Destination, $true)
+            if ($state.ChangePath -and $Relative.EndsWith('/bundle.zip')) {
+                [IO.File]::WriteAllText($state.ChangePath, 'alteracao concorrente')
+            }
+        }.GetNewClosure()
+        [pscustomobject]@{ Root = $root; Config = $config; State = $state; Download = $download }
+    }
+    function Invoke-TestPrepare {
+        param($Area, [scriptblock] $ApplyFile)
+        $log = [Collections.Generic.List[string]]::new()
+        $errorText = ''
+        $Area.State.Calls.Clear()
+        try {
+            Invoke-PrepareDependencies -WorkPath $Area.Root -ConfigPath $Area.Config -DownloadFile $Area.Download -ApplyFile $ApplyFile 6>&1 | ForEach-Object { $log.Add([string] $_) }
+        }
+        catch { $errorText = $_.Exception.Message }
+        [pscustomobject]@{ Success = ($errorText -eq ''); Error = $errorText; Log = ($log -join [Environment]::NewLine) }
+    }
+    try {
+        foreach ($relative in @('build', 'runtime/baseline', 'runtime/internal')) { [void] [IO.Directory]::CreateDirectory((Join-Path $payload $relative)) }
+        foreach ($relative in @('build/a.dcp', 'build/b.dcp', 'runtime/baseline/vendor.dll', 'runtime/baseline/stable.exe', 'runtime/internal/hw.alpha.dll', 'runtime/internal/hw.beta.dll')) {
+            [IO.File]::WriteAllText((Join-Path $payload $relative), "original $relative")
+            [IO.File]::SetLastWriteTime((Join-Path $payload $relative), [datetime]::new(2023, 2, 3, 10, 20, 30))
+        }
+        . $pack -SourcePath $payload -OutputPath $remote
+        Invoke-PackDependencies $payload $remote 'v0001' 6>&1 | Out-Null
+        . $prepare
+        $area = New-ClientArea 'clone'
+        $result = Invoke-TestPrepare $area
+        if (-not $result.Success) { throw $result.Error }
+        Assert-Check ([IO.File]::ReadAllText((Join-Path $area.Root 'dcp/a.dcp')) -eq 'original build/a.dcp') 'Build do repositório remoto é aplicado em dcp'
+        Assert-Check ([IO.File]::ReadAllText((Join-Path $area.Root 'bpl/vendor.dll')) -eq 'original runtime/baseline/vendor.dll' -and [IO.File]::ReadAllText((Join-Path $area.Root 'bpl/hw.alpha.dll')) -eq 'original runtime/internal/hw.alpha.dll') 'Baseline e módulos internos usam o mesmo fluxo ZIP e são aplicados em bpl'
+        Assert-Check (@($area.State.Calls | Where-Object { $_.EndsWith('bundle.zip') }).Count -eq 4 -and [IO.File]::Exists((Join-Path $area.Root '_automation/temp/dependencies/last-applied.json'))) 'Primeira execução obtém os quatro pacotes e registra a composição aplicada'
+        $datesPreserved = $true
+        foreach ($pair in @(@('build/a.dcp','dcp/a.dcp'), @('runtime/baseline/vendor.dll','bpl/vendor.dll'), @('runtime/internal/hw.alpha.dll','bpl/hw.alpha.dll'))) {
+            if ([IO.File]::GetLastWriteTime((Join-Path $area.Root $pair[1])) -ne [IO.File]::GetLastWriteTime((Join-Path $payload $pair[0]))) { $datesPreserved = $false }
+        }
+        Assert-Check $datesPreserved 'Extração e aplicação preservam a data histórica do ZIP em build, baseline e módulo interno'
+        $dateFile = Join-Path $area.Root 'bpl/vendor.dll'
+        [IO.File]::SetLastWriteTimeUtc($dateFile, [datetime]::UtcNow)
+        $result = Invoke-TestPrepare $area -ApplyFile { throw 'Não deveria recopiar conteúdo idêntico' }
+        Assert-Check ($result.Success -and [IO.File]::GetLastWriteTime($dateFile) -eq [IO.File]::GetLastWriteTime((Join-Path $payload 'runtime/baseline/vendor.dll')) -and @($area.State.Calls | Where-Object { $_.EndsWith('bundle.zip') }).Count -eq 0) 'Corrige somente a data de arquivo já aplicado sem recopiar conteúdo nem baixar ZIP do cache'
+        Assert-Check ([IO.File]::ReadAllText((Join-Path $area.Root 'bpl/preservar.rpt')) -eq 'arquivo local fora dos pacotes') 'Arquivos que não pertencem aos pacotes permanecem intactos'
+        $timestamp = [IO.File]::GetLastWriteTimeUtc((Join-Path $area.Root 'bpl/vendor.dll'))
+        $result = Invoke-TestPrepare $area
+        Assert-Check ($result.Success -and @($area.State.Calls | Where-Object { $_.EndsWith('bundle.zip') }).Count -eq 0 -and [IO.File]::GetLastWriteTimeUtc((Join-Path $area.Root 'bpl/vendor.dll')) -eq $timestamp) 'Reexecução confere a composição sem baixar ZIPs ou copiar arquivos já corretos'
+        [IO.File]::WriteAllText((Join-Path $area.Root 'dcp/a.dcp'), 'versao local antiga')
+        $result = Invoke-TestPrepare $area
+        Assert-Check ($result.Success -and @($area.State.Calls | Where-Object { $_.EndsWith('bundle.zip') }).Count -eq 0 -and [IO.File]::ReadAllText((Join-Path $area.Root 'dcp/a.dcp')) -eq 'original build/a.dcp') 'Arquivo diferente é sobrescrito sem confirmação usando o cache validado'
+        $indexPath = Join-Path $remote 'index.json'
+        $originalIndex = [IO.File]::ReadAllText($indexPath)
+        $index = $originalIndex | ConvertFrom-Json
+        $buildManifestPath = Join-Path $remote $index.build
+        $buildManifest = Get-Content -LiteralPath $buildManifestPath -Raw | ConvertFrom-Json
+        $buildArchive = Join-Path (Split-Path -Parent $buildManifestPath) 'bundle.zip'
+        $cacheArchive = Join-Path $area.Root ("_automation/temp/dependencies/cache/" + $buildManifest.artifact.sha256 + '.zip')
+        [IO.File]::WriteAllText($cacheArchive, 'cache corrompido')
+        [IO.File]::WriteAllText((Join-Path $area.Root 'dcp/a.dcp'), 'antigo novamente')
+        $result = Invoke-TestPrepare $area
+        Assert-Check ($result.Success -and @($area.State.Calls | Where-Object { $_.EndsWith('bundle.zip') }).Count -eq 1) 'Cache corrompido é baixado novamente antes da aplicação'
+        $area.State.FailPath = 'index.json'
+        $result = Invoke-TestPrepare $area
+        Assert-Check (-not $result.Success -and -not $result.Error.Contains('ficticia=abc:123') -and -not $result.Log.Contains('ficticia=abc:123')) 'Falha de transporte mascara a senha e não exibe credenciais'
+        $area.State.FailPath = ''
+
+        $index.build = '../outside.json'
+        [IO.File]::WriteAllText($indexPath, (ConvertTo-Json $index -Depth 10))
+        $bad = New-ClientArea 'index-invalido'
+        $result = Invoke-TestPrepare $bad
+        Assert-Check (-not $result.Success -and $bad.State.Calls.Count -eq 1 -and -not [IO.Directory]::Exists((Join-Path $bad.Root 'dcp'))) 'Referência com travessia no índice é recusada antes de baixar manifestos ou aplicar arquivos'
+        [IO.File]::WriteAllText($indexPath, $originalIndex)
+        $index = $originalIndex | ConvertFrom-Json
+        $moduleManifestPath = Join-Path $remote $index.runtime.internal[0]
+        $originalManifest = [IO.File]::ReadAllText($moduleManifestPath)
+        $manifest = $originalManifest | ConvertFrom-Json
+        $manifest.files[0].path = '../outside.dll'
+        [IO.File]::WriteAllText($moduleManifestPath, (ConvertTo-Json $manifest -Depth 10))
+        $bad = New-ClientArea 'manifesto-invalido'
+        $result = Invoke-TestPrepare $bad
+        Assert-Check (-not $result.Success -and @($bad.State.Calls | Where-Object { $_.EndsWith('bundle.zip') }).Count -eq 0 -and -not [IO.Directory]::Exists((Join-Path $bad.Root 'dcp'))) 'Destino com travessia no manifesto é recusado sem baixar pacotes ou alterar destinos'
+        [IO.File]::WriteAllText($moduleManifestPath, $originalManifest)
+
+        $originalArchive = [IO.File]::ReadAllBytes($buildArchive)
+        [IO.File]::WriteAllBytes($buildArchive, [byte[]]($originalArchive + [byte] 1))
+        $bad = New-ClientArea 'zip-corrompido'
+        $result = Invoke-TestPrepare $bad
+        Assert-Check (-not $result.Success -and -not [IO.Directory]::Exists((Join-Path $bad.Root 'dcp')) -and -not [IO.File]::Exists((Join-Path $bad.Root 'bpl/vendor.dll'))) 'ZIP com tamanho/hash divergente interrompe antes de aplicar qualquer arquivo'
+        [IO.File]::WriteAllBytes($buildArchive, $originalArchive)
+
+        $moduleArchive = Join-Path (Split-Path -Parent $moduleManifestPath) 'bundle.zip'
+        $originalModuleArchive = [IO.File]::ReadAllBytes($moduleArchive)
+        [IO.File]::Delete($moduleArchive)
+        $zip = [IO.Compression.ZipFile]::Open($moduleArchive, [IO.Compression.ZipArchiveMode]::Create)
+        try {
+            $entry = $zip.CreateEntry('../outside.dll')
+            $writer = [IO.StreamWriter]::new($entry.Open())
+            try { $writer.Write('nao deve ser extraido') } finally { $writer.Dispose() }
+        }
+        finally { $zip.Dispose() }
+        $manifest = $originalManifest | ConvertFrom-Json
+        $manifest.artifact.size = [IO.FileInfo]::new($moduleArchive).Length
+        $manifest.artifact.sha256 = (Get-FileHash -LiteralPath $moduleArchive -Algorithm SHA256).Hash.ToLowerInvariant()
+        [IO.File]::WriteAllText($moduleManifestPath, (ConvertTo-Json $manifest -Depth 10))
+        $bad = New-ClientArea 'zip-traversal'
+        $result = Invoke-TestPrepare $bad
+        Assert-Check (-not $result.Success -and -not [IO.Directory]::Exists((Join-Path $bad.Root 'dcp')) -and -not [IO.File]::Exists((Join-Path $bad.Root 'outside.dll'))) 'Travessia dentro do ZIP é rejeitada mesmo com hash externo válido'
+        [IO.File]::WriteAllBytes($moduleArchive, $originalModuleArchive)
+        [IO.File]::WriteAllText($moduleManifestPath, $originalManifest)
+
+        $manifest = $originalManifest | ConvertFrom-Json
+        $manifest.files[0].path = 'vendor.dll'
+        [IO.File]::WriteAllText($moduleManifestPath, (ConvertTo-Json $manifest -Depth 10))
+        $bad = New-ClientArea 'destino-duplicado'
+        $result = Invoke-TestPrepare $bad
+        Assert-Check (-not $result.Success -and $result.Error.Contains('Destino repetido') -and -not [IO.Directory]::Exists((Join-Path $bad.Root 'dcp'))) 'Itens diferentes não podem anunciar o mesmo destino de runtime'
+        [IO.File]::WriteAllText($moduleManifestPath, $originalManifest)
+
+        $a = Join-Path $area.Root 'dcp/a.dcp'
+        $b = Join-Path $area.Root 'dcp/b.dcp'
+        [IO.File]::WriteAllText($a, 'anterior A')
+        [IO.File]::WriteAllText($b, 'anterior B')
+        [IO.File]::SetLastWriteTimeUtc($a, [datetime]::new(2024, 5, 6, 7, 8, 9, [DateTimeKind]::Utc).AddTicks(12345))
+        [IO.File]::SetLastWriteTimeUtc($b, [datetime]::new(2025, 6, 7, 8, 9, 10, [DateTimeKind]::Utc).AddTicks(67890))
+        $previousTimeA = [IO.File]::GetLastWriteTimeUtc($a)
+        $previousTimeB = [IO.File]::GetLastWriteTimeUtc($b)
+        $copyState = @{ Count = 0 }
+        $failCopy = {
+            param($Source, $Destination)
+            $copyState.Count++
+            if ($copyState.Count -eq 2) { [IO.File]::WriteAllText($Destination, 'copia parcial'); throw 'falha de copia simulada' }
+            [IO.File]::Copy($Source, $Destination, $true)
+        }.GetNewClosure()
+        $result = Invoke-TestPrepare $area -ApplyFile $failCopy
+        Assert-Check (-not $result.Success -and [IO.File]::ReadAllText($a) -eq 'anterior A' -and [IO.File]::ReadAllText($b) -eq 'anterior B') 'Falha durante a aplicação restaura inclusive o arquivo que ficou parcialmente copiado'
+        Assert-Check ([IO.File]::GetLastWriteTimeUtc($a) -eq $previousTimeA -and [IO.File]::GetLastWriteTimeUtc($b) -eq $previousTimeB) 'Restauração após cópia parcial preserva também as datas anteriores dos dois arquivos'
+        $result = Invoke-TestPrepare $area
+        Assert-Check ($result.Success -and [IO.File]::ReadAllText($b) -eq 'original build/b.dcp') 'Após a falha corrigida, nova execução conclui normalmente sem perguntas'
+
+        $concurrent = New-ClientArea 'alteracao-concorrente'
+        [void] [IO.Directory]::CreateDirectory((Join-Path $concurrent.Root 'dcp'))
+        $concurrent.State.ChangePath = Join-Path $concurrent.Root 'dcp/a.dcp'
+        [IO.File]::WriteAllText($concurrent.State.ChangePath, 'antes')
+        $result = Invoke-TestPrepare $concurrent
+        Assert-Check (-not $result.Success -and [IO.File]::ReadAllText($concurrent.State.ChangePath) -eq 'alteracao concorrente' -and -not [IO.File]::Exists((Join-Path $concurrent.Root 'bpl/vendor.dll'))) 'Alteração local durante o download é preservada antes de qualquer aplicação'
+        $svn = New-ClientArea 'pasta-svn'
+        [void] [IO.Directory]::CreateDirectory((Join-Path $svn.Root '.svn'))
+        $result = Invoke-TestPrepare $svn
+        Assert-Check (-not $result.Success -and $svn.State.Calls.Count -eq 0) 'Pasta SVN não recebe dependências nem exige conhecer um IntegrationPath'
+        Assert-Check (@(Get-ChildItem -LiteralPath (Join-Path $area.Root '_automation/temp/dependencies') -Directory -Filter 'run-*').Count -eq 0) 'Remove áreas temporárias e mantém somente cache e registro da aplicação'
+    }
+    finally {
+        $resolved = [IO.Path]::GetFullPath($fixture)
+        if ($resolved.StartsWith($temporaryBase, [StringComparison]::OrdinalIgnoreCase) -and (Split-Path -Leaf $resolved) -match '^hwdesktop-prepare-[a-f0-9]{32}$' -and [IO.Directory]::Exists($resolved)) {
+            Remove-Item -LiteralPath $resolved -Recurse -Force
+        }
+    }
+}
+
 $sections = @(
     @{ Group='Build'; Title='Compilação e publicação simuladas'; Action={ Test-Build } }
     @{ Group='Sync'; Title='Sincronização SVN/Git isolada'; Action={ Test-Sync } }
     @{ Group='Start'; Title='Início de demanda em clones locais'; Action={ Test-Start } }
     @{ Group='Dependencies'; Title='Empacotamento de dependências'; Action={ Test-Dependencies } }
+    @{ Group='Dependencies'; Title='Preparação de dependências'; Action={ Test-PrepareDependencies } }
     @{ Group='Menu'; Title='Lançador do menu'; Action={ Test-MenuLauncher } }
     @{ Group='Menu'; Title='Diagnósticos do menu'; Action={ Test-MenuDiagnostics } }
 )

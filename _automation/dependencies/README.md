@@ -42,7 +42,7 @@ dependencies/
 
 Os ZIPs são reabertos e seus conteúdos conferidos. Todos os itens, inclusive módulos internos, usam o mesmo algoritmo de ZIP e conferência. Os arquivos de origem também são conferidos por hash antes de finalizar. Não são carregadas DLLs ou executados os binários. A versão indicada identifica os itens desta exportação inicial; o layout permite que os módulos evoluam em versões independentes posteriormente.
 
-Envie a pasta `dependencies` para a pasta `hwdesktop` no armazenamento. Não envie `dependencies-files`, que é apenas a origem de preparação. A obtenção por WebDAV será uma próxima etapa.
+Envie a pasta `dependencies` para a pasta `hwdesktop` no armazenamento. Não envie `dependencies-files`, que é apenas a origem de preparação. A obtenção e a aplicação no clone são feitas por `workflow/prepare-dependencies.ps1`, também disponível no menu. Veja [configuração e uso](../workflow/README.md#preparar-dependências). Build é aplicado em `dcp`; todo runtime é aplicado em `bpl`, com sobrescrita automática e sem exclusão dos demais arquivos.
 
 ## Testes
 
@@ -52,4 +52,4 @@ Os testes continuam no arquivo único:
 .\_automation\tests\verify.ps1 -Group Dependencies
 ```
 
-Usam somente arquivos temporários para verificar organização, conteúdo, integridade, preservação da origem e recusa de saídas existentes/indevidas.
+Usam somente arquivos temporários para verificar empacotamento e preparação: integridade, preservação da origem, sobrescrita automática, reexecução, cache, caminhos inválidos e restauração após falha na cópia. Não acessam o Nextcloud real nem leem segredos pessoais.

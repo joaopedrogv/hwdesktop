@@ -180,6 +180,10 @@ function Invoke-MenuCommand {
             $commandArguments = @()
             $scriptPath = Join-Path $PSScriptRoot 'workflow\start-demand.ps1'
         }
+        elseif ($Item.Id -eq 'dependencies') {
+            $commandArguments = @()
+            $scriptPath = Join-Path $PSScriptRoot 'workflow\prepare-dependencies.ps1'
+        }
         else {
             $commandArguments = @('-ProjectRoot', $ProjectRoot)
             $scriptPath = Join-Path $PSScriptRoot "build\$($Item.ScriptName)"
@@ -207,7 +211,7 @@ function Invoke-AutomationMenu {
         [pscustomobject]@{ Label = 'Sincronizar integração'; Description = 'Atualizar pelo SVN e publicar seu estado no Git.'; Status = 'Disponível'; Id = 'sync' }
         [pscustomobject]@{ Label = 'Iniciar demanda'; Description = 'Atualizar a base Git e criar a branch de trabalho.'; Status = 'Disponível'; Id = 'start' }
         [pscustomobject]@{ Label = 'Integrar demanda'; Description = 'Preparar a integração do trabalho concluído.'; Status = 'Planejado'; Id = 'integrate' }
-        [pscustomobject]@{ Label = 'Preparar dependências'; Description = 'Obter os conjuntos de binários no Nextcloud.'; Status = 'Planejado'; Id = 'dependencies' }
+        [pscustomobject]@{ Label = 'Preparar dependências'; Description = 'Obter build em dcp e runtime em bpl pelo Nextcloud.'; Status = 'Disponível'; Id = 'dependencies' }
         [pscustomobject]@{ Label = 'Informações do ambiente'; Description = 'Consultar caminhos e a versão do PowerShell.'; Status = 'Disponível'; Id = 'environment' }
     )
     $buildItems = @(
@@ -284,7 +288,7 @@ function Invoke-AutomationMenu {
             $selectedIndex = $transition.SelectedIndex
             if ($transition.Action -eq 'Exit') { return 0 }
             if ($transition.Action -eq 'Open') {
-                if ($Section -eq 'Build' -or $items[$selectedIndex].Id -in @('sync', 'start')) {
+                if ($Section -eq 'Build' -or $items[$selectedIndex].Id -in @('sync', 'start', 'dependencies')) {
                     Invoke-MenuCommand -Item $items[$selectedIndex] -ProjectRoot $projectRoot -Plain:$plain
                     $selectedIndex = -1
                 }

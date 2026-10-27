@@ -24,7 +24,7 @@ O Windows PowerShell 5.1 (`powershell.exe`) não atende ao requisito. O lançado
 
 ## Operações disponíveis
 
-As áreas de integração de demandas e dependências continuam **Planejadas**. A opção **Informações do ambiente** consulta somente os caminhos locais e a versão do PowerShell.
+A área de integração de demandas continua **Planejada**. A opção **Informações do ambiente** consulta somente os caminhos locais e a versão do PowerShell.
 
 **Sincronizar integração**, segundo item do menu, atualiza a área de integração pelo SVN e publica esse estado no Git. Usa a configuração individual `config/workflow.local.psd1` e o arquivo de segredos existente. Instruções em [workflow/README.md](workflow/README.md).
 
@@ -32,7 +32,7 @@ As áreas de integração de demandas e dependências continuam **Planejadas**. 
 
 **Build / Deploy**, primeiro item do menu, abre seis comandos PS1 independentes em `build/`: compilar todos, compilar selecionados, compilar reestruturação, limpar, publicar e compilar/publicar. Selecionar uma ação e pressionar Enter chama seu comando diretamente. Não há pergunta adicional de limpeza, destino ou escolha de modo. As interações próprias dos originais permanecem: seleção gráfica de pacotes e confirmação S/N de compilar/publicar. O destino vem de `config/deploy.psd1`. Exemplos e parâmetros estão em [build/README.md](build/README.md).
 
-Os scripts antigos foram movidos pelo responsável para `legados`. Os comandos de compilação compartilham `core/Build.Automation.psm1`, e a compilação de cada pacote ainda usa `core/build-package.bat`, preservando a lógica especial `SQL_RES`. O acesso ao Nextcloud permanece planejado. A proteção do menu não altera o comportamento dos BATs antigos abertos diretamente.
+Os scripts antigos foram movidos pelo responsável para `legados`. Os comandos de compilação compartilham `core/Build.Automation.psm1`, e a compilação de cada pacote ainda usa `core/build-package.bat`, preservando a lógica especial `SQL_RES`. **Preparar dependências**, quinto item, baixa do Nextcloud os pacotes necessários e aplica build em `dcp` e runtime em `bpl`, sobrescrevendo arquivos diferentes sem confirmação. Usa a configuração individual `config/dependencies.local.psd1` e as chaves NEXTCLOUD_USER/NEXTCLOUD_PASS do arquivo de segredos. Instruções em [workflow/README.md](workflow/README.md#preparar-dependências). A proteção do menu não altera o comportamento dos BATs antigos abertos diretamente.
 
 ## Opções de execução
 
@@ -76,7 +76,7 @@ Todos os testes ficam em um único arquivo: **`tests/verify.ps1`**. Novas verifi
 .\_automation\tests\verify.ps1 -Group Start
 ```
 
-A suíte cobre compilação/publicação simuladas, sincronização, início de demanda, lançador e diagnósticos do menu. Usa somente pastas temporárias, remoto Git local e compilador/SVN simulados. Não lê configurações pessoais ou segredos, não compila o ERP nem publica na rede ou nos remotos reais. Os grupos ficam separados dentro do mesmo arquivo para evitar interferência entre suas funções auxiliares. O resultado mostra a contagem por área e o total; uma falha interrompe com código de saída 1.
+A suíte cobre compilação/publicação simuladas, sincronização, início de demanda, empacotamento e preparação de dependências, lançador e diagnósticos do menu. Usa somente pastas temporárias, remoto Git local e compilador/SVN simulados. Não lê configurações pessoais ou segredos, não compila o ERP nem publica na rede ou nos remotos reais. Os grupos ficam separados dentro do mesmo arquivo para evitar interferência entre suas funções auxiliares. O resultado mostra a contagem por área e o total; uma falha interrompe com código de saída 1.
 
 ## Empacotar dependências
 

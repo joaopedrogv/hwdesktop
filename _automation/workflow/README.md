@@ -71,6 +71,39 @@ Não publica a branch, não cria commits, não executa reset, stash, limpeza, ex
 
 Em falha, informa a etapa e a última operação concluída. Se a main já tiver sido selecionada ou atualizada, ela permanece nesse estado; não há rollback automático. Código de saída: `0` para sucesso/cancelamento pelo nome vazio, `1` para erro.
 
+## Preparar dependências
+
+Abra **Preparar dependências** no menu do clone ou execute no PowerShell 7.5+:
+
+```powershell
+.\_automation\workflow\prepare-dependencies.ps1
+# Opcional: indicar o clone ou uma configuração pessoal específica.
+.\_automation\workflow\prepare-dependencies.ps1 -WorkPath 'D:\Hw\meu-clone'
+.\_automation\workflow\prepare-dependencies.ps1 -ConfigPath 'D:\minhas-configuracoes\dependencies.local.psd1'
+```
+
+O alvo padrão é o projeto do próprio script, independentemente do diretório do terminal. Aceita somente clone Git sem working copy SVN. Se o próprio script estiver na integração SVN, solicita o clone daquela execução, como no início de demanda. Não exige IntegrationPath, cadastro de clones ou configuração SVN.
+
+Copie `config/dependencies.exemplo.psd1` para `config/dependencies.local.psd1`, individual e ignorado pelo Git. Configure:
+
+- `WebDavUrl`: base WebDAV HTTPS da conta; nesta instalação, `https://drive.hwsistemasti.com.br/remote.php/dav/files/hw`.
+- `RemoteDirectory`: `hwdesktop/dependencies`, onde está o índice publicado.
+- `SecretsFile`: arquivo pessoal com `NEXTCLOUD_USER=...` e `NEXTCLOUD_PASS=...`, uma chave por linha. Um caminho relativo parte da pasta da configuração; o padrão é `segredos.md`.
+
+Usa a senha de aplicativo já criada. As credenciais são lidas em memória para autenticar os downloads, sem argumentos de processo ou impressão da senha. Não há senha Git nesta configuração.
+
+O comando lê o `index.json` remoto e os manifestos referenciados para obter a composição atual. Aplica **build em `dcp`** e **baseline e módulos internos em `bpl`**, preservando os caminhos relativos de cada arquivo.
+
+**Arquivos existentes com conteúdo diferente são sobrescritos sem confirmação.** A data de modificação registrada no ZIP é preservada. Se o conteúdo já for idêntico e apenas a data estiver diferente, ajusta somente a data, exibindo `[DATA]`, sem recopiar o arquivo. Arquivos já corretos em conteúdo e data não são reaplicados; arquivos que não constam nos manifestos não são excluídos. Portanto, este comando prepara as dependências declaradas, mas não limpa arquivos de versões anteriores.
+
+Todos os pacotes usam o mesmo fluxo: download, conferência de tamanho e SHA-256, leitura do ZIP, conferência dos arquivos extraídos e aplicação. Os pacotes necessários são preparados antes de alterar qualquer destino. Caminhos fora das pastas esperadas, destinos duplicados e ZIPs divergentes interrompem a execução. Se um arquivo local mudar durante a preparação, a operação para antes de aplicar.
+
+Os ZIPs conferidos ficam em `_automation/temp/dependencies/cache`, identificados pelo SHA-256. A reexecução consulta a composição remota e confere conteúdo e datas dos arquivos locais. Os ZIPs fornecem as datas e são obtidos do cache validado ou baixados quando ausentes ou inválidos. As datas seguem a hora local e a precisão registradas no formato ZIP. O registro local `last-applied.json` fica na mesma área temporária ignorada pelo Git; não substitui o índice remoto.
+
+Antes da cópia, guarda os arquivos que serão substituídos. Em falha durante a aplicação, tenta restaurar seu conteúdo e sua data de modificação e remover apenas os arquivos novos daquela execução. Se a restauração falhar, informa onde preservou as cópias anteriores. Não executa os binários, não compila, não altera branches, não cria commits e não envia arquivos ao Nextcloud.
+
+Códigos de saída: `0` para sucesso/cancelamento pela escolha de clone vazia, `1` para erro.
+
 ## Testes isolados
 
-Todos os testes estão em `_automation/tests/verify.ps1`. Sem parâmetros, executa a suíte completa; `-Group Sync` seleciona a sincronização e `-Group Start` seleciona o início de demanda, no mesmo arquivo. Usa clones e remoto Git locais temporários e SVN simulado. Não utiliza configurações pessoais, segredos, servidor SVN ou GitHub reais.
+Todos os testes estão em `_automation/tests/verify.ps1`. Sem parâmetros, executa a suíte completa; `-Group Sync` seleciona a sincronização e `-Group Start` seleciona o início de demanda, no mesmo arquivo. Usa clones e remoto Git locais temporários e SVN simulado. O grupo Dependencies cobre empacotamento e preparação, usando pacotes e transporte simulados em pastas temporárias. Não utiliza configurações pessoais, segredos, servidor SVN, GitHub ou Nextcloud reais.
