@@ -3294,6 +3294,13 @@ begin
   end
   
   update promocao set ordem = 999 where ativo <> 1;
+  
+  select max(promocao.cod_promocao) from promocao where promocao.cod_empresa = :cod_empresa into :vpromocao;
+  
+  select valor from codigo where tabela = 'PROMOCAO' and cod_empresa = :cod_empresa into :vcodigo;
+  
+  if (coalesce(vpromocao, 0) > coalesce(vcodigo, 0)) then
+    update codigo set valor = coalesce(:vpromocao, 0) where tabela = 'PROMOCAO' and cod_empresa = :cod_empresa;
 
   select count(*) from promocao where cod_promocao > 0 and cod_tppreco = 2 and cod_empresa = :cod_empresa and padrao = 'S' into :vlocalidade;
   if (coalesce(vlocalidade, 0) <= 0) then
@@ -3745,6 +3752,13 @@ begin
   end
   
   update promocao set ordem = 999 where ativo <> 1;
+  
+  select max(promocao.cod_promocao) from promocao where promocao.cod_empresa = :cod_empresa into :vpromocao;
+  
+  select valor from codigo where tabela = 'PROMOCAO' and cod_empresa = :cod_empresa into :vcodigo;
+  
+  if (coalesce(vpromocao, 0) > coalesce(vcodigo, 0)) then
+    update codigo set valor = coalesce(:vpromocao, 0) where tabela = 'PROMOCAO' and cod_empresa = :cod_empresa;
 
   select count(*) from promocao where cod_promocao > 0 and cod_tppreco = 2 and cod_empresa = :cod_empresa and padrao = 'S' into :vlocalidade;
   if (coalesce(vlocalidade, 0) <= 0) then

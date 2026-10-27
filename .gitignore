@@ -74,7 +74,7 @@ _automation/config/segredos.md
 _automation/config/workflow.local.psd1
 _automation/temp/
 
-### Exclusivo para RAIZ, arquivos e extensoes
+### Permite exclusivo para RAIZ, arquivos e extensoes
 !/*.pas
 !/*.dfm
 !/HwSistemas.bdsproj
@@ -82,3 +82,6 @@ _automation/temp/
 !/HwSistemas.cfg
 !/HwSistemas.res
 !/pendencias.md
+
+### Permite exclusivos especificos.
+!/Hw Gestor/fontes/html.res

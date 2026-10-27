@@ -3749,6 +3749,7 @@ begin
     vConfigAPIpromocaoOrdem.dataSet.Insert;
     vConfigAPIpromocaoOrdem.dataSet.FieldByName('cod_promocao').AsInteger := vcodpromocao;
     vConfigAPIpromocaoOrdem.dataSet.FieldByName('cod_empresa').AsInteger := StrToInt(vDadosIni.codEmpresa);
+    vConfigAPIpromocaoOrdem.dataSet.FieldByName('tab_ce').AsString := 'S';
     vConfigAPIpromocaoOrdem.dataSet.Post;
     vConfigAPIpromocaoOrdem.Apply;
 
@@ -4745,7 +4746,7 @@ end;
 
 function TConfigAPI.post: Boolean;
 var
-	vapi: string;
+  vapi: string;
   acao: string;
 begin
   try
@@ -5175,6 +5176,27 @@ begin
         if trim(dataSet.FieldByName('DRIVE_CREDENTIALS').AsString) = '' then
           raiseExceptionCreate('drive credentials não informado.', 'DBMemoDriveCredentials');
       end;
+
+      if vConfigAPIpromocaoOrdem.IsEmpty then
+        raiseExceptionCreate('Nenhuma tabela de preço adicionada.', 'TreeViewPromocaoHwCloudIA_DB');
+
+      try
+        vConfigAPIpromocaoOrdem.dataSet.First;
+        while not vConfigAPIpromocaoOrdem.dataSet.Eof do
+        begin
+          if (Trim(vConfigAPIpromocaoOrdem.dataSet.FieldByName('TAB_CE').AsString) <> 'S')
+          	and (trim(vConfigAPIpromocaoOrdem.dataSet.FieldByName('TAB_CI').AsString) <> 'S') then
+              raiseExceptionCreate('Precisa informar o tipo da tabela de preço (CE/CI): ' + #13 + #13 +
+              	'TABELA DE PREÇO' + #13 +
+               'Código: ' + IntToStr(vConfigAPIpromocaoOrdem.dataSet.FieldByName('COD_PROMOCAO').AsInteger) + #13 +
+               'Descrição: ' + Trim(vConfigAPIpromocaoOrdem.dataSet.FieldByName('DESCR_PROMOCAO').AsString) + #13 + #13 +
+               'Favor verificar antes de continuar.', 'TreeViewPromocaoHwCloudIA_DB');
+
+          vConfigAPIpromocaoOrdem.dataSet.Next;
+        end;
+      finally
+        vConfigAPIpromocaoOrdem.dataSet.First;
+      end;
     end
     else if trim(dataSet.FieldByName('API').AsString) = 'SUZUKI' then
     begin
@@ -5397,8 +5419,14 @@ begin
       if not vConfigAPIpromocaoOrdem.dataSet.IsEmpty then
       begin
         vConfigAPIpromocaoOrdem.dataSet.Edit;
+
+        if (pCeCi = 'CE') and (vConfigAPIpromocaoOrdem.dataSet.FieldByName('TAB_CE').AsString = 'S') and (vConfigAPIpromocaoOrdem.dataSet.FieldByName('TAB_CI').AsString <> 'S') then
+          vConfigAPIpromocaoOrdem.dataSet.FieldByName('TAB_CI').AsString := 'S'
+        else if (pCeCi = 'CI') and (vConfigAPIpromocaoOrdem.dataSet.FieldByName('TAB_CI').AsString = 'S') and (vConfigAPIpromocaoOrdem.dataSet.FieldByName('TAB_CE').AsString <> 'S') then
+          vConfigAPIpromocaoOrdem.dataSet.FieldByName('TAB_CE').AsString := 'S';
+
         vConfigAPIpromocaoOrdem.dataSet.FieldByName('TAB_' +pCeCi).AsString :=
-        	 vDadosIni.IfThen(vConfigAPIpromocaoOrdem.dataSet.FieldByName('TAB_' +pCeCi).AsString = 'S', 'N', 'S');
+        	 vDadosIni.IfThen(vConfigAPIpromocaoOrdem.dataSet.FieldByName('TAB_' + pCeCi).AsString = 'S', 'N', 'S');
         vConfigAPIpromocaoOrdem.dataSet.Post;
         vConfigAPIpromocaoOrdem.Apply;
       end;
@@ -5546,6 +5574,23 @@ begin
       ' where promocao_ordem_hc.cod_empresa = ' + vDadosIni.codEmpresa +
       ' and promocao_ordem_hc.cod_promocao > 0 ' +
       ' order by 3 ');
+
+    try
+    	dataSet.First;
+      while not dataSet.Eof do
+      begin
+        if (dataSet.FieldByName('TAB_CE').AsString <> 'S') and (dataSet.FieldByName('TAB_CI').AsString <> 'S') then
+        begin
+          dataSet.Edit;
+          dataSet.FieldByName('TAB_CE').AsString := 'S';
+          dataSet.Post;
+        end;
+
+        dataSet.Next;
+      end;
+    finally
+      dataSet.First;
+    end;
   end
   else if pTipo = 'E' then
     Result := montaSelect(' select promocao_ordem_ec.cod_promocao, promocao_ordem_ec.cod_empresa, promocao_ordem_ec.ordem, promocao_ordem_ec.atual, ' +

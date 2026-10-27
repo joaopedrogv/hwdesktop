@@ -44758,11 +44758,14 @@ begin
     vProdutosECgrade.dataSet.First;
     while not vProdutosECgrade.dataSet.Eof do
     begin
-      SqlOpen(' select coalesce(tipo_ec, '''') tipo_ec, coalesce(tipo_ec1, '''') tipo_ec1 from grade ' +
-        ' where cod_grade = ' + IntToStr(vProdutosECgrade.dataSet.FieldByName('cod_grade').AsInteger) +
-        ' and cod_empresa = ' + vDadosIni.codEmpresa, buscas);
+    	if vProdutosECgrade.dataSet.FieldByName('cod_grade').AsInteger > 0 then
+      begin
+        SqlOpen(' select coalesce(tipo_ec, '''') tipo_ec, coalesce(tipo_ec1, '''') tipo_ec1 from grade ' +
+          ' where cod_grade = ' + IntToStr(vProdutosECgrade.dataSet.FieldByName('cod_grade').AsInteger) +
+          ' and cod_empresa = ' + vDadosIni.codEmpresa, buscas);
 
-      vStringListTipoGrade.Add(trim(buscas.FieldByName('tipo_ec').AsString) + '|' + trim(buscas.FieldByName('tipo_ec1').AsString) + '|');
+        vStringListTipoGrade.Add(trim(buscas.FieldByName('tipo_ec').AsString) + '|' + trim(buscas.FieldByName('tipo_ec1').AsString) + '|');
+      end;
 
       vProdutosECgrade.dataSet.Next;
     end;
@@ -44914,24 +44917,27 @@ begin
           dataSet.First;
           while not dataSet.Eof do
           begin
-          	if ((pTipo = 'E') and (dataSet.FieldByName('SINC_ECOMMERCE').AsString = 'S'))
-            	or ((pTipo = 'C') and (dataSet.FieldByName('ENV_COMERCIO_ABERTO').AsString = 'S')) then
+          	if dataSet.FieldByName('cod_grade').AsInteger > 0 then
             begin
-              SqlOpen(' select coalesce(tipo_ec, '''') tipo_ec, coalesce(tipo_ec1, '''') tipo_ec1 from grade ' +
-                ' where cod_grade = ' + IntToStr(dataSet.FieldByName('cod_grade').AsInteger) +
-                ' and cod_empresa = ' + vDadosIni.codEmpresa);
-
-              vtemptipoec := trim(buscas.FieldByName('tipo_ec').AsString);
-              vtemptipoec1 := trim(buscas.FieldByName('tipo_ec1').AsString);
-
-              if (UpperCase(trim(vtemptipoec)) <> UpperCase(trim(vtipoEC))) or (UpperCase(trim(vtemptipoec1)) <> UpperCase(trim(vtipoEC1))) then
+              if ((pTipo = 'E') and (dataSet.FieldByName('SINC_ECOMMERCE').AsString = 'S'))
+                 or ((pTipo = 'C') and (dataSet.FieldByName('ENV_COMERCIO_ABERTO').AsString = 'S')) then
               begin
-                Application.MessageBox(PChar('Empresa utiliza o E-Commerce: '+ #13 + #13 +
-                  'Este produto está vinculado a uma Grade/Variação do tipo ' + QuotedStr(vtemptipoec + IfThen(trim(vtemptipoec1) = '', '', ' | ' + vtemptipoec1)) + '.' + #13 +
-                  'A Grade/Variação selecionada é do tipo ' + QuotedStr(vtipoEC + IfThen(trim(vtipoEC1) = '', '', ' | ' + vtipoEC1)) + '.' + #13 +
-                  'Não é possível utilizar tipos de Grade/Variação diferentes para o mesmo produto.' + #13 + #13 +
-                  'Favor verificar antes de continuar!'), 'Atenção', MB_OK + MB_ICONWARNING + MB_DEFBUTTON1);
-                exit;
+                SqlOpen(' select coalesce(tipo_ec, '''') tipo_ec, coalesce(tipo_ec1, '''') tipo_ec1 from grade ' +
+                  ' where cod_grade = ' + IntToStr(dataSet.FieldByName('cod_grade').AsInteger) +
+                  ' and cod_empresa = ' + vDadosIni.codEmpresa);
+
+                vtemptipoec := trim(buscas.FieldByName('tipo_ec').AsString);
+                vtemptipoec1 := trim(buscas.FieldByName('tipo_ec1').AsString);
+
+                if (UpperCase(trim(vtemptipoec)) <> UpperCase(trim(vtipoEC))) or (UpperCase(trim(vtemptipoec1)) <> UpperCase(trim(vtipoEC1))) then
+                begin
+                  Application.MessageBox(PChar('Empresa utiliza o E-Commerce: '+ #13 + #13 +
+                    'Este produto está vinculado a uma Grade/Variação do tipo ' + QuotedStr(vtemptipoec + IfThen(trim(vtemptipoec1) = '', '', ' | ' + vtemptipoec1)) + '.' + #13 +
+                    'A Grade/Variação selecionada é do tipo ' + QuotedStr(vtipoEC + IfThen(trim(vtipoEC1) = '', '', ' | ' + vtipoEC1)) + '.' + #13 +
+                    'Não é possível utilizar tipos de Grade/Variação diferentes para o mesmo produto.' + #13 + #13 +
+                    'Favor verificar antes de continuar!'), 'Atenção', MB_OK + MB_ICONWARNING + MB_DEFBUTTON1);
+                  exit;
+                end;
               end;
             end;
 

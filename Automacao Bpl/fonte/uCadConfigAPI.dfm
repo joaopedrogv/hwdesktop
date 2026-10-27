@@ -23,6 +23,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
       inherited PageControl1: TPageControl
         Width = 820
         Height = 558
+        ActivePage = TabSheet1
         ExplicitWidth = 820
         ExplicitHeight = 558
         inherited TabSheet1: TTabSheet
@@ -65,7 +66,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                   Top = 0
                   Width = 804
                   Height = 448
-                  ActivePage = TabSheetTrayEC
+                  ActivePage = TabSheetHwCloudIA
                   Align = alClient
                   Style = tsFlatButtons
                   TabOrder = 0
@@ -1136,10 +1137,6 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                   object TabSheetSmartbis: TTabSheet
                     Caption = 'API Smartbis (Programa de Fidelidade)'
                     ImageIndex = 1
-                    ExplicitLeft = 0
-                    ExplicitTop = 0
-                    ExplicitWidth = 0
-                    ExplicitHeight = 0
                     object GroupBox5: TGroupBox
                       Left = 0
                       Top = 0
@@ -1208,10 +1205,6 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                   object TabSheetNummus: TTabSheet
                     Caption = 'API Nummus (Cashback)'
                     ImageIndex = 7
-                    ExplicitLeft = 0
-                    ExplicitTop = 0
-                    ExplicitWidth = 0
-                    ExplicitHeight = 0
                     object GroupBox14: TGroupBox
                       Left = 0
                       Top = 0
@@ -1273,10 +1266,6 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                   object TabSheetConcCartao: TTabSheet
                     Caption = 'API Confere (Concilia'#231#227'o de Cart'#245'es)'
                     ImageIndex = 3
-                    ExplicitLeft = 0
-                    ExplicitTop = 0
-                    ExplicitWidth = 0
-                    ExplicitHeight = 0
                     object GroupBox9: TGroupBox
                       Left = 0
                       Top = 0
@@ -1379,10 +1368,6 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                   object TabSheetKentro: TTabSheet
                     Caption = 'API Kentro (Mensagens Via WhatsApp)'
                     ImageIndex = 4
-                    ExplicitLeft = 0
-                    ExplicitTop = 0
-                    ExplicitWidth = 0
-                    ExplicitHeight = 0
                     object GroupBox10: TGroupBox
                       Left = 0
                       Top = 0
@@ -1920,10 +1905,6 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                         object TabSheet5: TTabSheet
                           Caption = 'Mensageria'
                           ImageIndex = 1
-                          ExplicitLeft = 0
-                          ExplicitTop = 0
-                          ExplicitWidth = 0
-                          ExplicitHeight = 0
                           object GroupBox17: TGroupBox
                             Left = 0
                             Top = 0
@@ -2412,10 +2393,6 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                         object TabSheet7: TTabSheet
                           Caption = #205'cones'
                           ImageIndex = 3
-                          ExplicitLeft = 0
-                          ExplicitTop = 0
-                          ExplicitWidth = 0
-                          ExplicitHeight = 0
                           object GroupBox19: TGroupBox
                             Left = 0
                             Top = 0
@@ -2543,10 +2520,6 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                         object TabSheet4: TTabSheet
                           Caption = 'White Label'
                           ImageIndex = 2
-                          ExplicitLeft = 0
-                          ExplicitTop = 0
-                          ExplicitWidth = 0
-                          ExplicitHeight = 0
                           object GroupBox18: TGroupBox
                             Left = 0
                             Top = 0
@@ -3623,10 +3596,6 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                         object TabSheet11: TTabSheet
                           Caption = 'Collections Rag'
                           ImageIndex = 7
-                          ExplicitLeft = 0
-                          ExplicitTop = 0
-                          ExplicitWidth = 0
-                          ExplicitHeight = 0
                           object GroupBox23: TGroupBox
                             Left = 0
                             Top = 0
@@ -3646,10 +3615,6 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                               TabOrder = 0
                               object TabSheet12: TTabSheet
                                 Caption = 'Consultar Collections Rag'
-                                ExplicitLeft = 0
-                                ExplicitTop = 0
-                                ExplicitWidth = 0
-                                ExplicitHeight = 0
                                 object Panel38: TPanel
                                   Left = 0
                                   Top = 0
@@ -3791,10 +3756,6 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                               object TabSheet13: TTabSheet
                                 Caption = 'Cadastrar Collections Rag'
                                 ImageIndex = 1
-                                ExplicitLeft = 0
-                                ExplicitTop = 0
-                                ExplicitWidth = 0
-                                ExplicitHeight = 0
                                 object Label101: TLabel
                                   Left = 81
                                   Top = 14

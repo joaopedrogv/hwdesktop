@@ -20146,6 +20146,7 @@ begin
         ' where produtos_ec_grade.grupo_prod = :grupo_prod ' +
         ' and produtos_ec_grade.cod_prod = :cod_prod ' +
         ' and produtos_ec_grade.cod_empresa = :cod_empresa ' +
+        ' and produtos_ec_grade.cod_grade > 0 ' +
         ' and (select count(*) from cod_grade_prod ' +
         '      where cod_grade_prod.grupo_prod = produtos_ec_grade.grupo_prod ' +
         '      and cod_grade_prod.cod_prod = produtos_ec_grade.cod_prod ' +
