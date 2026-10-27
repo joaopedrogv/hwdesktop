@@ -28,7 +28,7 @@ As áreas de integração de demandas e dependências continuam **Planejadas**. 
 
 **Sincronizar integração**, segundo item do menu, atualiza a área de integração pelo SVN e publica esse estado no Git. Usa a configuração individual `config/workflow.local.psd1` e o arquivo de segredos existente. Instruções em [workflow/README.md](workflow/README.md).
 
-**Iniciar demanda**, terceiro item, solicita o nome da nova branch, atualiza a main do clone de desenvolvimento e cria a branch local. Preencha `WorkPath` em `config/workflow.local.psd1`. A sincronização SVN anterior permanece uma chamada separada; este comando não publica a branch nem obtém binários. Instruções e uso independente em [workflow/README.md](workflow/README.md#iniciar-demanda).
+**Iniciar demanda**, terceiro item, solicita o nome da nova branch, atualiza a main e cria a branch no próprio clone Git. Não exige `IntegrationPath` ou `WorkPath` na configuração do clone. Pelo menu da integração, solicita qual clone preparar naquela execução; não mantém lista de clones na configuração. A sincronização SVN anterior permanece separada; este comando não publica a branch nem obtém binários. Instruções em [workflow/README.md](workflow/README.md#iniciar-demanda).
 
 **Build / Deploy**, primeiro item do menu, abre seis comandos PS1 independentes em `build/`: compilar todos, compilar selecionados, compilar reestruturação, limpar, publicar e compilar/publicar. Selecionar uma ação e pressionar Enter chama seu comando diretamente. Não há pergunta adicional de limpeza, destino ou escolha de modo. As interações próprias dos originais permanecem: seleção gráfica de pacotes e confirmação S/N de compilar/publicar. O destino vem de `config/deploy.psd1`. Exemplos e parâmetros estão em [build/README.md](build/README.md).
 
@@ -58,8 +58,22 @@ Códigos de saída: `0` para encerramento normal/preview, `1` para falha de exec
 
 O BAT permanece um lançador, encaminhando argumentos e o código de saída. A apresentação e a navegação ficam no PS1. Não há módulos externos, reorganização do acervo antigo ou descoberta automática de scripts para execução. O menu usa processos PowerShell separados para que os códigos de saída dos comandos não encerrem a navegação.
 
-`tests/verify-menu-launcher.ps1` verifica o diretório e o encaminhamento dos parâmetros do BAT em projetos temporários, abrindo o menu real somente em preview, sem operações Git/SVN.
-
 A seleção usa texto branco e fundo azul escuro em RGB explícito, evitando depender das cores personalizadas da paleta do terminal. As bordas utilizam caracteres retos para compatibilidade de apresentação. Ajustes das chamadas devem preservar as mensagens e as interações dos scripts originais.
 
+Diagnósticos enviados pelos comandos ao menu aparecem em bloco separado, com título **ATENÇÃO — CONFIRA O MOTIVO ABAIXO**, separadores e texto amarelo. Etapa, motivo, arquivos e demais detalhes são preservados. Em `-NoColor`, o bloco mantém título e separadores sem aplicar cor ao diagnóstico. O código de saída continua sendo propagado.
+
 As rotinas futuras deverão ter sua própria validação de contexto e parâmetros, preservando a parada segura acordada para o fluxo. A escolha de uma opção no menu não substitui essas validações.
+
+## Testes
+
+Todos os testes ficam em um único arquivo: **`tests/verify.ps1`**. Novas verificações devem ser acrescentadas nele, sem criar arquivos de teste por comando.
+
+```powershell
+# Executar todos os testes
+.\_automation\tests\verify.ps1
+
+# Opcional: executar somente uma área (Build, Sync, Start ou Menu)
+.\_automation\tests\verify.ps1 -Group Start
+```
+
+A suíte cobre compilação/publicação simuladas, sincronização, início de demanda, lançador e diagnósticos do menu. Usa somente pastas temporárias, remoto Git local e compilador/SVN simulados. Não lê configurações pessoais ou segredos, não compila o ERP nem publica na rede ou nos remotos reais. Os grupos ficam separados dentro do mesmo arquivo para evitar interferência entre suas funções auxiliares. O resultado mostra a contagem por área e o total; uma falha interrompe com código de saída 1.

@@ -132,8 +132,41 @@ function Write-MenuScreen {
     [Console]::WriteLine(" $($palette.Accent)$($border.BottomLeft)$($border.Horizontal * ($width - 2))$($border.BottomRight)$($palette.Reset)")
 }
 
+function Invoke-MenuScript {
+    param([string] $Engine, [string] $ScriptPath, [string[]] $Arguments = @(), [switch] $Plain)
+    $hasDiagnostic = $false
+    & $Engine -NoLogo -NoProfile -File $ScriptPath @Arguments 2>&1 | ForEach-Object {
+        if ($_ -is [System.Management.Automation.ErrorRecord]) {
+            if (-not $hasDiagnostic) {
+                Write-Host ''
+                if ($Plain) {
+                    Write-Host ('=' * 64)
+                    Write-Host '  ATENÇÃO — CONFIRA O MOTIVO ABAIXO'
+                    Write-Host ('=' * 64)
+                }
+                else {
+                    Write-Host ('=' * 64) -ForegroundColor Yellow
+                    Write-Host '  ATENÇÃO — CONFIRA O MOTIVO ABAIXO' -ForegroundColor White
+                    Write-Host ('=' * 64) -ForegroundColor Yellow
+                }
+                $hasDiagnostic = $true
+            }
+            if ($Plain) { Write-Host $_.ToString() }
+            else { Write-Host $_.ToString() -ForegroundColor Yellow }
+        }
+        else { $_ | Out-Host }
+    }
+    $commandExitCode = $LASTEXITCODE
+    if ($hasDiagnostic) {
+        if ($Plain) { Write-Host ('=' * 64) }
+        else { Write-Host ('=' * 64) -ForegroundColor Yellow }
+        Write-Host ''
+    }
+    return $commandExitCode
+}
+
 function Invoke-MenuCommand {
-    param([Parameter(Mandatory)] $Item, [Parameter(Mandatory)] [string] $ProjectRoot)
+    param([Parameter(Mandatory)] $Item, [Parameter(Mandatory)] [string] $ProjectRoot, [switch] $Plain)
     [Console]::CursorVisible = $true
     [Console]::TreatControlCAsInput = $false
     $previousNativePreference = $PSNativeCommandUseErrorActionPreference
@@ -153,8 +186,7 @@ function Invoke-MenuCommand {
         }
         $engine = (Get-Process -Id $PID).Path
         $PSNativeCommandUseErrorActionPreference = $false
-        & $engine -NoLogo -NoProfile -File $scriptPath @commandArguments | Out-Host
-        $operationExitCode = $LASTEXITCODE
+        $operationExitCode = Invoke-MenuScript -Engine $engine -ScriptPath $scriptPath -Arguments $commandArguments -Plain:$Plain
         if ($operationExitCode -ne 0) { Write-Host "`nA operação terminou com erro (código $operationExitCode)." -ForegroundColor Red }
     }
     catch { Write-Host "`n$($_.Exception.Message)" -ForegroundColor Red }
@@ -253,7 +285,7 @@ function Invoke-AutomationMenu {
             if ($transition.Action -eq 'Exit') { return 0 }
             if ($transition.Action -eq 'Open') {
                 if ($Section -eq 'Build' -or $items[$selectedIndex].Id -in @('sync', 'start')) {
-                    Invoke-MenuCommand -Item $items[$selectedIndex] -ProjectRoot $projectRoot
+                    Invoke-MenuCommand -Item $items[$selectedIndex] -ProjectRoot $projectRoot -Plain:$plain
                     $selectedIndex = -1
                 }
                 elseif ($items[$selectedIndex].Id -eq 'build') {

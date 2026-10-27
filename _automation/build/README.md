@@ -62,7 +62,7 @@ O menu principal chama os mesmos PS1 em processos PowerShell separados e mantém
 ## Verificação isolada
 
 ```powershell
-.\_automation\build\tests\verify.ps1
+.\_automation\tests\verify.ps1 -Group Build
 ```
 
-Essa verificação usa um projeto temporário, um compilador BAT simulado e cópia local. Não usa Delphi, a configuração real, os binários do ERP ou a rede. Testa seleção/ordem, encaminhamento `SQL_RES`, simulação, escopo da limpeza, cópia, interrupção em falha e preservação das mensagens principais de cada operação. A compilação real e a publicação no ambiente da empresa continuam pendentes de avaliação do responsável.
+Esse grupo do arquivo único de testes usa um projeto temporário, um compilador BAT simulado e cópia local. Não usa Delphi, a configuração real, os binários do ERP ou a rede. Testa seleção/ordem, encaminhamento `SQL_RES`, simulação, escopo da limpeza, cópia, interrupção em falha e preservação das mensagens principais de cada operação. Sem `-Group`, o mesmo arquivo executa todos os testes das automações. A compilação real e a publicação no ambiente da empresa continuam pendentes de avaliação do responsável.

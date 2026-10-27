@@ -17,7 +17,9 @@ Set-Location 'D:\Hw\ERP-Master' # IntegrationPath da sua configuração
 
 ## Configuração individual
 
-O modelo é `config/workflow.exemplo.psd1`. A configuração de uso é `config/workflow.local.psd1`, excluída do Git. Caminhos relativos são resolvidos a partir da pasta dessa configuração. `WorkPath` não é utilizado pela sincronização; deve apontar para o clone de desenvolvimento existente ao usar `start-demand.ps1`.
+Para a integração, use `config/workflow.exemplo.psd1` como modelo de `config/workflow.local.psd1`, excluído do Git. Ele contém somente os dados da própria integração: `IntegrationPath`, `GitBranch`, `SvnUrlSuffix` e `SecretsFile`. Não precisa conhecer os clones de trabalho. Caminhos relativos são resolvidos a partir da pasta dessa configuração.
+
+Nos clones Git, a configuração do início de demanda é opcional. O modelo `config/workflow.work.exemplo.psd1` contém apenas `GitBranch`. Sem arquivo pessoal, utiliza `main`. Não copie nem preencha dados de integração ou segredos SVN nos clones para usar esse comando.
 
 `SecretsFile` aponta para o arquivo individual existente, com `SVN_USER=...` e `SVN_PASS=...`, uma chave por linha. O script não altera esse arquivo nem verifica suas regras de exclusão. As credenciais SVN são passadas ao cliente, sem impressão da senha. O cliente SVN instalado recebe a senha como argumento do processo; ela pode ser inspecionada por ferramentas locais com acesso ao processo. A autenticação Git é a já configurada na máquina; não há usuário/senha Git neste arquivo.
 
@@ -42,17 +44,23 @@ Execute primeiro a sincronização da integração pelo comando anterior. Depois
 
 ```powershell
 .\_automation\workflow\start-demand.ps1 -Branch 'nome-da-demanda'
+# Opcional: preparar outro clone nessa execução, sem persistir seu caminho:
+.\_automation\workflow\start-demand.ps1 -WorkPath 'D:\Hw\meu-clone' -Branch 'nome-da-demanda'
 # Também aceita outra configuração pessoal:
 .\_automation\workflow\start-demand.ps1 -Branch 'nome-da-demanda' -ConfigPath 'D:\minhas-configuracoes\workflow.local.psd1'
 ```
 
-Preencha `WorkPath` na configuração pessoal com o clone Git de desenvolvimento, diferente de `IntegrationPath`. O comando não cria o clone. Usa somente `WorkPath`, `IntegrationPath` e `GitBranch`; não lê segredos nem executa SVN.
+Sem `-WorkPath`, o comando usa a raiz do projeto onde o próprio script está localizado. Não depende do diretório do terminal para descobrir qual clone usar. O clone já deve existir. Arquivos `workflow.local.psd1` antigos podem ter seus campos `WorkPath` e `IntegrationPath` removidos; o início da demanda ignora esses campos. Não lê segredos nem executa SVN.
+
+Quando o próprio script está numa working copy SVN, como na integração, pede o diretório do clone a preparar, ou aceita `-WorkPath`. Esse caminho vale apenas para aquela execução e não é guardado em arquivo. A configuração padrão é lida do clone alvo, não da integração. É possível preparar qualquer quantidade de clones independentes, inclusive alternar o alvo a cada execução. Uma pasta com `.svn` é rejeitada como alvo de desenvolvimento, sem comparação com um `IntegrationPath` configurado.
+
+`-ConfigPath`, quando informado, seleciona explicitamente o arquivo de opções Git; se esse arquivo não existir, a execução é interrompida. A sincronização continua exclusiva da integração, com as validações próprias já existentes.
 
 Sem `-Branch`, solicita o nome completo no terminal. Enter vazio cancela antes de qualquer operação Git. Em execução com entrada redirecionada, informe o parâmetro explicitamente.
 
 O comando:
 
-1. Confere `git --version`, raiz Git, ausência de alterações pendentes e operações em andamento, nome válido e ainda não existente localmente, branch principal local e remoto `origin`.
+1. Identifica o próprio clone ou o alvo indicado nesta execução e lê sua opção `GitBranch` (padrão `main`). Confere `git --version`, raiz Git, ausência de alterações pendentes e operações em andamento, nome válido e ainda não existente localmente, branch principal local e remoto `origin`.
 2. Executa `git fetch origin`; rejeita nome já existente no remoto e interrompe se a main local tiver commits ausentes da main remota, inclusive em caso de divergência.
 3. Executa `git switch main` e atualização por `git merge --ff-only` até o commit remoto capturado no fetch. Não cria commit de merge. Os arquivos são conferidos novamente antes da troca para evitar carregar mudanças feitas durante o fetch.
 4. Cria e seleciona a nova branch com `git switch --no-track -c <nome>`. Informa pasta, branch e commit da base.
@@ -65,6 +73,4 @@ Em falha, informa a etapa e a última operação concluída. Se a main já tiver
 
 ## Testes isolados
 
-`tests/verify.ps1` usa repositórios Git temporários, com remoto local e SVN simulado. Não utiliza a configuração pessoal, os segredos ou os remotos reais do ERP.
-
-`tests/verify-start-demand.ps1` usa clones e remoto Git locais temporários. Testa início de demanda, preservação de commits e arquivos, validações e falhas. Não utiliza a configuração pessoal nem acessa SVN ou GitHub.
+Todos os testes estão em `_automation/tests/verify.ps1`. Sem parâmetros, executa a suíte completa; `-Group Sync` seleciona a sincronização e `-Group Start` seleciona o início de demanda, no mesmo arquivo. Usa clones e remoto Git locais temporários e SVN simulado. Não utiliza configurações pessoais, segredos, servidor SVN ou GitHub reais.

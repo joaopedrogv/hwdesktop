@@ -5,12 +5,16 @@
 .PARAMETER Branch
     Nome completo da nova branch. Sem o parâmetro, solicita o nome no terminal.
 .PARAMETER ConfigPath
-    Configuração individual que contém WorkPath, IntegrationPath e GitBranch.
+    Configuração opcional do clone alvo, utilizada somente para GitBranch.
+.PARAMETER WorkPath
+    Clone alvo nesta execução. Por padrão, usa o projeto do próprio script.
+    Quando o script pertence à integração SVN, solicita o clone no terminal.
 #>
 [CmdletBinding()]
 param(
     [string] $Branch,
-    [string] $ConfigPath = (Join-Path $PSScriptRoot '..\config\workflow.local.psd1')
+    [string] $ConfigPath,
+    [string] $WorkPath
 )
 
 Set-StrictMode -Version Latest
@@ -44,26 +48,38 @@ function Invoke-DemandProcess {
 
 function Invoke-StartDemand {
     # CommandRunner permite simular falhas nos testes com repositórios temporários.
-    param([string] $Branch, [string] $ConfigPath, [scriptblock] $CommandRunner)
-    $phase = 'Ler configuração'
+    param([string] $Branch, [string] $ConfigPath, [string] $WorkPath, [scriptblock] $CommandRunner)
+    $phase = 'Definir clone de desenvolvimento'
     $lastState = 'Nenhuma troca de branch ou atualização de arquivos foi concluída.'
     try {
-        $configFile = [IO.Path]::GetFullPath($ConfigPath)
-        if (-not [IO.File]::Exists($configFile)) {
-            throw "Configuração pessoal não encontrada: $configFile. Copie config/workflow.exemplo.psd1 para workflow.local.psd1."
+        $sourceRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..')).TrimEnd('\', '/')
+        if ([string]::IsNullOrWhiteSpace($WorkPath)) {
+            if ([IO.Directory]::Exists((Join-Path $sourceRoot '.svn'))) {
+                if ([Console]::IsInputRedirected) { throw 'Informe -WorkPath com o clone Git a preparar, ou execute pelo menu do próprio clone.' }
+                $WorkPath = Read-Host 'Diretório do clone Git de trabalho (Enter para cancelar)'
+                if ([string]::IsNullOrWhiteSpace($WorkPath)) {
+                    Write-Host 'Início da demanda cancelado; nenhuma operação Git executada.'
+                    return
+                }
+            }
+            else { $WorkPath = $sourceRoot }
         }
-        $config = Import-PowerShellDataFile -LiteralPath $configFile
-        foreach ($key in @('WorkPath', 'IntegrationPath', 'GitBranch')) {
-            if (-not $config.ContainsKey($key) -or [string]::IsNullOrWhiteSpace([string] $config[$key])) {
-                throw "Campo obrigatório não preenchido: $key"
+        $root = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($WorkPath).TrimEnd('\', '/')
+        if (-not [IO.Directory]::Exists($root)) { throw "Clone de desenvolvimento não encontrado: $root. Prepare o clone antes de iniciar a demanda." }
+        if ([IO.Directory]::Exists((Join-Path $root '.svn'))) { throw "A pasta '$root' é uma working copy SVN. Selecione um clone somente Git para a demanda." }
+
+        $phase = 'Ler configuração do clone'
+        $explicitConfig = -not [string]::IsNullOrWhiteSpace($ConfigPath)
+        $configFile = if ($explicitConfig) { [IO.Path]::GetFullPath($ConfigPath) } else { Join-Path $root '_automation\config\workflow.local.psd1' }
+        $main = 'main'
+        if ([IO.File]::Exists($configFile)) {
+            $config = Import-PowerShellDataFile -LiteralPath $configFile
+            if ($config.ContainsKey('GitBranch')) {
+                if ([string]::IsNullOrWhiteSpace([string] $config.GitBranch)) { throw 'Campo GitBranch vazio na configuração do clone.' }
+                $main = [string] $config.GitBranch
             }
         }
-        $configDirectory = Split-Path -Parent $configFile
-        $root = [IO.Path]::GetFullPath([IO.Path]::Combine($configDirectory, $config.WorkPath)).TrimEnd('\', '/')
-        $integration = [IO.Path]::GetFullPath([IO.Path]::Combine($configDirectory, $config.IntegrationPath)).TrimEnd('\', '/')
-        if ($root.Equals($integration, [StringComparison]::OrdinalIgnoreCase)) { throw 'WorkPath deve ser diferente de IntegrationPath.' }
-        if (-not [IO.Directory]::Exists($root)) { throw "Clone de desenvolvimento não encontrado: $root. Prepare o clone e ajuste WorkPath." }
-        $main = [string] $config.GitBranch
+        elseif ($explicitConfig) { throw "Configuração informada não encontrada: $configFile" }
 
         if ([string]::IsNullOrWhiteSpace($Branch)) {
             if ([Console]::IsInputRedirected) { throw 'Informe o nome da nova branch pelo parâmetro -Branch.' }
@@ -103,7 +119,7 @@ function Invoke-StartDemand {
         [void] (Invoke-Git @('--version') -ShowOutput)
         $gitRoot = (Invoke-Git @('rev-parse', '--show-toplevel')).Output.Trim()
         $gitRoot = [IO.Path]::GetFullPath($gitRoot).TrimEnd('\', '/')
-        if (-not $root.Equals($gitRoot, [StringComparison]::OrdinalIgnoreCase)) { throw "WorkPath não é a raiz Git: $gitRoot" }
+        if (-not $root.Equals($gitRoot, [StringComparison]::OrdinalIgnoreCase)) { throw "A pasta de trabalho não é a raiz Git: $gitRoot" }
         $gitDirectory = (Invoke-Git @('rev-parse', '--absolute-git-dir')).Output.Trim()
         foreach ($operation in @('MERGE_HEAD', 'rebase-merge', 'rebase-apply', 'CHERRY_PICK_HEAD', 'REVERT_HEAD', 'sequencer')) {
             if (Test-Path -LiteralPath (Join-Path $gitDirectory $operation)) { throw "Operação Git em andamento: $operation" }
@@ -160,7 +176,7 @@ function Invoke-StartDemand {
 # Dot-sourcing carrega as funções para testes sem iniciar uma demanda.
 if ($MyInvocation.InvocationName -ne '.') {
     try {
-        Invoke-StartDemand -Branch $Branch -ConfigPath $ConfigPath
+        Invoke-StartDemand -Branch $Branch -ConfigPath $ConfigPath -WorkPath $WorkPath
         exit 0
     }
     catch {
