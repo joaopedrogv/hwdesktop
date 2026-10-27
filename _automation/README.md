@@ -72,8 +72,12 @@ Todos os testes ficam em um único arquivo: **`tests/verify.ps1`**. Novas verifi
 # Executar todos os testes
 .\_automation\tests\verify.ps1
 
-# Opcional: executar somente uma área (Build, Sync, Start ou Menu)
+# Opcional: executar somente uma área (Build, Sync, Start, Menu ou Dependencies)
 .\_automation\tests\verify.ps1 -Group Start
 ```
 
 A suíte cobre compilação/publicação simuladas, sincronização, início de demanda, lançador e diagnósticos do menu. Usa somente pastas temporárias, remoto Git local e compilador/SVN simulados. Não lê configurações pessoais ou segredos, não compila o ERP nem publica na rede ou nos remotos reais. Os grupos ficam separados dentro do mesmo arquivo para evitar interferência entre suas funções auxiliares. O resultado mostra a contagem por área e o total; uma falha interrompe com código de saída 1.
+
+## Empacotar dependências
+
+`dependencies/pack-dependencies.ps1` gera a estrutura local para publicação no Nextcloud a partir dos arquivos separados pelo responsável. Agrupa build e runtime/baseline em ZIPs e mantém runtime/internal por módulo e versão. Instruções em [dependencies/README.md](dependencies/README.md). Os testes estão no arquivo único, grupo `Dependencies`.

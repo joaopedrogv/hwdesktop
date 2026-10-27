@@ -6,10 +6,10 @@
     Usa somente pastas temporárias, compilador/SVN simulados e remoto Git local.
     Não lê configurações pessoais ou segredos nem opera nos projetos reais.
 .PARAMETER Group
-    All executa tudo. Opcionalmente: Build, Sync, Start ou Menu.
+    All executa tudo. Opcionalmente: Build, Sync, Start, Menu ou Dependencies.
 #>
 [CmdletBinding()]
-param([ValidateSet('All', 'Build', 'Sync', 'Start', 'Menu')] [string] $Group = 'All')
+param([ValidateSet('All', 'Build', 'Sync', 'Start', 'Menu', 'Dependencies')] [string] $Group = 'All')
 
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $false
@@ -823,10 +823,114 @@ exit 1
     }
 }
 
+function Test-Dependencies {
+    $scriptPath = Join-Path $automationRoot 'dependencies\pack-dependencies.ps1'
+    $temporaryBase = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $fixture = Join-Path $temporaryBase ('hwdesktop-pack-' + [guid]::NewGuid().ToString('N'))
+    $inputRoot = Join-Path $fixture 'dependencies-files'
+    $outputRoot = Join-Path $fixture 'dependencies'
+    try {
+        foreach ($relative in @('build/v0001', 'runtime/third-party', 'runtime/internal')) {
+            [void][IO.Directory]::CreateDirectory((Join-Path $inputRoot $relative))
+        }
+        foreach ($relative in @('build/v0001/alpha.dcp', 'build/v0001/beta com espacos.dcp', 'runtime/third-party/vendor.dll', 'runtime/third-party/own-stable.exe', 'runtime/internal/hw.alpha.dll', 'runtime/internal/hw.beta.dll')) {
+            [IO.File]::WriteAllText((Join-Path $inputRoot $relative), "conteudo de teste: $relative")
+        }
+        [IO.File]::WriteAllBytes((Join-Path $inputRoot 'build/v0001/dcp.txt'), [byte[]]@(1))
+        $before = @(Get-ChildItem -LiteralPath $inputRoot -Recurse -File | Get-FileHash -Algorithm SHA256 | Sort-Object Path | ForEach-Object { "$($_.Path)=$($_.Hash)" })
+        . $scriptPath -SourcePath $inputRoot -OutputPath $outputRoot
+        Invoke-PackDependencies -SourcePath $inputRoot -OutputPath $outputRoot -Version 'v0001' 6>&1 | Out-Null
+        Assert-Check ([IO.File]::Exists((Join-Path $outputRoot 'index.json'))) 'Publicação local gera índice sem acessar WebDAV'
+        $zip = [IO.Compression.ZipFile]::OpenRead((Join-Path $outputRoot 'build/v0001/bundle.zip'))
+        try {
+            $names = @($zip.Entries | ForEach-Object FullName)
+            Assert-Check ($names.Count -eq 3 -and 'dcp.txt' -in $names -and 'beta com espacos.dcp' -in $names -and -not ($names -match '^v0001/')) 'Build inclui todos os arquivos e normaliza a pasta de versão já existente'
+        }
+        finally { $zip.Dispose() }
+        $zip = [IO.Compression.ZipFile]::OpenRead((Join-Path $outputRoot 'runtime/baseline/v0001/bundle.zip'))
+        try { Assert-Check ($zip.Entries.Count -eq 2) 'Baseline agrupa os estáveis próprios e de terceiros sem reclassificar arquivos' }
+        finally { $zip.Dispose() }
+        Assert-Check ([IO.File]::Exists((Join-Path $outputRoot 'runtime/internal/hw.alpha/v0001/bundle.zip')) -and [IO.File]::Exists((Join-Path $outputRoot 'runtime/internal/hw.beta/v0001/bundle.zip'))) 'Cada binário interno recebe seu ZIP na pasta do módulo e da versão'
+        $index = Get-Content -LiteralPath (Join-Path $outputRoot 'index.json') -Raw | ConvertFrom-Json
+        $manifests = @($index.build, $index.runtime.baseline) + @($index.runtime.internal)
+        $valid = $true
+        foreach ($relative in $manifests) {
+            $manifestPath = Join-Path $outputRoot $relative
+            $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+            $artifact = Join-Path (Split-Path -Parent $manifestPath) $manifest.artifact.path
+            if ((Get-FileHash -LiteralPath $artifact -Algorithm SHA256).Hash.ToLowerInvariant() -ne $manifest.artifact.sha256 -or [IO.FileInfo]::new($artifact).Length -ne $manifest.artifact.size) { $valid = $false }
+            if ($manifest.artifact.path -cne 'bundle.zip') { $valid = $false }
+            $zip = [IO.Compression.ZipFile]::OpenRead($artifact)
+            try {
+                if ($zip.Entries.Count -ne @($manifest.files).Count) { $valid = $false }
+                foreach ($entry in $zip.Entries) {
+                    $record = @($manifest.files | Where-Object { $_.path -ceq $entry.FullName })
+                    $stream = $entry.Open()
+                    $sha = [Security.Cryptography.SHA256]::Create()
+                    try { $hash = [Convert]::ToHexString($sha.ComputeHash($stream)).ToLowerInvariant() }
+                    finally { $stream.Dispose(); $sha.Dispose() }
+                    if ($record.Count -ne 1 -or $hash -ne $record[0].sha256 -or $entry.Length -ne $record[0].size) { $valid = $false }
+                    $sourceDirectory = switch ($manifest.id) {
+                        'build' { Join-Path $inputRoot 'build/v0001' }
+                        'baseline' { Join-Path $inputRoot 'runtime/third-party' }
+                        default { Join-Path $inputRoot 'runtime/internal' }
+                    }
+                    $original = Join-Path $sourceDirectory $entry.FullName
+                    if ((Get-FileHash -LiteralPath $original -Algorithm SHA256).Hash.ToLowerInvariant() -ne $hash) { $valid = $false }
+                }
+            }
+            finally { $zip.Dispose() }
+            if ([IO.File]::ReadAllText($manifestPath).Contains($inputRoot)) { $valid = $false }
+        }
+        Assert-Check ($valid -and $manifests.Count -eq 4) 'Todos os itens usam ZIPs com conteúdo original, hashes/tamanhos válidos e caminhos relativos'
+        Assert-Check (@(Get-ChildItem -LiteralPath $outputRoot -Recurse -File -Filter *.dll).Count -eq 0) 'Publicação não deixa DLLs soltas ao lado dos ZIPs'
+        $after = @(Get-ChildItem -LiteralPath $inputRoot -Recurse -File | Get-FileHash -Algorithm SHA256 | Sort-Object Path | ForEach-Object { "$($_.Path)=$($_.Hash)" })
+        Assert-Check (($before -join '|') -ceq ($after -join '|')) 'Empacotamento preserva todos os arquivos de origem byte a byte'
+
+        $indexHash = (Get-FileHash -LiteralPath (Join-Path $outputRoot 'index.json')).Hash
+        $failed = $false
+        try { Invoke-PackDependencies $inputRoot $outputRoot 'v0001' 6>&1 | Out-Null } catch { $failed = $true }
+        Assert-Check ($failed -and (Get-FileHash -LiteralPath (Join-Path $outputRoot 'index.json')).Hash -eq $indexHash) 'Saída existente é recusada sem substituir uma publicação'
+        $nested = Join-Path $inputRoot 'output'
+        $failed = $false
+        try { Invoke-PackDependencies $inputRoot $nested 'v0001' 6>&1 | Out-Null } catch { $failed = $true }
+        Assert-Check ($failed -and -not [IO.Directory]::Exists($nested)) 'Saída dentro da origem é recusada sem criar pastas'
+        $failed = $false
+        try { Invoke-PackDependencies $inputRoot $inputRoot 'v0001' 6>&1 | Out-Null } catch { $failed = $true }
+        Assert-Check $failed 'Origem e saída iguais são recusadas'
+        $failed = $false
+        try { Invoke-PackDependencies $inputRoot (Join-Path $fixture 'invalid-version') '../fora' 6>&1 | Out-Null } catch { $failed = $true }
+        Assert-Check ($failed -and -not [IO.Directory]::Exists((Join-Path $fixture 'invalid-version'))) 'Versão não pode conter travessia de diretórios'
+
+        $duplicate = Join-Path $inputRoot 'runtime/internal/outro/hw.alpha.dll'
+        [void][IO.Directory]::CreateDirectory((Split-Path -Parent $duplicate))
+        [IO.File]::WriteAllText($duplicate, 'outro arquivo de mesmo modulo')
+        $failed = $false
+        try { Invoke-PackDependencies $inputRoot (Join-Path $fixture 'duplicate') 'v0001' 6>&1 | Out-Null } catch { $failed = $true }
+        Assert-Check ($failed -and -not [IO.Directory]::Exists((Join-Path $fixture 'duplicate'))) 'Módulos duplicados são recusados sem sobrescrever arquivos'
+        [IO.File]::Delete($duplicate)
+
+        $missing = Join-Path $fixture 'missing-source'
+        [void][IO.Directory]::CreateDirectory((Join-Path $missing 'build'))
+        [IO.File]::WriteAllText((Join-Path $missing 'build/a.dcp'), 'a')
+        $failed = $false
+        try { Invoke-PackDependencies $missing (Join-Path $fixture 'missing-output') 'v0001' 6>&1 | Out-Null } catch { $failed = $true }
+        Assert-Check ($failed -and -not [IO.Directory]::Exists((Join-Path $fixture 'missing-output'))) 'Conjunto obrigatório ausente interrompe antes de publicar'
+        Assert-Check (@(Get-ChildItem -LiteralPath $fixture -Directory | Where-Object Name -Like '*.staging-*').Count -eq 0) 'Não deixa áreas de publicação temporárias após concluir ou recusar entradas'
+    }
+    finally {
+        $resolved = [IO.Path]::GetFullPath($fixture)
+        if ($resolved.StartsWith($temporaryBase, [StringComparison]::OrdinalIgnoreCase) -and (Split-Path -Leaf $resolved) -like 'hwdesktop-pack-*' -and [IO.Directory]::Exists($resolved)) {
+            Remove-Item -LiteralPath $resolved -Recurse -Force
+        }
+    }
+}
+
 $sections = @(
     @{ Group='Build'; Title='Compilação e publicação simuladas'; Action={ Test-Build } }
     @{ Group='Sync'; Title='Sincronização SVN/Git isolada'; Action={ Test-Sync } }
     @{ Group='Start'; Title='Início de demanda em clones locais'; Action={ Test-Start } }
+    @{ Group='Dependencies'; Title='Empacotamento de dependências'; Action={ Test-Dependencies } }
     @{ Group='Menu'; Title='Lançador do menu'; Action={ Test-MenuLauncher } }
     @{ Group='Menu'; Title='Diagnósticos do menu'; Action={ Test-MenuDiagnostics } }
 )
