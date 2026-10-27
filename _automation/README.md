@@ -72,12 +72,18 @@ Todos os testes ficam em um único arquivo: **`tests/verify.ps1`**. Novas verifi
 # Executar todos os testes
 .\_automation\tests\verify.ps1
 
-# Opcional: executar somente uma área (Build, Sync, Start, Merge, Menu ou Dependencies)
+# Opcional: executar somente uma área (Build, Sync, SyncGitSvn, Start, Merge, Menu ou Dependencies)
 .\_automation\tests\verify.ps1 -Group Start
 ```
 
 A suíte cobre compilação/publicação simuladas, sincronização, início e merge de demandas, empacotamento e preparação de dependências, lançador e diagnósticos do menu. Usa somente pastas temporárias, remoto Git local e compilador/SVN simulados. Não lê configurações pessoais ou segredos, não compila o ERP nem publica na rede ou nos remotos reais. Os grupos ficam separados dentro do mesmo arquivo para evitar interferência entre suas funções auxiliares. O resultado mostra a contagem por área e o total; uma falha interrompe com código de saída 1.
 
+## Modos de sincronização
+
+A mesma entrada workflow/sync-integration.ps1 identifica SVN tradicional ou git-svn pelos metadados da integração. As implementações ficam separadas em workflow/svn e workflow/git-svn. O modo SVN permanece independente de WSL. O modo git-svn prepara uma publicação privada, respeitando filtros e atributos por caminho e preservando a linha SVN. Modelos individuais e comportamento em [workflow/README.md](workflow/README.md).
+
 ## Empacotar dependências
 
 `dependencies/pack-dependencies.ps1` gera a estrutura local para publicação no Nextcloud a partir dos arquivos separados pelo responsável. Agrupa build e runtime/baseline em ZIPs e mantém runtime/internal por módulo e versão. Instruções em [dependencies/README.md](dependencies/README.md). Os testes estão no arquivo único, grupo `Dependencies`.
+
+O fluxo completo, incluindo commit, push e entrega SVN, está em [workflow/GUIA-OPERACIONAL.md](workflow/GUIA-OPERACIONAL.md). A entrega está disponível no menu e pelo script workflow/deliver-svn.ps1; -Commit confirma uma preparação já conferida.

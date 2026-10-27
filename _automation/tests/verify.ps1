@@ -3,13 +3,13 @@
 .SYNOPSIS
     Testes das automações: build, sincronização, início de demanda e menu.
 .DESCRIPTION
-    Usa somente pastas temporárias, compilador/SVN simulados e remoto Git local.
+    Usa pastas temporárias e remotos Git locais. Delivery usa SVN local real e git-svn/WSL; os demais grupos simulam serviços.
     Não lê configurações pessoais ou segredos nem opera nos projetos reais.
 .PARAMETER Group
-    All executa tudo. Opcionalmente: Build, Sync, Start, Merge, Menu ou Dependencies.
+    All executa tudo. Grupos: Build, Sync, SyncGitSvn, Start, Merge, Menu, Dependencies, Delivery.
 #>
 [CmdletBinding()]
-param([ValidateSet('All', 'Build', 'Sync', 'Start', 'Menu', 'Dependencies', 'Merge')] [string] $Group = 'All')
+param([ValidateSet('All', 'Build', 'Sync', 'Start', 'Menu', 'Dependencies', 'Merge', 'SyncGitSvn', 'Delivery')] [string] $Group = 'All')
 
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $false
@@ -186,6 +186,10 @@ function Test-Sync {
         $syncScript = Join-Path $root '_automation\workflow\sync-integration.ps1'
         [void] [IO.Directory]::CreateDirectory((Split-Path -Parent $syncScript))
         Copy-Item -LiteralPath $syncSource -Destination $syncScript
+        [void] [IO.Directory]::CreateDirectory((Join-Path $root '.svn'))
+        $providerDirectory = Join-Path (Split-Path -Parent $syncScript) 'svn'
+        [void] [IO.Directory]::CreateDirectory($providerDirectory)
+        Copy-Item -LiteralPath (Join-Path $automationRoot 'workflow/svn/sync-integration.ps1') -Destination (Join-Path $providerDirectory 'sync-integration.ps1')
         $state = @{
             Updated = $false; BeforeRevision = '19038'; AfterRevision = '19040'
             Url = 'https://servidor.invalid/svn/hwsistemas/Projeto_Fiscal40'
@@ -343,7 +347,7 @@ function Test-Sync {
         Assert-Check ('.gitignore' -in $publishedNames -and $result.Log.Contains('fora do SVN')) 'gitignore versionado pelo SVN permanece, e as retiradas são informadas'
         $passwordIndex = [Array]::IndexOf($area.State.UpdateArguments, '--password')
         Assert-Check ($passwordIndex -gt 0 -and $area.State.UpdateArguments[$passwordIndex + 1] -eq 'senha=ficticia\teste' -and -not $result.Log.Contains('senha=ficticia\teste')) 'Credenciais com igual e barra são encaminhadas sem impressão'
-        Assert-Check (-not (Test-Called $area git config) -and -not (Test-Called $area git pull) -and -not (Test-Called $area git merge)) 'Não acrescenta validação de autoria, pull ou merge'
+        Assert-Check (@($area.State.Calls | Where-Object { $_.Tool -eq 'git' -and $_.Arguments[0] -eq 'config' -and $_.Arguments[-1] -match '^user\.(name|email)$' }).Count -eq 0 -and -not (Test-Called $area git pull) -and -not (Test-Called $area git merge)) 'Não acrescenta validação de autoria, pull ou merge'
         $head = Invoke-TestGit $area.Root @('rev-parse', 'HEAD')
         $result = Invoke-TestSync $area
         Assert-Check ($result.Success -and (Invoke-TestGit $area.Root @('rev-parse', 'HEAD')) -eq $head -and -not (Test-Called $area git commit)) 'Nova sincronização sem diferenças não cria commit vazio'
@@ -1279,9 +1283,324 @@ function Test-Merge {
 }
 
 
+function Test-SyncGitSvn {
+    $temporaryBase = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $fixture = Join-Path $temporaryBase ('hwdesktop-dual-sync-'+[guid]::NewGuid().ToString('N'))
+    $source = Join-Path $automationRoot 'workflow/sync-integration.ps1'
+    . $source
+    function TestGit {
+        param([string] $Directory,[string[]] $Arguments)
+        $r = Invoke-SyncProcess git $Arguments $Directory
+        if ($r.ExitCode -ne 0) { throw "Git do teste: $($r.Error) $($r.Output)" }
+        return $r.Output.TrimEnd()
+    }
+    $root = Join-Path $fixture 'Ponte SVN'
+    $publisher = Join-Path $fixture 'Publicador GitHub'
+    $origin = Join-Path $fixture 'origin.git'
+    $url = 'https://servidor.invalid/svn/hwsistemas/Projeto_Fiscal40'
+    function Save-SvnRevision {
+        param([string] $Revision)
+        [void] (TestGit $root @('add','--all','--force','.'))
+        $message = "Base SVN "+$Revision+[Environment]::NewLine+[Environment]::NewLine+"git-svn-id: $url@$Revision 985b6d82-50e3-384c-aa2a-157267a88f1d"
+        [void] (TestGit $root @('commit','-m',$message))
+        $hash = TestGit $root @('rev-parse','HEAD')
+        [void] (TestGit $root @('update-ref','refs/remotes/svn/git-svn',$hash))
+        return $hash
+    }
+    function Invoke-TestDualSync {
+        $state.Calls.Clear()
+        $failure = ''; $log = [Collections.Generic.List[string]]::new()
+        Push-Location $root
+        try {
+            . $entry
+            Invoke-SyncIntegration -ConfigPath $config -CommandRunner $runner 6>&1 | ForEach-Object { $log.Add([string] $_) }
+        } catch { $failure = $_.Exception.Message } finally { Pop-Location }
+        [pscustomobject]@{Success=($failure -eq '');Error=$failure;Log=($log -join [Environment]::NewLine)}
+    }
+    try {
+        foreach ($folder in @($root,$publisher)) {
+            [void] [IO.Directory]::CreateDirectory($folder)
+            [void] (TestGit $folder @('init','--initial-branch=main'))
+            [void] (TestGit $folder @('config','user.name','Teste local'))
+            [void] (TestGit $folder @('config','user.email','teste@example.invalid'))
+            [void] (TestGit $folder @('config','core.autocrlf','false'))
+            foreach ($name in @('Modern','Unix','assets','estranho','Legacy')) { [void] [IO.Directory]::CreateDirectory((Join-Path $folder $name)) }
+            [IO.File]::WriteAllLines((Join-Path $folder '.gitignore'),[string[]]@('/*','!/.gitignore','!/Modern/','!/Unix/','!/assets/','!/Legacy/','_automation/'))
+            [IO.File]::WriteAllText((Join-Path $folder 'Modern/.gitattributes'),"*.pas text eol=crlf")
+            [IO.File]::WriteAllText((Join-Path $folder 'Unix/.gitattributes'),"*.pas text eol=lf")
+            [IO.File]::WriteAllText((Join-Path $folder 'Modern/inalterado.pas'),"linha um"+[char]13+[char]10+"linha dois"+[char]10)
+            [IO.File]::WriteAllText((Join-Path $folder 'Modern/remover.pas'),'remover')
+            [IO.File]::WriteAllText((Join-Path $folder 'Legacy/padrao-proprio.pas'),"legado"+[char]13+[char]10+"misto"+[char]10)
+            [IO.File]::WriteAllText((Join-Path $folder 'Unix/mesma-extensao.pas'),"unix"+[char]10)
+            [IO.File]::WriteAllBytes((Join-Path $folder 'assets/binario.dll'),[byte[]]@(0,255,13,10,0,10,128))
+            [IO.File]::WriteAllText((Join-Path $folder 'estranho/projeto.pas'),"fora do GitHub"+[char]13+[char]10)
+        }
+        [void] (TestGit $fixture @('init','--bare','--initial-branch=main',$origin))
+        [void] (TestGit $publisher @('remote','add','origin',$origin))
+        [void] (TestGit $publisher @('add','.'))
+        [void] (TestGit $publisher @('commit','-m','Base GitHub independente'))
+        [void] (TestGit $publisher @('push','origin','main'))
+        $initialGithub = TestGit $publisher @('rev-parse','HEAD')
+        [IO.File]::WriteAllText((Join-Path $root '.git/info/attributes'),'* -text')
+        $initialSvn = Save-SvnRevision '19050'
+        [void] (TestGit $root @('config','svn-remote.svn.url',$url))
+        [void] (TestGit $root @('config','svn-remote.svn.fetch',':refs/remotes/svn/git-svn'))
+        [void] (TestGit $root @('remote','add','origin',$origin))
+        $entry = Join-Path $root '_automation/workflow/sync-integration.ps1'
+        [void] [IO.Directory]::CreateDirectory((Split-Path -Parent $entry))
+        Copy-Item -LiteralPath $source -Destination $entry
+        foreach ($mode in @('svn','git-svn')) {
+            $folder = Join-Path (Split-Path -Parent $entry) $mode
+            [void] [IO.Directory]::CreateDirectory($folder)
+            Copy-Item -LiteralPath (Join-Path $automationRoot "workflow/$mode/sync-integration.ps1") -Destination (Join-Path $folder 'sync-integration.ps1')
+        }
+        $config = Join-Path $root '_automation/config/workflow.local.psd1'
+        [void] [IO.Directory]::CreateDirectory((Split-Path -Parent $config))
+        $rootValue = $root.Replace("'","''")
+        [IO.File]::WriteAllText($config,"@{ IntegrationPath='$rootValue'; GitBranch='main'; SvnUrlSuffix='/svn/hwsistemas/Projeto_Fiscal40'; WslDistribution='Ubuntu-simulado'; SvnRef='refs/remotes/svn/git-svn' }")
+        $state = @{ Calls=[Collections.Generic.List[object]]::new(); FailWsl=$false; FailPush=$false }
+        $runner = {
+            param($Tool,$Arguments,$Directory,$InputText)
+            $state.Calls.Add([pscustomobject]@{Tool=$Tool;Arguments=@($Arguments);Directory=$Directory})
+            if ($Tool -eq 'wsl.exe') {
+                if ($state.FailWsl) { return [pscustomobject]@{ExitCode=1;Output='';Error='WSL indisponível simulado'} }
+                $output = if ('wslpath' -in $Arguments) { '/simulated/'+$Arguments[-1].Replace('\','/') } else { 'git-svn simulado' }
+                return [pscustomobject]@{ExitCode=0;Output=$output;Error=''}
+            }
+            if ($Tool -eq 'svn') { throw 'Modo git-svn não deve chamar o cliente SVN do Windows.' }
+            if ($state.FailPush -and $Arguments[0] -eq 'push') { return [pscustomobject]@{ExitCode=1;Output='';Error='Push rejeitado simulado'} }
+            return $null
+        }.GetNewClosure()
+
+        Assert-Check ((Get-IntegrationClient $root $runner) -eq 'git-svn') 'Identifica git-svn por configuração, sem confundir um clone Git comum'
+        $first = Invoke-TestDualSync
+        if (-not $first.Success) { throw $first.Error }
+        Assert-Check ((TestGit $origin @('rev-parse','main')) -eq $initialGithub) 'Diferenças somente de CRLF/mistas não criam commit artificial no GitHub'
+        Assert-Check ((TestGit $origin @('rev-parse','main:Legacy/padrao-proprio.pas')) -eq (TestGit $root @('rev-parse','HEAD:Legacy/padrao-proprio.pas'))) 'Pasta sem gitattributes mantém sua representação mista já existente, sem normalização coletiva'
+        Assert-Check ((TestGit $root @('rev-parse','HEAD')) -eq $initialSvn -and [IO.File]::ReadAllText((Join-Path $root 'Modern/inalterado.pas')).Contains([string][char]13)) 'Linha SVN e seus finais de linha permanecem intactos'
+        $cache = Join-Path $root '.git/hwdesktop-sync'
+        Assert-Check (@(Get-ChildItem -LiteralPath $cache -Directory -Filter 'run-*').Count -eq 0) 'Preparação temporária privada é removida após sucesso'
+
+        [IO.File]::WriteAllText((Join-Path $root 'Modern/novo [ação].pas'),"nova demanda"+[char]13+[char]10)
+        [IO.File]::Delete((Join-Path $root 'Modern/remover.pas'))
+        # Evitar adicionar a instalação local da automação à revisão SVN simulada.
+        [void] (TestGit $root @('add','--all','--','Modern'))
+        $message = "Atualizacao SVN"+[Environment]::NewLine+[Environment]::NewLine+"git-svn-id: $url@19055 985b6d82-50e3-384c-aa2a-157267a88f1d"
+        [void] (TestGit $root @('commit','-m',$message))
+        $newSvn = TestGit $root @('rev-parse','HEAD')
+        [void] (TestGit $root @('update-ref','refs/remotes/svn/git-svn',$newSvn))
+        [IO.File]::WriteAllText((Join-Path $root 'Modern/novo [ação].pas'),'alteracao local preservada')
+        [IO.File]::WriteAllText((Join-Path $root 'Modern/nao-versionado.pas'),'nao publicar')
+        $second = Invoke-TestDualSync
+        if (-not $second.Success) { throw $second.Error }
+        $newGithub = TestGit $origin @('rev-parse','main')
+        Assert-Check ((TestGit $origin @('rev-parse','main^')) -eq $initialGithub -and (TestGit $origin @('log','-1','--format=%s','main')).Contains('r19055')) 'Novo commit preserva a ancestralidade GitHub e registra a revisão SVN'
+        $published = TestGit $origin @('ls-tree','-r','--name-only','main')
+        Assert-Check ($published.Contains('novo') -and -not $published.Contains('remover.pas') -and -not $published.Contains('estranho/') -and -not $published.Contains('nao-versionado')) 'Publica adições e exclusões SVN respeitando o filtro e ignorando arquivos locais novos'
+        $diff = TestGit $origin @('diff','--name-only',"$initialGithub..$newGithub")
+        Assert-Check (-not $diff.Contains('inalterado.pas') -and -not $diff.Contains('mesma-extensao.pas') -and -not $diff.Contains('binario.dll')) 'Atributos por área preservam arquivos inalterados, padrões diferentes e binários'
+        Assert-Check ((TestGit $origin @('show','main:Modern/novo [ação].pas')) -eq 'nova demanda' -and [IO.File]::ReadAllText((Join-Path $root 'Modern/novo [ação].pas')) -eq 'alteracao local preservada') 'Usa os blobs recebidos do SVN e não sobrescreve alterações locais da ponte'
+        $again = Invoke-TestDualSync
+        Assert-Check ($again.Success -and (TestGit $origin @('rev-parse','main')) -eq $newGithub) 'Reexecução idêntica não cria commit vazio'
+        $state.FailWsl = $true
+        $failed = Invoke-TestDualSync
+        Assert-Check (-not $failed.Success -and (TestGit $origin @('rev-parse','main')) -eq $newGithub) 'Indisponibilidade WSL interrompe sem publicar nem trocar automaticamente de cliente'
+        $state.FailWsl = $false
+        [void] [IO.Directory]::CreateDirectory((Join-Path $root '.svn'))
+        $ambiguous = Invoke-TestDualSync
+        Assert-Check (-not $ambiguous.Success -and @($state.Calls | Where-Object Tool -eq 'wsl.exe').Count -eq 0) 'Pasta com dois tipos de metadados é recusada antes de executar WSL'
+        [IO.Directory]::Delete((Join-Path $root '.svn'))
+        [void] [IO.Directory]::CreateDirectory((Join-Path $publisher '.svn'))
+        Assert-Check ((Get-IntegrationClient $publisher) -eq 'svn') 'Pasta SVN com Git permanece no modo tradicional sem depender de WSL'
+        [IO.Directory]::Delete((Join-Path $publisher '.svn'))
+        $ordinary = $false
+        try { [void] (Get-IntegrationClient $publisher) } catch { $ordinary = $true }
+        Assert-Check $ordinary 'Clone somente Git não é tratado como integração'
+
+        [IO.File]::WriteAllText((Join-Path $root 'Modern/novo [ação].pas'),'proxima revisao')
+        [void] (TestGit $root @('add','--','Modern'))
+        $message = "Outra SVN"+[Environment]::NewLine+[Environment]::NewLine+"git-svn-id: $url@19056 985b6d82-50e3-384c-aa2a-157267a88f1d"
+        [void] (TestGit $root @('commit','-m',$message))
+        [void] (TestGit $root @('update-ref','refs/remotes/svn/git-svn',(TestGit $root @('rev-parse','HEAD'))))
+        $state.FailPush = $true
+        $failed = Invoke-TestDualSync
+        $retained = @(Get-ChildItem -LiteralPath $cache -Directory -Filter 'run-*')
+        Assert-Check (-not $failed.Success -and $retained.Count -eq 1 -and (TestGit $origin @('rev-parse','main')) -eq $newGithub) 'Push rejeitado preserva a preparação e seu commit para revisão, sem alterar remoto'
+    }
+    finally {
+        $resolved = [IO.Path]::GetFullPath($fixture)
+        if ($resolved.StartsWith($temporaryBase,[StringComparison]::OrdinalIgnoreCase) -and (Split-Path -Leaf $resolved) -match '^hwdesktop-dual-sync-[a-f0-9]{32}$' -and [IO.Directory]::Exists($resolved)) { Remove-Item -LiteralPath $resolved -Recurse -Force }
+    }
+}
+
+
+
+function Test-Delivery {
+    $temporaryBase=[IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $fixture=Join-Path $temporaryBase ('hwdesktop-delivery-'+[guid]::NewGuid().ToString('N'))
+    [void] [IO.Directory]::CreateDirectory($fixture)
+    . (Join-Path $automationRoot 'workflow\sync-integration.ps1')
+    . (Join-Path $automationRoot 'workflow\Delivery.Common.ps1')
+    function Run([string] $Tool,[string[]] $Arguments,[string] $Directory=$fixture) {
+        $result=Invoke-SyncProcess $Tool $Arguments $Directory
+        if ($result.ExitCode -ne 0) { throw "$Tool $($Arguments -join ' '): $($result.Error) $($result.Output)" }
+        return $result.Output.Trim()
+    }
+    function WriteFile([string] $Directory,[string] $Path,[string] $Text) {
+        $file=Join-Path $Directory $Path
+        [void] [IO.Directory]::CreateDirectory((Split-Path -Parent $file))
+        [IO.File]::WriteAllText($file,$Text,[Text.UTF8Encoding]::new($false))
+    }
+    function Install([string] $Directory) {
+        foreach ($relative in @('sync-integration.ps1','deliver-svn.ps1','Delivery.Common.ps1','svn\sync-integration.ps1','svn\deliver-svn.ps1','git-svn\sync-integration.ps1','git-svn\deliver-svn.ps1')) {
+            $dest=Join-Path $Directory ("_automation\workflow\"+$relative)
+            [void] [IO.Directory]::CreateDirectory((Split-Path -Parent $dest))
+            [IO.File]::Copy((Join-Path $automationRoot ("workflow\"+$relative)),$dest)
+        }
+        [void] [IO.Directory]::CreateDirectory((Join-Path $Directory '_automation\config'))
+    }
+    function InvokeEntry([string] $Directory,[switch] $Commit,[scriptblock] $Runner) {
+        Push-Location $Directory
+        try {
+            . (Join-Path $Directory '_automation\workflow\deliver-svn.ps1') -Commit:$Commit
+            Invoke-DeliverSvn -ConfigPath (Join-Path $Directory '_automation\config\workflow.local.psd1') -Commit:$Commit -CommandRunner $Runner | Out-Host
+        } finally { Pop-Location }
+    }
+    try {
+        foreach ($mode in @('svn','git-svn')) {
+            $area=Join-Path $fixture $mode; [void] [IO.Directory]::CreateDirectory($area)
+            $repository=Join-Path $area 'repository'
+            [void] (Run svnadmin @('create','--compatible-version','1.9',$repository))
+            $winUrl=([uri] ($repository.Replace('\','/')+'/')).AbsoluteUri.TrimEnd('/')
+            [void] (Run svn @('mkdir',($winUrl+'/trunk'),'-m','trunk','--non-interactive'))
+            $seed=Join-Path $area 'seed'
+            [void] (Run svn @('checkout',($winUrl+'/trunk'),$seed,'--non-interactive'))
+            WriteFile $seed 'Modern/.gitattributes' "*.pas text eol=crlf`n"
+            WriteFile $seed 'Unix/.gitattributes' "*.pas text eol=lf`n"
+            WriteFile $seed 'Modern/change.pas' "antes`r`nmeio`nfinal`r`n"
+            WriteFile $seed 'Modern/keep.pas' "intacto`r`n"
+            WriteFile $seed 'Modern/delete.pas' "remover`r`n"
+            WriteFile $seed 'Unix/file.pas' "unix`n"
+            WriteFile $seed 'foreign/keep.txt' "outro projeto`r`n"
+            WriteFile $seed '.gitignore' "_automation/`nforeign/`n.svn/`n"
+            [IO.File]::WriteAllBytes((Join-Path $seed 'Modern/test.dll'),[byte[]]@(0,255,1,128,10))
+            [void] (Run svn @('add','--force','.','--non-interactive') $seed)
+            [void] (Run svn @('commit','-m','base','--non-interactive') $seed)
+            [void] (Run svn @('update','--non-interactive') $seed)
+            $revision=([xml] (Run svn @('info','--xml','.') $seed)).info.entry.revision
+            $root=Join-Path $area 'integration'
+            if ($mode -eq 'svn') {
+                [void] (Run svn @('checkout',($winUrl+'/trunk'),$root,'--non-interactive'))
+            } else {
+                [void] (Run svn @('export',($winUrl+'/trunk'),$root,'--non-interactive'))
+            }
+            [void] (Run git @('init','-b','main',$root))
+            [void] (Run git @('config','user.name','Delivery Test') $root)
+            [void] (Run git @('config','user.email','test@example.invalid') $root)
+            [void] (Run git @('config','core.autocrlf','false') $root)
+            if ($mode -eq 'git-svn') {
+                WriteFile $root '.git/info/attributes' "* -text`n"
+                [void] (Run git @('add','--force','--','.gitignore','Modern','Unix','foreign') $root)
+                $linuxRepository=(Run wsl.exe @('--distribution','Ubuntu-24.04','--exec','wslpath','-a',$repository))
+                $url='file://'+$linuxRepository+'/trunk'
+                $uuid=([xml] (Run svn @('info','--xml','.') $seed)).info.entry.repository.uuid
+                $msg="Base`n`ngit-svn-id: "+$url+'@'+$revision+' '+$uuid
+                [void] (Run git @('commit','-m',$msg) $root)
+                $svnBase=Run git @('rev-parse','HEAD') $root
+                [void] (Run git @('config','svn-remote.svn.url',$url) $root)
+                [void] (Run git @('config','svn-remote.svn.fetch',':refs/remotes/svn/git-svn') $root)
+                [void] (Run git @('update-ref','refs/remotes/svn/git-svn',$svnBase) $root)
+            } else {
+                [void] (Run git @('add','--','.gitignore','Modern','Unix') $root)
+                [void] (Run git @('commit','-m','Base GitHub') $root)
+            }
+            $origin=Join-Path $area 'origin.git'; [void] (Run git @('init','--bare',$origin))
+            $publisher=Join-Path $area 'work'
+            if ($mode -eq 'git-svn') {
+                [void] (Run git @('clone',$root,$publisher))
+                [IO.File]::Delete((Join-Path $publisher 'foreign/keep.txt'))
+                [void] (Run git @('rm','--cached','--','foreign/keep.txt') $publisher)
+                [void] (Run git @('add','--renormalize','--','Modern','Unix') $publisher)
+            } else { [void] (Run git @('clone',$root,$publisher)) }
+            [void] (Run git @('config','user.name','Delivery Test') $publisher)
+            [void] (Run git @('config','user.email','test@example.invalid') $publisher)
+            if ($mode -eq 'git-svn') { [void] (Run git @('commit','-m','Recorte GitHub') $publisher) }
+            [void] (Run git @('remote','set-url','origin',$origin) $publisher)
+            [void] (Run git @('push','origin','main') $publisher)
+            [void] (Run git @('remote','add','origin',$origin) $root)
+            $githubBase=Run git @('rev-parse','HEAD') $publisher
+            if ($mode -eq 'git-svn') {
+                $cache=Join-Path $root '.git/hwdesktop-sync'; [void] [IO.Directory]::CreateDirectory($cache)
+                $mirror=Join-Path $cache 'github.git'
+                [void] (Run git @('clone','--bare',$origin,$mirror))
+                WriteFile $mirror 'hwdesktop-owner.json' (@{root=$root}|ConvertTo-Json)
+                WriteFile $cache 'last-sync.json' (@{svnRevision=$revision;svnCommit=$svnBase;githubCommit=$githubBase}|ConvertTo-Json)
+            }
+            Install $root
+            $config="@{ IntegrationPath = '"+$root.Replace("'","''")+"'; GitBranch='main'; SvnUrlSuffix='/trunk'; SecretsFile='segredos.md'; WslDistribution='Ubuntu-24.04'; SvnRef='refs/remotes/svn/git-svn' }"
+            WriteFile $root '_automation/config/workflow.local.psd1' $config
+            WriteFile $root '_automation/config/segredos.md' "SVN_USER=test`nSVN_PASS=test`n"
+            WriteFile $publisher 'Modern/change.pas' "depois`nmeio`nfinal`n"
+            [IO.File]::Delete((Join-Path $publisher 'Modern/delete.pas'))
+            WriteFile $publisher 'new/sub/novo [ação]@.txt' "novo`n"
+            WriteFile $publisher 'Unix/file.pas' "unix novo`n"
+            [IO.File]::WriteAllBytes((Join-Path $publisher 'Modern/test.dll'),[byte[]]@(0,254,2,129,10))
+            [void] (Run git @('add','--all') $publisher); [void] (Run git @('commit','-m','Demanda') $publisher)
+            [void] (Run git @('push','origin','main') $publisher)
+            $target=Run git @('rev-parse','HEAD') $publisher
+            $bridgeHead=Run git @('rev-parse','HEAD') $root
+            if ($mode -eq 'git-svn') { WriteFile $root 'Modern/local.pas' 'nao entregar' }
+            InvokeEntry $root
+            $stateFile=Join-Path $root '.git/hwdesktop-delivery/pending.json'
+            $state=Get-Content -LiteralPath $stateFile -Raw | ConvertFrom-Json
+            Assert-Check ($state.status -eq 'prepared' -and $state.githubCommit -eq $target) "$mode prepara a ponta publicada, sem enviar SVN"
+            Assert-Check ((Run svnlook @('youngest',$repository)) -eq $revision) "$mode preparação não cria revisão SVN"
+            InvokeEntry $root
+            $again=Get-Content -LiteralPath $stateFile -Raw | ConvertFrom-Json
+            Assert-Check ($again.id -eq $state.id) "$mode reexecução apresenta a mesma entrega pendente"
+            if ($mode -eq 'svn') {
+                $svnStatus=Run svn @('status') $root
+                Assert-Check ($svnStatus -match '(?m)^A\s+new' -and $svnStatus -match '(?m)^D\s+Modern\\delete.pas') 'SVN agenda automaticamente arquivos novos, diretórios pais e exclusões'
+                WriteFile $root 'foreign/keep.txt' "alteracao local fora da entrega`r`n"
+            } else {
+                Assert-Check ((Run git @('rev-parse','HEAD') $root) -eq $bridgeHead -and [IO.File]::Exists((Join-Path $root 'Modern/local.pas'))) 'git-svn preserva branch e arquivos locais da ponte'
+                $oldBlob=Get-DeliveryBlob @{Root=$root} $root (Run git @('rev-parse',($state.deliveryCommit+':Modern/change.pas')) $root)
+                Assert-Check ([Text.Encoding]::UTF8.GetString($oldBlob) -ceq "depois`r`nmeio`nfinal`r`n") 'Alteração em arquivo misto preserva terminadores das linhas existentes'
+                Assert-Check ((Run git @('rev-parse',($state.deliveryCommit+':Modern/keep.pas')) $root) -eq (Run git @('rev-parse',($svnBase+':Modern/keep.pas')) $root)) 'Arquivo inalterado mantém exatamente o blob SVN'
+                $failureRunner={ param($Tool,$Arguments,$Directory,$InputText)
+                    if ($Tool -eq 'wsl.exe' -and 'commit-diff' -in $Arguments) { return [pscustomobject]@{ExitCode=1;Output='';Error='Falha de comunicação simulada'} }
+                    return $null
+                }
+                $blocked=$false
+                try { InvokeEntry $root -Commit -Runner $failureRunner } catch { $blocked=$_.Exception.Message.Contains('confirmação segura') }
+                $uncertain=Get-Content -LiteralPath $stateFile -Raw | ConvertFrom-Json
+                Assert-Check ($blocked -and $uncertain.status -eq 'uncertain') 'Falha de envio preserva a entrega e exige conferência do log SVN'
+                $blocked=$false
+                try { InvokeEntry $root -Commit } catch { $blocked=$_.Exception.Message.Contains('Confira o registro SVN') }
+                Assert-Check $blocked 'Estado incerto impede uma repetição automática do commit'
+                # Somente a simulação falhou antes do envio; restaurar a fixture para testar o cliente real.
+                $state.status='prepared'; WriteFile (Split-Path -Parent $stateFile) (Split-Path -Leaf $stateFile) ($state|ConvertTo-Json -Depth 8)
+            }
+            InvokeEntry $root -Commit
+            $done=Get-Content -LiteralPath $stateFile -Raw | ConvertFrom-Json
+            Assert-Check ($done.status -eq 'delivered' -and [int] $done.resultRevision -gt [int] $revision) "$mode confirma e cria uma única revisão SVN"
+            [void] (Run svn @('update','--non-interactive') $seed)
+            Assert-Check ([IO.File]::Exists((Join-Path $seed 'new/sub/novo [ação]@.txt')) -and -not [IO.File]::Exists((Join-Path $seed 'Modern/delete.pas'))) "$mode entrega adição Unicode/com @ e exclusão"
+            Assert-Check ([IO.File]::ReadAllText((Join-Path $seed 'foreign/keep.txt')) -ceq "outro projeto`r`n") "$mode preserva projetos SVN fora do GitHub e alterações locais fora dos alvos"
+            Assert-Check (([IO.File]::ReadAllBytes((Join-Path $seed 'Modern/test.dll')) -join ',') -eq '0,254,2,129,10') "$mode entrega binários sem recodificação"
+            Assert-Check ((Run git @('rev-parse','main') $origin) -eq $target) "$mode não reescreve nem publica o histórico GitHub"
+        }
+    } finally {
+        $resolved=[IO.Path]::GetFullPath($fixture)
+        if ($resolved.StartsWith($temporaryBase,[StringComparison]::OrdinalIgnoreCase) -and (Split-Path -Leaf $resolved) -match '^hwdesktop-delivery-[a-f0-9]{32}$' -and [IO.Directory]::Exists($resolved)) { Remove-Item -LiteralPath $resolved -Recurse -Force }
+    }
+}
+
 $sections = @(
+    @{ Group='Delivery'; Title='Entrega GitHub/SVN em repositórios temporários'; Action={ Test-Delivery } }
     @{ Group='Build'; Title='Compilação e publicação simuladas'; Action={ Test-Build } }
     @{ Group='Sync'; Title='Sincronização SVN/Git isolada'; Action={ Test-Sync } }
+    @{ Group='SyncGitSvn'; Title='Sincronização git-svn isolada'; Action={ Test-SyncGitSvn } }
     @{ Group='Start'; Title='Início de demanda em clones locais'; Action={ Test-Start } }
     @{ Group='Merge'; Title='Merge de demandas em clones locais'; Action={ Test-Merge } }
     @{ Group='Dependencies'; Title='Empacotamento de dependências'; Action={ Test-Dependencies } }

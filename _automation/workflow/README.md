@@ -2,7 +2,7 @@
 
 ## Sincronizar integração
 
-Requer PowerShell 7.5+, Git e SVN no PATH. **O diretório atual deve ser exatamente `IntegrationPath`**, e o script executado deve ser o arquivo `_automation/workflow/sync-integration.ps1` dessa integração. A chamada direta do PS1 a partir de outra pasta, inclusive uma subpasta ou `WorkPath`, provoca erro antes de ler os segredos ou executar Git/SVN. Estar na integração e chamar uma cópia do script localizada em outro lugar também é rejeitado.
+A entrada comum requer PowerShell 7.5+ e Git no PATH. Identifica o modo pelos metadados da pasta, sem exigir um campo de seleção: .svn encaminha para workflow/svn/sync-integration.ps1; configuração svn-remote encaminha para workflow/git-svn/sync-integration.ps1. Uma pasta com ambos os tipos é recusada. Um clone somente Git também é recusado. O modo tradicional requer SVN no PATH e não consulta WSL/git-svn. **O diretório atual deve ser exatamente `IntegrationPath`**, e o script executado deve ser o arquivo `_automation/workflow/sync-integration.ps1` dessa integração. A chamada direta do PS1 a partir de outra pasta, inclusive uma subpasta ou `WorkPath`, provoca erro antes de ler os segredos ou executar Git/SVN. Estar na integração e chamar uma cópia do script localizada em outro lugar também é rejeitado.
 
 O `menu.bat` aberto na própria `_automation` pelo Explorer inicia o menu na raiz do projeto ao qual pertence. Assim, o BAT da integração atende à regra, enquanto o BAT do WorkPath continua no projeto de trabalho e não pode sincronizar a integração. Se o BAT da integração for chamado de um terminal no WorkPath ou em outra pasta, esse diretório é preservado e a sincronização continua bloqueada.
 
@@ -23,7 +23,7 @@ Nos clones Git, a configuração do início de demanda é opcional. O modelo `co
 
 `SecretsFile` aponta para o arquivo individual existente, com `SVN_USER=...` e `SVN_PASS=...`, uma chave por linha. O script não altera esse arquivo nem verifica suas regras de exclusão. As credenciais SVN são passadas ao cliente, sem impressão da senha. O cliente SVN instalado recebe a senha como argumento do processo; ela pode ser inspecionada por ferramentas locais com acesso ao processo. A autenticação Git é a já configurada na máquina; não há usuário/senha Git neste arquivo.
 
-## Operação
+## Operação SVN tradicional
 
 1. Confere diretório atual e origem do próprio script. Depois consulta `git --version` e `svn --version`, confere raiz Git, branch configurada, URL SVN e existência de `origin`. Não muda o diretório para contornar essa validação.
 2. Interrompe diante de operação Git em andamento, conflito, índice Git previamente preparado ou mudanças locais SVN fora da changelist `ignore-on-commit`. Conflitos nessa changelist também interrompem. Diferenças Git não preparadas são permitidas.
@@ -37,6 +37,27 @@ Nos clones Git, a configuração do início de demanda é opcional. O modelo `co
 `ignore-on-commit` dispensa o bloqueio por alterações locais SVN; não cria uma exclusão Git. A inclusão segue o `.gitignore` e o rastreamento Git existente, limitada aos arquivos versionados pelo SVN. Uma regra de ignore não retira, por si só, um arquivo já rastreado no Git e ainda versionado no SVN.
 
 O script não troca branches, não aplica arquivos Git sobre a pasta SVN, não resolve conflitos e não executa limpeza, revert, reset hard, merge, rebase ou push forçado. Não verifica autoria Git previamente. Não altera o clone de desenvolvimento, não compila, não entrega commit SVN e não obtém dependências.
+
+## Operação git-svn
+
+Use config/workflow.git-svn.exemplo.psd1 como modelo da configuração individual workflow.local.psd1 da ponte. Contém IntegrationPath, GitBranch, SvnUrlSuffix, SvnRef, WslDistribution e OpenSslConfig opcional. O modo git-svn não lê o arquivo de segredos SVN: utiliza a autenticação e a confiança do certificado preparadas manualmente no cliente Ubuntu. A autenticação GitHub continua sendo a do Git do Windows.
+
+O remoto origin da ponte deve apontar para o repositório GitHub existente. A configuração svn-remote continua apontando para o SVN. O script exige uma origem SVN e confere URL e mapeamento de SvnRef antes de receber revisões. Não inicializa uma ponte nem importa o histórico completo.
+
+1. Identifica e valida a própria integração, seus metadados e a disponibilidade do git-svn na distribuição configurada.
+2. Executa git svn fetch pelo WSL. Recebe revisões nos metadados, sem checkout/rebase, sem trocar a branch ativa e sem alterar os arquivos locais. Usa a referência SVN recebida como fonte do conteúdo, inclusive se houver arquivos locais novos ou modificados; eles são preservados e não publicados.
+3. Obtém a main do GitHub num cache Git privado dentro de .git/hwdesktop-sync/github.git e cria uma preparação temporária independente. Os dois históricos não são unidos por merge.
+4. Lê os caminhos versionados da revisão SVN, aplica o .gitignore dessa revisão e exporta somente os blobs selecionados. O .gitignore da raiz é obrigatório. Um arquivo já rastreado no GitHub mantém a semântica normal de rastreamento do Git; adicionar uma regra de ignore não o remove automaticamente.
+5. Prepara o índice a partir da main existente e aplica os atributos presentes nas áreas incluídas. A normalização automática de texto do destino Git usa core.autocrlf=true; regras .gitattributes específicas dos caminhos têm precedência. A configuração local * -text da linha SVN não é copiada para o destino. Binários seguem o tratamento do Git e seus atributos. Arquivos SVN fora do escopo Git não são materializados na preparação, exceto pequenos arquivos .gitignore usados na seleção.
+6. Cria Sincronizacao SVN r<revisao> somente se houver diferenças e publica por push normal. O novo commit descende da main GitHub recebida; nenhum commit do histórico publicado é reescrito.
+
+A branch atual e a árvore de arquivos da ponte podem continuar exibindo sua revisão anterior: fetch atualiza a referência SVN, não o checkout. A publicação é baseada nessa referência recebida. Não confundir a branch interna com a main compartilhada no GitHub.
+
+A configuração OpenSslConfig aponta somente para um perfil já preparado pelo responsável, convertido para caminho WSL e utilizado no processo git-svn. O script não muda a configuração global do Ubuntu, não desativa a validação de certificado e não aceita certificados automaticamente. Prompts inesperados de certificado/autenticação são recusados por um helper local sem credenciais, evitando espera indefinida; prepare ou renove a autenticação manualmente no WSL antes de repetir.
+
+O cache e os registros ficam sob .git, fora do versionamento. last-sync.json registra revisão/commit SVN e pai/commit GitHub publicados. A preparação temporária é removida após sucesso. Em rejeição de push, mantém o repositório temporário e informa seu caminho, com o commit preservado para revisão. Não faz troca automática para o SVN tradicional; a alternativa é executar a entrada comum na outra pasta de integração.
+
+Esta operação é somente SVN → GitHub. A entrega GitHub → SVN permanece uma etapa posterior, a implementar com os dois modos. Não executa dcommit, commit SVN, build ou alterações nos clones de trabalho.
 
 ## Iniciar demanda
 
@@ -136,4 +157,29 @@ Códigos de saída: 0 para sucesso/cancelamento pelo nome vazio; 1 para erro. Te
 
 ## Testes isolados
 
-Todos os testes estão em `_automation/tests/verify.ps1`. Sem parâmetros, executa a suíte completa; `-Group Sync` seleciona a sincronização e `-Group Start` seleciona o início de demanda, no mesmo arquivo. Usa clones e remoto Git locais temporários e SVN simulado. O grupo Dependencies cobre empacotamento e preparação, usando pacotes e transporte simulados em pastas temporárias. Não utiliza configurações pessoais, segredos, servidor SVN, GitHub ou Nextcloud reais.
+Todos os testes estão em `_automation/tests/verify.ps1`. Sem parâmetros, executa a suíte completa; `-Group Sync` seleciona a sincronização e `-Group Start` seleciona o início de demanda, no mesmo arquivo. Usa clones e remoto Git locais temporários e SVN simulado. O grupo SyncGitSvn usa uma base pequena com Git real e transporte WSL/SVN simulado, cobrindo atributos, filtros, histórico e falhas. O grupo Dependencies cobre empacotamento e preparação, usando pacotes e transporte simulados em pastas temporárias. Não utiliza configurações pessoais, segredos, servidor SVN, GitHub ou Nextcloud reais.
+
+
+## Entregar ao SVN
+
+Execute na raiz da integração que fez a última sincronização:
+
+~~~powershell
+.\_automation\workflow\deliver-svn.ps1 -Message 'Entrega da demanda'
+# Depois de conferir a preparação:
+.\_automation\workflow\deliver-svn.ps1 -Commit
+~~~
+
+O menu **Entregar ao SVN** executa somente a preparação. [Guia operacional completo](GUIA-OPERACIONAL.md): sequência da demanda, commit Git, push GitHub, confirmação SVN e tratamento de falhas.
+
+A entrada pública confere IntegrationPath e a origem do próprio script. Identifica o modo pelos mesmos metadados da sincronização e chama svn/deliver-svn.ps1 ou git-svn/deliver-svn.ps1. Delivery.Common.ps1 contém apenas as funções internas compartilhadas.
+
+No SVN tradicional, exige main e Git limpo, valida alterações SVN, recebe a main remota com um fetch e fast-forward sobre a ponta capturada. Agenda apenas arquivos recebidos e seus diretórios pais. A confirmação usa svn commit --depth empty com uma lista explícita de arquivos/diretórios; mudanças locais fora desses alvos não entram no commit. Entradas ignore-on-commit não são removidas da lista de proteção: se um alvo da entrega estiver nela, a preparação/confirmação interrompe. O arquivo --targets usa a página de código do cliente Windows; nomes não representáveis causam parada explícita.
+
+No git-svn, exige last-sync.json da sincronização desta ponte e main descendente da base GitHub registrada. Não materializa a árvore SVN inteira. Aplica somente o delta GitHub sobre os objetos da árvore SVN, preservando as outras áreas. Para os arquivos textuais existentes, mantém os terminadores das linhas inalteradas e o padrão local nas linhas modificadas, inclusive em arquivos mistos. Binários marcados -text ou com NUL não sofrem conversão. Arquivos novos seguem eol explícito do caminho; sem regra, conservam os bytes Git. Encoding ANSI/UTF-8 é preservado sem recodificação.
+
+Cria uma referência privada codex/svn-delivery/<id> para revisão, sem alterar branch/checkout. A confirmação usa git svn commit-diff, base numérica SVN e URL já conferidas. Não faz dcommit, rebase ou push GitHub. A autenticação e o perfil OpenSSL seguem o mesmo modelo da sincronização git-svn, restrito ao processo.
+
+O registro .git/hwdesktop-delivery/pending.json mantém a ponta GitHub, base SVN, mensagem, alvos/commit privado e estado. Uma entrega pendente bloqueia sincronização. Repetir a preparação mostra a mesma entrega. Uma falha durante o envio passa para uncertain e impede repetição automática, pois o servidor pode ter aceitado o commit antes da queda da comunicação. Entregas confirmadas são arquivadas quando uma nova preparação começa. Confira o procedimento do guia antes de alterar um registro.
+
+Teste específico no arquivo único: .\_automation\tests\verify.ps1 -Group Delivery. Usa Git e SVN reais apenas em repositórios locais temporários, mais git-svn do Ubuntu-24.04 para a confirmação local. Não usa servidores ou credenciais reais.
