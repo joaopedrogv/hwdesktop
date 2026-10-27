@@ -55,6 +55,7 @@ Utilitario/*
 Hw Gestor/Documentação/
 HWNFeDX/ERP-ACBr-*.groupproj
 Automacao Bpl/ERP-*.bdsgroup
+Ativos/dpk/manifest_crc.txt
 
 # Permite Bpl - Diretório de saída de compilacao
 !/bpl/*.rpt
@@ -72,6 +73,7 @@ Automacao Bpl/ERP-*.bdsgroup
 _automation/config/config-paths.bat
 _automation/config/segredos.md
 _automation/config/workflow.local.psd1
+_automation/config/dependencies.local.psd1
 _automation/temp/
 
 ### Permite exclusivo para RAIZ, arquivos e extensoes
