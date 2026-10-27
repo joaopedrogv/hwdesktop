@@ -9,7 +9,7 @@
     All executa tudo. Grupos: Build, Sync, SyncGitSvn, Start, Merge, Menu, Dependencies, Delivery.
 #>
 [CmdletBinding()]
-param([ValidateSet('All', 'Build', 'Sync', 'Start', 'Menu', 'Dependencies', 'Merge', 'SyncGitSvn', 'Delivery')] [string] $Group = 'All')
+param([ValidateSet('All', 'Build', 'Sync', 'Start', 'Menu', 'Dependencies', 'Merge', 'SyncGitSvn', 'Delivery', 'GitSvnAuth')] [string] $Group = 'All')
 
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $false
@@ -1358,6 +1358,10 @@ function Test-SyncGitSvn {
         [void] [IO.Directory]::CreateDirectory((Split-Path -Parent $config))
         $rootValue = $root.Replace("'","''")
         [IO.File]::WriteAllText($config,"@{ IntegrationPath='$rootValue'; GitBranch='main'; SvnUrlSuffix='/svn/hwsistemas/Projeto_Fiscal40'; WslDistribution='Ubuntu-simulado'; SvnRef='refs/remotes/svn/git-svn' }")
+        $fakePassword='fixture-password==\literal'
+        $configured=[IO.File]::ReadAllText($config).TrimEnd().TrimEnd('}')
+        [IO.File]::WriteAllText($config,($configured+"; SecretsFile='segredos.md' }"))
+        [IO.File]::WriteAllText((Join-Path (Split-Path -Parent $config) 'segredos.md'),("SVN_USER=fixture-svn-user"+[Environment]::NewLine+"SVN_PASS="+$fakePassword+[Environment]::NewLine))
         $state = @{ Calls=[Collections.Generic.List[object]]::new(); FailWsl=$false; FailPush=$false }
         $runner = {
             param($Tool,$Arguments,$Directory,$InputText)
@@ -1375,6 +1379,8 @@ function Test-SyncGitSvn {
         Assert-Check ((Get-IntegrationClient $root $runner) -eq 'git-svn') 'Identifica git-svn por configuração, sem confundir um clone Git comum'
         $first = Invoke-TestDualSync
         if (-not $first.Success) { throw $first.Error }
+        $authenticated=@($state.Calls | Where-Object { $_.Tool -eq 'wsl.exe' -and 'fetch' -in $_.Arguments -and 'fixture-svn-user' -in $_.Arguments })
+        Assert-Check ($authenticated.Count -eq 1 -and -not (($authenticated[0].Arguments -join ' ').Contains($fakePassword))) 'Sincronização encaminha usuário/askpass do arquivo pessoal, sem senha em argumentos'
         Assert-Check ((TestGit $origin @('rev-parse','main')) -eq $initialGithub) 'Diferenças somente de CRLF/mistas não criam commit artificial no GitHub'
         Assert-Check ((TestGit $origin @('rev-parse','main:Legacy/padrao-proprio.pas')) -eq (TestGit $root @('rev-parse','HEAD:Legacy/padrao-proprio.pas'))) 'Pasta sem gitattributes mantém sua representação mista já existente, sem normalização coletiva'
         Assert-Check ((TestGit $root @('rev-parse','HEAD')) -eq $initialSvn -and [IO.File]::ReadAllText((Join-Path $root 'Modern/inalterado.pas')).Contains([string][char]13)) 'Linha SVN e seus finais de linha permanecem intactos'
@@ -1596,7 +1602,61 @@ function Test-Delivery {
     }
 }
 
+
+function Test-GitSvnAuth {
+    . (Join-Path $automationRoot 'workflow/sync-integration.ps1')
+    . (Join-Path $automationRoot 'workflow/Delivery.Common.ps1')
+    $temporaryBase=[IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $fixture=Join-Path $temporaryBase ('hwdesktop-svn-auth-'+[guid]::NewGuid().ToString('N'))
+    [void] [IO.Directory]::CreateDirectory($fixture)
+    try {
+        Assert-Check ($null -eq (Read-GitSvnCredentials @{} $fixture)) 'Sem SecretsFile, preserva o modo anterior de cache WSL'
+        $config=@{SecretsFile='segredos.md';WslDistribution='Ubuntu-24.04';SvnRef='refs/remotes/svn/git-svn'}
+        $secretPath=Join-Path $fixture 'segredos.md'
+        [IO.File]::WriteAllText($secretPath,"SVN_USER=ficticio"+[Environment]::NewLine+"SVN_PASS=")
+        $blocked=$false
+        try { [void] (Read-GitSvnCredentials $config $fixture) } catch { $blocked=$_.Exception.Message.Contains('SVN_PASS') }
+        Assert-Check $blocked 'Senha vazia interrompe com instrução para preencher SVN_PASS'
+        $fakePassword='ficticio==\&$literal''✓'
+        $fakeUser='svn-user-ficticio'
+        [IO.File]::WriteAllText($secretPath,("SVN_PASS=valor-anterior"+[char]13+[char]10+"SVN_USER="+$fakeUser+[char]13+[char]10+"SVN_PASS="+$fakePassword+[char]13+[char]10),[Text.UTF8Encoding]::new($true))
+        $credentials=Read-GitSvnCredentials $config $fixture
+        Assert-Check ($credentials.Password -ceq $fakePassword -and $credentials.UserName -ceq $fakeUser) 'Arquivo com BOM/CRLF preserva senha com igual, barra, aspas e Unicode'
+        $askPass=New-GitSvnAskPass (Join-Path $fixture 'cache') $credentials
+        Assert-Check (-not [IO.File]::ReadAllText($askPass.Path).Contains($fakePassword)) 'Helper gerado contém código, sem cópia da senha'
+        $linuxFile=(Invoke-SyncProcess wsl.exe @('--distribution','Ubuntu-24.04','--exec','wslpath','-a',$secretPath) $fixture).Output.Trim()
+        $linuxHelper=(Invoke-SyncProcess wsl.exe @('--distribution','Ubuntu-24.04','--exec','wslpath','-a',$askPass.Path) $fixture).Output.Trim()
+        $promptCode='print Git::prompt($ARGV[0], 1);'
+        function Prompt([string] $Text) {
+            $parameters=@('--distribution','Ubuntu-24.04','--exec','env',("GIT_ASKPASS="+$linuxHelper),("HWDESKTOP_SVN_SECRETS_FILE="+$linuxFile),'perl','-MGit','-e',$promptCode,$Text)
+            $result=Invoke-SyncProcess wsl.exe $parameters $fixture
+            if ($result.ExitCode -ne 0) { throw "Consulta local do helper falhou: $($result.ExitCode)" }
+            return $result.Output.TrimEnd([char]13,[char]10)
+        }
+        [void] (Invoke-SyncProcess wsl.exe @('--distribution','Ubuntu-24.04','--exec','chmod','u+x',$linuxHelper) $fixture)
+        Assert-Check ((Prompt "Password for 'ficticio': ") -ceq $fakePassword) 'Prompt real do Git/Perl recebe a senha do arquivo sem interpretação como comando'
+        Assert-Check ((Prompt 'Username: ') -ceq $fakeUser) 'Prompt real recebe o usuário configurado'
+        Assert-Check ([string]::IsNullOrEmpty((Prompt 'Certificate problem. (R)eject or accept?'))) 'Helper não aceita certificado automaticamente'
+        Assert-Check ([string]::IsNullOrEmpty((Prompt 'Password: '))) 'Helper não fornece senha SVN a um prompt de certificado de cliente'
+        $calls=[Collections.Generic.List[object]]::new()
+        $runner={
+            param($Tool,$Arguments,$Directory,$InputText)
+            $calls.Add(@($Arguments))
+            $output=if ('wslpath' -in $Arguments) { '/simulado/caminho' } else { 'git-svn simulado' }
+            [pscustomobject]@{ExitCode=0;Output=$output;Error=''}
+        }.GetNewClosure()
+        $context=@{Root=$fixture;Config=$config;ConfigDirectory=$fixture;Cache=(Join-Path $fixture 'delivery');Password='';Runner=$runner}
+        Initialize-DeliveryWsl $context
+        $arguments=(@($calls | ForEach-Object { $_ }) -join ' ')
+        Assert-Check (-not $arguments.Contains($fakePassword) -and -not ($context.WslEnvironment -join ' ').Contains($fakePassword) -and $context.Password -ceq $fakePassword) 'Entrega configura o arquivo pessoal, sem senha em argumentos ou variáveis de ambiente'
+    } finally {
+        $resolved=[IO.Path]::GetFullPath($fixture)
+        if ($resolved.StartsWith($temporaryBase,[StringComparison]::OrdinalIgnoreCase) -and (Split-Path -Leaf $resolved) -match '^hwdesktop-svn-auth-[a-f0-9]{32}$') { Remove-Item -LiteralPath $resolved -Recurse -Force }
+    }
+}
+
 $sections = @(
+    @{ Group='GitSvnAuth'; Title='Credenciais fictícias git-svn'; Action={ Test-GitSvnAuth } }
     @{ Group='Delivery'; Title='Entrega GitHub/SVN em repositórios temporários'; Action={ Test-Delivery } }
     @{ Group='Build'; Title='Compilação e publicação simuladas'; Action={ Test-Build } }
     @{ Group='Sync'; Title='Sincronização SVN/Git isolada'; Action={ Test-Sync } }

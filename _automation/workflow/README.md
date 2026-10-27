@@ -183,3 +183,16 @@ Cria uma referência privada codex/svn-delivery/<id> para revisão, sem alterar 
 O registro .git/hwdesktop-delivery/pending.json mantém a ponta GitHub, base SVN, mensagem, alvos/commit privado e estado. Uma entrega pendente bloqueia sincronização. Repetir a preparação mostra a mesma entrega. Uma falha durante o envio passa para uncertain e impede repetição automática, pois o servidor pode ter aceitado o commit antes da queda da comunicação. Entregas confirmadas são arquivadas quando uma nova preparação começa. Confira o procedimento do guia antes de alterar um registro.
 
 Teste específico no arquivo único: .\_automation\tests\verify.ps1 -Group Delivery. Usa Git e SVN reais apenas em repositórios locais temporários, mais git-svn do Ubuntu-24.04 para a confirmação local. Não usa servidores ou credenciais reais.
+
+
+### Credenciais SVN no modo git-svn
+
+Configure SecretsFile = 'segredos.md' no workflow.local.psd1 da integração. O caminho é relativo à pasta da configuração; também pode ser absoluto. O arquivo pessoal deve conter SVN_USER e SVN_PASS preenchidos. O exemplo git-svn já inclui essa opção.
+
+Sincronização e entrega usam essas credenciais pelo GIT_ASKPASS do git-svn. O helper gerado contém apenas código e lê o arquivo pessoal no momento da autenticação. A senha não é embutida em argumentos, variáveis de ambiente ou outro arquivo; segue apenas pela resposta privada do prompt. No fetch, o comando informa o usuário explicitamente e utiliza --no-auth-cache. Na entrega, commit-diff usa os prompts suportados pelo cliente; não aceita essas duas opções. O cache existente e a política de armazenamento do cliente podem continuar participando da autenticação.
+
+Prompts de certificado e outros prompts desconhecidos não recebem a senha. A confiança do certificado continua sendo preparada manualmente. Configuração OpenSslConfig e opções TLS continuam restritas ao processo.
+
+Sem SecretsFile explícito, instalações anteriores continuam usando o cache WSL, sem mudança automática da configuração pessoal. Quando SecretsFile é informado e uma chave está vazia/ausente, o script interrompe antes de acessar o SVN, indicando o campo a preencher. A configuração pessoal da ponte em uso foi ajustada para utilizar seu próprio segredos.md.
+
+Teste direcionado: verify.ps1 -Group GitSvnAuth. Usa credenciais fictícias e chamadas locais do Git/Perl; não acessa SVN ou GitHub.

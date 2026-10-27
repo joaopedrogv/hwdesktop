@@ -47,6 +47,58 @@ function Invoke-SyncProcess {
 }
 
 
+
+function Read-GitSvnCredentials {
+    param([hashtable] $Config,[string] $ConfigDirectory)
+    # Sem SecretsFile explícito, preservar instalações que usam o cache do WSL.
+    if (-not $Config.ContainsKey('SecretsFile')) { return $null }
+    if ([string]::IsNullOrWhiteSpace([string] $Config.SecretsFile)) { throw 'Campo obrigatório não preenchido: SecretsFile' }
+    $path=[IO.Path]::GetFullPath([IO.Path]::Combine($ConfigDirectory,[string] $Config.SecretsFile))
+    if (-not [IO.File]::Exists($path)) { throw "Arquivo de segredos não encontrado: $path" }
+    $values=@{}
+    foreach ($line in [IO.File]::ReadAllLines($path)) {
+        if ($line -match '^\s*(SVN_USER|SVN_PASS)\s*=(.*)$') { $values[$Matches[1]]=$Matches[2].Trim() }
+    }
+    foreach ($key in @('SVN_USER','SVN_PASS')) {
+        if (-not $values.ContainsKey($key) -or [string]::IsNullOrWhiteSpace($values[$key])) { throw "Preencha $key no arquivo pessoal: $path" }
+    }
+    return [pscustomobject]@{Path=$path;UserName=$values.SVN_USER;Password=$values.SVN_PASS}
+}
+
+function New-GitSvnAskPass {
+    param([string] $Cache,$Credentials)
+    [void] [IO.Directory]::CreateDirectory($Cache)
+    $noPrompt=Join-Path $Cache 'no-prompt.sh'
+    [IO.File]::WriteAllText($noPrompt,("#!/bin/sh"+[char]10+"printf '\n'"+[char]10),[Text.UTF8Encoding]::new($false))
+    if ($null -eq $Credentials) { return [pscustomobject]@{Path=$noPrompt;NoPromptPath=$noPrompt} }
+    # O helper contém somente código. O segredo permanece no arquivo pessoal.
+    # Perl já é dependência do git-svn. Não interpretar valores como código/comandos.
+    $perl=@'
+#!/usr/bin/perl
+use strict;
+use warnings;
+my $prompt = $ARGV[0] // '';
+my $key = $prompt =~ /^Username:/ ? 'SVN_USER' :
+          $prompt =~ /^Password for '/ ? 'SVN_PASS' : '';
+sub reject_prompt { print "\n"; exit 0; }
+reject_prompt() if !$key;
+open(my $file, '<', $ENV{'HWDESKTOP_SVN_SECRETS_FILE'}) or reject_prompt();
+my $value;
+while (my $line = <$file>) {
+    $line =~ s/^\xEF\xBB\xBF//;
+    if ($line =~ /^\s*\Q$key\E\s*=(.*)$/) {
+        $value = $1;
+        $value =~ s/^\s+|\s+$//g;
+    }
+}
+if (defined $value) { print "$value\n"; exit 0; }
+reject_prompt();
+'@
+    $path=Join-Path $Cache 'svn-askpass.pl'
+    [IO.File]::WriteAllText($path,($perl.Replace(([string][char]13+[char]10),[string][char]10)+[char]10),[Text.UTF8Encoding]::new($false))
+    return [pscustomobject]@{Path=$path;NoPromptPath=$noPrompt}
+}
+
 function Get-IntegrationClient {
     param([string] $Root, [scriptblock] $CommandRunner)
     $result = $null

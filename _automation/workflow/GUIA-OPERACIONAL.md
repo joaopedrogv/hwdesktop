@@ -27,7 +27,7 @@ O código foi desenvolvido no clone D:\Hw\githw\hwdesktop, na branch criacao-bin
 
 A ponte recebeu cópias de bootstrap dos scripts. Sua branch/checkout SVN pode continuar na revisão inicial, porque a sincronização lê a referência SVN atualizada sem fazer checkout. Se a implementação dos scripts mudar, atualize essas cópias a partir do código aprovado antes de utilizá-las. O SVN tradicional mantém sua própria cópia versionada, atualizada por svn update.
 
-A configuração git-svn parte de _automation/config/workflow.git-svn.exemplo.psd1. A tradicional parte de workflow.exemplo.psd1. Copie apenas para o arquivo pessoal workflow.local.psd1 de cada integração; preserve segredos e configurações existentes. O modo git-svn depende do cliente WSL previamente autenticado e do certificado já conferido. OpenSslConfig é opcional e restrito ao processo.
+A configuração git-svn parte de _automation/config/workflow.git-svn.exemplo.psd1. A tradicional parte de workflow.exemplo.psd1. Copie apenas para o arquivo pessoal workflow.local.psd1 de cada integração; preserve segredos e configurações existentes. No modo git-svn, configure SecretsFile no arquivo pessoal e preencha SVN_USER e SVN_PASS no segredos.md indicado. Sem essa opção explícita, utiliza o cache WSL anterior. O certificado deve estar previamente conferido. OpenSslConfig é opcional e restrito ao processo.
 
 ## Ciclo de uma demanda
 

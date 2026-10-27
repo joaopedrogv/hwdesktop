@@ -51,7 +51,7 @@ function Export-GitSvnBlobs {
 function Invoke-GitSvnSyncIntegration {
     param([string] $ConfigPath, [scriptblock] $CommandRunner)
     $phase = 'Ler configuração git-svn'
-    $run = ''; $keepRun = $false
+    $run = ''; $keepRun = $false; $password = ''
     try {
         $configFile = [IO.Path]::GetFullPath($ConfigPath)
         $config = Import-PowerShellDataFile -LiteralPath $configFile
@@ -59,6 +59,8 @@ function Invoke-GitSvnSyncIntegration {
             if (-not $config.ContainsKey($key) -or [string]::IsNullOrWhiteSpace([string] $config[$key])) { throw "Campo obrigatório não preenchido: $key" }
         }
         $configDirectory = Split-Path -Parent $configFile
+        $credentials = Read-GitSvnCredentials $config $configDirectory
+        if ($null -ne $credentials) { $password=$credentials.Password }
         $root = [IO.Path]::GetFullPath([IO.Path]::Combine($configDirectory,$config.IntegrationPath)).TrimEnd('\','/')
         $branch = [string] $config.GitBranch; $svnRef = [string] $config.SvnRef
         $distribution = [string] $config.WslDistribution
@@ -69,10 +71,15 @@ function Invoke-GitSvnSyncIntegration {
             $result = $null
             if ($null -ne $CommandRunner) { $result = & $CommandRunner $Tool $Arguments $Directory $InputText }
             if ($null -eq $result) { $result = Invoke-SyncProcess $Tool $Arguments $Directory $InputText }
+
             if ($ShowOutput) {
-                foreach ($content in @($result.Output,$result.Error)) { if (-not [string]::IsNullOrWhiteSpace($content)) { Write-Host $content.TrimEnd() } }
+                foreach ($content in @($result.Output,$result.Error)) { if (-not [string]::IsNullOrWhiteSpace($content)) { if ($password) { $content=$content.Replace($password,'***') }; Write-Host $content.TrimEnd() } }
             }
-            if ($result.ExitCode -notin $AllowedCodes) { throw "$Tool terminou com código $($result.ExitCode).`n$(($result.Error+[Environment]::NewLine+$result.Output).Trim())" }
+            if ($result.ExitCode -notin $AllowedCodes) {
+                $detail=($result.Error+[Environment]::NewLine+$result.Output).Trim()
+                if ($password) { $detail=$detail.Replace($password,'***') }
+                throw "$Tool terminou com código $($result.ExitCode).`n$detail"
+            }
             return $result
         }
         function Git {
@@ -111,11 +118,16 @@ function Invoke-GitSvnSyncIntegration {
         if (-not $linuxRoot.StartsWith('/')) { throw 'O WSL não retornou um caminho Linux válido.' }
         $cache = Join-Path $gitDirectory 'hwdesktop-sync'
         [void] [IO.Directory]::CreateDirectory($cache)
-        $askPass = Join-Path $cache 'no-prompt.sh'
-        [IO.File]::WriteAllText($askPass,"#!/bin/sh`nprintf '\n'`n",[Text.UTF8Encoding]::new($false))
-        $linuxAskPass = Get-LinuxPath $askPass
-        [void] (Wsl @('chmod','u+x',$linuxAskPass))
-        $environment = @("GIT_ASKPASS=$linuxAskPass","SSH_ASKPASS=$linuxAskPass")
+        $askPass = New-GitSvnAskPass $cache $credentials
+        $linuxAskPass = Get-LinuxPath $askPass.Path
+        $linuxNoPrompt = if ($askPass.Path -eq $askPass.NoPromptPath) { $linuxAskPass } else { Get-LinuxPath $askPass.NoPromptPath }
+        [void] (Wsl @('chmod','u+x',$linuxAskPass,$linuxNoPrompt))
+        $environment = @("GIT_ASKPASS=$linuxAskPass","SSH_ASKPASS=$linuxNoPrompt")
+        $svnAuthOptions = @()
+        if ($null -ne $credentials) {
+            $environment += "HWDESKTOP_SVN_SECRETS_FILE=$(Get-LinuxPath $credentials.Path)"
+            $svnAuthOptions = @('--username',$credentials.UserName,'--no-auth-cache')
+        }
         if ($config.ContainsKey('OpenSslConfig') -and -not [string]::IsNullOrWhiteSpace([string] $config.OpenSslConfig)) {
             $openssl = [IO.Path]::GetFullPath([IO.Path]::Combine($configDirectory,$config.OpenSslConfig))
             if (-not [IO.File]::Exists($openssl)) { throw "Configuração OpenSSL não encontrada: $openssl" }
@@ -123,7 +135,7 @@ function Invoke-GitSvnSyncIntegration {
         }
         $phase = 'Receber revisões SVN'
         Write-Host "`nRecebendo revisões pelo git-svn; arquivos locais e branch atual preservados..."
-        [void] (Wsl (@('env')+$environment+@('git','-C',$linuxRoot,'svn','fetch','-R',$remoteName)) -ShowOutput)
+        [void] (Wsl (@('env')+$environment+@('git','-C',$linuxRoot,'svn','fetch','-R',$remoteName)+$svnAuthOptions) -ShowOutput)
         $svnCommit = (Git @('rev-parse','--verify',"$svnRef^{commit}")).Output.Trim()
         $message = (Git @('log','-1','--format=%B',$svnCommit)).Output
         if ($message -notmatch '(?m)^git-svn-id: (\S+)@([0-9]+) [0-9a-fA-F-]+\s*$') { throw 'A referência SVN não possui identificação de revisão válida.' }

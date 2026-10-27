@@ -34,7 +34,7 @@ function Invoke-DeliveryCommand {
     }
     if ($ShowOutput) {
         foreach ($value in @($result.Output,$result.Error)) {
-            if (-not [string]::IsNullOrWhiteSpace($value)) { Write-Host $value.TrimEnd() }
+            if (-not [string]::IsNullOrWhiteSpace($value)) { if ($Context.Password) { $value=$value.Replace($Context.Password,'***') }; Write-Host $value.TrimEnd() }
         }
     }
     if ($result.ExitCode -notin $AllowedCodes) {
@@ -153,13 +153,16 @@ function Initialize-DeliveryWsl {
     foreach ($key in @('WslDistribution','SvnRef')) {
         if (-not $Context.Config.ContainsKey($key) -or [string]::IsNullOrWhiteSpace([string] $Context.Config[$key])) { throw "Campo obrigatório não preenchido: $key" }
     }
+    $credentials=Read-GitSvnCredentials $Context.Config $Context.ConfigDirectory
+    if ($null -ne $credentials) { $Context.Password=$credentials.Password }
     [void] (Invoke-DeliveryWsl $Context @('git','svn','--version') -ShowOutput)
     $Context.LinuxRoot=Get-DeliveryLinuxPath $Context $Context.Root
-    $askPass=Join-Path $Context.Cache 'no-prompt.sh'
-    [IO.File]::WriteAllText($askPass,"#!/bin/sh`nprintf '\n'`n",[Text.UTF8Encoding]::new($false))
-    $linuxAsk=Get-DeliveryLinuxPath $Context $askPass
-    [void] (Invoke-DeliveryWsl $Context @('chmod','u+x',$linuxAsk))
-    $Context.WslEnvironment=@("GIT_ASKPASS=$linuxAsk","SSH_ASKPASS=$linuxAsk")
+    $askPass=New-GitSvnAskPass $Context.Cache $credentials
+    $linuxAsk=Get-DeliveryLinuxPath $Context $askPass.Path
+    $linuxNoPrompt=if ($askPass.Path -eq $askPass.NoPromptPath) { $linuxAsk } else { Get-DeliveryLinuxPath $Context $askPass.NoPromptPath }
+    [void] (Invoke-DeliveryWsl $Context @('chmod','u+x',$linuxAsk,$linuxNoPrompt))
+    $Context.WslEnvironment=@("GIT_ASKPASS=$linuxAsk","SSH_ASKPASS=$linuxNoPrompt")
+    if ($null -ne $credentials) { $Context.WslEnvironment+="HWDESKTOP_SVN_SECRETS_FILE=$(Get-DeliveryLinuxPath $Context $credentials.Path)" }
     if ($Context.Config.ContainsKey('OpenSslConfig') -and $Context.Config.OpenSslConfig) {
         $openssl=[IO.Path]::GetFullPath([IO.Path]::Combine($Context.ConfigDirectory,$Context.Config.OpenSslConfig))
         if (-not [IO.File]::Exists($openssl)) { throw "Configuração OpenSSL não encontrada: $openssl" }
