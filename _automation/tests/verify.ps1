@@ -6,10 +6,10 @@
     Usa pastas temporárias e remotos Git locais. Delivery usa SVN local real e git-svn/WSL; os demais grupos simulam serviços.
     Não lê configurações pessoais ou segredos nem opera nos projetos reais.
 .PARAMETER Group
-    All executa tudo. Grupos: Build, Sync, SyncGitSvn, Start, Merge, Menu, Dependencies, Delivery.
+    All executa tudo. Grupos: Build, Sync, SyncGitSvn, GitSvnAuth, ProcessEncoding, Start, Merge, Menu, Dependencies, Delivery.
 #>
 [CmdletBinding()]
-param([ValidateSet('All', 'Build', 'Sync', 'Start', 'Menu', 'Dependencies', 'Merge', 'SyncGitSvn', 'Delivery', 'GitSvnAuth')] [string] $Group = 'All')
+param([ValidateSet('All', 'Build', 'Sync', 'Start', 'Menu', 'Dependencies', 'Merge', 'SyncGitSvn', 'Delivery', 'GitSvnAuth', 'ProcessEncoding')] [string] $Group = 'All')
 
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $false
@@ -1363,6 +1363,7 @@ function Test-SyncGitSvn {
         [IO.File]::WriteAllText($config,($configured+"; SecretsFile='segredos.md' }"))
         [IO.File]::WriteAllText((Join-Path (Split-Path -Parent $config) 'segredos.md'),("SVN_USER=fixture-svn-user"+[Environment]::NewLine+"SVN_PASS="+$fakePassword+[Environment]::NewLine))
         $state = @{ Calls=[Collections.Generic.List[object]]::new(); FailWsl=$false; FailPush=$false }
+        $processInvoker=(Get-Command Invoke-SyncProcess -CommandType Function).ScriptBlock
         $runner = {
             param($Tool,$Arguments,$Directory,$InputText)
             $state.Calls.Add([pscustomobject]@{Tool=$Tool;Arguments=@($Arguments);Directory=$Directory})
@@ -1373,6 +1374,13 @@ function Test-SyncGitSvn {
             }
             if ($Tool -eq 'svn') { throw 'Modo git-svn não deve chamar o cliente SVN do Windows.' }
             if ($state.FailPush -and $Arguments[0] -eq 'push') { return [pscustomobject]@{ExitCode=1;Output='';Error='Push rejeitado simulado'} }
+            if ($Tool -eq 'git') {
+                $previousEncoding=[Console]::OutputEncoding
+                try {
+                    [Console]::OutputEncoding=[Text.Encoding]::GetEncoding(850)
+                    return & $processInvoker $Tool $Arguments $Directory $InputText
+                } finally { [Console]::OutputEncoding=$previousEncoding }
+            }
             return $null
         }.GetNewClosure()
 
@@ -1408,6 +1416,22 @@ function Test-SyncGitSvn {
         Assert-Check ((TestGit $origin @('show','main:Modern/novo [ação].pas')) -eq 'nova demanda' -and [IO.File]::ReadAllText((Join-Path $root 'Modern/novo [ação].pas')) -eq 'alteracao local preservada') 'Usa os blobs recebidos do SVN e não sobrescreve alterações locais da ponte'
         $again = Invoke-TestDualSync
         Assert-Check ($again.Success -and (TestGit $origin @('rev-parse','main')) -eq $newGithub) 'Reexecução idêntica não cria commit vazio'
+        # Reproduzir o estado já publicado com um nome UTF-8 lido como OEM 850.
+        [void] (TestGit $publisher @('fetch','origin'))
+        [void] (TestGit $publisher @('merge','--ff-only','origin/main'))
+        $correctName='Modern/novo [ação].pas'
+        $badName=[Text.Encoding]::GetEncoding(850).GetString([Text.Encoding]::UTF8.GetBytes($correctName))
+        [void] (TestGit $publisher @('mv','--',$correctName,$badName))
+        [void] (TestGit $publisher @('commit','-m','Nome incorreto simulado'))
+        [void] (TestGit $publisher @('push','origin','main'))
+        $badCommit=TestGit $origin @('rev-parse','main')
+        $repaired=Invoke-TestDualSync
+        if (-not $repaired.Success) { throw $repaired.Error }
+        $fixed=TestGit $origin @('rev-parse','main')
+        Assert-Check ((TestGit $origin @('rev-parse','main^')) -eq $badCommit) 'Repara nome já publicado com commit normal, preservando o commit anterior'
+        Assert-Check ((TestGit $origin @('rev-parse',($fixed+'^{tree}'))) -eq (TestGit $origin @('rev-parse',($newGithub+'^{tree}')))) 'Repetir a sincronização restaura exatamente a árvore correta anterior à corrupção do nome'
+        $newGithub=$fixed
+
         $state.FailWsl = $true
         $failed = Invoke-TestDualSync
         Assert-Check (-not $failed.Success -and (TestGit $origin @('rev-parse','main')) -eq $newGithub) 'Indisponibilidade WSL interrompe sem publicar nem trocar automaticamente de cliente'
@@ -1655,7 +1679,47 @@ function Test-GitSvnAuth {
     }
 }
 
+
+function Test-ProcessEncoding {
+    $temporaryBase=[IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $fixture=Join-Path $temporaryBase ('hwdesktop-encoding-'+[guid]::NewGuid().ToString('N'))
+    [void] [IO.Directory]::CreateDirectory($fixture)
+    $previousEncoding=[Console]::OutputEncoding
+    try {
+        . (Join-Path $automationRoot 'workflow/sync-integration.ps1')
+        foreach ($arguments in @(@('init','-b','main'),@('config','core.autocrlf','false'))) {
+            $result=Invoke-SyncProcess git $arguments $fixture
+            if ($result.ExitCode -ne 0) { throw $result.Error }
+        }
+        $name='Conciliação Bancária - Cópia.rpt'
+        [IO.File]::WriteAllBytes((Join-Path $fixture $name),[byte[]]@(0,193,231,227,255))
+        $result=Invoke-SyncProcess git @('add','--',$name) $fixture
+        if ($result.ExitCode -ne 0) { throw $result.Error }
+        foreach ($provider in @('sync-integration.ps1','svn/sync-integration.ps1')) {
+            . (Join-Path $automationRoot ('workflow/'+$provider))
+            foreach ($codePage in @(850,1252)) {
+                try {
+                    [Console]::OutputEncoding=[Text.Encoding]::GetEncoding($codePage)
+                    $result=Invoke-SyncProcess git @('ls-files','-z') $fixture
+                } finally { [Console]::OutputEncoding=$previousEncoding }
+                Assert-Check ($result.ExitCode -eq 0 -and $result.Output -ceq ($name+[char]0)) "$provider lê nomes Git em UTF-8 com console $codePage"
+            }
+        }
+        . (Join-Path $automationRoot 'workflow/sync-integration.ps1')
+        try {
+            [Console]::OutputEncoding=[Text.Encoding]::GetEncoding(850)
+            $result=Invoke-SyncProcess wsl.exe @('--distribution','Ubuntu-24.04','--exec','printf','%s',$name) $fixture
+        } finally { [Console]::OutputEncoding=$previousEncoding }
+        Assert-Check ($result.ExitCode -eq 0 -and $result.Output -ceq $name) 'Saída WSL UTF-8 independe da página de código 850 do terminal'
+    } finally {
+        [Console]::OutputEncoding=$previousEncoding
+        $resolved=[IO.Path]::GetFullPath($fixture)
+        if ($resolved.StartsWith($temporaryBase,[StringComparison]::OrdinalIgnoreCase) -and (Split-Path -Leaf $resolved) -match '^hwdesktop-encoding-[a-f0-9]{32}$') { Remove-Item -LiteralPath $resolved -Recurse -Force }
+    }
+}
+
 $sections = @(
+    @{ Group='ProcessEncoding'; Title='UTF-8 com páginas de código Windows distintas'; Action={ Test-ProcessEncoding } }
     @{ Group='GitSvnAuth'; Title='Credenciais fictícias git-svn'; Action={ Test-GitSvnAuth } }
     @{ Group='Delivery'; Title='Entrega GitHub/SVN em repositórios temporários'; Action={ Test-Delivery } }
     @{ Group='Build'; Title='Compilação e publicação simuladas'; Action={ Test-Build } }

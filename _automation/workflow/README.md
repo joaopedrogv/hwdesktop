@@ -196,3 +196,12 @@ Prompts de certificado e outros prompts desconhecidos não recebem a senha. A co
 Sem SecretsFile explícito, instalações anteriores continuam usando o cache WSL, sem mudança automática da configuração pessoal. Quando SecretsFile é informado e uma chave está vazia/ausente, o script interrompe antes de acessar o SVN, indicando o campo a preencher. A configuração pessoal da ponte em uso foi ajustada para utilizar seu próprio segredos.md.
 
 Teste direcionado: verify.ps1 -Group GitSvnAuth. Usa credenciais fictícias e chamadas locais do Git/Perl; não acessa SVN ou GitHub.
+
+
+### Codificação da saída dos clientes
+
+Os executores leem a saída do Git e do WSL explicitamente como UTF-8, independentemente da página de código do PowerShell/terminal (por exemplo, OEM 850 ou Windows 1252). O XML do SVN também é lido em UTF-8. A codificação explícita de um comando, como a saída de texto do SVN Windows antigo, mantém precedência.
+
+Isso trata nomes de caminhos e respostas dos comandos; não converte o conteúdo dos fontes Delphi ou dos relatórios. Não exige retirar acentos dos nomes no SVN. O teste ProcessEncoding reproduz nomes como Conciliação Bancária - Cópia.rpt nas duas páginas de código. A sincronização git-svn é também testada com Git executado sob console OEM 850.
+
+Se uma sincronização anterior com a implementação antiga tiver convertido nomes acentuados, repetir a sincronização com o executor corrigido recria o recorte do SVN com seus nomes reais e publica um commit normal descendente da main atual. Não se usa force push nem se renomeia a origem SVN para contornar o problema.

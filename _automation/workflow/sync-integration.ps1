@@ -21,6 +21,10 @@ function Invoke-SyncProcess {
     $start.CreateNoWindow = $true
     $start.RedirectStandardOutput = $true
     $start.RedirectStandardError = $true
+    # Git/WSL e XML SVN emitem UTF-8, independentemente da página do console.
+    $utf8Tool=[IO.Path]::GetFileNameWithoutExtension($Tool) -in @('git','wsl')
+    if (-not $OutputEncoding -and ($utf8Tool -or '--xml' -in $Arguments)) { $OutputEncoding=[Text.UTF8Encoding]::new($false) }
+    if (-not $ErrorEncoding -and $utf8Tool) { $ErrorEncoding=[Text.UTF8Encoding]::new($false) }
     if ($OutputEncoding) { $start.StandardOutputEncoding=$OutputEncoding }
     if ($ErrorEncoding) { $start.StandardErrorEncoding=$ErrorEncoding }
     $start.RedirectStandardInput = $InputText.Length -gt 0
