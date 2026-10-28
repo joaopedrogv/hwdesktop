@@ -1,1 +1,0 @@
-Arquivo descartavel para validar a exclusao pela demanda.
