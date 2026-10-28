@@ -205,3 +205,6 @@ Os executores leem a saída do Git e do WSL explicitamente como UTF-8, independe
 Isso trata nomes de caminhos e respostas dos comandos; não converte o conteúdo dos fontes Delphi ou dos relatórios. Não exige retirar acentos dos nomes no SVN. O teste ProcessEncoding reproduz nomes como Conciliação Bancária - Cópia.rpt nas duas páginas de código. A sincronização git-svn é também testada com Git executado sob console OEM 850.
 
 Se uma sincronização anterior com a implementação antiga tiver convertido nomes acentuados, repetir a sincronização com o executor corrigido recria o recorte do SVN com seus nomes reais e publica um commit normal descendente da main atual. Não se usa force push nem se renomeia a origem SVN para contornar o problema.
+
+
+A apresentação da entrega SVN tradicional lista somente os alvos preparados, em lotes com profundidade empty. Essa lista aparece no resumo e na reapresentação de uma entrega pendente; arquivos locais não versionados e a changelist ignore-on-commit fora da entrega não são despejados no terminal. As validações gerais continuam sendo feitas por XML, sem imprimir a árvore inteira. Erros dos comandos permanecem visíveis.

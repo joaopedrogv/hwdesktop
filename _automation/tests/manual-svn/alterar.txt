@@ -1,2 +1,0 @@
-Base da validacao SVN tradicional.
-Este arquivo foi alterado na branch de teste.

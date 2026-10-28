@@ -73,6 +73,5 @@ function New-SvnDelivery {
     if ($targets.Count -eq 0) { $state.status='delivered'; Save-DeliveryState $Context $state; Write-Host 'A atualização Git não produziu alterações SVN.'; return }
     $state.targets=@($targets | Sort-Object); $state.status='prepared'
     Save-DeliveryState $Context $state
-    [void] (Invoke-DeliveryCommand $Context svn @('status','--ignore-externals') -ShowOutput)
     return [pscustomobject] $state
 }

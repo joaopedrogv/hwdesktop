@@ -215,7 +215,16 @@ function Show-DeliveryState {
     Write-Host "Modo: $($State.mode) | Base SVN: r$($State.svnRevision) | URL: $($State.svnUrl)`nGitHub: $($State.githubCommit)`nMensagem: $($State.message)"
     if ($State.mode -eq 'git-svn') {
         Write-Host "Commit privado para revisão: $($State.deliveryCommit)`nConfira com: git diff --stat $($State.svnCommit) $($State.deliveryCommit)"
-    } else { Write-Host 'Confira com: svn status e svn diff' }
+    } elseif ($State.status -eq 'prepared') {
+        $targets=@($State.targets)
+        Write-Host ("Status SVN dos {0} alvos da entrega:" -f $targets.Count) -ForegroundColor Cyan
+        for ($offset=0; $offset -lt $targets.Count; $offset+=20) {
+            $last=[Math]::Min($offset+19,$targets.Count-1)
+            $arguments=@('status','--depth','empty','--ignore-externals','--')+@($targets[$offset..$last] | ForEach-Object { $_+'@' })
+            [void] (Invoke-DeliveryCommand $Context svn $arguments -ShowOutput)
+        }
+        Write-Host 'Confira os alvos acima pelo TortoiseSVN ou por svn diff <alvo>.'
+    }
     if ($State.status -eq 'prepared') {
         Write-Host "Preparação concluída. Nada foi enviado ao SVN.`nApós conferir: .\_automation\workflow\deliver-svn.ps1 -Commit" -ForegroundColor Yellow
     }

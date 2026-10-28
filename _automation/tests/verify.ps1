@@ -1580,10 +1580,22 @@ function Test-Delivery {
             $target=Run git @('rev-parse','HEAD') $publisher
             $bridgeHead=Run git @('rev-parse','HEAD') $root
             if ($mode -eq 'git-svn') { WriteFile $root 'Modern/local.pas' 'nao entregar' }
-            InvokeEntry $root
+            $statusCalls=[Collections.Generic.List[object]]::new()
+            $listingRunner={
+                param($Tool,$Arguments,$Directory,$InputText)
+                if($Tool -eq 'svn' -and $Arguments[0] -eq 'status' -and '--xml' -notin $Arguments){$statusCalls.Add(@($Arguments))}
+                return $null
+            }.GetNewClosure()
+            InvokeEntry $root -Runner $listingRunner
             $stateFile=Join-Path $root '.git/hwdesktop-delivery/pending.json'
             $state=Get-Content -LiteralPath $stateFile -Raw | ConvertFrom-Json
             Assert-Check ($state.status -eq 'prepared' -and $state.githubCommit -eq $target) "$mode prepara a ponta publicada, sem enviar SVN"
+            if($mode -eq 'svn'){
+                Assert-Check ($statusCalls.Count -gt 0 -and @($statusCalls | Where-Object { '--depth' -notin $_ -or 'empty' -notin $_ -or '--' -notin $_ }).Count -eq 0) 'Resumo SVN consulta somente alvos explícitos e não percorre a pasta inteira'
+                $shown=@($statusCalls | ForEach-Object { $separator=[Array]::IndexOf($_,'--'); $_[($separator+1)..($_.Count-1)] })
+                $expected=@($state.targets | ForEach-Object { $_+'@' })
+                Assert-Check (@(Compare-Object $shown $expected).Count -eq 0) 'Resumo SVN mostra exatamente os alvos preparados, sem arquivos locais alheios'
+            }
             Assert-Check ((Run svnlook @('youngest',$repository)) -eq $revision) "$mode preparação não cria revisão SVN"
             InvokeEntry $root
             $again=Get-Content -LiteralPath $stateFile -Raw | ConvertFrom-Json

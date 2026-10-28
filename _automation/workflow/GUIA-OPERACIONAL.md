@@ -94,7 +94,7 @@ Set-Location 'D:\Hw\hwdesktop-integration'
 O item **Entregar ao SVN** do menu executa apenas esta preparação. Não envia ao SVN.
 
 - Modo git-svn: informa um commit privado e a base SVN. Confira com git diff --stat <base> <entrega> e git diff <base> <entrega>. Os dois identificadores aparecem na saída. A branch e os arquivos da ponte permanecem preservados.
-- Modo SVN tradicional: atualiza a main local somente por fast-forward e agenda as adições/exclusões recebidas. Confira com svn status, svn diff ou TortoiseSVN. As alterações ficam na working copy para revisão.
+- Modo SVN tradicional: atualiza a main local somente por fast-forward e agenda as adições/exclusões recebidas. Confira o status dos alvos exibido pelo script e use TortoiseSVN ou svn diff <alvo> para os detalhes. As alterações ficam na working copy para revisão.
 
 Depois da conferência:
 
