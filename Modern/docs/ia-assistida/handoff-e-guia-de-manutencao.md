@@ -1,5 +1,13 @@
 # Handoff e guia de manutenção da arquitetura de IA
 
+> Continuidade em 28/10/2026: o responsável incorporou este trabalho ao chat de
+> [Contexto e decisões do HWDESKTOP](D:/Hw/ai-docs/hwdesktop/README.md). O
+> [mapa de manutenção de IA no Modern](D:/Hw/ai-docs/hwdesktop/ferramentas-e-processos/ia-no-modern/README.md)
+> referencia estas fontes e o handoff recebido. Este guia conserva o histórico de
+> consolidação; o checklist apresenta as pendências, e `.ai/` permanece canônica
+> para as orientações técnicas. Durante programação, siga a fronteira de leitura
+> definida em `AGENTS.md`.
+
 ## Finalidade
 
 Este documento permite retomar a manutenção da arquitetura de desenvolvimento

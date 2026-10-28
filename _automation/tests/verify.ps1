@@ -524,15 +524,17 @@ function Test-Start {
     }
 
     function Invoke-TestStart {
-        param($Area, [string] $Branch = 'demanda/nova', [string] $ConfigPath = $Area.Config, [string] $WorkPath = '')
+        param($Area, [string] $Branch = 'demanda/nova', [string] $ConfigPath = $Area.Config, [string] $WorkPath = '',
+              [switch] $Gui, [scriptblock] $InputReader, [switch] $FromIntegration)
         $Area.State.Calls.Clear()
         $log = [Collections.Generic.List[string]]::new()
         $failure = ''
         $locationAfter = ''
         Push-Location -LiteralPath $Area.Integration
         try {
-            . $Area.StartScript -Branch $Branch -ConfigPath $ConfigPath -WorkPath $WorkPath
-            Invoke-StartDemand -ConfigPath $ConfigPath -Branch $Branch -WorkPath $WorkPath -CommandRunner $Area.Runner 6>&1 | ForEach-Object { $log.Add([string] $_) }
+            $entryScript = if ($FromIntegration) { $Area.IntegrationScript } else { $Area.StartScript }
+            . $entryScript -Branch $Branch -ConfigPath $ConfigPath -WorkPath $WorkPath -Gui:$Gui
+            Invoke-StartDemand -ConfigPath $ConfigPath -Branch $Branch -WorkPath $WorkPath -Gui:$Gui -InputReader $InputReader -CommandRunner $Area.Runner 6>&1 | ForEach-Object { $log.Add([string] $_) }
         }
         catch { $failure = $_.Exception.Message }
         finally { $locationAfter = (Get-Location).ProviderPath; Pop-Location }
@@ -658,6 +660,22 @@ function Test-Start {
         $cliOutput = @(& $engine -NoLogo -NoProfile -File $area.IntegrationScript -WorkPath $secondRoot -Branch 'demanda/central-segundo' 2>&1)
         Assert-Check ($LASTEXITCODE -eq 0 -and (Invoke-TestGit $secondRoot @('branch', '--show-current')) -eq 'demanda/central-segundo') 'Uma integração pode escolher um segundo clone na próxima execução, sem lista de WorkPaths'
         Assert-Check ((Invoke-TestGit $area.Root @('rev-parse', 'HEAD')) -eq $firstHead -and [IO.File]::ReadAllText($area.IntegrationConfig) -eq $integrationConfigBefore) 'Vários clones não mudam a configuração da integração nem o trabalho dos demais'
+
+        $dialogRequests = [Collections.Generic.List[string]]::new()
+        $dialogInputs = @{ WorkPath = $area.Root; Branch = 'demanda/dialogo' }
+        $dialogReader = {
+            param($kind)
+            $dialogRequests.Add($kind)
+            return $dialogInputs[$kind]
+        }.GetNewClosure()
+        $result = Invoke-TestStart $area -Branch '' -Gui -FromIntegration -InputReader $dialogReader
+        Assert-Check ($result.Success -and (Invoke-TestGit $area.Root @('branch', '--show-current')) -eq 'demanda/dialogo') 'Entradas gráficas simuladas preparam o clone escolhido e criam a branch informada'
+        Assert-Check (($dialogRequests -join ',') -eq 'WorkPath,Branch' -and [IO.File]::ReadAllText($area.IntegrationConfig) -eq $integrationConfigBefore) 'Integração solicita clone antes da branch, sem persistir o caminho escolhido'
+        $headBeforeCancel = Invoke-TestGit $area.Root @('rev-parse', 'HEAD')
+        $result = Invoke-TestStart $area -Branch '' -Gui -FromIntegration -InputReader { param($kind) '' }
+        Assert-Check ($result.Success -and $area.State.Calls.Count -eq 0 -and $result.Log.Contains('cancelado')) 'Cancelar a seleção do clone encerra sem executar Git'
+        $result = Invoke-TestStart $area -Branch '' -Gui -InputReader { param($kind) '' }
+        Assert-Check ($result.Success -and $area.State.Calls.Count -eq 0 -and (Invoke-TestGit $area.Root @('rev-parse', 'HEAD')) -eq $headBeforeCancel) 'Cancelar ou deixar vazio o nome da branch preserva o trabalho, sem executar Git'
 
         $ahead = New-TestArea 'main-com-trabalho-local'
         [IO.File]::WriteAllText((Join-Path $ahead.Root 'somente-local.txt'), 'commit que nao pode ser perdido')
@@ -813,6 +831,17 @@ exit 1
             $yellowMessages = @($captured | Where-Object { $_ -is [System.Management.Automation.InformationRecord] -and $_.MessageData.ForegroundColor -eq [ConsoleColor]::Yellow })
             Assert-Check (($plain -and $yellowMessages.Count -eq 0) -or (-not $plain -and $yellowMessages.Count -gt 0)) "Aplica destaque amarelo somente quando cores estão habilitadas, modo sem cores: $plain"
         }
+        $apartmentScript = Join-Path $fixture 'entrada-grafica.ps1'
+        $apartmentResult = Join-Path $fixture 'entrada-grafica.txt'
+        $apartmentProbe = @'
+param([switch] $Gui, [string] $ResultFile)
+[IO.File]::WriteAllText($ResultFile, ('APARTMENT=' + [Threading.Thread]::CurrentThread.GetApartmentState() + ';GUI=' + $Gui))
+exit 0
+'@
+        [IO.File]::WriteAllText($apartmentScript, $apartmentProbe)
+        $captured = @(Invoke-MenuScript -Engine $engine -ScriptPath $apartmentScript -Arguments @('-Gui', '-ResultFile', $apartmentResult) -Sta -Plain 6>&1)
+        Assert-Check ($captured[-1] -eq 0 -and [IO.File]::ReadAllText($apartmentResult) -eq 'APARTMENT=STA;GUI=True') 'Menu consegue iniciar o processo de entrada gráfica em STA e encaminhar -Gui'
+
         $successScript = Join-Path $fixture 'sucesso.ps1'
         [IO.File]::WriteAllText($successScript, "Write-Output 'OPERACAO_OK'`nexit 0")
         $captured = @(Invoke-MenuScript -Engine $engine -ScriptPath $successScript -Plain 6>&1)

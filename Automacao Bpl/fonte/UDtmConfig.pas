@@ -590,6 +590,7 @@ type
     cdsPromocaoOrdemECATUAL: TDateTimeField;
     cdsPromocaoOrdemECDATA_INI: TDateTimeField;
     cdsPromocaoOrdemECDATA_FIM: TDateTimeField;
+    cdsConfigAPIUSAR_API_PEDIDO: TStringField;
     procedure cdswsScriptERROGetText(Sender: TField; var Text: string;
       DisplayText: Boolean);
     procedure cdswsScriptSQLGetText(Sender: TField; var Text: string;

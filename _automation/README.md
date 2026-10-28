@@ -15,7 +15,7 @@ O Windows PowerShell 5.1 (`powershell.exe`) não atende ao requisito. O lançado
 
 ## Navegação
 
-- **Setas para cima/baixo**, **Home/End** ou **1 a 6** selecionam uma opção.
+- **Setas para cima/baixo**, **Home/End** ou **1 a 7** selecionam uma opção no menu principal. O submenu Build / Deploy tem seis opções.
 - **Enter** abre a opção selecionada. Ao abrir o menu, nenhuma opção está selecionada; Enter sozinho não inicia uma ação.
 - **Esc**, **0** ou **Q** encerram o menu na tela inicial.
 - Nos detalhes, **Esc/Backspace** retornam à tela inicial, novamente sem seleção; **0/Q** encerram.
@@ -24,15 +24,47 @@ O Windows PowerShell 5.1 (`powershell.exe`) não atende ao requisito. O lançado
 
 ## Operações disponíveis
 
+| Item | Operação | Resultado |
+| --- | --- | --- |
+| 1 | Build / Deploy | Compilar, limpar ou publicar BPLs pelos seis comandos independentes. |
+| 2 | Sincronizar integração | Atualizar a base SVN e publicar seu recorte na main do GitHub. |
+| 3 | Iniciar demanda | Atualizar a main do clone e criar uma branch; entradas por janelas gráficas no menu. |
+| 4 | Integrar demanda | Incorporar a branch na main local, para revisão e validação, sem push. |
+| 5 | Preparar dependências | Obter os pacotes Nextcloud e aplicar build em dcp e runtime em bpl. |
+| 6 | Entregar ao SVN | Preparar as mudanças da main publicada; commit SVN por chamada separada com -Commit. |
+| 7 | Informações do ambiente | Consultar os caminhos locais e a versão do PowerShell, sem alterações. |
+
 **Integrar demanda**, quarto item, atualiza a main do clone com pull por fast-forward e incorpora a branch da demanda. Não faz push: o resultado aguarda sua revisão e validação. Faça antes a sincronização no diretório de integração. Instruções em [workflow/README.md](workflow/README.md#integrar-demanda). A opção **Informações do ambiente** consulta somente os caminhos locais e a versão do PowerShell.
 
 **Sincronizar integração**, segundo item do menu, atualiza a área de integração pelo SVN e publica esse estado no Git. Usa a configuração individual `config/workflow.local.psd1` e o arquivo de segredos existente. Instruções em [workflow/README.md](workflow/README.md).
 
-**Iniciar demanda**, terceiro item, solicita o nome da nova branch, atualiza a main e cria a branch no próprio clone Git. Não exige `IntegrationPath` ou `WorkPath` na configuração do clone. Pelo menu da integração, solicita qual clone preparar naquela execução; não mantém lista de clones na configuração. A sincronização SVN anterior permanece separada; este comando não publica a branch nem obtém binários. Instruções em [workflow/README.md](workflow/README.md#iniciar-demanda).
+**Iniciar demanda**, terceiro item, abre uma janela para informar o nome completo da nova branch, atualiza a main e cria a branch no próprio clone Git. Não exige `IntegrationPath` ou `WorkPath` na configuração do clone. Pelo menu da integração SVN, abre primeiro uma janela para selecionar o clone daquela execução; não mantém lista de clones na configuração. Cancelar a seleção, cancelar a entrada ou deixar o nome vazio encerra antes de qualquer operação Git. O menu inicia essa ação em modo STA para as janelas, evitando depender da digitação no terminal integrado do VS Code ou Antigravity. A chamada direta com `-WorkPath` e `-Branch` continua disponível, sem janelas. A sincronização SVN anterior permanece separada; este comando não publica a branch nem obtém binários. Instruções em [workflow/README.md](workflow/README.md#iniciar-demanda).
 
 **Build / Deploy**, primeiro item do menu, abre seis comandos PS1 independentes em `build/`: compilar todos, compilar selecionados, compilar reestruturação, limpar, publicar e compilar/publicar. Selecionar uma ação e pressionar Enter chama seu comando diretamente. Não há pergunta adicional de limpeza, destino ou escolha de modo. As interações próprias dos originais permanecem: seleção gráfica de pacotes e confirmação S/N de compilar/publicar. O destino vem de `config/deploy.psd1`. Exemplos e parâmetros estão em [build/README.md](build/README.md).
 
 Os scripts antigos foram movidos pelo responsável para `legados`. Os comandos de compilação compartilham `core/Build.Automation.psm1`, e a compilação de cada pacote ainda usa `core/build-package.bat`, preservando a lógica especial `SQL_RES`. **Preparar dependências**, quinto item, baixa do Nextcloud os pacotes necessários e aplica build em `dcp` e runtime em `bpl`, sobrescrevendo arquivos diferentes sem confirmação. Usa a configuração individual `config/dependencies.local.psd1` e as chaves NEXTCLOUD_USER/NEXTCLOUD_PASS do arquivo de segredos. Instruções em [workflow/README.md](workflow/README.md#preparar-dependências). A proteção do menu não altera o comportamento dos BATs antigos abertos diretamente.
+
+**Entregar ao SVN**, sexto item, executa **somente a preparação**, na integração que fez a última sincronização, depois do merge, validação e publicação da main no GitHub. No SVN tradicional, recebe as mudanças e agenda inclusões e exclusões; no git-svn, prepara um commit privado para revisão, preservando o checkout da ponte.
+
+Depois de conferir a preparação, confirme o envio separadamente na raiz da mesma integração:
+
+```powershell
+.\_automation\workflow\deliver-svn.ps1 -Commit
+```
+
+No modo tradicional, a confirmação utiliza `svn commit` com alvos explícitos; na ponte, `git svn commit-diff`. Essa chamada também atualiza o controle local da entrega. Se quiser definir a mensagem antes de preparar, utilize `deliver-svn.ps1 -Message 'Entrega da demanda'`. O menu não envia a entrega automaticamente.
+
+Uma preparação pendente bloqueia nova sincronização; repetir a preparação mostra a mesma entrega. Um commit manual pelo TortoiseSVN não atualiza esse controle automaticamente. Para esse caso ou uma falha de comunicação durante o envio, consulte o [guia operacional](workflow/GUIA-OPERACIONAL.md) antes de retomar. [Detalhes da entrega nos dois modos](workflow/README.md#entregar-ao-svn).
+
+## Sequência do workflow
+
+1. Na integração, **Sincronizar integração**.
+2. No clone, **Iniciar demanda**, **Preparar dependências** e desenvolver.
+3. Antes do merge, sincronizar novamente a integração.
+4. No clone, **Integrar demanda**, revisar, validar e publicar a main.
+5. Na mesma integração, **Entregar ao SVN**, conferir e confirmar com `-Commit`.
+
+Build / Deploy pode ser usado conforme a necessidade da demanda. O [guia operacional completo](workflow/GUIA-OPERACIONAL.md) apresenta os comandos e o tratamento de falhas.
 
 ## Opções de execução
 
@@ -72,11 +104,13 @@ Todos os testes ficam em um único arquivo: **`tests/verify.ps1`**. Novas verifi
 # Executar todos os testes
 .\_automation\tests\verify.ps1
 
-# Opcional: executar somente uma área (Build, Sync, SyncGitSvn, Start, Merge, Menu ou Dependencies)
+# Opcional: executar somente uma área
 .\_automation\tests\verify.ps1 -Group Start
 ```
 
-A suíte cobre compilação/publicação simuladas, sincronização, início e merge de demandas, empacotamento e preparação de dependências, lançador e diagnósticos do menu. Usa somente pastas temporárias, remoto Git local e compilador/SVN simulados. Não lê configurações pessoais ou segredos, não compila o ERP nem publica na rede ou nos remotos reais. Os grupos ficam separados dentro do mesmo arquivo para evitar interferência entre suas funções auxiliares. O resultado mostra a contagem por área e o total; uma falha interrompe com código de saída 1.
+A suíte cobre compilação/publicação simuladas, sincronização, início e merge de demandas, empacotamento e preparação de dependências, entrega, autenticação, codificação, lançador e diagnósticos do menu. Grupos disponíveis: `Build`, `Sync`, `SyncGitSvn`, `Start`, `Merge`, `Menu`, `Dependencies`, `Delivery`, `GitSvnAuth` e `ProcessEncoding`. Sem parâmetro, executa todos.
+
+Usa ambientes temporários, remotos Git locais e serviços simulados; Delivery utiliza SVN local real e git-svn pelo WSL. Não lê configurações pessoais ou segredos, não compila o ERP nem publica na rede ou nos remotos reais. As entradas gráficas do início de demanda são simuladas nos testes; a apresentação no terminal do usuário requer sua avaliação. Os grupos ficam separados dentro do mesmo arquivo. O resultado mostra a contagem por área e o total; uma falha interrompe com código de saída 1.
 
 ## Modos de sincronização
 

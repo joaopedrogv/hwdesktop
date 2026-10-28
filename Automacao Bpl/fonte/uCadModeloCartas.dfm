@@ -187,6 +187,10 @@ inherited frmCadModeloCartas: TfrmCadModeloCartas
               object TabSheet5: TTabSheet
                 Caption = 'TabSheet5'
                 ImageIndex = 1
+                ExplicitLeft = 0
+                ExplicitTop = 0
+                ExplicitWidth = 0
+                ExplicitHeight = 0
                 object GroupBox4: TGroupBox
                   Left = 0
                   Top = 0
@@ -451,6 +455,10 @@ inherited frmCadModeloCartas: TfrmCadModeloCartas
                     TabOrder = 4
                     object tsHtml: TTabSheet
                       Caption = 'tsHtml'
+                      ExplicitLeft = 0
+                      ExplicitTop = 0
+                      ExplicitWidth = 0
+                      ExplicitHeight = 0
                       object Panel6: TPanel
                         Left = 0
                         Top = 0
@@ -568,6 +576,10 @@ inherited frmCadModeloCartas: TfrmCadModeloCartas
                     object tsMarkdown: TTabSheet
                       Caption = 'tsMarkdown'
                       ImageIndex = 1
+                      ExplicitLeft = 0
+                      ExplicitTop = 0
+                      ExplicitWidth = 0
+                      ExplicitHeight = 0
                       object Panel9: TPanel
                         Left = 0
                         Top = 20
@@ -768,6 +780,10 @@ inherited frmCadModeloCartas: TfrmCadModeloCartas
               object TabSheet6: TTabSheet
                 Caption = 'TabSheet6'
                 ImageIndex = 2
+                ExplicitLeft = 0
+                ExplicitTop = 0
+                ExplicitWidth = 0
+                ExplicitHeight = 0
                 object GroupBox5: TGroupBox
                   Left = 0
                   Top = 0
@@ -943,6 +959,10 @@ inherited frmCadModeloCartas: TfrmCadModeloCartas
                     TabOrder = 5
                     object tsHtml2: TTabSheet
                       Caption = 'tsHtml'
+                      ExplicitLeft = 0
+                      ExplicitTop = 0
+                      ExplicitWidth = 0
+                      ExplicitHeight = 0
                       object Panel18: TPanel
                         Left = 0
                         Top = 0
@@ -1060,6 +1080,10 @@ inherited frmCadModeloCartas: TfrmCadModeloCartas
                     object tsMarkdown2: TTabSheet
                       Caption = 'tsMarkdown'
                       ImageIndex = 1
+                      ExplicitLeft = 0
+                      ExplicitTop = 0
+                      ExplicitWidth = 0
+                      ExplicitHeight = 0
                       object Panel22: TPanel
                         Left = 0
                         Top = 20
@@ -1599,6 +1623,10 @@ inherited frmCadModeloCartas: TfrmCadModeloCartas
         object TabSheet4: TTabSheet
           Caption = 'TabSheet4'
           ImageIndex = 3
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object Label9: TLabel
             Left = 74
             Top = 24
@@ -1982,6 +2010,10 @@ inherited frmCadModeloCartas: TfrmCadModeloCartas
         object tsControles: TTabSheet
           Caption = 'tsControles'
           ImageIndex = 4
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object pnControles: TPanel
             Left = 16
             Top = 16
@@ -2230,6 +2262,10 @@ inherited frmCadModeloCartas: TfrmCadModeloCartas
         object tsPlataforma: TTabSheet
           Caption = 'tsPlataforma'
           ImageIndex = 5
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object pnPlataforma: TPanel
             Left = 16
             Top = 16
@@ -2363,12 +2399,6 @@ inherited frmCadModeloCartas: TfrmCadModeloCartas
       Top = 444
       ExplicitLeft = 619
       ExplicitTop = 444
-    end
-  end
-  inherited pnStatusProcessamento: TPanel
-    inherited lbTextoProcessamento: TLabel
-      Width = 477
-      Height = 21
     end
   end
   inherited PopupMenu1: TPopupMenu

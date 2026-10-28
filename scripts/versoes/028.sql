@@ -4080,3 +4080,122 @@ begin
   suspend;
 end;
 |/BLOCO|
+
+|BLOCO|
+CREATE OR ALTER VIEW FICHAVENDAPROD4(
+    TP,
+    NOME_CLIENTE,
+    NDOC,
+    VALOR,
+    DATA,
+    DATA_FECH,
+    DESCR_PROD,
+    NUM_FAB_PROD,
+    QTDE,
+    QTDE_CONV,
+    VL_UNIT,
+    VL_UNIT_LIQ,
+    VL_UNIT_CONV,
+    VL_UNIT_CONV_LIQ,
+    VL_TOT,
+	VL_TOT_LIQ,
+    RATEIO_ACRESC,
+    RATEIO_DESC,
+    COD_CLIENTE,
+    COD_EMPRESA,
+    GRUPO_PROD,
+    COD_PROD,
+    COD_GRADE,
+    TIPOVENDA,
+    TIPOOS,
+    DESCRICAOGRADE,
+    N_ITEM,
+    STATUS_PED,
+    STATUS,
+    TABPRATICADA,
+    UNIDADE,
+    UNIDADE_CONV,
+    OPERACAO_CONV,
+    FATOR_CONV)
+AS
+select pv.Tipo,cl.nome_cliente, pv.nped,
+coalesce(pv.valor_total, 0) valor_total,
+pv.data_ped, pv.data_fech, pvp.descr_prod_ped,
+pvp.num_fab_prod,
+coalesce(pvp.quant_ped_item, 0) quant_ped_item,
+
+case when (trim(coalesce(pvp.unidade_conv, '')) = '') then
+       pvp.quant_ped_item
+     when (trim(coalesce(pvp.unidade_conv, '')) = trim(coalesce(pvp.unidade, ''))) then
+       pvp.quant_ped_item
+     when ((pvp.operacao_conv = 'M') and (pvp.fator_conv > 0)) then
+       (pvp.quant_ped_item * pvp.fator_conv)
+     when ((pvp.operacao_conv = 'D') and (pvp.fator_conv > 0)) then
+       (pvp.quant_ped_item / pvp.fator_conv)
+     else
+       pvp.quant_ped_item
+end quant_ped_item_conv,
+
+coalesce(pvp.vlun_ped_item, 0) vlun_ped_item,
+case when (pvp.quant_ped_item > 0) then
+       ((pvp.vltot_ped_item - pvp.rateio_desc + pvp.rateio_acresc) / pvp.quant_ped_item)
+     else
+        0
+end vlun_ped_item_liq,
+
+case when (trim(coalesce(pvp.unidade_conv, '')) = '') then
+       pvp.vlun_ped_item
+     when (trim(coalesce(pvp.unidade_conv, '')) = trim(coalesce(pvp.unidade, ''))) then
+       pvp.vlun_ped_item
+     when ((pvp.operacao_conv = 'M') and (pvp.fator_conv > 0)) then
+       (pvp.vlun_ped_item / pvp.fator_conv)
+     when ((pvp.operacao_conv = 'D') and (pvp.fator_conv > 0)) then
+       (pvp.vlun_ped_item * pvp.fator_conv)
+     else
+       pvp.vlun_ped_item
+end vlun_ped_item_conv,
+case when (case when (trim(coalesce(pvp.unidade_conv, '')) = '') then
+                  pvp.quant_ped_item
+                when (trim(coalesce(pvp.unidade_conv, '')) = trim(coalesce(pvp.unidade, ''))) then
+                  pvp.quant_ped_item
+                when ((pvp.operacao_conv = 'M') and (pvp.fator_conv > 0)) then
+                  (pvp.quant_ped_item * pvp.fator_conv)
+                when ((pvp.operacao_conv = 'D') and (pvp.fator_conv > 0)) then
+                  (pvp.quant_ped_item / pvp.fator_conv)
+                else
+                  pvp.quant_ped_item
+           end > 0) then
+             ((pvp.vltot_ped_item - pvp.rateio_desc + pvp.rateio_acresc) /
+               case when (trim(coalesce(pvp.unidade_conv, '')) = '') then
+                      pvp.quant_ped_item
+                    when (trim(coalesce(pvp.unidade_conv, '')) = trim(coalesce(pvp.unidade, ''))) then
+                      pvp.quant_ped_item
+                    when ((pvp.operacao_conv = 'M') and (pvp.fator_conv > 0)) then
+                      (pvp.quant_ped_item * pvp.fator_conv)
+                    when ((pvp.operacao_conv = 'D') and (pvp.fator_conv > 0)) then
+                      (pvp.quant_ped_item / pvp.fator_conv)
+                    else
+                      pvp.quant_ped_item
+               end)
+     else
+       0
+end vlun_ped_item_conv_liq,
+
+coalesce(pvp.vltot_ped_item, 0) vltot_ped_item,
+
+(coalesce(pvp.vltot_ped_item, 0) - coalesce(pvp.rateio_desc, 0) + coalesce(pvp.rateio_acresc, 0)) vltot_ped_item_liq,
+
+pvp.rateio_acresc, pvp.rateio_desc,
+pv.cod_cliente, pv.cod_empresa, pvp.grupo_prod, pvp.cod_prod, pvp.cod_grade,
+pv.tipv, pv.tipo_os, gr.descricao, pvp.nitem, pv.status_ped, pvp.status,
+pvp.tabpraticada, pvp.unidade, pvp.unidade_conv, pvp.operacao_conv, pvp.fator_conv
+from pedvenda pv
+inner join pedvenda_prod pvp on pvp.nped = pv.nped and pvp.cod_empresa = pv.cod_empresa and pvp.tipo = pv.tipo
+and (pvp.status is null or pvp.status = '')
+left join grade gr on pvp.cod_grade = gr.cod_grade and gr.cod_empresa = pvp.cod_empresa
+inner join clientes cl on cl.cod_cliente = pv.cod_cliente and cl.cod_empresa = pv.cod_empresa
+inner join produtos p on p.cod_prod = pvp.cod_prod and p.grupo_prod = pvp.grupo_prod and p.cod_empresa = pvp.cod_empresa
+where pv.ativo = 1;
+|/BLOCO|
+
+ALTER TABLE CONFIG_API ADD USAR_API_PEDIDO CHAR(1);

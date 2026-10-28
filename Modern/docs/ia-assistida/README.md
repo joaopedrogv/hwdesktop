@@ -1,5 +1,18 @@
 # Desenvolvimento assistido por IA no Modern
 
+## Continuidade da documentação
+
+Em 28/10/2026, o responsável transferiu a continuidade deste trabalho para o chat
+que mantém [Contexto e decisões do HWDESKTOP](D:/Hw/ai-docs/hwdesktop/README.md).
+O [mapa de Modern](D:/Hw/ai-docs/hwdesktop/produto/modern.md) relaciona o contexto
+global e estas fontes. Os caminhos externos correspondem ao ambiente atual.
+
+A fonte técnica canônica permanece em `Modern/.ai/`, e esta área continua sendo
+a explicação humana correspondente. O repositório documental registra contexto,
+decisões e justificativas sem manter cópias concorrentes das regras. Esta
+continuidade não concede autorização para implementar features, executar builds,
+testes ou aplicar setups que não tenham sido solicitados.
+
 ## Objetivo
 
 Este guia explica, em português brasileiro, como o repositório organiza instruções,
@@ -131,8 +144,11 @@ somente escolhas que afetam decisões de implementação:
 - a DLL `hw.nfe.dx` usa Delphi Rio 10.3.3 e compartilha units do `Modern`;
 - Firebird 2.5 é o único banco operacional suportado e usa IBX por trás das
   abstrações próprias de conexão e transação;
-- SQLite é exclusivo da `calculadora.db` do SERPRO;
-- ZeosLib é a implementação atual e substituível do adapter SQLite.
+- a sincronização dos dados da calculadora utiliza a API por `CalculadoraApiReader`,
+  substituindo a importação de `calculadora.db`/SQLite, conforme confirmação do
+  responsável em 28/10/2026;
+- a presença de adapters SQLite/ZeosLib remanescentes não indica que o fluxo antigo
+  continua ativo nem autoriza ampliar o uso de SQLite.
 
 O Context não cataloga todas as bibliotecas presentes nos projetos. Tecnologias
 especializadas permanecem explicadas no Context ou na Skill correspondente.

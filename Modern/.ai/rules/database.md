@@ -13,8 +13,8 @@ applies_to:
 - ERP SQL MUST be compatible with **Firebird 2.5**.
 - Do not use SQL features introduced only in later Firebird versions.
 - When Firebird 2.5 compatibility is uncertain, verify support before using the feature.
-- SQLite is restricted to the existing SERPRO `calculadora.db` synchronization flow.
-- Any other SQLite use requires developer consultation and explicit approval before design or implementation.
+- SQLite MUST NOT be introduced or reactivated without developer consultation and explicit approval before design or implementation.
+- Remaining SQLite adapters MUST NOT be treated as approval for a new SQLite flow or an alternative ERP operational database.
 - Preserve the database engine established by the component being modified.
 
 ## Data Access

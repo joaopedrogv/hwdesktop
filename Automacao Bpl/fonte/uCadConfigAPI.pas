@@ -358,6 +358,9 @@ type
     PopupMenu3: TPopupMenu;
     tab_ce: TMenuItem;
     tab_ci: TMenuItem;
+    DBComboBoxUsarAPIPedidoHwCloudIA: TDBComboBox;
+    Label100: TLabel;
+    procedure DBComboBoxUsarAPIPedidoHwCloudIAExit(Sender: TObject);
     procedure tab_ciClick(Sender: TObject);
     procedure tab_ceClick(Sender: TObject);
     procedure BitBtn_Excluir_Collection_RagClick(Sender: TObject);
@@ -755,10 +758,12 @@ begin
         vConfigAPI.montarTipoREQ(DBComboBoxTipoVendaPadraoREQHwCloudIA);
 		  vConfigAPI.montarTipoOS(DBComboBoxTipoVendaPadraoOSHwCloudIA);
 
-        Label71.Visible := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
-        DBEditNomeBotHwCloudIA.Visible := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
-
-        if vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'N' then
+        if vConfigAPI.dataSet.FieldByName('USAR_API_PEDIDO').AsString = 'N' then
+        	 DBComboBoxUsarAPIPedidoHwCloudIA.ItemIndex := 1
+        else
+        	 DBComboBoxUsarAPIPedidoHwCloudIA.ItemIndex := 0;
+          
+		  if vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'N' then
         	 DBComboBoxUsarAPICogHwCloudIA.ItemIndex := 1
         else
         	 DBComboBoxUsarAPICogHwCloudIA.ItemIndex := 0;
@@ -843,8 +848,28 @@ begin
         PageControl5.ActivePage := TabSheet12;
         TabSheet12.Show;
 
-        PageControl4.ActivePage := TabSheet5;
-        TabSheet5.Show;
+        Label71.Visible := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
+        DBEditNomeBotHwCloudIA.Visible := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
+
+        TabSheet5.TabVisible  := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
+        TabSheet9.TabVisible  := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
+        TabSheet11.TabVisible := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
+
+        TabSheet8.TabVisible  := vConfigAPI.dataSet.FieldByName('USAR_API_PEDIDO').AsString = 'S';
+        TabSheet7.TabVisible  := vConfigAPI.dataSet.FieldByName('USAR_API_PEDIDO').AsString = 'S';
+        TabSheet4.TabVisible  := vConfigAPI.dataSet.FieldByName('USAR_API_PEDIDO').AsString = 'S';
+        TabSheet10.TabVisible := vConfigAPI.dataSet.FieldByName('USAR_API_PEDIDO').AsString = 'S';
+        
+        if vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S' then
+        begin
+        	 PageControl4.ActivePage := TabSheet5;
+          TabSheet5.Show;
+        end
+        else
+        begin
+          PageControl4.ActivePage := TabSheet6;
+          TabSheet6.Show;
+        end;
 
         PageControl2.ActivePage := TabSheetHwCloudIA;
         TabSheetHwCloudIA.Show;
@@ -976,9 +1001,6 @@ begin
         vConfigAPI.montarTipoREQ(DBComboBoxTipoVendaPadraoREQHwCloudIA);
         vConfigAPI.montarTipoOS(DBComboBoxTipoVendaPadraoOSHwCloudIA);
 
-        Label71.Visible := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
-        DBEditNomeBotHwCloudIA.Visible := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
-
         EditHwCondPagHwCloudIA.AsValue := vConfigAPI.dataSet.FieldByName('COD_COND_PAG').AsInteger;
         EditHwTipoClienteHwCloudIA.AsValue := vConfigAPI.dataSet.FieldByName('COD_TIP_CLIENTE').AsInteger;
         EditHwVendedorHwCloudIA.AsValue := vConfigAPI.dataSet.FieldByName('COD_VENDEDOR').AsInteger;
@@ -987,6 +1009,11 @@ begin
         DBLookupComboBoxTipoClienteHwCLoudIA.KeyValue := EditHwTipoClienteHwCloudIA.AsInteger;
 		  DBLookupComboBoxVendedorHwCloudIA.KeyValue := EditHwVendedorHwCloudIA.AsInteger;
 
+        if vConfigAPI.dataSet.FieldByName('USAR_API_PEDIDO').AsString = 'N' then
+        	 DBComboBoxUsarAPIPedidoHwCloudIA.ItemIndex := 1
+        else
+        	 DBComboBoxUsarAPIPedidoHwCloudIA.ItemIndex := 0;
+          
         if vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'N' then
         	 DBComboBoxUsarAPICogHwCloudIA.ItemIndex := 1
         else
@@ -1072,8 +1099,28 @@ begin
         PageControl5.ActivePage := TabSheet12;
         TabSheet12.Show;
 
-        PageControl4.ActivePage := TabSheet5;
-        TabSheet5.Show;
+        Label71.Visible := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
+        DBEditNomeBotHwCloudIA.Visible := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
+
+        TabSheet5.TabVisible  := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
+        TabSheet9.TabVisible  := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
+        TabSheet11.TabVisible := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
+
+        TabSheet8.TabVisible  := vConfigAPI.dataSet.FieldByName('USAR_API_PEDIDO').AsString = 'S';
+        TabSheet7.TabVisible  := vConfigAPI.dataSet.FieldByName('USAR_API_PEDIDO').AsString = 'S';
+        TabSheet4.TabVisible  := vConfigAPI.dataSet.FieldByName('USAR_API_PEDIDO').AsString = 'S';
+        TabSheet10.TabVisible := vConfigAPI.dataSet.FieldByName('USAR_API_PEDIDO').AsString = 'S';
+
+        if vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S' then
+        begin
+        	 PageControl4.ActivePage := TabSheet5;
+          TabSheet5.Show;
+        end
+        else
+        begin
+          PageControl4.ActivePage := TabSheet6;
+          TabSheet6.Show;
+        end;
 
         PageControl2.ActivePage := TabSheetHwCloudIA;
         TabSheetHwCloudIA.Show;
@@ -1473,10 +1520,46 @@ begin
 end;
 
 procedure TfrmCadConfigAPI.DBComboBoxUsarAPICogHwCloudIAExit(Sender: TObject);
+var
+  vUsarAPICog: Integer;
 begin
   inherited;
   Label71.Visible := DBComboBoxUsarAPICogHwCloudIA.ItemIndex = 0;
   DBEditNomeBotHwCloudIA.Visible := DBComboBoxUsarAPICogHwCloudIA.ItemIndex = 0;
+
+  vUsarAPICog := DBComboBoxUsarAPICogHwCloudIA.ItemIndex;
+
+  TabSheet5.TabVisible  := DBComboBoxUsarAPICogHwCloudIA.ItemIndex = 0;
+  TabSheet9.TabVisible  := DBComboBoxUsarAPICogHwCloudIA.ItemIndex = 0;
+  TabSheet11.TabVisible := DBComboBoxUsarAPICogHwCloudIA.ItemIndex = 0;
+
+  if (vUsarAPICog <> DBComboBoxUsarAPICogHwCloudIA.ItemIndex) then
+  begin
+    if DBComboBoxUsarAPICogHwCloudIA.ItemIndex = 0 then
+    begin
+      PageControl4.ActivePage := TabSheet5;
+      TabSheet5.Show;
+    end
+    else
+    begin
+      PageControl4.ActivePage := TabSheet6;
+      TabSheet6.Show;
+    end;
+  end;
+end;
+
+procedure TfrmCadConfigAPI.DBComboBoxUsarAPIPedidoHwCloudIAExit(
+  Sender: TObject);
+var
+  vVendaOnline: Integer;
+begin
+  inherited;
+  vVendaOnline := DBComboBoxUsarAPIPedidoHwCloudIA.ItemIndex;
+
+  TabSheet8.TabVisible  := DBComboBoxUsarAPIPedidoHwCloudIA.ItemIndex = 0;
+  TabSheet7.TabVisible  := DBComboBoxUsarAPIPedidoHwCloudIA.ItemIndex = 0;
+  TabSheet4.TabVisible  := DBComboBoxUsarAPIPedidoHwCloudIA.ItemIndex = 0;
+  TabSheet10.TabVisible := DBComboBoxUsarAPIPedidoHwCloudIA.ItemIndex = 0;
 end;
 
 procedure TfrmCadConfigAPI.DBEditSabadoFimHwCloudIAEnter(Sender: TObject);
@@ -2087,6 +2170,7 @@ end;
 procedure TfrmCadConfigAPI.SpeedButton1Click(Sender: TObject);
 var
   I: Integer;
+  vHabTabSheet5, vHabTabSheet9, vHabTabSheet11: boolean;
 begin
   try
     if vConfigAPI.dataSet.IsEmpty then
@@ -2251,15 +2335,13 @@ begin
       else if trim(vConfigAPI.dataSet.FieldByName('API').AsString) = 'HWCLOUD_IA' then
       begin
         if vDadosIni.GetIni('MD', 'MHTT', 'N') <> 'S' then
-          vDadosIni.buscarConfigHwCloud;
+          if vDadosIni.vHwCloudIA.vUsarServMensageria = 'S' then
+          	vDadosIni.buscarConfigHwCloud;
 
         vConfigAPI.montarTreeViewPromocaoDB('H', TreeViewPromocaoHwCloudIA, TreeViewPromocaoHwCloudIA_DB);	
         vConfigAPI.montarAmbiente(DBComboBoxAmbienteHwCloudIA, vConfigAPI.dataSet.FieldByName('AMBIENTE_API').AsString);
         vConfigAPI.montarTipoREQ(DBComboBoxTipoVendaPadraoREQHwCloudIA);
         vConfigAPI.montarTipoOS(DBComboBoxTipoVendaPadraoOSHwCloudIA);
-
-        Label71.Visible := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
-        DBEditNomeBotHwCloudIA.Visible := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
 
         EditHwCondPagHwCloudIA.AsValue := vConfigAPI.dataSet.FieldByName('COD_COND_PAG').AsInteger;
         EditHwTipoClienteHwCloudIA.AsValue := vConfigAPI.dataSet.FieldByName('COD_TIP_CLIENTE').AsInteger;
@@ -2269,6 +2351,11 @@ begin
         DBLookupComboBoxTipoClienteHwCLoudIA.KeyValue := EditHwTipoClienteHwCloudIA.AsInteger;
         DBLookupComboBoxVendedorHwCloudIA.KeyValue := EditHwVendedorHwCloudIA.AsInteger;
 
+        if vConfigAPI.dataSet.FieldByName('USAR_API_PEDIDO').AsString = 'N' then
+        	 DBComboBoxUsarAPIPedidoHwCloudIA.ItemIndex := 1
+        else
+        	 DBComboBoxUsarAPIPedidoHwCloudIA.ItemIndex := 0;
+          
         if vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'N' then
         	 DBComboBoxUsarAPICogHwCloudIA.ItemIndex := 1
         else
@@ -2354,8 +2441,28 @@ begin
         PageControl5.ActivePage := TabSheet12;
         TabSheet12.Show;
 
-        PageControl4.ActivePage := TabSheet5;
-        TabSheet5.Show;
+        Label71.Visible := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
+        DBEditNomeBotHwCloudIA.Visible := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
+
+        TabSheet5.TabVisible  := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
+        TabSheet9.TabVisible  := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
+        TabSheet11.TabVisible := vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S';
+
+        TabSheet8.TabVisible  := vConfigAPI.dataSet.FieldByName('USAR_API_PEDIDO').AsString = 'S';
+        TabSheet7.TabVisible  := vConfigAPI.dataSet.FieldByName('USAR_API_PEDIDO').AsString = 'S';
+        TabSheet4.TabVisible  := vConfigAPI.dataSet.FieldByName('USAR_API_PEDIDO').AsString = 'S';
+        TabSheet10.TabVisible := vConfigAPI.dataSet.FieldByName('USAR_API_PEDIDO').AsString = 'S';
+
+        if vConfigAPI.dataSet.FieldByName('USAR_API_COG').AsString = 'S' then
+        begin
+        	 PageControl4.ActivePage := TabSheet5;
+          TabSheet5.Show;
+        end
+        else
+        begin
+          PageControl4.ActivePage := TabSheet6;
+          TabSheet6.Show;
+        end;
 
         PageControl2.ActivePage := TabSheetHwCloudIA;
         TabSheetHwCloudIA.Show;

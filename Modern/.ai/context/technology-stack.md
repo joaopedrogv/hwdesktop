@@ -1,6 +1,6 @@
 ---
 name: technology-stack
-description: Understand Modern's Delphi compiler boundaries, Win32 runtime, Firebird 2.5 operational database, and restricted SQLite exception.
+description: Understand Modern's Delphi compiler boundaries, Win32 runtime, Firebird 2.5 operational database, and calculator API integration.
 ---
 
 # Technology Stack
@@ -40,18 +40,21 @@ those abstractions rather than on IBX components.
 
 SQL and persistence constraints are defined in `.ai/rules/database.md`.
 
-## SQLite Exception
+## Calculator API and Former SQLite Integration
 
-SQLite is used exclusively to process the SERPRO calculator database,
-`calculadora.db`, during fiscal-data synchronization. It is not an alternative ERP
-operational database.
+The calculator's fiscal data is synchronized through the API using
+`CalculadoraApiReader`. The developer confirmed on 2026-10-28 that this flow
+replaced the former `CalculadoraReader` / SQLite `calculadora.db` import.
 
-The current SQLite adapter uses ZeosLib as an implementation of the project's
-connection and transaction abstractions. ZeosLib is replaceable and is not an
-architectural dependency of business code.
+The file synchronization Use Case ignores a residual `calculadora.db` entry in
+the distribution manifest; its presence does not reactivate the database import.
+The operational ERP database remains Firebird 2.5.
 
-Any proposed SQLite use outside the existing calculator flow requires developer
-consultation and explicit approval before design or implementation proceeds.
+Remaining SQLite or ZeosLib adapters are not evidence that the former flow is
+still active, nor approval to use SQLite as an alternative ERP database. Any
+proposed SQLite use or reactivation requires developer consultation and explicit
+approval before design or implementation proceeds. No adapter removal is implied
+by this documentation update.
 
 ## Evolution of the Stack
 

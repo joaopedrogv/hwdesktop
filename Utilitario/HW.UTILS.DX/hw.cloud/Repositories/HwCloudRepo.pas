@@ -1100,136 +1100,148 @@ begin
 
     for var plataforma in configResponse.resposta.plataformas do
     begin
-      query.Close;
-      query.SQL(' select id, cod_empresa from msg_plataforma ' +
-        ' where plataforma = :plataforma ' +
-        ' and identificador_bot = :identificador_bot ' +
-        ' and cod_empresa = :cod_empresa ');
-      query.ParamValue('plataforma', trim(plataforma.plataforma_parc_id));
-      query.ParamValue('identificador_bot', trim(plataforma.cod_plataforma_parc));
-      query.ParamValue('cod_empresa', CodEmpresa);
-      query.Open;
-
-      if query.IsEmpty then
+      if trim(plataforma.plataforma_parc_id) <> '' then
       begin
         query.Close;
-        query.SQL(' insert into msg_plataforma ' +
-          ' (id, cod_empresa, id_msg_aplicativo, plataforma, identificador_bot, padrao) ' +
-          ' values ' +
-          ' ((select cod from incrementa_codigo (:cod_empresa, ''MSG_PLATAFORMA'')),  ' +
-          ' :cod_empresa, :id_msg_aplicativo, :plataforma, :identificador_bot, :padrao) ');
-        query.ParamValue('cod_empresa', CodEmpresa);
-        if ContainsStr(LowerCase(trim(plataforma.plataforma_parc_id)), 'email') or ContainsStr(LowerCase(trim(plataforma.plataforma_parc_id)), 'e-mail') then
-          query.ParamValue('id_msg_aplicativo', 1)
-        else if ContainsStr(LowerCase(trim(plataforma.plataforma_parc_id)), 'whats') then
-          query.ParamValue('id_msg_aplicativo', 2)
-        else if ContainsStr(LowerCase(trim(plataforma.plataforma_parc_id)), 'telegram') then
-          query.ParamValue('id_msg_aplicativo', 3)
-        else
-          query.ParamValue('id_msg_aplicativo', 0);
-
-        query.ParamValue('plataforma', trim(plataforma.plataforma_parc_id));
-        query.ParamValue('identificador_bot', trim(plataforma.cod_plataforma_parc));
-        query.ParamValue('padrao', IfThen(plataforma.plat_padrao, 0, 1));
-        query.ExecSQL;
-      end
-      else
-      begin
-        query.Close;
-        query.SQL(' update msg_plataforma set padrao = :padrao ' +
+        query.SQL(' select id, cod_empresa from msg_plataforma ' +
           ' where plataforma = :plataforma ' +
           ' and identificador_bot = :identificador_bot ' +
           ' and cod_empresa = :cod_empresa ');
         query.ParamValue('plataforma', trim(plataforma.plataforma_parc_id));
         query.ParamValue('identificador_bot', trim(plataforma.cod_plataforma_parc));
         query.ParamValue('cod_empresa', CodEmpresa);
-        query.ParamValue('padrao', IfThen(plataforma.plat_padrao, 0, 1));
-        query.ExecSQL;
-      end;
-    end;
-
-    for var tipo in configResponse.resposta.tipo_templates_meta do
-    begin
-      query.Close;
-      query.SQL(' select id from msg_tipo_template ' +
-        ' where categoria = :categoria ');
-      query.ParamValue('categoria', trim(tipo.categoria));
-      query.Open;
-
-      if query.IsEmpty then
-      begin
-        query.Close;
-        query.SQL(' insert into msg_tipo_template ' +
-          ' (id, categoria, valor_aprox) ' +
-          ' values ' +
-          ' ((select cod from incrementa_codigo (0, ''MSG_TIPO_TEMPLATE'')),  ' +
-          ' :categoria, :valor_aprox) ');
-        query.ParamValue('categoria', trim(tipo.categoria));
-        query.ParamAsFloat('valor_aprox', tipo.valor_aprox);
-        query.ExecSQL;
-      end
-      else
-      begin
-        query.Close;
-        query.SQL(' update msg_tipo_template set ' +
-          ' valor_aprox = :valor_aprox ' +
-          ' where categoria = :categoria ');
-        query.ParamValue('categoria', trim(tipo.categoria));
-        query.ParamAsFloat('valor_aprox', tipo.valor_aprox);
-        query.ExecSQL;
-      end;
-    end;
-
-    for var template in configResponse.resposta.templates_meta do
-    begin
-      query.Close;
-      query.SQL(' select id from msg_tipo_template ' +
-        ' where categoria = :categoria ');
-      query.ParamValue('categoria', template.categoria);
-      query.Open;
-
-      if not query.IsEmpty then
-      begin
-        vIdTipo := query.fint('id');
-
-        query.Close;
-        query.SQL(' select id, cod_empresa from msg_template ' +
-          ' where template = :template ' +
-          ' and cod_empresa = :cod_empresa ');
-        query.ParamValue('template', trim(template.nome_template));
-        query.ParamValue('cod_empresa', CodEmpresa);
         query.Open;
 
         if query.IsEmpty then
         begin
           query.Close;
-          query.SQL(' insert into msg_template ' +
-            ' (id, cod_empresa, id_msg_tipo_template, template, status, texto) ' +
+          query.SQL(' insert into msg_plataforma ' +
+            ' (id, cod_empresa, id_msg_aplicativo, plataforma, identificador_bot, padrao) ' +
             ' values ' +
-            ' ((select cod from incrementa_codigo (:cod_empresa, ''MSG_TEMPLATE'')),  ' +
-            ' :cod_empresa, :id_msg_tipo_template, :template, :status, :texto) ');
+            ' ((select cod from incrementa_codigo (:cod_empresa, ''MSG_PLATAFORMA'')),  ' +
+            ' :cod_empresa, :id_msg_aplicativo, :plataforma, :identificador_bot, :padrao) ');
           query.ParamValue('cod_empresa', CodEmpresa);
-          query.ParamValue('id_msg_tipo_template', vIdTipo);
-          query.ParamValue('template', trim(template.nome_template));
-          query.ParamValue('status', trim(template.conteudo_template.status));
-          query.ParamValue('texto',template.texto_template);
+          if ContainsStr(LowerCase(trim(plataforma.plataforma_parc_id)), 'email') or ContainsStr(LowerCase(trim(plataforma.plataforma_parc_id)), 'e-mail') then
+            query.ParamValue('id_msg_aplicativo', 1)
+          else if ContainsStr(LowerCase(trim(plataforma.plataforma_parc_id)), 'whats') then
+            query.ParamValue('id_msg_aplicativo', 2)
+          else if ContainsStr(LowerCase(trim(plataforma.plataforma_parc_id)), 'telegram') then
+            query.ParamValue('id_msg_aplicativo', 3)
+          else
+            query.ParamValue('id_msg_aplicativo', 0);
+
+          query.ParamValue('plataforma', trim(plataforma.plataforma_parc_id));
+          query.ParamValue('identificador_bot', trim(plataforma.cod_plataforma_parc));
+          query.ParamValue('padrao', IfThen(plataforma.plat_padrao, 0, 1));
           query.ExecSQL;
         end
         else
         begin
           query.Close;
-          query.SQL(' update msg_template set ' +
-            ' id_msg_tipo_template = :id_msg_tipo_template, ' +
-            ' status = :status, ' +
-            ' texto = :texto ' +
-            ' where template = :template ' +
+          query.SQL(' update msg_plataforma set padrao = :padrao ' +
+            ' where plataforma = :plataforma ' +
+            ' and identificador_bot = :identificador_bot ' +
             ' and cod_empresa = :cod_empresa ');
+          query.ParamValue('plataforma', trim(plataforma.plataforma_parc_id));
+          query.ParamValue('identificador_bot', trim(plataforma.cod_plataforma_parc));
           query.ParamValue('cod_empresa', CodEmpresa);
-          query.ParamValue('id_msg_tipo_template', vIdTipo);
-          query.ParamValue('template', trim(template.nome_template));
-          query.ParamValue('status', trim(template.conteudo_template.status));
-          query.ParamValue('texto', template.texto_template);
+          query.ParamValue('padrao', IfThen(plataforma.plat_padrao, 0, 1));
           query.ExecSQL;
+        end;
+      end;
+    end;
+
+    for var tipo in configResponse.resposta.tipo_templates_meta do
+    begin
+      if trim(tipo.categoria) <> '' then
+      begin
+        query.Close;
+        query.SQL(' select id from msg_tipo_template ' +
+          ' where categoria = :categoria ');
+        query.ParamValue('categoria', trim(tipo.categoria));
+        query.Open;
+
+        if query.IsEmpty then
+        begin
+          query.Close;
+          query.SQL(' insert into msg_tipo_template ' +
+            ' (id, categoria, valor_aprox) ' +
+            ' values ' +
+            ' ((select cod from incrementa_codigo (0, ''MSG_TIPO_TEMPLATE'')),  ' +
+            ' :categoria, :valor_aprox) ');
+          query.ParamValue('categoria', trim(tipo.categoria));
+          query.ParamAsFloat('valor_aprox', tipo.valor_aprox);
+          query.ExecSQL;
+        end
+        else
+        begin
+          query.Close;
+          query.SQL(' update msg_tipo_template set ' +
+            ' valor_aprox = :valor_aprox ' +
+            ' where categoria = :categoria ');
+          query.ParamValue('categoria', trim(tipo.categoria));
+          query.ParamAsFloat('valor_aprox', tipo.valor_aprox);
+          query.ExecSQL;
+        end;
+      end;
+    end;
+
+    for var template in configResponse.resposta.templates_meta do
+    begin
+      if trim(template.categoria) <> '' then
+      begin
+        query.Close;
+        query.SQL(' select id from msg_tipo_template ' +
+          ' where categoria = :categoria ');
+        query.ParamValue('categoria', template.categoria);
+        query.Open;
+
+        if not query.IsEmpty then
+        begin
+          vIdTipo := query.fint('id');
+
+          if trim(template.nome_template) <> '' then
+          begin
+            query.Close;
+            query.SQL(' select id, cod_empresa from msg_template ' +
+              ' where template = :template ' +
+              ' and cod_empresa = :cod_empresa ');
+            query.ParamValue('template', trim(template.nome_template));
+            query.ParamValue('cod_empresa', CodEmpresa);
+            query.Open;
+
+            if query.IsEmpty then
+            begin
+              query.Close;
+              query.SQL(' insert into msg_template ' +
+                ' (id, cod_empresa, id_msg_tipo_template, template, status, texto) ' +
+                ' values ' +
+                ' ((select cod from incrementa_codigo (:cod_empresa, ''MSG_TEMPLATE'')),  ' +
+                ' :cod_empresa, :id_msg_tipo_template, :template, :status, :texto) ');
+              query.ParamValue('cod_empresa', CodEmpresa);
+              query.ParamValue('id_msg_tipo_template', vIdTipo);
+              query.ParamValue('template', trim(template.nome_template));
+              query.ParamValue('status', trim(template.conteudo_template.status));
+              query.ParamValue('texto',template.texto_template);
+              query.ExecSQL;
+            end
+            else
+            begin
+              query.Close;
+              query.SQL(' update msg_template set ' +
+                ' id_msg_tipo_template = :id_msg_tipo_template, ' +
+                ' status = :status, ' +
+                ' texto = :texto ' +
+                ' where template = :template ' +
+                ' and cod_empresa = :cod_empresa ');
+              query.ParamValue('cod_empresa', CodEmpresa);
+              query.ParamValue('id_msg_tipo_template', vIdTipo);
+              query.ParamValue('template', trim(template.nome_template));
+              query.ParamValue('status', trim(template.conteudo_template.status));
+              query.ParamValue('texto', template.texto_template);
+              query.ExecSQL;
+            end;
+          end;
         end;
       end;
     end;

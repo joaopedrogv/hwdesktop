@@ -79,9 +79,12 @@ differ from Modern.
 ## Mirror Table Population
 
 Rows in ERP tables that mirror official calculator data are supplied by the
-external calculator synchronization flow, currently from the distributed
-`calculadora.db` through `CalculadoraReader` and `ERPWriter`. They are not seeded or
-maintained by ERP migration `INSERT`, `UPDATE`, or `DELETE` commands.
+external calculator synchronization flow, currently through the API using
+`CalculadoraApiReader` and `ERPWriter`. The developer confirmed on 2026-10-28 that
+the API replaced the former SQLite `calculadora.db` import. A residual database
+file in a distribution manifest is ignored by file synchronization. Mirrored rows
+are not seeded or maintained by ERP migration `INSERT`, `UPDATE`, or `DELETE`
+commands.
 
 An RTC update may still require migration SQL to create or alter the Firebird
 schema of a mirror table. Data-manipulation statements from the Java migrations

@@ -3554,7 +3554,7 @@ var
   vCodNF: Integer;
   AstrWide: WideString;
   vImprimirBol: Boolean;
-  vStringListAnexos: TStringList;
+  vStringListAnexos, vStringListAnexosTmp: TStringList;
   vGerarBoleto: Boolean;
   vDataHoraBanco: TDateTime;
   vQtdPdf: Integer;
@@ -3587,6 +3587,10 @@ begin
     vStringListAnexos := TStringList.Create;
     vStringListAnexos.Duplicates := dupIgnore;
     vStringListAnexos.Clear;
+
+    vStringListAnexosTmp := TStringList.Create;
+    vStringListAnexosTmp.Duplicates := dupIgnore;
+    vStringListAnexosTmp.Clear;
 
     if (pValorServ > 0) and ((cReciboLoc in pImprimirArrayorigem) or (cReciboLoc in pEnviarArrayorigem) or (cReciboLoc in pGerarZipArrayOrigem)) then
     	vExisteArrayorigem := vExisteArrayorigem + [cReciboLoc];
@@ -3649,6 +3653,9 @@ begin
 
           try
             vDadosIni.vDirArqLocacao := '';
+
+            vStringListAnexosTmp.Clear;
+            
             if not vDadosIni.imprimirReciboLocacao(
               buscas,
               pNumOS,
@@ -3685,6 +3692,8 @@ begin
         try
         	 vDadosIni.abreStatusProcessamento('', pHint + ' - ' + IntToStr(pIncReg) + '/' + IntToStr(pTotReg) + ' (Preparando NFS)');
 
+          vStringListAnexosTmp.Clear;
+
           anexosNFS := TArrayString(CallerNFSeFeatures.CriarAnexosEmail(pNumOS, True));
 
           for I := 0 to High(anexosNFS) do
@@ -3711,17 +3720,22 @@ begin
       	try
           vDadosIni.abreStatusProcessamento('', pHint + ' - ' + IntToStr(pIncReg) + '/' + IntToStr(pTotReg) + ' (Preparando NF)');
 
+          vStringListAnexosTmp.Clear;
+          
           if not ImprimirNFGerarPDF(
             pHandleDllNF,
             vCodNF,
             False,
             ((cNfe in pImprimirArrayorigem) or (cNfe in pEnviarArrayorigem) or (cNfe in pGerarZipArrayOrigem)),
             vGerouNF,
-            vStringListAnexos) then
+            vStringListAnexosTmp) then
             Exit;
 
-          for I := 0 to vStringListAnexos.Count - 1 do
-          	pStringListAnexosNF.Add(vStringListAnexos[I]);
+          for I := 0 to vStringListAnexosTmp.Count - 1 do
+            vStringListAnexos.Add(vStringListAnexosTmp[I]);
+
+          for I := 0 to vStringListAnexosTmp.Count - 1 do
+          	pStringListAnexosNF.Add(vStringListAnexosTmp[I]);
 
           if vGerouNF then
           	vGerouArrayOrigem := vGerouArrayOrigem + [cNfe];
@@ -3754,6 +3768,8 @@ begin
         	try
             vDadosIni.abreStatusProcessamento('', pHint + ' - ' + IntToStr(pIncReg) + '/' + IntToStr(pTotReg) + ' (Preparando BOLETO)');
 
+            vStringListAnexosTmp.Clear;
+
             if not vDadosIni.gerar_boleto(
               False,
               False,
@@ -3767,17 +3783,20 @@ begin
               False) then
                 exit;
 
-            vStringListAnexos := getArquivosBoletoParaAnexos(
+            vStringListAnexosTmp := getArquivosBoletoParaAnexos(
                                      pNumOS,
                                      'OS',
                                      pCodCobrebem,
                                      pListaBol);
 
-             for I := 0 to vStringListAnexos.Count - 1 do
-               pStringListAnexosBol.Add(vStringListAnexos[I]);
+            for I := 0 to vStringListAnexosTmp.Count - 1 do
+              vStringListAnexos.Add(vStringListAnexosTmp[I]);
 
-             if vStringListAnexos.Count > 0 then
-               vGerouArrayOrigem := vGerouArrayOrigem + [cBoleto];
+            for I := 0 to vStringListAnexosTmp.Count - 1 do
+              pStringListAnexosBol.Add(vStringListAnexosTmp[I]);
+
+            if vStringListAnexos.Count > 0 then
+              vGerouArrayOrigem := vGerouArrayOrigem + [cBoleto];
           finally
             vDadosIni.fechaStatusProcessamento;
           end;
@@ -4057,6 +4076,8 @@ begin
 
       if Assigned(vStringListAnexos) then
         vStringListAnexos.Free;
+   	if Assigned(vStringListAnexosTmp) then
+        vStringListAnexosTmp.Free;
 
     end;
   except

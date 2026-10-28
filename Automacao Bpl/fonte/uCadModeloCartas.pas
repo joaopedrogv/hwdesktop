@@ -438,7 +438,8 @@ begin
   if vDadosIni.GetIni('MD', 'MHTT', 'N') <> 'S' then
     if obModCarta.getTipoContrato = 'DOC' then
     	if vDadosIni.retornaDadosHwCloudIA(obModCarta.buscas, False) <> '' then
-      	vDadosIni.buscarConfigHwCloud;
+        if vDadosIni.vHwCloudIA.vUsarServMensageria = 'S' then
+          vDadosIni.buscarConfigHwCloud;
 
   _GravaConfiguracoesBoolean(MenuCartasCobranca.Name, MenuCartasCobranca.Checked);
   _GravaConfiguracoesBoolean(MenuCartasClientes.Name, MenuCartasClientes.Checked);

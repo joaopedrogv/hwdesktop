@@ -23,7 +23,6 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
       inherited PageControl1: TPageControl
         Width = 820
         Height = 558
-        ActivePage = TabSheet1
         ExplicitWidth = 820
         ExplicitHeight = 558
         inherited TabSheet1: TTabSheet
@@ -66,7 +65,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                   Top = 0
                   Width = 804
                   Height = 448
-                  ActivePage = TabSheetHwCloudIA
+                  ActivePage = TabSheetTrayEC
                   Align = alClient
                   Style = tsFlatButtons
                   TabOrder = 0
@@ -1638,7 +1637,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                         end
                         object Label65: TLabel
                           Left = 95
-                          Top = 175
+                          Top = 200
                           Width = 31
                           Height = 13
                           Alignment = taRightJustify
@@ -1647,7 +1646,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                         end
                         object Label66: TLabel
                           Left = 95
-                          Top = 155
+                          Top = 179
                           Width = 120
                           Height = 13
                           Alignment = taCenter
@@ -1662,7 +1661,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                         end
                         object Label67: TLabel
                           Left = 236
-                          Top = 175
+                          Top = 200
                           Width = 26
                           Height = 13
                           Alignment = taRightJustify
@@ -1671,7 +1670,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                         end
                         object Label68: TLabel
                           Left = 448
-                          Top = 175
+                          Top = 200
                           Width = 31
                           Height = 13
                           Alignment = taRightJustify
@@ -1680,7 +1679,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                         end
                         object Label69: TLabel
                           Left = 448
-                          Top = 155
+                          Top = 179
                           Width = 89
                           Height = 13
                           Alignment = taCenter
@@ -1695,7 +1694,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                         end
                         object Label70: TLabel
                           Left = 589
-                          Top = 175
+                          Top = 200
                           Width = 26
                           Height = 13
                           Alignment = taRightJustify
@@ -1703,8 +1702,8 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                           FocusControl = DBEditSabadoFimHwCloudIA
                         end
                         object Label71: TLabel
-                          Left = 550
-                          Top = 108
+                          Left = 61
+                          Top = 133
                           Width = 65
                           Height = 13
                           Alignment = taRightJustify
@@ -1712,7 +1711,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                           FocusControl = DBEditNomeBotHwCloudIA
                         end
                         object Label72: TLabel
-                          Left = 21
+                          Left = 250
                           Top = 109
                           Width = 105
                           Height = 13
@@ -1721,7 +1720,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                           FocusControl = DBComboBoxUsarAPICogHwCloudIA
                         end
                         object Label74: TLabel
-                          Left = 340
+                          Left = 569
                           Top = 109
                           Width = 49
                           Height = 13
@@ -1730,7 +1729,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                           FocusControl = DBComboBoxAmbienteHwCloudIA
                         end
                         object Label90: TLabel
-                          Left = 202
+                          Left = 431
                           Top = 109
                           Width = 75
                           Height = 13
@@ -1739,7 +1738,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                         end
                         object Label91: TLabel
                           Left = 15
-                          Top = 134
+                          Top = 158
                           Width = 111
                           Height = 13
                           Alignment = taRightJustify
@@ -1748,11 +1747,20 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                         end
                         object Label92: TLabel
                           Left = 278
-                          Top = 134
+                          Top = 158
                           Width = 111
                           Height = 13
                           Alignment = taRightJustify
                           Caption = 'Limite Gastos Meta ($):'
+                        end
+                        object Label100: TLabel
+                          Left = 59
+                          Top = 109
+                          Width = 67
+                          Height = 13
+                          Alignment = taRightJustify
+                          Caption = 'Venda Online:'
+                          FocusControl = DBComboBoxUsarAPICogHwCloudIA
                         end
                         object DBEditUrlHwCloudIA: TDBEdit
                           Left = 132
@@ -1784,59 +1792,59 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                         end
                         object DBEditSemanaIniHwCloudIA: TDBEdit
                           Left = 132
-                          Top = 172
+                          Top = 196
                           Width = 71
                           Height = 21
                           DataField = 'HORARIO_SEMANA_INI'
                           DataSource = dtmConfig.dsConfigAPI
-                          TabOrder = 9
+                          TabOrder = 10
                           OnEnter = DBEditSemanaIniHwCloudIAEnter
                           OnKeyDown = DBEditSemanaIniHwCloudIAKeyDown
                         end
                         object DBEditSemanaFimHwCloudIA: TDBEdit
                           Left = 268
-                          Top = 172
+                          Top = 196
                           Width = 71
                           Height = 21
                           DataField = 'HORARIO_SEMANA_FIM'
                           DataSource = dtmConfig.dsConfigAPI
-                          TabOrder = 10
+                          TabOrder = 11
                           OnEnter = DBEditSemanaFimHwCloudIAEnter
                           OnKeyDown = DBEditSemanaFimHwCloudIAKeyDown
                         end
                         object DBEditSabadoIniHwCloudIA: TDBEdit
                           Left = 485
-                          Top = 172
+                          Top = 196
                           Width = 71
                           Height = 21
                           DataField = 'HORARIO_SABADO_INI'
                           DataSource = dtmConfig.dsConfigAPI
-                          TabOrder = 11
+                          TabOrder = 12
                           OnEnter = DBEditSabadoIniHwCloudIAEnter
                           OnKeyDown = DBEditSabadoIniHwCloudIAKeyDown
                         end
                         object DBEditSabadoFimHwCloudIA: TDBEdit
                           Left = 621
-                          Top = 172
+                          Top = 197
                           Width = 71
                           Height = 21
                           DataField = 'HORARIO_SABADO_FIM'
                           DataSource = dtmConfig.dsConfigAPI
-                          TabOrder = 12
+                          TabOrder = 13
                           OnEnter = DBEditSabadoFimHwCloudIAEnter
                           OnKeyDown = DBEditSabadoFimHwCloudIAKeyDown
                         end
                         object DBEditNomeBotHwCloudIA: TDBEdit
-                          Left = 620
-                          Top = 106
+                          Left = 131
+                          Top = 131
                           Width = 154
                           Height = 21
                           DataField = 'NOME_BOT'
                           DataSource = dtmConfig.dsConfigAPI
-                          TabOrder = 6
+                          TabOrder = 7
                         end
                         object DBComboBoxUsarAPICogHwCloudIA: TDBComboBox
-                          Left = 132
+                          Left = 361
                           Top = 106
                           Width = 63
                           Height = 21
@@ -1847,11 +1855,12 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                           Items.Strings = (
                             'S - SIM'
                             'N - N'#195'O')
-                          TabOrder = 3
+                          TabOrder = 4
+                          OnChange = DBComboBoxUsarAPICogHwCloudIAExit
                           OnExit = DBComboBoxUsarAPICogHwCloudIAExit
                         end
                         object DBComboBoxAmbienteHwCloudIA: TDBComboBox
-                          Left = 395
+                          Left = 624
                           Top = 106
                           Width = 150
                           Height = 21
@@ -1862,35 +1871,51 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                           Items.Strings = (
                             'S - SIM'
                             'N - N'#195'O')
-                          TabOrder = 5
+                          TabOrder = 6
                           OnExit = DBComboBoxUsarAPICogHwCloudIAExit
                         end
                         object DBEditModeloPadraoHwCloudIA: TDBEdit
-                          Left = 282
+                          Left = 511
                           Top = 106
                           Width = 43
                           Height = 21
                           DataField = 'MODELO_PADRAO'
                           DataSource = dtmConfig.dsConfigAPI
-                          TabOrder = 4
+                          TabOrder = 5
                         end
                         object DBEditDiaMesFatMetaHwCloudIA: TDBEdit
                           Left = 132
-                          Top = 132
+                          Top = 156
                           Width = 43
                           Height = 21
                           DataField = 'DIA_MES_INI_FAT_META'
                           DataSource = dtmConfig.dsConfigAPI
-                          TabOrder = 7
+                          TabOrder = 8
                         end
                         object DBEditLimiteGastosMetaHwCloudIA: TDBEdit
                           Left = 395
-                          Top = 132
+                          Top = 156
                           Width = 71
                           Height = 21
                           DataField = 'LIMITE_GASTOS_META'
                           DataSource = dtmConfig.dsConfigAPI
-                          TabOrder = 8
+                          TabOrder = 9
+                        end
+                        object DBComboBoxUsarAPIPedidoHwCloudIA: TDBComboBox
+                          Left = 132
+                          Top = 106
+                          Width = 63
+                          Height = 21
+                          Style = csDropDownList
+                          DataField = 'USAR_API_PEDIDO'
+                          DataSource = dtmConfig.dsConfigAPI
+                          ItemHeight = 13
+                          Items.Strings = (
+                            'S - SIM'
+                            'N - N'#195'O')
+                          TabOrder = 3
+                          OnChange = DBComboBoxUsarAPIPedidoHwCloudIAExit
+                          OnExit = DBComboBoxUsarAPIPedidoHwCloudIAExit
                         end
                       end
                       object PageControl4: TPageControl
@@ -1898,7 +1923,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                         Top = 241
                         Width = 792
                         Height = 174
-                        ActivePage = TabSheet10
+                        ActivePage = TabSheet5
                         Align = alClient
                         Style = tsFlatButtons
                         TabOrder = 0
@@ -1920,6 +1945,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                               Height = 126
                               Align = alClient
                               DataSource = dtmConfig.dsMsgPlataforma
+                              Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit]
                               TabOrder = 0
                               TitleFont.Charset = DEFAULT_CHARSET
                               TitleFont.Color = clWindowText
@@ -2255,7 +2281,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                             Caption = 'Pedidos'
                             TabOrder = 0
                             object Label73: TLabel
-                              Left = 72
+                              Left = 74
                               Top = 95
                               Width = 50
                               Height = 13
@@ -2263,7 +2289,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                               Caption = 'Vendedor:'
                             end
                             object Label75: TLabel
-                              Left = 33
+                              Left = 35
                               Top = 16
                               Width = 89
                               Height = 13
@@ -2271,7 +2297,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                               Caption = 'Tipo Venda (REQ):'
                             end
                             object Label76: TLabel
-                              Left = 356
+                              Left = 358
                               Top = 16
                               Width = 82
                               Height = 13
@@ -2282,21 +2308,21 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                             object Label93: TLabel
                               Left = 49
                               Top = 69
-                              Width = 73
+                              Width = 75
                               Height = 13
                               Alignment = taRightJustify
-                              Caption = 'Tipo de cliente:'
+                              Caption = 'Tipo de Cliente:'
                             end
                             object Label94: TLabel
-                              Left = 17
+                              Left = 4
                               Top = 41
-                              Width = 105
+                              Width = 120
                               Height = 13
                               Alignment = taRightJustify
-                              Caption = 'Condi'#231#227'o Pagamento:'
+                              Caption = 'Condi'#231#227'o de Pagamento:'
                             end
                             object EditHwVendedorHwCloudIA: TEditHw
-                              Left = 128
+                              Left = 130
                               Top = 92
                               Width = 63
                               Height = 21
@@ -2308,7 +2334,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                               FormatSize = '0.2'
                             end
                             object DBLookupComboBoxVendedorHwCloudIA: TDBLookupComboBox
-                              Left = 197
+                              Left = 199
                               Top = 92
                               Width = 573
                               Height = 21
@@ -2319,7 +2345,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                               OnExit = DBLookupComboBoxVendedorHwCloudIAExit
                             end
                             object DBComboBoxTipoVendaPadraoOSHwCloudIA: TDBComboBox
-                              Left = 444
+                              Left = 446
                               Top = 11
                               Width = 159
                               Height = 21
@@ -2331,7 +2357,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                               OnExit = DBComboBoxUsarAPICogHwCloudIAExit
                             end
                             object DBComboBoxTipoVendaPadraoREQHwCloudIA: TDBComboBox
-                              Left = 128
+                              Left = 130
                               Top = 11
                               Width = 159
                               Height = 21
@@ -2340,10 +2366,9 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                               DataSource = dtmConfig.dsConfigAPI
                               ItemHeight = 13
                               TabOrder = 0
-                              OnExit = DBComboBoxUsarAPICogHwCloudIAExit
                             end
                             object EditHwTipoClienteHwCloudIA: TEditHw
-                              Left = 128
+                              Left = 130
                               Top = 66
                               Width = 63
                               Height = 21
@@ -2355,7 +2380,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                               FormatSize = '0.2'
                             end
                             object DBLookupComboBoxTipoClienteHwCLoudIA: TDBLookupComboBox
-                              Left = 197
+                              Left = 199
                               Top = 66
                               Width = 573
                               Height = 21
@@ -2366,7 +2391,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                               OnExit = DBLookupComboBoxTipoClienteHwCLoudIAExit
                             end
                             object EditHwCondPagHwCloudIA: TEditHw
-                              Left = 128
+                              Left = 130
                               Top = 39
                               Width = 63
                               Height = 21
@@ -2378,7 +2403,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                               FormatSize = '0.2'
                             end
                             object DBLookupComboBoxCondPagHwCloudIA: TDBLookupComboBox
-                              Left = 197
+                              Left = 199
                               Top = 39
                               Width = 573
                               Height = 21
@@ -3521,7 +3546,6 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                                 DataSource = dtmConfig.dsConfigAPI
                                 ItemHeight = 13
                                 Items.Strings = (
-                                  ''
                                   'gdrive')
                                 TabOrder = 0
                               end

@@ -57,7 +57,7 @@ A configuração OpenSslConfig aponta somente para um perfil já preparado pelo 
 
 O cache e os registros ficam sob .git, fora do versionamento. last-sync.json registra revisão/commit SVN e pai/commit GitHub publicados. A preparação temporária é removida após sucesso. Em rejeição de push, mantém o repositório temporário e informa seu caminho, com o commit preservado para revisão. Não faz troca automática para o SVN tradicional; a alternativa é executar a entrada comum na outra pasta de integração.
 
-Esta operação é somente SVN → GitHub. A entrega GitHub → SVN permanece uma etapa posterior, a implementar com os dois modos. Não executa dcommit, commit SVN, build ou alterações nos clones de trabalho.
+Esta operação é somente SVN → GitHub. A entrega GitHub → SVN é uma etapa separada, implementada por `deliver-svn.ps1` nos dois modos. A sincronização não executa dcommit, commit SVN, build ou alterações nos clones de trabalho.
 
 ## Iniciar demanda
 
@@ -77,7 +77,15 @@ Quando o próprio script está numa working copy SVN, como na integração, pede
 
 `-ConfigPath`, quando informado, seleciona explicitamente o arquivo de opções Git; se esse arquivo não existir, a execução é interrompida. A sincronização continua exclusiva da integração, com as validações próprias já existentes.
 
-Sem `-Branch`, solicita o nome completo no terminal. Enter vazio cancela antes de qualquer operação Git. Em execução com entrada redirecionada, informe o parâmetro explicitamente.
+Pelo menu, a ação usa `-Gui`: uma janela solicita o nome completo da branch e, quando chamada da integração SVN, uma janela anterior seleciona o clone Git. Cancelar ou deixar o nome vazio encerra antes de qualquer operação Git. O caminho escolhido não é persistido. O menu inicia esse processo com `-STA`, necessário às janelas no Windows; a entrada não depende do cursor do terminal integrado.
+
+Na chamada direta sem `-Gui` nem `-Branch`, o nome continua sendo solicitado no terminal. Enter vazio cancela antes de qualquer operação Git. Em execução com entrada redirecionada, informe os parâmetros explicitamente. Para usar as janelas fora do menu:
+
+```powershell
+pwsh -NoProfile -STA -File .\_automation\workflow\start-demand.ps1 -Gui
+```
+
+Os parâmetros `-WorkPath` e `-Branch`, quando fornecidos, dispensam as respectivas janelas. A validação e o fluxo Git são os mesmos nos dois modos de entrada.
 
 O comando:
 

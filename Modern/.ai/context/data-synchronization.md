@@ -39,15 +39,21 @@ not benefit from separate Ports.
 
 The fiscal synchronization currently uses:
 
-- `CalculadoraReader` for the SERPRO SQLite `calculadora.db`;
+- `CalculadoraApiReader` for calculator fiscal data obtained through the API;
 - `NCMJsonReader` for SICOMEX JSON data;
 - `IbptCsvReader` for IBPT CSV data;
 - `TabelasFiscaisNFSeCsvReader` for GovNFSe CSV data;
 - `ERPWriter` as the Firebird Writer for the corresponding ERP tables.
 
-The SQLite source receives a separate `IDatabaseConnection` created through
-`IDatabaseConnectionFactory`. JSON and CSV sources use format-specific adapters and
-do not require a database connection.
+The developer confirmed on 2026-10-28 that the calculator API replaced the former
+`CalculadoraReader` / SQLite `calculadora.db` flow. The file synchronization Use
+Case ignores a residual `calculadora.db` manifest entry without downloading,
+hashing, or scheduling removal of that file. Do not infer an active SQLite import
+from remaining adapters or old distribution manifests.
+
+API, JSON, and CSV sources use protocol- or format-specific adapters and do not
+require an external database connection. An approved external-database source
+would require a separate connection through `IDatabaseConnectionFactory`.
 
 The application Use Case coordinates download, temporary-file cleanup, manifest
 hashes, and the operational Firebird transaction. Concrete Readers and Writers are
@@ -67,9 +73,10 @@ behavior, and compatibility with future source versions.
 
 ## Source Version Compatibility
 
-The current synchronization records downloaded-file hashes, but the canonical
-strategy for handling incompatible schema or format versions published by an
-external source is still unresolved. Until that strategy is defined, a detected
+File-based synchronization records downloaded-file hashes. The presence of API
+version-control components does not by itself establish the canonical strategy for
+handling incompatible external schema or format versions; that strategy remains
+unresolved. Until it is defined, a detected
 source-contract change must be raised to the developer before adapting or importing
 the new version.
 

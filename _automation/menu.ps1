@@ -3,8 +3,8 @@
 .SYNOPSIS
     Central interativa das automações do HWDESKTOP.
 .DESCRIPTION
-    Apresenta as áreas planejadas, informações locais e os novos comandos
-    de Build / Deploy, preservando as interações dos comandos originais.
+    Apresenta Build / Deploy, sincronização, início e merge de demandas,
+    dependências, preparação de entrega SVN e informações locais.
 .PARAMETER Preview
     Exibe a tela inicial sem aguardar entrada ou alterar o terminal.
 .PARAMETER NoColor
@@ -133,9 +133,12 @@ function Write-MenuScreen {
 }
 
 function Invoke-MenuScript {
-    param([string] $Engine, [string] $ScriptPath, [string[]] $Arguments = @(), [switch] $Plain)
+    param([string] $Engine, [string] $ScriptPath, [string[]] $Arguments = @(), [switch] $Plain, [switch] $Sta)
     $hasDiagnostic = $false
-    & $Engine -NoLogo -NoProfile -File $ScriptPath @Arguments 2>&1 | ForEach-Object {
+    $engineArguments = @('-NoLogo', '-NoProfile')
+    if ($Sta) { $engineArguments += '-STA' }
+    $engineArguments += @('-File', $ScriptPath)
+    & $Engine @engineArguments @Arguments 2>&1 | ForEach-Object {
         if ($_ -is [System.Management.Automation.ErrorRecord]) {
             if (-not $hasDiagnostic) {
                 Write-Host ''
@@ -177,7 +180,7 @@ function Invoke-MenuCommand {
             $scriptPath = Join-Path $PSScriptRoot 'workflow\sync-integration.ps1'
         }
         elseif ($Item.Id -eq 'start') {
-            $commandArguments = @()
+            $commandArguments = @('-Gui')
             $scriptPath = Join-Path $PSScriptRoot 'workflow\start-demand.ps1'
         }
         elseif ($Item.Id -eq 'integrate') {
@@ -198,7 +201,7 @@ function Invoke-MenuCommand {
         }
         $engine = (Get-Process -Id $PID).Path
         $PSNativeCommandUseErrorActionPreference = $false
-        $operationExitCode = Invoke-MenuScript -Engine $engine -ScriptPath $scriptPath -Arguments $commandArguments -Plain:$Plain
+        $operationExitCode = Invoke-MenuScript -Engine $engine -ScriptPath $scriptPath -Arguments $commandArguments -Plain:$Plain -Sta:($Item.Id -eq 'start')
         if ($operationExitCode -ne 0) { Write-Host "`nA operação terminou com erro (código $operationExitCode)." -ForegroundColor Red }
     }
     catch { Write-Host "`n$($_.Exception.Message)" -ForegroundColor Red }
@@ -220,7 +223,7 @@ function Invoke-AutomationMenu {
         [pscustomobject]@{ Label = 'Iniciar demanda'; Description = 'Atualizar a base Git e criar a branch de trabalho.'; Status = 'Disponível'; Id = 'start' }
         [pscustomobject]@{ Label = 'Integrar demanda'; Description = 'Atualizar a main e incorporar a demanda local, sem push.'; Status = 'Disponível'; Id = 'integrate' }
         [pscustomobject]@{ Label = 'Preparar dependências'; Description = 'Obter build em dcp e runtime em bpl pelo Nextcloud.'; Status = 'Disponível'; Id = 'dependencies' }
-        [pscustomobject]@{ Label = 'Entregar ao SVN'; Description = 'Preparar a main publicada para entrega SVN; confirmação pelo terminal.'; Status = 'Disponível'; Id = 'deliver' }
+        [pscustomobject]@{ Label = 'Entregar ao SVN'; Description = 'Preparar a entrega; commit SVN por chamada separada com -Commit.'; Status = 'Disponível'; Id = 'deliver' }
         [pscustomobject]@{ Label = 'Informações do ambiente'; Description = 'Consultar caminhos e a versão do PowerShell.'; Status = 'Disponível'; Id = 'environment' }
     )
     $buildItems = @(

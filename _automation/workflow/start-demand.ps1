@@ -3,22 +3,72 @@
 .SYNOPSIS
     Atualiza o clone de desenvolvimento e cria a branch de uma demanda.
 .PARAMETER Branch
-    Nome completo da nova branch. Sem o parâmetro, solicita o nome no terminal.
+    Nome completo da nova branch. Sem o parâmetro, solicita o nome no terminal
+    ou na janela ativada por -Gui.
 .PARAMETER ConfigPath
     Configuração opcional do clone alvo, utilizada somente para GitBranch.
 .PARAMETER WorkPath
     Clone alvo nesta execução. Por padrão, usa o projeto do próprio script.
-    Quando o script pertence à integração SVN, solicita o clone no terminal.
+    Quando o script pertence à integração SVN, solicita o clone; com -Gui,
+    utiliza uma janela de seleção de pasta.
+.PARAMETER Gui
+    Usa janelas para selecionar o clone e informar a branch. Requer Windows e
+    PowerShell iniciado com -STA; o menu fornece essas opções automaticamente.
 #>
 [CmdletBinding()]
 param(
     [string] $Branch,
     [string] $ConfigPath,
-    [string] $WorkPath
+    [string] $WorkPath,
+    [switch] $Gui
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+
+function Read-DemandInput {
+    param(
+        [ValidateSet('WorkPath', 'Branch')] [string] $Kind,
+        [switch] $Gui,
+        [string] $InitialDirectory
+    )
+
+    if (-not $Gui) {
+        if ([Console]::IsInputRedirected) {
+            if ($Kind -eq 'WorkPath') { throw 'Informe -WorkPath com o clone Git a preparar, ou execute pelo menu do próprio clone.' }
+            throw 'Informe o nome da nova branch pelo parâmetro -Branch.'
+        }
+        $prompt = if ($Kind -eq 'WorkPath') { 'Diretório do clone Git de trabalho (Enter para cancelar)' }
+                  else { 'Nome da nova branch (Enter para cancelar)' }
+        return Read-Host $prompt
+    }
+
+    if (-not $IsWindows) { throw 'A entrada gráfica requer Windows. Informe -WorkPath e -Branch para executar sem janelas.' }
+    if ([Threading.Thread]::CurrentThread.GetApartmentState() -ne 'STA') {
+        throw 'Para usar -Gui, inicie o PowerShell com -STA ou utilize Iniciar demanda no menu.'
+    }
+    if ($Kind -eq 'WorkPath') {
+        Add-Type -AssemblyName System.Windows.Forms
+        $dialog = [Windows.Forms.FolderBrowserDialog]::new()
+        try {
+            $dialog.Description = 'HWDESKTOP — Selecione o clone Git de trabalho'
+            $dialog.UseDescriptionForTitle = $true
+            $dialog.ShowNewFolderButton = $false
+            $dialog.SelectedPath = $InitialDirectory
+            if ($dialog.ShowDialog() -eq [Windows.Forms.DialogResult]::OK) { return $dialog.SelectedPath }
+            return ''
+        }
+        finally { $dialog.Dispose() }
+    }
+
+    Add-Type -AssemblyName Microsoft.VisualBasic
+    Add-Type -AssemblyName Microsoft.VisualBasic.Forms
+    return [Microsoft.VisualBasic.Interaction]::InputBox(
+        'Informe o nome completo da nova branch. Cancelar ou deixar vazio encerra sem iniciar a demanda.',
+        'HWDESKTOP — Iniciar demanda',
+        ''
+    )
+}
 
 function Invoke-DemandProcess {
     param([string[]] $Arguments, [string] $Directory)
@@ -48,15 +98,20 @@ function Invoke-DemandProcess {
 
 function Invoke-StartDemand {
     # CommandRunner permite simular falhas nos testes com repositórios temporários.
-    param([string] $Branch, [string] $ConfigPath, [string] $WorkPath, [scriptblock] $CommandRunner)
+    param([string] $Branch, [string] $ConfigPath, [string] $WorkPath, [switch] $Gui,
+          [scriptblock] $CommandRunner, [scriptblock] $InputReader)
     $phase = 'Definir clone de desenvolvimento'
     $lastState = 'Nenhuma troca de branch ou atualização de arquivos foi concluída.'
     try {
         $sourceRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..')).TrimEnd('\', '/')
+        function Read-Input {
+            param([string] $Kind)
+            if ($null -ne $InputReader) { return & $InputReader $Kind }
+            Read-DemandInput -Kind $Kind -Gui:$Gui -InitialDirectory (Split-Path -Parent $sourceRoot)
+        }
         if ([string]::IsNullOrWhiteSpace($WorkPath)) {
             if ([IO.Directory]::Exists((Join-Path $sourceRoot '.svn'))) {
-                if ([Console]::IsInputRedirected) { throw 'Informe -WorkPath com o clone Git a preparar, ou execute pelo menu do próprio clone.' }
-                $WorkPath = Read-Host 'Diretório do clone Git de trabalho (Enter para cancelar)'
+                $WorkPath = Read-Input 'WorkPath'
                 if ([string]::IsNullOrWhiteSpace($WorkPath)) {
                     Write-Host 'Início da demanda cancelado; nenhuma operação Git executada.'
                     return
@@ -82,8 +137,7 @@ function Invoke-StartDemand {
         elseif ($explicitConfig) { throw "Configuração informada não encontrada: $configFile" }
 
         if ([string]::IsNullOrWhiteSpace($Branch)) {
-            if ([Console]::IsInputRedirected) { throw 'Informe o nome da nova branch pelo parâmetro -Branch.' }
-            $Branch = Read-Host 'Nome da nova branch (Enter para cancelar)'
+            $Branch = Read-Input 'Branch'
             if ([string]::IsNullOrWhiteSpace($Branch)) {
                 Write-Host 'Início da demanda cancelado; nenhuma operação Git executada.'
                 return
@@ -176,7 +230,7 @@ function Invoke-StartDemand {
 # Dot-sourcing carrega as funções para testes sem iniciar uma demanda.
 if ($MyInvocation.InvocationName -ne '.') {
     try {
-        Invoke-StartDemand -Branch $Branch -ConfigPath $ConfigPath -WorkPath $WorkPath
+        Invoke-StartDemand -Branch $Branch -ConfigPath $ConfigPath -WorkPath $WorkPath -Gui:$Gui
         exit 0
     }
     catch {

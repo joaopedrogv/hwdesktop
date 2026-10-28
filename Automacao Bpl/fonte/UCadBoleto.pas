@@ -1470,7 +1470,7 @@ begin
 
   if FrameCheckListaContato.CheckListBoxAplicativo.Visible then
   begin
-  	for I := 0 to FrameCheckListaContato.CheckListBoxAplicativo.Items.Count - 1 do
+  	 for I := 0 to FrameCheckListaContato.CheckListBoxAplicativo.Items.Count - 1 do
       if FrameCheckListaContato.CheckListBoxAplicativo.Checked[I] then
       begin
         vSel := True;
@@ -1496,26 +1496,29 @@ begin
     Exit;
   end;
 
-  if FrameCheckListaContato.CheckListBoxAplicativo.Visible then
+  if (ckEnviarBoleto.Visible) and (ckEnviarBoleto.Checked) then
   begin
-  	if (not vSel) then
+    if FrameCheckListaContato.CheckListBoxAplicativo.Visible then
     begin
-      Application.MessageBox(PChar('Forma de envio (' + vDadosIni.retornaNomesAplicativo(FrameCheckListaContato.CheckListBoxAplicativo) + ') não informada.'),
-        'Atenção', MB_ICONWARNING + MB_DEFBUTTON1);
-      if (Self.Enabled) and (Self.Visible) and (FrameCheckListaContato.CheckListBoxAplicativo.CanFocus) then
-      	FrameCheckListaContato.CheckListBoxAplicativo.SetFocus;
-      exit;
-    end;
-  end
-  else
-  begin
-    if (not vSel) then
+     if (not vSel) then
+      begin
+        Application.MessageBox(PChar('Forma de envio (' + vDadosIni.retornaNomesAplicativo(FrameCheckListaContato.CheckListBoxAplicativo) + ') não informada.'),
+          'Atenção', MB_ICONWARNING + MB_DEFBUTTON1);
+        if (Self.Enabled) and (Self.Visible) and (FrameCheckListaContato.CheckListBoxAplicativo.CanFocus) then
+           FrameCheckListaContato.CheckListBoxAplicativo.SetFocus;
+        exit;
+      end;
+    end
+    else
     begin
-      Application.MessageBox('Contato não informado.',
-        'Atenção', MB_ICONWARNING + MB_DEFBUTTON1);
-      if (Self.Enabled) and (Self.Visible) and (FrameCheckListaContato.CheckListBoxContato.CanFocus) then
-      	FrameCheckListaContato.CheckListBoxContato.SetFocus;
-      exit;
+      if (not vSel) then
+      begin
+        Application.MessageBox('Contato não informado.',
+          'Atenção', MB_ICONWARNING + MB_DEFBUTTON1);
+        if (Self.Enabled) and (Self.Visible) and (FrameCheckListaContato.CheckListBoxContato.CanFocus) then
+           FrameCheckListaContato.CheckListBoxContato.SetFocus;
+        exit;
+      end;
     end;
   end;
 
@@ -1666,7 +1669,7 @@ end;
 procedure TfrmCadBoletos.ckEnviarBoletoClick(Sender: TObject);
 begin
   inherited;
-	if (ckImprimirBoleto.Visible) and (ckEnviarBoleto.Visible) then
+  if (ckImprimirBoleto.Visible) and (ckEnviarBoleto.Visible) then
     if (not ckEnviarBoleto.Checked) then
       ckImprimirBoleto.Checked := true;
 
@@ -1676,14 +1679,14 @@ begin
 
   pnSelecionarConvenio.Height := vDadosIni.IfThen(FrameCheckListaContato.GroupBoxContato.Visible, 241, 146);
 
-  ckConfEmailWhatsAppAssunto.Enabled := (ckEnviarBoleto.Checked);
+  ckConfEmailWhatsAppAssunto.Enabled := (ckEnviarBoleto.Visible) and (ckEnviarBoleto.Checked);
 
-	ckUnicoEmailWhatsApp.Enabled := (ckEnviarBoleto.Checked);
+  ckUnicoEmailWhatsApp.Enabled := (ckEnviarBoleto.Visible) and (ckEnviarBoleto.Checked);
 
   if not ckConfEmailWhatsAppAssunto.Enabled then
     ckConfEmailWhatsAppAssunto.Checked := False;
   if not ckUnicoEmailWhatsApp.Enabled then
-  	ckUnicoEmailWhatsApp.Checked := False;
+  	 ckUnicoEmailWhatsApp.Checked := False;
 end;
 
 procedure TfrmCadBoletos.ckEnviarEmailClick(Sender: TObject);

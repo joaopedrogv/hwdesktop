@@ -4172,6 +4172,9 @@ begin
       if fempty('url_api') then
         fdata('url_api').Put('https://hwcloudia.hwsistemasti.com.br/');
 
+      if fempty('usar_api_pedido') then
+        fdata('usar_api_pedido').Put('N');
+
       if fempty('usar_api_cog') then
         fdata('usar_api_cog').Put('N');
 
@@ -4438,6 +4441,9 @@ begin
       if fempty('url_api') then
         fdata('url_api').Put('https://hwcloudia.hwsistemasti.com.br/');
 
+      if fempty('usar_api_pedido') then
+        fdata('usar_api_pedido').Put('N');
+        
       if fempty('usar_api_cog') then
         fdata('usar_api_cog').Put('N');
 
@@ -4937,6 +4943,9 @@ begin
       if trim(dataSet.FieldByName('TOKEN_API').AsString) = '' then
       	raiseExceptionCreate('Authorization não informado.', 'DBEditAuthorizationHwCloudIA');
 
+      if trim(dataSet.FieldByName('USAR_API_PEDIDO').AsString) = '' then
+         raiseExceptionCreate('Utilizar Venda Online (API Pedido) não informado.', 'DBComboBoxUsarAPIPedidoHwCloudIA');
+
       if trim(dataSet.FieldByName('USAR_API_COG').AsString) = '' then
       	raiseExceptionCreate('Utilizar Bot (API Cog) não informado.', 'DBComboBoxUsarAPICogHwCloudIA');
 
@@ -4973,229 +4982,421 @@ begin
       	raiseExceptionCreate('Horário do sábado final não informado.', 'DBEditSabadoFimHwCloudIA');
           
     	if dataSet.FieldByName('PESO_POPULARIDADE').AsInteger <= 0 then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Peso (Popularidade) não informado.', 'DBEditPesoPopularidadeHwCloudIA');
+      end;
 
       if dataSet.FieldByName('PESO_NIVEL_GIRO_MEDIO').AsInteger <= 0 then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Peso (Nível Giro Médio) não informado.', 'DBEditPesoNivelGiroMedioHwCloudIA');
+      end;
 
       if dataSet.FieldByName('PESO_DEMANDA').AsInteger <= 0 then
-      	raiseExceptionCreate('Peso (Demanda) não informado.', 'DBEditPesoDemandaHwCloudIA');
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
+        raiseExceptionCreate('Peso (Demanda) não informado.', 'DBEditPesoDemandaHwCloudIA');
+      end;
 
       if dataSet.FieldByName('PESO_FREQUENCIA').AsInteger <= 0 then
-      	raiseExceptionCreate('Peso (Frequência) não informado.', 'DBEditPesoFrequenciaHwCloudIA');
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
+        raiseExceptionCreate('Peso (Frequência) não informado.', 'DBEditPesoFrequenciaHwCloudIA');
+      end;
 
       if dataSet.FieldByName('PESO_PRECO').AsInteger <= 0 then
-      	raiseExceptionCreate('Peso (Preço) não informado.', 'DBEditPesoPrecoHwCloudIA');
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
+        raiseExceptionCreate('Peso (Preço) não informado.', 'DBEditPesoPrecoHwCloudIA');
+      end;
 
       if (dataSet.FieldByName('PESO_POPULARIDADE').AsInteger +
-      		dataSet.FieldByName('PESO_NIVEL_GIRO_MEDIO').AsInteger +
+      	 dataSet.FieldByName('PESO_NIVEL_GIRO_MEDIO').AsInteger +
           dataSet.FieldByName('PESO_DEMANDA').AsInteger +
           dataSet.FieldByName('PESO_FREQUENCIA').AsInteger +
           dataSet.FieldByName('PESO_PRECO').AsInteger <> 100) then
-          	raiseExceptionCreate('Soma dos Pesos não deve ser diferente de 100%.', 'DBEditPesoPopularidade');
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
+        raiseExceptionCreate('Soma dos Pesos não deve ser diferente de 100%.', 'DBEditPesoPopularidade');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_BAIXO_INI').AsFloat <= 0 then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro baixo inicial não informado.', 'DBEditGiroBaixaIniHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_BAIXO_FIM').AsFloat <= 0 then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro baixo final não informado.', 'DBEditGiroBaixoFimHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_MEDIO_INI').AsFloat <= 0 then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro médio inicial não informado.', 'DBEditGiroMedioIniHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_MEDIO_FIM').AsFloat <= 0 then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro médio final não informado.', 'DBEditGiroMedioFimHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_ALTO_INI').AsFloat <= 0 then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro alto inicial não informado.', 'DBEditGiroAltoIniHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_ALTO_FIM').AsFloat <= 0 then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro alto final não informado.', 'DBEditGiroAltoFimHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_BAIXO_INI').AsFloat >= dataSet.FieldByName('GIRO_PADRAO_BAIXO_FIM').AsFloat then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro baixo inicial deve ser menor que o giro baixo final.', 'DBEditGiroBaixaIniHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_MEDIO_INI').AsFloat >= dataSet.FieldByName('GIRO_PADRAO_MEDIO_FIM').AsFloat then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro médio inicial deve ser menor que o giro médio final.', 'DBEditGiroMedioIniHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_ALTO_INI').AsFloat >= dataSet.FieldByName('GIRO_PADRAO_ALTO_FIM').AsFloat then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro alto inicial deve ser menor que o giro alto final.', 'DBEditGiroAltoIniHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_BAIXO_INI').AsFloat >= dataSet.FieldByName('GIRO_PADRAO_MEDIO_INI').AsFloat then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro baixo inicial deve ser menor que o giro médio inicial.', 'DBEditGiroBaixaIniHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_BAIXO_INI').AsFloat >= dataSet.FieldByName('GIRO_PADRAO_MEDIO_FIM').AsFloat then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro baixo inicial deve ser menor que o giro médio final.', 'DBEditGiroBaixaIniHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_BAIXO_FIM').AsFloat >= dataSet.FieldByName('GIRO_PADRAO_MEDIO_INI').AsFloat then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro baixo final deve ser menor que o giro médio inicial.', 'DBEditGiroBaixoFimHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_BAIXO_FIM').AsFloat >= dataSet.FieldByName('GIRO_PADRAO_MEDIO_FIM').AsFloat then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro baixo final deve ser menor que o giro médio final.', 'DBEditGiroBaixoFimHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_BAIXO_INI').AsFloat >= dataSet.FieldByName('GIRO_PADRAO_ALTO_INI').AsFloat then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro baixo inicial deve ser menor que o giro alto inicial.', 'DBEditGiroBaixaIniHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_BAIXO_INI').AsFloat >= dataSet.FieldByName('GIRO_PADRAO_ALTO_FIM').AsFloat then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro baixo inicial deve ser menor que o giro alto final.', 'DBEditGiroBaixaIniHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_BAIXO_FIM').AsFloat >= dataSet.FieldByName('GIRO_PADRAO_ALTO_INI').AsFloat then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro baixo final deve ser menor que o giro alto inicial.', 'DBEditGiroBaixoFimHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_BAIXO_FIM').AsFloat >= dataSet.FieldByName('GIRO_PADRAO_ALTO_FIM').AsFloat then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro baixo final deve ser menor que o giro alto final.', 'DBEditGiroBaixoFimHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_MEDIO_INI').AsFloat >= dataSet.FieldByName('GIRO_PADRAO_ALTO_INI').AsFloat then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro médio inicial deve ser menor que o giro alto inicial.', 'DBEditGiroMedioIniHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_MEDIO_INI').AsFloat >= dataSet.FieldByName('GIRO_PADRAO_ALTO_FIM').AsFloat then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro médio inicial deve ser menor que o giro alto final.', 'DBEditGiroMedioIniHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_MEDIO_FIM').AsFloat >= dataSet.FieldByName('GIRO_PADRAO_ALTO_INI').AsFloat then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro médio final deve ser menor que o giro alto inicial.', 'DBEditGiroMedioFimHwCloudIA');
+      end;
 
       if dataSet.FieldByName('GIRO_PADRAO_MEDIO_FIM').AsFloat >= dataSet.FieldByName('GIRO_PADRAO_ALTO_FIM').AsFloat then
+      begin
+        frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet6;
         raiseExceptionCreate('Giro médio final deve ser menor que o giro alto final.', 'DBEditGiroMedioFimHwCloudIA');
+      end;
 
-      if trim(dataSet.FieldByName('TIPO_VENDA').AsString) = '' then
-      	raiseExceptionCreate('Tipo de Venda não informado.', 'DBComboBoxTipoVendaPadraoREQHwCloud');
+      if trim(dataSet.FieldByName('USAR_API_PEDIDO').AsString) = 'S' then
+      begin
+        if trim(dataSet.FieldByName('TIPO_VENDA').AsString) = '' then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet8;
+          raiseExceptionCreate('Tipo de Venda não informado.', 'DBComboBoxTipoVendaPadraoREQHwCloud');
+        end;
 
-      if trim(dataSet.FieldByName('TIPO_VENDA').AsString) <> '' then
-        if not buscarTipoVenda('REQ', Copy(trim(dataSet.FieldByName('TIPO_VENDA').AsString), 1, 1)) then
-          raiseExceptionCreate('Sigla "' + Copy(trim(dataSet.FieldByName('TIPO_VENDA').AsString), 1, 1) +
-            '" para tipo de venda "REQ" não encontrada.', 'DBComboBoxTipoVendaPadraoREQHwCloud');
+        if trim(dataSet.FieldByName('TIPO_VENDA').AsString) <> '' then
+          if not buscarTipoVenda('REQ', Copy(trim(dataSet.FieldByName('TIPO_VENDA').AsString), 1, 1)) then
+          begin
+        	 	frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet8;
+            raiseExceptionCreate('Sigla "' + Copy(trim(dataSet.FieldByName('TIPO_VENDA').AsString), 1, 1) +
+              '" para tipo de venda "REQ" não encontrada.', 'DBComboBoxTipoVendaPadraoREQHwCloud');
+          end;
 
-      if trim(dataSet.FieldByName('TIPO_OS').AsString) = '' then
-      	raiseExceptionCreate('Tipo de OS não informado.', 'DBComboBoxTipoVendaPadraoOSHwCloud');
+        if trim(dataSet.FieldByName('TIPO_OS').AsString) = '' then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet8;
+          raiseExceptionCreate('Tipo de OS não informado.', 'DBComboBoxTipoVendaPadraoOSHwCloud');
+        end;
 
-      if trim(dataSet.FieldByName('TIPO_OS').AsString) <> '' then
-        if not buscarTipoVenda('OS', dataSet.FieldByName('TIPO_OS').AsString) then
-          raiseExceptionCreate('Tipo de OS "' + dataSet.FieldByName('TIPO_OS').AsString +
-            '" para tipo de venda "OS" não encontrada.', 'DBComboBoxTipoVendaPadraoOSHwCloud');
-            
-      if vcodcondpag <= 0 then
-         raiseExceptionCreate('Condição de Pagamento não informado.', 'EditHwCondPagHwCloudIA');
+        if trim(dataSet.FieldByName('TIPO_OS').AsString) <> '' then
+          if not buscarTipoVenda('OS', dataSet.FieldByName('TIPO_OS').AsString) then
+          begin
+        	 	frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet8;
+            raiseExceptionCreate('Tipo de OS "' + dataSet.FieldByName('TIPO_OS').AsString +
+              '" para tipo de venda "OS" não encontrada.', 'DBComboBoxTipoVendaPadraoOSHwCloud');
+          end;
 
-      if vcodcondpag > 0 then
-        if not buscarCondPag(vcodcondpag) then
-          raiseExceptionCreate('Condição de Pagamento não encontrada!', 'EditHwCondPagHwCloudIA');
+        if vcodcondpag <= 0 then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet8;
+          raiseExceptionCreate('Condição de Pagamento não informado.', 'EditHwCondPagHwCloudIA');
+        end;
 
-      if vcodtipocliente <= 0 then
-      	raiseExceptionCreate('Tipo de Cliente não informado.', 'EditHwTipoClienteHwCloudIA');
+        if vcodcondpag > 0 then
+          if not buscarCondPag(vcodcondpag) then
+          begin
+            frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet8;
+            raiseExceptionCreate('Condição de Pagamento não encontrada!', 'EditHwCondPagHwCloudIA');
+          end;
 
-      if vcodtipocliente > 0 then
-        if not buscarTipoCliente(vcodtipocliente) then
-          raiseExceptionCreate('Tipo de cliente não encontrado!', 'EditHwTipoClienteHwCloudIA');
+        if vcodtipocliente <= 0 then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet8;
+          raiseExceptionCreate('Tipo de Cliente não informado.', 'EditHwTipoClienteHwCloudIA');
+        end;
 
-      if vcodvendedor <= 0 then
-        raiseExceptionCreate('Vendedor não informado.', 'EditHwVendedorHwCloudIA');
+        if vcodtipocliente > 0 then
+          if not buscarTipoCliente(vcodtipocliente) then
+          begin
+        	 	frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet8;
+            raiseExceptionCreate('Tipo de cliente não encontrado!', 'EditHwTipoClienteHwCloudIA');
+          end;
 
-      if vcodvendedor > 0 then
-        if not buscarVendedor(vcodvendedor) then
-          raiseExceptionCreate('Vendedor não encontrado!', 'EditHwVendedorHwCloudIA');
+        if vcodvendedor <= 0 then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet8;
+          raiseExceptionCreate('Vendedor não informado.', 'EditHwVendedorHwCloudIA');
+        end;
 
-      if trim(dataSet.FieldByName('CAMINHO_LOGO_EMP').AsString) <> '' then
-        if not FileExists(trim(dataSet.FieldByName('CAMINHO_LOGO_EMP').AsString)) then
-          raiseExceptionCreate('Logo da empresa não encontrado.', 'DBEditLogoEmpHwCloudIA');
+        if vcodvendedor > 0 then
+          if not buscarVendedor(vcodvendedor) then
+          begin
+        	 	frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet8;
+            raiseExceptionCreate('Vendedor não encontrado!', 'EditHwVendedorHwCloudIA');
+          end;
 
-      if trim(dataSet.FieldByName('CAMINHO_LOGO_EMP').AsString) <> '' then
-        if LowerCase(ExtractFileExt(trim(dataSet.FieldByName('CAMINHO_LOGO_EMP').AsString))) <> '.png' then
-          raiseExceptionCreate('Extensão da logo da empresa incorreta, extensão deve ser (.png)', 'DBEditLogoEmpHwCloudIA');
+        if trim(dataSet.FieldByName('CAMINHO_LOGO_EMP').AsString) <> '' then
+          if not FileExists(trim(dataSet.FieldByName('CAMINHO_LOGO_EMP').AsString)) then
+          begin
+        	 	frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet7;
+            raiseExceptionCreate('Logo da empresa não encontrado.', 'DBEditLogoEmpHwCloudIA');
+          end;
 
-      if trim(dataSet.FieldByName('CAMINHO_LOGO_EMP').AsString) <> '' then
-        dataSet.FieldByName('CAMINHO_LOGO_EMP_BASE64').AsString := _strImagetoBase64(trim(dataSet.FieldByName('CAMINHO_LOGO_EMP').AsString))
-      else
-        dataSet.FieldByName('CAMINHO_LOGO_EMP_BASE64').Value := Null;
+        if trim(dataSet.FieldByName('CAMINHO_LOGO_EMP').AsString) <> '' then
+          if LowerCase(ExtractFileExt(trim(dataSet.FieldByName('CAMINHO_LOGO_EMP').AsString))) <> '.png' then
+          begin
+        	 	frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet7;
+            raiseExceptionCreate('Extensão da logo da empresa incorreta, extensão deve ser (.png)', 'DBEditLogoEmpHwCloudIA');
+          end;
 
-      if trim(dataSet.FieldByName('CAMINHO_FAVICON_EMP').AsString) <> '' then
-        if not FileExists(trim(dataSet.FieldByName('CAMINHO_FAVICON_EMP').AsString)) then
-          raiseExceptionCreate('Favicon da empresa não encontrado.', 'DBEditFaviconEmpresaHwCloudIA');
+        if trim(dataSet.FieldByName('CAMINHO_LOGO_EMP').AsString) <> '' then
+          dataSet.FieldByName('CAMINHO_LOGO_EMP_BASE64').AsString := _strImagetoBase64(trim(dataSet.FieldByName('CAMINHO_LOGO_EMP').AsString))
+        else
+          dataSet.FieldByName('CAMINHO_LOGO_EMP_BASE64').Value := Null;
 
-      if trim(dataSet.FieldByName('CAMINHO_FAVICON_EMP').AsString) <> '' then
-        if LowerCase(ExtractFileExt(trim(dataSet.FieldByName('CAMINHO_FAVICON_EMP').AsString))) <> '.ico' then
-          raiseExceptionCreate('Extensão do favicon da empresa incorreta, extensão deve ser (.ico)', 'DBEditFaviconEmpresaHwCloudIA');
-      
-      if trim(dataSet.FieldByName('CAMINHO_FAVICON_EMP').AsString) <> '' then
-        dataSet.FieldByName('CAMINHO_FAVICON_EMP_BASE64').AsString := _strImagetoBase64(trim(dataSet.FieldByName('CAMINHO_FAVICON_EMP').AsString))
-      else
-        dataSet.FieldByName('CAMINHO_FAVICON_EMP_BASE64').Value := Null;
+        if trim(dataSet.FieldByName('CAMINHO_FAVICON_EMP').AsString) <> '' then
+          if not FileExists(trim(dataSet.FieldByName('CAMINHO_FAVICON_EMP').AsString)) then
+          begin
+        	 	frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet7;
+            raiseExceptionCreate('Favicon da empresa não encontrado.', 'DBEditFaviconEmpresaHwCloudIA');
+          end;
 
-    	if trim(dataSet.FieldByName('COR_PRIMARY').AsString) = '' then
-        raiseExceptionCreate('Cor Primary não informada.', 'pnCorPrimaryHwCloudIA');
+        if trim(dataSet.FieldByName('CAMINHO_FAVICON_EMP').AsString) <> '' then
+          if LowerCase(ExtractFileExt(trim(dataSet.FieldByName('CAMINHO_FAVICON_EMP').AsString))) <> '.ico' then
+          begin
+        	 	frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet7;
+            raiseExceptionCreate('Extensão do favicon da empresa incorreta, extensão deve ser (.ico)', 'DBEditFaviconEmpresaHwCloudIA');
+          end;
 
-      if trim(dataSet.FieldByName('COR_PRIMARY_CONTAINER').AsString) = '' then
-        raiseExceptionCreate('Cor Primary Container não informada.', 'pnCorPrimaryContainerHwCloudIA');
+        if trim(dataSet.FieldByName('CAMINHO_FAVICON_EMP').AsString) <> '' then
+          dataSet.FieldByName('CAMINHO_FAVICON_EMP_BASE64').AsString := _strImagetoBase64(trim(dataSet.FieldByName('CAMINHO_FAVICON_EMP').AsString))
+        else
+          dataSet.FieldByName('CAMINHO_FAVICON_EMP_BASE64').Value := Null;
 
-      if trim(dataSet.FieldByName('COR_PRIMARY_FIXED').AsString) = '' then
-        raiseExceptionCreate('Cor Primary Fixed não informada.', 'pnCorPrimaryFixedHwCloudIA');
+        if trim(dataSet.FieldByName('COR_PRIMARY').AsString) = '' then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet4;
+          raiseExceptionCreate('Cor Primary não informada.', 'pnCorPrimaryHwCloudIA');   
+        end;
 
-      if trim(dataSet.FieldByName('COR_ON_PRIMARY').AsString) = '' then
-        raiseExceptionCreate('Cor On Primary não informada.', 'pnCorOnPrimaryHwCloudIA');
+        if trim(dataSet.FieldByName('COR_PRIMARY_CONTAINER').AsString) = '' then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet4;
+          raiseExceptionCreate('Cor Primary Container não informada.', 'pnCorPrimaryContainerHwCloudIA');
+        end;
 
-      if trim(dataSet.FieldByName('COR_SECONDARY').AsString) = '' then
-        raiseExceptionCreate('Cor Secondary não informada.', 'pnCorSecondaryHwCloudIA');
+        if trim(dataSet.FieldByName('COR_PRIMARY_FIXED').AsString) = '' then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet4;
+          raiseExceptionCreate('Cor Primary Fixed não informada.', 'pnCorPrimaryFixedHwCloudIA');
+        end;
 
-      if trim(dataSet.FieldByName('COR_SECONDARY_CONTAINER').AsString) = '' then
-        raiseExceptionCreate('Cor Secondary Container não informada.', 'pnCorSecondaryContainerHwCloudIA');
+        if trim(dataSet.FieldByName('COR_ON_PRIMARY').AsString) = '' then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet4;
+          raiseExceptionCreate('Cor On Primary não informada.', 'pnCorOnPrimaryHwCloudIA');
+        end;
 
-      if trim(dataSet.FieldByName('COR_TERTIARY').AsString) = '' then
-        raiseExceptionCreate('Cor Tertiary não informada.', 'pnCorTertiaryHwCloudIA');
+        if trim(dataSet.FieldByName('COR_SECONDARY').AsString) = '' then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet4;
+          raiseExceptionCreate('Cor Secondary não informada.', 'pnCorSecondaryHwCloudIA');
+        end;
 
-      if trim(dataSet.FieldByName('COR_ERROR').AsString) = '' then
-        raiseExceptionCreate('Cor Error não informada.', 'pnCorErrorHwCloudIA');
+        if trim(dataSet.FieldByName('COR_SECONDARY_CONTAINER').AsString) = '' then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet4;
+          raiseExceptionCreate('Cor Secondary Container não informada.', 'pnCorSecondaryContainerHwCloudIA');
+        end;
 
-      if trim(dataSet.FieldByName('COR_BACKGROUND').AsString) = '' then
-        raiseExceptionCreate('Cor Background não informada.', 'pnCorBackGroundHwCloudIA');
+        if trim(dataSet.FieldByName('COR_TERTIARY').AsString) = '' then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet4;
+          raiseExceptionCreate('Cor Tertiary não informada.', 'pnCorTertiaryHwCloudIA');
+        end;
 
-      if trim(dataSet.FieldByName('COR_SURFACE_LOWEST').AsString) = '' then
-        raiseExceptionCreate('Cor Primary não informada.', 'pnCorSurfaceLowestHwCloudIA');
+        if trim(dataSet.FieldByName('COR_ERROR').AsString) = '' then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet4;
+          raiseExceptionCreate('Cor Error não informada.', 'pnCorErrorHwCloudIA');
+        end;
 
-      if trim(dataSet.FieldByName('COR_SURFACE_LOW').AsString) = '' then
-        raiseExceptionCreate('Cor Primary não informada.', 'pnCorSurfaceLowHwCloudIA');
+        if trim(dataSet.FieldByName('COR_BACKGROUND').AsString) = '' then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet4;
+          raiseExceptionCreate('Cor Background não informada.', 'pnCorBackGroundHwCloudIA');
+        end;
+
+        if trim(dataSet.FieldByName('COR_SURFACE_LOWEST').AsString) = '' then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet4;
+          raiseExceptionCreate('Cor Primary não informada.', 'pnCorSurfaceLowestHwCloudIA');
+        end;
+
+        if trim(dataSet.FieldByName('COR_SURFACE_LOW').AsString) = '' then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet4;
+          raiseExceptionCreate('Cor Primary não informada.', 'pnCorSurfaceLowHwCloudIA');
+        end;
+
+        if vConfigAPIpromocaoOrdem.IsEmpty then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet10;
+          raiseExceptionCreate('Nenhuma tabela de preço adicionada.', 'TreeViewPromocaoHwCloudIA_DB');
+        end;
+
+        try
+          vConfigAPIpromocaoOrdem.dataSet.First;
+          while not vConfigAPIpromocaoOrdem.dataSet.Eof do
+          begin
+            if (Trim(vConfigAPIpromocaoOrdem.dataSet.FieldByName('TAB_CE').AsString) <> 'S')
+              and (trim(vConfigAPIpromocaoOrdem.dataSet.FieldByName('TAB_CI').AsString) <> 'S') then
+              begin
+                frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet10;
+                raiseExceptionCreate('Precisa informar o tipo da tabela de preço (CE/CI): ' + #13 + #13 +
+                  'TABELA DE PREÇO' + #13 +
+                  'Código: ' + IntToStr(vConfigAPIpromocaoOrdem.dataSet.FieldByName('COD_PROMOCAO').AsInteger) + #13 +
+                  'Descrição: ' + Trim(vConfigAPIpromocaoOrdem.dataSet.FieldByName('DESCR_PROMOCAO').AsString) + #13 + #13 +
+                  'Favor verificar antes de continuar.', 'TreeViewPromocaoHwCloudIA_DB');
+              end;
+
+            vConfigAPIpromocaoOrdem.dataSet.Next;
+          end;
+        finally
+          vConfigAPIpromocaoOrdem.dataSet.First;
+        end;
+      end;
 
       if trim(dataSet.FieldByName('USAR_API_COG').AsString) = 'S' then
       begin
         if trim(dataSet.FieldByName('DRIVE_TYPE').AsString) = '' then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet9;
           raiseExceptionCreate('drive type não informado.', 'DBComboBoxDriveTypeHwCloudIA');
+        end;
 
         if trim(dataSet.FieldByName('DRIVE_CHECK_MODIF').AsString) = '' then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet9;
           raiseExceptionCreate('drive check_modification não informado.', 'DBComboBoxDriveCheckModif');
+        end;
 
         if (trim(dataSet.FieldByName('DRIVE_CHECK_MODIF').AsString) <> 'S') and (trim(dataSet.FieldByName('DRIVE_CHECK_MODIF').AsString) <> 'N') then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet9;
           raiseExceptionCreate('drive check_modification incorreto.', 'DBComboBoxDriveCheckModif');
+        end;
 
         if trim(dataSet.FieldByName('UTIL_AGENTIC_RAG').AsString) = '' then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet9;
           raiseExceptionCreate('util agentic_rag não informado.', 'DBComboBoxUtlAgenticRagHwCloudIA');
+        end;
 
         if (trim(dataSet.FieldByName('UTIL_AGENTIC_RAG').AsString) <> 'S') and (trim(dataSet.FieldByName('UTIL_AGENTIC_RAG').AsString) <> 'N') then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet9;
           raiseExceptionCreate('util agentic_incorreto.', 'DBComboBoxUtlAgenticRagHwCloudIA');
+        end;
 
         if trim(dataSet.FieldByName('PASTA_PADRAO_DRIVE').AsString) = '' then
+        begin
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet9;
           raiseExceptionCreate('pasta padrao_drive não informado.', 'DBEditPastaPadraoDriveHwCloudIA');
+        end;
 
         if trim(dataSet.FieldByName('DRIVE_CREDENTIALS').AsString) = '' then
-          raiseExceptionCreate('drive credentials não informado.', 'DBMemoDriveCredentials');
-      end;
-
-      if vConfigAPIpromocaoOrdem.IsEmpty then
-        raiseExceptionCreate('Nenhuma tabela de preço adicionada.', 'TreeViewPromocaoHwCloudIA_DB');
-
-      try
-        vConfigAPIpromocaoOrdem.dataSet.First;
-        while not vConfigAPIpromocaoOrdem.dataSet.Eof do
         begin
-          if (Trim(vConfigAPIpromocaoOrdem.dataSet.FieldByName('TAB_CE').AsString) <> 'S')
-          	and (trim(vConfigAPIpromocaoOrdem.dataSet.FieldByName('TAB_CI').AsString) <> 'S') then
-              raiseExceptionCreate('Precisa informar o tipo da tabela de preço (CE/CI): ' + #13 + #13 +
-              	'TABELA DE PREÇO' + #13 +
-               'Código: ' + IntToStr(vConfigAPIpromocaoOrdem.dataSet.FieldByName('COD_PROMOCAO').AsInteger) + #13 +
-               'Descrição: ' + Trim(vConfigAPIpromocaoOrdem.dataSet.FieldByName('DESCR_PROMOCAO').AsString) + #13 + #13 +
-               'Favor verificar antes de continuar.', 'TreeViewPromocaoHwCloudIA_DB');
-
-          vConfigAPIpromocaoOrdem.dataSet.Next;
+        	 frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet9;
+          raiseExceptionCreate('drive credentials não informado.', 'DBMemoDriveCredentials');
         end;
-      finally
-        vConfigAPIpromocaoOrdem.dataSet.First;
+
+        if vConfigAPIcollectionsRag.dataSet.IsEmpty then
+        begin
+          frmCadConfigAPI.PageControl4.ActivePage := frmCadConfigAPI.TabSheet11;
+          raiseExceptionCreate('Nenhuma collection rag adicionada.', 'DBGridCollectionRagHwCloudIA');
+        end;
       end;
     end
     else if trim(dataSet.FieldByName('API').AsString) = 'SUZUKI' then
@@ -5375,7 +5576,8 @@ begin
 
     if vDadosIni.GetIni('MD', 'MHTT', 'N') <> 'S' then
       if trim(vapi) = 'HWCLOUD_IA' then
-        vDadosIni.buscarConfigHwCloud;
+        if vDadosIni.vHwCloudIA.vUsarServMensageria = 'S' then
+          vDadosIni.buscarConfigHwCloud;
 
     Refresh;
 

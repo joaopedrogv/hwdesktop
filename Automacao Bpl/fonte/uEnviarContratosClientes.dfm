@@ -1814,7 +1814,7 @@ inherited frmEnviarContratosClientes: TfrmEnviarContratosClientes
                   Top = 24
                   Width = 123
                   Height = 17
-                  Caption = 'Gerar arquivo zipado'
+                  Caption = 'Gerar Arquivo Zipado'
                   TabOrder = 2
                   OnClick = ckGerarArqZipadoClick
                 end

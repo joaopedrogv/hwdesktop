@@ -93,6 +93,16 @@ substituídas. A seção de simplificação de outubro de 2026, no final do arqu
 substitui o papel operacional separado, a dependência do fork e o planner somente
 leitura descritos no histórico.
 
+### Reconciliação da fonte da calculadora — 28/10/2026
+
+- [x] Incorporar a confirmação do responsável de que a API substituiu a importação
+  de `calculadora.db`/SQLite. Atualizar stack, sincronização, contexto fiscal,
+  restrição de banco e explicação humana. Os itens históricos de stack abaixo
+  descrevem decisões anteriores e não tornam o fluxo antigo vigente.
+- [x] Preservar a restrição de uso de SQLite, as regras de população das tabelas
+  espelho e a pendência sobre compatibilidade de fontes externas. A existência de
+  componentes de versão da API não resolve, por si só, essa estratégia.
+
 ### Integração ativa do Codex
 
 - [x] Confirmar na documentação oficial vigente que o Codex carrega `AGENTS.md`,

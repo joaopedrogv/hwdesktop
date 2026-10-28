@@ -1335,7 +1335,11 @@ begin
       vdtItensProd.FieldDefs.Add('QTDE_CONV', ftFloat, 0, false);
       vdtItensProd.FieldDefs.Add('QUANT_DEV_ITEM_TEMP_CONV', ftFloat, 0, false);
       vdtItensProd.FieldDefs.Add('VL_UNIT_CONV', ftFloat, 0, false);
+      vdtItensProd.FieldDefs.Add('VL_UNIT_CONV_LIQ', ftFloat, 0, false);
       vdtItensProd.FieldDefs.Add('VL_TOT', ftFloat, 0, false);
+      vdtItensProd.FieldDefs.Add('VL_TOT_LIQ', ftFloat, 0, false);
+      vdtItensProd.FieldDefs.Add('RATEIO_DESC', ftFloat, 0, false);
+      vdtItensProd.FieldDefs.Add('RATEIO_ACRESC', ftFloat, 0, false);
       vdtItensProd.FieldDefs.Add('COD_CLIENTE', ftInteger, 0, false);
       vdtItensProd.FieldDefs.Add('GRUPO_PROD', ftInteger, 0, false);
       vdtItensProd.FieldDefs.Add('COD_PROD', ftString, 6, false);
@@ -1351,6 +1355,7 @@ begin
       vdtItensProd.FieldDefs.Add('QTDE', ftFloat, 0, false);
       vdtItensProd.FieldDefs.Add('QUANT_DEV_ITEM_TEMP', ftFloat, 0, false);
       vdtItensProd.FieldDefs.Add('VL_UNIT', ftFloat, 0, false);
+      vdtItensProd.FieldDefs.Add('VL_UNIT_LIQ', ftFloat, 0, false);
       vdtItensProd.FieldDefs.Add('N_ITEM', ftInteger, 0, false);
       vdtItensProd.FieldDefs.Add('COD_EMPRESA', ftInteger, 0, false);
       vdtItensProd.FieldDefs.Add('UNIDADE', ftString, 6, false);
@@ -1373,8 +1378,12 @@ begin
         vdtItensProd.FieldByName('NUM_FAB_PROD').DisplayLabel := 'Numero Fabricação';
         vdtItensProd.FieldByName('QTDE_CONV').DisplayLabel := 'Qtde';
         vdtItensProd.FieldByName('QUANT_DEV_ITEM_TEMP_CONV').DisplayLabel := 'Qtde Dev';
-        vdtItensProd.FieldByName('VL_UNIT_CONV').DisplayLabel := 'Valor Unitário';
-        vdtItensProd.FieldByName('VL_TOT').DisplayLabel := 'Valor Total';
+        vdtItensProd.FieldByName('VL_UNIT_CONV').DisplayLabel := 'Val. Unitário Bruto';
+        vdtItensProd.FieldByName('VL_UNIT_CONV_LIQ').DisplayLabel := 'Val. Unitário Liq';
+        vdtItensProd.FieldByName('VL_TOT').DisplayLabel := 'Total Bruto';
+        vdtItensProd.FieldByName('VL_TOT_LIQ').DisplayLabel := 'Total Liq';
+        vdtItensProd.FieldByName('RATEIO_DESC').DisplayLabel := 'Rateio de Desconto';
+        vdtItensProd.FieldByName('RATEIO_ACRESC').DisplayLabel := 'Rateio do Acréscimo';
         vdtItensProd.FieldByName('COD_CLIENTE').DisplayLabel := 'Cod Cliente';
         vdtItensProd.FieldByName('COD_EMPRESA').DisplayLabel := 'Cod Empresa';
         vdtItensProd.FieldByName('GRUPO_PROD').DisplayLabel := 'Grupo Produto';
@@ -1385,20 +1394,26 @@ begin
         vdtItensProd.FieldByName('DESCRICAOGRADE').DisplayLabel := 'GRADE';
         vdtItensProd.FieldByName('STATUS_PED').DisplayLabel := 'Status Pedido';
         vdtItensProd.FieldByName('STATUS').DisplayLabel := 'Status';
-				vdtItensProd.FieldByName('TABPRATICADA').DisplayLabel := 'Preço P/T/Q/N';
+		  vdtItensProd.FieldByName('TABPRATICADA').DisplayLabel := 'Preço P/T/Q/N';
         vdtItensProd.FieldByName('QTDE').DisplayLabel := 'Qtde (Un Princ)';
-        vdtItensProd.FieldByName('VL_UNIT').DisplayLabel := 'Valor Unitário (Un Princ)';
+        vdtItensProd.FieldByName('VL_UNIT').DisplayLabel := 'Val. Unitário Bruto (Un Princ)';
+        vdtItensProd.FieldByName('VL_UNIT_LIQ').DisplayLabel := 'Val. Unitário Liq (Un Princ)';
         vdtItensProd.FieldByName('QUANT_DEV_ITEM_TEMP').DisplayLabel := 'Qtde Dev (Un Princ)';
         vdtItensProd.FieldByName('N_ITEM').DisplayLabel := 'Nº Item';
 
         TFloatField(vdtItensProd.FieldByName('VALOR')).DisplayFormat := '##0.00';
         TFloatField(vdtItensProd.FieldByName('QTDE')).DisplayFormat := '##0.0000';
-        TFloatField(vdtItensProd.FieldByName('QTDE_CONV')).DisplayFormat := '##0.0000';
+        TFloatField(vdtItensProd.FieldByName('QTDE_CONV')).DisplayFormat := '##0.0000';        
         TFloatField(vdtItensProd.FieldByName('QUANT_DEV_ITEM_TEMP')).DisplayFormat := '##0.0000';
         TFloatField(vdtItensProd.FieldByName('QUANT_DEV_ITEM_TEMP_CONV')).DisplayFormat := '##0.0000';
-        TFloatField(vdtItensProd.FieldByName('VL_UNIT')).DisplayFormat := '##0.000';
         TFloatField(vdtItensProd.FieldByName('VL_UNIT_CONV')).DisplayFormat := '##0.000';
+        TFloatField(vdtItensProd.FieldByName('VL_UNIT_CONV_LIQ')).DisplayFormat := '##0.000';
+        TFloatField(vdtItensProd.FieldByName('VL_UNIT')).DisplayFormat := '##0.000';
+        TFloatField(vdtItensProd.FieldByName('VL_UNIT_LIQ')).DisplayFormat := '##0.000';
         TFloatField(vdtItensProd.FieldByName('VL_TOT')).DisplayFormat := '##0.000';
+        TFloatField(vdtItensProd.FieldByName('VL_TOT_LIQ')).DisplayFormat := '##0.000';
+        TFloatField(vdtItensProd.FieldByName('RATEIO_DESC')).DisplayFormat := '##0.000';
+        TFloatField(vdtItensProd.FieldByName('RATEIO_ACRESC')).DisplayFormat := '##0.000';
 
         vdtItensProd.FieldByName('COD_EMPRESA').Visible := False;
         vdtItensProd.FieldByName('UNIDADE').Visible := False;
@@ -1473,65 +1488,21 @@ begin
       buscas.Open;
 
       try
-      	buscas.DisableControls;
+        buscas.DisableControls;
         buscas.First;
         while not buscas.Eof do
         begin
         	vdtItensProd.Insert;
           for I := 0 to vdtItensProd.Fields.Count - 1 do
-          	if (vdtItensProd.Fields[I].FieldName <> 'QTDE_CONV')
-            	and (vdtItensProd.Fields[I].FieldName <> 'VL_UNIT_CONV')
-              and (vdtItensProd.Fields[I].FieldName <> 'QUANT_DEV_ITEM_TEMP')
+          	if (vdtItensProd.Fields[I].FieldName <> 'QUANT_DEV_ITEM_TEMP')
               and (vdtItensProd.Fields[I].FieldName <> 'QUANT_DEV_ITEM_TEMP_CONV') then
           			vdtItensProd.FieldByName(vdtItensProd.Fields[I].FieldName).Value := buscas.FieldByName(vdtItensProd.Fields[I].FieldName).Value;
-
-          if (trim(vdtItensProd.FieldByName('UNIDADE_CONV').AsString) = '')
-            or (UpperCase(trim(vdtItensProd.FieldByName('UNIDADE').AsString)) = UpperCase(trim(vdtItensProd.FieldByName('UNIDADE_CONV').AsString))) then
-          begin
-          	vdtItensProd.FieldByName('QTDE_CONV').AsFloat := RoundTo(
-              vdtItensProd.FieldByName('QTDE').AsFloat, - 4);
-
-            vdtItensProd.FieldByName('VL_UNIT_CONV').AsFloat := RoundTo(
-              vdtItensProd.FieldByName('VL_UNIT').AsFloat, - vDadosIni.vEmp.vCasasDecimais);
-          end
-          else
-          begin
-            if (vdtItensProd.FieldByName('OPERACAO_CONV').AsString = 'M') and (vdtItensProd.FieldByName('FATOR_CONV').AsFloat > 0) then
-            begin
-            	vdtItensProd.FieldByName('QTDE_CONV').AsFloat := RoundTo(
-                vdtItensProd.FieldByName('QTDE').AsFloat *
-                  vdtItensProd.FieldByName('FATOR_CONV').AsFloat, - 4);
-
-              vdtItensProd.FieldByName('VL_UNIT_CONV').AsFloat := RoundTo(
-                vdtItensProd.FieldByName('VL_UNIT').AsFloat /
-                  vdtItensProd.FieldByName('FATOR_CONV').AsFloat, - vDadosIni.vEmp.vCasasDecimais);
-            end
-            else if (vdtItensProd.FieldByName('OPERACAO_CONV').AsString = 'D') and (vdtItensProd.FieldByName('FATOR_CONV').AsFloat > 0) then
-    				begin
-             	vdtItensProd.FieldByName('QTDE_CONV').AsFloat := RoundTo(
-                vdtItensProd.FieldByName('QTDE').AsFloat /
-                  vdtItensProd.FieldByName('FATOR_CONV').AsFloat, - 4);
-
-              vdtItensProd.FieldByName('VL_UNIT_CONV').AsFloat := RoundTo(
-                vdtItensProd.FieldByName('VL_UNIT').AsFloat *
-                  vdtItensProd.FieldByName('FATOR_CONV').AsFloat, - vDadosIni.vEmp.vCasasDecimais);
-            end
-            else
-    				begin
-            	vdtItensProd.FieldByName('QTDE_CONV').AsFloat := RoundTo(
-        				vdtItensProd.FieldByName('QTDE').AsFloat, - 4);
-
-              vdtItensProd.FieldByName('VL_UNIT_CONV').AsFloat := RoundTo(
-        				vdtItensProd.FieldByName('VL_UNIT').AsFloat, - vDadosIni.vEmp.vCasasDecimais);
-            end;
-          end;
-
           vdtItensProd.Post;
 
           buscas.Next;
         end;
       finally
-      	buscas.EnableControls;
+        buscas.EnableControls;
         buscas.First;
       end;
 
@@ -1545,7 +1516,7 @@ begin
         vdtItensProd.First;
         while not vdtItensProd.Eof do
         begin
-        	buscas2.Close;
+        	 buscas2.Close;
           buscas2.SQL.Text := ' select ' + QuotedStr(vdtItensProd.FieldByName('TP').AsString) + ' tipo, ' +
             ' d.grupo_prod, d.cod_prod, d.cod_grade, sum(coalesce(d.quant, 0)) quant_dev_item from devolucao d ' +
             ' where d.cod_venda = ' + IntToStr(vdtItensProd.FieldByName('NDOC').AsInteger) +
@@ -1597,8 +1568,8 @@ begin
 
                 vdtSetDevTemp.Insert;
                 vdtSetDevTemp.FieldByName('NPED').AsInteger := vdtItensProd.FieldByName('NDOC').AsInteger;
-              	vdtSetDevTemp.FieldByName('TIPO').AsString := vdtItensProd.FieldByName('TP').AsString;
-              	vdtSetDevTemp.FieldByName('GRUPO_PROD').AsInteger := vdtItensProd.FieldByName('GRUPO_PROD').AsInteger;
+              	 vdtSetDevTemp.FieldByName('TIPO').AsString := vdtItensProd.FieldByName('TP').AsString;
+              	 vdtSetDevTemp.FieldByName('GRUPO_PROD').AsInteger := vdtItensProd.FieldByName('GRUPO_PROD').AsInteger;
                 vdtSetDevTemp.FieldByName('COD_PROD').AsString := vdtItensProd.FieldByName('COD_PROD').AsString;
                 vdtSetDevTemp.FieldByName('COD_GRADE').AsInteger := vdtItensProd.FieldByName('COD_GRADE').AsInteger;
                 vdtSetDevTemp.FieldByName('QUANT_DEV_REST').AsFloat := buscas2.FieldByName('QUANT_DEV_ITEM').AsFloat;
@@ -1674,7 +1645,7 @@ begin
   	                vdtItensProd.FieldByName('FATOR_CONV').AsFloat, - 4);
               end
               else if (vdtItensProd.FieldByName('OPERACAO_CONV').AsString = 'D') and (vdtItensProd.FieldByName('FATOR_CONV').AsFloat > 0) then
-    					begin
+    			  begin
                 vdtItensProd.FieldByName('QUANT_DEV_ITEM_TEMP_CONV').AsFloat := RoundTo(
 	                vdtItensProd.FieldByName('QUANT_DEV_ITEM_TEMP').AsFloat /
   	                vdtItensProd.FieldByName('FATOR_CONV').AsFloat, - 4);

@@ -2550,6 +2550,12 @@ object dtmConfig: TdtmConfig
       EditMask = '!90:00;1;_'
       Size = 5
     end
+    object cdsConfigAPIUSAR_API_PEDIDO: TStringField
+      Tag = 1
+      DisplayLabel = 'Usar Api Pedido'
+      FieldName = 'USAR_API_PEDIDO'
+      Size = 1
+    end
     object cdsConfigAPIUSAR_API_COG: TStringField
       Tag = 1
       DisplayLabel = 'Usar API Cog'
