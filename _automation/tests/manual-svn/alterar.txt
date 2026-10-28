@@ -1,0 +1,2 @@
+Base da validacao SVN tradicional.
+Este arquivo sera alterado pela demanda.
