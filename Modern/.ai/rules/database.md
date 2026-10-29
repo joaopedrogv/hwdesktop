@@ -17,6 +17,15 @@ applies_to:
 - Remaining SQLite adapters MUST NOT be treated as approval for a new SQLite flow or an alternative ERP operational database.
 - Preserve the database engine established by the component being modified.
 
+## Schema Reference for Agent Work
+
+- The shared generated snapshot is at ../scripts/database/schema/schema.sql; read ../scripts/database/schema/README.md for provenance and availability first.
+- Search for the affected objects and read only the relevant definitions and dependencies. Do not load the entire snapshot by default.
+- Use an identified reference state. Code, old migration commands, and a source-control revision alone do not prove the current physical schema.
+- Keep the snapshot distinct from pending demand SQL. Never edit the generated DDL manually to simulate an unapplied change.
+- If the snapshot is absent, stale, or incomplete for the affected scope, identify the missing evidence before designing a physical change that depends on it. Do not silently substitute an arbitrary database.
+- A schema reference does not require giving the agent a physical database, customer records, or unrestricted live access. Executing SQL and integration tests remains separately authorized.
+
 ## Data Access
 
 - Business, domain, and application code MUST NOT directly depend on concrete database libraries or components such as UniDAC, FireDAC, ZeosLib, `TFDQuery`, or `TUniQuery`.

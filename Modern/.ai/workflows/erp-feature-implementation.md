@@ -145,7 +145,10 @@ the document directly. Include:
 - types, Ports, Use Case inputs/outputs, and Services;
 - validation, transaction, and ownership boundaries;
 - repositories, adapters, integrations, composition, and factories;
-- physical persistence and development migration strategy;
+- physical persistence and development migration strategy, identifying the schema
+  reference and pending changes; route general development SQL through
+  ../scripts/database/changes/<demand-id>/ under database-migration, preserving explicit
+  specialized exceptions;
 - UI integration;
 - approved process codes, permission checks, manager approval, and audit outcomes;
 - affected test projects and support code.

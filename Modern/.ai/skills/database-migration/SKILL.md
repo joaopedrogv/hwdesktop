@@ -161,9 +161,36 @@ During development, SQL is tested against the developer's database before it is 
 
 Do NOT place unfinished migration commands into the active production version file unless explicitly instructed.
 
-The canonical project location for general temporary development scripts has not
-yet been standardized. Follow the location specified by the developer or the
-current task.
+### General Demand Scripts
+
+Prepare general development migration SQL outside Modern at:
+
+```text
+../scripts/database/changes/<demand-id>/
+```
+
+Read ../scripts/database/README.md. Verify the physical starting state against the generated
+reference at ../scripts/database/schema/schema.sql and its provenance in
+../scripts/database/schema/README.md. Search only the relevant objects and dependencies;
+keep already approved pending migrations distinct from that baseline. If required
+schema evidence is unavailable, report the specific gap instead of inventing DDL.
+
+Start with one migration file. Use ordered names such as 001-condicoes.sql and
+002-complemento.sql when distinct increments need an explicit application order;
+do not create a file per Agent message. Record the baseline, order, delivery
+commands, and actual validation/application status in the demand's existing plan
+or notes. Keep diagnostic queries and test fixtures distinguishable from delivery
+migration commands.
+
+An unexecuted draft may be revised. SQL already applied to a shared database needs
+an identifiable subsequent change; editing an old file does not update that database.
+Do not execute SQL, refresh the schema snapshot, or incorporate commands into
+../scripts/versoes/ implicitly during implementation. Preserve the source link when
+commands are incorporated so that completed scripts are not treated as pending.
+
+Prepare commands with the documented pkReestrutura interpreter in mind. A DDL
+extraction or a script containing client directives is not automatically valid input
+for that interpreter; review the statement boundaries at incorporation time.
 
 ### Fiscal.Calculos version-range scripts
 

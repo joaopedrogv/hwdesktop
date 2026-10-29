@@ -3,10 +3,12 @@
 
 # Acompanhar o próprio filtro
 !/.gitignore
+!/AGENTS.md
 
 # Descartáveis dentro das áreas liberadas
 .svn/
 _history/
+__recovery/
 *.res
 *.dcu
 *.identcache
@@ -55,6 +57,7 @@ Utilitario/*
 Hw Gestor/Documentação/
 HWNFeDX/ERP-ACBr-*.groupproj
 Automacao Bpl/ERP-*.bdsgroup
+Automacao Bpl/hwdesktop-*.bdsgroup
 Ativos/dpk/manifest_crc.txt
 
 # Permite Bpl - Diretório de saída de compilacao
@@ -64,10 +67,17 @@ Ativos/dpk/manifest_crc.txt
 
 # Permite em Scripts
 !/scripts/versoes/
+!/scripts/database/
 
 # Permite em Utilitario
 !/Utilitario/HW.UTILS.DX
 !/Utilitario/md5XE3
+
+# Bancos físicos e backups ficam fora da referência estrutural
+scripts/database/**/*.fdb
+scripts/database/**/*.fbk
+scripts/database/**/*.gdb
+scripts/database/**/*.gbk
 
 # Exclusões especificas
 _automation/config/config-paths.bat
@@ -87,3 +97,5 @@ _automation/temp/
 
 ### Permite exclusivos especificos.
 !/Hw Gestor/fontes/html.res
+_automation/config/database.local.psd1
+scripts/database/schema/.export-*/
