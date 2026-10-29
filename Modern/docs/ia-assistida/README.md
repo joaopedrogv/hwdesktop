@@ -132,6 +132,14 @@ Exemplos:
 - [integração da UI Modern com o legado](../../.ai/context/ui-integration.md);
 - [particularidades do Fiscal.Calculos](../../.ai/context/fiscal-calculos.md).
 
+Para cadastros compatíveis, o contexto de UI agora apresenta a referência de MVP
+supervisionado do cadastro RedBenefPC: formulário concreto, contrato de View,
+Presenter e composição na abertura da tela. A base TModernCadastroForm compartilha
+feedback, FiltroGrid e SetupDataSetGrid, preservando a infraestrutura legada. As
+Skills de cadastro e validação apontam esse caminho sem exigir conversão de todos
+os formulários. O core continua sem dependências visuais; permissões e auditoria
+permanecem na fronteira de UI estabelecida.
+
 Um agente deve carregar somente o Context relevante. Uma tarefa restrita ao domínio
 não precisa consumir todo o material de UI, por exemplo.
 
@@ -274,8 +282,8 @@ Uma Command não é necessária para usar uma Skill.
 | [`delphi-record-encapsulation`](../../.ai/skills/delphi-record-encapsulation/SKILL.md) | encapsular records existentes |
 | [`delphi-entity-validation`](../../.ai/skills/delphi-entity-validation/SKILL.md) | Validation Factories |
 | [`delphi-dataset-grid`](../../.ai/skills/delphi-dataset-grid/SKILL.md) | datasets baseados em `TDataSetGrid` |
-| [`delphi-cadastro-form-scaffold`](../../.ai/skills/delphi-cadastro-form-scaffold/SKILL.md) | scaffold de cadastro com `TfrmCadPadraoM` |
-| [`delphi-ui-form-validation`](../../.ai/skills/delphi-ui-form-validation/SKILL.md) | projetar validação na UI |
+| [`delphi-cadastro-form-scaffold`](../../.ai/skills/delphi-cadastro-form-scaffold/SKILL.md) | cadastro com base selecionada, infraestrutura compartilhada e MVP quando aplicável |
+| [`delphi-ui-form-validation`](../../.ai/skills/delphi-ui-form-validation/SKILL.md) | projetar validação na UI, diretamente ou pelo feedback da View/Presenter |
 | [`delphi-usecase-testing`](../../.ai/skills/delphi-usecase-testing/SKILL.md) | testes unitários isolados de Use Cases |
 | [`delphi-test-runner`](../../.ai/skills/delphi-test-runner/SKILL.md) | executar `ERP.UnitTests` quando autorizado |
 | [`rtc-update-inputs`](../../.ai/skills/rtc-update-inputs/SKILL.md) | obter do GitHub as tags e o pacote RTC exatos para uma execução |

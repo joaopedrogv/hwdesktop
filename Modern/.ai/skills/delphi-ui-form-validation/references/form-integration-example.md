@@ -1,63 +1,66 @@
 # Form Validation Integration Example
 
-The following pattern is based on an existing Modern form.
+The binding initialization stays in the concrete form because it knows the
+controls and entity metadata. This applies with or without a Presenter.
 
-## Form Initialization
+## Concrete Form Initialization
 
 ```delphi
-procedure TFrmCadRegrasRedBenefPC.FormCreate(Sender: TObject);
-var
-  Meta: EntityMetadata;
-begin
-  Meta := RegraRedBenefPcMetadata.GetMetadata();
+FFormValidator := UIFormValidatorFactory.Create()
+  .Builder(Meta, BitBtn4)
+  .Bind(edCST)
+  .Bind(edDescricao)
+  .Bind(Meta.Attribute['EmpresasId'], CheckListBoxEmpresasFrame1)
+  .Validator();
+```
 
-  FFormValidator := UIFormValidatorFactory.Create()
-    .Builder(Meta, BitBtn4)
-    .Bind(edCST)
-    .Bind(edDescricao)
-    .Bind(edPercReducao)
-    .Bind(edIndAjusteEFD)
-    .Bind(edCodAjusteEFD)
-    .Bind(edDescricaoAjusteEFD)
-    .Bind(edInfComplementarAjusteEFD)
-    .Bind(edCodContaContabil)
-    .Bind(Meta.Attribute['NaturezasReceita'], lbxNaturezasReceita)
-    .Bind(Meta.Attribute['RestricoesNcm'], lbxRestricoesNcm)
-    .Bind(edInicioVigencia)
-    .Bind(edFimVigencia)
-    .Bind(Meta.Attribute['EmpresasId'], CheckListBoxEmpresasFrame1)
-    .Validator();
+The component names illustrate implicit and explicit bindings; use only controls
+and metadata verified for the target screen. TModernCadastroForm already provides
+FFormValidator: initialize that field instead of shadowing it.
+
+## MVP Result Projection
+
+In a Presenter with an injected Use Case, consume its output and route invalid
+validation through the View contract:
+
+```delphi
+resultado := FSalvarUseCase.Executar(AAjuste);
+try
+  if not resultado.Validation.IsValid then
+    FView.ExibirValidacoes(resultado.Validation)
+  else
+    Result := True;
+finally
+  resultado.Free;
 end;
 ```
 
-This example shows both:
+This fragment belongs inside the operation's established result/error handling;
+it is not a complete method. Initialize any success flag to False before execution.
+Do not free a real reference-counted Use Case interface.
 
-- implicit component binding; and
-- explicit metadata attribute binding for list/custom controls.
+The feature View extends IViewFeedback. A TModernCadastroForm descendant reuses the
+base's ExibirValidacoes implementation, which calls FFormValidator.Validate.
+Do not copy that method into each concrete form.
 
-## Use Case Result
+The form's success branch preserves its permission/audit boundary, inherited
+completion, and refresh. Invalid validation must not run that branch.
 
-```delphi
-createResult := Container.GetInstance()
-  .ErpFeaturesFactory
-  .CreateSalvarRegraRedBenefPcUseCase()
-  .Executar(FState);
+## Other Existing Forms
 
-if not createResult.Validation.IsValid then
-  FFormValidator.Validate(createResult.Validation)
-else
-begin
-  // existing success flow
-end;
-```
-
-The form consumes validation output; it does not reproduce the entity's business
-validation rules.
+When an existing direct-form integration is outside the requested adaptation
+scope, it may continue to call FFormValidator.Validate after checking its Use Case
+result. Do not create a second validation mechanism or require an unrelated MVP
+migration.
 
 ## Reset
-
-When the form changes to a state where old validation hints are no longer valid:
 
 ```delphi
 FFormValidator.Reset();
 ```
+
+Reset when changing the edited entity or reinitializing input. This clears visual
+validation state, not business rules.
+
+Source reference: UI/Forms/RedBenefPC/UCadAjustesRedBenefPC.pas and its Presenter,
+with responsibility/ownership guidance in .ai/context/ui-integration.md.

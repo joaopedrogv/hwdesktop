@@ -103,6 +103,113 @@ this infrastructure rather than reimplementing it.
 Use the `delphi-cadastro-form-scaffold` Skill when creating a new standard
 cadastro form based on this pattern.
 
+### Modern Cadastro Base
+
+Compatible cadastros can reuse `TModernCadastroForm`, defined with its inherited
+DFM in `UI/Infrastructure/Components/ModernCadastroFormUnit.pas`. It descends from
+`TfrmCadPadraoM`; it does not replace the legacy base or apply to every Modern form.
+
+The shared base provides:
+
+- `ExibirValidacoes`, `ExibirErro`, and `ExibirInformacao`;
+- the inherited `FFormValidator` field, configured by each concrete form;
+- a borrowed `FAuditor` reference supplied by the concrete form/dataset;
+- `FiltroGrid: TFilterFramePadrao`;
+- `SetupDataSetGrid(ADataSet: TDataSetGrid)`, which connects the grid datasource
+  and calls the established legacy grid-configuration setup.
+
+`SetupDataSetGrid` does not create, configure, own, or free the dataset. Dataset
+`Setup`, metadata, filter callbacks, validation bindings, and application of field
+configuration remain explicit in the concrete form. Do not repeat the legacy
+grid-configuration call after using this helper.
+
+Do not redeclare inherited validator/auditor fields or duplicate shared feedback
+methods. Initialize the validator before feedback can be invoked. Keep process
+codes, authorization, manager approval, and audit labels/outcomes at the established
+feature-specific UI boundary; storing the auditor reference does not transfer ownership.
+
+The base DFM disables/hides the replaced legacy filter controls. Preserve unrelated
+inherited actions, especially New/Save/Edit/Delete, when adapting an inherited DFM.
+
+### Scoped MVP Presentation Pattern
+
+For compatible cadastros following the RedBenefPC pilot, use the supervising form
+of Model-View-Presenter:
+
+| Part | Responsibility |
+| --- | --- |
+| Concrete form | Controls, simple mapping, edit state, grid/filter wiring, protected-action checks, audit, and inherited visual completion. |
+| Presenter | Application calls and presentation response coordination, including validation, failures, and lookup loading. |
+| Use Cases/core | Application behavior, business rules, transactions, and persistence abstractions. |
+| Composition entry point | Create and inject the Presenter and its Use Cases before interaction is allowed. |
+
+The Presenter belongs to UI, depends on a feature View contract and application
+contracts, and must not access VCL controls, the concrete form/base class, datasets,
+or the global Container to obtain its dependencies. A form may still coordinate
+the established `TDataSetGrid` read model; moving business Use Case calls to a
+Presenter does not require moving this UI read infrastructure into the Presenter.
+
+`UI/Infrastructure/Interfaces/IViewFeedbackUnit.pas` defines `IViewFeedback`.
+A feature View interface extends it with only the presentation capabilities needed
+by that flow. The concrete form implements the feature interface and reuses the
+feedback implementations inherited from `TModernCadastroForm`.
+
+Keep feature Presenters and View contracts beside their form, under
+`UI/Forms/<MicroContext>/`. Use established names for existing files; apply naming
+Rules when introducing new files. Do not create a generic Presenter hierarchy or
+one Presenter per button merely to follow the pilot.
+
+#### Composition, Mapping, and Results
+
+Use the owning screen-opening/composition entry point to create/inject dependencies.
+The pilot uses `ShowAjustesRedBenefPC` in `package/PackageSetuptUnit.pas`.
+Do not construct Use Cases through factories/Container in the form's interaction
+handlers or inside the Presenter. Preserve the screen's modal/MDI behavior.
+
+Keep `MapStateToForm` and `MapFormToState` as mappings. Load prerequisite data
+once in an explicit preparation step and honor its result in every caller. For
+example, after `PrepararCamposCadastro` has loaded lookups and mapped the state,
+do not call the mapping again unconditionally or continue opening/unlocking the
+screen when preparation failed.
+
+Do not equate failed reads with a missing record or an empty lookup. Report the
+appropriate outcome without duplicate messages. Successful save/delete results
+must still trigger the established success audit and visual refresh.
+
+#### Ownership
+
+The form owns its Presenter and explicitly releases it before inherited destruction.
+Use Cases implemented with `TInterfacedObject` and retained through real interfaces
+are released by reference counting; do not call `.Free` on those references.
+An `I` prefix alone is not proof: older factory aliases may be classes.
+
+Entity/model results, lists, and output objects retain their explicit ownership
+contracts. In the pilot:
+
+- the form owns its edit state;
+- the Presenter releases `CreateEntityUseCaseOutput` after consuming its result;
+- `TComboboxEntityPickerFrame.LoadEntities(list, True)` claims the items, not the
+  source list container; the caller must still release that container;
+- validation results and exceptions passed to the View are consumed synchronously,
+  not retained as borrowed objects after the owning scope ends.
+
+#### Source Reference and Scope
+
+Read only the parts needed from:
+
+- `UI/Forms/RedBenefPC/UCadAjustesRedBenefPC.pas` and its DFM;
+- `UI/Forms/RedBenefPC/AjustesRedBenefPcPresenter.pas`;
+- `UI/Forms/RedBenefPC/AjustesRedBenefPcView.pas`;
+- `UI/Infrastructure/Components/ModernCadastroFormUnit.pas` and its DFM;
+- `UI/Infrastructure/Interfaces/IViewFeedbackUnit.pas`;
+- `package/PackageSetuptUnit.pas`, specifically the screen-opening method.
+
+The developer reported compiling and manually validating this pilot on 2026-10-29.
+It is implementation evidence, not a frozen template or proof that every current
+caller is correct. Inspect outcomes, ownership, and error paths before reuse.
+Existing direct-form integrations are not automatically invalid. Do not migrate
+unrelated forms, specialized dialogs, or legacy code as an incidental change.
+
 ### Other Forms
 
 Forms that do not require the behavior provided by `TfrmCadPadraoM` may use
@@ -219,6 +326,11 @@ specializes that frame for forms based on `TfrmCadPadraoM`.
 Modern code SHOULD reuse this infrastructure rather than introduce a
 parallel filtering mechanism without a specific architectural reason.
 
+A TModernCadastroForm descendant reuses FiltroGrid instead of creating a second
+copy of the frame. The concrete form binds OnFieldChange and fills the available
+fields after dataset/metadata setup. Its query action passes GetFiltros to the
+established SQLMaker/FilterMaker. Keep dataset-specific filtering outside the base.
+
 ---
 
 ## Grid Field Configuration
@@ -294,6 +406,11 @@ with a form.
 
 Entity validation rules themselves belong to the
 `delphi-entity-validation` Skill.
+
+With scoped MVP, the Presenter checks the Use Case output and calls the feature
+View's inherited ExibirValidacoes capability. TModernCadastroForm projects the
+result through its configured validator; the concrete form still creates the
+metadata/component bindings. Do not shadow the inherited FFormValidator field.
 
 ---
 
