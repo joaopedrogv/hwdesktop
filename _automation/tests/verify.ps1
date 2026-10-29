@@ -6,10 +6,10 @@
     Usa pastas temporárias e remotos Git locais. Delivery usa SVN local real e git-svn/WSL; os demais grupos simulam serviços.
     Não lê configurações pessoais ou segredos nem opera nos projetos reais.
 .PARAMETER Group
-    All executa tudo. Grupos: Build, Sync, SyncGitSvn, GitSvnAuth, ProcessEncoding, Start, Merge, Menu, Dependencies, Delivery.
+    All executa tudo. Grupos: Build, Sync, SyncGitSvn, GitSvnAuth, ProcessEncoding, Start, Merge, Menu, Dependencies, Delivery, AISetup.
 #>
 [CmdletBinding()]
-param([ValidateSet('All', 'Build', 'Sync', 'Start', 'Menu', 'Dependencies', 'Merge', 'SyncGitSvn', 'Delivery', 'GitSvnAuth', 'ProcessEncoding')] [string] $Group = 'All')
+param([ValidateSet('All', 'Build', 'Sync', 'Start', 'Menu', 'Dependencies', 'Merge', 'SyncGitSvn', 'Delivery', 'GitSvnAuth', 'ProcessEncoding', 'AISetup')] [string] $Group = 'All')
 
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $false
@@ -1766,7 +1766,158 @@ function Test-ProcessEncoding {
     }
 }
 
+function Test-AISetup {
+    $temporaryBase = [IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd('\','/')
+    $fixture = Join-Path $temporaryBase ('hwdesktop-ai-setup-' + [guid]::NewGuid().ToString('N'))
+    $project = Join-Path $fixture 'Projeto com espacos'
+    $sourceRoot = Split-Path -Parent $automationRoot
+    $engine = (Get-Process -Id $PID).Path
+
+    function WriteFixture([string]$Relative, [string]$Content) {
+        $path = Join-Path $project $Relative
+        [void][IO.Directory]::CreateDirectory((Split-Path -Parent $path))
+        [IO.File]::WriteAllText($path, $Content, [Text.UTF8Encoding]::new($false))
+    }
+    function InvokeSetup([string[]]$Parameters) {
+        $scriptPath = Join-Path $project '_automation/ai/Sync-AIProfiles.ps1'
+        $output = @(& $engine -NoLogo -NoProfile -File $scriptPath -Tool Kilo @Parameters 2>&1)
+        [pscustomobject]@{ Code=$LASTEXITCODE; Output=($output -join [Environment]::NewLine) }
+    }
+    function InstalledHashes {
+        $rows = foreach ($relative in @('.kilo','.agents')) {
+            $directory = Join-Path $project $relative
+            if ([IO.Directory]::Exists($directory)) {
+                Get-ChildItem -LiteralPath $directory -Recurse -File | Sort-Object FullName | ForEach-Object {
+                    [IO.Path]::GetRelativePath($project,$_.FullName) + '=' + (Get-FileHash -LiteralPath $_.FullName).Hash
+                }
+            }
+        }
+        return ($rows -join '|')
+    }
+    try {
+        [void][IO.Directory]::CreateDirectory($project)
+        foreach ($relative in @('AGENTS.md','Modern/AGENTS.md','_automation/ai/Sync-AIProfiles.ps1')) {
+            $target = Join-Path $project $relative
+            [void][IO.Directory]::CreateDirectory((Split-Path -Parent $target))
+            [IO.File]::Copy((Join-Path $sourceRoot $relative),$target)
+        }
+        foreach ($relative in @('.ai','Modern/.ai','_automation/ai/tool-setup')) {
+            $source = Join-Path $sourceRoot $relative
+            foreach ($file in @(Get-ChildItem -LiteralPath $source -Recurse -File | Where-Object { $_.Name -ne 'models.local.json' })) {
+                $target = Join-Path $project ($relative + '/' + [IO.Path]::GetRelativePath($source,$file.FullName))
+                [void][IO.Directory]::CreateDirectory((Split-Path -Parent $target))
+                [IO.File]::Copy($file.FullName,$target)
+            }
+        }
+        Push-Location $fixture
+        try {
+            $result = InvokeSetup @('-Action','Plan')
+            Assert-Check ($result.Code -eq 0 -and -not [IO.Directory]::Exists((Join-Path $project '.kilo'))) 'Plano resolve o checkout pelo script, fora do diretório atual, sem instalar'
+            $result = InvokeSetup @('-Action','Apply','-WhatIf')
+            Assert-Check ($result.Code -eq 0 -and -not [IO.Directory]::Exists((Join-Path $project '.agents'))) 'Apply -WhatIf não cria os adapters compartilhados'
+            WriteFixture '.kilo/commands/implement-erp-feature.md' 'arquivo local desconhecido'
+            $result = InvokeSetup @('-Action','Apply')
+            Assert-Check ($result.Code -ne 0 -and -not [IO.Directory]::Exists((Join-Path $project '.agents'))) 'Conflito no Kilo interrompe antes de instalar a dependência Shared'
+            [IO.File]::Delete((Join-Path $project '.kilo/commands/implement-erp-feature.md'))
+
+            WriteFixture '.kilo/kilo.jsonc' '{ "local": "preservar" }'
+            WriteFixture '.kilo/meu-arquivo.txt' 'conteudo pessoal ficticio'
+            WriteFixture '.kilo/agents/modern-increment-implementer-critical.md' 'adapter antigo gerenciado'
+            WriteFixture '.kilo/agents/orchestrator.md' 'adapter que colide com o nativo'
+            $state=@{schemaVersion=1;tool='Kilo';files=@(@{path='.kilo/agents/modern-increment-implementer-critical.md';sha256='antigo'},@{path='.kilo/agents/orchestrator.md';sha256='antigo'})}
+            WriteFixture '.kilo/.modern-ai-setup.json' ($state | ConvertTo-Json -Depth 5)
+            $personalHash=(Get-FileHash -LiteralPath (Join-Path $project '.kilo/kilo.jsonc')).Hash
+
+            $result = InvokeSetup @('-Action','Apply')
+            if ($result.Code -ne 0) {throw $result.Output}
+            $agents=@(Get-ChildItem -LiteralPath (Join-Path $project '.kilo/agents') -Filter '*.md' | ForEach-Object BaseName | Sort-Object)
+            $expected=@('implementer','implementer-fast','coordinator','planner','researcher','researcher-critical','reviewer') | Sort-Object
+            Assert-Check (($agents -join '|') -ceq ($expected -join '|')) 'Kilo instala os sete perfis curtos, com somente dois implementadores'
+            Assert-Check (-not [IO.File]::Exists((Join-Path $project '.kilo/agents/modern-increment-implementer-critical.md')) -and -not [IO.File]::Exists((Join-Path $project '.kilo/agents/orchestrator.md'))) 'Atualização remove os adapters antigos gerenciados e libera o nome nativo orchestrator'
+            Assert-Check ((Get-FileHash -LiteralPath (Join-Path $project '.kilo/kilo.jsonc')).Hash -eq $personalHash -and [IO.File]::ReadAllText((Join-Path $project '.kilo/meu-arquivo.txt')) -ceq 'conteudo pessoal ficticio') 'Preferências locais e arquivos desconhecidos são preservados'
+            $general=[IO.File]::ReadAllText((Join-Path $project '.agents/skills/database-migration/SKILL.md'))
+            $scoped=[IO.File]::ReadAllText((Join-Path $project '.agents/skills/delphi-cadastro-form-scaffold/SKILL.md'))
+            $special=[IO.File]::ReadAllText((Join-Path $project '.agents/skills/update-fiscal-calculos/SKILL.md'))
+            Assert-Check ($general.Contains('.ai/skills/database-migration/SKILL.md') -and $scoped.Contains('Modern/.ai/skills/delphi-cadastro-form-scaffold/SKILL.md') -and $special.Contains('Modern/.ai/commands/update-fiscal-calculos.md')) 'Wrappers apontam para a fonte exata, geral ou Modern'
+            $coordinator=[IO.File]::ReadAllText((Join-Path $project '.kilo/agents/coordinator.md'))
+            Assert-Check ($coordinator.Contains('Modern/Scripts/Fiscal.Calculos/') -and -not $coordinator.Contains('implementer-critical') -and $coordinator.Contains('quality-critical')) 'Roteamento e permissões usam os novos caminhos e o implementador padrão crítico'
+            $standard=[IO.File]::ReadAllText((Join-Path $project '.kilo/agents/implementer.md'))
+            $forcedModels=@(Get-ChildItem -LiteralPath (Join-Path $project '.kilo/agents') -Filter '*.md' | Where-Object {[regex]::IsMatch([IO.File]::ReadAllText($_.FullName),'(?m)^model:')})
+            Assert-Check ($forcedModels.Count -eq 0) 'Sem configuração individual, nenhum perfil força um modelo de LLM'
+            $result = InvokeSetup @('-Action','Check')
+            Assert-Check ($result.Code -eq 0) 'Check confirma os dois componentes instalados'
+            $hashes=InstalledHashes
+            $result = InvokeSetup @('-Action','Apply')
+            Assert-Check ($result.Code -eq 0 -and (InstalledHashes) -ceq $hashes) 'Reaplicação idêntica preserva conteúdo e state byte a byte'
+
+            WriteFixture 'Modern/.ai/skills/database-migration/SKILL.md' ([IO.File]::ReadAllText((Join-Path $project '.ai/skills/database-migration/SKILL.md')))
+            $result=InvokeSetup @('-Action','Apply')
+            Assert-Check ($result.Code -ne 0 -and $result.Output.Contains('Duplicate canonical') -and (InstalledHashes) -ceq $hashes) 'Nome de Skill duplicado entre os níveis é recusado sem modificar a instalação'
+            [IO.File]::Delete((Join-Path $project 'Modern/.ai/skills/database-migration/SKILL.md'))
+
+            $personalModel=@{schemaVersion=1;kiloAgents=@{'orchestrator'=@{model='fake/coordinator-model'};planner=@{model='fake/planning-model'}}}
+            WriteFixture '_automation/config/ai-models.local.json' ($personalModel | ConvertTo-Json -Depth 6)
+            $result=InvokeSetup @('-Action','Apply')
+            $coordinator=[IO.File]::ReadAllText((Join-Path $project '.kilo/agents/coordinator.md'))
+            $planner=[IO.File]::ReadAllText((Join-Path $project '.kilo/agents/planner.md'))
+            $fast=[IO.File]::ReadAllText((Join-Path $project '.kilo/agents/implementer-fast.md'))
+            Assert-Check ($result.Code -eq 0 -and $coordinator.Contains('model: fake/coordinator-model') -and $planner.Contains('model: fake/planning-model') -and -not [regex]::IsMatch($fast,'(?m)^model:')) 'Config da pasta config define modelos por agente e aceita o alias orchestrator, sem padrões compartilhados'
+            $personalModel.executionProfiles=@{'quality-critical'=@{kilo=@{model='fake/profile-model'}}}
+            $personalModel.kiloAgents['planner']=@{model=$null}
+            WriteFixture '_automation/config/ai-models.local.json' ($personalModel | ConvertTo-Json -Depth 7)
+            $result=InvokeSetup @('-Action','Apply')
+            $standard=[IO.File]::ReadAllText((Join-Path $project '.kilo/agents/implementer.md'))
+            $planner=[IO.File]::ReadAllText((Join-Path $project '.kilo/agents/planner.md'))
+            Assert-Check ($result.Code -eq 0 -and $standard.Contains('model: fake/profile-model') -and -not [regex]::IsMatch($planner,'(?m)^model:')) 'Mapeamento individual por nível é aceito e null por agente preserva a herança do Kilo'
+            $hashes=InstalledHashes
+            $personalModel.kiloAgents['planner']=@{model='invalid model with spaces'}
+            WriteFixture '_automation/config/ai-models.local.json' ($personalModel | ConvertTo-Json -Depth 7)
+            $result=InvokeSetup @('-Action','Apply')
+            Assert-Check ($result.Code -ne 0 -and (InstalledHashes) -ceq $hashes) 'Modelo pessoal inválido interrompe antes de escrever nos adapters'
+            [IO.File]::Delete((Join-Path $project '_automation/config/ai-models.local.json'))
+
+            $override=@{schemaVersion=1;kiloAgents=@{'modern-increment-implementer-critical'=@{model='fake/strong-model';steps=55}}}
+            WriteFixture 'Modern/docs/ia-assistida/setups-de-ferramentas/models.local.json' ($override | ConvertTo-Json -Depth 5)
+            $result=InvokeSetup @('-Action','Apply')
+            $standard=[IO.File]::ReadAllText((Join-Path $project '.kilo/agents/implementer.md'))
+            Assert-Check ($result.Code -eq 0 -and $standard.Contains('model: fake/strong-model') -and $standard.Contains('steps: 55')) 'Configuração na localização antiga e override do critical são reaproveitados sem regravar preferências'
+            $hashes=InstalledHashes
+            $override.kiloAgents['implementer']=@{model='fake/different-model'}
+            WriteFixture 'Modern/docs/ia-assistida/setups-de-ferramentas/models.local.json' ($override | ConvertTo-Json -Depth 5)
+            $result=InvokeSetup @('-Action','Apply')
+            Assert-Check ($result.Code -ne 0 -and (InstalledHashes) -ceq $hashes) 'Preferências conflitantes para o perfil unificado exigem resolução explícita, sem sobrescrever arquivos'
+            [IO.File]::Delete((Join-Path $project 'Modern/docs/ia-assistida/setups-de-ferramentas/models.local.json'))
+            $result=InvokeSetup @('-Action','Apply')
+            if ($result.Code -ne 0) {throw $result.Output}
+            [IO.File]::AppendAllText((Join-Path $project '.kilo/agents/implementer.md'),[Environment]::NewLine+'alteracao simulada')
+            $hashes=InstalledHashes
+            $result=InvokeSetup @('-Action','Check')
+            Assert-Check ($result.Code -eq 2 -and (InstalledHashes) -ceq $hashes) 'Check identifica drift e retorna 2 sem corrigir ou alterar arquivos'
+
+            $statePath=Join-Path $project '.kilo/.modern-ai-setup.json'
+            $state=Get-Content -LiteralPath $statePath -Raw | ConvertFrom-Json
+            $state.files=@([pscustomobject]@{path='../fora-do-projeto.txt';sha256='invalido'})
+            [IO.File]::WriteAllText($statePath,($state | ConvertTo-Json -Depth 5))
+            $hashes=InstalledHashes
+            $result=InvokeSetup @('-Action','Apply')
+            Assert-Check ($result.Code -ne 0 -and (InstalledHashes) -ceq $hashes) 'State com caminho fora do checkout é recusado antes de qualquer escrita'
+
+            $menu=Join-Path $automationRoot 'menu.ps1'
+            $output=@(& $engine -NoLogo -NoProfile -File $menu -Section AI -Preview -NoColor 2>&1)
+            Assert-Check ($LASTEXITCODE -eq 0 -and ($output -join '|').Contains('Aplicar / atualizar Kilo')) 'Submenu de IA pode ser visualizado sem executar setup'
+        }
+        finally {Pop-Location}
+    }
+    finally {
+        $resolved=[IO.Path]::GetFullPath($fixture)
+        if ($resolved.StartsWith($temporaryBase+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase) -and (Split-Path -Leaf $resolved) -match '^hwdesktop-ai-setup-[a-f0-9]{32}$' -and [IO.Directory]::Exists($resolved)) {
+            Remove-Item -LiteralPath $resolved -Recurse -Force
+        }
+    }
+}
+
 $sections = @(
+    @{ Group='AISetup'; Title='Setup de IA isolado'; Action={ Test-AISetup } }
     @{ Group='ProcessEncoding'; Title='UTF-8 com páginas de código Windows distintas'; Action={ Test-ProcessEncoding } }
     @{ Group='GitSvnAuth'; Title='Credenciais fictícias git-svn'; Action={ Test-GitSvnAuth } }
     @{ Group='Delivery'; Title='Entrega GitHub/SVN em repositórios temporários'; Action={ Test-Delivery } }

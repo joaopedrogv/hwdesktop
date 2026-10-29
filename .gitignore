@@ -3,7 +3,21 @@
 
 # Acompanhar o próprio filtro
 !/.gitignore
+!/.vscode
 !/AGENTS.md
+!/.ai/
+!/docs/
+/docs/*
+!/docs/ia-assistida/
+
+# Adapters e estado de IA locais
+/.agents/
+/.kilo/
+/.aider-desk/
+/.codex/
+/.opencode/
+/.ai-runs/
+/_automation/ai/tool-setup/models.local.json
 
 # Descartáveis dentro das áreas liberadas
 .svn/
@@ -99,3 +113,4 @@ _automation/temp/
 !/Hw Gestor/fontes/html.res
 _automation/config/database.local.psd1
 scripts/database/schema/.export-*/
+_automation/config/ai-models.local.json

@@ -44,7 +44,7 @@ nearby interval, or invent a missing tag. When resuming, read only the exact
 
 1. Read `.ai/workflows/fiscal-calculos-update.md` completely.
 2. Start or resume `workflow-orchestrator` through
-   `.ai/agents/orchestration-protocol.md`.
+   `../.ai/agents/orchestration-protocol.md`.
 3. Follow the Workflow from `RECEIVED` and explicitly invoke each named Specialist
    Agent through the active tool's native delegation mechanism.
 4. Use supervised manual mode when a required role cannot be invoked.

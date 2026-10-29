@@ -306,9 +306,9 @@ Canônicos principais:
 - `AGENTS.md`;
 - `.ai/commands/update-fiscal-calculos.md`;
 - `.ai/workflows/fiscal-calculos-update.md`;
-- `.ai/agents/orchestration-protocol.md`;
-- `.ai/agents/workflow-orchestrator.md` e `workflow-operator.md`;
-- `.ai/context/fiscal-calculos.md`;
+- `../.ai/agents/orchestration-protocol.md`;
+- `../.ai/agents/workflow-orchestrator.md` e `workflow-operator.md`;
+- `.ai/context/fiscal-calculos-context.md`;
 - `.ai/rules/fiscal-calculos.md` e `coding-standards.md`;
 - Skills `rtc-update-inputs`, `rtc-implementation-evidence`,
   `rtc-source-snapshots` e `delphi-fiscal-calculos-test-runner`.

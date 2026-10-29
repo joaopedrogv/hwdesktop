@@ -15,8 +15,7 @@ or other bounded concerns.
 
 ## Delphi and Runtime
 
-The legacy ERP is composed of 47 packages, including `pkModern`. All ERP packages
-are compiled with Delphi 2006 for Win32.
+The shared ERP boundary is documented in ../.ai/context/hwdesktop-overview.md.
 
 Production units are therefore Delphi 2006-compatible by default, as defined in
 `.ai/rules/delphi-compatibility.md`.
@@ -31,8 +30,7 @@ The presentation layer uses VCL and integrates with the legacy ERP. See
 
 ## Operational Database
 
-Firebird 2.5 is the only supported version and the only supported operational
-database for the ERP.
+Operational database compatibility follows ../.ai/rules/database-safety.md.
 
 Firebird access uses IBX behind the project's `IDatabaseConnection` and
 `ITransaction` abstractions. Business, domain, and application code must depend on

@@ -1,0 +1,46 @@
+---
+name: repository-safety
+description: Preserve HWDESKTOP work, authorization, credentials, sensitive data and existing security controls across the checkout.
+always_apply: true
+---
+
+# Repository Safety
+
+## Authorization and preservation
+
+- Preserve the developer's task scope, approved behavior and existing contracts.
+- Preserve unrelated changes, personal configuration, ignored dependencies, file
+  encoding and line endings. Do not perform incidental cleanup or normalization.
+- Planning, implementation, test creation, build/test execution, SQL execution,
+  setup changes and publication have distinct authorization boundaries.
+- Preserve existing authentication, authorization, company isolation and audit.
+  Never weaken a control to simplify a task or bypass an error.
+- Do not infer a uniform architecture or stack from this checkout's directory tree.
+
+## Secrets, certificates and sensitive data
+
+- Never hardcode or commit credentials, tokens, private keys or real secret files.
+  Use the component's established configuration and secret mechanism.
+- Never copy discovered secrets into code, comments, documentation, fixtures,
+  prompts, reports, logs or diagnostic output. Redact values when needed.
+- Never commit certificates containing private keys, including .pfx and .p12.
+  Do not disable certificate or TLS validation to work around an integration error.
+- Minimize personal, financial and authentication data exposure. Log only necessary
+  information with appropriate masking; user-facing errors must not disclose it.
+
+## Input and failures
+
+- Treat user input, external files, databases and services as untrusted. Validate
+  according to the operation's business and technical constraints.
+- Use parameterized runtime SQL and trusted/validated dynamic identifiers through
+  the data-access mechanism established for the affected component.
+- Do not suppress security failures or convert them into successful operations.
+
+## Validation and local tooling
+
+- Do not write to production data from automated tests. Execution needs verified
+  infrastructure and the developer's authorization.
+- Generated tool files do not expand a role's ownership or grant permission for
+  build, tests, database operations, release or publication.
+- Do not reset, stash, discard work, rewrite published history or publish as an
+  implicit part of an investigation. Keep SVN integration separate from feature work.

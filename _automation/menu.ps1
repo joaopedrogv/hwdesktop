@@ -14,7 +14,7 @@
 param(
     [switch] $Preview,
     [switch] $NoColor,
-    [ValidateSet('Main', 'Build', 'Database')] [string] $Section = 'Main'
+    [ValidateSet('Main', 'Build', 'Database', 'AI')] [string] $Section = 'Main'
 )
 
 Set-StrictMode -Version Latest
@@ -64,7 +64,8 @@ function Write-MenuScreen {
         [switch] $Plain,
         [switch] $Refresh,
         [switch] $BuildSection,
-        [switch] $DatabaseSection
+        [switch] $DatabaseSection,
+        [switch] $AiSection
     )
 
     $width = 88
@@ -72,7 +73,7 @@ function Write-MenuScreen {
     if (-not [Console]::IsOutputRedirected) {
         try {
             $width = [Math]::Clamp([Console]::WindowWidth - 2, 40, 98)
-            $compact = [Console]::WindowHeight -lt 30
+            $compact = [Console]::WindowHeight -lt (15 + 3 * $Items.Count)
         }
         catch { $width = 78 }
     }
@@ -102,7 +103,7 @@ function Write-MenuScreen {
     [Console]::WriteLine()
     [Console]::WriteLine(" $($palette.Accent)$($border.TopLeft)$($border.Horizontal * ($width - 2))$($border.TopRight)$($palette.Reset)")
     Write-Row 'HWDESKTOP  /  AUTOMAÇÕES' $palette.Title
-    Write-Row $(if ($DatabaseSection) { 'Banco de dados' } elseif ($BuildSection) { 'Build / Deploy' } else { 'Ambiente de desenvolvimento' }) $palette.Muted
+    Write-Row $(if ($AiSection) { 'Ferramentas de IA' } elseif ($DatabaseSection) { 'Banco de dados' } elseif ($BuildSection) { 'Build / Deploy' } else { 'Ambiente de desenvolvimento' }) $palette.Muted
     if (-not $compact) { Write-Row }
     Write-Row "Projeto: $ProjectRoot" $palette.Muted
     if (-not $compact) { Write-Row "PowerShell $($PSVersionTable.PSVersion)" $palette.Muted }
@@ -125,7 +126,7 @@ function Write-MenuScreen {
             Write-Row
         }
         Write-Row 'Setas ou número: selecionar    Enter: abrir' $palette.Accent
-        Write-Row $(if ($BuildSection -or $DatabaseSection) { 'Esc / Backspace: voltar    0 / Q: sair' } else { '0 / Esc / Q: sair' }) $palette.Muted
+        Write-Row $(if ($BuildSection -or $DatabaseSection -or $AiSection) { 'Esc / Backspace: voltar    0 / Q: sair' } else { '0 / Esc / Q: sair' }) $palette.Muted
         Write-Row
         Write-Row 'Escolha uma opção. Abrir o menu não inicia operações.' $palette.Muted
     }
@@ -196,6 +197,10 @@ function Invoke-MenuCommand {
             $commandArguments = @()
             $scriptPath = Join-Path $PSScriptRoot 'database\export-schema.ps1'
         }
+        elseif ($Item.Id -in @('ai-plan', 'ai-apply', 'ai-check')) {
+            $commandArguments = @('-Tool', 'Kilo', '-Action', $Item.Id.Substring(3))
+            $scriptPath = Join-Path $PSScriptRoot 'ai\Sync-AIProfiles.ps1'
+        }
         elseif ($Item.Id -eq 'dependencies') {
             $commandArguments = @()
             $scriptPath = Join-Path $PSScriptRoot 'workflow\prepare-dependencies.ps1'
@@ -231,6 +236,7 @@ function Invoke-AutomationMenu {
         [pscustomobject]@{ Label = 'Entregar ao SVN'; Description = 'Preparar a entrega; commit SVN por chamada separada com -Commit.'; Status = 'Disponível'; Id = 'deliver' }
         [pscustomobject]@{ Label = 'Informações do ambiente'; Description = 'Consultar caminhos e a versão do PowerShell.'; Status = 'Disponível'; Id = 'environment' }
         [pscustomobject]@{ Label = 'Banco de dados'; Description = 'Ferramentas da base de referência.'; Status = 'Disponível'; Id = 'database' }
+        [pscustomobject]@{ Label = 'Ferramentas de IA'; Description = 'Planejar, aplicar e conferir o setup local do Kilo.'; Status = 'Disponível'; Id = 'ai' }
     )
     $buildItems = @(
         [pscustomobject]@{ Label = 'Compilar todos'; Description = 'Limpeza geral e compilação do catálogo completo.'; Status = 'Disponível'; Id = 'all'; ScriptName = 'build-all.ps1' }
@@ -243,11 +249,16 @@ function Invoke-AutomationMenu {
     $databaseItems = @(
         [pscustomobject]@{ Label = 'Atualizar schema'; Description = 'Extrair metadados da base configurada, sem aplicar migrações.'; Status = 'Disponível'; Id = 'schema' }
     )
-    $items = if ($Section -eq 'Build') { $buildItems } elseif ($Section -eq 'Database') { $databaseItems } else { $mainItems }
+    $aiItems = @(
+        [pscustomobject]@{ Label = 'Visualizar setup do Kilo'; Description = 'Conferir o plano de instalação sem alterar arquivos.'; Status = 'Disponível'; Id = 'ai-plan' }
+        [pscustomobject]@{ Label = 'Aplicar / atualizar Kilo'; Description = 'Aplicar os adapters na raiz e conferir o resultado.'; Status = 'Disponível'; Id = 'ai-apply' }
+        [pscustomobject]@{ Label = 'Verificar setup do Kilo'; Description = 'Identificar diferenças sem modificar a instalação.'; Status = 'Disponível'; Id = 'ai-check' }
+    )
+    $items = if ($Section -eq 'Build') { $buildItems } elseif ($Section -eq 'Database') { $databaseItems } elseif ($Section -eq 'AI') { $aiItems } else { $mainItems }
     $plain = $NoColor -or [Console]::IsOutputRedirected -or (Test-Path Env:NO_COLOR)
 
     if ($Preview) {
-        Write-MenuScreen -Items $items -SelectedIndex -1 -ProjectRoot $projectRoot -Plain:$plain -BuildSection:($Section -eq 'Build') -DatabaseSection:($Section -eq 'Database')
+        Write-MenuScreen -Items $items -SelectedIndex -1 -ProjectRoot $projectRoot -Plain:$plain -BuildSection:($Section -eq 'Build') -DatabaseSection:($Section -eq 'Database') -AiSection:($Section -eq 'AI')
         return 0
     }
 
@@ -287,7 +298,7 @@ function Invoke-AutomationMenu {
                 Write-MenuScreen -Items $items -SelectedIndex $selectedIndex -ProjectRoot $projectRoot -Plain:$plain -Refresh -DetailTitle $detailItem.Label -Details $details
             }
             else {
-                Write-MenuScreen -Items $items -SelectedIndex $selectedIndex -ProjectRoot $projectRoot -Plain:$plain -Refresh -BuildSection:($Section -eq 'Build') -DatabaseSection:($Section -eq 'Database')
+                Write-MenuScreen -Items $items -SelectedIndex $selectedIndex -ProjectRoot $projectRoot -Plain:$plain -Refresh -BuildSection:($Section -eq 'Build') -DatabaseSection:($Section -eq 'Database') -AiSection:($Section -eq 'AI')
             }
 
             $key = [Console]::ReadKey($true)
@@ -301,7 +312,7 @@ function Invoke-AutomationMenu {
                 continue
             }
 
-            if ($Section -in @('Build', 'Database') -and $key.Key -in @([ConsoleKey]::Escape, [ConsoleKey]::Backspace)) {
+            if ($Section -in @('Build', 'Database', 'AI') -and $key.Key -in @([ConsoleKey]::Escape, [ConsoleKey]::Backspace)) {
                 $Section = 'Main'; $items = $mainItems; $selectedIndex = -1
                 continue
             }
@@ -309,7 +320,7 @@ function Invoke-AutomationMenu {
             $selectedIndex = $transition.SelectedIndex
             if ($transition.Action -eq 'Exit') { return 0 }
             if ($transition.Action -eq 'Open') {
-                if ($Section -in @('Build', 'Database') -or $items[$selectedIndex].Id -in @('sync', 'start', 'dependencies', 'integrate', 'deliver')) {
+                if ($Section -in @('Build', 'Database', 'AI') -or $items[$selectedIndex].Id -in @('sync', 'start', 'dependencies', 'integrate', 'deliver')) {
                     Invoke-MenuCommand -Item $items[$selectedIndex] -ProjectRoot $projectRoot -Plain:$plain
                     $selectedIndex = -1
                 }
@@ -318,6 +329,9 @@ function Invoke-AutomationMenu {
                 }
                 elseif ($items[$selectedIndex].Id -eq 'database') {
                     $Section = 'Database'; $items = $databaseItems; $selectedIndex = -1
+                }
+                elseif ($items[$selectedIndex].Id -eq 'ai') {
+                    $Section = 'AI'; $items = $aiItems; $selectedIndex = -1
                 }
                 else { $detailItem = $items[$selectedIndex] }
             }

@@ -117,4 +117,4 @@ module solely for organizational separation.
 from the predominant project structure because fidelity to the official government
 implementation takes precedence.
 
-See `.ai/context/fiscal-calculos.md` for module-specific context.
+See `.ai/context/fiscal-calculos-context.md` for module-specific context.

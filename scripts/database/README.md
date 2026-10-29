@@ -44,7 +44,7 @@ Preparar SQL não autoriza executá-lo. Uma revisão de um rascunho ainda não a
 
 Ao concluir, incorpore os comandos aprovados em `scripts/versoes` somente em uma etapa solicitada para esse fim. Observe a sintaxe do interpretador, preserve o histórico e consulte o arquivo ativo no manifesto. Não atualizar versão, manifesto ou CRC como efeito implícito da implementação.
 
-A skill [database-migration](../../Modern/.ai/skills/database-migration/SKILL.md) é a fonte técnica do procedimento. O Workflow Fiscal.Calculos mantém sua exceção de caminho para scripts por intervalo de versões; esta organização não move seus arquivos nem altera esse contrato.
+A skill [database-migration](../../.ai/skills/database-migration/SKILL.md) é a fonte técnica do procedimento. O Workflow Fiscal.Calculos mantém sua exceção de caminho para scripts por intervalo de versões; esta organização não move seus arquivos nem altera esse contrato.
 
 ## Banco real e arquivos locais
 

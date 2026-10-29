@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "kiloAgents": {
+    "coordinator": {
+      "model": null
+    },
+    "planner": {
+      "model": null
+    },
+    "researcher": {
+      "model": null
+    },
+    "researcher-critical": {
+      "model": null
+    },
+    "implementer": {
+      "model": null
+    },
+    "implementer-fast": {
+      "model": null
+    },
+    "reviewer": {
+      "model": null
+    }
+  }
+}

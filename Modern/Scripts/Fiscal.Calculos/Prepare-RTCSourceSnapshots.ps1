@@ -171,7 +171,7 @@ if ($toCommit -ne $package.toCommit) {
 $guideHash = $package.guideSha256
 $evidenceHash = $package.evidenceSha256
 
-$repositoryRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..\..')).ProviderPath
+$repositoryRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..\..\..')).ProviderPath
 $runsRoot = Join-Path $repositoryRoot '.ai-runs'
 $runRoot = Join-Path $runsRoot $RunId
 $snapshotRoot = Join-Path $runRoot 'rtc-sources'

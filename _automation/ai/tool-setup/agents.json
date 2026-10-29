@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "agents": [
+    {
+      "name": "coordinator",
+      "canonicalRole": "workflow-orchestrator",
+      "executionProfile": "fast-routine",
+      "kiloTemplate": "tools/kilo/agents/coordinator.md.tpl",
+      "aiderDesk": {
+        "id": "806d7878-e2b9-4fa2-9d06-41cf6afcc273",
+        "order": 0,
+        "maxIterations": 40,
+        "preset": "orchestrator",
+        "promptFile": "tools/aider-desk/prompts/coordinator.md",
+        "primary": true
+      }
+    },
+    {
+      "name": "researcher",
+      "canonicalRole": "repository-researcher",
+      "executionProfile": "fast-routine",
+      "kiloTemplate": "tools/kilo/agents/researcher.md.tpl",
+      "aiderDesk": {
+        "id": "0713446e-ee60-4bd6-a99d-9bffdc4fd583",
+        "order": 1,
+        "maxIterations": 15,
+        "preset": "read-only",
+        "promptFile": "tools/aider-desk/prompts/researcher.md",
+        "primary": false
+      },
+      "codex": {
+        "description": "Perform bounded read-only repository research using the fast-routine profile.",
+        "promptFile": "tools/codex/prompts/researcher.md"
+      }
+    },
+    {
+      "name": "researcher-critical",
+      "canonicalRole": "repository-researcher",
+      "executionProfile": "quality-critical",
+      "kiloTemplate": "tools/kilo/agents/researcher-critical.md.tpl",
+      "aiderDesk": {
+        "id": "64c7497b-768a-4bd6-992b-6b5eab709326",
+        "order": 2,
+        "maxIterations": 30,
+        "preset": "read-only",
+        "promptFile": "tools/aider-desk/prompts/researcher-critical.md",
+        "primary": false
+      },
+      "codex": {
+        "description": "Perform bounded high-risk repository research using the quality-critical profile.",
+        "promptFile": "tools/codex/prompts/researcher-critical.md"
+      }
+    },
+    {
+      "name": "planner",
+      "canonicalRole": "feature-planner",
+      "executionProfile": "quality-critical",
+      "kiloTemplate": "tools/kilo/agents/planner.md.tpl",
+      "aiderDesk": {
+        "id": "f2c47df9-9650-4403-9bc8-3cb0681900d8",
+        "order": 3,
+        "maxIterations": 40,
+        "preset": "planner",
+        "promptFile": "tools/aider-desk/prompts/planner.md",
+        "primary": false
+      },
+      "codex": {
+        "description": "Produce an approval-ready feature plan or technical design from verified evidence without implementing it.",
+        "promptFile": "tools/codex/prompts/planner.md"
+      }
+    },
+    {
+      "name": "implementer",
+      "canonicalRole": "increment-implementer",
+      "executionProfile": "balanced-work",
+      "kiloTemplate": "tools/kilo/agents/implementer.md.tpl",
+      "aiderDesk": {
+        "id": "0180878c-258a-48b7-96ac-e6b55a93f150",
+        "order": 4,
+        "maxIterations": 30,
+        "preset": "implementer",
+        "promptFile": "tools/aider-desk/prompts/implementer.md",
+        "primary": false
+      },
+      "codex": {
+        "description": "Implement one bounded approved HWDESKTOP increment using the balanced-work profile.",
+        "promptFile": "tools/codex/prompts/implementer.md"
+      },
+      "kiloExecutionProfile": "quality-critical"
+    },
+    {
+      "name": "implementer-fast",
+      "canonicalRole": "increment-implementer",
+      "executionProfile": "fast-routine",
+      "kiloTemplate": "tools/kilo/agents/implementer-fast.md.tpl",
+      "aiderDesk": {
+        "id": "9d6db626-33c4-40bd-a246-5f641972c364",
+        "order": 5,
+        "maxIterations": 20,
+        "preset": "implementer",
+        "promptFile": "tools/aider-desk/prompts/implementer-fast.md",
+        "primary": false
+      },
+      "codex": {
+        "description": "Implement a well-defined approved assignment using fast-routine, with or without an applicable Skill.",
+        "promptFile": "tools/codex/prompts/implementer-fast.md"
+      }
+    },
+    {
+      "name": "implementer-critical",
+      "canonicalRole": "increment-implementer",
+      "executionProfile": "quality-critical",
+      "aiderDesk": {
+        "id": "c6d5d40d-86f0-46e5-a266-054f4fea9f3d",
+        "order": 6,
+        "maxIterations": 40,
+        "preset": "implementer",
+        "promptFile": "tools/aider-desk/prompts/implementer-critical.md",
+        "primary": false
+      },
+      "codex": {
+        "description": "Implement one bounded approved high-risk Modern increment using the quality-critical profile.",
+        "promptFile": "tools/codex/prompts/implementer-critical.md"
+      }
+    },
+    {
+      "name": "reviewer",
+      "canonicalRole": "increment-reviewer",
+      "executionProfile": "quality-critical",
+      "kiloTemplate": "tools/kilo/agents/reviewer.md.tpl",
+      "aiderDesk": {
+        "id": "2f85d014-a828-49ef-9b84-9d578dc82d2f",
+        "order": 7,
+        "maxIterations": 30,
+        "preset": "read-only-skills",
+        "promptFile": "tools/aider-desk/prompts/reviewer.md",
+        "primary": false
+      },
+      "codex": {
+        "description": "Independently review an implemented increment or integrated feature using the quality-critical profile.",
+        "promptFile": "tools/codex/prompts/reviewer.md"
+      }
+    }
+  ]
+}
