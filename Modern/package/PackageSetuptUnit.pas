@@ -13,7 +13,7 @@ uses
   UCadOperacoesFiscaisIbsCbs, UCadOpInternasComTiposVendas,
   SharedFactoryContainerUnit, SharedRepoContainerUnit, FiscalRepoContainerUnit,
   ErpFeaturesRepoContainerUnit, UCentralDadosFiscais, UCadNFSe, ISharedFactoryUnit, ISessionContextUnit,
-  UCadRegrasRedBenefPC, UCadAjustesRedBenefPC;
+  UCadRegrasRedBenefPC, UCadAjustesRedBenefPC, AjustesRedBenefPcPresenter;
 
 var
   GFiscalFactoryInst: IFiscalCalculosFactory;
@@ -70,6 +70,11 @@ begin
   {$ENDIF}
 
   AppSetupShutdown();
+end;
+
+function GetFeaturesFactory(): IErpFeaturesFactory;
+begin
+  Result := Container.GetInstance().ErpFeaturesFactory;
 end;
 
 procedure ShowGruposFiscais(Amodal: Boolean);
@@ -188,6 +193,16 @@ begin
   begin
     vDadosIni.vModalOuChild := IfThen(Amodal, 'M', 'C');
     Application.CreateForm( TFrmCadAjustesRedBenefPC, FrmCadAjustesRedBenefPC );
+          
+    FrmCadAjustesRedBenefPC.SetupPresenter(
+      TAjustesRedBenefPcPresenter.Create(
+        FrmCadAjustesRedBenefPC,
+        GetFeaturesFactory().CreateSalvarAjusteRedBenefPcUseCase(),
+        GetFeaturesFactory().CreateRemoverAjusteRedBenefPcUseCase(),
+        GetFeaturesFactory().CreateListarRegrasRedBenefPcVigentesEAtualUseCase(),
+        GetFeaturesFactory().CreateObterAjusteRedBenefPcPorIdUseCase()
+      )
+    );
   end;
 
   if Amodal then

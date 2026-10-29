@@ -882,6 +882,11 @@
     ..\Fiscal.Calculos\Core\Domain\Entities\LocalFornecimentoEnumUnit.pas;
     ..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocaisFornecimentoUseCaseUnit.pas;
     ..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocaisIncidenciaUseCaseUnit.pas;
+    ..\UI\Forms\RedBenefPC\AjustesRedBenefPcPresenter.pas;
+    ..\UI\Forms\RedBenefPC\AjustesRedBenefPcView.pas;
+    ..\UI\Infrastructure\Components\ModernCadastroFormUnit.pas;
+    ..\UI\Infrastructure\Components\ModernCadastroFormUnit.dfm;
+    ..\UI\Infrastructure\Interfaces\IViewFeedbackUnit.pas;
     pkModern.bdsproj;
     pkModern.dpk;
     pkModern.res

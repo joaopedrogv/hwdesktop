@@ -4,26 +4,44 @@ inherited FrmCadAjustesRedBenefPC: TFrmCadAjustesRedBenefPC
   Caption = 
     'Ajustes da redu'#231#227'o do benef'#237'cio fiscal do PIS/COFINS - LC 224/20' +
     '25'
-  ExplicitWidth = 806
-  ExplicitHeight = 598
+  ExplicitWidth = 814
+  ExplicitHeight = 603
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelFundo: TPanel
     inherited PanelLeft: TPanel
+      ExplicitLeft = 3
+      ExplicitTop = 0
+      ExplicitWidth = 795
+      ExplicitHeight = 545
       inherited PageControl1: TPageControl
+        ActivePage = TabSheet1
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 795
+        ExplicitHeight = 545
         inherited TabSheet1: TTabSheet
           ExplicitLeft = 4
           ExplicitTop = 27
-          ExplicitWidth = 783
-          ExplicitHeight = 510
+          ExplicitWidth = 787
+          ExplicitHeight = 514
           inherited ScrollBox1: TScrollBox
+            ExplicitWidth = 787
+            ExplicitHeight = 514
             inherited PageControl3: TPageControl
               ActivePage = tabCadastro
+              ExplicitWidth = 787
+              ExplicitHeight = 466
               inherited TabSheet3: TTabSheet
-                ExplicitLeft = 4
-                ExplicitTop = 27
-                ExplicitWidth = 775
-                ExplicitHeight = 431
+                ExplicitWidth = 779
+                ExplicitHeight = 435
+                inherited ScrollBox3: TScrollBox
+                  ExplicitWidth = 779
+                  ExplicitHeight = 435
+                  inherited GroupBox1: TGroupBox
+                    ExplicitWidth = 775
+                  end
+                end
               end
               object tabCadastro: TTabSheet
                 Caption = 'Cadastro'
@@ -147,11 +165,11 @@ inherited FrmCadAjustesRedBenefPC: TFrmCadAjustesRedBenefPC
                   ExplicitHeight = 44
                   inherited edEntity: TComboBox
                     Width = 322
-                    ExplicitWidth = 298
+                    ExplicitWidth = 322
                   end
                   inherited pnVigencia: TPanel
                     Width = 322
-                    ExplicitWidth = 298
+                    ExplicitWidth = 322
                     inherited lbInfo: TLabel
                       Height = 11
                     end
@@ -251,6 +269,8 @@ inherited FrmCadAjustesRedBenefPC: TFrmCadAjustesRedBenefPC
               end
             end
             inherited Panel3: TPanel
+              ExplicitTop = 466
+              ExplicitWidth = 787
               inherited LabelSeq: TLabel
                 Enabled = False
                 Visible = False
@@ -268,104 +288,22 @@ inherited FrmCadAjustesRedBenefPC: TFrmCadAjustesRedBenefPC
         inherited TabSheet2: TTabSheet
           ExplicitLeft = 4
           ExplicitTop = 27
-          ExplicitWidth = 783
-          ExplicitHeight = 510
+          ExplicitWidth = 787
+          ExplicitHeight = 514
           inherited GroupBox3: TGroupBox
-            inherited Label1: TLabel
-              Enabled = False
-              Visible = False
-            end
-            inherited Label2: TLabel
-              Enabled = False
-              Visible = False
-            end
-            inherited Label3: TLabel
-              Enabled = False
-            end
-            inherited Label4: TLabel
-              Enabled = False
-              Visible = False
-            end
-            inherited Label5: TLabel
-              Enabled = False
-              Visible = False
-            end
-            inherited MaskEdit3: TMaskEdit
-              Enabled = False
-              Visible = False
-            end
-            inherited MaskEdit1: TMaskEdit
-              Enabled = False
-              Visible = False
-            end
-            inherited MaskEdit2: TMaskEdit
-              Enabled = False
-              Visible = False
-            end
-            inherited ComboBox1: TComboBox
-              Enabled = False
-              Visible = False
-            end
-            inherited ComboBox2: TComboBox
-              Enabled = False
-            end
+            ExplicitWidth = 787
             inherited BitBtn1: TBitBtn
               Hint = 'Clique para pesquisar - [MOD038]'
             end
             inherited BitBtn3: TBitBtn
               Hint = 'Novo cadastro - [MOD039]'
             end
-            inherited CheckBox3: TCheckBox
-              Enabled = False
-              Visible = False
-            end
-            inherited CheckBox1: TCheckBox
-              Enabled = False
-              Visible = False
-            end
-            inherited ComboBox3: TComboBox
-              Enabled = False
-              Visible = False
-            end
-            inline FilterFramePadrao1: TFilterFramePadrao
-              Left = 3
-              Top = 11
-              Width = 407
-              Height = 54
-              TabOrder = 11
-              TabStop = True
-              ExplicitLeft = 3
-              ExplicitTop = 11
-              inherited pnCondicao: TPanel
-                inherited edCondicao: TComboBox
-                  ExplicitLeft = 64
-                  ExplicitWidth = 127
-                end
-              end
-              inherited pnConteudos: TPanel
-                inherited pnConteudo1: TPanel
-                  inherited edConteudo1: TMaskEdit
-                    ExplicitLeft = 64
-                    ExplicitWidth = 140
-                  end
-                end
-                inherited pnConteudo2: TPanel
-                  inherited edConteudo2: TMaskEdit
-                    ExplicitLeft = 64
-                    ExplicitWidth = 72
-                  end
-                end
-                inherited pnBtns: TPanel
-                  inherited lbCountFiltros: TLabel
-                    Width = 27
-                    Height = 21
-                  end
-                end
-              end
-            end
           end
           inherited Panel1: TPanel
+            ExplicitWidth = 787
+            ExplicitHeight = 441
             inherited Panel2: TPanel
+              ExplicitWidth = 783
               inherited SpeedButton1: TSpeedButton
                 Hint = 'Editar Registro - [MOD040]'
               end
@@ -376,67 +314,49 @@ inherited FrmCadAjustesRedBenefPC: TFrmCadAjustesRedBenefPC
               inherited SpeedButton3: TSpeedButton
                 Left = 691
                 Enabled = False
-                Visible = False
                 ExplicitLeft = 691
               end
               inherited SpeedButton4: TSpeedButton
                 Left = 691
                 Enabled = False
-                Visible = False
                 ExplicitLeft = 691
               end
               inherited SpeedButton5: TSpeedButton
                 Left = 691
                 Enabled = False
-                Visible = False
                 ExplicitLeft = 691
               end
               inherited SpeedButton6: TSpeedButton
-                Left = 691
                 Enabled = False
                 Visible = False
-                ExplicitLeft = 691
               end
               inherited SpeedButton7: TSpeedButton
-                Left = 691
                 Enabled = False
                 Visible = False
-                ExplicitLeft = 691
               end
               inherited SpeedButton8: TSpeedButton
-                Left = 691
                 Enabled = False
                 Visible = False
-                ExplicitLeft = 691
               end
               inherited SpeedButton11: TSpeedButton
-                Left = 691
                 Enabled = False
                 Visible = False
-                ExplicitLeft = 691
               end
               inherited SpeedButton12: TSpeedButton
-                Left = 691
                 Enabled = False
                 Visible = False
-                ExplicitLeft = 691
               end
               inherited SpeedButton23: TSpeedButton
-                Left = 691
                 Enabled = False
                 Visible = False
-                ExplicitLeft = 691
               end
               inherited SpeedButton24: TSpeedButton
-                Left = 691
                 Enabled = False
                 Visible = False
-                ExplicitLeft = 691
               end
               inherited SpeedButton25: TSpeedButton
                 Left = 691
                 Enabled = False
-                Visible = False
                 ExplicitLeft = 691
               end
               inherited SpeedButton26: TSpeedButton
@@ -444,21 +364,19 @@ inherited FrmCadAjustesRedBenefPC: TFrmCadAjustesRedBenefPC
                 Visible = False
               end
             end
+            inherited GroupBox2: TGroupBox
+              ExplicitHeight = 380
+              inherited ScrollBox2: TScrollBox
+                ExplicitHeight = 363
+              end
+            end
           end
         end
         inherited tsMemo: TTabSheet
-          ExplicitLeft = 4
-          ExplicitTop = 27
-          ExplicitWidth = 783
-          ExplicitHeight = 510
+          ExplicitWidth = 787
+          ExplicitHeight = 514
         end
       end
-    end
-  end
-  inherited pnStatusProcessamento: TPanel
-    inherited lbTextoProcessamento: TLabel
-      Width = 477
-      Height = 21
     end
   end
 end

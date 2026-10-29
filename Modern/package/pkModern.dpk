@@ -697,6 +697,10 @@ contains
   LocalIncidenciaEnumUnit in '..\Fiscal.Calculos\Core\Domain\Entities\LocalIncidenciaEnumUnit.pas',
   LocalFornecimentoEnumUnit in '..\Fiscal.Calculos\Core\Domain\Entities\LocalFornecimentoEnumUnit.pas',
   ConsultarLocaisFornecimentoUseCaseUnit in '..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocaisFornecimentoUseCaseUnit.pas',
-  ConsultarLocaisIncidenciaUseCaseUnit in '..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocaisIncidenciaUseCaseUnit.pas';
+  ConsultarLocaisIncidenciaUseCaseUnit in '..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocaisIncidenciaUseCaseUnit.pas',
+  AjustesRedBenefPcPresenter in '..\UI\Forms\RedBenefPC\AjustesRedBenefPcPresenter.pas',
+  AjustesRedBenefPcView in '..\UI\Forms\RedBenefPC\AjustesRedBenefPcView.pas',
+  ModernCadastroFormUnit in '..\UI\Infrastructure\Components\ModernCadastroFormUnit.pas' {ModernCadastroForm},
+  IViewFeedbackUnit in '..\UI\Infrastructure\Interfaces\IViewFeedbackUnit.pas';
 
 end.

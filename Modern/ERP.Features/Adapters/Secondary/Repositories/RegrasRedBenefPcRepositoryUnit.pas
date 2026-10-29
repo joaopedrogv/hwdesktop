@@ -211,27 +211,27 @@ begin
   if FCacheObjs.TryGetValue(CacheKey, TObject(Result)) then
     Exit;
 
-  SQL := 'SELECT r.ID, r.SEQID, r.CST, r.DESCRICAO, r.PRED, r.IND_AJ, r.COD_AJ, r.DESCR_AJ, r.INF_COMPL_AJ, r.COD_CTA, ' +
-    ' r.DATA_INI_VIGENCIA, r.DATA_FIM_VIGENCIA, r.ATIVO, ' +
-    ' (select list(e.COD_EMPRESA, '','') from REGRAS_REDBENEF_PC_EMP e where e.REGRA_ID = r.ID) COD_EMPRESA, ' +
-    ' (select list(n.NAT_REC, '','') from REGRAS_REDBENEF_PC_NAT_REC n where n.REGRA_ID = r.ID) NAT_REC, ' +
-    ' (select list(ne.NCM, '','') from REGRAS_REDBENEF_PC_NCM_EXC ne where ne.REGRA_ID = r.ID) NCM ' +
-    'FROM REGRAS_REDBENEF_PC r ';
-
-  SqlVigente := SQL +
-    '  inner join REGRAS_REDBENEF_PC_EMP e on e.REGRA_ID = r.ID and e.COD_EMPRESA = :COD_EMPRESA ' +
-    'where :DATA BETWEEN r.DATA_INI_VIGENCIA and COALESCE(r.DATA_FIM_VIGENCIA, :DATA) and r.ATIVO = 1 ';
-
-  SqlPorId := Format( SQL + 'where r.ID = ''%s'' ', [ RegraId ]);
-
-  if RegraId = '' then
-    SQL := SqlVigente
-
-  else
-    SQL := Format( 'select * from (%s union distinct %s) as c order by c.descricao ', [ SqlVigente, SqlPorId ]);
+  SQL := 
+    'SELECT c.*, ' +
+    '  (select list(e.COD_EMPRESA, '','') from REGRAS_REDBENEF_PC_EMP e where e.REGRA_ID = c.ID) COD_EMPRESA, ' +
+    '  (select list(n.NAT_REC, '','') from REGRAS_REDBENEF_PC_NAT_REC n where n.REGRA_ID = c.ID) NAT_REC, ' +
+    '  (select list(ne.NCM, '','') from REGRAS_REDBENEF_PC_NCM_EXC ne where ne.REGRA_ID = c.ID) NCM ' +
+    'from ( ' +
+    '  SELECT r.ID, r.SEQID, r.CST, r.DESCRICAO, r.PRED, r.IND_AJ, r.COD_AJ, r.DESCR_AJ, r.INF_COMPL_AJ, r.COD_CTA, ' +
+    '    r.DATA_INI_VIGENCIA, r.DATA_FIM_VIGENCIA, r.ATIVO ' +
+    '  FROM REGRAS_REDBENEF_PC r ' +
+    '    inner join REGRAS_REDBENEF_PC_EMP e on e.REGRA_ID = r.ID and e.COD_EMPRESA = :COD_EMPRESA ' +
+    '  where :DATA BETWEEN r.DATA_INI_VIGENCIA and COALESCE(r.DATA_FIM_VIGENCIA, :DATA) and r.ATIVO = 1 ' +
+    '  union distinct ' +
+    '  SELECT r.ID, r.SEQID, r.CST, r.DESCRICAO, r.PRED, r.IND_AJ, r.COD_AJ, r.DESCR_AJ, r.INF_COMPL_AJ, r.COD_CTA, ' +
+    '    r.DATA_INI_VIGENCIA, r.DATA_FIM_VIGENCIA, r.ATIVO ' +
+    '  FROM REGRAS_REDBENEF_PC r ' +
+    '  where r.ID = :ID and r.ID <> '''' ' +
+    ') as c order by c.descricao';
 
   Q := FConnection.CreateQuery( SQL,
-    ParametersBuilder.Create(2)
+    ParametersBuilder.Create(3)
+      .ByName('ID', RegraId)
       .ByName('COD_EMPRESA', FSession.EmpresaId)
       .ByName('DATA', Data)
       .Build()

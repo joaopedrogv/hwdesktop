@@ -4,13 +4,13 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, uCadPadraoModal, AppEvnts, ExtCtrls, Menus, ComCtrls, StdCtrls, Buttons, Grids, DBGrids, Mask,
-  AjustesRedBenefPcDataSet, hw_audit_utils, IUIFormValidatorUnit, AjusteRedBenefPcModelUnit, FilterFR, FilterPadraoFR,
-  uEditHw, ComboboxEntityPickerFrameUnit;
+  Dialogs, AppEvnts, ExtCtrls, Menus, ComCtrls, StdCtrls, Buttons, Grids, DBGrids, Mask, uEditHw,
+  uCadPadraoModal, ModernCadastroFormUnit, FilterFR, FilterPadraoFR, ComboboxEntityPickerFrameUnit,
+  AjustesRedBenefPcDataSet, AjusteRedBenefPcModelUnit, AjustesRedBenefPcPresenter, AjustesRedBenefPcView,
+  RegraRedBenefPcEtdUnit;
 
 type
-  TFrmCadAjustesRedBenefPC = class(TfrmCadPadraoM)
-    FilterFramePadrao1: TFilterFramePadrao;
+  TFrmCadAjustesRedBenefPC = class(TModernCadastroForm, IAjustesRedBenefPcView)
     tabCadastro: TTabSheet;
     Label6: TLabel;
     Label11: TLabel;
@@ -46,16 +46,21 @@ type
     procedure FormCreate(Sender: TObject);
   private
     FData: TAjustesRedBenefPcDataSet;
-    FAuditor: TAudit_OOP;
-    FFormValidator: IUIFormValidator;
     FState: AjusteRedBenefPcModel;
+    FPresenter: TAjustesRedBenefPcPresenter;
   private
+    procedure ExibirRegras(ARegras: RegraRedBenefPcEtdList);
+
     procedure RegrasListSelectEvent(Sender: TObject; Entity: TObject; out DisplayInfo: string);
     procedure RegrasListAddEvent(Sender: TObject; Entity: TObject; out DisplayInfo: string; out SetSelected: Boolean);
     procedure MapStateToForm();
     procedure MapFormToState();
     procedure ShowAbaCadastro();
+  protected
+    function PrepararCamposCadastro(): Boolean;
   public
+    procedure SetupPresenter(APresenter: TAjustesRedBenefPcPresenter);
+    destructor Destroy; override;
   end;
 
 var
@@ -65,9 +70,8 @@ implementation
 
 uses
   uDtmAtivo,
-  CreateEntityUseCaseOutputUnit, ContainerUnit, ErpFeaturesFactoryUnit, UIUtilsUnit, FieldsConfigUnit,
-  EntityMetadataUnit, AjusteRedBenefPcMetadataUnit, UIFormValidatorFactoryUnit, DbGridConfigUtilsUnit,
-  RegraRedBenefPcEtdUnit;
+  UIUtilsUnit, FieldsConfigUnit, EntityMetadataUnit, AjusteRedBenefPcMetadataUnit, UIFormValidatorFactoryUnit,
+  DbGridConfigUtilsUnit;
 
 {$R *.dfm}
 
@@ -80,7 +84,7 @@ begin
       Exit;
 
     FData.SQLMaker.FilterMk.FreeFilters()
-      .Add(FilterFramePadrao1.GetFiltros());
+      .Add(FiltroGrid.GetFiltros());
 
     FData.RunSQLMaker();
 
@@ -104,8 +108,8 @@ begin
     FState := AjusteRedBenefPcModel.Create();
     FState.DataRef := Date();
 
-    MapStateToForm();
-    ShowAbaCadastro();
+    if PrepararCamposCadastro() then
+      ShowAbaCadastro();
 
   finally
     Screen.Cursor := crDefault;
@@ -113,8 +117,6 @@ begin
 end;
 
 procedure TFrmCadAjustesRedBenefPC.BitBtn4Click(Sender: TObject);
-var
-  createResult: CreateEntityUseCaseOutPut;
 begin
   MapFormToState();
 
@@ -122,43 +124,34 @@ begin
     .Permitido() then
     Exit;
 
-  try try
-    createResult := Container.GetInstance().ErpFeaturesFactory.CreateSalvarAjusteRedBenefPcUseCase().
-      Executar( FState );
+  if FPresenter.Salvar(FState) then
+  begin
+    FAuditor.Sucesso().GravarMensagem( FState.GetAuditLabel() );
 
-    if not createResult.Validation.IsValid then
-      FFormValidator.Validate(createResult.Validation)
+    inherited;
 
-    else
-    begin
-      FAuditor.Sucesso().GravarMensagem( FState.GetAuditLabel() );
-
-      inherited;
-      FData.Refresh();
-    end;
-
-  finally
-    createResult.Free();
-  end;
-  except on E: Exception do
-    UIUtils.HandleError(E);
+    FData.Refresh();
   end;
 end;
 
 procedure TFrmCadAjustesRedBenefPC.edDataRefExit(Sender: TObject);
 var
-  dt: TDateTime;
+  dataReferencia: TDateTime;
 begin
-  if TryStrToDate(edDataRef.Text, dt)
-    and (dt <> FState.DataRef) then
+  if TryStrToDate(edDataRef.Text, dataReferencia)
+    and (dataReferencia <> FState.DataRef) then
   begin
-    FState.DataRef := dt;
-    edRegraId.LoadEntities(
-      Container.GetInstance().ErpFeaturesFactory.CreateListarRegrasRedBenefPcVigentesEAtualUseCase()
-        .Executar(FState.Id, FState.DataRef),
-      True
-    );
+    if FPresenter.CarregarRegras(
+      FState.RegraId, dataReferencia) then
+      FState.DataRef := dataReferencia
+    else
+      edDataRef.Text := DateToStr(FState.DataRef);
   end;
+end;
+
+procedure TFrmCadAjustesRedBenefPC.ExibirRegras(ARegras: RegraRedBenefPcEtdList);
+begin
+  edRegraId.LoadEntities(ARegras, True);
 end;
 
 procedure TFrmCadAjustesRedBenefPC.FormCreate(Sender: TObject);
@@ -172,15 +165,13 @@ begin
   FAuditor := FData.Auditor;
   builder := FieldsConfigFactory.Create();
 
-  DBGrid1.DataSource := FData._dataSourceOOP;
-  setTClientDataSet(vDadosIni.dataSetCol, vDadosIni.vNomeUsuario,
-    vDadosIni.transacaoCol);
-  //configurarGridPeloConfigColunas(DBGrid1);
+  SetupDataSetGrid(FData);
+
   Meta := AjusteRedBenefPcMetadata.GetMetadata();
   FData.Setup(builder, Meta);
 
-  FilterFramePadrao1.OnFieldChange := FData.HandleFilterField;
-  FilterFramePadrao1.TodosToggle(True).FillForm(FData.dataSet, nil, 'Todos');
+  FiltroGrid.OnFieldChange := FData.HandleFilterField;
+  FiltroGrid.TodosToggle(True).FillForm(FData.dataSet, nil, 'Todos');
 
   edRegraId.OnEntitySelected := RegrasListSelectEvent;
   edRegraId.OnEntityAdd := RegrasListAddEvent;
@@ -239,12 +230,6 @@ end;
 
 procedure TFrmCadAjustesRedBenefPC.MapStateToForm;
 begin
-  edRegraId.LoadEntities(
-    Container.GetInstance().ErpFeaturesFactory.CreateListarRegrasRedBenefPcVigentesEAtualUseCase()
-      .Executar(FState.Id, FState.DataRef),
-    True
-  );
-
   edIndAj.UpdateValue(FState.IndAj);
   edCodAj.UpdateValue(FState.CodAj);
   edCST.Text := FState.Cst;
@@ -270,6 +255,14 @@ begin
   btRegistroSistema.Visible := FState.Automatico;
 end;
 
+function TFrmCadAjustesRedBenefPC.PrepararCamposCadastro: Boolean;
+begin    
+  Result := FPresenter.CarregarRegras(FState.RegraId, FState.DataRef);
+
+  if Result then
+    MapStateToForm();
+end;
+
 procedure TFrmCadAjustesRedBenefPC.RegrasListAddEvent(Sender, Entity: TObject; out DisplayInfo: string;
   out SetSelected: Boolean);
 begin
@@ -286,6 +279,11 @@ begin
   DisplayInfo := Format('CST: %s - Indicador: %d - Codigo Ajuste: %d',
     [ regra.Cst, regra.IndAjusteEFD, regra.CodAjusteEFD ]
   );
+end;
+
+procedure TFrmCadAjustesRedBenefPC.SetupPresenter(APresenter: TAjustesRedBenefPcPresenter);
+begin
+  FPresenter := APresenter;
 end;
 
 procedure TFrmCadAjustesRedBenefPC.ShowAbaCadastro;
@@ -306,8 +304,8 @@ begin
   if FData.IsEmpty() then
     Exit;
 
-  dado := Container.GetInstance().ErpFeaturesFactory.CreateObterAjusteRedBenefPcPorIdUseCase()
-    .Executar(FData.fstr('id'));
+  if not FPresenter.ObterParaEdicao(FData.fstr('id'), dado) then
+    Exit;
 
   if dado = nil then
     UIUtils.ShowInfo('Registro não se encontra mais disponível')
@@ -322,8 +320,8 @@ begin
       .Permitido() then
       Exit;
 
-    MapStateToForm();
-    ShowAbaCadastro();
+    if PrepararCamposCadastro() then
+      ShowAbaCadastro();
   end;
 end;
 
@@ -337,17 +335,10 @@ begin
     .Permitido() then
     Exit;
 
-  try
-    Container.GetInstance().ErpFeaturesFactory.CreateRemoverAjusteRedBenefPcUseCase()
-      .Executar(FData.fstr('id'));
-
+  if FPresenter.Remover(FData.fstr('id')) then
+  begin               
     FAuditor.Sucesso.GravarMensagem( FAuditor.Mensagem );
-
     FData.Refresh();
-
-  except
-    on E: Exception do
-      UIUtils.HandleError(E);
   end;
 end;
 
@@ -358,7 +349,14 @@ begin
     Exit;                             
 
   FState.Automatico := False;
-  MapStateToForm();
+  if PrepararCamposCadastro() then
+    MapStateToForm();
+end;
+
+destructor TFrmCadAjustesRedBenefPC.Destroy;
+begin
+  FreeAndNil(FPresenter);
+  inherited;
 end;
 
 end.
