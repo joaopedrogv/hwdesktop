@@ -1,13 +1,13 @@
 ---
 name: erp-feature-implementation
-description: Plan and implement an ERP feature from an informal request through discovery, human approval, incremental Use Case delivery, and validation up to Ready for Release.
+description: Plan and implement an ERP feature from an informal request or a prepared plan, preserving approval, incremental Use Case delivery, and validation up to Ready for Release.
 ---
 
 # ERP Feature Implementation
 
 ## Purpose
 
-Guide an ERP feature from an informal request to **Ready for Release**.
+Guide an ERP feature from an informal request or a prepared plan to **Ready for Release**.
 
 This Workflow owns orchestration: sequence, approval gates, branches, Skill routing,
 and handoffs. Project constraints, knowledge, and specialized procedures remain in
@@ -26,15 +26,15 @@ required by the coding standards.
 ## Flow
 
 ```text
-Informal request
-      ↓
-Repository research
-      ↓
-Feature planning
-      ↓
-HUMAN APPROVAL
-      ↓
-Technical design
+Informal request                    Prepared plan
+      ↓                                   ↓
+Repository research                Planner checks coverage,
+      ↓                            evidence, and prior approval
+Feature planning                          ↓
+      ↓                            Only missing decisions return
+HUMAN APPROVAL                     to HUMAN APPROVAL
+      ↓                                   ↓
+Technical design ←────────────────────────┘
       ↓
 Incremental implementation by Use Case
       ├── production behavior
@@ -51,7 +51,43 @@ Ready for Release
 At run start, create or resume `.ai-runs/<run-id>/state.json`. Use the states and
 assignment/result contracts defined by `orchestration-protocol.md`.
 
+## 0. Select the Entry
+
+The Orchestrator records either an informal request or a prepared plan. A plan may
+come from prior work with the developer, another conversation, or an external file;
+its origin does not require repeating accepted planning.
+
+For a prepared plan, follow the intake contract in
+`.ai/agents/orchestration-protocol.md`. Assign `feature-planner` ownership of
+`.ai-runs/<run-id>/feature-plan.md` to preserve the supplied plan, identify its
+source version and approval evidence, and check it against section 2. Preserve
+approved functional decisions; do not rewrite the plan to impose a preferred format
+or reopen settled policy. Mark genuinely inapplicable items with a brief reason.
+
+- Reuse relevant verified evidence; delegate only missing or stale repository
+  questions to `repository-researcher` before repository-specific design.
+- When the plan is complete for the requested scope and its explicit approval is
+  established, adopt it as the run's feature plan and proceed to technical design.
+  Intake may be the opening part of the same planner assignment that produces the
+  technical design; no separate full planning round or repeated approval is required.
+- When information is missing, preserve the approved baseline and identify only the
+  gaps. Factual supplements may be recorded separately without changing approval;
+  new decisions, missing approval, or material deviations return to section 3.
+  A functional description alone does not establish all required planning coverage.
+- The source remains read-only. Preserve the adopted version in the run; later edits
+  to the source do not silently change the approved scope.
+
+If approval is absent or ambiguous, retain the prepared work and ask only for the
+approval or decisions still required. Never infer approval from the document's
+presence, an Agent's assertion, or the request to start this Workflow. Routine
+technical choices within the approved scope remain part of technical design and
+do not reopen plan approval.
+
 ## 1. Discovery
+
+For an informal request, perform this discovery before planning. For a prepared
+plan, use the same research responsibility only for the evidence gaps identified
+during intake; do not repeat accepted research.
 
 Accept the request at the level provided; a complete technical specification is not
 required. The Workflow Orchestrator assigns bounded, read-only questions to one or
@@ -76,12 +112,14 @@ inferences, relevant paths, reusable components, gaps, constraints, risks, and o
 questions. The Workflow Orchestrator registers these results without performing
 missing research itself and passes them to `feature-planner`.
 
-## 2. Mandatory Feature Plan
+## 2. Required Feature Plan
 
-Assign `feature-planner` to synthesize the request and repository evidence. Before
-implementation, assign it ownership of exactly
-`.ai-runs/<run-id>/feature-plan.md` for direct writing and revision. Require the
-saved artifact and verification of its content. The plan contains, when applicable:
+Every run needs a feature plan, created from the request or adopted through section
+0. For new planning, assign `feature-planner` to synthesize the request and repository
+evidence, with ownership of exactly `.ai-runs/<run-id>/feature-plan.md` for direct
+writing and revision. For a prepared plan, the planner checks coverage and preserves
+the accepted content instead of recreating it. Require the saved artifact and
+verification of its content in either path. The plan contains, when applicable:
 
 1. objective, scope, non-goals, and observable acceptance criteria;
 2. discovery evidence and reusable components;
@@ -126,7 +164,10 @@ strategy outside the default ERP feature path.
 ## 3. Human Approval Gate
 
 The Workflow Orchestrator presents the complete planner result and waits for explicit
-developer approval.
+developer approval when that approval has not already been established for the
+adopted plan and requested scope. Record approval of the exact plan version under
+the intake contract. A verified prior approval satisfies this gate for the unchanged
+scope; request approval only for unresolved decisions or material changes.
 
 Before approval, do not modify production code, tests, schema, migrations, or UI,
 and do not build or execute tests.
@@ -137,10 +178,12 @@ the affected plan and obtain approval before continuing that change.
 
 ## 4. Technical Design
 
-After approval, assign `feature-planner` again to translate the approved conceptual
-model into the minimum repository-specific design required for the feature. Give it
-ownership of exactly `.ai-runs/<run-id>/technical-design.md`; it writes and verifies
-the document directly. Include:
+Once the plan's approval is established, assign `feature-planner` to translate the
+approved conceptual model into the minimum repository-specific design required for
+the feature. This may continue the prepared-plan intake assignment after its checks
+succeed. Give it ownership of `.ai-runs/<run-id>/technical-design.md` as well when
+combining the tasks; otherwise this is the assignment's only writable artifact.
+It writes and verifies the document directly. Include:
 
 - types, Ports, Use Case inputs/outputs, and Services;
 - validation, transaction, and ownership boundaries;
@@ -226,7 +269,8 @@ Use these canonical responsibilities:
   ownership, canonical operations, result registration, developer communication,
   and final status, performed by the primary conversation Agent;
 - `repository-researcher` — bounded read-only repository evidence;
-- `feature-planner` — approval-ready plan and post-approval technical design;
+- `feature-planner` — new planning or prepared-plan intake, and post-approval
+  technical design;
 - `increment-implementer` — one approved writing assignment with explicit
   ownership and authorization boundaries;
 - `increment-reviewer` — independent read-only review of each increment and the

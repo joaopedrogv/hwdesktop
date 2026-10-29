@@ -298,7 +298,7 @@ Um Workflow coordena várias etapas, decisões humanas, Skills e handoffs.
 O primeiro Workflow canônico é
 [`erp-feature-implementation`](../../.ai/workflows/erp-feature-implementation.md).
 
-Seu fluxo é:
+O Workflow aceita duas entradas. Para um pedido ainda sem plano, o fluxo é:
 
 ```text
 descrição informal
@@ -319,6 +319,20 @@ validação
       ↓
 Ready for Release
 ```
+
+Para um plano já elaborado, o planner preserva seu conteúdo em
+`feature-plan.md` no run, registra a versão da fonte e a aprovação recebida e confere
+a cobertura necessária. Se o plano estiver completo para o escopo e aprovado, segue
+para `technical-design.md`; essa conferência pode ocorrer na mesma atribuição, sem
+refazer o planejamento nem pedir a mesma aprovação. A pesquisa de repositório fica
+limitada às evidências ausentes ou desatualizadas. Lacunas reais e decisões novas
+voltam ao desenvolvedor, preservando o que já foi decidido.
+
+Forneça o caminho ou conteúdo do plano e uma aprovação que identifique a versão e o
+escopo. Um desenho funcional pode servir como plano quando tiver a cobertura
+necessária; seu nome ou sua origem em outra conversa não o aprova automaticamente.
+O original permanece somente leitura, e mudanças posteriores não alteram
+silenciosamente o plano adotado no run.
 
 O Workflow termina em `Ready for Release`. Release, publicação, build de
 distribuição e incorporação da migration ao histórico de produção pertencem a outro
@@ -358,8 +372,10 @@ Cada ferramenta poderá oferecer uma sintaxe diferente: slash command, item de
 paleta, arquivo de prompt ou apenas linguagem natural. O adapter faz essa tradução.
 
 Invocar `implement-erp-feature` inicia ou retoma o `workflow-orchestrator`, que
-encaminha discovery e planejamento aos papéis especialistas. Isso não aprova
-previamente a implementação nem autoriza automaticamente a execução de testes.
+seleciona discovery/planejamento ou a adoção de um plano preparado pelos papéis
+especialistas. A Command respeita a aprovação já estabelecida para a versão e o
+escopo recebidos; sua invocação isolada não aprova a implementação nem autoriza
+automaticamente a execução de testes.
 
 O setup de uma ferramenta também pode ser solicitado diretamente:
 
@@ -388,9 +404,9 @@ Os papéis atuais são:
   agente principal da conversa;
 - [`repository-researcher`](../../.ai/agents/repository-researcher.md): pesquisa
   somente leitura;
-- [`feature-planner`](../../.ai/agents/feature-planner.md): plano completo para
-  aprovação e desenho técnico posterior, gravados diretamente nos arquivos
-  atribuídos do run;
+- [`feature-planner`](../../.ai/agents/feature-planner.md): criação ou adoção do plano
+  e desenho técnico após aprovação, gravados diretamente nos arquivos atribuídos
+  do run;
 - [`increment-implementer`](../../.ai/agents/increment-implementer.md): programação
   de um incremento aprovado;
 - [`increment-reviewer`](../../.ai/agents/increment-reviewer.md): revisão
@@ -457,7 +473,9 @@ Execute implement-erp-feature para a seguinte demanda:
 ...
 ```
 
-O agente inicia discovery, apresenta o plano e aguarda aprovação.
+O agente inicia discovery, apresenta o plano e aguarda aprovação. Se receber um
+plano já elaborado e aprovado para o escopo, faz a conferência de entrada e segue
+para o desenho técnico, solicitando somente esclarecimentos ou decisões faltantes.
 
 ### Skill explícita
 

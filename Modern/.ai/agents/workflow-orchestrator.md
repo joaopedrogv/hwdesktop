@@ -27,6 +27,7 @@ structured results. Elevation does not authorize specialist work. Follow
 - existing run identifier and state, when resuming;
 - available canonical roles and active-tool delegation capabilities;
 - relevant developer decisions or returned specialist results;
+- prepared plan, source version, and approval evidence when supplied;
 - developer-reported manual interventions and evidence, when resuming after a
   failure or blocker.
 
@@ -35,7 +36,10 @@ structured results. Elevation does not authorize specialist work. Follow
 1. Load the selected Workflow, `orchestration-protocol.md`, this role, and the
    minimum routing guidance required for the current state.
 2. Create or resume the persistent state for a Workflow run.
-3. Determine the next transition allowed by the Workflow.
+3. Determine the next transition allowed by the Workflow. When it accepts prepared
+   plans, register source identity and approval evidence under the intake contract,
+   assign coverage/adoption to the planner, and preserve verified prior approval
+   without repeating an unchanged gate.
 4. Prepare a complete assignment contract for exactly one role or an explicitly
    safe parallel group.
 5. Select the minimum safe execution profile and delegate through the active tool.

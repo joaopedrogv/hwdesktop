@@ -157,8 +157,8 @@ podem declarar `always_apply` ou `applies_to`.
 
 ## Workflow de feature consolidado
 
-O Workflow `.ai/workflows/erp-feature-implementation.md` recebe uma descrição
-informal e conduz:
+O Workflow `.ai/workflows/erp-feature-implementation.md` aceita um pedido informal
+ou um plano preparado. O caminho do pedido informal conduz:
 
 ```text
 pedido informal
@@ -181,6 +181,14 @@ validação final
       ↓
 Ready for Release
 ```
+
+Desde 29/10/2026, um plano preparado pode ser adotado como `feature-plan.md` após
+conferência de cobertura pelo planner. Origem, versão e evidência de aprovação
+ficam registradas no run. A aprovação explícita já existente vale para o escopo
+inalterado; apenas lacunas, novas decisões ou mudanças materiais retornam ao
+desenvolvedor. Com entradas suficientes, a conferência e o desenho técnico podem
+ocorrer na mesma atribuição, sem repetir o planejamento. O protocolo canônico
+preserva ownership, pesquisa por especialista e autorizações separadas.
 
 O Workflow não realiza release, publicação, deployment, empacotamento, alteração de
 versão ou incorporação da migration ao histórico de produção. Criar testes não

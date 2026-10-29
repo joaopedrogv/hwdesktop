@@ -122,6 +122,41 @@ reporting a transition, blocker, failure, resumption, or completion, the Workflo
 Orchestrator MUST persist that same status in `state.json`. It must never report a
 current state that differs from the persisted current state.
 
+## Prepared-Plan Intake
+
+A Workflow may accept a plan prepared outside the run. The Orchestrator registers
+its source and the developer's approval evidence; `feature-planner` checks coverage
+and writes the adopted `feature-plan.md`. The Orchestrator does not synthesize,
+approve, or rewrite the plan in place of the planner.
+
+The Orchestrator records in `state.json`, referencing details in the planner's
+saved artifact:
+
+- entry type, source path(s), and an immutable source identity (revision or content
+  digest), plus the identity of the adopted run artifact;
+- the developer's explicit approval statement or a traceable approval reference,
+  including which version and scope it covers and any partial approval;
+- the planner's coverage result, accepted evidence, supplements, unresolved
+  decisions, and any proposed deviation.
+
+The supplied content is the baseline. Preserve its approved decisions and separate
+factual supplements from new proposals. Store the adopted plan within the run so
+future source edits cannot silently alter it. Do not modify the external source or
+treat an Agent's claim of approval as human approval. If approval evidence does not
+identify the supplied version or scope, ask the developer to clarify that point.
+
+Use existing lifecycle states: intake starts in `PLANNING`; missing repository
+evidence uses `DISCOVERING`; absent approval or new decisions use
+`AWAITING_PLAN_APPROVAL`. The planner may combine intake with technical design
+when coverage, evidence, and prior approval are sufficient. The Orchestrator then
+records the accepted intake and transition to `TECHNICAL_DESIGN` before accepting
+the design result or reporting that transition. No additional state or human gate
+is required solely because the plan originated elsewhere.
+
+A prior approval satisfies only the unchanged scope it explicitly covers. A
+material deviation returns to the human approval gate; build, test, database,
+release, and publication authorizations remain separate.
+
 ## Canonical Lifecycle States
 
 Multi-agent feature delivery uses these states unless a more specialized Workflow
@@ -129,9 +164,10 @@ defines an explicit compatible extension:
 
 - `RECEIVED` — request registered, no specialist work accepted yet;
 - `DISCOVERING` — one or more read-only research assignments are active;
-- `PLANNING` — evidence is being synthesized into the complete feature plan;
-- `AWAITING_PLAN_APPROVAL` — implementation is prohibited until the developer
-  explicitly approves the plan;
+- `PLANNING` — a feature plan is being created or a prepared plan is being checked
+  and adopted;
+- `AWAITING_PLAN_APPROVAL` — required plan approval, uncovered decisions, or material
+  changes await explicit developer approval; implementation of that scope is prohibited;
 - `TECHNICAL_DESIGN` — the approved conceptual model is being translated into
   repository-specific design;
 - `READY_FOR_INCREMENT` — the next approved increment may be assigned;

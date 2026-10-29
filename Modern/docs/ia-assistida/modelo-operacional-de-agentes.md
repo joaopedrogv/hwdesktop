@@ -78,6 +78,12 @@ Recebe a demanda e os resultados dos pesquisadores. Produz:
 1. o plano completo da feature para aprovação humana;
 2. depois da aprovação, o desenho técnico necessário para implementação.
 
+Quando recebe um plano preparado, confere sua cobertura, preserva a versão aprovada
+em `feature-plan.md` e explicita somente complementos, lacunas ou mudanças propostas.
+Com evidências e aprovação suficientes, pode produzir o desenho técnico na mesma
+atribuição. O orquestrador registra a origem e a aprovação; não recria o plano.
+Decisões funcionais aprovadas não voltam à discussão sem um motivo concreto.
+
 É o papel que normalmente exige maior capacidade, pois trata modelo conceitual,
 Use Cases, limites arquiteturais, persistência, segurança, testes, riscos e divisão
 dos incrementos. Por isso começa em `quality-critical`.
@@ -109,6 +115,8 @@ ao implementador e depois revisada novamente.
 
 ## Fluxo de uma feature
 
+Caminho de uma demanda ainda sem plano:
+
 ```text
 Demanda informal
       ↓
@@ -133,6 +141,12 @@ Validações autorizadas
       ↓
 Ready for Release
 ```
+
+Um plano preparado entra pela conferência do planner. Se completo para o escopo e
+com aprovação explícita da versão recebida, passa ao desenho técnico; se houver
+lacunas, somente elas são complementadas ou submetidas à aprovação. A pesquisa
+continua com o researcher, limitada às evidências necessárias. O run registra a
+versão adotada e não acompanha alterações externas silenciosamente.
 
 O limite continua sendo `Ready for Release`. O Workflow não autoriza publicação,
 release, distribuição ou migration de produção.
