@@ -346,11 +346,13 @@ procedure TFrmCadAjustesRedBenefPC.btRegistroSistemaClick(Sender: TObject);
 begin
   if not FAuditor.Processo('MOD043', FState.GetAuditKey(), FState.GetAuditLabel()).Alterar()
     .Permitido() then
-    Exit;                             
+    Exit;
 
-  FState.Automatico := False;
   if PrepararCamposCadastro() then
+  begin
+    FState.Automatico := False;
     MapStateToForm();
+  end;
 end;
 
 destructor TFrmCadAjustesRedBenefPC.Destroy;
