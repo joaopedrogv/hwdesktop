@@ -4,7 +4,7 @@
     Central interativa das automações do HWDESKTOP.
 .DESCRIPTION
     Apresenta Build / Deploy, sincronização, início e merge de demandas,
-    dependências, preparação de entrega SVN e informações locais.
+    dependências, preparação de entrega SVN, informações locais e banco de dados.
 .PARAMETER Preview
     Exibe a tela inicial sem aguardar entrada ou alterar o terminal.
 .PARAMETER NoColor
@@ -14,7 +14,7 @@
 param(
     [switch] $Preview,
     [switch] $NoColor,
-    [ValidateSet('Main', 'Build')] [string] $Section = 'Main'
+    [ValidateSet('Main', 'Build', 'Database')] [string] $Section = 'Main'
 )
 
 Set-StrictMode -Version Latest
@@ -63,7 +63,8 @@ function Write-MenuScreen {
         [string] $DetailTitle,
         [switch] $Plain,
         [switch] $Refresh,
-        [switch] $BuildSection
+        [switch] $BuildSection,
+        [switch] $DatabaseSection
     )
 
     $width = 88
@@ -101,7 +102,7 @@ function Write-MenuScreen {
     [Console]::WriteLine()
     [Console]::WriteLine(" $($palette.Accent)$($border.TopLeft)$($border.Horizontal * ($width - 2))$($border.TopRight)$($palette.Reset)")
     Write-Row 'HWDESKTOP  /  AUTOMAÇÕES' $palette.Title
-    Write-Row $(if ($BuildSection) { 'Build / Deploy' } else { 'Ambiente de desenvolvimento' }) $palette.Muted
+    Write-Row $(if ($DatabaseSection) { 'Banco de dados' } elseif ($BuildSection) { 'Build / Deploy' } else { 'Ambiente de desenvolvimento' }) $palette.Muted
     if (-not $compact) { Write-Row }
     Write-Row "Projeto: $ProjectRoot" $palette.Muted
     if (-not $compact) { Write-Row "PowerShell $($PSVersionTable.PSVersion)" $palette.Muted }
@@ -124,7 +125,7 @@ function Write-MenuScreen {
             Write-Row
         }
         Write-Row 'Setas ou número: selecionar    Enter: abrir' $palette.Accent
-        Write-Row $(if ($BuildSection) { 'Esc / Backspace: voltar    0 / Q: sair' } else { '0 / Esc / Q: sair' }) $palette.Muted
+        Write-Row $(if ($BuildSection -or $DatabaseSection) { 'Esc / Backspace: voltar    0 / Q: sair' } else { '0 / Esc / Q: sair' }) $palette.Muted
         Write-Row
         Write-Row 'Escolha uma opção. Abrir o menu não inicia operações.' $palette.Muted
     }
@@ -191,6 +192,10 @@ function Invoke-MenuCommand {
             $commandArguments = @()
             $scriptPath = Join-Path $PSScriptRoot 'workflow\deliver-svn.ps1'
         }
+        elseif ($Item.Id -eq 'schema') {
+            $commandArguments = @()
+            $scriptPath = Join-Path $PSScriptRoot 'database\export-schema.ps1'
+        }
         elseif ($Item.Id -eq 'dependencies') {
             $commandArguments = @()
             $scriptPath = Join-Path $PSScriptRoot 'workflow\prepare-dependencies.ps1'
@@ -225,6 +230,7 @@ function Invoke-AutomationMenu {
         [pscustomobject]@{ Label = 'Preparar dependências'; Description = 'Obter build em dcp e runtime em bpl pelo Nextcloud.'; Status = 'Disponível'; Id = 'dependencies' }
         [pscustomobject]@{ Label = 'Entregar ao SVN'; Description = 'Preparar a entrega; commit SVN por chamada separada com -Commit.'; Status = 'Disponível'; Id = 'deliver' }
         [pscustomobject]@{ Label = 'Informações do ambiente'; Description = 'Consultar caminhos e a versão do PowerShell.'; Status = 'Disponível'; Id = 'environment' }
+        [pscustomobject]@{ Label = 'Banco de dados'; Description = 'Ferramentas da base de referência.'; Status = 'Disponível'; Id = 'database' }
     )
     $buildItems = @(
         [pscustomobject]@{ Label = 'Compilar todos'; Description = 'Limpeza geral e compilação do catálogo completo.'; Status = 'Disponível'; Id = 'all'; ScriptName = 'build-all.ps1' }
@@ -234,11 +240,14 @@ function Invoke-AutomationMenu {
         [pscustomobject]@{ Label = 'Publicar BPLs'; Description = 'Copiar as BPLs disponíveis para o destino.'; Status = 'Disponível'; Id = 'deploy'; ScriptName = 'deploy-all.ps1' }
         [pscustomobject]@{ Label = 'Compilar e publicar'; Description = 'Publicar após a compilação terminar com sucesso.'; Status = 'Disponível'; Id = 'combined'; ScriptName = 'build-and-deploy.ps1' }
     )
-    $items = if ($Section -eq 'Build') { $buildItems } else { $mainItems }
+    $databaseItems = @(
+        [pscustomobject]@{ Label = 'Atualizar schema'; Description = 'Extrair metadados da base configurada, sem aplicar migrações.'; Status = 'Disponível'; Id = 'schema' }
+    )
+    $items = if ($Section -eq 'Build') { $buildItems } elseif ($Section -eq 'Database') { $databaseItems } else { $mainItems }
     $plain = $NoColor -or [Console]::IsOutputRedirected -or (Test-Path Env:NO_COLOR)
 
     if ($Preview) {
-        Write-MenuScreen -Items $items -SelectedIndex -1 -ProjectRoot $projectRoot -Plain:$plain -BuildSection:($Section -eq 'Build')
+        Write-MenuScreen -Items $items -SelectedIndex -1 -ProjectRoot $projectRoot -Plain:$plain -BuildSection:($Section -eq 'Build') -DatabaseSection:($Section -eq 'Database')
         return 0
     }
 
@@ -278,7 +287,7 @@ function Invoke-AutomationMenu {
                 Write-MenuScreen -Items $items -SelectedIndex $selectedIndex -ProjectRoot $projectRoot -Plain:$plain -Refresh -DetailTitle $detailItem.Label -Details $details
             }
             else {
-                Write-MenuScreen -Items $items -SelectedIndex $selectedIndex -ProjectRoot $projectRoot -Plain:$plain -Refresh -BuildSection:($Section -eq 'Build')
+                Write-MenuScreen -Items $items -SelectedIndex $selectedIndex -ProjectRoot $projectRoot -Plain:$plain -Refresh -BuildSection:($Section -eq 'Build') -DatabaseSection:($Section -eq 'Database')
             }
 
             $key = [Console]::ReadKey($true)
@@ -292,7 +301,7 @@ function Invoke-AutomationMenu {
                 continue
             }
 
-            if ($Section -eq 'Build' -and $key.Key -in @([ConsoleKey]::Escape, [ConsoleKey]::Backspace)) {
+            if ($Section -in @('Build', 'Database') -and $key.Key -in @([ConsoleKey]::Escape, [ConsoleKey]::Backspace)) {
                 $Section = 'Main'; $items = $mainItems; $selectedIndex = -1
                 continue
             }
@@ -300,12 +309,15 @@ function Invoke-AutomationMenu {
             $selectedIndex = $transition.SelectedIndex
             if ($transition.Action -eq 'Exit') { return 0 }
             if ($transition.Action -eq 'Open') {
-                if ($Section -eq 'Build' -or $items[$selectedIndex].Id -in @('sync', 'start', 'dependencies', 'integrate', 'deliver')) {
+                if ($Section -in @('Build', 'Database') -or $items[$selectedIndex].Id -in @('sync', 'start', 'dependencies', 'integrate', 'deliver')) {
                     Invoke-MenuCommand -Item $items[$selectedIndex] -ProjectRoot $projectRoot -Plain:$plain
                     $selectedIndex = -1
                 }
                 elseif ($items[$selectedIndex].Id -eq 'build') {
                     $Section = 'Build'; $items = $buildItems; $selectedIndex = -1
+                }
+                elseif ($items[$selectedIndex].Id -eq 'database') {
+                    $Section = 'Database'; $items = $databaseItems; $selectedIndex = -1
                 }
                 else { $detailItem = $items[$selectedIndex] }
             }

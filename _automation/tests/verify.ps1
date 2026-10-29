@@ -779,6 +779,13 @@ exit $LASTEXITCODE
         if ($result.Code -ne 0) { throw "$($result.Error)`n$($result.Output)" }
         Assert-Check (Test-Directory $result $integration) 'BAT aberto na própria _automation usa a raiz da integração'
         Assert-Check ($result.Output.Contains('PREVIEW=True;NOCOLOR=True') -and $result.Output.Contains('Build / Deploy')) 'Encaminha parâmetros e abre o menu real em preview sem executar operações'
+        Assert-Check ($result.Output.Contains('Banco de dados')) 'Menu principal oferece o grupo Banco de dados sem iniciar a extração'
+        $engine = (Get-Process -Id $PID).Path
+        $preview = @(& $engine -NoLogo -NoProfile -File (Join-Path $integration '_automation/menu-real.ps1') -Preview -NoColor -Section Database 2>&1)
+        Assert-Check ($LASTEXITCODE -eq 0 -and ($preview -join [Environment]::NewLine).Contains('Atualizar schema')) 'Submenu Banco de dados abre em preview sem configuração ou acesso a banco'
+        Assert-Check (($preview -join [Environment]::NewLine).Contains('Esc / Backspace: voltar')) 'Submenu Banco de dados apresenta navegação de retorno'
+        $preview = @(& $engine -NoLogo -NoProfile -File (Join-Path $integration '_automation/menu-real.ps1') -Preview -NoColor -Section Build 2>&1)
+        Assert-Check ($LASTEXITCODE -eq 0 -and ($preview -join [Environment]::NewLine).Contains('Compilar todos')) 'Submenu Build / Deploy continua disponível'
         $result = Invoke-Launcher $integrationLauncher $integration
         Assert-Check ($result.Code -eq 0 -and (Test-Directory $result $integration)) 'Chamada a partir da raiz da integração mantém a raiz'
         $result = Invoke-Launcher $workLauncher (Join-Path $work '_automation')

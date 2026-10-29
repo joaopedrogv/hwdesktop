@@ -15,7 +15,7 @@ O Windows PowerShell 5.1 (`powershell.exe`) não atende ao requisito. O lançado
 
 ## Navegação
 
-- **Setas para cima/baixo**, **Home/End** ou **1 a 7** selecionam uma opção no menu principal. O submenu Build / Deploy tem seis opções.
+- **Setas para cima/baixo**, **Home/End** ou **1 a 8** selecionam uma opção no menu principal. O submenu Build / Deploy tem seis opções; Banco de dados reúne as operações de esquema.
 - **Enter** abre a opção selecionada. Ao abrir o menu, nenhuma opção está selecionada; Enter sozinho não inicia uma ação.
 - **Esc**, **0** ou **Q** encerram o menu na tela inicial.
 - Nos detalhes, **Esc/Backspace** retornam à tela inicial, novamente sem seleção; **0/Q** encerram.
@@ -33,6 +33,7 @@ O Windows PowerShell 5.1 (`powershell.exe`) não atende ao requisito. O lançado
 | 5 | Preparar dependências | Obter os pacotes Nextcloud e aplicar build em dcp e runtime em bpl. |
 | 6 | Entregar ao SVN | Preparar as mudanças da main publicada; commit SVN por chamada separada com -Commit. |
 | 7 | Informações do ambiente | Consultar os caminhos locais e a versão do PowerShell, sem alterações. |
+| 8 | Banco de dados | Abrir o submenu com Atualizar schema, usando a configuração individual. |
 
 **Integrar demanda**, quarto item, atualiza a main do clone com pull por fast-forward e incorpora a branch da demanda. Não faz push: o resultado aguarda sua revisão e validação. Faça antes a sincronização no diretório de integração. Instruções em [workflow/README.md](workflow/README.md#integrar-demanda). A opção **Informações do ambiente** consulta somente os caminhos locais e a versão do PowerShell.
 
@@ -121,3 +122,8 @@ A mesma entrada workflow/sync-integration.ps1 identifica SVN tradicional ou git-
 `dependencies/pack-dependencies.ps1` gera a estrutura local para publicação no Nextcloud a partir dos arquivos separados pelo responsável. Agrupa build e runtime/baseline em ZIPs e mantém runtime/internal por módulo e versão. Instruções em [dependencies/README.md](dependencies/README.md). Os testes estão no arquivo único, grupo `Dependencies`.
 
 O fluxo completo, incluindo commit, push e entrega SVN, está em [workflow/GUIA-OPERACIONAL.md](workflow/GUIA-OPERACIONAL.md). A entrega está disponível no menu e pelo script workflow/deliver-svn.ps1; -Commit confirma uma preparação já conferida.
+
+
+## Esquema do banco
+
+Depois de atualizar a base de referência pelo próprio ERP, execute database/export-schema.ps1 para atualizar scripts/database/schema/schema.sql. A extração usa configuração individual e não executa migrações. Também está acessível em **Banco de dados → Atualizar schema**; abrir o submenu não inicia a operação. Permanece separado de start-demand.ps1. A conexão vem de config/database.local.psd1, campo Database, sem caminho de banco fixo no script. [Configuração e limites](database/README.md).
