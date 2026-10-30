@@ -17,6 +17,25 @@ always_apply: true
   Never weaken a control to simplify a task or bypass an error.
 - Do not infer a uniform architecture or stack from this checkout's directory tree.
 
+## Run Context and Repository Searches
+
+- Operational runs are task-local evidence, not canonical project context. Use the
+  exact current run path and only the artifacts needed for the assignment.
+- Exclude .ai-runs/ and historical locations such as Modern/.ai-runs/ from routine
+  source-code searches, including searches that bypass ignore settings. Read the
+  current run through its explicit path, not by searching all runs.
+- Do not enumerate runs to select the newest or infer which task to resume. For a
+  new run, check only its candidate path; if a resumed run is unidentified, ask for
+  its path instead of scanning the history. A task without a run does not require
+  loading operational history.
+- Consult another run only for an identified relevant reference or research need.
+  Bound the read to its exact artifact/path and record the purpose in the existing
+  assignment or result. Treat it as historical evidence to verify, not authority
+  over current source or approved decisions. A narrower Workflow restriction still
+  applies.
+- Read access does not grant write ownership over another run. Preserve its state
+  and artifacts.
+
 ## Secrets, certificates and sensitive data
 
 - Never hardcode or commit credentials, tokens, private keys or real secret files.

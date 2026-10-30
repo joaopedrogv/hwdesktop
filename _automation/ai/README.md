@@ -61,6 +61,26 @@ coordinator evita a colisão com o Orchestrator nativo depreciado do Kilo.
 O papel canônico continua sendo workflow-orchestrator.
 -Tool Kilo instala somente Kilo e Shared; os demais clientes não são alterados.
 
+## Limites de passos
+
+Os limites compartilhados do Kilo ficam nos templates dos perfis:
+
+| Perfil | Steps |
+| --- | ---: |
+| coordinator | 200 |
+| planner | 100 |
+| implementer | 100 |
+| implementer-fast | 60 |
+| researcher | 40 |
+| researcher-critical | 80 |
+| reviewer | 80 |
+
+São tetos de iterações, não quantidades de incrementos ou consumo obrigatório.
+O aumento evita interrupções prematuras; não acelera cada chamada ao modelo.
+Uma escolha individual de steps em kiloAgents no arquivo de configuração prevalece
+sobre o template. Preserve essa preferência; não edite o perfil gerado esperando
+que a alteração sobreviva à reaplicação do setup.
+
 ## Preservação e validação
 
 Os destinos .kilo/ e .agents/ e os novos runs .ai-runs/ ficam na raiz, ignorados.

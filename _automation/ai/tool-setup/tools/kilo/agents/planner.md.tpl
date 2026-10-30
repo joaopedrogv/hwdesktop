@@ -1,7 +1,7 @@
 ---
 description: Produce an approval-ready ERP feature plan and an implementation-ready technical design from verified repository evidence.
 mode: subagent
-steps: 40
+steps: 100
 temperature: 0.1
 permission:
   "*": deny

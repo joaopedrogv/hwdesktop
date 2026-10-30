@@ -1,7 +1,7 @@
 ---
 description: Coordinate a canonical HWDESKTOP Workflow as the primary Agent with operational automation, bounded delegation, and human gates.
 mode: primary
-steps: 40
+steps: 200
 temperature: 0.1
 permission:
   "*": deny

@@ -1,7 +1,7 @@
 ---
 description: Perform bounded high-risk repository research with advanced deliberation and return evidence for critical planning or implementation.
 mode: subagent
-steps: 30
+steps: 80
 temperature: 0.1
 permission:
   "*": deny

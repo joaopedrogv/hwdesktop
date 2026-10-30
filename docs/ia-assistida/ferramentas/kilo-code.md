@@ -67,6 +67,14 @@ Os requisitos de capacidade são definidos pelas atribuições e perfis portáte
 sem escolha fixa de fornecedor ou LLM. O implementer padrão atende balanced-work
 e quality-critical; o rápido continua separado.
 
+## Limites de passos
+
+Os limites foram ampliados para comportar a coordenação e as atribuições sem as
+interrupções observadas no primeiro piloto. Os valores ficam nos templates; veja a
+[tabela de limites](../../../_automation/ai/README.md#limites-de-passos).
+É possível definir steps por agente na configuração individual, preservada pelo
+gerador. Os valores são tetos, não uma meta de consumo.
+
 ## Configuração de modelos
 
 O arquivo individual é **_automation/config/ai-models.local.json**, ignorado.
@@ -91,6 +99,12 @@ Para cada atribuição, o coordenador chama o especialista nomeado pela Task uma
 e aguarda seu resultado. Os especialistas não delegam. Pesquisa e revisão permanecem
 somente leitura; o planner grava somente os documentos exatos atribuídos no run.
 Somente o coordenador atualiza state.json.
+
+As buscas comuns no código excluem as pastas de runs. Cada atribuição identifica
+a execução atual e lê seus artefatos pelos caminhos exatos. Outra execução só é
+consultada por motivo identificado e com leitura delimitada; seu conteúdo é
+histórico, sujeito a conferência. Não se escolhe a run mais recente por varredura.
+A regra canônica está em .ai/rules/repository-safety.md.
 
 Os acessos técnicos permitem a delegação e as operações prescritas, mas não concedem
 ao coordenador autoria do conteúdo técnico nem autorização de build, testes ou SQL.

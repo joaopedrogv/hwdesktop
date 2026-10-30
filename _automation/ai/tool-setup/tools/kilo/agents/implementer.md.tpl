@@ -1,7 +1,7 @@
 ---
 description: Implement one bounded approved HWDESKTOP assignment requiring quality-critical capability, explicit ownership and authorization-aware validation.
 mode: subagent
-steps: 40
+steps: 100
 permission:
   "*": deny
   read: allow

@@ -1,7 +1,7 @@
 ---
-description: Perform bounded read-only research in the Modern repository and return evidence for discovery or implementation planning.
+description: Perform bounded read-only research in HWDESKTOP and return evidence for discovery or implementation planning.
 mode: subagent
-steps: 15
+steps: 40
 temperature: 0.1
 permission:
   "*": deny

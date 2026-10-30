@@ -77,6 +77,10 @@ invocation for supervised manual execution. Resume only after accepting its resu
 
 Operational run data belongs under `.ai-runs/<run-id>/`, separate from canonical
 instructions under `.ai/`. `.ai-runs/` is ignored by version control by default.
+Use the exact current run path in each assignment. Apply the run-context/search
+boundaries in `.ai/rules/repository-safety.md`, including for historical runs kept
+at older locations. Historical consultation is a bounded evidence read, not a new
+state format or an automatic step before every assignment.
 
 Recommended layout:
 
@@ -194,7 +198,7 @@ successful replacement assignment may resume them. `CANCELLED` is terminal.
 
 Every specialist assignment must identify:
 
-- run identifier and Workflow phase;
+- run identifier, exact current run directory, and Workflow phase;
 - canonical role;
 - objective and approved scope;
 - inputs, evidence, and artifact paths;

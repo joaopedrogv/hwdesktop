@@ -1,7 +1,7 @@
 ---
 description: Implement a well-defined approved assignment using fast-routine, with or without an applicable Skill.
 mode: subagent
-steps: 20
+steps: 60
 temperature: 0.1
 permission:
   "*": deny

@@ -104,4 +104,5 @@ implicit investigation step.
 New Workflow runs use .ai-runs/<run-id>/ at the checkout root, ignored by Git.
 Preserve historical run directories and evidence. When resuming an older run,
 identify its actual path explicitly; do not relocate it or replace its history
-automatically.
+automatically. Follow the current-run isolation and search boundaries in
+.ai/rules/repository-safety.md; do not load other runs as default project context.

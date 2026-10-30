@@ -1,7 +1,7 @@
 ---
-description: Independently review an implemented Modern increment against its approved plan and applicable canonical guidance.
+description: Independently review an implemented HWDESKTOP increment against its approved plan and applicable canonical guidance.
 mode: subagent
-steps: 30
+steps: 80
 temperature: 0.1
 permission:
   "*": deny
