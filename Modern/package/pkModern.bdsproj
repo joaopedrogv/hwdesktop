@@ -388,6 +388,7 @@
     ..\Core\Infrastructure\Services\ArrayServiceUnit.pas;
     ..\Core\Infrastructure\Exceptions\EValidacaoNegocioUnit.pas;
     ..\ERP.Features\Core\Domain\Entities\OperacaoInternaEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Metadata\OperacaoInternaMetadataUnit.pas;
     ..\ERP.Features\Core\Domain\Ports\IOperacoesInternasRepositoryUnit.pas;
     ..\ERP.Features\Adapters\Secondary\Repositories\OperacoesInternasRepositoryUnit.pas;
     ..\ERP.Features\Core\Application\UseCases\OperacoesInternas\ObterOperacaoInternaPorIdUseCaseUnit.pas;
@@ -401,6 +402,8 @@
     ..\ERP.Features\Core\Application\UseCases\RegrasFiscais\SalvarRegraFiscalIbsCbsUseCaseUnit.pas;
     ..\UI\Forms\OperacoesInternas\UCadOperacoesInternas.pas;
     ..\UI\Forms\OperacoesInternas\UCadOperacoesInternas.dfm;
+    ..\UI\DataSets\OperacoesInternas\OperacoesInternasDataSet.pas;
+    ..\UI\Forms\OperacoesInternas\OperacoesInternasPresenter.pas;
     ..\UI\Forms\RegrasFiscaisIbsCbs\UCadRegrasFiscaisIbsCbs.pas;
     ..\UI\Forms\RegrasFiscaisIbsCbs\UCadRegrasFiscaisIbsCbs.dfm;
     ..\UI\Frames\Contextos\Fiscal.RTC\ComboBoxClassTribFrameUnit.pas;

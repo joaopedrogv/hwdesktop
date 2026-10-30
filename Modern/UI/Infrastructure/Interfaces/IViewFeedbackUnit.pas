@@ -12,6 +12,7 @@ type
     procedure ExibirValidacoes(const AValidacoes: ValidationEntityOutput);
     procedure ExibirErro(AErro: Exception);
     procedure ExibirInformacao(const AMensagem: string);
+    procedure ExibirAtencao(const AMensagem: string);
   end;
 
 implementation

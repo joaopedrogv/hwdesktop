@@ -18,6 +18,7 @@ type
     procedure ExibirValidacoes(const AValidacoes: ValidationEntityOutput);
     procedure ExibirErro(AErro: Exception);
     procedure ExibirInformacao(const AMensagem: string);
+    procedure ExibirAtencao(const AMensagem: string);
 
     procedure SetupDataSetGrid(ADataSet: TDataSetGrid);
   end;
@@ -33,6 +34,11 @@ uses
   uDtmAtivo, UIUtilsUnit;
 
 { TModernCadastroForm }
+
+procedure TModernCadastroForm.ExibirAtencao(const AMensagem: string);
+begin
+  UIUtils.ShowAtention(AMensagem);
+end;
 
 procedure TModernCadastroForm.ExibirErro(AErro: Exception);
 begin

@@ -13,7 +13,8 @@ uses
   UCadOperacoesFiscaisIbsCbs, UCadOpInternasComTiposVendas,
   SharedFactoryContainerUnit, SharedRepoContainerUnit, FiscalRepoContainerUnit,
   ErpFeaturesRepoContainerUnit, UCentralDadosFiscais, UCadNFSe, ISharedFactoryUnit, ISessionContextUnit,
-  UCadRegrasRedBenefPC, UCadAjustesRedBenefPC, AjustesRedBenefPcPresenter;
+  UCadRegrasRedBenefPC, UCadAjustesRedBenefPC, AjustesRedBenefPcPresenter,
+  OperacoesInternasPresenter;
 
 var
   GFiscalFactoryInst: IFiscalCalculosFactory;
@@ -92,11 +93,65 @@ begin
 end;
 
 procedure ShowOperacoesInternas(Amodal: Boolean);
+var
+  SalvarUseCase: ISalvarOperacaoInternaUseCase;
+  ObterUseCase: IObterOperacaoInternaPorIdUseCase;
+  RemoverUseCase: IRemoverOperacaoInternaUseCase;
+  Presenter: TOperacoesInternasPresenter;
 begin
   if not Assigned(formOperacoInterna) then
   begin
     vDadosIni.vModalOuChild := IfThen(Amodal, 'M', 'C');
-    Application.CreateForm( TfrmCadOperacoesInternas, formOperacoInterna );
+
+    SalvarUseCase := nil;
+    ObterUseCase := nil;
+    RemoverUseCase := nil;
+    Presenter := nil;
+
+    try
+      Application.CreateForm( TfrmCadOperacoesInternas, formOperacoInterna );
+
+      SalvarUseCase := GetFeaturesFactory().CreateSalvarOperacaoInternaUseCase();
+      ObterUseCase := GetFeaturesFactory().CreateObterOperacaoInternaPorIdUseCase();
+      RemoverUseCase := GetFeaturesFactory().CreateRemoverOperacaoInternaUseCase();
+
+      Presenter := TOperacoesInternasPresenter.Create(
+        formOperacoInterna,
+        SalvarUseCase,
+        ObterUseCase,
+        RemoverUseCase
+      );
+
+      SalvarUseCase := nil;
+      ObterUseCase := nil;
+      RemoverUseCase := nil;
+
+      formOperacoInterna.SetupPresenter(Presenter);
+      Presenter := nil;
+    except
+      FreeAndNil(Presenter);
+
+      if Assigned(SalvarUseCase) then
+      begin
+        SalvarUseCase.FreeSafe();
+        SalvarUseCase := nil;
+      end;
+
+      if Assigned(ObterUseCase) then
+      begin
+        ObterUseCase.FreeSafe();
+        ObterUseCase := nil;
+      end;
+
+      if Assigned(RemoverUseCase) then
+      begin
+        RemoverUseCase.FreeSafe();
+        RemoverUseCase := nil;
+      end;
+
+      FreeAndNil(formOperacoInterna);
+      raise;
+    end;
   end;
 
   if Amodal then

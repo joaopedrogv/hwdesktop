@@ -9,6 +9,9 @@ inherited ModernCadastroForm: TModernCadastroForm
       Left = 0
       Top = 0
       Height = 545
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitHeight = 545
     end
     inherited PanelLeft: TPanel
       Left = 3
@@ -16,18 +19,30 @@ inherited ModernCadastroForm: TModernCadastroForm
       Width = 795
       Height = 545
       BevelOuter = bvNone
+      ExplicitLeft = 3
+      ExplicitTop = 0
+      ExplicitWidth = 795
+      ExplicitHeight = 545
       inherited PageControl1: TPageControl
         Left = 0
         Top = 0
         Width = 795
         Height = 545
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 795
+        ExplicitHeight = 545
         inherited TabSheet1: TTabSheet
           inherited ScrollBox1: TScrollBox
             Width = 787
             Height = 514
+            ExplicitWidth = 787
+            ExplicitHeight = 514
             inherited PageControl3: TPageControl
               Width = 787
               Height = 466
+              ExplicitWidth = 787
+              ExplicitHeight = 466
               inherited TabSheet3: TTabSheet
                 ExplicitLeft = 4
                 ExplicitTop = 27
@@ -36,8 +51,11 @@ inherited ModernCadastroForm: TModernCadastroForm
                 inherited ScrollBox3: TScrollBox
                   Width = 779
                   Height = 435
+                  ExplicitWidth = 779
+                  ExplicitHeight = 435
                   inherited GroupBox1: TGroupBox
                     Width = 775
+                    ExplicitWidth = 775
                   end
                 end
               end
@@ -45,12 +63,15 @@ inherited ModernCadastroForm: TModernCadastroForm
             inherited Panel3: TPanel
               Top = 466
               Width = 787
+              ExplicitTop = 466
+              ExplicitWidth = 787
             end
           end
         end
         inherited TabSheet2: TTabSheet
           inherited GroupBox3: TGroupBox
             Width = 787
+            ExplicitWidth = 787
             inherited Label1: TLabel
               Left = 77
               Top = 19
@@ -92,6 +113,7 @@ inherited ModernCadastroForm: TModernCadastroForm
             end
             inherited imgInformation: TImage
               Left = 761
+              ExplicitLeft = 761
             end
             inherited MaskEdit3: TMaskEdit
               Left = 120
@@ -190,20 +212,17 @@ inherited ModernCadastroForm: TModernCadastroForm
                     ExplicitWidth = 72
                   end
                 end
-                inherited pnBtns: TPanel
-                  inherited lbCountFiltros: TLabel
-                    Width = 27
-                    Height = 21
-                  end
-                end
               end
             end
           end
           inherited Panel1: TPanel
             Width = 787
             Height = 441
+            ExplicitWidth = 787
+            ExplicitHeight = 441
             inherited Splitter1: TSplitter
               Height = 380
+              ExplicitHeight = 380
             end
             inherited DBGrid1: TDBGrid
               Width = 494
@@ -211,6 +230,7 @@ inherited ModernCadastroForm: TModernCadastroForm
             end
             inherited Panel2: TPanel
               Width = 783
+              ExplicitWidth = 783
               inherited SpeedButton3: TSpeedButton
                 Left = 522
                 Visible = False
@@ -262,8 +282,10 @@ inherited ModernCadastroForm: TModernCadastroForm
             end
             inherited GroupBox2: TGroupBox
               Height = 380
+              ExplicitHeight = 380
               inherited ScrollBox2: TScrollBox
                 Height = 363
+                ExplicitHeight = 363
               end
             end
           end
@@ -275,12 +297,6 @@ inherited ModernCadastroForm: TModernCadastroForm
           ExplicitHeight = 510
         end
       end
-    end
-  end
-  inherited pnStatusProcessamento: TPanel
-    inherited lbTextoProcessamento: TLabel
-      Width = 477
-      Height = 21
     end
   end
 end

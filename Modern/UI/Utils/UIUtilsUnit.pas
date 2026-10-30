@@ -16,6 +16,7 @@ type
     class procedure Populate(List: TStrings; const Values: array of string); overload;
     class procedure HandleError(E: Exception);
     class function SafeActiveControl(WinControl: TWinControl): TWinControl;
+    class function ShowAtention(const Text: string): Integer;
     class function ShowInfo(const Text: string): Integer;
     class function ShowError(const Error: string): Integer;
     class function ShowQuestion(const Text: string; DefaultNo: Boolean = False): Integer;
@@ -94,6 +95,11 @@ begin
   Result := nil;
 end;
 
+class function UIUtils.ShowAtention(const Text: string): Integer;
+begin
+  Result := Application.MessageBox(PChar(Text), 'Atenção', 64);
+end;
+
 class function UIUtils.ShowError(const Error: string): Integer;
 begin
   Result := Application.MessageBox(PChar(Error), 'Atenção', 16);
@@ -101,7 +107,7 @@ end;
 
 class function UIUtils.ShowInfo(const Text: string): Integer;
 begin
-  Result := Application.MessageBox(PChar(Text), 'Atenção', 64);
+  Result := Application.MessageBox(PChar(Text), 'Informação', 64);
 end;
 
 class function UIUtils.ShowQuestion(const Text: string;
