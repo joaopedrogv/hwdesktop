@@ -35,6 +35,8 @@ type
     // Registra um atributo da classe vinculado a um campo da tabela
     procedure RegisterField(const Attribute, FieldName, DisplayName: string);
     // Registra um atributo da classe somente
+    // Descreve um atributo sem coluna fisica (ex.: lista de vinculos para validacao).
+    // Nao cria mapeamento de coluna nem inclui o atributo na projecao SQL do grid.
     procedure RegisterAttributeOnly(const Attribute, DisplayName: string);
     // Registra um campo da tabela somente
     procedure RegisterColumnOnly(const FieldName, DisplayName: string);

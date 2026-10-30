@@ -20,9 +20,11 @@ handles preparation failures correctly.
 
 ## Division of Work
 
-The concrete form inherits TModernCadastroForm and implements its feature View.
-The feature View extends IViewFeedback. Do not redeclare FFormValidator, FAuditor,
-FiltroGrid, or shared feedback methods already provided by the base.
+The concrete form inherits TModernCadastroForm. When the Presenter only needs
+shared feedback, both can use IViewFeedback directly. A feature View is introduced
+only for additional presentation capabilities, as in the RedBenefPC lookup flow.
+Do not create an empty interface or redeclare FFormValidator, FAuditor, FiltroGrid,
+or the shared validation/error/information/attention methods provided by the base.
 
 The Presenter receives application dependencies and a View contract. The existing
 opening entry point assembles it and gives ownership to the form. Do not obtain
@@ -35,7 +37,8 @@ create the grid dataset
 -> obtain its borrowed auditor reference
 -> SetupDataSetGrid(dataset)
 -> configure dataset with fields/metadata
--> connect FiltroGrid callbacks and available fields
+-> fill FiltroGrid after the dataset has opened/configured its fields
+-> connect a filter callback only when custom conditions are required
 -> configure the inherited UI validator with concrete controls
 -> apply grid field configuration
 ```
@@ -81,8 +84,10 @@ inherited FrmCadExemplo: TFrmCadExemplo
 end
 ```
 
-Use the actual ancestor resources and parent containers. Add only the controls
-already identified by the task. The shared base already supplies its filter frame
+Use the actual ancestor resources and parent containers. The base FormShow already
+hides the replaced legacy filter controls after its inherited call. Preserve the
+initialization chain; do not repeat those visibility assignments in the child.
+Add only the controls already identified by the task. The shared base already supplies its filter frame
 and inherited grid/actions. Final positions, tab order, captions, and unusual
 interactions remain feature work.
 

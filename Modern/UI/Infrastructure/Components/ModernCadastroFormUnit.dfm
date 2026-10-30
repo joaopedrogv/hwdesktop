@@ -1,6 +1,8 @@
 inherited ModernCadastroForm: TModernCadastroForm
   Caption = 'ModernCadastroForm'
   ShowHint = True
+  ExplicitWidth = 814
+  ExplicitHeight = 603
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelFundo: TPanel
@@ -69,6 +71,10 @@ inherited ModernCadastroForm: TModernCadastroForm
           end
         end
         inherited TabSheet2: TTabSheet
+          ExplicitLeft = 4
+          ExplicitTop = 27
+          ExplicitWidth = 787
+          ExplicitHeight = 514
           inherited GroupBox3: TGroupBox
             Width = 787
             ExplicitWidth = 787
@@ -212,6 +218,12 @@ inherited ModernCadastroForm: TModernCadastroForm
                     ExplicitWidth = 72
                   end
                 end
+                inherited pnBtns: TPanel
+                  inherited lbCountFiltros: TLabel
+                    Width = 27
+                    Height = 21
+                  end
+                end
               end
             end
           end
@@ -293,10 +305,16 @@ inherited ModernCadastroForm: TModernCadastroForm
         inherited tsMemo: TTabSheet
           ExplicitLeft = 4
           ExplicitTop = 27
-          ExplicitWidth = 783
-          ExplicitHeight = 510
+          ExplicitWidth = 787
+          ExplicitHeight = 514
         end
       end
+    end
+  end
+  inherited pnStatusProcessamento: TPanel
+    inherited lbTextoProcessamento: TLabel
+      Width = 477
+      Height = 21
     end
   end
 end

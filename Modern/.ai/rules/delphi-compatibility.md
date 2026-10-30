@@ -35,3 +35,26 @@ When compatibility is uncertain, assume Delphi 2006.
 - Delphi 2006 projects MUST contain only Delphi 2006-compatible dependencies.
 - Delphi Rio projects MAY consume both Delphi 2006-compatible and Delphi Rio-only units.
 - A project's compiler version does not change the compatibility target of the units it consumes.
+
+## Source Encoding
+
+For Delphi production sources, preserve the area's established ANSI /
+single-byte encoding and line endings, including when adding a new unit. Do not
+accept UTF-8 or UTF-8 BOM merely because an editing tool uses it by default.
+
+Use the target area's actual production files and explicit Pascal encoding
+configuration when present. The validated checkout uses `iso88591` for Pascal;
+this is a concrete workspace setting, not permission to convert every module.
+ANSI is not ASCII, and ISO-8859-1 is not a synonym for Windows-1252. If required
+characters are outside the selected encoding or local evidence conflicts, resolve
+that mismatch before writing; do not silently change the file format.
+
+Configure the write operation explicitly. Reopen edited/generated text using the
+intended encoding and check accented literals, captions and metadata labels.
+Correct rendering in an editor alone does not prove the compiled strings are
+correct. Respect existing BOM and format conventions for verified Rio-only files
+and UTF-8 documentation; do not normalize neighboring files.
+
+Apply the same preservation to supporting DFM, DPR, DPK and INC text touched by
+the change. Source editing does not authorize compilation; when build/manual
+validation is not authorized, report that validation as pending.

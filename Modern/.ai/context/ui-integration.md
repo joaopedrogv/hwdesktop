@@ -111,7 +111,7 @@ DFM in `UI/Infrastructure/Components/ModernCadastroFormUnit.pas`. It descends fr
 
 The shared base provides:
 
-- `ExibirValidacoes`, `ExibirErro`, and `ExibirInformacao`;
+- `ExibirValidacoes`, `ExibirErro`, `ExibirInformacao`, and `ExibirAtencao`;
 - the inherited `FFormValidator` field, configured by each concrete form;
 - a borrowed `FAuditor` reference supplied by the concrete form/dataset;
 - `FiltroGrid: TFilterFramePadrao`;
@@ -128,8 +128,16 @@ methods. Initialize the validator before feedback can be invoked. Keep process
 codes, authorization, manager approval, and audit labels/outcomes at the established
 feature-specific UI boundary; storing the auditor reference does not transfer ownership.
 
-The base DFM disables/hides the replaced legacy filter controls. Preserve unrelated
-inherited actions, especially New/Save/Edit/Delete, when adapting an inherited DFM.
+The base DFM disables/hides the legacy filter controls replaced by FiltroGrid.
+TModernCadastroForm.FormShow calls inherited first, then hides MaskEdit1/2/3 and
+ComboBox1/2/3. This centralizes the runtime state because the legacy FormShow can
+re-show a control such as MaskEdit3 for empty/Todos. Reuse that base behavior;
+do not repeat the same visibility assignments in each descendant.
+
+Preserve the existing FormShow initialization chain and first-show conditions;
+do not skip inherited merely to avoid the legacy filter code. Add a local
+visibility rule only for a genuine feature-specific requirement. Preserve unrelated
+inherited actions, especially New/Save/Edit/Delete.
 
 ### Scoped MVP Presentation Pattern
 
@@ -143,16 +151,24 @@ of Model-View-Presenter:
 | Use Cases/core | Application behavior, business rules, transactions, and persistence abstractions. |
 | Composition entry point | Create and inject the Presenter and its Use Cases before interaction is allowed. |
 
-The Presenter belongs to UI, depends on a feature View contract and application
+The Presenter belongs to UI, depends on a presentation contract and application
 contracts, and must not access VCL controls, the concrete form/base class, datasets,
 or the global Container to obtain its dependencies. A form may still coordinate
 the established `TDataSetGrid` read model; moving business Use Case calls to a
 Presenter does not require moving this UI read infrastructure into the Presenter.
 
-`UI/Infrastructure/Interfaces/IViewFeedbackUnit.pas` defines `IViewFeedback`.
-A feature View interface extends it with only the presentation capabilities needed
-by that flow. The concrete form implements the feature interface and reuses the
-feedback implementations inherited from `TModernCadastroForm`.
+`UI/Infrastructure/Interfaces/IViewFeedbackUnit.pas` defines IViewFeedback for
+validation, error, information and attention feedback. A Presenter needing only
+these capabilities can depend directly on IViewFeedback; the concrete form declares
+that interface and reuses TModernCadastroForm's implementations. Do not create an
+empty per-form View interface merely to reproduce the pilot's file structure.
+
+Create a feature View extending IViewFeedback when the flow needs genuinely specific
+presentation capabilities, such as showing its own lookup data. Generic feedback
+belongs in the shared contract/base; do not put ExibirAtencao in a feature interface
+solely because that form was the first consumer. Extending shared infrastructure
+still requires an assigned scope; propose a missing common capability instead of
+silently broadening a feature assignment. Preserve existing contracts outside scope.
 
 Keep feature Presenters and View contracts beside their form, under
 `UI/Forms/<MicroContext>/`. Use established names for existing files; apply naming
@@ -270,7 +286,12 @@ It provides capabilities such as:
 When a form requires a grid read model that does not already exist, a new
 `TDataSetGrid` descendant may be created.
 
-Use the `delphi-dataset-grid` Skill for this task.
+Use the `delphi-dataset-grid` Skill for this task. Its existing public/inherited
+API is the preferred boundary for opening and running data, including ClientOpen
+and RunSQLMaker. Raw dataset access is still used for VCL/filter bindings; it is
+not a reason to duplicate CommandText/Open or bypass field configuration in new code.
+Inspect legacy implementation only for the concrete question; root-level access
+does not make that implementation the preferred consumer API.
 
 ---
 
@@ -327,8 +348,9 @@ Modern code SHOULD reuse this infrastructure rather than introduce a
 parallel filtering mechanism without a specific architectural reason.
 
 A TModernCadastroForm descendant reuses FiltroGrid instead of creating a second
-copy of the frame. The concrete form binds OnFieldChange and fills the available
-fields after dataset/metadata setup. Its query action passes GetFiltros to the
+copy of the frame. The concrete form binds OnFieldChange only for actual custom
+conditions and fills the available fields after dataset/metadata setup and the
+normal AfterOpen field configuration. Its query action passes GetFiltros to the
 established SQLMaker/FilterMaker. Keep dataset-specific filtering outside the base.
 
 ---

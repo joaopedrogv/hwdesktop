@@ -39,9 +39,11 @@ This fragment belongs inside the operation's established result/error handling;
 it is not a complete method. Initialize any success flag to False before execution.
 Do not free a real reference-counted Use Case interface.
 
-The feature View extends IViewFeedback. A TModernCadastroForm descendant reuses the
-base's ExibirValidacoes implementation, which calls FFormValidator.Validate.
-Do not copy that method into each concrete form.
+The presentation contract can be IViewFeedback itself, or a feature View extending
+it when additional presentation behavior is required. A TModernCadastroForm
+descendant reuses the base's ExibirValidacoes implementation, which calls
+FFormValidator.Validate. Do not copy that method into each concrete form or create
+an empty feature interface solely for this validation path.
 
 The form's success branch preserves its permission/audit boundary, inherited
 completion, and refresh. Invalid validation must not run that branch.

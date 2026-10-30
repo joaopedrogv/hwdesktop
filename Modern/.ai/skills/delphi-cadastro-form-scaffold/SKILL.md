@@ -208,8 +208,18 @@ Do not reimplement the legacy filter builder inside the form.
 
 Use the filter mechanism already established by the inherited form and dataset.
 TModernCadastroForm supplies FiltroGrid: configure that instance after dataset
-setup rather than adding a second filter frame. Do not disable unrelated inherited
-actions while hiding legacy filter controls.
+setup rather than adding a second filter frame. Reuse the controls already hidden
+and disabled in the Modern base DFM rather than repeating those properties locally.
+TModernCadastroForm.FormShow now preserves inherited initialization and hides the
+six replaced MaskEdit/ComboBox controls afterwards, including a MaskEdit3 re-shown
+by the legacy ancestor. Reuse that shared handler rather than adding the same
+suppression to every child. Preserve the existing initialization chain/first-show
+conditions and add local visibility behavior only for a real feature-specific need.
+Do not skip inherited initialization or disable unrelated actions.
+
+Use the dataset Skill for field exposure and lifecycle. FillForm/frame selection
+already provides the standard operators, and GetFiltros performs filter validation.
+Do not reproduce those mechanisms or add an empty OnFieldChange handler.
 
 ## Form State
 
@@ -242,8 +252,12 @@ Do not make UI components themselves the domain state.
 
 When the selected design uses the scoped MVP pattern:
 
-1. Place the feature View contract and Presenter beside the concrete form.
-2. Extend `IViewFeedback` with only the feature's presentation needs.
+1. Place the Presenter beside the concrete form. Use IViewFeedback directly when
+   only shared feedback is required; the form declares that common interface.
+2. Create a feature View beside the form only for additional feature-specific
+   presentation needs. Extend IViewFeedback without redeclaring its generic
+   validation/error/information/attention methods or creating an empty marker
+   merely for structural consistency.
 3. Inject application dependencies into the Presenter; do not use Container/factories
    in form interaction handlers or inside the Presenter.
 4. Compose the objects at the existing screen-opening boundary, before interaction.

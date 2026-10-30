@@ -6,6 +6,9 @@ uses
   Contnrs, DB;
 
 type
+  // fvInvisivel gera Tag=1: oculta a coluna e a exclui do FillForm padrao.
+  // fvInvisivelConfiguravel gera Tag=3: oculta inicialmente, mas permite configuracao
+  // e continua elegivel para o filtro. Visible=False, sozinho, nao exclui da pesquisa.
   FieldConfigVisibilidade = (fvConfiguravel, fvInvisivel, fvSempreVisivel, fvInvisivelConfiguravel);
   FieldConfigStateVisibilidade = (fsvNaoDefinido, fsvInvisivel, fsvVisivel );
 

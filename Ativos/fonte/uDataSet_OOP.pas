@@ -140,6 +140,8 @@ type
     function Create_fb_transaction(Adb: TIBDatabase): TIBTransaction;
     function InitFieldsDef(sqlSemRetornarDados: string; const Args: array of const): TDataSet_OOP;
     function AddFieldInternalCalc(fieldName: string; fieldType: TFieldType; fieldSize: Smallint = 0): TDataSet_OOP;
+    // Recria a estrutura dos campos; nao abre dados nem aplica FFieldsConfig.
+    // Tags, labels e visibilidade sao aplicados pelo dataSetDBAfterOpen ao abrir.
     procedure AssignAndCreateFieldsFrom(ADataSet: TDataSet);
     function AddFieldDef(fieldName: string; fieldType: TFieldType; fieldKind: TFieldKind = fkData; fieldSize: Smallint = 0): TDataSet_OOP; //Ainda nao usei, parece nao funcionar
 
@@ -177,6 +179,8 @@ type
     function CloneDataSetProps(sourceDts: TDataSet_OOP; kinds: TFieldKinds = [fkData, fkCalculated, fkInternalCalc]): TDataSet_OOP; overload;
     function CloneDataSetProps(sourceCds: TClientDataSet; kinds: TFieldKinds = [fkData, fkCalculated, fkInternalCalc]): TDataSet_OOP; overload;
     //function NewQueryOOP(ASql: string; AQuery: TIBQuery): TQuery_OOP;
+    // Guarda um clone de Builder.List; nao assume a propriedade do builder.
+    // A configuracao dos TFields e aplicada no dataSetDBAfterOpen, apos a abertura.
     procedure ConfigFields(const Builder: IFieldsConfigBuilder);
 
     property dataSet: TClientDataSet read FDataSet write FDataSet;
@@ -211,6 +215,9 @@ type
     function montaSelect(sqlComandos: string; dataIni, dataFim: TDate): boolean; overload;
     function montaSelect(sqlComandos: string; const Args: array of const; AdataSet: TClientDataSet = nil): boolean; overload;
     function montaSelect(sqlComandos: string; dataIni, dataFim: TDate; const Args: array of const; AdataSet: TClientDataSet = nil): boolean; overload;
+    // API de abertura do ClientDataSet: fecha, atribui SQL, abre e registra o tempo.
+    // Sem ADataSet, usa o interno; a abertura executa o AfterOpen ja instalado.
+    // Preferir esta operacao a repetir CommandText/Open nos consumidores.
     function ClientOpen(ASql: string; ADataSet: TClientDataSet = nil): TClientDataSet ; overload;
     function ClientOpen(ASql: string; const Args: array of const; ADataSet: TClientDataSet = nil): TClientDataSet; overload;
     function ExecutaComandosSql(comandosSql: string; pCloseQueryAfter: Boolean = True): boolean; overload;

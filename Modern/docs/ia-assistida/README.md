@@ -158,3 +158,29 @@ definir um contrato pertencente à aplicação e implementá-lo em `Secondary`. 
 explicação operacional completa está no
 [Context de arquitetura](../../.ai/context/project-architecture.md), com o mapa de pastas no
 [Context de estrutura do projeto](../../.ai/context/project-structure.md).
+
+### Contratos de UI e codificação confirmados no piloto
+
+A refatoração de Operações Internas esclareceu os limites do padrão: o Presenter
+pode usar IViewFeedback diretamente quando necessita apenas de feedback genérico.
+A interface e TModernCadastroForm agora oferecem também ExibirAtencao; uma View
+específica continua apropriada para capacidades próprias do cadastro.
+
+GetAuditorFill é opcional para datasets de consulta. A implementação da base lança
+erro somente se for chamada; consumidores que usam esse contexto de auditoria
+precisam de uma implementação própria ou herdada apropriada.
+
+O dataset deve reutilizar ClientOpen/RunSQLMaker. A configuração de tags e rótulos
+é aplicada na abertura, antes de preparar o FiltroGrid. Além de o DFM desativar os
+filtros antigos, TModernCadastroForm.FormShow reaplica a ocultação depois da chamada
+herdada, pois o ancestral pode reexibir MaskEdit3. Os filhos preservam sua cadeia de
+inicialização e reutilizam essa centralização, sem repetir as mesmas atribuições.
+
+O responsável relatou que os rótulos compilados só ficaram corretos após salvar a
+metadata como ANSI, embora a IDE exibisse o UTF-8 corretamente. A orientação agora
+abrange fontes novos e a operação de gravação, além da preservação dos existentes.
+
+Os contratos vigentes estão no [Context de UI](../../.ai/context/ui-integration.md),
+na [Skill de dataset](../../.ai/skills/delphi-dataset-grid/SKILL.md) e na
+[Rule de compatibilidade](../../.ai/rules/delphi-compatibility.md). São orientações
+para os padrões compatíveis de Modern, sem impor essa estrutura ao legado inteiro.

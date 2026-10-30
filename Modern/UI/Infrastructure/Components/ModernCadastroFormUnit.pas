@@ -9,8 +9,11 @@ uses
   IUIFormValidatorUnit, ValidationEntityOutputUnit, DataSetGrid;
 
 type
+  // Cadastro com FiltroGrid: o FormShow preserva a inicializacao ancestral e
+  // centraliza a ocultacao dos filtros legados, sem repeti-la nos descendentes.
   TModernCadastroForm = class(TfrmCadPadraoM)
     FiltroGrid: TFilterFramePadrao;
+    procedure FormShow(Sender: TObject);
   protected
     FFormValidator: IUIFormValidator;
     FAuditor: TAudit_OOP;
@@ -20,6 +23,8 @@ type
     procedure ExibirInformacao(const AMensagem: string);
     procedure ExibirAtencao(const AMensagem: string);
 
+    // Liga o datasource e prepara a configuracao legada; nao cria nem possui ADataSet.
+    // Nao substitui Setup/ConfigFields nem DbGridConfigUtils.ApplyToDBGrid.
     procedure SetupDataSetGrid(ADataSet: TDataSetGrid);
   end;
 
@@ -53,6 +58,20 @@ end;
 procedure TModernCadastroForm.ExibirValidacoes(const AValidacoes: ValidationEntityOutput);
 begin
   FFormValidator.Validate(AValidacoes);
+end;
+
+procedure TModernCadastroForm.FormShow(Sender: TObject);
+begin
+  inherited;
+  // O DFM ja desativa/oculta estes controles, substituidos por FiltroGrid.
+  // O FormShow legado pode reexibi-los (ex.: MaskEdit3 na pesquisa por Todos).
+  // Reaplicar apos inherited centraliza a ocultacao; nao repetir nos formularios filhos.
+  MaskEdit1.Visible := False;
+  MaskEdit2.Visible := False;
+  MaskEdit3.Visible := False;
+  ComboBox1.Visible := False;
+  ComboBox2.Visible := False;
+  ComboBox3.Visible := False;
 end;
 
 procedure TModernCadastroForm.SetupDataSetGrid(ADataSet: TDataSetGrid);

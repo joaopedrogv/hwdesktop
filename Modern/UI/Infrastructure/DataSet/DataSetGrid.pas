@@ -11,6 +11,8 @@ uses
   DataMatrixUnit;
 
 type
+  // Fronteira do read model: reutilizar SQLMaker/RunSQLMaker e ClientOpen herdados.
+  // O dataSet exposto permite bindings VCL; nao exige repetir operacoes encapsuladas.
   TDataSetGrid = class(TDataSet_OOP)
   private
     FSelectionField: TField;
@@ -20,9 +22,13 @@ type
   protected
     function GetIsRowSelected(): Boolean;
     procedure CreateSelectionField(const FieldName: string);
+    // Cria a estrutura a partir da consulta; o ClientDataSet ainda precisa ser aberto
+    // para receber a configuracao dos campos pelo AfterOpen, antes do FillForm.
     procedure CreateFieldsBySQL(const SQLNoReturn: string);
     procedure AddToCache(const Key: string; TTLMinutes: Integer = 0);
     function TryGetFromCache(const Key: string): Boolean;
+    // Preferencias por usuario e dataSet.Name; preservar a identidade ao refatorar.
+    // Sincronizar no builder antes de ConfigFields e da aplicacao visual das colunas.
     function GetSavedGrid(): IFieldsConfigBuilder;
 
     property SelectionField: TField read FSelectionField;
@@ -44,7 +50,10 @@ type
       ReturnCurrentAsDefault: Boolean = True
     ): TDataMatrix; overload;
 
-    function GetAuditorFill(const AProcesso: string; const Additional: string = ''): TAudit_OOP; virtual; abstract;
+    // Opcional para consulta simples; o padrao lanca erro apenas quando chamado.
+    // Sobrescrever para preparar o contexto de auditoria usado pelo consumidor.
+    // Reutilizar o Auditor herdado, sem transferir/liberar sua propriedade.
+    function GetAuditorFill(const AProcesso: string; const Additional: string = ''): TAudit_OOP; virtual;
 
     property EmpresaId: Integer read GetEmpresaId;
   end;
@@ -217,6 +226,11 @@ begin
   TableName  := IfThen( ATableName <> '', ATableName, AComponentName );
 
   inherited Create(dtmAtivo.bancoHw, nil, True, AComponentName);
+end;
+
+function TDataSetGrid.GetAuditorFill(const AProcesso, Additional: string): TAudit_OOP;
+begin
+  raise Exception.Create('TDataSetGrid.GetAuditorFill - É necessário implementação própria');
 end;
 
 function TDataSetGrid.GetDataMatrix(

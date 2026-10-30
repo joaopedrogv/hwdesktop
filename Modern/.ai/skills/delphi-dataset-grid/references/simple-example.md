@@ -11,7 +11,6 @@ interface
 uses
   DataSetGrid,
   FieldsConfigUnit,
-  hw_filters,
   EntityMetadataUnit;
 
 type
@@ -80,4 +79,12 @@ Key characteristics:
 - metadata provides standard field/display pairs;
 - technical fields can be hidden explicitly;
 - `ReorderAndSync` preserves saved grid configuration;
-- `Setup` builds fields from the final SQL and executes the dataset.
+- `Setup` builds fields from the final SQL and opens through RunSQLMaker, applying
+  configured tags/labels before a form initializes FillForm;
+- this query/setup-only example omits GetAuditorFill because no audited operation
+  is shown. The real RedBenefPC flow has auditing callers: preserve its override
+  when editing that implementation. See the extended example for the optional hook.
+
+For an approved explicit empty projection, CreateFieldsBySQL(emptySQL) followed by
+ClientOpen(emptySQL) is also valid. Do not repeat CommandText/Open or Tag assignments
+already supplied by that lifecycle.

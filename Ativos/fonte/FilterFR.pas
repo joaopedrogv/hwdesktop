@@ -72,8 +72,12 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
+    // Recebe campos ja preparados/configurados; nao abre a consulta.
+    // Sem Displays: inclui fkData com Tag<>1; com Displays: seleciona por DisplayLabel.
+    // A selecao configura operadores por tipo; OnFieldChange permite especializacao.
     function FillForm(DataSet: TDataSet; Displays: TStrings; defaultDisplay: string = ''): TFilterFrame;
     function TodosToggle(const OnOff: Boolean): TFilterFrame;
+    // Valida o filtro corrente e retorna clones; a opcao Todos retorna lista vazia.
     function GetFiltros: TFiltersProps;
 
     property CurrentFilter: TFilterProps read GetCurrentFilter;
