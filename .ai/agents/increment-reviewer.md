@@ -30,7 +30,8 @@ Follow `execution-profiles.md`.
 1. Load applicable Rules, Context, and relevant Skill handoff requirements.
 2. Inspect the implementation and its actual dependencies.
 3. Verify behavior, architecture, compatibility, ownership, transactions, security,
-   persistence, composition, and tests as applicable.
+   persistence, composition, and tests as applicable. For legacy changes, apply
+   repository-safety.md's reference-quality criteria to the changed scope.
 4. Identify missing validation or evidence.
 5. Report actionable findings ordered by severity and supported by file evidence.
 6. For final review, evaluate integrated acceptance criteria, cross-increment

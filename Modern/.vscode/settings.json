@@ -1,16 +1,16 @@
 {
   "files.associations": {
-    "*.pas": "pascal",
-    "*.dpr": "pascal",
-    "*.dpk": "pascal",
-    "*.dfm": "pascal",
-    "*.inc": "pascal",
+    "*.pas": "delphi",
+    "*.dpr": "delphi",
+    "*.dpk": "delphi",
+    "*.dfm": "delphi",
+    "*.inc": "delphi",
     "*.sql": "sql"
   },
-  "[pascal]": {
+  "[delphi]": {
     "files.encoding": "iso88591"
   },
-  "files.defaultLanguage": "pascal",
+  "files.defaultLanguage": "delphi",
   "workbench.editorAssociations": {
     "*.dfm": "default"
   },

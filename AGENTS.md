@@ -39,7 +39,9 @@ For any scope in Modern/, also read Modern/AGENTS.md. Load its applicable Rules 
 only the Context and Skills needed by that scope. Do not load Modern's architecture,
 naming, Use Case, persistence, UI or testing conventions for exclusively legacy work.
 For legacy work, inspect the existing implementation and nearby examples before
-proposing changes. A cross-area task uses each area's guidance for its own files.
+proposing changes. Evaluate their quality under the Legacy References and Local
+Changes section of .ai/rules/repository-safety.md before reusing them. A cross-area
+task uses each area's guidance for its own files.
 
 Read the supplied functional design and relevant product context. Distinguish
 observed behavior, proposals, approved decisions and unverified assumptions.

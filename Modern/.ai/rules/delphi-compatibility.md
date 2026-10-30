@@ -42,9 +42,11 @@ For Delphi production sources, preserve the area's established ANSI /
 single-byte encoding and line endings, including when adding a new unit. Do not
 accept UTF-8 or UTF-8 BOM merely because an editing tool uses it by default.
 
-Use the target area's actual production files and explicit Pascal encoding
-configuration when present. The validated checkout uses `iso88591` for Pascal;
-this is a concrete workspace setting, not permission to convert every module.
+Use the target area's actual production files and explicit source-encoding
+configuration when present. The validated checkout's VS Code settings associate
+Delphi files with language ID `delphi` or `pascal` and set `files.encoding` to `iso88591` under `[delphi]` or `[pascal]`. Language-specific settings must use the active
+extension's language ID.
+This is a concrete workspace setting, not permission to convert every module.
 ANSI is not ASCII, and ISO-8859-1 is not a synonym for Windows-1252. If required
 characters are outside the selected encoding or local evidence conflicts, resolve
 that mismatch before writing; do not silently change the file format.

@@ -32,7 +32,8 @@ optional; report concrete difficulty rather than silently widening the assignmen
 
 1. Load applicable Rules, Context, and each required Skill completely.
 2. Inspect the actual declarations and nearby patterns needed by the increment.
-   Check affected references and tests within the assigned scope.
+   Evaluate legacy examples using repository-safety.md before reusing them; check
+   affected references and tests within the assigned scope.
 3. Implement only the assigned production and test changes.
 4. Preserve architecture, compatibility, ownership, transaction, and security
    boundaries.

@@ -17,6 +17,25 @@ always_apply: true
   Never weaken a control to simplify a task or bypass an error.
 - Do not infer a uniform architecture or stack from this checkout's directory tree.
 
+## Legacy References and Local Changes
+
+- Use existing legacy code to establish behavior, contracts, integration points,
+  compiler constraints and local conventions. A nearby example is evidence to
+  evaluate; its presence alone does not make it an approved quality standard.
+- Assess candidate references for concrete correctness, failure handling, resource
+  ownership and security. Prefer clear, compatible implementations and established
+  reusable mechanisms. Do not propagate unjustified duplication, swallowed errors
+  or other demonstrated defects merely to resemble existing code. Distinguish
+  such risks from personal style preferences.
+- Write clear, maintainable code within the assigned change. Local improvements
+  that preserve approved behavior and contracts do not require a separate gate.
+  Preserve the area's architecture; do not introduce Modern infrastructure or
+  perform unrelated cleanup or broad refactoring under this rule.
+- Report relevant existing defects and bounded alternatives in the existing
+  assignment/result artifacts when needed. Ask for a decision only when a needed
+  correction changes approved behavior, contracts or scope, or leaves a material
+  ambiguity. Do not silently change business behavior or expand the demand.
+
 ## Run Context and Repository Searches
 
 - Operational runs are task-local evidence, not canonical project context. Use the

@@ -28,6 +28,8 @@ evidence. Follow `execution-profiles.md`.
 1. Load only applicable Rules and Context.
 2. Inspect relevant source, tests, configuration, and canonical AI guidance.
 3. Identify existing patterns, reusable components, dependencies, and constraints.
+   Evaluate legacy references under repository-safety.md; distinguish verified
+   constraints from incidental habits and concrete risks.
 4. Distinguish verified evidence from inference.
 5. Return concise findings with file paths and material uncertainties.
 

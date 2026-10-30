@@ -104,7 +104,15 @@ O roteamento geral está definido em
 Trabalhe pela raiz do HWDESKTOP. O AGENTS.md geral carrega regras comuns e encaminha
 para Modern/AGENTS.md quando necessário. Arquitetura hexagonal, convenções de
 entidades, UI e projetos de testes permanecem restritos ao módulo. Fora dele,
-o agente preserva a implementação e os contratos existentes.
+o agente preserva os contratos, o comportamento aprovado e a arquitetura existente.
+
+A [Rule compartilhada](../../.ai/rules/repository-safety.md#legacy-references-and-local-changes)
+orienta avaliar a qualidade dos exemplos legados antes de reutilizá-los. Código
+novo ou alterado deve ser claro e compatível, evitando propagar problemas concretos
+dos exemplos. Melhorias locais cabem no escopo aprovado; alterações de comportamento
+ou contrato além do aprovado e refatorações amplas precisam de definição própria.
+Esse critério não impõe a arquitetura de Modern ao legado nem acrescenta uma etapa
+ao workflow.
 
 O setup está no menu **Ferramentas de IA**, com visualização, aplicação/atualização
 e verificação do Kilo. O guia de instalação está em

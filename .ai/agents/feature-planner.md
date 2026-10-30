@@ -71,7 +71,8 @@ boundary is involved. Follow `execution-profiles.md`.
 2. Define the minimum repository-specific contracts, types, Ports, Use Cases,
    Services, adapters, persistence, composition, UI integration, and test support.
 3. Preserve approved identifiers, authorization, audit, transaction, ownership,
-   compatibility, and migration boundaries.
+   compatibility, and migration boundaries. Select legacy references using the
+   quality and local-change criteria in repository-safety.md.
 4. Produce implementation-ready increment assignments without writing code.
 5. Save the technical design to the assigned run artifact and verify its content.
 
