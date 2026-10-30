@@ -30,7 +30,9 @@ Read `AGENTS.md`, `.ai/agents/increment-implementer.md`,
 `.ai/agents/orchestration-protocol.md`, and `.ai/agents/execution-profiles.md`
 completely. Follow the assignment and canonical role. A Skill is optional; read
 applicable Skills completely. Do not refuse an assignment merely because no Skill
-applies.
+applies. This is the preferred implementation route when inputs/contracts and the
+procedure are established and no material decision remains. Return concrete gaps
+rather than adding speculative behavior; state.json belongs only to the coordinator.
 
 Follow the canonical role and modify only owned files and directly related changes
 allowed by the assignment. Report a concrete difficulty if this Agent cannot

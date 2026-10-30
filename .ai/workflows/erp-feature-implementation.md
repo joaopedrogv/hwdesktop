@@ -295,9 +295,14 @@ Select the implementation profile using `execution-profiles.md` and the develope
 request. A Skill is not required to use `fast-routine`. Report concrete execution
 limitations without silently replacing the requested Agent.
 
-Independent read-only research may run in parallel. Writing is sequential by
-default. Concurrent writers require explicit dependency analysis and non-overlapping
-ownership in the approved plan. Nested delegation is not allowed.
+The Orchestrator chooses sequential or parallel task scheduling using the
+protocol's dependency and ownership criteria. Independent ready work within the
+current approved increment may use multiple implementation assignments, including
+instances of the same role. Preserve the existing increment division, order,
+acceptance criteria and review gates; scheduling alone does not reopen plan approval.
+Prefer fast-routine for established bounded implementation with verified inputs,
+including suitable Skills; unresolved judgment stays with the appropriate profile.
+Nested delegation is not allowed. Only the Orchestrator updates state.json.
 
 If the active tool cannot invoke a required role, use supervised manual mode: the
 Workflow Orchestrator emits the complete assignment, stops, and waits for the

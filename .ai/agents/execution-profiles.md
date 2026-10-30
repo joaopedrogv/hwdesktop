@@ -23,6 +23,23 @@ models and settings; role definitions provide their defaults.
   ownership, independent review, and execution authorization remain defined by
   the developer request, role, and applicable Workflow.
 
+
+## Routine Implementation Routing
+
+Classify each bounded assignment rather than inheriting the whole feature's profile.
+Prefer fast-routine for implementation when inputs and contracts are verified, the
+procedure is established, material decisions are settled, the change is bounded
+and its outcome can be checked against explicit criteria. A suitable Skill with
+complete inputs is a strong signal; it is neither required nor proof of low risk.
+
+Use balanced-work or quality-critical when the actual assignment still requires
+significant interpretation or architectural, fiscal, security, persistence or
+other high-impact judgment. A module name alone does not determine that choice.
+Use the existing discovery/design evidence and Workflow routing guidance; do not
+repeat research merely to select a profile. Honor explicit developer choices,
+preserve review/authorization gates and follow the result/failure contract when
+a selected Agent reports concrete difficulty; do not silently substitute profiles.
+
 ## Adapter Mapping
 
 Keep concrete models and tool settings in adapters. Use these presets as defaults

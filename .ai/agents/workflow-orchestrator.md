@@ -40,9 +40,11 @@ structured results. Elevation does not authorize specialist work. Follow
    plans, register source identity and approval evidence under the intake contract,
    assign coverage/adoption to the planner, and preserve verified prior approval
    without repeating an unchanged gate.
-4. Prepare a complete assignment contract for exactly one role or an explicitly
-   safe parallel group.
-5. Select the minimum safe execution profile and delegate through the active tool.
+4. Prepare complete assignment contracts and choose sequential or parallel
+   scheduling under the protocol, preserving approved increment boundaries/order.
+5. Select the profile per assignment, preferring fast-routine for established
+   bounded implementation; delegate through the active tool and accept results
+   before dependent work.
 6. Validate the returned result against its contract and register it without
    silently filling specialist gaps.
 7. Present plans, material decisions, authorizations, blockers, and final status to

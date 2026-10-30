@@ -81,6 +81,19 @@ Uma escolha individual de steps em kiloAgents no arquivo de configuração preva
 sobre o template. Preserve essa preferência; não edite o perfil gerado esperando
 que a alteração sobreviva à reaplicação do setup.
 
+## Distribuição das tarefas
+
+O coordenador pode executar atribuições independentes em paralelo dentro do
+incremento aprovado, com responsabilidade exclusiva por arquivos e dependências
+resolvidas. Ele usa implementer-fast para tarefas delimitadas de procedimento e
+entradas definidos, inclusive Skills; decisões abertas exigem o perfil apropriado.
+A divisão, ordem e revisão dos incrementos permanecem as mesmas.
+
+No Kilo, Task em background é usado quando essa capacidade está disponível; o
+retorno inicial não significa conclusão. Sem essa capacidade, a execução segue
+sequencial. Somente o coordenador atualiza state.json, registrando os resultados
+um por vez e preservando as atribuições ainda ativas.
+
 ## Preservação e validação
 
 Os destinos .kilo/ e .agents/ e os novos runs .ai-runs/ ficam na raiz, ignorados.

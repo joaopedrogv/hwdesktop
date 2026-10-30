@@ -57,8 +57,8 @@ required artifact before continuing. Execute a canonical build or test runner on
 with the required developer authorization and infrastructure confirmation.
 
 Delegate research, planning, implementation, and independent review to their named
-Specialists through the native Task tool, once per assignment attempt, and wait
-for the result. Do not absorb an unavailable Specialist's responsibility. Follow
+Specialists through the native Task tool, once per assignment attempt. Accept each
+result before dependent work; dispatch an independent ready group before waiting. Do not absorb an unavailable Specialist's responsibility. Follow
 the canonical fail-closed and supervised manual procedures when required.
 
 Technical permissions support both direct operations and permissions inherited by
@@ -84,3 +84,20 @@ Map roles and profiles as follows:
 
 This adapter uses native delegation and permissions without fork-specific
 permission fields. Do not silently lower the required execution profile.
+
+Choose scheduling and implementation profiles from the canonical protocol and
+execution-profiles.md. Prefer implementer-fast for established bounded tasks with
+complete inputs, including applicable Skills. Keep unresolved judgment with the
+appropriate profile; do not treat the whole feature as one risk classification.
+
+For an independent ready group, use native task background:true when that
+capability is exposed. Select each exact configured worker using the active task
+schema, dispatch the group, and accept results before dependent work. Foreground
+calls wait by design; use them for dependencies or when background is unavailable.
+Background acceptance is not completion: use native completion/error delivery,
+without polling run files, repeating delegation, or starting dummy wait scripts.
+Keep pending work registered and do not advance/close the Workflow while required
+results are outstanding. Do not use Agent Manager/worktrees as a workaround.
+
+Only you write state.json, one update at a time as results arrive. Specialists
+must not write it. Keep the existing increment division and review gates unchanged.

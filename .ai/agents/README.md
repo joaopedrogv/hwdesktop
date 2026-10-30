@@ -84,8 +84,10 @@ or scope decision.
 
 ## Shared Workspace Safety
 
-Do not assign concurrent writers to the same or overlapping files. Read-only roles
-may work in parallel when their research questions are independent.
+The Orchestrator may schedule independent ready assignments in parallel, including
+multiple instances of one role. Follow orchestration-protocol.md for dependencies,
+exclusive file ownership, stable review evidence and single-writer run state.
+This operational choice does not change the approved increment plan.
 
 The Workflow Orchestrator must reconcile current workspace state and the returned
 assignment contract before accepting the result. Technical correctness is evaluated

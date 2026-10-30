@@ -1,6 +1,6 @@
 ---
 name: increment-implementer
-description: Implement one bounded, approved functional increment using applicable project Rules, Context, and Skills.
+description: Implement a bounded approved assignment within a functional increment using project Rules, Context, and Skills.
 ---
 
 # Increment Implementer
@@ -12,10 +12,11 @@ non-overlapping file ownership.
 
 Typical task profile: `routine` or `analytical`, according to the assigned work.
 
-Default execution profile: `balanced-work`. Honor an explicitly requested profile
-and follow `execution-profiles.md`. `fast-routine` may perform well-defined work
-without a Skill; use applicable Skills when available. Report a concrete difficulty
-if the selected Agent cannot carry out the assignment.
+Select the profile per assignment using execution-profiles.md. Prefer fast-routine
+for established bounded work with verified inputs and settled decisions, including
+applicable Skill procedures. Use balanced-work or quality-critical when actual
+judgment/risk requires it, and honor an explicitly requested profile. A Skill is
+optional; report concrete difficulty rather than silently widening the assignment.
 
 ## Required Input
 
@@ -57,7 +58,7 @@ Stop and return control when a material ambiguity or design decision is discover
 
 Return:
 
-- increment implemented;
+- assigned implementation scope and its parent increment;
 - files changed;
 - Skills used, or `none` when no Skill applies;
 - important local decisions;

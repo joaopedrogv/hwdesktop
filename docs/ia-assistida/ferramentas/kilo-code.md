@@ -95,8 +95,18 @@ O antigo catálogo compartilhado models.json foi removido.
 
 ## Delegação e preservação
 
-Para cada atribuição, o coordenador chama o especialista nomeado pela Task uma vez
-e aguarda seu resultado. Os especialistas não delegam. Pesquisa e revisão permanecem
+Para cada atribuição, o coordenador chama o especialista nomeado pela Task uma vez.
+Pode iniciar um grupo independente em paralelo e aguarda cada resultado antes do
+trabalho dependente. Task background:true é usado quando a capacidade está
+exposta; resultados chegam pelo mecanismo nativo. Sem essa capacidade, segue em
+sequência, sem recorrer a varreduras de arquivos ou delegações repetidas.
+A [documentação oficial](https://kilo.ai/docs/automate/tools#task-tool) descreve
+foreground e background; a disponibilidade real será conferida no uso.
+
+Tarefas delimitadas com entradas, contratos e procedimento definidos são candidatas
+preferenciais a implementer-fast, incluindo Skills aplicáveis. Isso não reduz o
+perfil de decisões ainda abertas nem muda a divisão ou ordem dos incrementos.
+Os especialistas não delegam. Pesquisa e revisão permanecem
 somente leitura; o planner grava somente os documentos exatos atribuídos no run.
 Somente o coordenador atualiza state.json.
 

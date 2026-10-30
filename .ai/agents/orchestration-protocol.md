@@ -37,7 +37,9 @@ Orchestrator delegates every specialist responsibility and waits for its result.
 Delegation is an explicit tool action, not an instruction for the Orchestrator to
 adopt another role. For each assignment attempt, the Orchestrator MUST invoke the
 named configured Agent exactly once through the active tool's native delegation
-mechanism and then wait for that invocation's result. Merely naming a role, loading
+mechanism. Accept its result before dependent work or phase advancement. Independent
+ready assignments may be dispatched as a group before waiting under the concurrency
+policy below; waiting does not require serializing that group. Merely naming a role, loading
 its prompt or Skill, or performing its procedure in the Orchestrator's own context
 does not satisfy delegation.
 
@@ -175,7 +177,8 @@ defines an explicit compatible extension:
 - `TECHNICAL_DESIGN` — the approved conceptual model is being translated into
   repository-specific design;
 - `READY_FOR_INCREMENT` — the next approved increment may be assigned;
-- `IMPLEMENTING_INCREMENT` — one bounded writing assignment is active;
+- `IMPLEMENTING_INCREMENT` — one or more bounded writing assignments for the
+  current approved increment are active;
 - `REVIEWING_INCREMENT` — independent review is active after writing ended;
 - `CHANGES_REQUIRED` — bounded corrections must be assigned and reviewed again;
 - `FINAL_REVIEW` — the integrated feature is under independent review;
@@ -313,13 +316,31 @@ conflicting evidence, or a material design change return control to the develope
 
 ## Concurrency and Ownership
 
-- Independent read-only research may run in parallel.
-- Writing is sequential by default.
-- Concurrent writers require explicit dependency analysis and non-overlapping file
-  ownership in the approved plan.
-- A reviewer starts only after the implementer's writing assignment has ended.
-- The Workflow Orchestrator reconciles current workspace state before issuing the
-  next writing assignment.
+- The Orchestrator chooses sequential or parallel scheduling inside the approved
+  scope; independent ready work should not be serialized merely because there is
+  one configured role. Multiple instances of the same role/profile are allowed.
+- Dispatch together only assignments with available inputs, settled contracts and
+  no dependency on another unfinished result. Serialize unresolved dependencies.
+- Concurrent writers require exclusive file ownership and non-conflicting mutable
+  resources. Assign shared package/composition files or output locations to a
+  serialized owner; do not divide simultaneous ownership by hunks of one file.
+  Give parallel workers distinct run-artifact paths as well, with one owner for
+  any increment summary; they never share writes to state.json.
+- For incremental feature work, schedule tasks within the current approved
+  increment. Preserve its boundaries, order, acceptance criteria and review gates;
+  scheduling alone does not require a new human approval or a revised feature plan.
+- Record dependencies/ownership in the existing assignments, dispatch the ready
+  independent group, then accept each result before issuing work that depends on it.
+- Review starts after all writers that could affect its scope/evidence have ended.
+  Preserve the independent increment review and final review already required.
+- Only the Orchestrator updates state.json. Specialists own only assigned artifacts
+  and return results; the Orchestrator serializes state updates and retains every
+  still-active assignment. One result does not complete the other assignments.
+- On failure/blocker, apply fail-closed behavior and report remaining in-flight
+  work. Do not start overlapping retries, review or dependent writes until the
+  affected writers end or native cancellation is confirmed. Preserve partial work.
+- Use sequential execution when independence or native concurrency is unavailable;
+  do not invent background tools or claim parallel execution without evidence.
 
 ## Execution-Profile Routing
 

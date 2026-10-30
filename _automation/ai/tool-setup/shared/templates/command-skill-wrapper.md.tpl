@@ -21,7 +21,9 @@ research, planning, implementation, or independent review.
 
 In Codex, invoke each required Specialist directly from the primary Agent through
 the native Subagent mechanism, using the exact configured `*` custom Agent
-name as `agent_type`, exactly once per assignment attempt, and wait for its result.
+name as `agent_type`, exactly once per assignment attempt. Dispatch the independent
+ready group under the canonical concurrency policy before waiting; accept each
+result before dependent work. Preserve the approved increment division and order.
 Start every named custom Agent without a full-history fork: set
 `fork_context: false` or omit `fork_context`; never combine an explicit
 `agent_type` with `fork_context: true`. Pass every required decision, constraint,
