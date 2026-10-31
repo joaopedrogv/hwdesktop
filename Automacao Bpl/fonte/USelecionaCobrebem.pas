@@ -286,8 +286,8 @@ begin
   	vDadosIni.IfThen(not GroupBoxAcoes.Visible, 140,
     	vDadosIni.IfThen((ckEnviarBoleto.Visible) and (ckEnviarBoleto.Checked), 278, 175));
 
-  if (ckEnviarBoleto.Visible) and (ckEnviarBoleto.Checked) then
-  	FrameCheckListaContato.carregarContatoAplicativo;
+//  if (ckEnviarBoleto.Visible) and (ckEnviarBoleto.Checked) then
+  FrameCheckListaContato.carregarContatoAplicativo;
 
   FrameCheckListaContato._LerConfiguracoesRegistro;
 

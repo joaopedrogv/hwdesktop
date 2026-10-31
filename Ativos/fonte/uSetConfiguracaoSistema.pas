@@ -5388,8 +5388,8 @@ begin
             .Comment('Configuracao', '  Acrescimo - Exibir acréscimo dos pedidos recebibos')
             .Comment('Configuracao', '  Desconto - Exibir desconto dos pedidos recebibos')
         	 	.Comment('Configuracao', 'UsarVendaOnline')
-            .Comment('Configuracao', '  S - Habilitar campos para o uso do venda online')
-            .Comment('Configuracao', '  S - Desabilitar campos para o uso do venda online');
+            .Comment('Configuracao', '  S - Habilitar campos para o uso do venda online pelo ERP')
+            .Comment('Configuracao', '  S - Desabilitar campos para o uso do venda online pelo ERP');
           Aconf.SaveConfDB(buscas);
         end;
       finally

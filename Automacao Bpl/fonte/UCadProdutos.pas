@@ -4147,8 +4147,7 @@ type
     procedure QRExpr7Print(sender: TObject; var Value: string);
     procedure montarComponentes(pAlterarGrupo: boolean = false);
     procedure tabSheetCadastroSimplesExit(Sender: TObject);
-    procedure verificarBotaoLixeira;
-
+    
     // eventos selects
     procedure EventAddEntitiesSelects(Sender: TObject; Entity: TObject; out Display: string; out SetSelected: Boolean);
     procedure EventChangeEntitiesSelects(Sender: TObject; Entity: TObject; out Info: string);
@@ -7335,9 +7334,6 @@ var
   tim: TTime;
   vEstoqueDisp: Boolean;
 begin
-	SpeedButton2.Hint := 'Enviar para Lixeira - [PRO006]';
-  btExcluirRegistro.Hint := 'Enviar para Lixeira - [PRO006]';
-
   vEstoqueDisp := False;
   if not vEstoqueDisp then
   	vEstoqueDisp := ckEstoqueDisponivel.Checked;
@@ -7878,7 +7874,7 @@ begin
         btRestaurarRegistro.Visible := false;
 
         SpeedButton2.Hint := 'Enviar para Lixeira - [PRO006]';
-		    btExcluirRegistro.Hint := 'Enviar para Lixeira - [PRO006]';
+		  btExcluirRegistro.Hint := 'Enviar para Lixeira - [PRO006]';
       end;
     finally
       gravaConfiguracoesFormRegistro;
@@ -19262,6 +19258,7 @@ end;
 procedure TFrmCadProdutos.FormShow(Sender: TObject);
 var
   i: integer;
+  vStatusLixeira: boolean;
 begin
 	if not Self.Enabled then
     Exit;
@@ -19348,7 +19345,9 @@ begin
       Produto.vEstoquePorEmpresa.vPrecoPorEmpresa.abrePrecoPorEmpresa(Produto.dataSet, true);
     end;
 
-    verificarBotaoLixeira;
+    vStatusLixeira := Produto.StatusLixeira;
+    btLixeiraCheia.Visible := vStatusLixeira;
+    lixeiraVazia(not vStatusLixeira);
 
     if vCriou = 0 then
     begin
@@ -23018,13 +23017,6 @@ begin
 //      BitBtn3.Visible := true;
       SpeedButton1.Visible := true;
       SpeedButton5.Visible := false;
-      btRestaurarRegistro.Visible := false;
-      SpeedButtonAlterarProduto.Visible := true;
-      SpeedButtonAlterarProduto2.Visible := true;
-      SpeedButtonGradesEstoqueProduto.Visible := true;
-      SpeedButtonAlterarGrupoCodProduto.Visible := true;
-      SpeedButtonSincronizarOutrasEmpECommerce.Visible := true;
-
       SpeedButton12.Visible := true;
       SpeedButton15.Visible := true;
       SpeedButton22.Visible := true;
@@ -23044,6 +23036,13 @@ begin
       SpeedButtonCashback.Visible := vDadosIni.vCashback.vHabilitarCashback;
       btHistPreco.Visible := true;
 
+      btRestaurarRegistro.Visible := false;
+      SpeedButtonAlterarProduto.Visible := true;
+      SpeedButtonAlterarProduto2.Visible := true;
+      SpeedButtonGradesEstoqueProduto.Visible := true;
+      SpeedButtonAlterarGrupoCodProduto.Visible := true;
+      SpeedButtonSincronizarOutrasEmpECommerce.Visible := true;
+
       ckLixeira.Enabled := false;
       ckLixeira.Checked := false;
       ckLixeira.Enabled := true;
@@ -23059,7 +23058,6 @@ begin
 //      BitBtn3.Visible := false;
       SpeedButton1.Visible := false;
       SpeedButton5.Visible := true;
-      btRestaurarRegistro.Visible := true;
 
       SpeedButton12.Visible := false;
       SpeedButton15.Visible := false;
@@ -23080,6 +23078,7 @@ begin
       SpeedButtonCashback.Visible := false;
       btHistPreco.Visible := false;
 
+      btRestaurarRegistro.Visible := true;
       SpeedButtonAlterarProduto.Visible := false;
       SpeedButtonAlterarProduto2.Visible := false;
       SpeedButtonGradesEstoqueProduto.Visible := false;
@@ -23157,7 +23156,9 @@ begin
 //      Produto.dataSet.FieldByName('COD_PROD').AsString, Produto.buscas, false) then
 //      Exit;
 
-    Produto.Delete;
+    if not Produto.Delete then
+    	Exit;
+      
     vStatusLixeira := Produto.StatusLixeira;
     btLixeiraCheia.Visible := vStatusLixeira;
     lixeiraVazia(not vStatusLixeira);
@@ -24463,6 +24464,8 @@ begin
 end;
 
 procedure TFrmCadProdutos.SpeedButton5Click(Sender: TObject);
+var
+  vStatusLixeira: boolean;
 begin
   inherited;
   if not vDadosIni.validarAcessoCadastrosEmpresas('PRODUTOS', 'A', Produto.buscas) then
@@ -24471,8 +24474,12 @@ begin
 //  if vDadosIni.PesqPros('PRO007', '', '', 'RESTAURAR',
 //  	Produto.dataSet.FieldByName('GRUPO_PROD').AsString + '-' +
 //    Produto.dataSet.FieldByName('COD_PROD').AsString, Produto.buscas, false) then
-  if Produto.RestaurarRegistro then
-    lixeiraVazia(not Produto.StatusLixeira);
+  if not Produto.RestaurarRegistro then
+  	 Exit;
+
+  vStatusLixeira := Produto.StatusLixeira;
+  btLixeiraCheia.Visible := vStatusLixeira;
+  lixeiraVazia(not vStatusLixeira);
 end;
 
 procedure TFrmCadProdutos.SpeedButtonAlterarHtmlCAClick(Sender: TObject);
@@ -26444,20 +26451,6 @@ begin
       sbAvancarCA.Visible := false;
       LbPagCA.Caption := '3/3';
 		end;
-  end;
-end;
-
-procedure TFrmCadProdutos.verificarBotaoLixeira;
-begin
-  if Produto.StatusLixeira then
-  begin
-    SpeedButton25.Visible := true;
-    btLixeiraCheia.Visible := true;
-  end
-  else
-  begin
-    SpeedButton25.Visible := false;
-    btLixeiraCheia.Visible := false;
   end;
 end;
 

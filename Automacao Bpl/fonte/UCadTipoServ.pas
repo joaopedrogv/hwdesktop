@@ -236,7 +236,7 @@ type
     SpeedButtonAlterarServico: TSpeedButton;
     SpeedBSelTodos: TSpeedButton;
     SpeedBDesmarcarTodos: TSpeedButton;
-    SpeedButtonAlterarProduto2: TSpeedButton;
+    SpeedButtonAlterarServico2: TSpeedButton;
     lbCorLote: TLabel;
     btExcluirRegistro: TSpeedButton;
     btLixeiraVazia: TSpeedButton;
@@ -377,7 +377,7 @@ type
     procedure ckLixeiraClick(Sender: TObject);
     procedure DBLCfopExit(Sender: TObject);
     procedure EdCodCFOPExit(Sender: TObject);
-    procedure SpeedButtonAlterarProduto2Click(Sender: TObject);
+    procedure SpeedButtonAlterarServico2Click(Sender: TObject);
     procedure ckPermOpcaoMarcadasClick(Sender: TObject);
     procedure ckUnidadeClick(Sender: TObject);
     procedure ckEspecieVapClick(Sender: TObject);
@@ -532,7 +532,6 @@ end;
 
 procedure TFrmCadTipoServ.BitBtn1Click(Sender: TObject);
 begin
-  SpeedButton2.Hint := 'Enviar para Lixeira -  [BAS085]';
   if vDadosIni.PesqPros('BAS084', 'PESQUISAR', '', 'TIPO_SERVICO', '', TipoServ.buscas, true) then
   begin
     inherited;
@@ -583,6 +582,15 @@ begin
       SpeedButton12.Visible := false;
       btAlterarDadosFiscais.Visible := false;
       SpeedButton24.Visible := false;
+
+      SpeedButtonAlterarServico2.Visible := false;
+      SpeedButtonAlterarServico.Visible := false;
+      btSincronizarServicos.Visible := false;
+
+      btRestaurarRegistro.Visible := true;
+
+      SpeedButton2.Hint := 'Excluir registro permanentemente - [BAS017]';
+      btExcluirRegistro.Hint := 'Excluir registro permanentemente - [BAS017]';
     end
     else
     begin
@@ -596,6 +604,15 @@ begin
       SpeedButton12.Visible := true;
       btAlterarDadosFiscais.Visible := true;
       SpeedButton24.Visible := true;
+
+      SpeedButtonAlterarServico2.Visible := true;
+      SpeedButtonAlterarServico.Visible := true;
+      btSincronizarServicos.Visible := true;
+      
+      btRestaurarRegistro.Visible := false;
+
+      SpeedButton2.Hint := 'Enviar para Lixeira - [BAS085]';
+      btExcluirRegistro.Hint := 'Enviar para Lixeira - [BAS085]';
     end;
 
     TipoServ.ultimasql := TipoServ.dataset.CommandText;
@@ -2241,6 +2258,8 @@ begin
 end;
 
 procedure TFrmCadTipoServ.FormShow(Sender: TObject);
+var
+  vStatusLixeira: boolean;
 begin
 	if not Self.Enabled then
     Exit;
@@ -2252,7 +2271,9 @@ begin
   if TelaCadastro = 1 then
     BitBtn3Click(Sender);
 
-  lixeiraVazia(not TipoServ.StatusLixeira);
+  vStatusLixeira := TipoServ.StatusLixeira;
+  btLixeiraCheia.Visible := vStatusLixeira;
+  lixeiraVazia(not vStatusLixeira);
 
   if Assigned(TipoServ) then
   begin
@@ -2811,6 +2832,11 @@ begin
         btAlterarDadosFiscais.Visible := true;
         SpeedButton24.Visible := true;
 
+        btRestaurarRegistro.Visible := false;
+        SpeedButtonAlterarServico.Visible := true;
+        SpeedButtonAlterarServico2.Visible := true;
+        btSincronizarServicos.Visible := true;
+
         ckLixeira.Enabled := false;
         ckLixeira.Checked := false;
         ckLixeira.Enabled := true;
@@ -2829,6 +2855,11 @@ begin
         btAlterarDadosFiscais.Visible := false;
         SpeedButton24.Visible := false;
 
+        btRestaurarRegistro.Visible := true;
+        SpeedButtonAlterarServico.Visible := false;
+        SpeedButtonAlterarServico2.Visible := false;
+        btSincronizarServicos.Visible := false;
+
         ckLixeira.Enabled := false;
         ckLixeira.Checked := true;
         ckLixeira.Enabled := true;
@@ -2846,10 +2877,9 @@ var
 begin
   inherited;
   try
-    if not TipoServ.Delete then
-    	Exit;
-      
+    TipoServ.Delete;
     vStatusLixeira := TipoServ.StatusLixeira;
+    btLixeiraCheia.Visible := vStatusLixeira;
     lixeiraVazia(not vStatusLixeira);
     
   except
@@ -2880,15 +2910,16 @@ begin
 end;
 
 procedure TFrmCadTipoServ.SpeedButton5Click(Sender: TObject);
+var
+  vStatusLixeira: boolean;
 begin
   inherited;
   if not TipoServ.restaurarRegistro then
   	Exit;
     
-  if TipoServ.StatusLixeira then
-    lixeiraVazia(false)
-  else
-    lixeiraVazia(true);
+  vStatusLixeira := TipoServ.StatusLixeira;
+  btLixeiraCheia.Visible := vStatusLixeira;
+  lixeiraVazia(not vStatusLixeira);
 end;
 
 procedure TFrmCadTipoServ.SpeedButton68Click(Sender: TObject);
@@ -2983,7 +3014,7 @@ begin
   TipoServ.dataSet.FieldByName('DESC_SERV_COMPL').AsString := HTMLDocument.body.innerHTML;
 end;
 
-procedure TFrmCadTipoServ.SpeedButtonAlterarProduto2Click(Sender: TObject);
+procedure TFrmCadTipoServ.SpeedButtonAlterarServico2Click(Sender: TObject);
 var
   I: Integer;
   vArrayCodTipoItem: array of string;

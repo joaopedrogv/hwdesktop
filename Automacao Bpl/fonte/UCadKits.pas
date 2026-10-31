@@ -285,14 +285,14 @@ type
     SpeedButtonAlterarKit: TSpeedButton;
     SpeedBSelTodos: TSpeedButton;
     SpeedBDesmarcarTodos: TSpeedButton;
-    SpeedButtonAlterarProduto2: TSpeedButton;
+    SpeedButtonAlterarKit2: TSpeedButton;
     lbCorLote: TLabel;
     btExcluirRegistro: TSpeedButton;
     btLixeiraVazia: TSpeedButton;
     btRestaurarRegistro: TSpeedButton;
     btLixeiraCheia: TSpeedButton;
     SpeedButton68: TSpeedButton;
-    btSincronizarServicos: TSpeedButton;
+    btSincronizarKit: TSpeedButton;
     pnCorLote: TPanel;
     ckPermOpcaoMarcadas: TCheckBox;
     tsAlterDadosLote: TTabSheet;
@@ -317,11 +317,11 @@ type
     CheckBox4: TCheckBox;
     ckVendaOnline: TCheckBox;
     cbVendaOnline: TComboBox;
-    procedure btSincronizarServicosClick(Sender: TObject);
+    procedure btSincronizarKitClick(Sender: TObject);
     procedure btSalvarServLoteClick(Sender: TObject);
     procedure ckVendaOnlineClick(Sender: TObject);
     procedure ckSomenteKitTodoClick(Sender: TObject);
-    procedure SpeedButtonAlterarProduto2Click(Sender: TObject);
+    procedure SpeedButtonAlterarKit2Click(Sender: TObject);
     procedure SpeedButtonAlterarKitClick(Sender: TObject);
     procedure ckLixeiraClick(Sender: TObject);
     procedure btVoltarDadosKit2Click(Sender: TObject);
@@ -710,7 +710,6 @@ end;
 
 procedure TFrmCadKits.BitBtn1Click(Sender: TObject);
 begin
-  SpeedButton2.Hint := 'Enviar para Lixeira -  [PRO114]';
   if not vDadosIni.PesqPros('PRO110', 'PESQUISAR', '','KITS_PROD_KITS','', kit.buscas, true) then
     Exit;
 
@@ -850,6 +849,15 @@ begin
 
       SpeedButtonECommerce.Visible := false;
       SpeedButton7.Visible := false;
+
+      SpeedButtonAlterarKit2.Visible := false;
+      SpeedButtonAlterarKit.Visible := false;
+      btSincronizarKit.Visible := false;
+
+      btRestaurarRegistro.Visible := true;
+
+      SpeedButton2.Hint := 'Excluir registro permanentemente - [PRO113]';
+      btExcluirRegistro.Hint := 'Excluir registro permanentemente - [PRO113]';
     end
     else
     begin
@@ -859,6 +867,15 @@ begin
 
       SpeedButtonECommerce.Visible := true;
       SpeedButton7.Visible := true;
+
+      SpeedButtonAlterarKit2.Visible := true;
+      SpeedButtonAlterarKit.Visible := true;
+      btSincronizarKit.Visible := true;
+
+      btRestaurarRegistro.Visible := false;
+
+      SpeedButton2.Hint := 'Enviar para Lixeira - [PRO114]';
+      btExcluirRegistro.Hint := 'Enviar para Lixeira - [PRO114]';
     end;
 
     Screen.Cursor := crDefault;
@@ -1398,7 +1415,7 @@ begin
   end;
 end;
 
-procedure TFrmCadKits.btSincronizarServicosClick(Sender: TObject);
+procedure TFrmCadKits.btSincronizarKitClick(Sender: TObject);
 begin
   inherited;
   try
@@ -2232,6 +2249,8 @@ begin
 end;
 
 procedure TFrmCadKits.FormShow(Sender: TObject);
+var
+  vStatusLixeira: boolean;
 begin
 	if not Self.Enabled then
     Exit;
@@ -2253,7 +2272,9 @@ begin
   if TelaCadastro = 1 then
     BitBtn3Click(Sender);
 
-  lixeiraVazia(not Kit.StatusLixeira);
+  vStatusLixeira := Kit.StatusLixeira;
+  btLixeiraCheia.Visible := vStatusLixeira;
+  lixeiraVazia(not vStatusLixeira);
 
   if PrimeiraPesquisa2 then
   begin
@@ -2788,6 +2809,11 @@ begin
     		and (trim(vDadosIni.vEcommerce.vEcommerceIntegrado) = 'TRAY');
       SpeedButton7.Visible := true;
 
+      btRestaurarRegistro.Visible := false;
+      SpeedButtonAlterarKit.Visible := true;
+      SpeedButtonAlterarKit2.Visible := true;
+      btSincronizarKit.Visible := true;
+      
       ckLixeira.Enabled := false;
       ckLixeira.Checked := false;
       ckLixeira.Enabled := true;
@@ -2800,6 +2826,11 @@ begin
       SpeedButton6.Visible := false;
       SpeedButtonECommerce.Visible := false;
       SpeedButton7.Visible := false;
+
+      btRestaurarRegistro.Visible := true;
+      SpeedButtonAlterarKit.Visible := false;
+      SpeedButtonAlterarKit2.Visible := false;
+      btSincronizarKit.Visible := false;
 
       ckLixeira.Enabled := false;
       ckLixeira.Checked := true;
@@ -2818,6 +2849,7 @@ begin
       Exit;
 
     vStatusLixeira := Kit.StatusLixeira;
+    btLixeiraCheia.Visible := vStatusLixeira;
     lixeiraVazia(not vStatusLixeira);
 
   except
@@ -3358,15 +3390,16 @@ begin
 end;
 
 procedure TFrmCadKits.SpeedButton5Click(Sender: TObject);
+var
+  vStatusLixeira: boolean;
 begin
   inherited;
   if not Kit.restaurarRegistro then
-  	Exit;
+  	 Exit;
 
-  if Kit.StatusLixeira then
-    lixeiraVazia(false)
-  else
-    lixeiraVazia(true);
+  vStatusLixeira := Kit.StatusLixeira;
+  btLixeiraCheia.Visible := vStatusLixeira;
+  lixeiraVazia(not vStatusLixeira);
 end;
 
 procedure TFrmCadKits.SpeedButton6Click(Sender: TObject);
@@ -3496,7 +3529,7 @@ begin
   end;
 end;
 
-procedure TFrmCadKits.SpeedButtonAlterarProduto2Click(Sender: TObject);
+procedure TFrmCadKits.SpeedButtonAlterarKit2Click(Sender: TObject);
 var
   I: Integer;
   vIndexFieldNames: string;

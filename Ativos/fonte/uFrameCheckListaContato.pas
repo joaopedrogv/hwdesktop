@@ -48,7 +48,7 @@ uses
 
 procedure TFrameCheckListaContato.carregarContatoAplicativo;
 begin
-	bt_contatos_pla_add.Hint  := 'Incluir contato - [' + vDadosIni.IfThen(vDadosIni.vHwCloudIA.vUsarServMensageria = 'S', 'CLI294', 'CLI260') + ']';
+  bt_contatos_pla_add.Hint  := 'Incluir contato - [' + vDadosIni.IfThen(vDadosIni.vHwCloudIA.vUsarServMensageria = 'S', 'CLI294', 'CLI260') + ']';
   bt_contatos_pla_edit.Hint := 'Alterar contato - [' + vDadosIni.IfThen(vDadosIni.vHwCloudIA.vUsarServMensageria = 'S', 'CLI295', 'CLI254') + ']';
   bt_contatos_pla_del.Hint  := 'Excluir contato - [' + vDadosIni.IfThen(vDadosIni.vHwCloudIA.vUsarServMensageria = 'S', 'CLI296', 'CLI256') + ']';
 
@@ -70,12 +70,12 @@ begin
   else
   	bt_contatos_pla_outros_del.Visible := True;
 
-	if (UnicoMens) then
+  if (UnicoMens) then
   	CheckListBoxAplicativo.Visible := False
   else if vDadosIni.vHwCloudIA.vUsarServMensageria <> 'S' then
   	CheckListBoxAplicativo.Visible := True
   else
-		CheckListBoxAplicativo.Visible := (CodCliente <= 0) and (not UnicoMens);
+	 CheckListBoxAplicativo.Visible := (CodCliente <= 0) and (not UnicoMens);
   CheckListBoxContato.Visible := not CheckListBoxAplicativo.Visible;
   pnContato.Visible := not CheckListBoxAplicativo.Visible;
 
@@ -124,7 +124,7 @@ procedure TFrameCheckListaContato._LerConfiguracoesRegistro;
 var
 	I: Integer;
 begin
-	if (CheckListBoxAplicativo.Enabled) and (CheckListBoxAplicativo.Visible) then
+  if (CheckListBoxAplicativo.Enabled) and (CheckListBoxAplicativo.Visible) then
   begin
     if CheckListBoxAplicativo.Items.Count = 1 then
       CheckListBoxAplicativo.Checked[0] := True

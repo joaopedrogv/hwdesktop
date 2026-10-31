@@ -41,6 +41,7 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
             inherited PageControl3: TPageControl
               Width = 888
               Height = 539
+              ActivePage = tsRelTipoServ
               OnChange = PageControl3Change
               ExplicitWidth = 888
               ExplicitHeight = 539
@@ -2331,6 +2332,8 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
           end
         end
         inherited TabSheet2: TTabSheet
+          ExplicitLeft = 4
+          ExplicitTop = 27
           ExplicitWidth = 888
           ExplicitHeight = 587
           inherited GroupBox3: TGroupBox
@@ -2616,7 +2619,7 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                 Hint = 'Editar Registro - [BAS016]'
               end
               inherited SpeedButton2: TSpeedButton
-                Hint = 'Apagar Registro - [BAS017]'
+                Hint = 'Apagar Registro - [BAS085]'
                 OnClick = SpeedButton2Click
               end
               inherited SpeedButton3: TSpeedButton
@@ -3185,6 +3188,8 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
           end
         end
         inherited tsMemo: TTabSheet
+          ExplicitLeft = 4
+          ExplicitTop = 27
           ExplicitWidth = 888
           ExplicitHeight = 587
         end
@@ -4780,7 +4785,7 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                 ShowHint = True
                 OnClick = SpeedBDesmarcarTodosClick
               end
-              object SpeedButtonAlterarProduto2: TSpeedButton
+              object SpeedButtonAlterarServico2: TSpeedButton
                 Left = 2
                 Top = 2
                 Width = 51
@@ -4842,7 +4847,7 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                   3333333333333333333333333333333333333333333333333333}
                 ParentShowHint = False
                 ShowHint = True
-                OnClick = SpeedButtonAlterarProduto2Click
+                OnClick = SpeedButtonAlterarServico2Click
               end
               object lbCorLote: TLabel
                 Left = 687
@@ -4916,7 +4921,7 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                 OnClick = SpeedButton2Click
               end
               object btLixeiraVazia: TSpeedButton
-                Left = 161
+                Left = 162
                 Top = 2
                 Width = 51
                 Height = 45
@@ -4980,7 +4985,7 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                 OnClick = SpeedButton25Click
               end
               object btRestaurarRegistro: TSpeedButton
-                Left = 215
+                Left = 216
                 Top = 2
                 Width = 51
                 Height = 45
@@ -5028,7 +5033,7 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                 OnClick = SpeedButton5Click
               end
               object btLixeiraCheia: TSpeedButton
-                Left = 162
+                Left = 163
                 Top = 2
                 Width = 51
                 Height = 45
@@ -5147,7 +5152,7 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                 OnClick = SpeedButton68Click
               end
               object btSincronizarServicos: TSpeedButton
-                Left = 269
+                Left = 270
                 Top = 2
                 Width = 51
                 Height = 45
@@ -6670,6 +6675,10 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
     inherited lbStatusProcessamento: TLabel
       ExplicitLeft = 10
       ExplicitTop = 26
+    end
+    inherited lbTextoProcessamento: TLabel
+      Width = 477
+      Height = 21
     end
   end
   inherited PopupMenu1: TPopupMenu

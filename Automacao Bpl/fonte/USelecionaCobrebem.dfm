@@ -7,8 +7,8 @@ inherited frmSelecionaCobrebem: TfrmSelecionaCobrebem
   ClientWidth = 778
   KeyPreview = True
   Position = poScreenCenter
-  ExplicitWidth = 786
-  ExplicitHeight = 278
+  ExplicitWidth = 794
+  ExplicitHeight = 283
   PixelsPerInch = 96
   TextHeight = 13
   object Panel_Cobrebem: TPanel

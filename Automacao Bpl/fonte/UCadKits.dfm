@@ -524,7 +524,7 @@ inherited FrmCadKits: TFrmCadKits
                           Left = 192
                           Top = 0
                           Width = 29
-                          Height = 18
+                          Height = 33
                           Align = alRight
                           Alignment = taRightJustify
                           Caption = '1/4'
@@ -534,6 +534,7 @@ inherited FrmCadKits: TFrmCadKits
                           Font.Name = 'Tahoma'
                           Font.Style = [fsBold]
                           ParentFont = False
+                          ExplicitHeight = 18
                         end
                       end
                       object Panel115: TPanel
@@ -1852,7 +1853,7 @@ inherited FrmCadKits: TFrmCadKits
                                   Left = 340
                                   Top = 0
                                   Width = 29
-                                  Height = 18
+                                  Height = 16
                                   Align = alRight
                                   Alignment = taRightJustify
                                   Caption = '1/1'
@@ -1862,6 +1863,7 @@ inherited FrmCadKits: TFrmCadKits
                                   Font.Name = 'Tahoma'
                                   Font.Style = [fsBold]
                                   ParentFont = False
+                                  ExplicitHeight = 18
                                 end
                                 object Panel112: TPanel
                                   Left = 369
@@ -2187,8 +2189,8 @@ inherited FrmCadKits: TFrmCadKits
                                       object lbDescrGradeImg: TLabel
                                         Left = 0
                                         Top = 0
-                                        Width = 9
-                                        Height = 13
+                                        Width = 337
+                                        Height = 19
                                         Align = alClient
                                         Alignment = taCenter
                                         Caption = '...'
@@ -2198,6 +2200,8 @@ inherited FrmCadKits: TFrmCadKits
                                         Font.Name = 'Tahoma'
                                         Font.Style = [fsBold]
                                         ParentFont = False
+                                        ExplicitWidth = 9
+                                        ExplicitHeight = 13
                                       end
                                     end
                                     object pnDescImagemProduto: TPanel
@@ -2236,10 +2240,6 @@ inherited FrmCadKits: TFrmCadKits
                       object TabSheetEC3: TTabSheet
                         Caption = 'TabSheetEC3'
                         ImageIndex = 4
-                        ExplicitLeft = 0
-                        ExplicitTop = 0
-                        ExplicitWidth = 0
-                        ExplicitHeight = 0
                         object ScrollBox5: TScrollBox
                           Left = 0
                           Top = 0
@@ -2348,10 +2348,6 @@ inherited FrmCadKits: TFrmCadKits
                       object TabSheetEC4: TTabSheet
                         Caption = 'TabSheetEC4'
                         ImageIndex = 2
-                        ExplicitLeft = 0
-                        ExplicitTop = 0
-                        ExplicitWidth = 0
-                        ExplicitHeight = 0
                         object pnGradeVaricaoEC: TPanel
                           Left = 0
                           Top = 0
@@ -2572,10 +2568,6 @@ inherited FrmCadKits: TFrmCadKits
                       object TabSheetEC5: TTabSheet
                         Caption = 'TabSheetEC5'
                         ImageIndex = 3
-                        ExplicitLeft = 0
-                        ExplicitTop = 0
-                        ExplicitWidth = 0
-                        ExplicitHeight = 0
                         object pnItensKit: TPanel
                           Left = 0
                           Top = 0
@@ -2804,6 +2796,8 @@ inherited FrmCadKits: TFrmCadKits
           end
         end
         inherited TabSheet2: TTabSheet
+          ExplicitLeft = 4
+          ExplicitTop = 27
           ExplicitWidth = 895
           ExplicitHeight = 587
           inherited GroupBox3: TGroupBox
@@ -2992,7 +2986,7 @@ inherited FrmCadKits: TFrmCadKits
                 Hint = 'Editar Registro - [PRO112]'
               end
               inherited SpeedButton2: TSpeedButton
-                Hint = 'Apagar Registro - [PRO113]'
+                Hint = 'Apagar Registro - [PRO114]'
                 OnClick = SpeedButton2Click
               end
               inherited SpeedButton3: TSpeedButton
@@ -3372,6 +3366,8 @@ inherited FrmCadKits: TFrmCadKits
           end
         end
         inherited tsMemo: TTabSheet
+          ExplicitLeft = 4
+          ExplicitTop = 27
           ExplicitWidth = 895
           ExplicitHeight = 587
         end
@@ -3379,10 +3375,6 @@ inherited FrmCadKits: TFrmCadKits
           Caption = 'TabSheet4'
           ImageIndex = 2
           OnShow = TabSheet4Show
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object PageControl2: TPageControl
             Left = 0
             Top = 75
@@ -3393,10 +3385,6 @@ inherited FrmCadKits: TFrmCadKits
             TabOrder = 0
             object TabSheet5: TTabSheet
               Caption = 'TabSheet5'
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object GroupBox14: TGroupBox
                 Left = 0
                 Top = 436
@@ -3818,10 +3806,6 @@ inherited FrmCadKits: TFrmCadKits
             object TabSheet6: TTabSheet
               Caption = 'TabSheet6'
               ImageIndex = 1
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object GroupBox15: TGroupBox
                 Left = 0
                 Top = 0
@@ -4390,10 +4374,6 @@ inherited FrmCadKits: TFrmCadKits
         object tsPromocaoKit: TTabSheet
           Caption = 'tsPromocaoKit'
           ImageIndex = 4
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object GroupBox5: TGroupBox
             Left = 0
             Top = 0
@@ -4844,10 +4824,6 @@ inherited FrmCadKits: TFrmCadKits
         object tsImagemKit: TTabSheet
           Caption = 'tsImagemKit'
           ImageIndex = 5
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnImagemKit: TPanel
             Left = 3
             Top = 3
@@ -4986,10 +4962,6 @@ inherited FrmCadKits: TFrmCadKits
         object tsAlterDadosKit: TTabSheet
           Caption = 'tsAlterDadosKit'
           ImageIndex = 6
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object Panel52: TPanel
             Left = 0
             Top = 0
@@ -5236,7 +5208,7 @@ inherited FrmCadKits: TFrmCadKits
                 ShowHint = True
                 OnClick = SpeedBDesmarcarTodosClick
               end
-              object SpeedButtonAlterarProduto2: TSpeedButton
+              object SpeedButtonAlterarKit2: TSpeedButton
                 Left = 2
                 Top = 2
                 Width = 51
@@ -5298,7 +5270,7 @@ inherited FrmCadKits: TFrmCadKits
                   3333333333333333333333333333333333333333333333333333}
                 ParentShowHint = False
                 ShowHint = True
-                OnClick = SpeedButtonAlterarProduto2Click
+                OnClick = SpeedButtonAlterarKit2Click
               end
               object lbCorLote: TLabel
                 Left = 687
@@ -5312,7 +5284,7 @@ inherited FrmCadKits: TFrmCadKits
                 Top = 2
                 Width = 51
                 Height = 45
-                Hint = 'Enviar para Lixeira -  [PRO113]'
+                Hint = 'Enviar para Lixeira -  [PRO114]'
                 Flat = True
                 Glyph.Data = {
                   76060000424D7606000000000000360400002800000018000000180000000100
@@ -5601,12 +5573,12 @@ inherited FrmCadKits: TFrmCadKits
                   17040A1049CFCFCFCFCFCF4A5050AF7F2D25111BCFCFCFCFCFCFCFCF5D50A46C
                   303548CFCFCFCFCFCFCFCFCFCF4A6D45341FCFCFCFCFCFCFCFCF}
               end
-              object btSincronizarServicos: TSpeedButton
+              object btSincronizarKit: TSpeedButton
                 Left = 269
                 Top = 2
                 Width = 51
                 Height = 45
-                Hint = 'Sincronizar servi'#231'os - [PRO462]'
+                Hint = 'Sincronizar kit - [PRO462]'
                 Flat = True
                 Glyph.Data = {
                   36150000424D361500000000000036000000280000002A0000002A0000000100
@@ -5781,7 +5753,7 @@ inherited FrmCadKits: TFrmCadKits
                   FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000}
                 ParentShowHint = False
                 ShowHint = True
-                OnClick = btSincronizarServicosClick
+                OnClick = btSincronizarKitClick
               end
               object pnCorLote: TPanel
                 Left = 614
@@ -6092,6 +6064,12 @@ inherited FrmCadKits: TFrmCadKits
     Width = 910
     ExplicitTop = 622
     ExplicitWidth = 910
+  end
+  inherited pnStatusProcessamento: TPanel
+    inherited lbTextoProcessamento: TLabel
+      Width = 477
+      Height = 21
+    end
   end
   inherited PopupMenu1: TPopupMenu
     Left = 452

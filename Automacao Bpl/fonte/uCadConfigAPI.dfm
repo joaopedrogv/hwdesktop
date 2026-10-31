@@ -65,7 +65,7 @@ inherited frmCadConfigAPI: TfrmCadConfigAPI
                   Top = 0
                   Width = 804
                   Height = 448
-                  ActivePage = TabSheetTrayEC
+                  ActivePage = TabSheetHwCloudIA
                   Align = alClient
                   Style = tsFlatButtons
                   TabOrder = 0

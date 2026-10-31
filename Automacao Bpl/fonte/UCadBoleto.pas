@@ -1735,7 +1735,7 @@ procedure TfrmCadBoletos.ckUnicoEmailWhatsAppClick(Sender: TObject);
 begin
   FrameCheckListaContato.UnicoMens := (ckUnicoEmailWhatsApp.Enabled) and (ckUnicoEmailWhatsApp.Visible) and (ckUnicoEmailWhatsApp.Checked);
 
-	FrameCheckListaContato.carregarContatoAplicativo;
+  FrameCheckListaContato.carregarContatoAplicativo;
 
   ckConfEmailWhatsAppAssunto.Enabled := not ckUnicoEmailWhatsApp.Checked;
 end;

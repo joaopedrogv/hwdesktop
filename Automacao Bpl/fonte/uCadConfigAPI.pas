@@ -1533,7 +1533,7 @@ begin
   TabSheet9.TabVisible  := DBComboBoxUsarAPICogHwCloudIA.ItemIndex = 0;
   TabSheet11.TabVisible := DBComboBoxUsarAPICogHwCloudIA.ItemIndex = 0;
 
-  if (vUsarAPICog <> DBComboBoxUsarAPICogHwCloudIA.ItemIndex) then
+  if vUsarAPICog <> DBComboBoxUsarAPICogHwCloudIA.ItemIndex then
   begin
     if DBComboBoxUsarAPICogHwCloudIA.ItemIndex = 0 then
     begin
@@ -1560,6 +1560,20 @@ begin
   TabSheet7.TabVisible  := DBComboBoxUsarAPIPedidoHwCloudIA.ItemIndex = 0;
   TabSheet4.TabVisible  := DBComboBoxUsarAPIPedidoHwCloudIA.ItemIndex = 0;
   TabSheet10.TabVisible := DBComboBoxUsarAPIPedidoHwCloudIA.ItemIndex = 0;
+
+  if vVendaOnline <> DBComboBoxUsarAPIPedidoHwCloudIA.ItemIndex then
+  begin
+    if DBComboBoxUsarAPICogHwCloudIA.ItemIndex = 0 then
+    begin
+      PageControl4.ActivePage := TabSheet5;
+      TabSheet5.Show;
+    end
+    else
+    begin
+      PageControl4.ActivePage := TabSheet6;
+      TabSheet6.Show;
+    end;
+  end;
 end;
 
 procedure TfrmCadConfigAPI.DBEditSabadoFimHwCloudIAEnter(Sender: TObject);

@@ -73,6 +73,8 @@ inherited FrmCadProdutos: TFrmCadProdutos
         ExplicitHeight = 612
         inherited TabSheet1: TTabSheet
           OnExit = nil
+          ExplicitLeft = 4
+          ExplicitTop = 27
           ExplicitWidth = 892
           ExplicitHeight = 581
           inherited ScrollBox1: TScrollBox
@@ -90,10 +92,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
               object tsPrecosModal: TTabSheet [0]
                 Caption = 'tsPrecosModal'
                 ImageIndex = 12
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object pnPrecosUnificados: TPanel
                   Left = -2
                   Top = 0
@@ -519,10 +517,10 @@ inherited FrmCadProdutos: TFrmCadProdutos
                     TabOrder = 0
                     object Label510: TLabel
                       AlignWithMargins = True
-                      Left = 44
+                      Left = 7
                       Top = 7
-                      Width = 76
-                      Height = 13
+                      Width = 113
+                      Height = 26
                       Align = alClient
                       Alignment = taRightJustify
                       Caption = 'Tipo de pre'#231'o'
@@ -533,13 +531,16 @@ inherited FrmCadProdutos: TFrmCadProdutos
                       Font.Style = [fsBold]
                       ParentFont = False
                       Layout = tlCenter
+                      ExplicitLeft = 44
+                      ExplicitWidth = 76
+                      ExplicitHeight = 13
                     end
                     object Label511: TLabel
                       AlignWithMargins = True
-                      Left = 194
+                      Left = 126
                       Top = 7
-                      Width = 32
-                      Height = 13
+                      Width = 100
+                      Height = 26
                       Align = alClient
                       Alignment = taRightJustify
                       Caption = 'Pre'#231'o'
@@ -550,12 +551,15 @@ inherited FrmCadProdutos: TFrmCadProdutos
                       Font.Style = [fsBold]
                       ParentFont = False
                       Layout = tlCenter
+                      ExplicitLeft = 194
+                      ExplicitWidth = 32
+                      ExplicitHeight = 13
                     end
                     object Label512: TLabel
                       AlignWithMargins = True
-                      Left = 265
+                      Left = 232
                       Top = 7
-                      Width = 67
+                      Width = 100
                       Height = 26
                       Align = alClient
                       Alignment = taRightJustify
@@ -568,12 +572,14 @@ inherited FrmCadProdutos: TFrmCadProdutos
                       ParentFont = False
                       Layout = tlCenter
                       WordWrap = True
+                      ExplicitLeft = 265
+                      ExplicitWidth = 67
                     end
                     object Label513: TLabel
                       AlignWithMargins = True
-                      Left = 371
+                      Left = 338
                       Top = 7
-                      Width = 67
+                      Width = 100
                       Height = 26
                       Align = alClient
                       Alignment = taRightJustify
@@ -586,12 +592,14 @@ inherited FrmCadProdutos: TFrmCadProdutos
                       ParentFont = False
                       Layout = tlCenter
                       WordWrap = True
+                      ExplicitLeft = 371
+                      ExplicitWidth = 67
                     end
                     object Label514: TLabel
                       AlignWithMargins = True
-                      Left = 475
+                      Left = 444
                       Top = 7
-                      Width = 69
+                      Width = 100
                       Height = 26
                       Align = alClient
                       Alignment = taRightJustify
@@ -604,12 +612,14 @@ inherited FrmCadProdutos: TFrmCadProdutos
                       ParentFont = False
                       Layout = tlCenter
                       WordWrap = True
+                      ExplicitLeft = 475
+                      ExplicitWidth = 69
                     end
                     object Label515: TLabel
                       AlignWithMargins = True
-                      Left = 581
+                      Left = 550
                       Top = 7
-                      Width = 69
+                      Width = 100
                       Height = 26
                       Align = alClient
                       Alignment = taRightJustify
@@ -622,12 +632,14 @@ inherited FrmCadProdutos: TFrmCadProdutos
                       ParentFont = False
                       Layout = tlCenter
                       WordWrap = True
+                      ExplicitLeft = 581
+                      ExplicitWidth = 69
                     end
                     object Label516: TLabel
                       AlignWithMargins = True
-                      Left = 668
+                      Left = 656
                       Top = 7
-                      Width = 88
+                      Width = 100
                       Height = 26
                       Hint = 
                         '% de desconto para calcular o Pre'#231'o Varejo com base no Pre'#231'o de ' +
@@ -643,13 +655,15 @@ inherited FrmCadProdutos: TFrmCadProdutos
                       ParentFont = False
                       Layout = tlCenter
                       WordWrap = True
+                      ExplicitLeft = 668
+                      ExplicitWidth = 88
                     end
                     object Label517: TLabel
                       AlignWithMargins = True
-                      Left = 83
+                      Left = 7
                       Top = 39
-                      Width = 37
-                      Height = 13
+                      Width = 113
+                      Height = 21
                       Align = alClient
                       Alignment = taRightJustify
                       Caption = 'Varejo'
@@ -660,13 +674,16 @@ inherited FrmCadProdutos: TFrmCadProdutos
                       Font.Style = [fsBold]
                       ParentFont = False
                       Layout = tlCenter
+                      ExplicitLeft = 83
+                      ExplicitWidth = 37
+                      ExplicitHeight = 13
                     end
                     object Label519: TLabel
                       AlignWithMargins = True
-                      Left = 73
+                      Left = 7
                       Top = 66
-                      Width = 47
-                      Height = 13
+                      Width = 113
+                      Height = 21
                       Align = alClient
                       Alignment = taRightJustify
                       Caption = 'Atacado'
@@ -677,13 +694,16 @@ inherited FrmCadProdutos: TFrmCadProdutos
                       Font.Style = [fsBold]
                       ParentFont = False
                       Layout = tlCenter
+                      ExplicitLeft = 73
+                      ExplicitWidth = 47
+                      ExplicitHeight = 13
                     end
                     object Label521: TLabel
                       AlignWithMargins = True
-                      Left = 80
+                      Left = 7
                       Top = 93
-                      Width = 40
-                      Height = 13
+                      Width = 113
+                      Height = 21
                       Align = alClient
                       Alignment = taRightJustify
                       Caption = '30 dias'
@@ -694,13 +714,16 @@ inherited FrmCadProdutos: TFrmCadProdutos
                       Font.Style = [fsBold]
                       ParentFont = False
                       Layout = tlCenter
+                      ExplicitLeft = 80
+                      ExplicitWidth = 40
+                      ExplicitHeight = 13
                     end
                     object Label522: TLabel
                       AlignWithMargins = True
-                      Left = 80
+                      Left = 7
                       Top = 120
-                      Width = 40
-                      Height = 13
+                      Width = 113
+                      Height = 21
                       Align = alClient
                       Alignment = taRightJustify
                       Caption = '60 dias'
@@ -711,13 +734,16 @@ inherited FrmCadProdutos: TFrmCadProdutos
                       Font.Style = [fsBold]
                       ParentFont = False
                       Layout = tlCenter
+                      ExplicitLeft = 80
+                      ExplicitWidth = 40
+                      ExplicitHeight = 13
                     end
                     object Label523: TLabel
                       AlignWithMargins = True
-                      Left = 80
+                      Left = 7
                       Top = 147
-                      Width = 40
-                      Height = 13
+                      Width = 113
+                      Height = 21
                       Align = alClient
                       Alignment = taRightJustify
                       Caption = '90 dias'
@@ -728,36 +754,48 @@ inherited FrmCadProdutos: TFrmCadProdutos
                       Font.Style = [fsBold]
                       ParentFont = False
                       Layout = tlCenter
+                      ExplicitLeft = 80
+                      ExplicitWidth = 40
+                      ExplicitHeight = 13
                     end
                     object Label525: TLabel
-                      Left = 298
+                      Left = 229
                       Top = 171
-                      Width = 37
-                      Height = 13
+                      Width = 106
+                      Height = 27
                       Align = alClient
                       Alignment = taRightJustify
                       Caption = 'Label18'
                       Visible = False
+                      ExplicitLeft = 298
+                      ExplicitWidth = 37
+                      ExplicitHeight = 13
                     end
                     object Label526: TLabel
-                      Left = 510
+                      Left = 441
                       Top = 171
-                      Width = 37
-                      Height = 13
+                      Width = 106
+                      Height = 27
                       Align = alClient
                       Alignment = taRightJustify
                       Caption = 'Label18'
                       Visible = False
+                      ExplicitLeft = 510
+                      ExplicitWidth = 37
+                      ExplicitHeight = 13
                     end
                     object Label527: TLabel
-                      Left = 722
+                      Left = 653
                       Top = 171
-                      Width = 37
-                      Height = 13
+                      Width = 106
+                      Height = 27
                       Align = alClient
                       Alignment = taRightJustify
                       Caption = 'Label18'
                       Visible = False
+                      ExplicitLeft = 722
+                      ExplicitWidth = 37
+                      ExplicitHeight = 13
                     end
                     object DBEdit219: TDBEdit
                       AlignWithMargins = True
@@ -1342,10 +1380,10 @@ inherited FrmCadProdutos: TFrmCadProdutos
                       TabOrder = 24
                       object Label524: TLabel
                         AlignWithMargins = True
-                        Left = 53
+                        Left = 26
                         Top = 3
-                        Width = 57
-                        Height = 13
+                        Width = 84
+                        Height = 15
                         Align = alClient
                         Alignment = taRightJustify
                         Caption = 'Promo'#231#227'o'
@@ -1356,6 +1394,9 @@ inherited FrmCadProdutos: TFrmCadProdutos
                         Font.Style = [fsBold]
                         ParentFont = False
                         Layout = tlCenter
+                        ExplicitLeft = 53
+                        ExplicitWidth = 57
+                        ExplicitHeight = 13
                       end
                       object SpeedButton57: TSpeedButton
                         Left = 0
@@ -1368,10 +1409,10 @@ inherited FrmCadProdutos: TFrmCadProdutos
                     end
                     object Label528: TLabel
                       AlignWithMargins = True
-                      Left = 797
+                      Left = 762
                       Top = 7
-                      Width = 27
-                      Height = 13
+                      Width = 62
+                      Height = 26
                       Align = alClient
                       Alignment = taRightJustify
                       Caption = 'PMM'
@@ -1383,6 +1424,9 @@ inherited FrmCadProdutos: TFrmCadProdutos
                       ParentFont = False
                       Layout = tlCenter
                       WordWrap = True
+                      ExplicitLeft = 797
+                      ExplicitWidth = 27
+                      ExplicitHeight = 13
                     end
                     object DBEdit250: TDBEdit
                       AlignWithMargins = True
@@ -1408,10 +1452,10 @@ inherited FrmCadProdutos: TFrmCadProdutos
                     end
                     object Label520: TLabel
                       AlignWithMargins = True
-                      Left = 664
+                      Left = 656
                       Top = 66
-                      Width = 92
-                      Height = 13
+                      Width = 100
+                      Height = 21
                       Hint = 'Percentual de acr'#233'cimo sobre o pre'#231'o de varejo'
                       Align = alClient
                       Alignment = taRightJustify
@@ -1424,6 +1468,9 @@ inherited FrmCadProdutos: TFrmCadProdutos
                       ParentFont = False
                       Layout = tlCenter
                       WordWrap = True
+                      ExplicitLeft = 664
+                      ExplicitWidth = 92
+                      ExplicitHeight = 13
                     end
                     object DBEdit252: TDBEdit
                       AlignWithMargins = True
@@ -5707,6 +5754,9 @@ inherited FrmCadProdutos: TFrmCadProdutos
                         inherited pnVigencia: TPanel
                           Width = 290
                           ExplicitWidth = 290
+                          inherited lbInfo: TLabel
+                            Height = 11
+                          end
                         end
                       end
                     end
@@ -6601,10 +6651,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
                         TabOrder = 0
                         object tsDefinirPreco_Visualizar: TTabSheet
                           Caption = 'tsDefinirPreco_Visualizar'
-                          ExplicitLeft = 0
-                          ExplicitTop = 0
-                          ExplicitWidth = 0
-                          ExplicitHeight = 0
                           object Panel26: TPanel
                             Left = 0
                             Top = 41
@@ -7482,10 +7528,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
                         object TabSheet10: TTabSheet
                           Caption = 'TabSheet10'
                           ImageIndex = 2
-                          ExplicitLeft = 0
-                          ExplicitTop = 0
-                          ExplicitWidth = 0
-                          ExplicitHeight = 0
                           object qrpPromocaoProduto: TQuickRep
                             Left = -14
                             Top = -21
@@ -8532,10 +8574,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
                         TabOrder = 0
                         object tsPrecosQtde_Visualizar: TTabSheet
                           Caption = 'tsPrecosQtde_Visualizar'
-                          ExplicitLeft = 0
-                          ExplicitTop = 0
-                          ExplicitWidth = 0
-                          ExplicitHeight = 0
                           object Panel59: TPanel
                             Left = 0
                             Top = 41
@@ -9420,10 +9458,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
                         object TabSheet16: TTabSheet
                           Caption = 'TabSheet16'
                           ImageIndex = 2
-                          ExplicitLeft = 0
-                          ExplicitTop = 0
-                          ExplicitWidth = 0
-                          ExplicitHeight = 0
                           object QuickRepProdutosPrecoQtde: TQuickRep
                             Left = -14
                             Top = -21
@@ -10271,10 +10305,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
               object tsKitsProd: TTabSheet
                 Caption = 'Kits'
                 ImageIndex = 13
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object GroupBox93: TGroupBox
                   Left = 0
                   Top = 0
@@ -10967,10 +10997,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
                         TabOrder = 0
                         object TabSheet11: TTabSheet
                           Caption = 'TabSheet11'
-                          ExplicitLeft = 0
-                          ExplicitTop = 0
-                          ExplicitWidth = 0
-                          ExplicitHeight = 0
                           object Panel29: TPanel
                             Left = 0
                             Top = 133
@@ -11717,10 +11743,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
                         object TabSheet19: TTabSheet
                           Caption = 'TabSheet19'
                           ImageIndex = 3
-                          ExplicitLeft = 0
-                          ExplicitTop = 0
-                          ExplicitWidth = 0
-                          ExplicitHeight = 0
                           object Panel157: TPanel
                             Left = 26
                             Top = 16
@@ -12098,10 +12120,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
                   TabOrder = 1
                   object tsFretePesoGrid: TTabSheet
                     Caption = 'tsFretePesoGrid'
-                    ExplicitLeft = 0
-                    ExplicitTop = 0
-                    ExplicitWidth = 0
-                    ExplicitHeight = 0
                     object Panel131: TPanel
                       Left = 0
                       Top = 0
@@ -12320,10 +12338,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
                   object tsFretePesoCadastro: TTabSheet
                     Caption = 'tsFretePesoCadastro'
                     ImageIndex = 1
-                    ExplicitLeft = 0
-                    ExplicitTop = 0
-                    ExplicitWidth = 0
-                    ExplicitHeight = 0
                     object ScrollBox19: TScrollBox
                       Left = 0
                       Top = 0
@@ -12555,10 +12569,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
               object tsTribAdicional: TTabSheet
                 Caption = 'Tributa'#231#227'o Adicional'
                 ImageIndex = 7
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object GroupBox75: TGroupBox
                   Left = 0
                   Top = 0
@@ -13142,10 +13152,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
               object tsOutros: TTabSheet
                 Caption = 'Outros Dados'
                 ImageIndex = 7
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object scrollOutros: TScrollBox
                   Left = 0
                   Top = 0
@@ -13601,7 +13607,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
                               Left = 192
                               Top = 0
                               Width = 29
-                              Height = 18
+                              Height = 33
                               Align = alRight
                               Alignment = taRightJustify
                               Caption = '1/4'
@@ -13611,6 +13617,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
                               Font.Name = 'Tahoma'
                               Font.Style = [fsBold]
                               ParentFont = False
+                              ExplicitHeight = 18
                             end
                           end
                           object Panel115: TPanel
@@ -14424,7 +14431,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
                                       Left = 333
                                       Top = 0
                                       Width = 29
-                                      Height = 18
+                                      Height = 16
                                       Align = alRight
                                       Alignment = taRightJustify
                                       Caption = '1/1'
@@ -14434,6 +14441,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
                                       Font.Name = 'Tahoma'
                                       Font.Style = [fsBold]
                                       ParentFont = False
+                                      ExplicitHeight = 18
                                     end
                                     object Panel112: TPanel
                                       Left = 362
@@ -14467,10 +14475,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
                           object TabSheetEC3: TTabSheet
                             Caption = 'TabSheetEC3'
                             ImageIndex = 3
-                            ExplicitLeft = 0
-                            ExplicitTop = 0
-                            ExplicitWidth = 0
-                            ExplicitHeight = 0
                             object ScrollBox18: TScrollBox
                               Left = 0
                               Top = 0
@@ -15813,7 +15817,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
                                       Left = 345
                                       Top = 0
                                       Width = 29
-                                      Height = 18
+                                      Height = 16
                                       Align = alRight
                                       Alignment = taRightJustify
                                       Caption = '1/1'
@@ -15823,6 +15827,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
                                       Font.Name = 'Tahoma'
                                       Font.Style = [fsBold]
                                       ParentFont = False
+                                      ExplicitHeight = 18
                                     end
                                     object Panel127: TPanel
                                       Left = 374
@@ -15856,10 +15861,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
                           object TabSheetCA3: TTabSheet
                             Caption = 'TabSheetCA3'
                             ImageIndex = 2
-                            ExplicitLeft = 0
-                            ExplicitTop = 0
-                            ExplicitWidth = 0
-                            ExplicitHeight = 0
                             object ScrollBox17: TScrollBox
                               Left = 0
                               Top = 0
@@ -16385,7 +16386,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
                               Left = 192
                               Top = 0
                               Width = 29
-                              Height = 18
+                              Height = 33
                               Align = alRight
                               Alignment = taRightJustify
                               Caption = '1/2'
@@ -16395,6 +16396,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
                               Font.Name = 'Tahoma'
                               Font.Style = [fsBold]
                               ParentFont = False
+                              ExplicitHeight = 18
                             end
                           end
                           object Panel138: TPanel
@@ -16586,10 +16588,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
               object tsCashback: TTabSheet
                 Caption = 'Cashback'
                 ImageIndex = 14
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object ScrollBox21: TScrollBox
                   Left = 0
                   Top = 73
@@ -16981,6 +16979,8 @@ inherited FrmCadProdutos: TFrmCadProdutos
           end
         end
         inherited TabSheet2: TTabSheet
+          ExplicitLeft = 4
+          ExplicitTop = 27
           ExplicitWidth = 892
           ExplicitHeight = 581
           inherited Panel1: TPanel [0]
@@ -17022,7 +17022,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
                 Hint = 'Editar Registro - [PRO004]'
               end
               inherited SpeedButton2: TSpeedButton
-                Hint = 'Apagar Registro - [PRO005]'
+                Hint = 'Apagar Registro - [PRO006]'
                 OnClick = SpeedButton2Click
               end
               inherited SpeedButton3: TSpeedButton
@@ -23409,8 +23409,8 @@ inherited FrmCadProdutos: TFrmCadProdutos
                           object lbDescrGradeImg: TLabel
                             Left = 0
                             Top = 0
-                            Width = 9
-                            Height = 13
+                            Width = 302
+                            Height = 19
                             Align = alClient
                             Alignment = taCenter
                             Caption = '...'
@@ -23420,6 +23420,8 @@ inherited FrmCadProdutos: TFrmCadProdutos
                             Font.Name = 'Tahoma'
                             Font.Style = [fsBold]
                             ParentFont = False
+                            ExplicitWidth = 9
+                            ExplicitHeight = 13
                           end
                         end
                         object pnDescImagemProduto: TPanel
@@ -24475,10 +24477,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsS_Composicao: TTabSheet
               Caption = 'Composi'#231#227'o'
               ImageIndex = 4
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnS_Composicao: TPanel
                 Left = 0
                 Top = 0
@@ -24501,10 +24499,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsS_Conversao: TTabSheet
               Caption = 'Convers'#227'o'
               ImageIndex = 5
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnS_Conversao: TPanel
                 Left = 0
                 Top = 0
@@ -24527,10 +24521,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsS_FretePeso: TTabSheet
               Caption = 'Frete por peso'
               ImageIndex = 9
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnS_FretePeso: TPanel
                 Left = 0
                 Top = 0
@@ -24554,10 +24544,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsS_Precos: TTabSheet
               Caption = 'Pre'#231'os'
               ImageIndex = 6
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnS_Precos: TPanel
                 Left = 0
                 Top = 0
@@ -24720,10 +24706,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsS_KitsProd: TTabSheet
               Caption = 'Kits'
               ImageIndex = 10
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnS_KitsProd: TPanel
                 Left = 0
                 Top = 0
@@ -24747,10 +24729,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsS_PrecosPorQtde: TTabSheet
               Caption = 'Pre'#231'os por quantidade'
               ImageIndex = 6
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnS_PrecosPorQtde: TPanel
                 Left = 0
                 Top = 0
@@ -24774,10 +24752,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsS_ECommerce: TTabSheet
               Caption = 'E-Commerce'
               ImageIndex = 7
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnS_ECommerce: TPanel
                 Left = 0
                 Top = 0
@@ -24803,10 +24777,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsS_ComercioAberto: TTabSheet
               Caption = 'Com'#233'rcio Aberto'
               ImageIndex = 8
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnS_ComercioAberto: TPanel
                 Left = 0
                 Top = 0
@@ -24832,10 +24802,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsS_Cashback: TTabSheet
               Caption = 'Cashback'
               ImageIndex = 11
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnS_Cashback: TPanel
                 Left = 0
                 Top = 0
@@ -25077,6 +25043,8 @@ inherited FrmCadProdutos: TFrmCadProdutos
           end
         end
         inherited tsMemo: TTabSheet
+          ExplicitLeft = 4
+          ExplicitTop = 27
           ExplicitWidth = 892
           ExplicitHeight = 581
         end
@@ -25097,10 +25065,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
               Caption = 'Ficha do Produto - Movimento'
               OnEnter = tsFichaComprasVendasEnter
               OnExit = tsFichaComprasVendasExit
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object ScrollBox5: TScrollBox
                 Left = 0
                 Top = 0
@@ -25723,10 +25687,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsFichaComprasVendasC: TTabSheet
               Caption = 'Ficha do Produto - Completa'
               ImageIndex = 3
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object ScrollBox8: TScrollBox
                 Left = 0
                 Top = 0
@@ -26533,10 +26493,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsUltComp: TTabSheet
               Caption = #218'ltimas Compras'
               ImageIndex = 1
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object GroupBox16: TGroupBox
                 Left = 0
                 Top = 0
@@ -26627,10 +26583,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
               Caption = 'TabSheet15'
               ImageIndex = 2
               TabVisible = False
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object GroupBox14: TGroupBox
                 Left = 0
                 Top = 0
@@ -26758,10 +26710,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsProdutosAcabados: TTabSheet
               Caption = 'Produtos Acabados'
               ImageIndex = 4
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnProdutosAcabados: TPanel
                 Left = 2
                 Top = 3
@@ -27339,10 +27287,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsProdutosMatInsumos: TTabSheet
               Caption = 'Mat'#233'rias Primas/Insumos/Embalagens'
               ImageIndex = 5
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnProdutosMatInsumos: TPanel
                 Left = 2
                 Top = 3
@@ -27933,10 +27877,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             TabOrder = 0
             object tsEscolha: TTabSheet
               Caption = 'Escolha'
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object BitBtn17: TBitBtn
                 Left = 280
                 Top = 4
@@ -29024,10 +28964,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsMedia: TTabSheet
               Caption = 'M'#233'dia de Venda'
               ImageIndex = 2
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object ScrollBox6: TScrollBox
                 Left = 0
                 Top = 0
@@ -29712,10 +29648,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsRelProd: TTabSheet
               Caption = 'Relat'#243'rio de Produtos'
               ImageIndex = 3
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object QuickRep2: TQuickRep
                 Left = 21
                 Top = -24
@@ -32267,10 +32199,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsCatalogo: TTabSheet
               Caption = 'Cat'#225'logo de Pre'#231'os'
               ImageIndex = 4
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object qrpCatalogo: TQuickRep
                 Left = 3
                 Top = 0
@@ -34381,10 +34309,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsFichaProds: TTabSheet
               Caption = 'Ficha do Produto'
               ImageIndex = 5
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object GroupBox30: TGroupBox
                 Left = 0
                 Top = 0
@@ -34525,10 +34449,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsPecasUltimaCompra: TTabSheet
               Caption = 'Pe'#231'as com '#218'ltima Compra'
               ImageIndex = 6
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object qrpPecaUltimaCompra: TQuickRep
                 Left = -4
                 Top = 0
@@ -35603,10 +35523,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object TabSheet_IndTecprod: TTabSheet
               Caption = 'Indice T'#233'cnico Ficha do produto'
               ImageIndex = 7
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object QuickRep_FichaProd: TQuickRep
                 Left = 3
                 Top = 0
@@ -36962,10 +36878,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object TabSheet_IndTecEst: TTabSheet
               Caption = 'Indice T'#233'cnico Estoque'
               ImageIndex = 8
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object QuickRep_IndiceEst: TQuickRep
                 Left = 16
                 Top = 0
@@ -38608,10 +38520,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object TabSheet_Validade: TTabSheet
               Caption = 'Validade dos produtos'
               ImageIndex = 9
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object QuickRep_Validade: TQuickRep
                 Left = 3
                 Top = 0
@@ -39937,10 +39845,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsControleProducaoEstoque: TTabSheet
               Caption = 'Producao e Estoque'
               ImageIndex = 10
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object qkRProducaoEstoque: TQuickRep
                 Left = 0
                 Top = 0
@@ -42676,10 +42580,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
         object tsReceitaAss: TTabSheet
           Caption = 'Receitas Associadas'
           ImageIndex = 4
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object GroupBox24: TGroupBox
             Left = 0
             Top = 0
@@ -43104,10 +43004,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
         object tsGrade: TTabSheet
           Caption = 'Grades de Estoque'
           ImageIndex = 5
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnGrades: TPanel
             Left = 19
             Top = 231
@@ -43916,10 +43812,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             TabOrder = 0
             object tsAltEstoque: TTabSheet
               Caption = 'Alterando Estoque do Produto'
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object GroupBox27: TGroupBox
                 Left = 0
                 Top = 0
@@ -44326,10 +44218,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsAltCusto: TTabSheet
               Caption = 'Alterando Custo do Produto'
               ImageIndex = 1
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object GroupBox28: TGroupBox
                 Left = 0
                 Top = 0
@@ -45155,10 +45043,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
         object tsReducao: TTabSheet
           Caption = 'Reducao'
           ImageIndex = 7
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnReducao: TPanel
             Left = 3
             Top = 3
@@ -46219,10 +46103,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
         object tsPendenciaPedido: TTabSheet
           Caption = 'tsPendenciaPedido'
           ImageIndex = 9
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object GroupBox36: TGroupBox
             Left = 0
             Top = 0
@@ -47953,10 +47833,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tbsEtiCodBarra: TTabSheet
               Caption = 'tbsEtiCodBarra'
               ImageIndex = 2
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object qrpEtiCodBarras: TQuickRep
                 Left = -2
                 Top = 0
@@ -48303,10 +48179,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tbsEtiCodBarra2: TTabSheet
               Caption = 'tbsEtiCodBarra2'
               ImageIndex = 6
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object qrpEtiCodBarras2: TQuickRep
                 Left = -2
                 Top = -4
@@ -48662,10 +48534,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsEster: TTabSheet
               Caption = 'tsEster'
               ImageIndex = 3
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnEtiquetasEs: TPanel
                 Left = 0
                 Top = 0
@@ -49159,10 +49027,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object tsModEtiTermica: TTabSheet
               Caption = 'tsModEtiTermica'
               ImageIndex = 4
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnModEtiTermica: TPanel
                 Left = -2
                 Top = 0
@@ -49289,10 +49153,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
               Caption = 'tsEtiTerRapida'
               ImageIndex = 5
               OnEnter = tsEtiTerRapidaEnter
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnEtiquetasTer: TPanel
                 Left = 0
                 Top = 0
@@ -49885,10 +49745,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             TabOrder = 2
             object TabSheet8: TTabSheet
               Caption = 'TabSheet8'
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object Panel20: TPanel
                 Left = 0
                 Top = 0
@@ -50824,10 +50680,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object TabSheet5: TTabSheet
               Caption = 'TabSheet5'
               ImageIndex = 2
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnDelPromocaoProd: TPanel
                 Left = 136
                 Top = 7
@@ -51109,10 +50961,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             TabOrder = 2
             object TabSheet13: TTabSheet
               Caption = 'TabSheet13'
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object Panel34: TPanel
                 Left = 0
                 Top = 0
@@ -51967,10 +51815,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
             object TabSheet17: TTabSheet
               Caption = 'TabSheet17'
               ImageIndex = 2
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnDelTabelaProd: TPanel
                 Left = 136
                 Top = 7
@@ -53061,10 +52905,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
         object tsGradesImagens: TTabSheet
           Caption = 'tsGradesImagens'
           ImageIndex = 17
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnGradesImagens: TPanel
             Left = 2
             Top = 0
@@ -53197,10 +53037,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
         object tsAlterDadosProd: TTabSheet
           Caption = 'tsAlterDadosProd'
           ImageIndex = 18
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object GroupBox79: TGroupBox
             Left = 0
             Top = 110
@@ -56940,10 +56776,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
         object tsDadosComercioAberto: TTabSheet
           Caption = 'Com'#233'rcio Aberto'
           ImageIndex = 20
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnDadosComercioAberto: TPanel
             Left = 3
             Top = 3
@@ -57059,10 +56891,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
         object tsOpcoesAlterarGrupo: TTabSheet
           Caption = 'tsOpcoesAlterarGrupo'
           ImageIndex = 21
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnOpcoesAlterarGrupo: TPanel
             Left = 3
             Top = 3
@@ -57181,10 +57009,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
         object tsGradeProducao: TTabSheet
           Caption = 'tsGradeProducao'
           ImageIndex = 22
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnCadastroMateriasPrimas: TPanel
             Left = 3
             Top = 243
@@ -57730,10 +57554,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
         object tsUnidade: TTabSheet
           Caption = 'tsUnidade'
           ImageIndex = 23
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnUnidade: TPanel
             Left = 3
             Top = 20
@@ -57889,10 +57709,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
         object tsObsMaxmized: TTabSheet
           Caption = 'tsObsMaxmized'
           ImageIndex = 24
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object ScrollBox20: TScrollBox
             Left = 0
             Top = 0
@@ -57912,10 +57728,11 @@ inherited FrmCadProdutos: TFrmCadProdutos
               object Label546: TLabel
                 Left = 6
                 Top = 6
-                Width = 63
+                Width = 859
                 Height = 13
                 Align = alTop
                 Caption = 'Observa'#231#245'es'
+                ExplicitWidth = 63
               end
               object Panel162: TPanel
                 Left = 6
@@ -57989,10 +57806,11 @@ inherited FrmCadProdutos: TFrmCadProdutos
               object Label309: TLabel
                 Left = 6
                 Top = 6
-                Width = 123
+                Width = 859
                 Height = 13
                 Align = alTop
                 Caption = 'Detalhes / Caracter'#237'sticas'
+                ExplicitWidth = 123
               end
               object Panel161: TPanel
                 Left = 6
@@ -58059,10 +57877,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
         object tsImagemProd: TTabSheet
           Caption = 'tsImagemProd'
           ImageIndex = 25
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnImagemProd: TPanel
             Left = 3
             Top = 3
@@ -58201,10 +58015,6 @@ inherited FrmCadProdutos: TFrmCadProdutos
         object tsInsumosOutrosProd: TTabSheet
           Caption = 'tsInsumosOutrosProd'
           ImageIndex = 26
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnInsumosOutrosProd: TPanel
             Left = 3
             Top = 3
@@ -58405,6 +58215,10 @@ inherited FrmCadProdutos: TFrmCadProdutos
     inherited lbStatusProcessamento: TLabel
       ExplicitLeft = 170
       ExplicitTop = -350
+    end
+    inherited lbTextoProcessamento: TLabel
+      Width = 477
+      Height = 21
     end
   end
   inherited PopupMenu1: TPopupMenu

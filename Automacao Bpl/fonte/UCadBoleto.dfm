@@ -851,7 +851,7 @@ inherited frmCadBoletos: TfrmCadBoletos
                 Width = 145
                 Height = 21
                 Hint = 'Campo filtro da pesquisa adicional. Informe o campo desejado'
-                ItemHeight = 13
+                ItemHeight = 0
                 TabOrder = 0
                 Text = 'ComboBox11'
                 OnEnter = ComboBox1Enter
@@ -2119,6 +2119,10 @@ inherited frmCadBoletos: TfrmCadBoletos
         object ts_outros: TTabSheet
           Caption = 'ts_outros'
           ImageIndex = 12
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object PageControl2: TPageControl
             Left = 0
             Top = 0
@@ -2900,13 +2904,11 @@ inherited frmCadBoletos: TfrmCadBoletos
                 item
                   Expanded = False
                   FieldName = 'NOME_CLIENTE'
-                  Width = 64
                   Visible = True
                 end
                 item
                   Expanded = False
                   FieldName = 'RAZAO'
-                  Width = 64
                   Visible = True
                 end
                 item
@@ -2922,13 +2924,11 @@ inherited frmCadBoletos: TfrmCadBoletos
                 item
                   Expanded = False
                   FieldName = 'DATA_EM_BOL'
-                  Width = 64
                   Visible = True
                 end
                 item
                   Expanded = False
                   FieldName = 'DATA_VEN_BOL'
-                  Width = 64
                   Visible = True
                 end
                 item
@@ -2945,13 +2945,11 @@ inherited frmCadBoletos: TfrmCadBoletos
                 item
                   Expanded = False
                   FieldName = 'OBS_BOL'
-                  Width = 64
                   Visible = True
                 end
                 item
                   Expanded = False
                   FieldName = 'OBS_BOL1'
-                  Width = 64
                   Visible = True
                 end
                 item
@@ -2967,43 +2965,36 @@ inherited frmCadBoletos: TfrmCadBoletos
                 item
                   Expanded = False
                   FieldName = 'LOCALPAG'
-                  Width = 64
                   Visible = True
                 end
                 item
                   Expanded = False
                   FieldName = 'COD_CONTROLE_CX'
-                  Width = 64
                   Visible = True
                 end
                 item
                   Expanded = False
                   FieldName = 'COD_COBREBEM'
-                  Width = 64
                   Visible = True
                 end
                 item
                   Expanded = False
                   FieldName = 'NOSSO_NUMERO_BANCO'
-                  Width = 64
                   Visible = True
                 end
                 item
                   Expanded = False
                   FieldName = 'REMESSA_ENVIADA'
-                  Width = 64
                   Visible = True
                 end
                 item
                   Expanded = False
                   FieldName = 'COD_SEQ_REMESSA'
-                  Width = 64
                   Visible = True
                 end
                 item
                   Expanded = False
                   FieldName = 'DATA_REMESSA'
-                  Width = 64
                   Visible = True
                 end
                 item
@@ -3019,13 +3010,11 @@ inherited frmCadBoletos: TfrmCadBoletos
                 item
                   Expanded = False
                   FieldName = 'SUB_SERIE'
-                  Width = 64
                   Visible = True
                 end
                 item
                   Expanded = False
                   FieldName = 'COD_EMPRESA'
-                  Width = 64
                   Visible = True
                 end
                 item
@@ -3036,7 +3025,6 @@ inherited frmCadBoletos: TfrmCadBoletos
                 item
                   Expanded = False
                   FieldName = 'STATUS'
-                  Width = 64
                   Visible = True
                 end>
             end
@@ -6549,13 +6537,11 @@ inherited frmCadBoletos: TfrmCadBoletos
               item
                 Expanded = False
                 FieldName = 'NOME_C'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'RAZAO'
-                Width = 64
                 Visible = True
               end
               item
@@ -6566,49 +6552,41 @@ inherited frmCadBoletos: TfrmCadBoletos
               item
                 Expanded = False
                 FieldName = 'N_CONTA_PLC'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'CODIGO_CTRL'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'N_DUPL_C'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'DATA_REC_C'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'TIPO_DOC_C'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'HISTORICO_C'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'DATA_VENC_C'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'VALOR_C'
-                Width = 64
                 Visible = True
               end
               item
@@ -6619,13 +6597,11 @@ inherited frmCadBoletos: TfrmCadBoletos
               item
                 Expanded = False
                 FieldName = 'DATQ_C'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'NATL_C'
-                Width = 64
                 Visible = True
               end
               item
@@ -6636,103 +6612,86 @@ inherited frmCadBoletos: TfrmCadBoletos
               item
                 Expanded = False
                 FieldName = 'OBS_C'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'TP_DOC_V'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'N_DOC_V'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'N_DOC_C'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'DATA_RETORNO_QUITACAO'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'SELEC'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'COD_CLI_TERC'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'NOME_TERC'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'TIP_CNT'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'DATA_CXL'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'CODIGO_VEND'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'TIP_BAIXA'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'DATA_REM_REC'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'COD_TERM'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'DATA_BAIXA'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'DATA_VENDA'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'VALOR_CORR'
-                Width = 64
                 Visible = True
               end
               item
@@ -6748,43 +6707,36 @@ inherited frmCadBoletos: TfrmCadBoletos
               item
                 Expanded = False
                 FieldName = 'VALOR_DESC'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'LOTE_ENT'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'DIA_CXL'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'STATUS_CXL_RQ'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'VL_RQ_PG_CXL'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'OP_CXL'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'CPFCGC'
-                Width = 64
                 Visible = True
               end
               item
@@ -6795,73 +6747,61 @@ inherited frmCadBoletos: TfrmCadBoletos
               item
                 Expanded = False
                 FieldName = 'TP_REC_CXL'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'PRCSS'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'JUROS_COB'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'COD_IT_CARTAS'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'DT_REG_CARTAS'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'COD_CARTA'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'N_AUT_CART'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'COD_FATURAMENTO'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'LOTE_NEG'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'DATA_LOTE_NEG'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'CODIGO_EMP'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'COD_EMP_MULT'
-                Width = 64
                 Visible = True
               end
               item
@@ -6882,7 +6822,6 @@ inherited frmCadBoletos: TfrmCadBoletos
               item
                 Expanded = False
                 FieldName = 'NCOMANDO'
-                Width = 64
                 Visible = True
               end
               item
@@ -6893,79 +6832,66 @@ inherited frmCadBoletos: TfrmCadBoletos
               item
                 Expanded = False
                 FieldName = 'COONAOFISCAL'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'NOSSO_NUMERO_BANCO'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'TAXA_COBRANCA'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'US_CANCELOU'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'DT_US_CANCELOU'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'OBS_PARACREDITO'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'DTORIGINAL_C'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'DATA_PREV_REC'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'DEPENDENTE'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'NSERIEECF'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'COD_TERMINAL'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'COD_COBREBEM'
-                Width = 64
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'OCORRENCIABANCARIA'
-                Width = 64
                 Visible = True
               end>
           end

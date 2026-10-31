@@ -529,7 +529,7 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                         Width = 212
                         Height = 21
                         Style = csDropDownList
-                        ItemHeight = 0
+                        ItemHeight = 13
                         TabOrder = 13
                         OnExit = ComboBox9Exit
                         Items.Strings = (
@@ -587,7 +587,7 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                             Height = 91
                             ExplicitWidth = 178
                             ExplicitHeight = 91
-                    end
+                          end
                           inherited pnContato: TPanel
                             Top = 106
                             Width = 275
@@ -596,7 +596,7 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                             inherited bt_contatos_pla_add: TSpeedButton
                               Left = 182
                               ExplicitLeft = 182
-                  end
+                            end
                             inherited bt_contatos_pla_edit: TSpeedButton
                               Left = 211
                               ExplicitLeft = 211
@@ -1984,7 +1984,7 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                 Width = 145
                 Height = 21
                 Hint = 'Campo filtro da pesquisa adicional. Informe o campo desejado'
-                ItemHeight = 13
+                ItemHeight = 0
                 TabOrder = 0
                 Text = 'ComboBox11'
                 OnEnter = ComboBox1Enter
@@ -3251,7 +3251,7 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                   Width = 199
                   Height = 21
                   Style = csDropDownList
-                  ItemHeight = 0
+                  ItemHeight = 13
                   ItemIndex = 0
                   TabOrder = 0
                   Text = 'Todos'
@@ -3729,7 +3729,7 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                   ForceNewColumn = False
                   ForceNewPage = False
                   Size.Values = (
-                    280.458333333333400000
+                    280.458333333333300000
                     1899.708333333333000000)
                   PreCaluculateBandHeight = False
                   KeepOnOnePage = False
@@ -4402,7 +4402,7 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                   ForceNewColumn = False
                   ForceNewPage = False
                   Size.Values = (
-                    58.208333333333340000
+                    58.208333333333330000
                     1899.708333333333000000)
                   PreCaluculateBandHeight = False
                   KeepOnOnePage = False
@@ -4476,7 +4476,7 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                   ForceNewColumn = False
                   ForceNewPage = False
                   Size.Values = (
-                    60.854166666666680000
+                    60.854166666666670000
                     1899.708333333333000000)
                   PreCaluculateBandHeight = False
                   KeepOnOnePage = False
@@ -4934,7 +4934,7 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                   ForceNewColumn = False
                   ForceNewPage = False
                   Size.Values = (
-                    66.145833333333340000
+                    66.145833333333330000
                     1899.708333333333000000)
                   PreCaluculateBandHeight = False
                   KeepOnOnePage = False
@@ -5088,7 +5088,7 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                   ForceNewColumn = False
                   ForceNewPage = False
                   Size.Values = (
-                    68.791666666666680000
+                    68.791666666666670000
                     1899.708333333333000000)
                   PreCaluculateBandHeight = False
                   KeepOnOnePage = False
@@ -6169,7 +6169,7 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                   Width = 212
                   Height = 21
                   Style = csDropDownList
-                  ItemHeight = 0
+                  ItemHeight = 13
                   TabOrder = 1
                   Items.Strings = (
                     'Ativo'
@@ -6396,7 +6396,7 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                       Width = 60
                       Height = 21
                       Style = csDropDownList
-                      ItemHeight = 0
+                      ItemHeight = 13
                       TabOrder = 1
                       Items.Strings = (
                         'Sim'
@@ -6433,7 +6433,7 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                       Width = 60
                       Height = 21
                       Style = csDropDownList
-                      ItemHeight = 0
+                      ItemHeight = 13
                       TabOrder = 1
                       Items.Strings = (
                         'Sim'
@@ -6470,7 +6470,7 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                       Width = 60
                       Height = 21
                       Style = csDropDownList
-                      ItemHeight = 0
+                      ItemHeight = 13
                       TabOrder = 1
                       Items.Strings = (
                         'Sim'
@@ -6507,7 +6507,7 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                       Width = 60
                       Height = 21
                       Style = csDropDownList
-                      ItemHeight = 0
+                      ItemHeight = 13
                       TabOrder = 1
                       Items.Strings = (
                         'Sim'
@@ -6853,10 +6853,6 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
     inherited lbStatusProcessamento: TLabel
       ExplicitLeft = 26
       ExplicitTop = 38
-    end
-    inherited lbTextoProcessamento: TLabel
-      Width = 477
-      Height = 21
     end
   end
   inherited PopupMenu1: TPopupMenu

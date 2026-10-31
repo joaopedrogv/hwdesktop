@@ -4673,6 +4673,14 @@ begin
         ' union all ' +
         ' select -11 cod_promocao, ''SERVICO'' descr_promocao, 0 ordem, ' +
         ' null data_ini, null data_fim, ' + vDadosIni.FusoSqlDate + ' dataatual from rdb$database ' +
+        ' union all ' +
+        ' select promocao.cod_promocao, promocao.descr_promocao, promocao.ordem, ' +
+        ' promocao.data_ini, promocao.data_fim, ' + vDadosIni.FusoSqlDate + ' dataatual from promocao ' +
+        ' inner join tipo_preco on tipo_preco.cod_tppreco = promocao.cod_tppreco ' +
+        '		  and tipo_preco.cod_empresa = promocao.cod_empresa ' +
+        ' where promocao.cod_empresa = ' + vDadosIni.codEmpresa +
+        ' and coalesce(promocao.padrao, ''N'') = ''S'' ' +
+        ' and promocao.data_ini is not null and promocao.data_fim is not null ' +
         ' union all '
       , '') +
   		' select promocao.cod_promocao, promocao.descr_promocao, promocao.ordem, ' +
@@ -4683,6 +4691,7 @@ begin
       ' and promocao.cod_promocao > 0 ' +
       vDadosIni.IfThen(trim(pTipo) = 'H',
         '',
+        ' and coalesce(promocao.padrao, ''N'') <> ''S'' ' +
         ' and promocao.data_ini is not null and promocao.data_fim is not null ') +
       ' and promocao.ativo = 1 ' +
       vDadosIni.IfThen(trim(pTipo) = 'H',
@@ -5734,37 +5743,37 @@ begin
 
     Result := montaSelect(
       ' select promocao_ordem_hc.cod_promocao, promocao_ordem_hc.cod_empresa, ' + IntToStr(0) + ' ordem, promocao_ordem_hc.atual, ' +
-      ' ''PROMOCAO'' descr_promocao, null data_ini, null data_fim, promocao_ordem_hc.tab_ce, promocao_ordem_hc.tab_ci, ' +
+      ' ''PROMOCAO'' descr_promocao, cast(null as timestamp) data_ini, cast(null as timestamp) data_fim, promocao_ordem_hc.tab_ce, promocao_ordem_hc.tab_ci, ' +
       ' (select current_d from sp_current_ts(' + vDadosIni.codEmpresa + ')) dataatual from promocao_ordem_hc ' +
       ' where promocao_ordem_hc.cod_promocao = -1 ' +
       ' and promocao_ordem_hc.cod_empresa = ' + vDadosIni.codEmpresa +
       ' union all ' +
       ' select promocao_ordem_hc.cod_promocao, promocao_ordem_hc.cod_empresa, ' + IntToStr(vMaxOrdem + 4) + ' ordem, promocao_ordem_hc.atual, ' +
-      ' ''VAREJO'' descr_promocao, null data_ini, null data_fim, promocao_ordem_hc.tab_ce, promocao_ordem_hc.tab_ci, ' +
+      ' ''VAREJO'' descr_promocao, cast(null as timestamp) data_ini, cast(null as timestamp) data_fim, promocao_ordem_hc.tab_ce, promocao_ordem_hc.tab_ci, ' +
       ' (select current_d from sp_current_ts(' + vDadosIni.codEmpresa + ')) dataatual from promocao_ordem_hc ' +
       ' where promocao_ordem_hc.cod_promocao = -2 ' +
       ' and promocao_ordem_hc.cod_empresa = ' + vDadosIni.codEmpresa +
       ' union all ' +
       ' select promocao_ordem_hc.cod_promocao, promocao_ordem_hc.cod_empresa, ' + IntToStr(vMaxOrdem + 1) + ' ordem, promocao_ordem_hc.atual, ' +
-      ' ''30 DIAS'' descr_promocao, null data_ini, null data_fim, promocao_ordem_hc.tab_ce, promocao_ordem_hc.tab_ci, ' +
+      ' ''30 DIAS'' descr_promocao, cast(null as timestamp) data_ini, cast(null as timestamp) data_fim, promocao_ordem_hc.tab_ce, promocao_ordem_hc.tab_ci, ' +
       ' (select current_d from sp_current_ts(' + vDadosIni.codEmpresa + ')) dataatual from promocao_ordem_hc ' +
       ' where promocao_ordem_hc.cod_promocao = -3 ' +
       ' and promocao_ordem_hc.cod_empresa = ' + vDadosIni.codEmpresa +
       ' union all ' +
       ' select promocao_ordem_hc.cod_promocao, promocao_ordem_hc.cod_empresa, ' + IntToStr(vMaxOrdem + 2) + ' ordem, promocao_ordem_hc.atual, ' +
-      ' ''60 DIAS'' descr_promocao, null data_ini, null data_fim, promocao_ordem_hc.tab_ce, promocao_ordem_hc.tab_ci, ' +
+      ' ''60 DIAS'' descr_promocao, cast(null as timestamp) data_ini, cast(null as timestamp) data_fim, promocao_ordem_hc.tab_ce, promocao_ordem_hc.tab_ci, ' +
       ' (select current_d from sp_current_ts(' + vDadosIni.codEmpresa + ')) dataatual from promocao_ordem_hc ' +
       ' where promocao_ordem_hc.cod_promocao = -4 ' +
       ' and promocao_ordem_hc.cod_empresa = ' + vDadosIni.codEmpresa +
       ' union all ' +
       ' select promocao_ordem_hc.cod_promocao, promocao_ordem_hc.cod_empresa, ' + IntToStr(vMaxOrdem + 3) + ' ordem, promocao_ordem_hc.atual, ' +
-      ' ''90 DIAS'' descr_promocao, null data_ini, null data_fim, promocao_ordem_hc.tab_ce, promocao_ordem_hc.tab_ci, ' +
+      ' ''90 DIAS'' descr_promocao, cast(null as timestamp) data_ini, cast(null as timestamp) data_fim, promocao_ordem_hc.tab_ce, promocao_ordem_hc.tab_ci, ' +
       ' (select current_d from sp_current_ts(' + vDadosIni.codEmpresa + ')) dataatual from promocao_ordem_hc ' +
       ' where promocao_ordem_hc.cod_promocao = -5 ' +
       ' and promocao_ordem_hc.cod_empresa = ' + vDadosIni.codEmpresa +
       ' union all ' +
       ' select promocao_ordem_hc.cod_promocao, promocao_ordem_hc.cod_empresa, ' + IntToStr(0) + ' ordem, promocao_ordem_hc.atual, ' +
-      ' ''SERVICO'' descr_promocao, null data_ini, null data_fim, promocao_ordem_hc.tab_ce, promocao_ordem_hc.tab_ci, ' +
+      ' ''SERVICO'' descr_promocao, cast(null as timestamp) data_ini, cast(null as timestamp) data_fim, promocao_ordem_hc.tab_ce, promocao_ordem_hc.tab_ci, ' +
       ' (select current_d from sp_current_ts(' + vDadosIni.codEmpresa + ')) dataatual from promocao_ordem_hc ' +
       ' where promocao_ordem_hc.cod_promocao = -11 ' +
       ' and promocao_ordem_hc.cod_empresa = ' + vDadosIni.codEmpresa +
@@ -5796,14 +5805,14 @@ begin
   end
   else if pTipo = 'E' then
     Result := montaSelect(' select promocao_ordem_ec.cod_promocao, promocao_ordem_ec.cod_empresa, promocao_ordem_ec.ordem, promocao_ordem_ec.atual, ' +
-    	' promocao.descr_promocao, null tab_ce, null tab_ci, ' +
+    	' promocao.descr_promocao, cast(null as timestamp) data_ini, cast(null as timestamp) data_fim, null tab_ce, null tab_ci, ' +
       ' (select current_d from sp_current_ts(' + vDadosIni.codEmpresa + ')) dataatual from promocao_ordem_ec ' +
       ' left join promocao on promocao.cod_promocao = promocao_ordem_ec.cod_promocao and promocao.cod_empresa = promocao_ordem_ec.cod_empresa ' +
       ' where promocao_ordem_ec.cod_empresa = ' + vDadosIni.codEmpresa +
       ' order by 3 ')
   else
   	Result := montaSelect(' select promocao_ordem_ca.cod_promocao, promocao_ordem_ca.cod_empresa, promocao_ordem_ca.ordem, promocao_ordem_ca.atual, ' +
-   	' promocao.descr_promocao, null tab_ce, null tab_ci, ' +
+   	' promocao.descr_promocao, cast(null as timestamp) data_ini, cast(null as timestamp) data_fim, null tab_ce, null tab_ci, ' +
       ' (select current_d from sp_current_ts(' + vDadosIni.codEmpresa + ')) dataatual from promocao_ordem_ca ' +
       ' left join promocao on promocao.cod_promocao = promocao_ordem_ca.cod_promocao and promocao.cod_empresa = promocao_ordem_ca.cod_empresa ' +
       ' where promocao_ordem_ca.cod_empresa = ' + vDadosIni.codEmpresa +

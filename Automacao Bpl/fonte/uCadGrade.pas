@@ -49,8 +49,8 @@ type
     Label13: TLabel;
     Panel128: TPanel;
     pnCenterAlterDadosProd: TPanel;
-    SpeedButtonAlterarProduto: TSpeedButton;
-    SpeedButtonAlterarProduto2: TSpeedButton;
+    SpeedButtonAlterarGrade: TSpeedButton;
+    SpeedButtonAlterarGrade2: TSpeedButton;
     btExcluirRegistro: TSpeedButton;
     ckPermOpcaoMarcadas: TCheckBox;
     Label14: TLabel;
@@ -84,6 +84,7 @@ type
     btSincronizarServicos: TSpeedButton;
     SpeedBSelTodos: TSpeedButton;
     SpeedBDesmarcarTodos: TSpeedButton;
+    btLixeiraVazia: TSpeedButton;
     procedure btSincronizarServicosClick(Sender: TObject);
     procedure SpeedBDesmarcarTodosClick(Sender: TObject);
     procedure SpeedBSelTodosClick(Sender: TObject);
@@ -95,8 +96,8 @@ type
     procedure btSelectAllClick(Sender: TObject);
     procedure SpeedButton2Click(Sender: TObject);
     procedure ckPermOpcaoMarcadasClick(Sender: TObject);
-    procedure SpeedButtonAlterarProduto2Click(Sender: TObject);
-    procedure SpeedButtonAlterarProdutoClick(Sender: TObject);
+    procedure SpeedButtonAlterarGrade2Click(Sender: TObject);
+    procedure SpeedButtonAlterarGradeClick(Sender: TObject);
     procedure btnCancelarAlteracaoEmLoteClick(Sender: TObject);
     procedure btVoltarDadosProcClick(Sender: TObject);
     procedure SpeedButton6Click(Sender: TObject);
@@ -253,12 +254,30 @@ begin
     SpeedButton1.Visible := false;
     SpeedButton5.Visible := true;
     SpeedButton6.Visible := false;
+
+    SpeedButtonAlterarGrade2.Visible := false;
+    SpeedButtonAlterarGrade.Visible := false;
+    btSincronizarServicos.Visible := false;
+
+    btRestaurarRegistro.Visible := true;
+
+    SpeedButton2.Hint := 'Excluir registro permanentemente - [PRO098]';
+    btExcluirRegistro.Hint := 'Excluir registro permanentemente - [PRO098]';
   end
   else
   begin
     SpeedButton1.Visible := true;
     SpeedButton5.Visible := false;
     SpeedButton6.Visible := vDadosIni.vEcommerce.vHabilitarEcommerce;
+
+    SpeedButtonAlterarGrade2.Visible := true;
+    SpeedButtonAlterarGrade.Visible := true;
+    btSincronizarServicos.Visible := true;
+
+    btRestaurarRegistro.Visible := false;
+
+    SpeedButton2.Hint := 'Enviar para Lixeira - [PRO099]';
+    btExcluirRegistro.Hint := 'Enviar para Lixeira - [PRO099]';
   end;
 
   obGrade.ultimasql := obGrade.dataSet.CommandText;
@@ -996,6 +1015,8 @@ begin
 end;
 
 procedure TfrmCadGrade.FormShow(Sender: TObject);
+var
+  vStatusLixeira: boolean;
 begin
 	if vShow <> 1 then
   begin
@@ -1014,7 +1035,9 @@ begin
   if TelaCadastro = 1 then
     BitBtn3Click(Sender);
 
-  lixeiraVazia(not obGrade.StatusLixeira);
+  vStatusLixeira := obGrade.StatusLixeira;
+  btLixeiraCheia.Visible := vStatusLixeira;
+  lixeiraVazia(not vStatusLixeira);
 end;
 
 procedure TfrmCadGrade.LabelSeqECClick(Sender: TObject);
@@ -1191,6 +1214,11 @@ begin
         SpeedButton5.Visible := false;
         SpeedButton6.Visible := vDadosIni.vEcommerce.vHabilitarEcommerce;
 
+        btRestaurarRegistro.Visible := false;
+        SpeedButtonAlterarGrade.Visible := true;
+        SpeedButtonAlterarGrade2.Visible := true;
+        btSincronizarServicos.Visible := true;
+
         ckLixeira.Enabled := false;
         ckLixeira.Checked := false;
         ckLixeira.Enabled := true;
@@ -1201,6 +1229,11 @@ begin
         SpeedButton1.Visible := false;
         SpeedButton5.Visible := true;
         SpeedButton6.Visible := false;
+
+        btRestaurarRegistro.Visible := true;
+        SpeedButtonAlterarGrade.Visible := false;
+        SpeedButtonAlterarGrade2.Visible := false;
+        btSincronizarServicos.Visible := false;
 
         ckLixeira.Enabled := false;
         ckLixeira.Checked := true;
@@ -1224,7 +1257,8 @@ begin
   try
     obGrade.Delete;
     vStatusLixeira := obGrade.StatusLixeira;
-	  lixeiraVazia(not vStatusLixeira);
+    btLixeiraCheia.Visible := vStatusLixeira;
+	 lixeiraVazia(not vStatusLixeira);
   except
     on E: Exception do
     begin
@@ -1238,6 +1272,8 @@ begin
 end;
 
 procedure TfrmCadGrade.SpeedButton5Click(Sender: TObject);
+var
+  vStatusLixeira: boolean;
 begin
   inherited;
   if not vDadosIni.validarAcessoCadastrosEmpresas('GRADES', 'A', obGrade.buscas) then
@@ -1246,10 +1282,9 @@ begin
   if not obGrade.RestaurarRegistro then
   	Exit;
 
-  if obGrade.StatusLixeira then
-  	 lixeiraVazia(false)
-  else
-    lixeiraVazia(true);
+  vStatusLixeira := obGrade.StatusLixeira;
+  btLixeiraCheia.Visible := vStatusLixeira;
+  lixeiraVazia(not vStatusLixeira);
 end;
 
 procedure TfrmCadGrade.SpeedButton6Click(Sender: TObject);
@@ -1275,7 +1310,7 @@ begin
 	PageControl1.ActivePage := tsAlterDadosProc;
 end;
 
-procedure TfrmCadGrade.SpeedButtonAlterarProduto2Click(Sender: TObject);
+procedure TfrmCadGrade.SpeedButtonAlterarGrade2Click(Sender: TObject);
 var
   vTipo1, vTipo2: string;
   vCodControle: Integer;
@@ -1352,7 +1387,7 @@ begin
   obGrade.dataSet.Refresh;
 end;
 
-procedure TfrmCadGrade.SpeedButtonAlterarProdutoClick(Sender: TObject);
+procedure TfrmCadGrade.SpeedButtonAlterarGradeClick(Sender: TObject);
 begin
   inherited;
   TelaCadastro := 5;
