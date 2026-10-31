@@ -6,6 +6,9 @@ uses
   Contnrs, Controls, Classes, basefb_class, PedVendaProd_Model, PedVendaServ_Model,
   PedVendaProdUndVenda_Model, hw_strings, boletas_class, formpagamento_class;
 
+const
+  TOLERANCIA_QUANT_DEVOLUCAO = 0.0001;
+
 type
 
   TReg_PedVendaProd = class;
@@ -338,12 +341,19 @@ type
     Ffr_pagbosch: string;
     Fcod_cli_fat: Integer;
     Fcod_gerador: Integer;
+    FDevolucaoExcedente: Boolean;
     function GetPagamentoNFCe: TReg_PedVendaPagamentoList;
   public
     destructor Destroy; override;
     constructor create;
     procedure CorrigirValores;
     function GetCamposDaTabela: TStringList; override;
+
+    function TemDevolucao: Boolean;
+    function TodosItensDevolvidos: Boolean;
+    procedure ResetDevolucoes;
+
+    property DevolucaoExcedente: Boolean read FDevolucaoExcedente write FDevolucaoExcedente;
 
     property nped            : Integer           read Fnped             write Fnped;
     property tipo            : string            read Ftipo             write Ftipo;
@@ -660,6 +670,7 @@ begin
   Fmd5 := 'sistema';
   Fsaveauto := 'N';
   Fcalc := 'S';
+  FDevolucaoExcedente := False;
 
   FProd := TReg_PedVendaProdList.Create;
   FServ := TReg_PedVendaServList.Create;
@@ -681,6 +692,48 @@ begin
   FreeAndNil(FPagamento);
   //FreeAndNil(FPagamentoNFCe);
   inherited;
+end;
+
+function TReg_PedVenda.TemDevolucao: Boolean;
+var
+  I: Integer;
+begin
+  Result := False;
+  for I := 0 to FProd.Count - 1 do
+    if FProd.Items[I].Quant_Devolvida > TOLERANCIA_QUANT_DEVOLUCAO then
+    begin
+      Result := True;
+      Break;
+    end;
+end;
+
+function TReg_PedVenda.TodosItensDevolvidos: Boolean;
+var
+  I: Integer;
+  ATemItemPositivo: Boolean;
+begin
+  Result := False;
+  ATemItemPositivo := False;
+
+  for I := 0 to FProd.Count - 1 do
+    if FProd.Items[I].quant_ped_item > TOLERANCIA_QUANT_DEVOLUCAO then
+    begin
+      ATemItemPositivo := True;
+      if FProd.Items[I].Quant_Devolvida <
+         (FProd.Items[I].quant_ped_item - TOLERANCIA_QUANT_DEVOLUCAO) then
+        Exit;
+    end;
+
+  Result := ATemItemPositivo;
+end;
+
+procedure TReg_PedVenda.ResetDevolucoes;
+var
+  I: Integer;
+begin
+  FDevolucaoExcedente := False;
+  for I := 0 to FProd.Count - 1 do
+    FProd.Items[I].Quant_Devolvida := 0;
 end;
 
 function TReg_PedVenda.GetCamposDaTabela: TStringList;
