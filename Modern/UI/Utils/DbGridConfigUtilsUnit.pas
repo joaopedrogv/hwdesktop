@@ -9,6 +9,8 @@ uses
 type
   DbGridConfigUtils = class
   public
+    // Reconstroi as colunas com a configuracao recebida; nao a retem nem a libera.
+    // Nao abre a consulta nem substitui a configuracao dos TFields no dataset.
     class procedure ApplyToDBGrid( AGrid: TDBGrid; AFieldConfigs: FieldsConfigModel );
   end;
 

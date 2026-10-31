@@ -5,12 +5,13 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, uCadPadraoModal, AppEvnts, ExtCtrls, Menus, ComCtrls, StdCtrls,
-  Buttons, Grids, DBGrids, Mask, uDataSet_OOP, OperacaoInternaEtdUnit, hw_audit_utils,
-  IUIFormValidatorUnit, CheckLst,
-  CheckListBoxEmpresasFrameUnit;
+  Buttons, Grids, DBGrids, Mask, ModernCadastroFormUnit, OperacoesInternasDataSet,
+  OperacoesInternasPresenter, IViewFeedbackUnit,
+  OperacaoInternaEtdUnit, CheckLst,
+  CheckListBoxEmpresasFrameUnit, FilterFR, FilterPadraoFR;
 
 type
-  TfrmCadOperacoesInternas = class(TfrmCadPadraoM)
+  TfrmCadOperacoesInternas = class(TModernCadastroForm, IViewFeedback)
     tabCadastro: TTabSheet;
     Label6: TLabel;
     edSeqId: TEdit;
@@ -35,57 +36,29 @@ type
     procedure FormCreate(Sender: TObject);
   private
     FOpInternaNFCeDefault: string;
-    FData: TDataSet_OOP;
-    FAuditor: TAudit_OOP;
+    FData: TOperacoesInternasDataSet;
     FState: OperacaoInternaEtd;
-    FFormValidator: IUIFormValidator;
+    FPresenter: TOperacoesInternasPresenter;
   private
     procedure ShowAbaCadastro();
     procedure MapStateToForm();
     procedure MapFormToState();
-  public  
+  public
+    procedure SetupPresenter(APresenter: TOperacoesInternasPresenter);
+    destructor Destroy; override;
   end;
 
 implementation
 
 uses
-  uDtmAtivo, UIUtilsUnit, hw_utils, hw_grid_utils, Math, DB,
-  FieldsConfigUnit, config_sistema_class,
-  Contnrs, UIFormValidatorFactoryUnit,
-  ContainerUnit, CreateEntityUseCaseOutputUnit,
-  EValidacaoNegocioUnit, StatusRegistroEnumUnit, ErpFeaturesFactoryUnit,
+  uDtmAtivo, UIUtilsUnit, Math,
+  FieldsConfigUnit, EntityMetadataUnit, OperacaoInternaMetadataUnit,
+  config_sistema_class, DbGridConfigUtilsUnit,
+  UIFormValidatorFactoryUnit,
+  StatusRegistroEnumUnit,
   UCadOpInternasComTiposVendas, uDadosIni;
 
-type
-  TOperacoesInternasOOP = class(TDataSet_OOP)
-  private
-    //procedure GetText(Sender: TField; var Text: string; DisplayText: Boolean);
-  public
-    constructor Create();
-  end;
-
 {$R *.dfm}
-
-{ TOperacoesInternasOOP }
-
-constructor TOperacoesInternasOOP.Create;
-begin
-  TableName := 'OP_INTERNAS';
-  inherited Create(dtmAtivo.bancoHw, nil, True, 'cds_op_internas');
-                                                       
-  ConfigFields(
-    FieldsConfigFactory.Create()
-      .Add('id,ativo', fvInvisivel)
-      .Add('descricao', '', fvSempreVisivel)
-  );
-
-//  SQLMaker.Build( TableName, 'o', 'o.*', '', '', 'o.seqid')
-//    .FilterMk.FreeFilters()
-//    .AddIsNull('id', True);
-//  Self.RunSQLMaker();
-
-  montaSelect('SELECT * FROM OP_INTERNAS WHERE 1=0');
-end;
 
 { TfrmCadOperacoesInternas }
 
@@ -98,23 +71,14 @@ begin
       .Permitido() then
       Exit;
 
-    if MaskEdit2.Visible then
-    begin
-      if not FData.ConsultaCampos( FData.TableName, ComboBox1.Text,
-        'seqid', maskedit1.text, maskedit2.text, vDadosIni.codEmpresa, IfThen(not ckLixeira.Checked, 1)) then
-        	if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
-        		combobox1.setfocus;
-    end
-    else
-      if FData.ConsultaCampos(FData.TableName, MaskEdit3.text, ComboBox1.Text,
-        combobox3.Text, 'seqid', true, vDadosIni.codEmpresa, IfThen(not ckLixeira.Checked, 1)) then
-        	if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
-        		ComboBox1.SetFocus;
+    FData.SQLMaker.FilterMk.FreeFilters()
+      .Add('ativo', IfThen(not ckLixeira.Checked, 1))
+      .Add(FiltroGrid.GetFiltros());
 
-    inherited;
+    FData.RunSQLMaker();
 
     if (Self.Enabled) and (Self.Visible) and (DBGrid1.CanFocus) then
-    	DBGrid1.SetFocus;
+      DBGrid1.SetFocus;
 
   finally
     Screen.Cursor := crDefault;
@@ -141,8 +105,6 @@ begin
 end;
 
 procedure TfrmCadOperacoesInternas.BitBtn4Click(Sender: TObject);
-var
-  createResult: CreateEntityUseCaseOutPut;
 begin
   MapFormToState();
 
@@ -151,31 +113,15 @@ begin
     .Permitido() then
     Exit;
 
-  try
-
+  if FPresenter.Salvar(FState) then
+  begin
     try
-      with Container.GetInstance().ErpFeaturesFactory.CreateSalvarOperacaoInternaUseCase() do
-      try
-        createResult := Executar( FState );
-      finally
-        FreeSafe();
-      end;
-
-      if not createResult.Validation.IsValid then
-        FFormValidator.Validate(createResult.Validation)
-
-      else
-      begin
-        inherited;
-        FData.Refresh();
-      end;
-
-    finally
-      createResult.Free();
+      inherited;
+      FData.Refresh();
+    except
+      on E: Exception do
+        UIUtils.HandleError(E);
     end;
-
-  except on E: Exception do
-    UIUtils.HandleError(E);
   end;
 end;
 
@@ -190,8 +136,8 @@ end;
 procedure TfrmCadOperacoesInternas.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
-  FData.Free();
-  FState.Free();
+  FreeAndNil(FData);
+  FreeAndNil(FState);
 
   Action := caFree;
 
@@ -199,21 +145,33 @@ begin
 end;
 
 procedure TfrmCadOperacoesInternas.FormCreate(Sender: TObject);
+var
+  Builder: IFieldsConfigBuilder;
+  Meta: EntityMetadata;
 begin
   TelaCadastro := vDadosIni.vTipoForm;
 
-  FState   := OperacaoInternaEtd.Create();
-  FData    := TOperacoesInternasOOP.Create();
+  FState := OperacaoInternaEtd.Create();
+  FData := TOperacoesInternasDataSet.Create();
   FAuditor := FData.Auditor;
 
+  Builder := FieldsConfigFactory.Create();
+  Meta := TOperacaoInternaMetadata.GetMetadata();
+
+  FData.Setup(Builder, Meta);
+
+  SetupDataSetGrid(FData);
+
+  //FiltroGrid.OnFieldChange := FData.HandleFilterField;
+  FiltroGrid.TodosToggle(True).FillForm(FData.dataSet, nil, 'Todos');
+
   FFormValidator := UIFormValidatorFactory.Create()
-    .Builder()
+    .Builder(Meta, BitBtn4)
     .Bind(edDescricao)
     .Validator();
 
-  DBGrid1.DataSource := FData._dataSourceOOP;
-  setTClientDataSet(vDadosIni.dataSetCol, vDadosIni.vNomeUsuario, vDadosIni.transacaoCol);
-  configurarGridPeloConfigColunas(DBGrid1);
+  DbGridConfigUtils.ApplyToDBGrid(DBGrid1, Builder.List);
+
   PrimeiraPesquisa := False;
 
   inherited;
@@ -276,6 +234,13 @@ begin
     edDescricao.SetFocus;
 end;
 
+procedure TfrmCadOperacoesInternas.SetupPresenter(
+  APresenter: TOperacoesInternasPresenter
+);
+begin
+  FPresenter := APresenter;
+end;
+
 procedure TfrmCadOperacoesInternas.SpeedButton11Click(Sender: TObject);
 begin
   inherited;
@@ -312,40 +277,41 @@ begin
   if FData.IsEmpty() then
     Exit;
 
-  with Container.GetInstance().ErpFeaturesFactory.CreateObterOperacaoInternaPorIdUseCase() do
-  try
-    dado := Executar(FData.fstr('id'));
-  finally
-    FreeSafe();
-  end;
+  if not FPresenter.ObterParaEdicao(FData.fstr('id'), dado) then
+    Exit;
 
-  if dado = nil then
-    ShowAtencao('Registro não se encontra mais disponível')
-  else if (dado.Ativo = saLixeira) and
-    ((ShowConfirmacao('Registro encontra-se na Lixeira. Deseja restaurar o registro?') <> IDYES) or
-    (not FAuditor.Processo('MOD006').Alterar()
-      .SetMensagem('%d - %s', [FData.fint('seqid'), FData.fstr('descricao')] )
-      .Permitido() )) then
-    dado.Free()
-  else
-  begin
+  try
+    if dado.Ativo = saLixeira then
+    begin
+      if UIUtils.ShowQuestion('Registro encontra-se na Lixeira. Deseja restaurar o registro?') <> IDYES then
+        Exit;
+
+      if not FAuditor.Processo('MOD006').Alterar()
+        .SetMensagem('%d - %s', [FData.fint('seqid'), FData.fstr('descricao')])
+        .Permitido() then
+        Exit;
+    end;
+
     if not FAuditor.Processo('MOD003').Alterar()
-      .SetMensagem('%d - %s', [ dado.SeqId, dado.Descricao] )
+      .SetMensagem('%d - %s', [dado.SeqId, dado.Descricao])
       .Permitido() then
       Exit;
 
     FState.Free();
     FState := dado;
+    dado := nil;
     FState.Ativo := saAtivo;
     MapStateToForm();
     ShowAbaCadastro();
+  finally
+    dado.Free();
   end;
 end;
 
 procedure TfrmCadOperacoesInternas.SpeedButton26Click(Sender: TObject);
 var
   form: TfrmCadOpInternasComTiposVendas;
-begin    
+begin
   if FData.IsEmpty() then
     Exit;
 
@@ -368,7 +334,7 @@ begin
   if FData.IsEmpty() then
     Exit;
 
-  if ShowConfirmacao('Deseja mesmo enviar oa registro para a lixeira?') <> ID_YES then
+  if UIUtils.ShowQuestion('Deseja mesmo enviar oa registro para a lixeira?') <> ID_YES then
     Exit;
 
   if not FAuditor.Processo('MOD005').Excluir()
@@ -376,20 +342,16 @@ begin
     .Permitido() then
     Exit;
 
-  try
-    with Container.GetInstance().ErpFeaturesFactory.CreateRemoverOperacaoInternaUseCase() do
-    try
-      Executar(FData.fstr('id'));
-    finally
-      FreeSafe();
-    end;
-
+  if FPresenter.Remover(FData.fstr('id')) then
     FData.Refresh();
+end;
 
-  except
-    on E: Exception do
-      UIUtils.HandleError(E);
-  end;
+destructor TfrmCadOperacoesInternas.Destroy;
+begin
+  FreeAndNil(FPresenter);
+  FreeAndNil(FData);
+  FreeAndNil(FState);
+  inherited;
 end;
 
 end.

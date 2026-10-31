@@ -388,6 +388,7 @@
     ..\Core\Infrastructure\Services\ArrayServiceUnit.pas;
     ..\Core\Infrastructure\Exceptions\EValidacaoNegocioUnit.pas;
     ..\ERP.Features\Core\Domain\Entities\OperacaoInternaEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Metadata\OperacaoInternaMetadataUnit.pas;
     ..\ERP.Features\Core\Domain\Ports\IOperacoesInternasRepositoryUnit.pas;
     ..\ERP.Features\Adapters\Secondary\Repositories\OperacoesInternasRepositoryUnit.pas;
     ..\ERP.Features\Core\Application\UseCases\OperacoesInternas\ObterOperacaoInternaPorIdUseCaseUnit.pas;
@@ -401,6 +402,8 @@
     ..\ERP.Features\Core\Application\UseCases\RegrasFiscais\SalvarRegraFiscalIbsCbsUseCaseUnit.pas;
     ..\UI\Forms\OperacoesInternas\UCadOperacoesInternas.pas;
     ..\UI\Forms\OperacoesInternas\UCadOperacoesInternas.dfm;
+    ..\UI\DataSets\OperacoesInternas\OperacoesInternasDataSet.pas;
+    ..\UI\Forms\OperacoesInternas\OperacoesInternasPresenter.pas;
     ..\UI\Forms\RegrasFiscaisIbsCbs\UCadRegrasFiscaisIbsCbs.pas;
     ..\UI\Forms\RegrasFiscaisIbsCbs\UCadRegrasFiscaisIbsCbs.dfm;
     ..\UI\Frames\Contextos\Fiscal.RTC\ComboBoxClassTribFrameUnit.pas;
@@ -882,6 +885,11 @@
     ..\Fiscal.Calculos\Core\Domain\Entities\LocalFornecimentoEnumUnit.pas;
     ..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocaisFornecimentoUseCaseUnit.pas;
     ..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocaisIncidenciaUseCaseUnit.pas;
+    ..\UI\Forms\RedBenefPC\AjustesRedBenefPcPresenter.pas;
+    ..\UI\Forms\RedBenefPC\AjustesRedBenefPcView.pas;
+    ..\UI\Infrastructure\Components\ModernCadastroFormUnit.pas;
+    ..\UI\Infrastructure\Components\ModernCadastroFormUnit.dfm;
+    ..\UI\Infrastructure\Interfaces\IViewFeedbackUnit.pas;
     pkModern.bdsproj;
     pkModern.dpk;
     pkModern.res

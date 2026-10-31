@@ -13,7 +13,8 @@ uses
   UCadOperacoesFiscaisIbsCbs, UCadOpInternasComTiposVendas,
   SharedFactoryContainerUnit, SharedRepoContainerUnit, FiscalRepoContainerUnit,
   ErpFeaturesRepoContainerUnit, UCentralDadosFiscais, UCadNFSe, ISharedFactoryUnit, ISessionContextUnit,
-  UCadRegrasRedBenefPC, UCadAjustesRedBenefPC;
+  UCadRegrasRedBenefPC, UCadAjustesRedBenefPC, AjustesRedBenefPcPresenter,
+  OperacoesInternasPresenter;
 
 var
   GFiscalFactoryInst: IFiscalCalculosFactory;
@@ -72,6 +73,11 @@ begin
   AppSetupShutdown();
 end;
 
+function GetFeaturesFactory(): IErpFeaturesFactory;
+begin
+  Result := Container.GetInstance().ErpFeaturesFactory;
+end;
+
 procedure ShowGruposFiscais(Amodal: Boolean);
 begin
   if not Assigned(formGruposFiscais) then
@@ -87,11 +93,65 @@ begin
 end;
 
 procedure ShowOperacoesInternas(Amodal: Boolean);
+var
+  SalvarUseCase: ISalvarOperacaoInternaUseCase;
+  ObterUseCase: IObterOperacaoInternaPorIdUseCase;
+  RemoverUseCase: IRemoverOperacaoInternaUseCase;
+  Presenter: TOperacoesInternasPresenter;
 begin
   if not Assigned(formOperacoInterna) then
   begin
     vDadosIni.vModalOuChild := IfThen(Amodal, 'M', 'C');
-    Application.CreateForm( TfrmCadOperacoesInternas, formOperacoInterna );
+
+    SalvarUseCase := nil;
+    ObterUseCase := nil;
+    RemoverUseCase := nil;
+    Presenter := nil;
+
+    try
+      Application.CreateForm( TfrmCadOperacoesInternas, formOperacoInterna );
+
+      SalvarUseCase := GetFeaturesFactory().CreateSalvarOperacaoInternaUseCase();
+      ObterUseCase := GetFeaturesFactory().CreateObterOperacaoInternaPorIdUseCase();
+      RemoverUseCase := GetFeaturesFactory().CreateRemoverOperacaoInternaUseCase();
+
+      Presenter := TOperacoesInternasPresenter.Create(
+        formOperacoInterna,
+        SalvarUseCase,
+        ObterUseCase,
+        RemoverUseCase
+      );
+
+      SalvarUseCase := nil;
+      ObterUseCase := nil;
+      RemoverUseCase := nil;
+
+      formOperacoInterna.SetupPresenter(Presenter);
+      Presenter := nil;
+    except
+      FreeAndNil(Presenter);
+
+      if Assigned(SalvarUseCase) then
+      begin
+        SalvarUseCase.FreeSafe();
+        SalvarUseCase := nil;
+      end;
+
+      if Assigned(ObterUseCase) then
+      begin
+        ObterUseCase.FreeSafe();
+        ObterUseCase := nil;
+      end;
+
+      if Assigned(RemoverUseCase) then
+      begin
+        RemoverUseCase.FreeSafe();
+        RemoverUseCase := nil;
+      end;
+
+      FreeAndNil(formOperacoInterna);
+      raise;
+    end;
   end;
 
   if Amodal then
@@ -188,6 +248,16 @@ begin
   begin
     vDadosIni.vModalOuChild := IfThen(Amodal, 'M', 'C');
     Application.CreateForm( TFrmCadAjustesRedBenefPC, FrmCadAjustesRedBenefPC );
+          
+    FrmCadAjustesRedBenefPC.SetupPresenter(
+      TAjustesRedBenefPcPresenter.Create(
+        FrmCadAjustesRedBenefPC,
+        GetFeaturesFactory().CreateSalvarAjusteRedBenefPcUseCase(),
+        GetFeaturesFactory().CreateRemoverAjusteRedBenefPcUseCase(),
+        GetFeaturesFactory().CreateListarRegrasRedBenefPcVigentesEAtualUseCase(),
+        GetFeaturesFactory().CreateObterAjusteRedBenefPcPorIdUseCase()
+      )
+    );
   end;
 
   if Amodal then

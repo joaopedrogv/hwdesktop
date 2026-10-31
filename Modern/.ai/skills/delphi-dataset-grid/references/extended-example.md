@@ -69,8 +69,10 @@ Do not reimplement the complete SQL/filter engine.
 
 ## Audit Support
 
-A dataset may override `GetAuditorFill` when its grid participates in the
-legacy audit flow:
+GetAuditorFill is an optional virtual hook. Its default implementation raises an
+exception when invoked. Override it only when consumers need a filled audit context;
+a query-only dataset can omit it. This example prepares the existing audit context
+without introducing new audit calls or authorizing new process identifiers:
 
 ```delphi
 function TNFSeDataSet.GetAuditorFill(

@@ -54,8 +54,9 @@ A form that projects validation results normally:
 2. creates a UI validator through `UIFormValidatorFactory`;
 3. builds it with metadata and the form action/control associated with validation;
 4. binds entity attributes to form components;
-5. stores the resulting `IUIFormValidator`;
-6. passes `ValidationEntityOutput` to it after a Use Case returns an invalid result;
+5. stores the resulting IUIFormValidator, reusing an inherited field when present;
+6. projects ValidationEntityOutput directly in an existing flow or through the
+   View feedback capability when the selected pattern uses a Presenter;
 7. resets validation state when the form state changes.
 
 ## Creating the UI Validator
@@ -112,7 +113,7 @@ from metadata or nearby form code.
 When a Use Case output contains `ValidationEntityOutput`, check it before
 continuing the successful UI flow.
 
-Typical pattern:
+An existing direct-form integration may use:
 
 ```delphi
 if not Result.Validation.IsValid then
@@ -122,6 +123,12 @@ begin
   // success flow
 end;
 ```
+
+With scoped MVP, this result check belongs in the Presenter, which calls
+FView.ExibirValidacoes(Result.Validation). The concrete form inherits the feedback
+implementation from TModernCadastroForm when that base is selected. Keep binding
+configuration in the concrete form and do not repeat the same result check in both
+places. Existing direct-form integrations remain valid outside the adaptation scope.
 
 Do not duplicate entity validation rules in the form.
 
@@ -158,7 +165,7 @@ Do not create parallel labels or field identifiers without a specific UI-only ne
 
 This Skill may be used by:
 
-- forms inherited from legacy `TfrmCadPadraoM`;
+- forms inherited from TModernCadastroForm or directly from legacy TfrmCadPadraoM;
 - Modern forms not based on that legacy form;
 - forms that use `TDataSetGrid`;
 - forms that do not require grid data.
@@ -190,12 +197,15 @@ When adding UI validation to a form:
 1. Identify the entity edited/created by the form.
 2. Identify the Use Case result that contains `ValidationEntityOutput`.
 3. Obtain the entity's `EntityMetadata`.
-4. Create/store an `IUIFormValidator` field when the form does not already have one.
+4. Reuse the inherited IUIFormValidator field where available; create one only
+   when the form/base does not already provide it.
 5. Build the validator through `UIFormValidatorFactory`.
 6. Bind each relevant entity attribute to its UI component.
 7. Prefer implicit `.Bind(Component)` only when the mapping is established.
 8. Use explicit metadata attribute binding for ambiguous/custom controls.
-9. On invalid Use Case output, call `Validate(...)`.
+9. On invalid Use Case output, route through the selected presentation boundary:
+   Presenter -> View.ExibirValidacoes -> inherited validator for scoped MVP,
+   or the established direct Validate call in an existing non-adapted form.
 10. Preserve the existing success flow when validation is valid.
 11. Call `Reset()` when prior validation UI state becomes stale.
 12. Do not move business validation logic into event handlers.

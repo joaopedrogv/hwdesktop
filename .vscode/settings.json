@@ -1,0 +1,33 @@
+{
+  "files.associations": {
+    "*.pas": "delphi",
+    "*.dpr": "delphi",
+    "*.dpk": "delphi",
+    "*.dfm": "delphi",
+    "*.inc": "delphi",
+    "*.sql": "sql"
+  },
+  "[delphi]": {
+    "files.encoding": "iso88591"
+  },
+  "files.defaultLanguage": "delphi",
+  "workbench.editorAssociations": {
+    "*.dfm": "default"
+  },
+  "search.exclude": {
+    "**/*.dcu": true,
+    "**/*.exe": true,
+    "**/*.dll": true,
+    "**/.git": true
+  },
+  "files.exclude": {
+    ".aider.tags.cache.v4": true,
+    ".aider.input.history": true,
+    ".aider.chat.history.md": true,
+    "**/*.identcache": true,
+    "**/*.bdsproj.local": true,
+    "**/*.dproj.local": true,
+    "**/__history": true,
+    "**/__recovery": true
+  }
+}

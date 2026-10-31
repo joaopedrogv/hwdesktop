@@ -28,12 +28,15 @@ type
     Fuvnd_fator: Double;
     Fqvnd      : Double;
     Fvvnd      : Double;
+    FQuant_Devolvida: Double;
   protected
     procedure InitializeObjects; override;
   public
     constructor Create;
 
     class function GetFieldsSql(Aalias: string = ''): string; override;
+
+    property Quant_Devolvida: Double read FQuant_Devolvida write FQuant_Devolvida;
 
   published
     property qcom      : Double read Fqcom       write Fqcom;
@@ -74,6 +77,7 @@ end;
 
 constructor TPedVendaProdUndVenda_Model.Create;
 begin
+  FQuant_Devolvida := 0;
   InitializeObjects;
 end;
 

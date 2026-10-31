@@ -1,69 +1,23 @@
 inherited frmCadOperacoesInternas: TfrmCadOperacoesInternas
   Caption = 'Cadastro de Opera'#231#245'es Internas'
-  ExplicitWidth = 806
-  ExplicitHeight = 598
+  ExplicitWidth = 814
+  ExplicitHeight = 603
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelFundo: TPanel
-    BevelOuter = bvNone
-    inherited Splitter2: TSplitter
-      Left = 0
-      Top = 0
-      Height = 545
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitHeight = 545
-    end
     inherited PanelLeft: TPanel
-      Left = 3
-      Top = 0
-      Width = 795
-      Height = 545
-      BevelOuter = bvNone
-      ExplicitLeft = 3
-      ExplicitTop = 0
-      ExplicitWidth = 795
-      ExplicitHeight = 545
       inherited PageControl1: TPageControl
-        Left = 0
-        Top = 0
-        Width = 795
-        Height = 545
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 795
-        ExplicitHeight = 545
         inherited TabSheet1: TTabSheet
           ExplicitLeft = 4
           ExplicitTop = 27
           ExplicitWidth = 787
           ExplicitHeight = 514
           inherited ScrollBox1: TScrollBox
-            Width = 787
-            Height = 514
-            ExplicitWidth = 787
-            ExplicitHeight = 514
             inherited PageControl3: TPageControl
-              Width = 787
-              Height = 466
               ActivePage = tabCadastro
-              ExplicitWidth = 787
-              ExplicitHeight = 466
               inherited TabSheet3: TTabSheet
-                ExplicitLeft = 4
-                ExplicitTop = 27
                 ExplicitWidth = 779
                 ExplicitHeight = 435
-                inherited ScrollBox3: TScrollBox
-                  Width = 779
-                  Height = 435
-                  ExplicitWidth = 779
-                  ExplicitHeight = 435
-                  inherited GroupBox1: TGroupBox
-                    Width = 775
-                    ExplicitWidth = 775
-                  end
-                end
               end
               object tabCadastro: TTabSheet
                 Caption = 'Cadastro'
@@ -147,10 +101,6 @@ inherited frmCadOperacoesInternas: TfrmCadOperacoesInternas
               end
             end
             inherited Panel3: TPanel
-              Top = 466
-              Width = 787
-              ExplicitTop = 466
-              ExplicitWidth = 787
               inherited LabelSeq: TLabel
                 Visible = False
               end
@@ -166,25 +116,28 @@ inherited frmCadOperacoesInternas: TfrmCadOperacoesInternas
           ExplicitWidth = 787
           ExplicitHeight = 514
           inherited GroupBox3: TGroupBox
-            Width = 787
-            ExplicitWidth = 787
-            inherited imgInformation: TImage
-              Left = 761
-              ExplicitLeft = 761
-            end
             inherited CheckBox3: TCheckBox
               Left = 409
-              Visible = False
               ExplicitLeft = 409
             end
             inherited CheckBox1: TCheckBox
               Left = 504
-              Visible = False
               ExplicitLeft = 504
             end
+            inherited FiltroGrid: TFilterFramePadrao
+              TabOrder = 12
+              inherited pnConteudos: TPanel
+                inherited pnBtns: TPanel
+                  inherited lbCountFiltros: TLabel
+                    Width = 27
+                    Height = 21
+                  end
+                end
+              end
+            end
             object ckLixeira: TCheckBox
-              Left = 257
-              Top = 50
+              Left = 416
+              Top = 44
               Width = 112
               Height = 17
               Caption = 'Pesquisar na lixeira'
@@ -192,54 +145,33 @@ inherited frmCadOperacoesInternas: TfrmCadOperacoesInternas
             end
           end
           inherited Panel1: TPanel
-            Width = 787
-            Height = 441
-            ExplicitWidth = 787
-            ExplicitHeight = 441
-            inherited Splitter1: TSplitter
-              Height = 380
-              ExplicitHeight = 380
-            end
             inherited DBGrid1: TDBGrid
-              Width = 494
-              Height = 380
               OnKeyDown = DBGrid1KeyDown
             end
             inherited Panel2: TPanel
-              Width = 783
-              ExplicitWidth = 783
               inherited SpeedButton2: TSpeedButton
                 OnClick = SpeedButton2Click
               end
               inherited SpeedButton3: TSpeedButton
                 Left = 691
-                Visible = False
                 ExplicitLeft = 691
               end
               inherited SpeedButton4: TSpeedButton
                 Left = 691
-                Visible = False
                 ExplicitLeft = 691
               end
               inherited SpeedButton5: TSpeedButton
                 Left = 691
-                Visible = False
                 ExplicitLeft = 691
               end
               inherited SpeedButton6: TSpeedButton
-                Left = 691
                 Visible = False
-                ExplicitLeft = 691
               end
               inherited SpeedButton7: TSpeedButton
-                Left = 691
                 Visible = False
-                ExplicitLeft = 691
               end
               inherited SpeedButton8: TSpeedButton
-                Left = 691
                 Visible = False
-                ExplicitLeft = 691
               end
               inherited SpeedButton11: TSpeedButton
                 Left = 178
@@ -328,7 +260,6 @@ inherited frmCadOperacoesInternas: TfrmCadOperacoesInternas
               inherited SpeedButton25: TSpeedButton
                 Left = 657
                 Top = 6
-                Visible = False
                 ExplicitLeft = 657
                 ExplicitTop = 6
               end
@@ -396,19 +327,9 @@ inherited frmCadOperacoesInternas: TfrmCadOperacoesInternas
                 ExplicitLeft = 121
               end
             end
-            inherited GroupBox2: TGroupBox
-              Height = 380
-              ExplicitHeight = 380
-              inherited ScrollBox2: TScrollBox
-                Height = 363
-                ExplicitHeight = 363
-              end
-            end
           end
         end
         inherited tsMemo: TTabSheet
-          ExplicitLeft = 4
-          ExplicitTop = 27
           ExplicitWidth = 787
           ExplicitHeight = 514
         end

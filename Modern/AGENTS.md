@@ -1,93 +1,56 @@
-# AI Agent Instructions
+# Modern — AI working instructions
 
-This repository uses a tool-independent AI instruction system under `.ai/`.
-Treat `.ai/` as the canonical source of project-specific AI guidance.
+These instructions supplement ../AGENTS.md for work involving Modern/. The shared
+roles, process and metadata are maintained at the HWDESKTOP root; Modern/.ai/
+remains the canonical source of module-specific constraints and knowledge.
 
-## Authority and Portability
+## Authority and routing
 
-These repository instructions operate within the instruction hierarchy imposed by
-the active AI tool. They do not replace higher-priority system, organization, or
-user instructions.
+Follow the developer's requested phase, scope and authorization. A planning or
+documentation task does not authorize feature implementation, build, tests, SQL
+execution, setup application or publication.
 
-The user's request defines task intent and granted authority within that hierarchy.
-Selecting a Command, Workflow, Skill, or Agent does not expand the request or grant
-an authorization that the user has not provided.
+Start with the root routing. Use ../.ai/metadata.md when routing or maintaining
+artifacts, and read each selected artifact completely. Preserve any explicit
+minimal-context exception defined by a selected specialized Workflow. Shared categories, role contracts and approval
+gates are not duplicated here.
 
-Tool-specific files are adapters. They may translate canonical paths, metadata,
-Commands, and execution profiles, but MUST NOT become independent sources of
-project rules, knowledge, or procedures.
+For Modern work, load Rules from .ai/rules/ under the shared metadata semantics:
+always_apply applies within Modern; applies_to patterns are relative to Modern;
+Rules without those fields are selected by relevance. Load only the Context and
+Skills needed by the affected flow. Do not broaden their scope to legacy files
+merely because a Modern feature calls the legacy ERP.
 
-## Path and Metadata Conventions
+Architecture and security Rules apply to every Modern task. Delphi compatibility,
+coding standards, database and testing Rules apply according to their scope.
+Fiscal.Calculos has an explicit architectural and naming exception; load its
+specialized guidance when that module is affected.
 
-Unless stated otherwise, paths in AI documentation are relative to the repository
-root (`Modern/`).
+## Paths
 
-Canonical artifact metadata is defined in `.ai/metadata.md`. Use metadata for
-routing, then read every selected canonical artifact completely before applying it.
+Paths in Modern/.ai/ are relative to Modern/ unless otherwise stated.
+Shared canonical sources are referenced through ../.ai/. A path starting Modern/
+is relative to the HWDESKTOP root.
 
-## Canonical Categories
+Operational paths beginning .ai-runs/ are always relative to the HWDESKTOP root.
+Shell commands run from that root: Scripts/... in a Modern document therefore
+means Modern/Scripts/... at invocation time. Resolve Skill-local references from
+the Skill directory. Do not change working directories merely to redefine a run
+or installation target.
 
-- `.ai/rules/` — mandatory project constraints.
-- `.ai/context/` — project knowledge loaded when relevant.
-- `.ai/skills/` — specialized, reusable procedures and capabilities.
-- `.ai/workflows/` — orchestration of genuine multi-step operations and approval gates.
-- `.ai/commands/` — stable manual entry points that dispatch to a Skill or Workflow.
-- `.ai/agents/` — reusable delegation roles, orchestration protocol, and portable
-  execution guidance.
+## Boundaries and preservation
 
-Supporting specifications, indexes, references, and the pending checklist are not
-directly routable unless their own content states otherwise.
+Preserve the module's compiler boundaries, dependency direction, ownership,
+transactions, authorization and audit integration. Modern's conventions do not
+automatically apply to the rest of the ERP.
 
-## Human Documentation Boundary
+Use repository evidence; do not invent APIs, schema, types or conventions.
+Keep investigation local and consult before expanding extensive processing.
+Preserve encoding, line endings and unrelated developer work.
 
-`docs/ia-assistida/` Completely ignore this directory during coding, analysis, or
-standard agent tasks. Do NOT read, search, or modify it unless the user explicitly
-requests an update to the documentation.
+## Human documentation
 
-## Canonical Routing
-
-For each task:
-
-1. Determine the user's requested outcome, scope, authorization, and whether the
-   task is analysis, implementation, execution, review, or another operation.
-2. If the user explicitly invokes a Command, follow that Command's dispatch. A
-   matching natural-language request may use the same Command without requiring
-   tool-specific syntax.
-3. Otherwise, select an existing Workflow when it defines the complete multi-step
-   operation. A directly requested Skill may be used without a Command or Workflow.
-   A bounded maintenance request may be assigned directly to an appropriate Agent;
-   neither a Skill nor a full feature-planning Workflow is a prerequisite.
-4. Load all applicable Rules, using the scope semantics below.
-5. Load only the Context needed to understand the affected project area and current
-   decision.
-6. Use each applicable Skill at the point required by the request or selected
-   Workflow. A Skill supplies a procedure; it does not replace Rules, approval
-   gates, or broader orchestration.
-7. Follow `.ai/agents/README.md` when a Workflow requires role separation or when
-   bounded delegation is otherwise beneficial. A Workflow Orchestrator MUST use
-   `.ai/agents/orchestration-protocol.md`. If the active tool cannot invoke a
-   required role, use the protocol's supervised manual mode; the Orchestrator must
-   not silently perform the missing specialist responsibility.
-
-When several artifacts apply, their instructions are cumulative. A more specialized
-artifact overrides another only when an explicit canonical exception says so.
-
-## Rule Loading
-
-Load Rules according to `.ai/metadata.md`:
-
-- `always_apply: true` — load for every repository task;
-- `applies_to` — load when the task touches a matching repository-relative path;
-- neither field — load when the Rule is semantically relevant.
-
-Do not load unrelated Rules or Context merely because they exist.
-
-## Repository Evidence and Safety
-
-Prefer repository evidence over assumptions. Do not invent project conventions,
-architecture, APIs, database objects, processes, or procedures when they can be
-verified from the repository or canonical guidance.
-
-Preserve the current task's authorization boundaries throughout routing and
-delegation. If a required action exceeds them or conflicts with a higher-priority
-instruction, stop that action and report the constraint to the developer.
+docs/ia-assistida/ and ../docs/ia-assistida/ are human-facing support. Completely
+ignore them during ordinary coding, analysis and Workflow execution unless the
+developer explicitly requests documentation maintenance. Technical setup sources
+live outside those guides, under ../_automation/ai/tool-setup/.

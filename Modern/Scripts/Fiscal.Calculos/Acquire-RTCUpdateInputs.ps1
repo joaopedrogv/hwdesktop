@@ -196,7 +196,7 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
   throw 'Git não encontrado no PATH.'
 }
 
-$repositoryRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..\..')).ProviderPath
+$repositoryRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..\..\..')).ProviderPath
 $runsRoot = Join-Path $repositoryRoot '.ai-runs'
 $runRoot = Join-Path $runsRoot $RunId
 $inputRoot = Join-Path $runRoot 'rtc-inputs'

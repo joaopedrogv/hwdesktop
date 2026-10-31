@@ -54,6 +54,35 @@ end;
 
 Do not assume every dataset requires the same `Setup` signature or the same extension methods.
 
+## Encapsulation and Initialization
+
+`TDataSetGrid` is the UI read-model boundary over `TDataSet_OOP`. Prefer its
+existing operations, including inherited ones, before accessing the encapsulated
+`TClientDataSet` directly. `RunSQLMaker` executes the configured query and filters;
+`ClientOpen(SQL)` handles an explicit SQL opening through the inherited API.
+Do not repeat `dataSet.CommandText := ...; dataSet.Open` when `ClientOpen` fits.
+Raw dataset/datasource access remains valid for established VCL grid and filter
+bindings; this is not a requirement to add wrappers for every property.
+
+`CreateFieldsBySQL` / `AssignAndCreateFieldsFrom` prepare field structure. They do
+not apply all field presentation settings. `ConfigFields` stores a clone of the
+builder list; the builder remains reference-counted and owned by its caller.
+The existing `dataSetDBAfterOpen` callback applies configured labels, masks, tags
+and field visibility when the client dataset opens. Complete this lifecycle before
+passing the fields to `FiltroGrid.FillForm`. Do not compensate for an unopened or
+unconfigured dataset by repeating individual field assignments.
+
+When initialization must expose configured fields without reading business rows,
+use the approved empty projection through `ClientOpen`, or the established empty
+SQLMaker filter followed by `RunSQLMaker`. Preserve the authorization boundary;
+do not replace an empty initialization query with an unrestricted read.
+
+Keep the established dataset name when refactoring: `GetSavedGrid` uses it together
+with the user to locate saved column preferences. The dataset synchronizes those
+preferences through `ReorderAndSync`; `SetupDataSetGrid` connects the grid and
+prepares legacy support; `ApplyToDBGrid` applies the final columns. These are
+different responsibilities, not interchangeable fallback calls.
+
 ## Constructor and Base Query
 
 Call the inherited constructor with the dataset identifier and primary table:
@@ -134,7 +163,21 @@ Use explicit `.Add(...)` when metadata cannot express the required UI field, inc
 
 Use `ReorderAndSync(Self.GetSavedGrid().List)` when the dataset must preserve the user's saved grid organization.
 
-Do not invent metadata mappings for query-only fields.
+Do not invent metadata mappings for query-only fields. An attribute registered
+through RegisterAttributeOnly has no physical column; do not project it as one.
+
+### Visibility and Filter Exposure
+
+Hidden technical UUID/GUID IDs and the internal ATIVO status are normally configured
+with `fvInvisivel` when present in this grid. This is a presentation convention,
+not automatic inference from a name, SQL CHAR(36), or data type; preserve justified
+exceptions and displayed identifiers such as SEQID.
+
+`FieldConfigModel.GetTag` maps `fvInvisivel` to Tag=1. The normal AfterOpen applies
+that tag; `FillForm` with `Displays=nil` excludes Tag=1 fields. Do not reaffirm
+`FieldByName(...).Tag := 1` after this contract has already applied merely as a
+defensive guarantee. `Visible=False` alone does not exclude a field from filtering:
+`fvInvisivelConfiguravel` uses Tag=3 and remains eligible for the standard frame.
 
 ## Filters
 
@@ -160,6 +203,16 @@ end;
 ```
 
 Do not override filtering behavior when the standard mechanism is sufficient.
+
+`FillForm` prepares the eligible fields and selects the current field. The frame
+chooses the normal operators by type; `GetFiltros` handles Todos, validates the
+current filter and returns its filter copies. Configure an explicit Displays list
+only when the feature actually needs that alternative selection.
+
+Do not enumerate operators, reproduce frame validation or add an empty
+`HandleFilterField` / event binding solely to match a reference form. Bind
+`OnFieldChange` only when a real customization is needed.
+
 
 ## Custom SQL Filter Translation
 
@@ -199,18 +252,28 @@ Do not add a selection field by default merely because other datasets contain on
 
 ## Audit Integration
 
-Override `GetAuditorFill` only when the dataset participates in the existing legacy audit flow.
+`TDataSetGrid.GetAuditorFill` is virtual and optional for a query-only dataset.
+The base implementation raises an exception only when the method is invoked;
+creating or using a dataset for ordinary grid reads does not require an override.
+Do not add a dummy implementation solely to satisfy a template.
 
-Use the inherited `Auditor` support exposed through `TDataSetGrid` and construct the audit description from stable dataset values relevant to the operation.
+When consumers need GetAuditorFill, provide a meaningful override or inherit one
+from an appropriate intermediate class. Reuse the inherited Auditor reference and
+preserve the established process, key and description contract. Do not create or
+free that borrowed auditor, return nil/an unprepared auditor, or suppress the
+base exception so a protected operation can continue.
 
-Do not introduce audit behavior into datasets that do not require it.
+Adding this capability does not authorize inventing MOD identifiers, introducing
+audit calls into a form, or moving protected-action checks into the dataset. If
+an audited flow lacks the required context, report that gap instead of fabricating
+a permissive or no-op implementation. Preserve existing valid overrides and callers.
 
 ## Extension Points
 
 Treat these as optional extension points, not mandatory members:
 
 - `GetText`
-- `GetAuditorFill`
+- `GetAuditorFill` when consumers need the filled audit context
 - `HandleFilterField`
 - `RunSQLMaker`
 - selection/calculated field creation
@@ -269,8 +332,12 @@ When creating a dataset:
 7. Use standard `SQLMaker.FilterMk` filtering when sufficient.
 8. Add only necessary extension points.
 9. Build fields from the final SQL.
-10. Execute through the established `TDataSetGrid`/`SQLMaker` mechanism.
-11. Leave form layout and component positioning to the form implementation/developer.
+10. Open through RunSQLMaker or inherited ClientOpen as appropriate; complete the
+    normal field-configuration lifecycle before filter initialization.
+11. Add GetAuditorFill only if an audited consumer needs it; otherwise keep the
+    base behavior. Verify builder ownership and saved-grid identity; avoid
+    duplicate Tag assignments and empty filter callbacks.
+12. Leave form layout and component positioning to the form implementation/developer.
 
 Do not refactor legacy UI/data-access infrastructure as part of dataset generation.
 

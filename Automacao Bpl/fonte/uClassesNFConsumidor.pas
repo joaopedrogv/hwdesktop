@@ -532,7 +532,8 @@ type
     function ImprimirNFCe: Boolean;
 
     function MovimentaEstoqueExecutar(APedVenda: TReg_PedVenda; ABaixa: Boolean): Boolean; //ABaixa = False corresponde Volta estoque
-    function PedVenda_GetFromPedVenda(ANPed: Integer; ATipo: string): TReg_PedVenda;
+    function PedVenda_GetFromPedVenda(ANPed: Integer; ATipo: string;
+      ACarregarDevolucoes: Boolean = False): TReg_PedVenda;
     function PedVenda_GetFromNFCe(ACodNFC: Integer): TReg_PedVenda;
     function PedVenda_PermiteCancelameto(APedVenda: TReg_PedVenda): Boolean;
     function PedVenda_CancelarPagamentos(APedVenda: TReg_PedVenda): Boolean;
@@ -569,7 +570,8 @@ type
 
     function PedVenda_VerificarVinculo(ACommit: Boolean = False; AGerarPagto: Boolean = False): Boolean; overload;
     function PedVenda_VerificarVinculo(ACodNFC: Integer; ACommit: Boolean = False; AGerarPagto: Boolean = False): Boolean; overload;
-    function PedVenda_SetNFCeFromPedVenda(APedVenda: TReg_PedVenda): Boolean;
+    function PedVenda_SetNFCeFromPedVenda(APedVenda: TReg_PedVenda;
+      ARemoverItensDevolvidos: Boolean = False): Boolean;
 
     procedure ImprimirTransacaoCartao;
     procedure MemorizarRegistro;
@@ -897,6 +899,17 @@ uses uDtmNFConsumidor, uDtmAtivo, IBDatabase, Forms, Windows, SysUtils,
   hw_sped_inf_compl, sped_inf_compl, DFeTypesUnit, CriadorCompraGovernamentalUtilsUnit,
   uEnviarMensagem;
 
+const
+  SQL_DEVOLUCAO =
+    'select d.grupo_prod, d.cod_prod, d.cod_grade, ' +
+    '       sum(coalesce(d.quant, 0)) as quant_dev ' +
+    '  from devolucao d ' +
+    ' where d.cod_venda = :cod_venda ' +
+    '   and d.tipo_venda = :tipo_venda ' +
+    '   and d.cod_empresa = :cod_empresa ' +
+    ' group by d.grupo_prod, d.cod_prod, d.cod_grade ' +
+    'having sum(coalesce(d.quant, 0)) > 0';
+
 type
   TributoDFeOrquestradorInput = record
   private                 
@@ -924,6 +937,15 @@ type
   TributoDFeOrquestrador = class
   public
     class function Create(const Input: TributoDFeOrquestradorInput): TributoDFeContextEtd; static;
+  end;
+
+  TSaldoDevolucao = class
+  public
+    GrupoProd: Integer;
+    CodProd: string;
+    CodGrade: Integer;
+    Quantidade: Double;
+    EncontrouLinha: Boolean;
   end;
 
 function hw_ibpt_produtos_get( Banco, Usuario, Senha: WideString; CodEmpresa: Integer;
@@ -1258,8 +1280,11 @@ var
   ACodNFCe, ANumNFCe: Integer;
   ARescueNFCe, ARescueForm: Boolean;
   ARescueConfNFCe, ANewConfNFCe: RNFCe;
+  ARemoverItensDevolvidos: Boolean;
   AStatus, ASituacao: string;
 begin
+
+  Result := False;
 
   {$REGION 'Verificando estado do fomulario e objeto NFCe se instanciados'}
 
@@ -1363,6 +1388,41 @@ begin
 
     {$ENDREGION}
 
+    {$REGION 'Abatimento de itens devolvidos'}
+
+    // Carrega a venda com as devolucoes antes do bloco destrutivo da NFC-e
+    APedVenda := NFCe.PedVenda_GetFromPedVenda(ANPed, ATipo, True);
+    ARemoverItensDevolvidos := False;
+
+    if Assigned(APedVenda) and APedVenda.TemDevolucao then
+    begin
+      if ShowConfirmacao(
+           'Existe devolução para algum(s) item(s) da NFCe' + sLineBreak +
+           'Deseja remover os itens devolvidos?',
+           MB_ICONQUESTION + MB_YESNO + MB_DEFBUTTON2) = IDYES then
+      begin
+        ARemoverItensDevolvidos := True;
+
+        if APedVenda.DevolucaoExcedente then
+        begin
+          vDadosIni.ShowAtencao(
+            'A quantidade devolvida é maior que a quantidade vendida para um ou mais itens.' + sLineBreak +
+            'Verifique as devoluções da venda. A NFC-e não foi alterada.');
+          Exit;
+        end;
+
+        if APedVenda.TodosItensDevolvidos then
+        begin
+          vDadosIni.ShowAtencao(
+            'Todos os itens da venda estão devolvidos.' + sLineBreak +
+            'Não há itens para emitir. A NFC-e não foi alterada.');
+          Exit;
+        end;
+      end;
+    end;
+
+    {$ENDREGION}
+
     {$REGION 'Montando a NFCe a partir do Pedido e prosseguindo com a emissão'}
 
     if NFCe.dataSet.FieldByName('cod_nfce').AsInteger > 0 then
@@ -1382,13 +1442,11 @@ begin
       NFCe.SqlExec('update nfce set status = %s where cod_nfce = %d and cod_empresa = %d',
         [QuotedStr(stsAberta), ACodNFCe, vDadosIni.cod_empresa]);
 
-      APedVenda := NFCe.PedVenda_GetFromPedVenda(ANPed, ATipo);
       NFCe.Refresh;
       NFCe.Edit;
     end
     else
     begin
-      APedVenda := NFCe.PedVenda_GetFromPedVenda(ANPed, ATipo);
       NFCe.Insert;
       NFCe.dataSet.FieldByName('ped_origem_num').AsInteger := ANPed;
       NFCe.dataSet.FieldByName('ped_origem_tip').AsString := ATipo;
@@ -1409,13 +1467,16 @@ begin
       ANewConfNFCe.Regras.EmitirAposCompletarPagamentos := NFCe.ConfigNFCe.Pedido.AutorizarComPgtoAuto;
       NFCe.ConfigNFCe := ANewConfNFCe;
 
-      if NFCe.PedVenda_SetNFCeFromPedVenda(APedVenda) then
+      if NFCe.PedVenda_SetNFCeFromPedVenda(APedVenda, ARemoverItensDevolvidos) then
+      begin
         with frmCadNFCe do
         begin
           Form_PreparaTela;
           vDadosIni.abreForm('Emissão da NFC-e', PanelLeft, opFormsDefCad);
           Form_PreparaTela_Voltar;
         end;
+        Result := True;
+      end;
     finally
       NFCe.ConfigNFCe := ARescueConfNFCe;
     end;
@@ -4991,13 +5052,36 @@ begin
 
 end;
 
-function TNFCe.PedVenda_GetFromPedVenda(ANPed: Integer; ATipo: string): TReg_PedVenda;
+function LocalizarSaldo(ASaldos: TList; AGrupoProd: Integer;
+  const ACodProd: string; ACodGrade: Integer): TSaldoDevolucao;
+var
+  K: Integer;
+begin
+  Result := nil;
+  for K := 0 to ASaldos.Count - 1 do
+    with TSaldoDevolucao(ASaldos[K]) do
+      if (GrupoProd = AGrupoProd) and
+         (CodProd = Trim(ACodProd)) and
+         (CodGrade = ACodGrade) then
+      begin
+        Result := TSaldoDevolucao(ASaldos[K]);
+        Exit;
+      end;
+end;
+
+function TNFCe.PedVenda_GetFromPedVenda(ANPed: Integer; ATipo: string;
+  ACarregarDevolucoes: Boolean = False): TReg_PedVenda;
 var
   APedVenda: TReg_PedVenda;
   ACampos: TStringList;
   slPP, slPF: TStringListHw;
   ASql: string;
   I: Integer;
+  ASaldos: TList;
+  ASaldo: TSaldoDevolucao;
+  AItem: TReg_PedVendaProd;
+  AQuant, AAlocado: Double;
+  J: Integer;
 begin
   if (ANPed = 0) or (not vDadosIni.strIn(ATipo, ['REQ', 'OS'])) then
   begin
@@ -5177,6 +5261,105 @@ begin
   end;
 
   APedVenda.Prod.CopyFrom(TPedVendaProdUndVenda_Model, queryCons.query, False);
+
+  APedVenda.ResetDevolucoes;
+
+  if ACarregarDevolucoes then
+  begin
+    ASaldos := TList.Create;
+    try
+      queryCons.Close;
+      try
+        queryCons.SQL(SQL_DEVOLUCAO)
+          .ParamValue('cod_venda', ANPed)
+          .ParamValue('tipo_venda', ATipo)
+          .ParamValue('cod_empresa', vDadosIni.cod_empresa)
+          .Open();
+
+        while not queryCons.Eof do
+        begin
+          AQuant := queryCons.ffloat('quant_dev');
+          if AQuant > TOLERANCIA_QUANT_DEVOLUCAO then
+          begin
+            ASaldo := LocalizarSaldo(ASaldos,
+              queryCons.fint('grupo_prod'),
+              queryCons.fstr('cod_prod'),
+              queryCons.fint('cod_grade'));
+
+            if not Assigned(ASaldo) then
+            begin
+              ASaldo := TSaldoDevolucao.Create;
+              try
+                ASaldo.GrupoProd      := queryCons.fint('grupo_prod');
+                ASaldo.CodProd        := Trim(queryCons.fstr('cod_prod'));
+                ASaldo.CodGrade       := queryCons.fint('cod_grade');
+                ASaldo.Quantidade     := 0;
+                ASaldo.EncontrouLinha := False;
+                ASaldos.Add(ASaldo);
+              except
+                ASaldo.Free;
+                raise;
+              end;
+            end;
+
+            // defensive sum in case the aggregate query repeats a key
+            ASaldo.Quantidade := ASaldo.Quantidade + AQuant;
+          end;
+          queryCons.Next;
+        end;
+      finally
+        queryCons.Close;
+      end;
+
+      // APedVenda.Prod is loaded in pf.nitem order
+      for I := 0 to APedVenda.Prod.Count - 1 do
+      begin
+        AItem := APedVenda.Prod.Items[I];
+        ASaldo := LocalizarSaldo(ASaldos,
+          AItem.grupo_prod, Trim(AItem.cod_prod), AItem.cod_grade);
+
+        if Assigned(ASaldo) then
+        begin
+          ASaldo.EncontrouLinha := True;
+
+          if (ASaldo.Quantidade > TOLERANCIA_QUANT_DEVOLUCAO) and
+             (AItem.quant_ped_item > 0) then
+          begin
+            AAlocado := ASaldo.Quantidade;
+            if AAlocado > AItem.quant_ped_item then
+              AAlocado := AItem.quant_ped_item;
+
+            if AAlocado > 0 then
+            begin
+              AItem.Quant_Devolvida := AAlocado;
+              ASaldo.Quantidade := ASaldo.Quantidade - AAlocado;
+              if ASaldo.Quantidade <= TOLERANCIA_QUANT_DEVOLUCAO then
+                ASaldo.Quantidade := 0;
+            end;
+          end
+          else
+            AItem.Quant_Devolvida := 0;
+        end
+        else
+          AItem.Quant_Devolvida := 0;
+      end;
+
+      for J := 0 to ASaldos.Count - 1 do
+      begin
+        ASaldo := TSaldoDevolucao(ASaldos[J]);
+        if ASaldo.EncontrouLinha and
+           (ASaldo.Quantidade > TOLERANCIA_QUANT_DEVOLUCAO) then
+        begin
+          APedVenda.DevolucaoExcedente := True;
+          Break;
+        end;
+      end;
+    finally
+      for J := 0 to ASaldos.Count - 1 do
+        TSaldoDevolucao(ASaldos[J]).Free;
+      ASaldos.Free;
+    end;
+  end;
 
   {
   ACampos   := APedVenda.Prod.GetCamposDaTabela;
@@ -7204,11 +7387,15 @@ begin
   end;
 end;
 
-function TNFCe.PedVenda_SetNFCeFromPedVenda(APedVenda: TReg_PedVenda): Boolean;
+function TNFCe.PedVenda_SetNFCeFromPedVenda(APedVenda: TReg_PedVenda;
+  ARemoverItensDevolvidos: Boolean = False): Boolean;
 var
   I, J: Integer;
   Asum: Double;
   AclienteConsumidor: Boolean;
+  AQtde, AValor, ADesc, AAcresc: Double;
+  AFator, AValorRemovido, ADescRemovido, AAcrescRemovido: Double;
+  AVlunCom: Double;
 
   function CpfCnpjValid(CpfCnpj: string): string;
   var
@@ -7226,6 +7413,13 @@ var
 
 begin
   if not Assigned(APedVenda) then
+  begin
+    Result := False;
+    Exit;
+  end;
+
+  if ARemoverItensDevolvidos and
+     (APedVenda.DevolucaoExcedente or APedVenda.TodosItensDevolvidos) then
   begin
     Result := False;
     Exit;
@@ -7303,6 +7497,47 @@ begin
     with APedVenda.Prod.Items[I] do
                                     
     begin
+      AQtde   := quant_ped_item;
+      AValor  := vltot_ped_item;
+      ADesc   := rateio_desc;
+      AAcresc := rateio_acresc;
+
+      if ARemoverItensDevolvidos and
+         (Quant_Devolvida > TOLERANCIA_QUANT_DEVOLUCAO) then
+      begin
+        AValor  := RoundTo(AValor,  -2);
+        ADesc   := RoundTo(ADesc,   -2);
+        AAcresc := RoundTo(AAcresc, -2);
+
+        if Quant_Devolvida >= (quant_ped_item - TOLERANCIA_QUANT_DEVOLUCAO) then
+          Continue;
+
+        if quant_ped_item <= 0 then
+          Continue;
+
+        AFator := Quant_Devolvida / quant_ped_item;
+
+        AValorRemovido  := RoundTo(AValor  * AFator, -2);
+        ADescRemovido   := RoundTo(ADesc   * AFator, -2);
+        AAcrescRemovido := RoundTo(AAcresc * AFator, -2);
+
+        if AValorRemovido  > AValor  then AValorRemovido  := AValor;
+        if ADescRemovido   > ADesc   then ADescRemovido   := ADesc;
+        if AAcrescRemovido > AAcresc then AAcrescRemovido := AAcresc;
+
+        AValor  := RoundTo(AValor  - AValorRemovido,  -2);
+        ADesc   := RoundTo(ADesc   - ADescRemovido,   -2);
+        AAcresc := RoundTo(AAcresc - AAcrescRemovido, -2);
+
+        if AValor  < 0 then AValor  := 0;
+        if ADesc   < 0 then ADesc   := 0;
+        if AAcresc < 0 then AAcresc := 0;
+
+        AQtde := quant_ped_item - Quant_Devolvida;
+        if AQtde <= TOLERANCIA_QUANT_DEVOLUCAO then
+          Continue;
+      end;
+
       Itens.Prod.buscaProduto(grupo_prod, cod_prod, True);
 
       if Itens.FProd.dataSet.RecordCount = 0 then
@@ -7311,25 +7546,31 @@ begin
       if not Itens.Insert then
         Exit;
 
-      if FConfigNFCe.Pedido.SubtrairDescontoNoTotal and (rateio_desc > 0) then
-        if (vltot_ped_item - rateio_desc) > 0 then
+      if FConfigNFCe.Pedido.SubtrairDescontoNoTotal and (ADesc > 0) then
+        if (AValor - ADesc) > 0 then
         begin
-          vltot_ped_item := vltot_ped_item - rateio_desc;
-          rateio_desc    := 0;
+          if ARemoverItensDevolvidos then
+            AValor := RoundTo(AValor - ADesc, -2)
+          else
+            AValor := AValor - ADesc;
+          ADesc  := 0;
         end;
 
-      if FConfigNFCe.Pedido.SomarAcrecimoNoTotal and (rateio_acresc > 0) then
+      if FConfigNFCe.Pedido.SomarAcrecimoNoTotal and (AAcresc > 0) then
       begin
-        vltot_ped_item := vltot_ped_item + rateio_acresc;
-        rateio_acresc    := 0;
+        if ARemoverItensDevolvidos then
+          AValor := RoundTo(AValor + AAcresc, -2)
+        else
+          AValor := AValor + AAcresc;
+        AAcresc := 0;
       end;
 
-      vlun_ped_item  := RoundTo(vltot_ped_item / quant_ped_item, 0 - FConfigNFCe.Itens.CasasDecimaisQtde);
-      if RoundTo(vltot_ped_item, -2) <> RoundTo(vlun_ped_item * quant_ped_item, -2) then
+      AVlunCom  := RoundTo(AValor / AQtde, 0 - FConfigNFCe.Itens.CasasDecimaisQtde);
+      if RoundTo(AValor, -2) <> RoundTo(AVlunCom * AQtde, -2) then
         for J := FConfigNFCe.Itens.CasasDecimaisQtde + 1 to 10 do
         begin
-          vlun_ped_item  := RoundTo(vltot_ped_item / quant_ped_item, 0 - J);
-          if RoundTo(vltot_ped_item, -2) = RoundTo(vlun_ped_item * quant_ped_item, -2) then
+          AVlunCom  := RoundTo(AValor / AQtde, 0 - J);
+          if RoundTo(AValor, -2) = RoundTo(AVlunCom * AQtde, -2) then
             Break;
         end;
 
@@ -7339,14 +7580,17 @@ begin
       Itens.dataSet.FieldByName('cod_grade').AsInteger := cod_grade;
       Itens.dataSet.FieldByName('num_fab_prod').AsString := num_fab_prod;
       Itens.dataSet.FieldByName('xprod').AsString := descr_prod_ped;
-      Itens.dataSet.FieldByName('qcom').AsFloat := quant_ped_item;
-      Itens.dataSet.FieldByName('vuncom').AsFloat := vlun_ped_item;
-      Itens.dataSet.FieldByName('vprod').AsFloat := vltot_ped_item;
-      Itens.dataSet.FieldByName('vdesc').AsFloat := rateio_desc;
+      Itens.dataSet.FieldByName('qcom').AsFloat := AQtde;
+      Itens.dataSet.FieldByName('vuncom').AsFloat := AVlunCom;
+      Itens.dataSet.FieldByName('vprod').AsFloat := AValor;
+      Itens.dataSet.FieldByName('vdesc').AsFloat := ADesc;
       Itens.dataSet.FieldByName('uvnd').AsString := uvnd;
       Itens.dataSet.FieldByName('uvnd_fator').AsFloat := uvnd_fator;
 
-      dataSet.FieldByName('voutro').AsFloat :=  dataSet.FieldByName('voutro').AsFloat + rateio_acresc;
+      if ARemoverItensDevolvidos then
+        dataSet.FieldByName('voutro').AsFloat := RoundTo(dataSet.FieldByName('voutro').AsFloat + AAcresc, -2)
+      else
+        dataSet.FieldByName('voutro').AsFloat := dataSet.FieldByName('voutro').AsFloat + AAcresc;
 
       Itens.SetDadosFiscaisProduto();
 

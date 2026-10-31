@@ -8,14 +8,11 @@ applies_to:
 
 # Database Rules
 
-## Compatibility
+## Shared Database Safety
 
-- ERP SQL MUST be compatible with **Firebird 2.5**.
-- Do not use SQL features introduced only in later Firebird versions.
-- When Firebird 2.5 compatibility is uncertain, verify support before using the feature.
-- SQLite MUST NOT be introduced or reactivated without developer consultation and explicit approval before design or implementation.
-- Remaining SQLite adapters MUST NOT be treated as approval for a new SQLite flow or an alternative ERP operational database.
-- Preserve the database engine established by the component being modified.
+Read ../.ai/rules/database-safety.md for operational engine compatibility,
+physical schema evidence, execution boundaries and released-history preservation.
+This Rule adds Modern's data-access and persistence contracts.
 
 ## Data Access
 
@@ -82,19 +79,3 @@ For new database objects:
 - Preserve existing query semantics and result shape unless the task explicitly requires changing them.
 - Do not rewrite working legacy SQL solely for formatting or modernization.
 - Make performance changes only when required by the task or supported by an identified problem.
-
-## Schema Safety
-
-- Do not create, alter, rename, or drop database objects unless the task explicitly requires a schema change.
-- Verify existing object and column names from the repository whenever possible; do not invent schema objects.
-- Destructive schema changes require explicit need and consideration of existing data and deployed installations.
-
-## Migration History
-
-The project uses a custom database migration mechanism.
-
-- Released migration history is immutable: NEVER delete, reorder, or rewrite released commands.
-- New migration commands MUST be appended according to the project's migration process.
-- Do not modernize historical migration commands to comply with current conventions.
-- Current standards apply to newly introduced objects and commands unless compatibility requires otherwise.
-- Detailed migration procedures belong to the `database-migration` skill.

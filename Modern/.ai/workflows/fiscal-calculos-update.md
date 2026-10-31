@@ -11,7 +11,7 @@ Guide a complete update of the Delphi calculator between two official RTC versio
 to **Ready for Release** while preserving behavioral conformity with the official
 Java implementation.
 
-Execute this Workflow through `.ai/agents/orchestration-protocol.md`. The
+Execute this Workflow through `../.ai/agents/orchestration-protocol.md`. The
 primary Agent assumes `workflow-orchestrator` and owns state, assignments, gates,
 canonical operational automation, and developer communication. Specialist Agents
 own research, planning, implementation, and evaluation.
@@ -20,7 +20,7 @@ own research, planning, implementation, and evaluation.
 
 While the run is in `RECEIVED` or `PREPARING_SOURCES`, the Orchestrator loads only
 `AGENTS.md`, this Workflow, its Command, its own role, the orchestration protocol,
-execution profiles, the always-applicable `architecture` and `security` Rules,
+execution profiles, the shared repository-safety Rule, the Modern always-applicable `architecture` and `security` Rules,
 and the operational Skill and script required by the current direct operation.
 
 It must not enumerate `.ai/`, inspect metadata or category indexes, read another
@@ -75,7 +75,7 @@ for the two exact versions.
 
 ## Operational Artifacts and States
 
-Use `.ai-runs/<run-id>/` and extend the canonical lifecycle with:
+Use `.ai-runs/<run-id>/` at the HWDESKTOP checkout root and extend the canonical lifecycle with:
 
 - `PREPARING_SOURCES` between `RECEIVED` and `DISCOVERING`;
 - `AWAITING_DISPOSITION_APPROVAL` as the specialized plan approval state.
@@ -303,7 +303,7 @@ shared dependency, but keep each increment bounded and independently reviewable.
 Associate each production behavior with its `change_id`, official evidence, and
 Delphi tests.
 
-Follow `.ai/context/fiscal-calculos.md` and `.ai/context/testing-strategy.md`.
+Follow `.ai/context/fiscal-calculos-context.md` and `.ai/context/testing-strategy.md`.
 Behavioral conformity takes precedence over applying the normal ERP feature
 architecture mechanically.
 

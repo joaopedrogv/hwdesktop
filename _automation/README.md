@@ -15,7 +15,7 @@ O Windows PowerShell 5.1 (`powershell.exe`) não atende ao requisito. O lançado
 
 ## Navegação
 
-- **Setas para cima/baixo**, **Home/End** ou **1 a 7** selecionam uma opção no menu principal. O submenu Build / Deploy tem seis opções.
+- **Setas para cima/baixo**, **Home/End** ou **1 a 9** selecionam uma opção no menu principal. O submenu Build / Deploy tem seis opções; Banco de dados reúne as operações de esquema; Ferramentas de IA reúne as ações do Kilo.
 - **Enter** abre a opção selecionada. Ao abrir o menu, nenhuma opção está selecionada; Enter sozinho não inicia uma ação.
 - **Esc**, **0** ou **Q** encerram o menu na tela inicial.
 - Nos detalhes, **Esc/Backspace** retornam à tela inicial, novamente sem seleção; **0/Q** encerram.
@@ -33,6 +33,8 @@ O Windows PowerShell 5.1 (`powershell.exe`) não atende ao requisito. O lançado
 | 5 | Preparar dependências | Obter os pacotes Nextcloud e aplicar build em dcp e runtime em bpl. |
 | 6 | Entregar ao SVN | Preparar as mudanças da main publicada; commit SVN por chamada separada com -Commit. |
 | 7 | Informações do ambiente | Consultar os caminhos locais e a versão do PowerShell, sem alterações. |
+| 8 | Banco de dados | Abrir o submenu com Atualizar schema, usando a configuração individual. |
+| 9 | Ferramentas de IA | Visualizar, aplicar/atualizar ou verificar os adapters do Kilo na raiz. |
 
 **Integrar demanda**, quarto item, atualiza a main do clone com pull por fast-forward e incorpora a branch da demanda. Não faz push: o resultado aguarda sua revisão e validação. Faça antes a sincronização no diretório de integração. Instruções em [workflow/README.md](workflow/README.md#integrar-demanda). A opção **Informações do ambiente** consulta somente os caminhos locais e a versão do PowerShell.
 
@@ -108,7 +110,7 @@ Todos os testes ficam em um único arquivo: **`tests/verify.ps1`**. Novas verifi
 .\_automation\tests\verify.ps1 -Group Start
 ```
 
-A suíte cobre compilação/publicação simuladas, sincronização, início e merge de demandas, empacotamento e preparação de dependências, entrega, autenticação, codificação, lançador e diagnósticos do menu. Grupos disponíveis: `Build`, `Sync`, `SyncGitSvn`, `Start`, `Merge`, `Menu`, `Dependencies`, `Delivery`, `GitSvnAuth` e `ProcessEncoding`. Sem parâmetro, executa todos.
+A suíte cobre compilação/publicação simuladas, sincronização, início e merge de demandas, empacotamento e preparação de dependências, entrega, autenticação, codificação, lançador e diagnósticos do menu. Grupos disponíveis: `Build`, `Sync`, `SyncGitSvn`, `Start`, `Merge`, `Menu`, `Dependencies`, `Delivery`, `GitSvnAuth`, `ProcessEncoding` e `AISetup`. Sem parâmetro, executa todos.
 
 Usa ambientes temporários, remotos Git locais e serviços simulados; Delivery utiliza SVN local real e git-svn pelo WSL. Não lê configurações pessoais ou segredos, não compila o ERP nem publica na rede ou nos remotos reais. As entradas gráficas do início de demanda são simuladas nos testes; a apresentação no terminal do usuário requer sua avaliação. Os grupos ficam separados dentro do mesmo arquivo. O resultado mostra a contagem por área e o total; uma falha interrompe com código de saída 1.
 
@@ -121,3 +123,23 @@ A mesma entrada workflow/sync-integration.ps1 identifica SVN tradicional ou git-
 `dependencies/pack-dependencies.ps1` gera a estrutura local para publicação no Nextcloud a partir dos arquivos separados pelo responsável. Agrupa build e runtime/baseline em ZIPs e mantém runtime/internal por módulo e versão. Instruções em [dependencies/README.md](dependencies/README.md). Os testes estão no arquivo único, grupo `Dependencies`.
 
 O fluxo completo, incluindo commit, push e entrega SVN, está em [workflow/GUIA-OPERACIONAL.md](workflow/GUIA-OPERACIONAL.md). A entrega está disponível no menu e pelo script workflow/deliver-svn.ps1; -Commit confirma uma preparação já conferida.
+
+
+## Esquema do banco
+
+Depois de atualizar a base de referência pelo próprio ERP, execute database/export-schema.ps1 para atualizar scripts/database/schema/schema.sql. A extração usa configuração individual e não executa migrações. Também está acessível em **Banco de dados → Atualizar schema**; abrir o submenu não inicia a operação. Permanece separado de start-demand.ps1. A conexão vem de config/database.local.psd1, campo Database, sem caminho de banco fixo no script. [Configuração e limites](database/README.md).
+
+## Ferramentas de IA
+
+O item **9 — Ferramentas de IA** abre três ações do Kilo: visualizar o plano,
+aplicar/atualizar e verificar diferenças. Abrir o submenu não modifica arquivos.
+A aplicação usa ai/Sync-AIProfiles.ps1, confere todos os componentes antes da
+primeira escrita e verifica o resultado. Instala somente Kilo e Shared na raiz do
+projeto; os demais setups não são aplicados ou removidos. Reinicie o Kilo para
+usar os perfis atualizados e selecione coordinator como agente principal.
+
+Os perfis locais do Kilo são coordinator, planner, researcher, researcher-critical,
+implementer, implementer-fast e reviewer. Fontes, configuração individual e limites
+estão no [guia de automação de IA](ai/README.md). O submenu pode ser visualizado com
+menu.ps1 -Section AI -Preview -NoColor. Os testes isolados são executados com
+tests/verify.ps1 -Group AISetup, no mesmo arquivo único da suíte.

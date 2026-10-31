@@ -1,14 +1,15 @@
 ---
 name: delphi-cadastro-form-scaffold
-description: Create a Modern Delphi cadastro-form scaffold inherited from the legacy TfrmCadPadraoM, wiring dataset, metadata, validation, Use Cases, mapping methods, and standard CRUD-oriented form flow while leaving feature-specific UI details to the developer.
+description: Create a Modern Delphi cadastro-form scaffold using the selected Modern or legacy base, dataset, metadata, validation, and scoped View/Presenter composition while preserving feature-specific UI decisions.
 ---
 
 # Delphi Cadastro Form Scaffold
 
 ## Purpose
 
-Use this Skill to create the initial structure of a Modern cadastro form that
-inherits from the legacy `TfrmCadPadraoM`.
+Use this Skill to create the initial structure of a Modern cadastro form using
+TModernCadastroForm when its shared behavior matches the selected design, or an
+existing direct TfrmCadPadraoM integration where adaptation was not requested.
 
 The goal is to generate a consistent working scaffold, not a finished UI.
 
@@ -41,8 +42,8 @@ Do not duplicate their internal procedures in this Skill.
 ## Execution Profile
 
 Default execution profile: `fast-routine` when the base form, microcontext, entity
-or state, Use Cases, dataset, metadata, validation flow, and required scaffold
-components are already established.
+or state, Use Cases, View/Presenter contracts and composition when applicable,
+dataset, metadata, validation flow, and required scaffold components are established.
 
 Escalate to `balanced-work` when selecting the form architecture, interpreting
 unusual legacy behavior, defining non-standard interaction, or resolving audit,
@@ -79,44 +80,45 @@ Use the microcontext that owns the UI responsibility.
 
 Do not move or modify the legacy base form as part of scaffold generation.
 
-## Legacy Base Form
+## Base Form Selection
 
-The generated form inherits from:
+For a compatible cadastro using the scoped MVP pattern, select:
 
-```delphi
-TfrmCadPadraoM
+```text
+UI/Infrastructure/Components/ModernCadastroFormUnit.pas
+TModernCadastroForm -> TfrmCadPadraoM
 ```
 
-defined outside `Modern`.
+Use `.ai/context/ui-integration.md` for the base's actual responsibilities and
+the RedBenefPC source reference. Do not redeclare inherited feedback, validator,
+auditor, or filter-frame members.
 
-The `.pas` unit therefore references the legacy unit required by the inherited form.
+Existing forms may directly inherit from the legacy `TfrmCadPadraoM`. Preserve
+that choice unless the requested work includes adaptation. Do not refactor the
+legacy base as part of scaffold generation.
 
-The `.dfm` MUST use Delphi inherited-form syntax:
+The `.pas` unit references the selected base unit, and its `.dfm` MUST use
+Delphi inherited-form syntax:
 
 ```text
 inherited <FormName>: T<FormType>
 ```
 
-rather than:
-
-```text
-object <FormName>: T<FormType>
-```
-
-The legacy source is a dependency/evidence source only. Modern coding conventions
-must not be retroactively applied to it.
+Do not use a new top-level `object` form or duplicate the base's controls.
+The legacy source is a dependency/evidence source, not a modernization target.
 
 ## Scaffold Responsibilities
 
 A typical cadastro-form scaffold may declare fields for:
 
 - the `TDataSetGrid` descendant used by the Consulta grid;
-- audit support obtained from the dataset when applicable;
-- `IUIFormValidator`;
+- the Presenter when the selected pattern requires it;
+- audit support and IUIFormValidator only when not already provided by the base;
 - the current entity/form state;
 - other infrastructure already established by the microcontext.
 
-Add only fields required by the target form.
+Add only fields required by the target form. Do not shadow inherited feedback,
+validator, auditor, or filter-frame members.
 
 Do not create infrastructure abstractions speculatively.
 
@@ -133,7 +135,7 @@ obtain audit support when applicable
 ↓
 create IFieldsConfigBuilder
 ↓
-connect dataset to inherited grid
+connect dataset to inherited grid through SetupDataSetGrid when available
 ↓
 obtain EntityMetadata
 ↓
@@ -171,13 +173,14 @@ has a specific presentation-only requirement.
 When the Use Case can return `ValidationEntityOutput`, integrate the form using
 the `delphi-ui-form-validation` Skill.
 
-The scaffold may therefore include:
+When the selected base does not already provide it, the scaffold may include:
 
 ```delphi
 FFormValidator: IUIFormValidator;
 ```
 
-and initialize it in `FormCreate`.
+Initialize the existing or inherited field in FormCreate; each concrete form
+owns its metadata/component binding decisions.
 
 Do not copy entity validation rules into the form.
 
@@ -204,6 +207,19 @@ integration exposed through `TDataSetGrid`.
 Do not reimplement the legacy filter builder inside the form.
 
 Use the filter mechanism already established by the inherited form and dataset.
+TModernCadastroForm supplies FiltroGrid: configure that instance after dataset
+setup rather than adding a second filter frame. Reuse the controls already hidden
+and disabled in the Modern base DFM rather than repeating those properties locally.
+TModernCadastroForm.FormShow now preserves inherited initialization and hides the
+six replaced MaskEdit/ComboBox controls afterwards, including a MaskEdit3 re-shown
+by the legacy ancestor. Reuse that shared handler rather than adding the same
+suppression to every child. Preserve the existing initialization chain/first-show
+conditions and add local visibility behavior only for a real feature-specific need.
+Do not skip inherited initialization or disable unrelated actions.
+
+Use the dataset Skill for field exposure and lifecycle. FillForm/frame selection
+already provides the standard operators, and GetFiltros performs filter validation.
+Do not reproduce those mechanisms or add an empty OnFieldChange handler.
 
 ## Form State
 
@@ -220,7 +236,9 @@ or equivalent names already established by the target microcontext.
 
 ### `MapStateToForm`
 
-Use it to project the current entity/state into the form controls.
+Use it to project the current entity/state into the form controls. Do not fetch
+lookups or execute Use Cases inside the mapping. Use a separate preparation step,
+execute it once, and honor failure before opening or changing the edit view.
 
 ### `MapFormToState`
 
@@ -229,6 +247,27 @@ Use it to build/update the entity/state from user input before calling a Use Cas
 Keep business calculations and decisions outside these mapping methods.
 
 Do not make UI components themselves the domain state.
+
+## View, Presenter, and Composition
+
+When the selected design uses the scoped MVP pattern:
+
+1. Place the Presenter beside the concrete form. Use IViewFeedback directly when
+   only shared feedback is required; the form declares that common interface.
+2. Create a feature View beside the form only for additional feature-specific
+   presentation needs. Extend IViewFeedback without redeclaring its generic
+   validation/error/information/attention methods or creating an empty marker
+   merely for structural consistency.
+3. Inject application dependencies into the Presenter; do not use Container/factories
+   in form interaction handlers or inside the Presenter.
+4. Compose the objects at the existing screen-opening boundary, before interaction.
+5. Keep controls, simple mapping, the grid read model, permissions, and audit in
+   their established UI owners; keep business rules/transactions in the core.
+6. Define ownership of the Presenter, interfaces, state, output objects, and lists.
+   Check the actual contract instead of inferring ownership from an `I` prefix.
+
+Preserve direct integrations in existing forms outside the requested scope.
+Do not create a generic framework to scaffold a single feature.
 
 ## Standard Actions
 
@@ -241,7 +280,9 @@ The scaffold may provide handlers for standard inherited actions when required:
 - cancel;
 - refresh/query.
 
-These handlers should coordinate UI state and call the appropriate Use Cases.
+These handlers coordinate UI state and, with scoped MVP, delegate application
+calls to the Presenter. Keep the dataset-driven query/refresh path at its
+established UI read-model boundary.
 
 They MUST NOT contain business rules that belong to the application/domain layer.
 
@@ -255,11 +296,13 @@ A typical save/confirm flow is:
 ```text
 MapFormToState
 ↓
-execute Use Case
+check the approved permission at the existing UI boundary
 ↓
-validation invalid?
-    ├── yes → project validation to form
-    └── no  → continue successful UI flow
+Presenter executes the injected Use Case (or preserves an existing direct flow)
+↓
+validation invalid or operation failed?
+    ├── yes → appropriate View feedback; no success continuation
+    └── no  → preserve success audit and inherited UI completion
 ↓
 refresh dataset/grid when required
 ↓
@@ -304,37 +347,35 @@ known.
 
 ## Form Opening Behavior
 
-Forms inherited from `TfrmCadPadraoM` are normally used as primary non-modal
-screens and commonly opened with:
-
-```delphi
-Form.Show();
-```
-
-Do not infer that all Modern forms use this behavior.
-
-Simple/specialized forms may use `ShowModal()` instead and may not inherit from
-`TfrmCadPadraoM`.
+Preserve the owning entry point's Show/ShowModal and MDI behavior. Shared ancestry
+does not imply one opening mode. When using a Presenter, compose/inject it before
+user interaction and preserve the existing form-owner and cleanup contract.
 
 ## Generation Procedure
 
 When creating a cadastro-form scaffold:
 
-1. Confirm that `TfrmCadPadraoM` is the appropriate base form.
-2. Identify the owning microcontext.
-3. Inspect the closest current Modern form that follows the desired pattern.
-4. Identify the entity/state edited by the form.
-5. Identify the Use Cases invoked by the form.
-6. Determine whether an existing `TDataSetGrid` satisfies the Consulta grid.
-7. If not, use `delphi-dataset-grid` to create one.
-8. Obtain the entity's `EntityMetadata` when available.
-9. Add UI validation through `delphi-ui-form-validation` when applicable.
-10. Declare explicit state ↔ form mapping methods.
-11. Wire standard inherited actions only when needed.
-12. Keep business logic and persistence implementation outside the form.
-13. Generate only a minimal inherited `.dfm` structure when requested.
-14. Leave feature-specific controls, detailed layout, and non-standard events for
-    the developer or a later targeted task.
+1. Confirm the appropriate base: shared Modern cadastro base when compatible,
+   or the established alternative justified by the screen.
+2. Identify the owning microcontext and inspect the relevant RedBenefPC reference.
+3. Identify the entity/edit state and its ownership.
+4. Identify the Use Cases, their real contracts, results, and lifetime semantics.
+5. Select the View/Presenter scope and the existing composition entry point.
+6. Determine whether an existing TDataSetGrid satisfies the Consulta grid; use
+   delphi-dataset-grid only if a new dataset is needed.
+7. Reuse inherited SetupDataSetGrid/FiltroGrid where available; configure the
+   dataset, metadata, field displays, and filter callbacks explicitly.
+8. Add UI validation through delphi-ui-form-validation, reusing inherited fields.
+9. Declare pure state/form mapping methods and a separate preparation step for
+   required lookups; execute it once and honor failure in all callers.
+10. Wire only the required inherited actions, preserving permission checks,
+    manager approval, audit, failure outcomes, and success refresh.
+11. Compose/inject dependencies before allowing interaction and preserve opening
+    mode and cleanup behavior.
+12. Generate only a minimal inherited DFM when requested. Do not disable unrelated
+    buttons when replacing the legacy filter controls.
+13. Leave detailed layout and unknown feature-specific interactions to the
+    developer or a later targeted task.
 
 ## Reference
 

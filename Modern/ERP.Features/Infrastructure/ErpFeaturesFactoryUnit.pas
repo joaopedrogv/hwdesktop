@@ -80,6 +80,8 @@ uses
   ObterQuantidadePendenciasSefazUseCaseUnit, ObterRetencoesNFSeDaOSUseCaseUnit, IInicializarDpsServiceUnit;
 
 type
+  // Estes aliases legados usam prefixo I, mas apontam para classes concretas.
+  // Conferir o tipo real e a propriedade; nao presumir contagem de referencias.
   IListarTodasEmpresasUseCase = ListarEmpresasUseCase;
   IListarEmpresasPermitidasUseCase = ListarEmpresasUseCase;
   IObterGrupoFiscalPorIdUseCase = ObterGrupoFiscalPorIdUseCase;
