@@ -94,7 +94,7 @@ Set-Location 'D:\Hw\hwdesktop-integration'
 O item **Entregar ao SVN** do menu executa apenas esta preparação. Não envia ao SVN.
 
 - Modo git-svn: informa um commit privado e a base SVN. Confira com git diff --stat <base> <entrega> e git diff <base> <entrega>. Os dois identificadores aparecem na saída. A branch e os arquivos da ponte permanecem preservados.
-- Modo SVN tradicional: atualiza a main local somente por fast-forward e agenda as adições/exclusões recebidas. Confira o status dos alvos exibido pelo script e use TortoiseSVN ou svn diff <alvo> para os detalhes. As alterações ficam na working copy para revisão.
+- Modo SVN tradicional: atualiza a main local somente por fast-forward e agenda as adições/exclusões recebidas. Confira o status dos alvos exibido pelo script e use TortoiseSVN ou svn diff <alvo> para os detalhes. As alterações ficam na working copy para revisão. Se o Git remover os pais do último arquivo excluído, agenda também a exclusão desses diretórios no SVN, após conferir que todos os itens versionados sob eles pertencem às exclusões da entrega. Pastas que permanecem no disco não são limpas. Conteúdo exclusivo do SVN ou local é preservado; se o inventário de uma pasta ausente contiver itens fora do escopo, a preparação para antes dos comandos de inclusão/exclusão. O modo git-svn mantém seu comportamento próprio.
 
 Depois da conferência:
 
@@ -133,3 +133,6 @@ Os testes ficam em um único arquivo:
 ~~~
 
 Esse grupo cria repositórios Git e SVN temporários e pequenos. Usa svnadmin/svnlook do Windows e, para o modo git-svn, Ubuntu-24.04 com git-svn. Não lê seus segredos nem acessa SVN, GitHub ou Nextcloud reais.
+
+Para conferir somente o modo SVN tradicional, sem WSL, use
+`.\_automation\tests\verify.ps1 -Group Delivery -DeliveryMode svn`.

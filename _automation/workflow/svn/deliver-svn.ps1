@@ -1,4 +1,45 @@
 # Implementação privada; chamada por workflow/deliver-svn.ps1.
+# Seleção local e somente leitura: uma exclusão de diretório SVN é recursiva.
+function Get-SvnDeliveryDirectoryDeletes {
+    param($Context,[object[]] $Changes,[object[]] $Entries)
+    $deletedFiles=[Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    $deletedParents=[Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach ($change in $Changes) {
+        if ($change.Status -ne 'D') { continue }
+        [void] $deletedFiles.Add($change.Path)
+        $path=$change.Path
+        while ($path.LastIndexOf('/') -gt 0) {
+            $path=$path.Substring(0,$path.LastIndexOf('/'))
+            [void] $deletedParents.Add($path)
+        }
+    }
+    $missing=[Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach ($entry in $Entries) {
+        $path=$entry.GetAttribute('path').Replace('\','/'); if ($path.StartsWith('./')) { $path=$path.Substring(2) }
+        if ($entry.SelectSingleNode('wc-status').GetAttribute('item') -eq 'missing' -and $deletedParents.Contains($path)) {
+            [void] $missing.Add($path)
+        }
+    }
+    $selected=[Collections.Generic.List[string]]::new()
+    foreach ($directory in @($missing | Sort-Object Length)) {
+        if (@($selected | Where-Object { $directory.StartsWith($_+'/',[StringComparison]::Ordinal) }).Count -gt 0) { continue }
+        # Sem -r ou URL: consulta o inventário da working copy, inclusive se ausente no disco.
+        $info=[xml] (Invoke-DeliveryCommand $Context svn @('info','--xml','--depth','infinity','--',($directory+'@'))).Output
+        $nodes=@($info.SelectNodes('//entry'))
+        if ($nodes.Count -eq 0) { throw "Não foi possível conferir o diretório SVN: $directory" }
+        foreach ($node in $nodes) {
+            $path=$node.GetAttribute('path').Replace('\','/'); if ($path.StartsWith('./')) { $path=$path.Substring(2) }
+            if ($path -cne $directory -and -not $path.StartsWith($directory+'/',[StringComparison]::Ordinal)) { throw "Inventário SVN fora do diretório esperado: $path" }
+            $covered=if ($node.GetAttribute('kind') -eq 'file') { $deletedFiles.Contains($path) }
+                     elseif ($node.GetAttribute('kind') -eq 'dir') { $deletedParents.Contains($path) }
+                     else { $false }
+            if (-not $covered) { throw "Diretório SVN contém item fora das exclusões da entrega: $path. Avalie antes de excluir $directory." }
+        }
+        $selected.Add($directory)
+    }
+    return $selected.ToArray()
+}
+
 function New-SvnDelivery {
     param($Context)
     $root=$Context.Root; $branch=[string] $Context.Config.GitBranch
@@ -54,7 +95,13 @@ function New-SvnDelivery {
         $states[$path]=$entry.SelectSingleNode('wc-status').GetAttribute('item')
     }
     $adds=@($changes | Where-Object { $_.Status -ne 'D' } | ForEach-Object Path)
-    $deletes=@($changes | Where-Object { $_.Status -eq 'D' -and $states[$_.Path] -eq 'missing' } | ForEach-Object Path)
+    $directoryDeletes=@(Get-SvnDeliveryDirectoryDeletes $Context $changes $entries)
+    $deletes=@($directoryDeletes)
+    foreach ($change in $changes) {
+        if ($change.Status -ne 'D' -or $states[$change.Path] -ne 'missing') { continue }
+        if (@($directoryDeletes | Where-Object { $change.Path.StartsWith($_+'/',[StringComparison]::Ordinal) }).Count -eq 0) { $deletes+=$change.Path }
+    }
+    # Os pais selecionados já incluem os descendentes; não repetir alvos no svn delete.
     foreach ($operation in @(@{Name='add';Paths=$adds},@{Name='delete';Paths=$deletes})) {
         if ($operation.Paths.Count -eq 0) { continue }
         $file=Join-Path $Context.Cache ($operation.Name+'-targets.txt')

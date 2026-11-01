@@ -7,9 +7,14 @@
     Não lê configurações pessoais ou segredos nem opera nos projetos reais.
 .PARAMETER Group
     All executa tudo. Grupos: Build, Sync, SyncGitSvn, GitSvnAuth, ProcessEncoding, Start, Merge, Menu, Dependencies, Delivery, AISetup.
+.PARAMETER DeliveryMode
+    Restringe o grupo Delivery ao SVN tradicional ou git-svn. All mantém os dois modos; svn dispensa WSL.
 #>
 [CmdletBinding()]
-param([ValidateSet('All', 'Build', 'Sync', 'Start', 'Menu', 'Dependencies', 'Merge', 'SyncGitSvn', 'Delivery', 'GitSvnAuth', 'ProcessEncoding', 'AISetup')] [string] $Group = 'All')
+param(
+    [ValidateSet('All', 'Build', 'Sync', 'Start', 'Menu', 'Dependencies', 'Merge', 'SyncGitSvn', 'Delivery', 'GitSvnAuth', 'ProcessEncoding', 'AISetup')] [string] $Group = 'All',
+    [ValidateSet('All','svn','git-svn')] [string] $DeliveryMode = 'All'
+)
 
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $false
@@ -1507,6 +1512,7 @@ function Test-Delivery {
     [void] [IO.Directory]::CreateDirectory($fixture)
     . (Join-Path $automationRoot 'workflow\sync-integration.ps1')
     . (Join-Path $automationRoot 'workflow\Delivery.Common.ps1')
+    . (Join-Path $automationRoot 'workflow\svn\deliver-svn.ps1')
     function Run([string] $Tool,[string[]] $Arguments,[string] $Directory=$fixture) {
         $result=Invoke-SyncProcess $Tool $Arguments $Directory
         if ($result.ExitCode -ne 0) { throw "$Tool $($Arguments -join ' '): $($result.Error) $($result.Output)" }
@@ -1534,6 +1540,7 @@ function Test-Delivery {
     }
     try {
         foreach ($mode in @('svn','git-svn')) {
+            if ($DeliveryMode -ne 'All' -and $mode -ne $DeliveryMode) { continue }
             $area=Join-Path $fixture $mode; [void] [IO.Directory]::CreateDirectory($area)
             $repository=Join-Path $area 'repository'
             [void] (Run svnadmin @('create','--compatible-version','1.9',$repository))
@@ -1546,11 +1553,20 @@ function Test-Delivery {
             WriteFile $seed 'Modern/change.pas' "antes`r`nmeio`nfinal`r`n"
             WriteFile $seed 'Modern/keep.pas' "intacto`r`n"
             WriteFile $seed 'Modern/delete.pas' "remover`r`n"
+            WriteFile $seed 'Modern/retired/sub/only.pas' "ultimo arquivo`r`n"
+            if ($mode -eq 'svn') {
+                WriteFile $seed 'Modern/mixed/remove.pas' "remover`r`n"
+                WriteFile $seed 'Modern/mixed/keep.bin' "somente SVN`r`n"
+                WriteFile $seed 'Modern/local/remove.pas' "remover`r`n"
+                [void][IO.Directory]::CreateDirectory((Join-Path $seed 'Modern/unrelated-empty'))
+                [void][IO.Directory]::CreateDirectory((Join-Path $seed 'Modern/mixed/empty-svn-only'))
+            }
             WriteFile $seed 'Unix/file.pas' "unix`n"
             WriteFile $seed 'foreign/keep.txt' "outro projeto`r`n"
-            WriteFile $seed '.gitignore' "_automation/`nforeign/`n.svn/`n"
+            WriteFile $seed '.gitignore' "_automation/`nforeign/`n.svn/`nModern/mixed/keep.bin`nModern/local/keep.local`n"
             [IO.File]::WriteAllBytes((Join-Path $seed 'Modern/test.dll'),[byte[]]@(0,255,1,128,10))
             [void] (Run svn @('add','--force','.','--non-interactive') $seed)
+            [void] (Run svn @('propset','purpose','keep-empty','Modern/retired') $seed)
             [void] (Run svn @('commit','-m','base','--non-interactive') $seed)
             [void] (Run svn @('update','--non-interactive') $seed)
             $revision=([xml] (Run svn @('info','--xml','.') $seed)).info.entry.revision
@@ -1603,11 +1619,31 @@ function Test-Delivery {
                 WriteFile $cache 'last-sync.json' (@{svnRevision=$revision;svnCommit=$svnBase;githubCommit=$githubBase}|ConvertTo-Json)
             }
             Install $root
+            if ($mode -eq 'svn') {
+                $selectionContext=@{Root=$root;Runner=$null;Password=''}
+                $missingParent=[xml] '<status><target path="."><entry path="Modern/mixed"><wc-status item="missing" props="none" /></entry></target></status>'
+                $selectionChanges=@([pscustomobject]@{Status='D';Path='Modern/mixed/remove.pas'})
+                $blocked=$false
+                try { [void](Get-SvnDeliveryDirectoryDeletes $selectionContext $selectionChanges @($missingParent.SelectNodes('//entry'))) }
+                catch { $blocked=$_.Exception.Message.Contains('fora das exclusões') }
+                Assert-Check $blocked 'Inventário SVN impede exclusão recursiva de arquivo fora da entrega'
+                $selectionChanges+=[pscustomobject]@{Status='D';Path='Modern/mixed/keep.bin'}
+                $blocked=$false
+                try { [void](Get-SvnDeliveryDirectoryDeletes $selectionContext $selectionChanges @($missingParent.SelectNodes('//entry'))) }
+                catch { $blocked=$_.Exception.Message.Contains('empty-svn-only') }
+                Assert-Check $blocked 'Inventário SVN protege subdiretório vazio que não pertence às exclusões'
+                Assert-Check ((Run svn @('status','Modern/mixed') $root) -eq '' -and [IO.File]::Exists((Join-Path $root 'Modern/mixed/keep.bin'))) 'Conferência recusada não agenda nem remove conteúdo SVN'
+            }
             $config="@{ IntegrationPath = '"+$root.Replace("'","''")+"'; GitBranch='main'; SvnUrlSuffix='/trunk'; SecretsFile='segredos.md'; WslDistribution='Ubuntu-24.04'; SvnRef='refs/remotes/svn/git-svn' }"
             WriteFile $root '_automation/config/workflow.local.psd1' $config
             WriteFile $root '_automation/config/segredos.md' "SVN_USER=test`nSVN_PASS=test`n"
             WriteFile $publisher 'Modern/change.pas' "depois`nmeio`nfinal`n"
             [IO.File]::Delete((Join-Path $publisher 'Modern/delete.pas'))
+            [IO.File]::Delete((Join-Path $publisher 'Modern/retired/sub/only.pas'))
+            if ($mode -eq 'svn') {
+                [IO.File]::Delete((Join-Path $publisher 'Modern/mixed/remove.pas'))
+                [IO.File]::Delete((Join-Path $publisher 'Modern/local/remove.pas'))
+            }
             WriteFile $publisher 'new/sub/novo [ação]@.txt' "novo`n"
             WriteFile $publisher 'Unix/file.pas' "unix novo`n"
             [IO.File]::WriteAllBytes((Join-Path $publisher 'Modern/test.dll'),[byte[]]@(0,254,2,129,10))
@@ -1616,6 +1652,11 @@ function Test-Delivery {
             $target=Run git @('rev-parse','HEAD') $publisher
             $bridgeHead=Run git @('rev-parse','HEAD') $root
             if ($mode -eq 'git-svn') { WriteFile $root 'Modern/local.pas' 'nao entregar' }
+            if ($mode -eq 'svn') {
+                WriteFile $root 'Modern/local/keep.local' "arquivo local`r`n"
+                [void](Run svn @('changelist','ignore-on-commit','Modern/mixed/keep.bin') $root)
+                WriteFile $root 'Modern/mixed/keep.bin' "alteracao local privada`r`n"
+            }
             $statusCalls=[Collections.Generic.List[object]]::new()
             $listingRunner={
                 param($Tool,$Arguments,$Directory,$InputText)
@@ -1638,6 +1679,11 @@ function Test-Delivery {
             Assert-Check ($again.id -eq $state.id) "$mode reexecução apresenta a mesma entrega pendente"
             if ($mode -eq 'svn') {
                 $svnStatus=Run svn @('status') $root
+                Assert-Check (-not [IO.Directory]::Exists((Join-Path $root 'Modern/retired')) -and $svnStatus -notmatch '(?m)^!') 'SVN agenda a exclusão dos diretórios ausentes, sem recriá-los nem deixar missing'
+                Assert-Check ('Modern/retired' -in $state.targets -and 'Modern/retired/sub' -in $state.targets -and 'Modern/retired/sub/only.pas' -in $state.targets) 'Alvos da confirmação incluem o diretório excluído e todos os seus descendentes'
+                Assert-Check ([IO.File]::ReadAllText((Join-Path $root 'Modern/mixed/keep.bin')) -ceq "alteracao local privada`r`n") 'Diretório e alteração SVN exclusiva em ignore-on-commit são preservados'
+                Assert-Check ([IO.File]::ReadAllText((Join-Path $root 'Modern/local/keep.local')) -ceq "arquivo local`r`n") 'Arquivo local ignorado pelo Git impede remoção de sua pasta'
+                Assert-Check ([IO.Directory]::Exists((Join-Path $root 'Modern/unrelated-empty'))) 'Diretório SVN vazio alheio à entrega permanece intacto'
                 Assert-Check ($svnStatus -match '(?m)^A\s+new' -and $svnStatus -match '(?m)^D\s+Modern\\delete.pas') 'SVN agenda automaticamente arquivos novos, diretórios pais e exclusões'
                 WriteFile $root 'foreign/keep.txt' "alteracao local fora da entrega`r`n"
             } else {
@@ -1664,6 +1710,12 @@ function Test-Delivery {
             Assert-Check ($done.status -eq 'delivered' -and [int] $done.resultRevision -gt [int] $revision) "$mode confirma e cria uma única revisão SVN"
             [void] (Run svn @('update','--non-interactive') $seed)
             Assert-Check ([IO.File]::Exists((Join-Path $seed 'new/sub/novo [ação]@.txt')) -and -not [IO.File]::Exists((Join-Path $seed 'Modern/delete.pas'))) "$mode entrega adição Unicode/com @ e exclusão"
+            if ($mode -eq 'svn') {
+                Assert-Check (-not [IO.Directory]::Exists((Join-Path $seed 'Modern/retired'))) 'SVN confirma a exclusão da árvore vazia sem exigir operações manuais'
+                Assert-Check ([IO.File]::ReadAllText((Join-Path $seed 'Modern/mixed/keep.bin')) -ceq "somente SVN`r`n" -and [IO.Directory]::Exists((Join-Path $seed 'Modern/local')) -and [IO.Directory]::Exists((Join-Path $seed 'Modern/unrelated-empty'))) 'Commit mantém conteúdo SVN fora do Git e pastas não removidas pela entrega'
+            } else {
+                Assert-Check ([IO.Directory]::Exists((Join-Path $seed 'Modern/retired/sub')) -and -not [IO.File]::Exists((Join-Path $seed 'Modern/retired/sub/only.pas'))) 'git-svn mantém seu comportamento de diretórios vazios'
+            }
             Assert-Check ([IO.File]::ReadAllText((Join-Path $seed 'foreign/keep.txt')) -ceq "outro projeto`r`n") "$mode preserva projetos SVN fora do GitHub e alterações locais fora dos alvos"
             Assert-Check (([IO.File]::ReadAllBytes((Join-Path $seed 'Modern/test.dll')) -join ',') -eq '0,254,2,129,10') "$mode entrega binários sem recodificação"
             Assert-Check ((Run git @('rev-parse','main') $origin) -eq $target) "$mode não reescreve nem publica o histórico GitHub"
