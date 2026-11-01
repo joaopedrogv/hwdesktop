@@ -14,7 +14,8 @@ uses
   SharedFactoryContainerUnit, SharedRepoContainerUnit, FiscalRepoContainerUnit,
   ErpFeaturesRepoContainerUnit, UCentralDadosFiscais, UCadNFSe, ISharedFactoryUnit, ISessionContextUnit,
   UCadRegrasRedBenefPC, UCadAjustesRedBenefPC, AjustesRedBenefPcPresenter,
-  OperacoesInternasPresenter;
+  OperacoesInternasPresenter, OperacoesFiscaisIbsCbsPresenter,
+  ListarOperacoesInternasUseCaseUnit, ListarGruposFiscaisUseCaseUnit;
 
 var
   GFiscalFactoryInst: IFiscalCalculosFactory;
@@ -175,11 +176,87 @@ begin
 end;
 
 procedure ShowOperacoesFiscaisIbsCbs(Amodal: Boolean);
+var
+  SalvarUseCase: ISalvarOperacaoFiscalIbsCbsUseCase;
+  ObterUseCase: IObterOperacaoFiscalIbsCbsPorIdUseCase;
+  RemoverUseCase: IRemoverOperacaoFiscalIbsCbsUseCase;
+  ListarOperacoesUseCase: IListarAtualeTodasOperacoesInternasUseCase;
+  ListarGruposUseCase: IListarAtualeTodosGruposFiscaisUseCase;
+  Presenter: TOperacoesFiscaisIbsCbsPresenter;
 begin
   if not Assigned(formOperacoesFiscaisIbsCbs) then
   begin
     vDadosIni.vModalOuChild := IfThen(Amodal, 'M', 'C');
-    Application.CreateForm( TfrmCadOperacoesFiscaisIbsCbs, formOperacoesFiscaisIbsCbs );
+
+    SalvarUseCase := nil;
+    ObterUseCase := nil;
+    RemoverUseCase := nil;
+    ListarOperacoesUseCase := nil;
+    ListarGruposUseCase := nil;
+    Presenter := nil;
+
+    try
+      Application.CreateForm( TfrmCadOperacoesFiscaisIbsCbs, formOperacoesFiscaisIbsCbs );
+
+      SalvarUseCase := GetFeaturesFactory().CreateSalvarOperacaoFiscalIbsCbsUseCase();
+      ObterUseCase := GetFeaturesFactory().CreateObterOperacaoFiscalIbsCbsPorIdUseCase();
+      RemoverUseCase := GetFeaturesFactory().CreateRemoverOperacaoFiscalIbsCbsUseCase();
+      ListarOperacoesUseCase := GetFeaturesFactory().CreateListarAtualeTodasOperacoesInternasUseCase();
+      ListarGruposUseCase := GetFeaturesFactory().CreateListarAtualeTodosGruposFiscaisUseCase();
+
+      Presenter := TOperacoesFiscaisIbsCbsPresenter.Create(
+        formOperacoesFiscaisIbsCbs,
+        SalvarUseCase,
+        ObterUseCase,
+        RemoverUseCase,
+        ListarOperacoesUseCase,
+        ListarGruposUseCase
+      );
+
+      SalvarUseCase := nil;
+      ObterUseCase := nil;
+      RemoverUseCase := nil;
+      ListarOperacoesUseCase := nil;
+      ListarGruposUseCase := nil;
+
+      formOperacoesFiscaisIbsCbs.SetupPresenter(Presenter);
+      Presenter := nil;
+    except
+      FreeAndNil(Presenter);
+
+      if Assigned(SalvarUseCase) then
+      begin
+        SalvarUseCase.FreeSafe();
+        SalvarUseCase := nil;
+      end;
+
+      if Assigned(ObterUseCase) then
+      begin
+        ObterUseCase.FreeSafe();
+        ObterUseCase := nil;
+      end;
+
+      if Assigned(RemoverUseCase) then
+      begin
+        RemoverUseCase.FreeSafe();
+        RemoverUseCase := nil;
+      end;
+
+      if Assigned(ListarOperacoesUseCase) then
+      begin
+        ListarOperacoesUseCase.FreeSafe();
+        ListarOperacoesUseCase := nil;
+      end;
+
+      if Assigned(ListarGruposUseCase) then
+      begin
+        ListarGruposUseCase.FreeSafe();
+        ListarGruposUseCase := nil;
+      end;
+
+      FreeAndNil(formOperacoesFiscaisIbsCbs);
+      raise;
+    end;
   end;
 
   if Amodal then

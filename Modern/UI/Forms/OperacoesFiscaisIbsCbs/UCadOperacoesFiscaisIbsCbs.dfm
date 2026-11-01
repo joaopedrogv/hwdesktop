@@ -320,42 +320,6 @@ inherited frmCadOperacoesFiscaisIbsCbs: TfrmCadOperacoesFiscaisIbsCbs
               Caption = 'Pesquisar na lixeira'
               TabOrder = 11
             end
-            inline FilterFramePadrao1: TFilterFramePadrao
-              Left = 3
-              Top = 11
-              Width = 407
-              Height = 54
-              TabOrder = 0
-              TabStop = True
-              ExplicitLeft = 3
-              ExplicitTop = 11
-              inherited pnCondicao: TPanel
-                inherited edCondicao: TComboBox
-                  ExplicitLeft = 64
-                  ExplicitWidth = 127
-                end
-              end
-              inherited pnConteudos: TPanel
-                inherited pnConteudo1: TPanel
-                  inherited edConteudo1: TMaskEdit
-                    ExplicitLeft = 64
-                    ExplicitWidth = 140
-                  end
-                end
-                inherited pnConteudo2: TPanel
-                  inherited edConteudo2: TMaskEdit
-                    ExplicitLeft = 64
-                    ExplicitWidth = 72
-                  end
-                end
-                inherited pnBtns: TPanel
-                  inherited lbCountFiltros: TLabel
-                    Width = 27
-                    Height = 21
-                  end
-                end
-              end
-            end
           end
           inherited Panel1: TPanel
             Width = 787

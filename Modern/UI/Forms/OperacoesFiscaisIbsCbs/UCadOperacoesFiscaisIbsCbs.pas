@@ -4,15 +4,17 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, uCadPadraoModal, AppEvnts, ExtCtrls, Menus, ComCtrls, StdCtrls,
-  Buttons, Grids, DBGrids, Mask, uDataSet_OOP, OperacaoFiscalIbsCbsEtdUnit, hw_audit_utils,
-  IUIFormValidatorUnit, CheckLst, FilterPadraoFR, RegraFiscalIbsCbsEtdUnit,
+  Dialogs, ModernCadastroFormUnit, AppEvnts, ExtCtrls, Menus, ComCtrls, StdCtrls,
+  Buttons, Grids, DBGrids, Mask, OperacoesFiscaisIbsCbsDataSet,
+  OperacoesFiscaisIbsCbsPresenter, OperacoesFiscaisIbsCbsView,
+  OperacaoFiscalIbsCbsEtdUnit, OperacaoInternaEtdUnit, GrupoFiscalEtdUnit,
+  CheckLst, RegraFiscalIbsCbsEtdUnit,
   CheckListBoxEmpresasFrameUnit, ComboBoxClassTribFrameUnit,
-  EditHwNullableFrameUnit, MaskEditNullableFrameUnit, FilterFR,
+  EditHwNullableFrameUnit, MaskEditNullableFrameUnit,
   ComboboxEntityPickerFrameUnit, ComboBoxRegrasFiscaisFrameUnit;
 
 type
-  TfrmCadOperacoesFiscaisIbsCbs = class(TfrmCadPadraoM)
+  TfrmCadOperacoesFiscaisIbsCbs = class(TModernCadastroForm, IOperacoesFiscaisIbsCbsView)
     tabCadastro: TTabSheet;
     Label6: TLabel;
     Label7: TLabel;
@@ -24,7 +26,6 @@ type
     Label15: TLabel;
     edFinalVigencia: TMaskEditNullableFrame;
     Label16: TLabel;
-    FilterFramePadrao1: TFilterFramePadrao;
     edPickerOpInterna: TComboboxEntityPickerFrame;
     edPickerGrupoFiscal: TComboboxEntityPickerFrame;
     ComboBoxRegrasFiscaisFrame1: TComboBoxRegrasFiscaisFrame;
@@ -40,10 +41,9 @@ type
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
-    FData: TDataSet_OOP;
-    FAuditor: TAudit_OOP;
+    FData: TOperacoesFiscaisIbsCbsDataSet;
     FState: OperacaoFiscalIbsCbsEtd;
-    FFormValidator: IUIFormValidator;
+    FPresenter: TOperacoesFiscaisIbsCbsPresenter;
 
     // eventos selects
     procedure EventAddEntitiesSelects(Sender: TObject; Entity: TObject; out Display: string; out SetSelected: Boolean);
@@ -51,111 +51,30 @@ type
     procedure RegrasFiscaisFrameChange(Sender: TObject; RegraFiscal: RegraFiscalIbsCbsEtd);
 
     function CriarMensagemAuditoriaFormState(): string;
-    function CriarMensagemAuditoriaFormGrid(): string;
+
+    procedure ExibirListas(
+      AOperacoesInternas: OperacoesInternasEtd;
+      AGruposFiscais: GruposFiscaisEtd
+    );
   private
     procedure ShowAbaCadastro();
     procedure MapStateToForm();
     procedure MapFormToState();
   public
-
+    procedure SetupPresenter(APresenter: TOperacoesFiscaisIbsCbsPresenter);
+    destructor Destroy; override;
   end;
 
 implementation
 
 uses
-  uDtmAtivo, UIUtilsUnit, hw_utils, hw_grid_utils, Math, DB, StrUtils,   
-  FieldsConfigUnit,
-  Contnrs, UIFormValidatorFactoryUnit,
-  ContainerUnit, CreateEntityUseCaseOutputUnit,
-  EValidacaoNegocioUnit, StatusRegistroEnumUnit, ErpFeaturesFactoryUnit,
-  TipoTributoFiscalEnumUnit, OperacaoInternaEtdUnit,
-  ListarOperacoesInternasUseCaseUnit,
-  GrupoFiscalEtdUnit, StringNullableUnit, DateTimeServiceUnit;
-
-type
-  TOperacoesFiscaisIbsCbsOOP = class(TDataSet_OOP)
-  private
-    procedure GetText(Sender: TField; var Text: string; DisplayText: Boolean);
-  public
-    constructor Create();
-  end;
+  uDtmAtivo, UIUtilsUnit, hw_utils, hw_grid_utils, Math, DB,
+  FieldsConfigUnit, EntityMetadataUnit, OperacaoFiscalIbsCbsMetadataUnit,
+  Contnrs, UIFormValidatorFactoryUnit, DbGridConfigUtilsUnit,
+  StatusRegistroEnumUnit,
+  StringNullableUnit, DateTimeServiceUnit;
 
 {$R *.dfm}
-
-{ TOperacoesFiscaisIbsCbsOOP }
-
-constructor TOperacoesFiscaisIbsCbsOOP.Create;
-var
-  I: Integer;
-begin
-  TableName := 'OP_FISCAIS_IBSCBS';
-  inherited Create(dtmAtivo.bancoHw, nil, True, 'cds_op_fiscais_ibscbs');
-
-  SQLMaker.Build(
-    TableName, 'o',
-    // 'select  ' +
-    '  o.id,  ' +
-    '  o.op_interna_id o_op_interna_id, ' +
-    '  o.regra_fiscal_id o_regra_fiscal_id, ' +
-    '  o.grupo_fiscal_id o_grupo_fiscal_id, ' +
-    '  o.data_ini_vigencia o_data_ini_vigencia, ' +
-    '  o.data_fim_vigencia o_data_fim_vigencia, ' +
-    '  o.ativo, ' +
-    '  op.seqid op_seqid, ' +
-    '  op.descricao op_descricao, ' +
-    // '  op.ativo op_ativo, ' +
-    //'  g.id g_id, ' +
-    '  g.seqid g_seqid, ' +
-    '  g.descricao g_descricao, ' +
-    '  g.tipo_tributo g_tipo_tributo, ' +
-    // '  g.ativo g_ativo, ' +
-    '  r.descricao r_descricao, ' +
-    '  r.cclasstrib r_cclasstrib, ' +
-    '  r.pdifcbs r_pdifcbs, ' +
-    '  r.pdifibsuf r_pdifibsuf, ' +
-    '  r.pdifibsmun r_pdifibsmun, ' +
-    //'  r.tpopergov r_tpopergov, ' +
-    '  r.data_ini_vigencia r_data_ini_vigencia, ' +
-    '  r.data_fim_vigencia r_data_fim_vigencia ' ,
-    //'  r.ativo r_ativo, ' +
-    // 'from op_fiscais_ibscbs o ' +
-    'inner join op_internas op on op.id = o.op_interna_id ' +
-    'inner join regras_fiscais_ibscbs r on r.id = o.regra_fiscal_id ' +
-    'left join grupos_fiscais g on g.id = o.grupo_fiscal_id ',
-    '','op.descricao, r.descricao, g.descricao'
-  );                              
-
-  ConfigFields(
-    FieldsConfigFactory.Create()
-      .Add('id,ativo,o_op_interna_id,o_regra_fiscal_id,o_grupo_fiscal_id', fvInvisivel)
-      .Add('o_data_ini_vigencia', 'Inicio Vigencia')
-      .Add('o_data_fim_vigencia', 'Fim Vigencia')
-      .Add('op_seqid', 'Cod. Op Interna')
-      .Add('op_descricao', 'Operação Interna', fvSempreVisivel)
-      .Add('g_seqid', 'Cod. Grupo Fiscal')
-      .Add('g_descricao', 'Grupo Fiscal', fvSempreVisivel)
-      .Add('g_tipo_tributo', 'Tipo Tributo', GetText)
-      .Add('r_descricao', 'Regra Fiscal', fvSempreVisivel)
-      .Add('r_cclasstrib', 'CClass Trib', fvSempreVisivel)
-      .Add('r_pdifcbs', 'Perc Diferimento CBS', '', DisplayNumber(4))
-      .Add('r_pdifibsuf', 'Perc Diferimento IBS UF', '', DisplayNumber(4))
-      .Add('r_pdifibsmun', 'Perc Diferimento IBS Municipio', '', DisplayNumber(4))
-      .Add('r_data_ini_vigencia', 'Inicio Vigencia Regra Fiscal')
-      .Add('r_data_fim_vigencia', 'Fim Vigencia Regra Fiscal')
-  );
-
-  SQLMaker.FilterMk.FreeFilters()
-    .AddIsNull('id', True);
-
-  RunSQLMaker();
-end;
-
-procedure TOperacoesFiscaisIbsCbsOOP.GetText(Sender: TField; var Text: string;
-  DisplayText: Boolean);
-begin
-  if Sender.FieldName = 'G_TIPO_TRIBUTO' then
-    Text := TipoTributoFiscalEnumDisplay[TipoTributoFiscalEnum(Sender.AsInteger)];
-end;
 
 { TfrmCadOperacoesFiscaisIbsCbs }
 
@@ -170,7 +89,7 @@ begin
 
     FData.SQLMaker.FilterMk.FreeFilters()
       .Add('ativo', IfThen(not ckLixeira.Checked, 1))
-      .Add(FilterFramePadrao1.GetFiltros());
+      .Add(FiltroGrid.GetFiltros());
 
     FData.RunSQLMaker();
 
@@ -193,6 +112,11 @@ begin
     FState.Free();
     FState := OperacaoFiscalIbsCbsEtd.Create();
 
+    if not FPresenter.CarregarListasSelecao(
+      FState.OperacaoInternaId, FState.GrupoFiscalId.ToText('')
+    ) then
+      Exit;
+
     MapStateToForm();
     ShowAbaCadastro();
 
@@ -202,58 +126,25 @@ begin
 end;
 
 procedure TfrmCadOperacoesFiscaisIbsCbs.BitBtn4Click(Sender: TObject);
-var
-  createResult: CreateEntityUseCaseOutPut;
 begin
-  MapFormToState(); 
+  MapFormToState();
 
   if not FAuditor.Processo('MOD023').Salvar()
     .Permitido() then
     Exit;
 
-  try
-
+  if FPresenter.Salvar(FState) then
+  begin
     try
-      with Container.GetInstance().ErpFeaturesFactory.CreateSalvarOperacaoFiscalIbsCbsUseCase() do
-      try
-        createResult := Executar( FState );
-      finally
-        FreeSafe();
-      end;
+      FAuditor.Sucesso().GravarMensagem( CriarMensagemAuditoriaFormState() );
 
-      if not createResult.Validation.IsValid then
-        FFormValidator.Validate(createResult.Validation)
-
-      else
-      begin
-        FAuditor.Sucesso().GravarMensagem( CriarMensagemAuditoriaFormState() );
-
-        inherited;
-        FData.Refresh();
-      end;
-
-    finally
-      createResult.Free();
+      inherited;
+      FData.Refresh();
+    except
+      on E: Exception do
+        UIUtils.HandleError(E);
     end;
-
-  except on E: Exception do
-    UIUtils.HandleError(E);
   end;
-end;
-
-function TfrmCadOperacoesFiscaisIbsCbs.CriarMensagemAuditoriaFormGrid: string;
-begin
-  Result := '';
-  if not FData.fempty('op_seqid') then
-    Result := Result + Format(' OP: %d', [ FData.fint('op_seqid') ]);
-
-  if not FData.fempty('op_seqid') then
-    Result := Result + Format(' GF: %d', [ FData.fint('g_seqid') ]);
-
-  if not FData.fempty('op_seqid') then
-    Result := Result + Format(' RF: %s - %s', [ FData.fstr('r_cclasstrib'), FData.fstr('r_descricao') ]);
-
-  Result := Trim(Result);
 end;
 
 function TfrmCadOperacoesFiscaisIbsCbs.CriarMensagemAuditoriaFormState: string;
@@ -291,8 +182,8 @@ end;
 procedure TfrmCadOperacoesFiscaisIbsCbs.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
-  FData.Free();
-  FState.Free();
+  FreeAndNil(FData);
+  FreeAndNil(FState);
 
   Action := caFree;
 
@@ -300,14 +191,23 @@ begin
 end;
 
 procedure TfrmCadOperacoesFiscaisIbsCbs.FormCreate(Sender: TObject);
+var
+  Builder: IFieldsConfigBuilder;
+  Meta: EntityMetadata;
 begin
   TelaCadastro := vDadosIni.vTipoForm;
 
   FState   := OperacaoFiscalIbsCbsEtd.Create();
-  FData    := TOperacoesFiscaisIbsCbsOOP.Create();
+  FData    := TOperacoesFiscaisIbsCbsDataSet.Create();
   FAuditor := FData.Auditor;
 
-  FilterFramePadrao1.TodosToggle(True).FillForm(FData.dataSet, nil, 'Todos');
+  Builder := FieldsConfigFactory.Create();
+
+  FData.Setup(Builder);
+
+  SetupDataSetGrid(FData);
+
+  FiltroGrid.TodosToggle(True).FillForm(FData.dataSet, nil, 'Todos');
 
   edPickerOpInterna.OnEntitySelected := EventChangeEntitiesSelects;
   edPickerOpInterna.OnEntityAdd := EventAddEntitiesSelects;
@@ -317,8 +217,10 @@ begin
 
   ComboBoxRegrasFiscaisFrame1.OnRegraFiscalChange := RegrasFiscaisFrameChange;
 
+  Meta := TOperacaoFiscalIbsCbsMetadata.GetMetadata();
+
   FFormValidator := UIFormValidatorFactory.Create()
-    .Builder()
+    .Builder(Meta, BitBtn4)
     .Bind('OperacaoInternaId', edPickerOpInterna.edEntity)
     .Bind('RegraFiscalId', ComboBoxRegrasFiscaisFrame1.edRegrasFiscais)
     .Bind('GrupoFiscalId', edPickerGrupoFiscal.edEntity)
@@ -326,9 +228,8 @@ begin
     .Bind('FimVigencia', edFinalVigencia.edMask)
     .Validator();
 
-  DBGrid1.DataSource := FData._dataSourceOOP;
-  setTClientDataSet(vDadosIni.dataSetCol, vDadosIni.vNomeUsuario, vDadosIni.transacaoCol);
-  configurarGridPeloConfigColunas(DBGrid1);
+  DbGridConfigUtils.ApplyToDBGrid(DBGrid1, Builder.List);
+
   PrimeiraPesquisa := False;
 
   inherited;
@@ -368,26 +269,7 @@ begin
 end;
 
 procedure TfrmCadOperacoesFiscaisIbsCbs.MapStateToForm;
-var
-  grupos: GruposFiscaisEtd;
 begin
-  with Container.GetInstance().ErpFeaturesFactory.CreateListarAtualeTodasOperacoesInternasUseCase() do
-  try
-    edPickerOpInterna.LoadEntities( Executar( FState.OperacaoInternaId ), True );
-  finally
-    FreeSafe();
-  end;
-
-  with Container.GetInstance().ErpFeaturesFactory.CreateListarAtualeTodosGruposFiscaisUseCase() do
-  try
-    grupos := Executar( FState.GrupoFiscalId.Value );
-  finally
-    FreeSafe();
-  end;
-
-  grupos.Insert(0, nil);
-  edPickerGrupoFiscal.LoadEntities( grupos, True );
-
   ComboBoxRegrasFiscaisFrame1.Setup( FState.RegraFiscalId, False );
   edInicioVigencia.Text := DateToStr(FState.InicioVigencia);
   edFinalVigencia.Setup( FState.FimVigencia );
@@ -473,35 +355,41 @@ begin
   if FData.IsEmpty() then
     Exit;
 
-  with Container.GetInstance().ErpFeaturesFactory.CreateObterOperacaoFiscalIbsCbsPorIdUseCase() do
-  try
-    dado := Executar(FData.fstr('id'));
-  finally
-    FreeSafe();
-  end;
+  if not FPresenter.ObterParaEdicao(FData.fstr('id'), dado) then
+    Exit;
 
-  if dado = nil then
-    ShowAtencao('Registro não se encontra mais disponível')
-  else if (dado.Ativo = saLixeira) and
-    ((ShowConfirmacao('Registro encontra-se na Lixeira. Deseja restaurar o registro?') <> IDYES) or
-    (not FAuditor.Processo('MOD025').Alterar()
-      .SetMensagem( CriarMensagemAuditoriaFormGrid() )
-      .Permitido() )) then
-    dado.Free()
-  else
+  if dado.Ativo = saLixeira then
   begin
-    FState.Free();
-    FState := dado;
-    FState.Ativo := saAtivo;
-    MapStateToForm();
-
-    if not FAuditor.Processo('MOD022').Alterar()
-      .SetMensagem( CriarMensagemAuditoriaFormState() )
-      .Permitido() then
+    if ShowConfirmacao('Registro encontra-se na Lixeira. Deseja restaurar o registro?') <> IDYES then
+    begin
+      dado.Free();
       Exit;
+    end;
 
-    ShowAbaCadastro();
+    if not FData.GetAuditorFill('MOD025').Alterar().Permitido() then
+    begin
+      dado.Free();
+      Exit;
+    end;
   end;
+
+  FState.Free();
+  FState := dado;
+  FState.Ativo := saAtivo;
+
+  if not FPresenter.CarregarListasSelecao(
+    FState.OperacaoInternaId, FState.GrupoFiscalId.ToText('')
+  ) then
+    Exit;
+
+  MapStateToForm();
+
+  if not FAuditor.Processo('MOD022').Alterar()
+    .SetMensagem( CriarMensagemAuditoriaFormState() )
+    .Permitido() then
+    Exit;
+
+  ShowAbaCadastro();
 end;
 
 procedure TfrmCadOperacoesFiscaisIbsCbs.SpeedButton2Click(Sender: TObject);
@@ -510,27 +398,47 @@ begin
     (ShowConfirmacao('Deseja mesmo enviar oa registro para a lixeira?') <> ID_YES) then
     Exit;       
 
-  if not FAuditor.Processo('MOD024').Excluir()
-    .SetMensagem( CriarMensagemAuditoriaFormGrid() )
+  if not FData.GetAuditorFill('MOD024').Excluir()
     .Permitido() then
     Exit;
 
-  try
-    with Container.GetInstance().ErpFeaturesFactory.CreateRemoverOperacaoFiscalIbsCbsUseCase() do
+  if FPresenter.Remover(FData.fstr('id')) then
+  begin
     try
-      Executar(FData.fstr('id'));
-    finally
-      FreeSafe();
+      FAuditor.Sucesso().GravarMensagem(FAuditor.Mensagem);
+      FData.Refresh();
+    except
+      on E: Exception do
+        UIUtils.HandleError(E);
     end;
-
-    FAuditor.Sucesso().GravarMensagem( CriarMensagemAuditoriaFormGrid() );
-
-    FData.Refresh();
-
-  except
-    on E: Exception do
-      UIUtils.HandleError(E);
   end;
+end;
+
+procedure TfrmCadOperacoesFiscaisIbsCbs.ExibirListas(
+  AOperacoesInternas: OperacoesInternasEtd;
+  AGruposFiscais: GruposFiscaisEtd
+);
+begin
+  edPickerOpInterna.LoadEntities(AOperacoesInternas, True);
+
+  AGruposFiscais.Insert(0, nil);
+  edPickerGrupoFiscal.LoadEntities(AGruposFiscais, True);
+end;
+
+procedure TfrmCadOperacoesFiscaisIbsCbs.SetupPresenter(
+  APresenter: TOperacoesFiscaisIbsCbsPresenter
+);
+begin
+  FPresenter := APresenter;
+end;
+
+destructor TfrmCadOperacoesFiscaisIbsCbs.Destroy;
+begin
+  FreeAndNil(FPresenter);
+  FreeAndNil(FData);
+  FreeAndNil(FState);
+
+  inherited;
 end;
 
 end.
