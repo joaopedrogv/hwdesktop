@@ -135,6 +135,14 @@ type
     EmitirAposCompletarPagamentos: Boolean;
   end;
 
+  // Contexto de consumidor ja aplicado aos tributos RTC. Valido indica que o
+  // recalculo e o commit foram concluidos; a identidade permite reconhecer
+  // mudanca de documento, empresa ou consumidor entre chamadas.
+  TTipoEnteGovConsumidorAplicado = record
+    Valido: Boolean;
+    CodNFCe, CodEmpresa, CodCliente: Integer;
+  end;
+
   RNFCe_Emissao_Padrao = record
     TipoDeImpressao, IndicadorDePresenca, ModalidadeDoFrete, NaturezaDeOperacao: string;
 //    QtdeViasEmContingencia: Smallint;
@@ -490,29 +498,17 @@ type
     FStatusChange: TEventProcedure;
     FlkVendedor: TDadosLookUp_OOP;
     FDest: TNFCe_Dest;
-    // Cache do tipo de ente governamental do consumidor. Uma consulta por
-    // identidade (documento, empresa e consumidor); invalidado em SetCliente
-    // e na carga/reabertura de rascunho. Documento finalizado preserva o
-    // cache e a chave aplicada, pois nao deve ser reavaliado.
-    FTipoEnteGovConsumidor: TipoEnteGovEnum;
-    FTipoEnteGovConsumidorCarregado: Boolean;
-    FTipoEnteGovConsumidorCodNFCe: Integer;
-    FTipoEnteGovConsumidorCodEmpresa: Integer;
-    FTipoEnteGovConsumidorCodCliente: Integer;
+    // Contexto do consumidor para o qual os tributos RTC foram efetivamente
+    // aplicados e commitados. Valido so e verdadeiro apos recalculo e commit
+    // bem-sucedidos. Documento, empresa e cliente sao copiados do estado
+    // corrente para detectar troca de consumidor, inclusive quando
+    // COD_CLIENTE e alterado fora de SetCliente.
+    FTipoEnteGovConsumidorAplicado: TTipoEnteGovConsumidorAplicado;
     // Sinaliza que o fato consumidor/ente publico deve ser reavaliado.
-    // Permanece ligado ate um recalculo dos itens ser concluido com sucesso;
-    // ao carregar um documento finalizado e descartado (nao ha reavaliacao).
+    // Permanece ligado ate um recalculo dos itens ser concluido com sucesso e
+    // commitado; ao carregar um documento finalizado e descartado, pois nao
+    // ha reavaliacao.
     FTipoEnteGovConsumidorAlterado: Boolean;
-    // Chave de referencia do fato consumidor: definida na carga do documento
-    // e apos cada recalculo concluido com sucesso. Comparada antes do
-    // recalculo para detectar mudanca efetiva mesmo quando o campo foi
-    // alterado fora de SetCliente. A carga de rascunho liga
-    // FTipoEnteGovConsumidorAlterado para reavaliar com a classificacao atual;
-    // recargas pos-salvamento restabelecem apenas esta chave.
-    FTipoEnteGovConsumidorAplicado: Boolean;
-    FTipoEnteGovConsumidorAplicadoCodNFCe: Integer;
-    FTipoEnteGovConsumidorAplicadoCodEmpresa: Integer;
-    FTipoEnteGovConsumidorAplicadoCodCliente: Integer;
     FEmissaoRapida: Boolean;
     FConsultaCliente: TNFC_Clientes;
     FEspelho: EspelhoValores;
@@ -530,7 +526,7 @@ type
     FDadosCertificado: TStrings;
     FFieldsWithNotificationChange: TStrings;
     FFieldChangeEvnt: TFieldNotifyEvent;
-    procedure InvalidarTipoEnteGovConsumidor;
+    procedure InicializarTipoEnteGovConsumidorAplicado;
     procedure MarcarTipoEnteGovConsumidorAlterado;
     procedure MarcarTipoEnteGovConsumidorAplicado;
     function TipoEnteGovConsumidorMudouDesdeAplicacao: Boolean;
@@ -2313,7 +2309,10 @@ begin
       // recalculo. Documento finalizado nao e reavaliado e descarta
       // pendencia remanescente de outro documento.
       if DocumentoPermiteReavaliacaoEnteGov then
-        MarcarTipoEnteGovConsumidorAlterado
+      begin
+        MarcarTipoEnteGovConsumidorAlterado;
+        InicializarTipoEnteGovConsumidorAplicado;
+      end
       else
       begin
         FTipoEnteGovConsumidorAlterado := False;
@@ -2321,15 +2320,18 @@ begin
       end;
     end
     else
-      // Recarga pos-salvamento: restabelece apenas a chave aplicada. Nao
-      // limpa a pendencia aqui; ela so pode ser limpa apos recalculo e
-      // commit bem-sucedidos em SalvarECalcular.
-      MarcarTipoEnteGovConsumidorAplicado;
+      // Recarga pos-salvamento: restabelece a chave aplicada apenas quando
+      // nao ha pendencia. Uma pendencia ativa nao e apagada nem convertida em
+      // sucesso; ela so pode ser limpa apos recalculo e commit efetivados em
+      // SalvarECalcular.
+      if not FTipoEnteGovConsumidorAlterado then
+        MarcarTipoEnteGovConsumidorAplicado;
   end
   else
   begin
-    InvalidarTipoEnteGovConsumidor;
-    FTipoEnteGovConsumidorAplicado := False;
+    // Sem documento: nao ha consumidor aplicado nem pendencia a preservar.
+    FTipoEnteGovConsumidorAlterado := False;
+    InicializarTipoEnteGovConsumidorAplicado;
   end;
 
   if ChildTo then
@@ -3283,16 +3285,8 @@ begin
     ' nfce.vibsmun, nfce.vibs, nfce.cbs_vdif, nfce.cbs_vdevtrib, nfce.vcbs, nfce.vibsmono, nfce.vcbsmono, nfce.vibsmonoreten,' +
     ' nfce.vcbsmonoreten, nfce.vibsmonoret, nfce.vcbsmonoret, nfce.vis, nfce.op_interna_id ';
   FCodNFCeMemorizada := 0;
-  FTipoEnteGovConsumidor := tgvNenhum;
-  FTipoEnteGovConsumidorCarregado := False;
-  FTipoEnteGovConsumidorCodNFCe := 0;
-  FTipoEnteGovConsumidorCodEmpresa := 0;
-  FTipoEnteGovConsumidorCodCliente := 0;
   FTipoEnteGovConsumidorAlterado := False;
-  FTipoEnteGovConsumidorAplicado := False;
-  FTipoEnteGovConsumidorAplicadoCodNFCe := 0;
-  FTipoEnteGovConsumidorAplicadoCodEmpresa := 0;
-  FTipoEnteGovConsumidorAplicadoCodCliente := 0;
+  InicializarTipoEnteGovConsumidorAplicado;
   FObjetosInternosAusentes := True;
   FEmEmissaoEx := False;
 end;
@@ -3913,8 +3907,8 @@ begin
     // pos-salvamento a chave ja corresponde e o sinal nao e reaberto.
     if DocumentoPermiteReavaliacaoEnteGov then
     begin
-      if FTipoEnteGovConsumidorAlterado
-        or ((not FTipoEnteGovConsumidorAplicado) and (fint('cod_nfce') > 0))
+      if ((fint('cod_nfce') > 0)
+        and (not FTipoEnteGovConsumidorAplicado.Valido))
         or TipoEnteGovConsumidorMudouDesdeAplicacao then
         MarcarTipoEnteGovConsumidorAlterado
       else
@@ -5869,7 +5863,6 @@ var
   SeqPrecoPadrao: string;
 begin
   Result := False;
-  InvalidarTipoEnteGovConsumidor;
 
   if not vDadosIni.PesqPros('NFC009', 'INSERIR', '',
     'NFCE', '') then
@@ -5879,7 +5872,9 @@ begin
   if not dataSet.Active then
     AbreRegistros(0);
 
-  FTipoEnteGovConsumidorAplicado := False;
+  // Novo documento: nenhum consumidor foi aplicado e nao ha pendencia.
+  FTipoEnteGovConsumidorAlterado := False;
+  InicializarTipoEnteGovConsumidorAplicado;
 
   LerConfigNFCe;
 
@@ -7007,9 +7002,9 @@ begin
     if CMunFGIbs = 0 then
       CMunFGIbs := vDadosIni.vEmp.vNfe.ibgeCodCidade;
 
-    // Premissa funcional aprovada (R-06): NFC-e sempre propria e saida. O
-    // tipo de orgao publico vem do consumidor do documento; o helper mantem
-    // cache por documento para nao consultar uma vez por item.
+    // NFC-e e sempre propria e saida. O tipo de orgao publico vem do
+    // consumidor efetivo do documento e e consultado uma unica vez antes do
+    // loop; os itens reutilizam o valor, sem consulta por item.
     TipoOrgaoPublico := ObterTipoEnteGovConsumidor;
 
     queryCons.SQL(
@@ -7263,8 +7258,6 @@ var
   CodigoClienteAnterior: Integer;
   Aiss_retido: string;
 begin
-  InvalidarTipoEnteGovConsumidor;
-
   if not (dataSet.State in [dsInsert, dsEdit]) then
     Exit;
 
@@ -7416,75 +7409,61 @@ end;
 
 function TNFCe.ObterTipoEnteGovConsumidor: TipoEnteGovEnum;
 var
-  CodCliente, CodigoTipoEnteGov, CodNFCe, CodEmpresa: Integer;
+  CodCliente, CodigoTipoEnteGov, CodEmpresa: Integer;
 begin
-  CodNFCe    := fint('cod_nfce');
-  CodEmpresa := vDadosIni.cod_empresa;
+  // Le sempre o consumidor efetivo do documento atual. O recalculo global
+  // chama este helper uma unica vez antes do loop de itens; o caminho
+  // individual de item chama uma vez por item. Nao ha cache entre chamadas.
   CodCliente := fint('COD_CLIENTE');
+  CodEmpresa := vDadosIni.cod_empresa;
 
-  // Reutiliza somente para a mesma identidade efetiva. Caminhos de navegacao
-  // seguidos de Edit nao passam por AbreRegistros; a chave evita transportar
-  // o ente de outro documento/consumidor e mantem no maximo uma consulta por
-  // identidade inalterada.
-  if (not FTipoEnteGovConsumidorCarregado)
-    or (FTipoEnteGovConsumidorCodNFCe <> CodNFCe)
-    or (FTipoEnteGovConsumidorCodEmpresa <> CodEmpresa)
-    or (FTipoEnteGovConsumidorCodCliente <> CodCliente) then
-  begin
-    if CodCliente > 0 then
-      CodigoTipoEnteGov := SqlScalar(
-        'select tipo_ente_gov from clientes' +
-        ' where cod_cliente = %d and cod_empresa = %d',
-        [CodCliente, CodEmpresa]).AsInteger
-    else
-      CodigoTipoEnteGov := 0;
+  if CodCliente > 0 then
+    CodigoTipoEnteGov := SqlScalar(
+      'select tipo_ente_gov from clientes' +
+      ' where cod_cliente = %d and cod_empresa = %d',
+      [CodCliente, CodEmpresa]).AsInteger
+  else
+    CodigoTipoEnteGov := 0;
 
-    // Bivalencia aprovada (TDQ-15): consumidor ausente, valor nulo ou codigo
-    // fora do catalogo resultam em "Nenhum"; nao existe estado desconhecido.
-    FTipoEnteGovConsumidor :=
-      OperacaoFiscalIbsCbsCondicoes.CodigoParaTipoEnteGov(CodigoTipoEnteGov);
-    FTipoEnteGovConsumidorCodNFCe := CodNFCe;
-    FTipoEnteGovConsumidorCodEmpresa := CodEmpresa;
-    FTipoEnteGovConsumidorCodCliente := CodCliente;
-    FTipoEnteGovConsumidorCarregado := True;
-  end;
-
-  Result := FTipoEnteGovConsumidor;
+  // O fluxo da NFC-e e sempre propria e saida. Consumidor ausente, valor nulo
+  // ou codigo fora do catalogo correspondem a "Nenhum"; este atributo nao tem
+  // estado desconhecido.
+  Result := OperacaoFiscalIbsCbsCondicoes.CodigoParaTipoEnteGov(CodigoTipoEnteGov);
 end;
 
-procedure TNFCe.InvalidarTipoEnteGovConsumidor;
+procedure TNFCe.InicializarTipoEnteGovConsumidorAplicado;
 begin
-  FTipoEnteGovConsumidorCarregado := False;
-  FTipoEnteGovConsumidor := tgvNenhum;
-  FTipoEnteGovConsumidorCodNFCe := 0;
-  FTipoEnteGovConsumidorCodEmpresa := 0;
-  FTipoEnteGovConsumidorCodCliente := 0;
+  FTipoEnteGovConsumidorAplicado.Valido := False;
+  FTipoEnteGovConsumidorAplicado.CodNFCe := 0;
+  FTipoEnteGovConsumidorAplicado.CodEmpresa := 0;
+  FTipoEnteGovConsumidorAplicado.CodCliente := 0;
 end;
 
 procedure TNFCe.MarcarTipoEnteGovConsumidorAlterado;
 begin
-  InvalidarTipoEnteGovConsumidor;
+  // A aplicacao existente so e substituida apos recalculo e commit; ate la,
+  // o sinal precisa sobreviver a rollback, refresh e reabertura do registro.
   FTipoEnteGovConsumidorAlterado := True;
 end;
 
 procedure TNFCe.MarcarTipoEnteGovConsumidorAplicado;
 begin
-  FTipoEnteGovConsumidorAplicado := True;
-  FTipoEnteGovConsumidorAplicadoCodNFCe := fint('cod_nfce');
-  FTipoEnteGovConsumidorAplicadoCodEmpresa := vDadosIni.cod_empresa;
-  FTipoEnteGovConsumidorAplicadoCodCliente := fint('COD_CLIENTE');
+  FTipoEnteGovConsumidorAplicado.Valido := True;
+  FTipoEnteGovConsumidorAplicado.CodNFCe := fint('cod_nfce');
+  FTipoEnteGovConsumidorAplicado.CodEmpresa := vDadosIni.cod_empresa;
+  FTipoEnteGovConsumidorAplicado.CodCliente := fint('COD_CLIENTE');
 end;
 
 function TNFCe.TipoEnteGovConsumidorMudouDesdeAplicacao: Boolean;
 begin
   Result := FTipoEnteGovConsumidorAlterado;
-  if Result or (not FTipoEnteGovConsumidorAplicado) then
+  if Result or (not FTipoEnteGovConsumidorAplicado.Valido) then
     Exit;
 
   Result :=
-    (FTipoEnteGovConsumidorAplicadoCodNFCe <> fint('cod_nfce'))
-    or (FTipoEnteGovConsumidorAplicadoCodEmpresa <> vDadosIni.cod_empresa)
-    or (FTipoEnteGovConsumidorAplicadoCodCliente <> fint('COD_CLIENTE'));
+    (FTipoEnteGovConsumidorAplicado.CodNFCe <> fint('cod_nfce'))
+    or (FTipoEnteGovConsumidorAplicado.CodEmpresa <> vDadosIni.cod_empresa)
+    or (FTipoEnteGovConsumidorAplicado.CodCliente <> fint('COD_CLIENTE'));
 end;
 
 function TNFCe.SetCodigoInterno: Boolean;
@@ -9980,7 +9959,8 @@ begin
     {PIS}          ffloat('pis_vpis'),
     {COFINS}       ffloat('cofins_vcofins'),
     {Quantidade}   ffloat('qcom'),
-    // Premissa funcional aprovada (R-06): propria/saida nao sao lidas de campo.
+    // A NFC-e fornece propria e saida ao resolvedor; esses valores nao sao
+    // lidos de campos do documento.
     {TipoEmissao}  OperacaoFiscalIbsCbsCondicoes.TipoEmissaoDePropria(True),
     {NaturezaEmissao} OperacaoFiscalIbsCbsCondicoes.NaturezaDeSaida(True),
     {TipoOrgaoPublico} NFCeAOwer.ObterTipoEnteGovConsumidor()
