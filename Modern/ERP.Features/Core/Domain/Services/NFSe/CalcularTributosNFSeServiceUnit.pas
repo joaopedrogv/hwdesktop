@@ -232,6 +232,7 @@ begin
   regraManual := nil;
   Resultado := nil;
   rocResult := nil;
+  indDoacao := False;
   try
     if tipoRegra = tctManual then
     begin
@@ -448,7 +449,6 @@ var
   paramsFiscais: ParametrosFiscaisNFSeResult;
 	valorLiq: Currency;
   nfse: NFSeEtd;
-  cUF: string;
   // totais
   TotaisNFSe: CalculoTotaisNFSeResult;
 	// iss

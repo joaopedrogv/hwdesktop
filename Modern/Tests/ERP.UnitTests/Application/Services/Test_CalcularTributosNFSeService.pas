@@ -38,7 +38,13 @@ uses
   ROCItemDomainUnit,
   TributosModelUnit,
   IBSCBSModelUnit,
-  ImpostoSeletivoModelUnit;
+  ImpostoSeletivoModelUnit,
+  TransferenciaCreditoModelUnit,
+  AjusteCompetenciaModelUnit,
+  EstornoCreditoModelUnit,
+  CreditoPresumidoOperacaoModelUnit,
+  CreditoPresumidoIBSZFMModelUnit,
+  OperacaoConsumoModelUnit;
 
 type
   TResolverAutomaticoStub = class(TInterfacedObject, IResolverRegraFiscalIbsCbsService)
@@ -95,7 +101,6 @@ implementation
 function TResolverAutomaticoStub.Analisar(
   const Input: ResolverRegraFiscalIbsCbsInput): ResolverRegraFiscalIbsCbsAnalise;
 begin
-  Result := nil;
   raise Exception.Create('Analisar não deveria ser chamado no cálculo NFS-e.');
 end;
 
@@ -153,8 +158,17 @@ begin
     1,
     TributosModel.Create(
       ImpostoSeletivoModel.NullInstance(),
-      IBSCBSModel.Create(410, '', nil, nil, nil, nil, nil, nil, nil)));
-  Result := ROCDomain.Create(nil, Itens, nil, Validacoes);
+      IBSCBSModel.Create(
+         410,
+         '',
+         nil,
+         nil,
+         TransferenciaCreditoModel.NullInstance(),
+         AjusteCompetenciaModel.NullInstance(),
+         EstornoCreditoModel.NullInstance(),
+         CreditoPresumidoOperacaoModel.NullInstance(),
+         CreditoPresumidoIBSZFMModel.NullInstance())));
+  Result := ROCDomain.Create(OperacaoConsumoModel.NullInstance(), Itens, nil, Validacoes);
 end;
 
 { TCalculoTotaisStub }
