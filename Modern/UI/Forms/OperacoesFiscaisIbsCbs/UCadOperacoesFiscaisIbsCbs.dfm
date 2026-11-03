@@ -228,6 +228,74 @@ inherited frmCadOperacoesFiscaisIbsCbs: TfrmCadOperacoesFiscaisIbsCbs
                   end
                 end
               end
+              object tabCondicoes: TTabSheet
+                Caption = 'Condi'#231#245'es'
+                ImageIndex = 2
+                object lbEscopoCondicoes: TLabel
+                  Left = 16
+                  Top = 12
+                  Width = 51
+                  Height = 13
+                  Caption = 'Escopo:'
+                end
+                object gbTipoEmissao: TGroupBox
+                  Left = 16
+                  Top = 36
+                  Width = 240
+                  Height = 110
+                  Caption = 'Tipo de emiss'#227'o'
+                  TabOrder = 0
+                  object clbTipoEmissao: TCheckListBox
+                    Left = 12
+                    Top = 20
+                    Width = 216
+                    Height = 80
+                    ItemHeight = 13
+                    TabOrder = 0
+                  end
+                end
+                object gbNatureza: TGroupBox
+                  Left = 268
+                  Top = 36
+                  Width = 240
+                  Height = 110
+                  Caption = 'Natureza'
+                  TabOrder = 1
+                  object clbNatureza: TCheckListBox
+                    Left = 12
+                    Top = 20
+                    Width = 216
+                    Height = 80
+                    ItemHeight = 13
+                    TabOrder = 0
+                  end
+                end
+                object gbTipoOrgaoPublico: TGroupBox
+                  Left = 16
+                  Top = 156
+                  Width = 492
+                  Height = 170
+                  Caption = 'Tipo de '#243'rg'#227'o p'#250'blico'
+                  TabOrder = 2
+                  object clbTipoOrgaoPublico: TCheckListBox
+                    Left = 12
+                    Top = 20
+                    Width = 468
+                    Height = 140
+                    Columns = 2
+                    ItemHeight = 13
+                    TabOrder = 0
+                  end
+                end
+                object btnVerificarCondicoes: TSpeedButton
+                  Left = 16
+                  Top = 340
+                  Width = 140
+                  Height = 25
+                  Caption = 'Verificar condi'#231#245'es'
+                  OnClick = btnVerificarCondicoesClick
+                end
+              end
             end
             inherited Panel3: TPanel
               Top = 466

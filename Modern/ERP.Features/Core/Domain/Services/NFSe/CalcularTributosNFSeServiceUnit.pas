@@ -88,7 +88,8 @@ uses
 	ConfiguracaoEtdUnit, StringNullableUnit, CalculoTotaisNFSeTypes, EstadosServiceUnit, CalcularTributoInputUnit,
   ICalculoBaseCalculoServiceUnit, CalcularBaseCalculoModelUnit, ImpostoSeletivoInputUnit, ROCDomainUnit,
   TributosDFeSerivceUnit, NFSeEtdUnit, TributosDFeServiceTypes, TributoDFeOrigemEnumUnit, ItemCalculoInputUnit,
-  TributoDFeImpostoSeletivoEtdUnit, DoubleNullableUnit, TributoDFeIbsCbsEtdUnit, TributoDFeGrupoIbsCbsEtdUnit,
+  TributoDFeImpostoSeletivoEtdUnit, DoubleNullableUnit, TributoDFeIbsCbsEtdUnit, OperacaoFiscalIbsCbsCondicaoEtdUnit,
+  TributoDFeGrupoIbsCbsEtdUnit,
   TributoDFeMonofasiaIbsCbsEtdUnit, TipoRegraTributoDFeEnumUnit, ResolverRegraFiscalIbsCbsTypesUnit,
   RegraFiscalIbsCbsEtdUnit, TributacaoRegularInputUnit, CalcularTributosAproximadosTypesUnit,
   TributoNFSeAproximadosOutputUnit, StringServiceUnit, TipoRetencaoFederalPJEnumUnit, CompraGovernamentalInputUnit,
@@ -188,6 +189,8 @@ var
   grupoFiscalId: string;
   regraFiscalId: string;
   regraFiscal  : RegraFiscalIbsCbsEtd;
+  regraManual  : RegraFiscalIbsCbsEtd;
+  Resultado    : ResolverRegraFiscalIbsCbsResult;
   rfTribRegular: RegraFiscalIbsCbsEtd;
   itensInput   : ItensCalculoInput;
   calcInput    : ItemCalculoInput;
@@ -226,14 +229,35 @@ begin
   else
     dataCalcRtc := DateOf(Input.NFSe.DCompet.Value);
 
-  regraFiscal := FResolvedorRegras.Executar( ResolverRegraFiscalIbsCbsInput.Create(
-    Input.NFSe.OpInternaId.Value,
-    grupoFiscalId,
-    Input.NFSe.CodEmpresa,
-    dataCalcRtc
-  ));
-  if regraFiscal = nil then
-    raise EValidacaoNegocio.Create( 'Regra fiscal do IBS e CBS não encontrada');
+  regraManual := nil;
+  Resultado := nil;
+  rocResult := nil;
+  try
+    if tipoRegra = tctManual then
+    begin
+      regraManual := FRegrasFiscaisIbsCbsRepo.GetById( regraFiscalId );
+      if regraManual = nil then
+        raise EValidacaoNegocio.Create('Regra fiscal do IBS e CBS selecionada manualmente não encontrada.');
+
+      regraFiscal := regraManual;
+    end
+    else
+    begin
+      Resultado := FResolvedorRegras.Executar( ResolverRegraFiscalIbsCbsInput.Create(
+        Input.NFSe.OpInternaId.Value,
+        grupoFiscalId,
+        Input.NFSe.CodEmpresa,
+        dataCalcRtc,
+        OperacaoFiscalIbsCbsCondicoes.TipoEmissaoDePropria(Input.NFSe.IsEmissaoPropria),
+        OperacaoFiscalIbsCbsCondicoes.NaturezaDeSaida(Input.NFSe.IsEmissaoPropria),
+        Input.NFSe.TpEnteGov
+      ));
+
+      if Resultado.Status <> rrDeterminado then
+        raise EValidacaoNegocio.Create(Resultado.Mensagem);
+
+      regraFiscal := Resultado.RegraFiscal;
+    end;
 
   if Input.NFSe.GetAnoFatoGerador() < 2027 then
     BaseCalcIS := 0.0
@@ -256,8 +280,6 @@ begin
   ));
 
   // 2: Criando inputs e Calculando Base de calculo ImpostoSeletivo, CBS e IBS
-  rocResult := nil;
-  try
     // Falta implentar como configura o Imposto Seletivo, é pra 2027 ainda
     if True then
       impSelInput := ImpostoSeletivoInput.NullInstance()
@@ -331,7 +353,8 @@ begin
     end;
 
   finally
-    regraFiscal.Free();
+    Resultado.Free();
+    regraManual.Free();
     rocResult.Free();
   end;
 end;

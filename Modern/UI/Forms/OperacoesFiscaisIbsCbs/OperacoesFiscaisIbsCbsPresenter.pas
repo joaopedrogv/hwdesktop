@@ -11,7 +11,9 @@ uses
   ObterOperacaoFiscalIbsCbsPorIdUseCaseUnit,
   RemoverOperacaoFiscalIbsCbsUseCaseUnit,
   ListarOperacoesInternasUseCaseUnit,
-  ListarGruposFiscaisUseCaseUnit;
+  ListarGruposFiscaisUseCaseUnit,
+  ResolverRegraFiscalIbsCbsUseCaseUnit,
+  ResolverRegraFiscalIbsCbsTypesUnit;
 
 type
   TOperacoesFiscaisIbsCbsPresenter = class
@@ -22,6 +24,7 @@ type
     FRemoverUseCase: IRemoverOperacaoFiscalIbsCbsUseCase;
     FListarOperacoesInternasUseCase: IListarAtualeTodasOperacoesInternasUseCase;
     FListarGruposFiscaisUseCase: IListarAtualeTodosGruposFiscaisUseCase;
+    FResolverUseCase: IResolverRegraFiscalIbsCbsUseCase;
   public
     constructor Create(
       const AView: IOperacoesFiscaisIbsCbsView;
@@ -29,7 +32,8 @@ type
       const AObterUseCase: IObterOperacaoFiscalIbsCbsPorIdUseCase;
       const ARemoverUseCase: IRemoverOperacaoFiscalIbsCbsUseCase;
       const AListarOperacoesInternasUseCase: IListarAtualeTodasOperacoesInternasUseCase;
-      const AListarGruposFiscaisUseCase: IListarAtualeTodosGruposFiscaisUseCase
+      const AListarGruposFiscaisUseCase: IListarAtualeTodosGruposFiscaisUseCase;
+      const AResolverUseCase: IResolverRegraFiscalIbsCbsUseCase
     );
     destructor Destroy; override;
 
@@ -42,13 +46,16 @@ type
     function CarregarListasSelecao(
       const AOperacaoInternaId, AGrupoFiscalId: string
     ): Boolean;
+    function AnalisarCondicoes(
+      const AState: OperacaoFiscalIbsCbsEtd
+    ): Boolean;
   end;
 
 implementation
 
 uses
   CreateEntityUseCaseOutputUnit,
-  OperacaoInternaEtdUnit, GrupoFiscalEtdUnit;
+  OperacaoInternaEtdUnit, GrupoFiscalEtdUnit, StringNullableUnit;
 
 { TOperacoesFiscaisIbsCbsPresenter }
 
@@ -58,7 +65,8 @@ constructor TOperacoesFiscaisIbsCbsPresenter.Create(
   const AObterUseCase: IObterOperacaoFiscalIbsCbsPorIdUseCase;
   const ARemoverUseCase: IRemoverOperacaoFiscalIbsCbsUseCase;
   const AListarOperacoesInternasUseCase: IListarAtualeTodasOperacoesInternasUseCase;
-  const AListarGruposFiscaisUseCase: IListarAtualeTodosGruposFiscaisUseCase
+  const AListarGruposFiscaisUseCase: IListarAtualeTodosGruposFiscaisUseCase;
+  const AResolverUseCase: IResolverRegraFiscalIbsCbsUseCase
 );
 begin
   inherited Create;
@@ -69,6 +77,7 @@ begin
   FRemoverUseCase := ARemoverUseCase;
   FListarOperacoesInternasUseCase := AListarOperacoesInternasUseCase;
   FListarGruposFiscaisUseCase := AListarGruposFiscaisUseCase;
+  FResolverUseCase := AResolverUseCase;
 end;
 
 destructor TOperacoesFiscaisIbsCbsPresenter.Destroy;
@@ -87,6 +96,9 @@ begin
 
   if Assigned(FListarGruposFiscaisUseCase) then
     FListarGruposFiscaisUseCase.FreeSafe();
+
+  if Assigned(FResolverUseCase) then
+    FResolverUseCase.FreeSafe();
 
   inherited;
 end;
@@ -172,6 +184,74 @@ begin
   finally
     FreeAndNil(Operacoes);
     FreeAndNil(Grupos);
+  end;
+end;
+
+function TOperacoesFiscaisIbsCbsPresenter.AnalisarCondicoes(
+  const AState: OperacaoFiscalIbsCbsEtd
+): Boolean;
+var
+  Analise: ResolverRegraFiscalIbsCbsAnalise;
+  Mensagem: string;
+  Escopo: string;
+  EmpresaTexto: string;
+  DataTexto: string;
+  EmpresaId: Integer;
+  i: Integer;
+begin
+  Result := False;
+  Analise := nil;
+
+  try
+    try
+      EmpresaId := 0;
+      if Length(AState.EmpresasId) > 0 then
+        EmpresaId := AState.EmpresasId[0];
+
+      Analise := FResolverUseCase.Analisar(
+        ResolverRegraFiscalIbsCbsInput.CreateParaAnalise(
+          AState.OperacaoInternaId,
+          AState.GrupoFiscalId.Value,
+          EmpresaId,
+          AState.InicioVigencia
+        )
+      );
+
+      if EmpresaId > 0 then
+        EmpresaTexto := Format('1 empresa (código %d)', [EmpresaId])
+      else
+        EmpresaTexto := '1 empresa não selecionada';
+
+      if AState.InicioVigencia > 0 then
+        DataTexto := DateToStr(AState.InicioVigencia)
+      else
+        DataTexto := 'data de início de vigência não informada';
+
+      Escopo := 'Escopo da análise: configuração persistida para ' + EmpresaTexto +
+        ' na data ' + DataTexto + '.' + sLineBreak +
+        'Alterações não salvas (checklists e seleção de empresas) não são consideradas. ' +
+        'As demais empresas selecionadas não foram analisadas e podem ter vínculos concorrentes diferentes.';
+
+      Mensagem := Escopo + sLineBreak + sLineBreak;
+      if Length(Analise.Mensagens) = 0 then
+        Mensagem := Mensagem +
+          'Nenhuma inconsistência ou redundância identificada na configuração persistida analisada.'
+      else
+        for i := 0 to High(Analise.Mensagens) do
+        begin
+          if i > 0 then
+            Mensagem := Mensagem + sLineBreak;
+          Mensagem := Mensagem + Analise.Mensagens[i];
+        end;
+
+      FView.ExibirInformacao(Mensagem);
+      Result := True;
+    except
+      on E: Exception do
+        FView.ExibirErro(E);
+    end;
+  finally
+    Analise.Free();
   end;
 end;
 

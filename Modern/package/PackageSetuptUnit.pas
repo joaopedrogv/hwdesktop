@@ -15,7 +15,8 @@ uses
   ErpFeaturesRepoContainerUnit, UCentralDadosFiscais, UCadNFSe, ISharedFactoryUnit, ISessionContextUnit,
   UCadRegrasRedBenefPC, UCadAjustesRedBenefPC, AjustesRedBenefPcPresenter,
   OperacoesInternasPresenter, OperacoesFiscaisIbsCbsPresenter,
-  ListarOperacoesInternasUseCaseUnit, ListarGruposFiscaisUseCaseUnit;
+  ListarOperacoesInternasUseCaseUnit, ListarGruposFiscaisUseCaseUnit,
+  ResolverRegraFiscalIbsCbsUseCaseUnit;
 
 var
   GFiscalFactoryInst: IFiscalCalculosFactory;
@@ -182,6 +183,7 @@ var
   RemoverUseCase: IRemoverOperacaoFiscalIbsCbsUseCase;
   ListarOperacoesUseCase: IListarAtualeTodasOperacoesInternasUseCase;
   ListarGruposUseCase: IListarAtualeTodosGruposFiscaisUseCase;
+  ResolverUseCase: IResolverRegraFiscalIbsCbsUseCase;
   Presenter: TOperacoesFiscaisIbsCbsPresenter;
 begin
   if not Assigned(formOperacoesFiscaisIbsCbs) then
@@ -193,6 +195,7 @@ begin
     RemoverUseCase := nil;
     ListarOperacoesUseCase := nil;
     ListarGruposUseCase := nil;
+    ResolverUseCase := nil;
     Presenter := nil;
 
     try
@@ -203,6 +206,7 @@ begin
       RemoverUseCase := GetFeaturesFactory().CreateRemoverOperacaoFiscalIbsCbsUseCase();
       ListarOperacoesUseCase := GetFeaturesFactory().CreateListarAtualeTodasOperacoesInternasUseCase();
       ListarGruposUseCase := GetFeaturesFactory().CreateListarAtualeTodosGruposFiscaisUseCase();
+      ResolverUseCase := GetFeaturesFactory().CreateResolverRegraFiscalIbsCbsUseCase();
 
       Presenter := TOperacoesFiscaisIbsCbsPresenter.Create(
         formOperacoesFiscaisIbsCbs,
@@ -210,7 +214,8 @@ begin
         ObterUseCase,
         RemoverUseCase,
         ListarOperacoesUseCase,
-        ListarGruposUseCase
+        ListarGruposUseCase,
+        ResolverUseCase
       );
 
       SalvarUseCase := nil;
@@ -218,6 +223,7 @@ begin
       RemoverUseCase := nil;
       ListarOperacoesUseCase := nil;
       ListarGruposUseCase := nil;
+      ResolverUseCase := nil;
 
       formOperacoesFiscaisIbsCbs.SetupPresenter(Presenter);
       Presenter := nil;
@@ -252,6 +258,12 @@ begin
       begin
         ListarGruposUseCase.FreeSafe();
         ListarGruposUseCase := nil;
+      end;
+
+      if Assigned(ResolverUseCase) then
+      begin
+        ResolverUseCase.FreeSafe();
+        ResolverUseCase := nil;
       end;
 
       FreeAndNil(formOperacoesFiscaisIbsCbs);

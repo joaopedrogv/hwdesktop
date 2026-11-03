@@ -5,16 +5,13 @@ interface
 uses
   BaseUseCaseUnit,
   IResolverRegraFiscalIbsCbsServiceUnit,
-  ResolverRegraFiscalIbsCbsTypesUnit,
-  OperacaoFiscalIbsCbsCondicaoEtdUnit,
-  IOperacoesFiscaisIbsCbsRepositoryUnit,
-  OperacaoFiscalIbsCbsEtdUnit,
-  RegraFiscalIbsCbsEtdUnit;
+  ResolverRegraFiscalIbsCbsTypesUnit;
 
-type      
+type
   IResolverRegraFiscalIbsCbsUseCase = class(BaseUseCase)
   public
-    function Executar(const Input: ResolverRegraFiscalIbsCbsInput): RegraFiscalIbsCbsEtd; virtual; abstract; 
+    function Executar(const Input: ResolverRegraFiscalIbsCbsInput): ResolverRegraFiscalIbsCbsResult; virtual; abstract;
+    function Analisar(const Input: ResolverRegraFiscalIbsCbsInput): ResolverRegraFiscalIbsCbsAnalise; virtual; abstract;
   end;
 
   ResolverRegraFiscalIbsCbsUseCase = class(IResolverRegraFiscalIbsCbsUseCase)
@@ -23,7 +20,8 @@ type
   public
     constructor Create(ResolvedorRegras: IResolverRegraFiscalIbsCbsService);
 
-    function Executar(const Input: ResolverRegraFiscalIbsCbsInput): RegraFiscalIbsCbsEtd; override;
+    function Executar(const Input: ResolverRegraFiscalIbsCbsInput): ResolverRegraFiscalIbsCbsResult; override;
+    function Analisar(const Input: ResolverRegraFiscalIbsCbsInput): ResolverRegraFiscalIbsCbsAnalise; override;
   end;
 
 implementation
@@ -37,9 +35,16 @@ begin
   FResolvedorRegras := ResolvedorRegras;
 end;
 
-function ResolverRegraFiscalIbsCbsUseCase.Executar(const Input: ResolverRegraFiscalIbsCbsInput): RegraFiscalIbsCbsEtd;
+function ResolverRegraFiscalIbsCbsUseCase.Executar(
+  const Input: ResolverRegraFiscalIbsCbsInput): ResolverRegraFiscalIbsCbsResult;
 begin
-  Result := FResolvedorRegras.Executar( Input );
+  Result := FResolvedorRegras.Executar(Input);
+end;
+
+function ResolverRegraFiscalIbsCbsUseCase.Analisar(
+  const Input: ResolverRegraFiscalIbsCbsInput): ResolverRegraFiscalIbsCbsAnalise;
+begin
+  Result := FResolvedorRegras.Analisar(Input);
 end;
 
 end.

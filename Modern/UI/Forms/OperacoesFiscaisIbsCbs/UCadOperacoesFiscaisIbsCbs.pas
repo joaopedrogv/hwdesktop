@@ -7,7 +7,8 @@ uses
   Dialogs, ModernCadastroFormUnit, AppEvnts, ExtCtrls, Menus, ComCtrls, StdCtrls,
   Buttons, Grids, DBGrids, Mask, OperacoesFiscaisIbsCbsDataSet,
   OperacoesFiscaisIbsCbsPresenter, OperacoesFiscaisIbsCbsView,
-  OperacaoFiscalIbsCbsEtdUnit, OperacaoInternaEtdUnit, GrupoFiscalEtdUnit,
+  OperacaoFiscalIbsCbsEtdUnit, OperacaoFiscalIbsCbsCondicaoEtdUnit,
+  TipoComunsUnit, OperacaoInternaEtdUnit, GrupoFiscalEtdUnit,
   CheckLst, RegraFiscalIbsCbsEtdUnit,
   CheckListBoxEmpresasFrameUnit, ComboBoxClassTribFrameUnit,
   EditHwNullableFrameUnit, MaskEditNullableFrameUnit,
@@ -29,6 +30,16 @@ type
     edPickerOpInterna: TComboboxEntityPickerFrame;
     edPickerGrupoFiscal: TComboboxEntityPickerFrame;
     ComboBoxRegrasFiscaisFrame1: TComboBoxRegrasFiscaisFrame;
+    tabCondicoes: TTabSheet;
+    lbEscopoCondicoes: TLabel;
+    gbTipoEmissao: TGroupBox;
+    clbTipoEmissao: TCheckListBox;
+    gbNatureza: TGroupBox;
+    clbNatureza: TCheckListBox;
+    gbTipoOrgaoPublico: TGroupBox;
+    clbTipoOrgaoPublico: TCheckListBox;
+    btnVerificarCondicoes: TSpeedButton;
+    procedure btnVerificarCondicoesClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure DBGrid1KeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
@@ -51,6 +62,22 @@ type
     procedure RegrasFiscaisFrameChange(Sender: TObject; RegraFiscal: RegraFiscalIbsCbsEtd);
 
     function CriarMensagemAuditoriaFormState(): string;
+
+    procedure CarregarCondicoesDisponiveis();
+    procedure CarregarCheckList(
+      const ACheckList: TCheckListBox;
+      const AAtributo: OperacaoFiscalIbsCbsCondicaoAtributo);
+    procedure LimparCondicoesDoForm();
+    procedure MarcarCondicaoNoForm(const ACondicao: OperacaoFiscalIbsCbsCondicaoEtd);
+    function CheckListDoAtributo(
+      const AAtributo: OperacaoFiscalIbsCbsCondicaoAtributo): TCheckListBox;
+    function ObterCondicaoDoForm(
+      const ACheckList: TCheckListBox;
+      const AAtributo: OperacaoFiscalIbsCbsCondicaoAtributo;
+      out ACondicao: OperacaoFiscalIbsCbsCondicaoEtd): Boolean;
+    function CriarResumoCondicoes(
+      const ACondicoes: OperacaoFiscalIbsCbsCondicaoEtdArray): string;
+    procedure AtualizarLabelEscopoCondicoes();
 
     procedure ExibirListas(
       AOperacoesInternas: OperacoesInternasEtd;
@@ -168,7 +195,13 @@ begin
   finally
     item.Free()
   end;
+
   Result := Trim(Result);
+
+  if Result <> '' then
+    Result := Result + ' | ';
+
+  Result := Result + CriarResumoCondicoes(FState.Condicoes);
 end;
 
 procedure TfrmCadOperacoesFiscaisIbsCbs.DBGrid1KeyDown(Sender: TObject; var Key: Word;
@@ -230,6 +263,8 @@ begin
 
   DbGridConfigUtils.ApplyToDBGrid(DBGrid1, Builder.List);
 
+  CarregarCondicoesDisponiveis();
+
   PrimeiraPesquisa := False;
 
   inherited;
@@ -258,7 +293,169 @@ begin
     inherited;
 end;
 
+procedure TfrmCadOperacoesFiscaisIbsCbs.CarregarCondicoesDisponiveis;
+begin
+  CarregarCheckList(clbTipoEmissao, ocaTipoEmissao);
+  CarregarCheckList(clbNatureza, ocaNaturezaEmissao);
+  CarregarCheckList(clbTipoOrgaoPublico, ocaTipoOrgaoPublico);
+end;
+
+procedure TfrmCadOperacoesFiscaisIbsCbs.CarregarCheckList(
+  const ACheckList: TCheckListBox;
+  const AAtributo: OperacaoFiscalIbsCbsCondicaoAtributo);
+var
+  Codigos: TArrayInteger;
+  i: Integer;
+begin
+  ACheckList.Items.Clear;
+
+  Codigos := OperacaoFiscalIbsCbsCondicoes.ValoresDoDominio(AAtributo);
+  for i := 0 to High(Codigos) do
+    ACheckList.Items.AddObject(
+      OperacaoFiscalIbsCbsCondicoes.DescricaoValor(AAtributo, Codigos[i]),
+      TObject(Codigos[i]));
+end;
+
+procedure TfrmCadOperacoesFiscaisIbsCbs.LimparCondicoesDoForm;
+var
+  i: Integer;
+begin
+  for i := 0 to clbTipoEmissao.Items.Count - 1 do
+    clbTipoEmissao.Checked[i] := False;
+
+  for i := 0 to clbNatureza.Items.Count - 1 do
+    clbNatureza.Checked[i] := False;
+
+  for i := 0 to clbTipoOrgaoPublico.Items.Count - 1 do
+    clbTipoOrgaoPublico.Checked[i] := False;
+end;
+
+function TfrmCadOperacoesFiscaisIbsCbs.CheckListDoAtributo(
+  const AAtributo: OperacaoFiscalIbsCbsCondicaoAtributo): TCheckListBox;
+begin
+  case AAtributo of
+    ocaTipoEmissao:
+      Result := clbTipoEmissao;
+    ocaNaturezaEmissao:
+      Result := clbNatureza;
+    ocaTipoOrgaoPublico:
+      Result := clbTipoOrgaoPublico;
+  else
+    Result := nil;
+  end;
+end;
+
+procedure TfrmCadOperacoesFiscaisIbsCbs.MarcarCondicaoNoForm(
+  const ACondicao: OperacaoFiscalIbsCbsCondicaoEtd);
+var
+  CheckList: TCheckListBox;
+  i: Integer;
+begin
+  CheckList := CheckListDoAtributo(ACondicao.Atributo);
+  if CheckList = nil then
+    Exit;
+
+  for i := 0 to CheckList.Items.Count - 1 do
+    if OperacaoFiscalIbsCbsCondicoes.Contem(
+      ACondicao, Integer(CheckList.Items.Objects[i])) then
+      CheckList.Checked[i] := True;
+end;
+
+function TfrmCadOperacoesFiscaisIbsCbs.ObterCondicaoDoForm(
+  const ACheckList: TCheckListBox;
+  const AAtributo: OperacaoFiscalIbsCbsCondicaoAtributo;
+  out ACondicao: OperacaoFiscalIbsCbsCondicaoEtd): Boolean;
+var
+  i, Qtd: Integer;
+  Valores: TArrayInteger;
+begin
+  Result := False;
+  SetLength(Valores, 0);
+  Qtd := 0;
+
+  for i := 0 to ACheckList.Items.Count - 1 do
+    if ACheckList.Checked[i] then
+    begin
+      SetLength(Valores, Qtd + 1);
+      Valores[Qtd] := Integer(ACheckList.Items.Objects[i]);
+      Inc(Qtd);
+    end;
+
+  if Qtd > 0 then
+  begin
+    ACondicao := OperacaoFiscalIbsCbsCondicaoEtd.Create(AAtributo, Valores);
+    Result := True;
+  end;
+end;
+
+function TfrmCadOperacoesFiscaisIbsCbs.CriarResumoCondicoes(
+  const ACondicoes: OperacaoFiscalIbsCbsCondicaoEtdArray): string;
+var
+  i, j: Integer;
+  NomeAtributo, Valores: string;
+  Condicao: OperacaoFiscalIbsCbsCondicaoEtd;
+begin
+  if Length(ACondicoes) = 0 then
+  begin
+    Result := 'Condi'#231#245'es: sem restri'#231#227'o';
+    Exit;
+  end;
+
+  Result := 'Condi'#231#245'es:';
+  for i := 0 to High(ACondicoes) do
+  begin
+    Condicao := ACondicoes[i];
+
+    case Condicao.Atributo of
+      ocaTipoEmissao:
+        NomeAtributo := 'Emiss'#227'o';
+      ocaNaturezaEmissao:
+        NomeAtributo := 'Natureza';
+      ocaTipoOrgaoPublico:
+        NomeAtributo := #211'rg'#227'o';
+    else
+      NomeAtributo := OperacaoFiscalIbsCbsCondicoes.DescricaoAtributo(
+        Condicao.Atributo);
+    end;
+
+    Valores := '';
+    for j := 0 to High(Condicao.Valores) do
+    begin
+      if Valores <> '' then
+        Valores := Valores + ', ';
+      Valores := Valores + OperacaoFiscalIbsCbsCondicoes.DescricaoValor(
+        Condicao.Atributo, Condicao.Valores[j]);
+    end;
+
+    if i > 0 then
+      Result := Result + ';';
+    Result := Result + ' ' + NomeAtributo + '=' + Valores;
+  end;
+end;
+
+procedure TfrmCadOperacoesFiscaisIbsCbs.AtualizarLabelEscopoCondicoes;
+var
+  Grupo: TObject;
+begin
+  if FState.GrupoFiscalId.ToText('') = '' then
+    lbEscopoCondicoes.Caption :=
+      'Escopo: Padr'#227'o (sem Grupo Fiscal) - aplica-se somente quando n'#227'o houver v'#237'nculo do grupo'
+  else
+  begin
+    Grupo := edPickerGrupoFiscal.GetSelectedEntity();
+    if Grupo <> nil then
+      lbEscopoCondicoes.Caption := 'Escopo: Grupo Fiscal ' +
+        GrupoFiscalEtd(Grupo).Descricao
+    else
+      lbEscopoCondicoes.Caption := 'Escopo: Grupo Fiscal ' +
+        FState.GrupoFiscalId.Value;
+  end;
+end;
+
 procedure TfrmCadOperacoesFiscaisIbsCbs.MapFormToState;
+var
+  Condicoes: OperacaoFiscalIbsCbsCondicaoEtdArray;
+  Condicao: OperacaoFiscalIbsCbsCondicaoEtd;
 begin
   // FState.OperacaoInternaId := ''; // ja atribuido no evento
   // FState.RegraFiscalId := '';
@@ -266,14 +463,45 @@ begin
   FState.InicioVigencia := StrToDate(edInicioVigencia.Text);
   FState.FimVigencia := edFinalVigencia.GetDateNullable();
   FState.EmpresasId := CheckListBoxEmpresasFrame1.GetIdsEmpresasSelecionadas();
+
+  SetLength(Condicoes, 0);
+
+  if ObterCondicaoDoForm(clbTipoEmissao, ocaTipoEmissao, Condicao) then
+  begin
+    SetLength(Condicoes, Length(Condicoes) + 1);
+    Condicoes[High(Condicoes)] := Condicao;
+  end;
+
+  if ObterCondicaoDoForm(clbNatureza, ocaNaturezaEmissao, Condicao) then
+  begin
+    SetLength(Condicoes, Length(Condicoes) + 1);
+    Condicoes[High(Condicoes)] := Condicao;
+  end;
+
+  if ObterCondicaoDoForm(clbTipoOrgaoPublico, ocaTipoOrgaoPublico, Condicao) then
+  begin
+    SetLength(Condicoes, Length(Condicoes) + 1);
+    Condicoes[High(Condicoes)] := Condicao;
+  end;
+
+  FState.Condicoes := Condicoes;
 end;
 
 procedure TfrmCadOperacoesFiscaisIbsCbs.MapStateToForm;
+var
+  i: Integer;
 begin
   ComboBoxRegrasFiscaisFrame1.Setup( FState.RegraFiscalId, False );
   edInicioVigencia.Text := DateToStr(FState.InicioVigencia);
   edFinalVigencia.Setup( FState.FimVigencia );
   CheckListBoxEmpresasFrame1.Setup( FState.EmpresasId, FState.Id <> '' );
+
+  LimparCondicoesDoForm();
+
+  for i := 0 to High(FState.Condicoes) do
+    MarcarCondicaoNoForm(FState.Condicoes[i]);
+
+  AtualizarLabelEscopoCondicoes();
 end;
 
 procedure TfrmCadOperacoesFiscaisIbsCbs.RegrasFiscaisFrameChange(
@@ -335,6 +563,14 @@ begin
     else
       FState.GrupoFiscalId := StringNullable.CreateOrNull ( GrupoFiscalEtd(Entity).Id )
   end;
+
+  AtualizarLabelEscopoCondicoes();
+end;
+
+procedure TfrmCadOperacoesFiscaisIbsCbs.btnVerificarCondicoesClick(
+  Sender: TObject);
+begin
+  FPresenter.AnalisarCondicoes(FState);
 end;
 
 procedure TfrmCadOperacoesFiscaisIbsCbs.ShowAbaCadastro;

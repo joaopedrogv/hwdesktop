@@ -31,6 +31,7 @@ begin
   Result.RegisterField('Ativo', 'ATIVO', 'Ativo');
 
   // Atributos sem vinculo com a tabela
+  Result.RegisterAttributeOnly('Condicoes', 'Condições de aplicabilidade');
 
   // Campos da tabela sem vinculo com a classe
 end;
