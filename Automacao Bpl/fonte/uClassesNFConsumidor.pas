@@ -5,7 +5,7 @@ interface
 uses
   uDataSet_OOP, DB, DBClient, StdCtrls, IBQuery, Classes, uClassesMigRegistros, PedVendaOrc_Model,
   config_Sistema_class, uClassesNFConsumidor_ProdutoInput, hw_undconv_utils,
-  ConfigGlobalNF_RTC, TributosDFePersistentHandler;
+  ConfigGlobalNF_RTC, TributosDFePersistentHandler, DFeTypesUnit;
 
 const
   strVerVazio = '';
@@ -490,6 +490,29 @@ type
     FStatusChange: TEventProcedure;
     FlkVendedor: TDadosLookUp_OOP;
     FDest: TNFCe_Dest;
+    // Cache do tipo de ente governamental do consumidor. Uma consulta por
+    // identidade (documento, empresa e consumidor); invalidado em SetCliente
+    // e na carga/reabertura de rascunho. Documento finalizado preserva o
+    // cache e a chave aplicada, pois nao deve ser reavaliado.
+    FTipoEnteGovConsumidor: TipoEnteGovEnum;
+    FTipoEnteGovConsumidorCarregado: Boolean;
+    FTipoEnteGovConsumidorCodNFCe: Integer;
+    FTipoEnteGovConsumidorCodEmpresa: Integer;
+    FTipoEnteGovConsumidorCodCliente: Integer;
+    // Sinaliza que o fato consumidor/ente publico deve ser reavaliado.
+    // Permanece ligado ate um recalculo dos itens ser concluido com sucesso;
+    // ao carregar um documento finalizado e descartado (nao ha reavaliacao).
+    FTipoEnteGovConsumidorAlterado: Boolean;
+    // Chave de referencia do fato consumidor: definida na carga do documento
+    // e apos cada recalculo concluido com sucesso. Comparada antes do
+    // recalculo para detectar mudanca efetiva mesmo quando o campo foi
+    // alterado fora de SetCliente. A carga de rascunho liga
+    // FTipoEnteGovConsumidorAlterado para reavaliar com a classificacao atual;
+    // recargas pos-salvamento restabelecem apenas esta chave.
+    FTipoEnteGovConsumidorAplicado: Boolean;
+    FTipoEnteGovConsumidorAplicadoCodNFCe: Integer;
+    FTipoEnteGovConsumidorAplicadoCodEmpresa: Integer;
+    FTipoEnteGovConsumidorAplicadoCodCliente: Integer;
     FEmissaoRapida: Boolean;
     FConsultaCliente: TNFC_Clientes;
     FEspelho: EspelhoValores;
@@ -507,6 +530,13 @@ type
     FDadosCertificado: TStrings;
     FFieldsWithNotificationChange: TStrings;
     FFieldChangeEvnt: TFieldNotifyEvent;
+    procedure InvalidarTipoEnteGovConsumidor;
+    procedure MarcarTipoEnteGovConsumidorAlterado;
+    procedure MarcarTipoEnteGovConsumidorAplicado;
+    function TipoEnteGovConsumidorMudouDesdeAplicacao: Boolean;
+    procedure AbreRegistrosInterno(Codigo: Integer; ChildTo,
+      ReavaliarEnteGov: Boolean);
+    function DocumentoPermiteReavaliacaoEnteGov: Boolean;
     procedure SetFieldChangeEvnt(const Value: TFieldNotifyEvent);
     function GetDadosCertificado: TStrings;
     procedure SetLastError(const Value: string); overload;
@@ -595,6 +625,9 @@ type
     function Orcamento_getOrcamento(Aped: Integer; var ATextOut: string): Boolean;
     function ValidacaoObjetosInternos(): RNFCe_ValidacaoEmGeral;
     function ObterImpressoraPadrao: string;
+    // Tipo de ente governamental do consumidor, lido de NFCE.COD_CLIENTE e
+    // CLIENTES.TIPO_ENTE_GOV. Ausente, nulo ou fora do catalogo: tgvNenhum.
+    function ObterTipoEnteGovConsumidor: TipoEnteGovEnum;
     function ConfigurarImpressoraPadrao(Impressora: string): Boolean;
     procedure MontarDadosAdicionaisInteresseFisco;
 
@@ -890,13 +923,14 @@ uses uDtmNFConsumidor, uDtmAtivo, IBDatabase, Forms, Windows, SysUtils,
   UnidadeVenda_Model, hw_strings, PedVendaProd_Model, PedVendaProdUndVenda_Model,
   nfc_class, nfc_item_class, basefb_class, nfc_pagamento_class, Types_OOP,
   ContainerUnit, TributoDFeOrigemEnumUnit, TributoDFeContextEtdUnit, TipoComunsUnit,
-  RegraFiscalIbsCbsEtdUnit, ResolverRegraFiscalIbsCbsTypesUnit, StringServiceUnit,
+  RegraFiscalIbsCbsEtdUnit, OperacaoFiscalIbsCbsCondicaoEtdUnit,
+  ResolverRegraFiscalIbsCbsTypesUnit, StringServiceUnit,
   ImpostoSeletivoInputUnit, CalcularBaseCalculoModelUnit, TributacaoRegularInputUnit,
   ItemCalculoInputUnit, CalcularTributoInputUnit, EstadosServiceUnit, ROCDomainUnit,
   TributosDFeServiceTypes, TributosDFeSerivceUnit,
   StringNullableUnit, TipoRegraTributoDFeEnumUnit,
   IRegistrarAjusteRedBenefPcUseCaseUnit, LegacyDFeDLLAdapterUnit,
-  hw_sped_inf_compl, sped_inf_compl, DFeTypesUnit, CriadorCompraGovernamentalUtilsUnit,
+  hw_sped_inf_compl, sped_inf_compl, CriadorCompraGovernamentalUtilsUnit,
   uEnviarMensagem;
 
 const
@@ -921,6 +955,9 @@ type
     CMunFBIbs, nItem: Integer;
     ValorLiquido, Acrescimos, Frete, ICMS, ISS, PIS, COFINS: Currency;
     Quantidade: Double;
+    TipoEmissao: TipoEmissaoOcorrencia;
+    NaturezaEmissao: NaturezaEmissaoOcorrencia;
+    TipoOrgaoPublico: TipoEnteGovEnum;
   public
     class function Create(
       OpInternaId: string;
@@ -930,7 +967,10 @@ type
       DhFatoGerador: TDateTime;
       CMunFBIbs, nItem: Integer;
       ValorLiquido, Acrescimos, Frete, ICMS, ISS, PIS, COFINS: Currency;
-      Quantidade: Double
+      Quantidade: Double;
+      const TipoEmissao: TipoEmissaoOcorrencia;
+      const NaturezaEmissao: NaturezaEmissaoOcorrencia;
+      TipoOrgaoPublico: TipoEnteGovEnum
     ): TributoDFeOrquestradorInput; static;
   end;
 
@@ -1525,7 +1565,7 @@ class function TributoDFeOrquestrador.Create(
   const Input: TributoDFeOrquestradorInput
 ): TributoDFeContextEtd;
 var
-  regraFiscal  : RegraFiscalIbsCbsEtd;
+  resultado    : ResolverRegraFiscalIbsCbsResult;
   rfTribRegular: RegraFiscalIbsCbsEtd;
   rocResult    : ROCDomain;
   calcInput    : ItemCalculoInput;
@@ -1540,27 +1580,35 @@ var
 begin
   Result := nil;
   regraFiscalId := '';
-
-  // 1: Encontrando a regra fiscal
-  with Container.GetInstance().ErpFeaturesFactory.CreateResolverRegraFiscalIbsCbsUseCase() do
-  try
-    regraFiscal := Executar(
-      ResolverRegraFiscalIbsCbsInput.Create(
-        Input.OpInternaId,
-        Input.GrupoFiscalId,
-        vDadosIni.cod_empresa, Input.DhFatoGerador
-      )
-    );
-  finally
-    FreeSafe();
-  end;
-
-  if regraFiscal = nil then
-    raise Exception.Create('Regra fiscal do IBS e CBS não encontrada');
-
-  // 2: Criando inputs e Calculando Base de calculo ImpostoSeletivo, CBS e IBS
+  resultado := nil;
   rocResult := nil;
+
   try
+    // 1: Encontrando a regra fiscal
+    with Container.GetInstance().ErpFeaturesFactory.CreateResolverRegraFiscalIbsCbsUseCase() do
+    try
+      resultado := Executar(
+        ResolverRegraFiscalIbsCbsInput.Create(
+          Input.OpInternaId,
+          Input.GrupoFiscalId,
+          vDadosIni.cod_empresa, Input.DhFatoGerador,
+          Input.TipoEmissao,
+          Input.NaturezaEmissao,
+          Input.TipoOrgaoPublico
+        )
+      );
+    finally
+      FreeSafe();
+    end;
+
+    if resultado = nil then
+      raise Exception.Create('Regra fiscal do IBS e CBS não encontrada')
+    else if resultado.Status <> rrDeterminado then
+      raise Exception.Create(resultado.Mensagem)
+    else if resultado.RegraFiscal = nil then
+      raise Exception.Create('Regra fiscal do IBS e CBS não encontrada');
+
+    // 2: Criando inputs e Calculando Base de calculo ImpostoSeletivo, CBS e IBS
     // Falta implentar como configura o Imposto Seletivo, é pra 2027 ainda
     if True then 
     begin
@@ -1600,10 +1648,10 @@ begin
     end;
 
     rfTribRegular := nil;
-    if not regraFiscal.RegraFiscalTribRegularId.IsNull then
+    if not resultado.RegraFiscal.RegraFiscalTribRegularId.IsNull then
       with Container.GetInstance().ErpFeaturesFactory.CreateObterRegraFiscalIbsCbsPorIdUseCase() do
       try
-        rfTribRegular := Executar( regraFiscal.RegraFiscalTribRegularId.Value );
+        rfTribRegular := Executar( resultado.RegraFiscal.RegraFiscalTribRegularId.Value );
       finally
         FreeSafe();
       end;
@@ -1646,8 +1694,8 @@ begin
     calcInput := ItemCalculoInput.Create(
       Input.nItem,
       Input.NCMouNBS,
-      regraFiscal.CClassTrib,
-      Copy(regraFiscal.CClassTrib, 1, 3),
+      resultado.RegraFiscal.CClassTrib,
+      Copy(resultado.RegraFiscal.CClassTrib, 1, 3),
       impSelInput,
       tribRegInput,
       bcCbsIbs,
@@ -1683,13 +1731,13 @@ begin
     end
     else
       Result := TributosDFeSerivce.Create(
-        TributoDFeContextInput.Create( Input.TributoDFeId, StringNullable.Create(regraFiscal.Id), tctAutomatica, False, tdfoNFCe ),
+        TributoDFeContextInput.Create( Input.TributoDFeId, StringNullable.Create(resultado.RegraFiscal.Id), tctAutomatica, False, tdfoNFCe ),
         rocResult.Objetos[0]
       );
 
   finally
-    regraFiscal.Free();
     rocResult.Free();
+    resultado.Free();
   end;
 end;
 
@@ -2246,8 +2294,43 @@ end;
 
 procedure TNFCe.AbreRegistros(Codigo: Integer; ChildTo: Boolean);
 begin
+  AbreRegistrosInterno(Codigo, ChildTo, True);
+end;
+
+procedure TNFCe.AbreRegistrosInterno(Codigo: Integer; ChildTo,
+  ReavaliarEnteGov: Boolean);
+begin
   montaSelect('select' + fCampos + ' from nfce ' +
     ' where nfce.cod_nfce = ' + IntToStr(Codigo) + ' and nfce.cod_empresa = ' + vDadosIni.codEmpresa);
+
+  if fint('cod_nfce') > 0 then
+  begin
+    if ReavaliarEnteGov then
+    begin
+      // Carga/reabertura de rascunho: a determinacao persistida depende do
+      // cadastro atual do consumidor e pode estar desatualizada. Liga a
+      // pendencia sem consultar o ente aqui; a consulta ocorre uma vez no
+      // recalculo. Documento finalizado nao e reavaliado e descarta
+      // pendencia remanescente de outro documento.
+      if DocumentoPermiteReavaliacaoEnteGov then
+        MarcarTipoEnteGovConsumidorAlterado
+      else
+      begin
+        FTipoEnteGovConsumidorAlterado := False;
+        MarcarTipoEnteGovConsumidorAplicado;
+      end;
+    end
+    else
+      // Recarga pos-salvamento: restabelece apenas a chave aplicada. Nao
+      // limpa a pendencia aqui; ela so pode ser limpa apos recalculo e
+      // commit bem-sucedidos em SalvarECalcular.
+      MarcarTipoEnteGovConsumidorAplicado;
+  end
+  else
+  begin
+    InvalidarTipoEnteGovConsumidor;
+    FTipoEnteGovConsumidorAplicado := False;
+  end;
 
   if ChildTo then
   begin
@@ -2256,7 +2339,14 @@ begin
     NFCe.Pagamento.AbreRegistros;
     NFCe.Itens.Serv.SetISSRetidoNoCliente;
     NFCe.Pagamento.TipoPagamento.AbreRegistros;
+  end;
 end;
+
+function TNFCe.DocumentoPermiteReavaliacaoEnteGov: Boolean;
+begin
+  // Somente rascunhos editaveis. Emitidos, em envio/processamento ou ja
+  // encerrados nao tem o fato reavaliado por uma simples reabertura.
+  Result := vDadosIni.strIn(Trim(fstr('situacao_nfce')), [sitVazio, sitRejeitada]);
 end;
 
 procedure TNFCe.AtualizarInfFrete(AModFreteOld: string);
@@ -3193,6 +3283,16 @@ begin
     ' nfce.vibsmun, nfce.vibs, nfce.cbs_vdif, nfce.cbs_vdevtrib, nfce.vcbs, nfce.vibsmono, nfce.vcbsmono, nfce.vibsmonoreten,' +
     ' nfce.vcbsmonoreten, nfce.vibsmonoret, nfce.vcbsmonoret, nfce.vis, nfce.op_interna_id ';
   FCodNFCeMemorizada := 0;
+  FTipoEnteGovConsumidor := tgvNenhum;
+  FTipoEnteGovConsumidorCarregado := False;
+  FTipoEnteGovConsumidorCodNFCe := 0;
+  FTipoEnteGovConsumidorCodEmpresa := 0;
+  FTipoEnteGovConsumidorCodCliente := 0;
+  FTipoEnteGovConsumidorAlterado := False;
+  FTipoEnteGovConsumidorAplicado := False;
+  FTipoEnteGovConsumidorAplicadoCodNFCe := 0;
+  FTipoEnteGovConsumidorAplicadoCodEmpresa := 0;
+  FTipoEnteGovConsumidorAplicadoCodCliente := 0;
   FObjetosInternosAusentes := True;
   FEmEmissaoEx := False;
 end;
@@ -3805,6 +3905,27 @@ begin
 
   if dataSet.IsEmpty then
     Exit;
+
+  if not (dataSet.State in [dsEdit, dsInsert]) then
+  begin
+    // Reabertura/navegacao para rascunho: se a chave aplicada nao corresponde
+    // a este documento, garante reavaliacao com o cadastro atual. Na recarga
+    // pos-salvamento a chave ja corresponde e o sinal nao e reaberto.
+    if DocumentoPermiteReavaliacaoEnteGov then
+    begin
+      if FTipoEnteGovConsumidorAlterado
+        or ((not FTipoEnteGovConsumidorAplicado) and (fint('cod_nfce') > 0))
+        or TipoEnteGovConsumidorMudouDesdeAplicacao then
+        MarcarTipoEnteGovConsumidorAlterado
+      else
+        MarcarTipoEnteGovConsumidorAplicado;
+    end
+    else
+    begin
+      FTipoEnteGovConsumidorAlterado := False;
+      MarcarTipoEnteGovConsumidorAplicado;
+    end;
+  end;
 
   LerConfigNFCe;
 
@@ -5748,6 +5869,7 @@ var
   SeqPrecoPadrao: string;
 begin
   Result := False;
+  InvalidarTipoEnteGovConsumidor;
 
   if not vDadosIni.PesqPros('NFC009', 'INSERIR', '',
     'NFCE', '') then
@@ -5756,6 +5878,8 @@ begin
   MemorizarRegistro;
   if not dataSet.Active then
     AbreRegistros(0);
+
+  FTipoEnteGovConsumidorAplicado := False;
 
   LerConfigNFCe;
 
@@ -6821,9 +6945,18 @@ var
   CMunFGIbs: Integer;
   OpInternaId: string;
   TributoDFeId: string;
+  TipoOrgaoPublico: TipoEnteGovEnum;
 begin
+  // Persiste a pendencia de reavaliacao antes de recalcular/commitar. Quando
+  // a mudanca e vista apenas pela comparacao da chave aplicada (por exemplo,
+  // atribuicao direta de COD_CLIENTE ou reabertura de rascunho), rollback ou
+  // refresh nao podem apagar o sinal.
+  if TipoEnteGovConsumidorMudouDesdeAplicacao then
+    FTipoEnteGovConsumidorAlterado := True;
+
   // So calcula se necessário, vprod nao é considerado aqui, pois já foi considerado ao salvar, aqui só os rateios
   if not ForcarRecalculo
+    and not FTipoEnteGovConsumidorAlterado
     and not FEspelho.RecalcularIbsCbs(
       fequals('DESC_POR_ITEM', 'S'),
       YesNoEnum(fint('dfe_trib_ignorar')) = ynYes,
@@ -6874,6 +7007,11 @@ begin
     if CMunFGIbs = 0 then
       CMunFGIbs := vDadosIni.vEmp.vNfe.ibgeCodCidade;
 
+    // Premissa funcional aprovada (R-06): NFC-e sempre propria e saida. O
+    // tipo de orgao publico vem do consumidor do documento; o helper mantem
+    // cache por documento para nao consultar uma vez por item.
+    TipoOrgaoPublico := ObterTipoEnteGovConsumidor;
+
     queryCons.SQL(
       'select ' +
       '   ni.nitem, ni.ucom, ni.qcom, ni.vprod, ni.vdesc, ni.vseg, ni.voutro, ni.vfrete, ' +
@@ -6908,7 +7046,10 @@ begin
         {ISS}          queryCons.ffloat('iss_vissqn'),
         {PIS}          queryCons.ffloat('pis_vpis'),
         {COFINS}       queryCons.ffloat('cofins_vcofins'),
-        {Quantidade}   queryCons.ffloat('qcom')
+        {Quantidade}   queryCons.ffloat('qcom'),
+        {TipoEmissao}  OperacaoFiscalIbsCbsCondicoes.TipoEmissaoDePropria(True),
+        {NaturezaEmissao} OperacaoFiscalIbsCbsCondicoes.NaturezaDeSaida(True),
+        {TipoOrgaoPublico} TipoOrgaoPublico
       ));
       try
         Itens.FTributos.SetItem( tributosRTC, tdfoNFCe );
@@ -7006,40 +7147,60 @@ begin
 
         SqlExec('update nfce set ativo = 1 where cod_nfce = %d and cod_empresa = %d and ativo <> 1', [Codigo, vDadosIni.cod_empresa]);
 
-        CommitaTransacao;
-        try
-          dataSet.RefreshRecord;
-        except
-          dataSet.Refresh;
-          if Codigo <> dataSet.FieldByName('COD_NFCE').AsInteger then
+        // O sinal so pode ser limpo depois que o recalculo foi efetivado.
+        // Em caso de falha, permanece ligado para forcar nova avaliacao.
+        if emTransacao then
+        begin
+          // CommitaTransacao ja executou o rollback quando retorna False.
+          // Nesse caso o salvamento falhou: nao prosseguir com o refresh nem
+          // substituir o espelho; manter o sinal e a aplicacao pendentes.
+          if not CommitaTransacao then
+            Result := False
+          else
           begin
-            if not dataSet.Locate('COD_NFCE', Codigo, []) then
-              AbreRegistros(Codigo);
-            if Codigo <> dataSet.FieldByName('COD_NFCE').AsInteger then
-              raiseExceptionCreate('Erro ao localizar o registro. Por favor consulte novamente', '');
+            FTipoEnteGovConsumidorAlterado := False;
+            MarcarTipoEnteGovConsumidorAplicado;
           end;
         end;
-        dataSet.Edit;
-        Itens.dataSet.Refresh;
-        if AvNF_Old <> dataSet.FieldByName('vnf').AsFloat then
-          if Assigned(Pagamento.PagamentoChange) then
-            Pagamento.PagamentoChange;
 
-        FEspelho := EspelhoValores.Create(
-          fequals('DESC_POR_ITEM', 'S'),
-          YesNoEnum(fint('dfe_trib_ignorar')) = ynYes,
-          ffloat('vprod'),
-          ffloat('vdesc'),
-          ffloat('vfrete'),
-          ffloat('vseg'),
-          ffloat('voutro')
-        );
+        if Result then
+        begin
+          try
+            dataSet.RefreshRecord;
+          except
+            dataSet.Refresh;
+            if Codigo <> dataSet.FieldByName('COD_NFCE').AsInteger then
+            begin
+              if not dataSet.Locate('COD_NFCE', Codigo, []) then
+                // Recarga pos-salvamento: restabelece a chave aplicada sem
+                // reabrir a pendencia de reavaliacao do rascunho.
+                AbreRegistrosInterno(Codigo, False, False);
+              if Codigo <> dataSet.FieldByName('COD_NFCE').AsInteger then
+                raiseExceptionCreate('Erro ao localizar o registro. Por favor consulte novamente', '');
+            end;
+          end;
+          dataSet.Edit;
+          Itens.dataSet.Refresh;
+          if AvNF_Old <> dataSet.FieldByName('vnf').AsFloat then
+            if Assigned(Pagamento.PagamentoChange) then
+              Pagamento.PagamentoChange;
+
+          FEspelho := EspelhoValores.Create(
+            fequals('DESC_POR_ITEM', 'S'),
+            YesNoEnum(fint('dfe_trib_ignorar')) = ynYes,
+            ffloat('vprod'),
+            ffloat('vdesc'),
+            ffloat('vfrete'),
+            ffloat('vseg'),
+            ffloat('voutro')
+          );
+        end;
       end;
     finally
       if Codigo <> dataSet.FieldByName('COD_NFCE').AsInteger then
       begin
         if not dataSet.Locate('COD_NFCE', Codigo, []) then
-          AbreRegistros(Codigo);
+          AbreRegistrosInterno(Codigo, False, False);
         if Codigo <> dataSet.FieldByName('COD_NFCE').AsInteger then
           raiseExceptionCreate('Erro ao localizar o registro. Por favor consulte novamente', '');
       end;
@@ -7099,10 +7260,15 @@ end;
 procedure TNFCe.SetCliente(LocalizarCliente: Boolean; var ClienteConsumidor: Boolean);
 var
   CodigoCliente: Integer;
+  CodigoClienteAnterior: Integer;
   Aiss_retido: string;
 begin
+  InvalidarTipoEnteGovConsumidor;
+
   if not (dataSet.State in [dsInsert, dsEdit]) then
     Exit;
+
+  CodigoClienteAnterior := dataSet.FieldByName('COD_CLIENTE').AsInteger;
 
   try
 
@@ -7119,6 +7285,8 @@ begin
     begin
       ClienteConsumidor := True;
       dataSet.FieldByName('COD_CLIENTE').AsVariant := Null;
+      if CodigoClienteAnterior <> 0 then
+        MarcarTipoEnteGovConsumidorAlterado;
       Exit;
     end;
 
@@ -7160,6 +7328,11 @@ begin
 
     if not buscas.IsEmpty then
     begin
+      // Carga bem-sucedida do cliente: reavaliar o fato de ente publico mesmo
+      // quando o COD_CLIENTE efetivo nao muda. A classificacao do cliente pode
+      // ter sido corrigida entre duas cargas.
+      MarcarTipoEnteGovConsumidorAlterado;
+
       {
       if (Length(Trim(buscas.FieldByName('cpfcgc').AsString)) = 14)
         and (Date >= ConfigNFCe.NT.sinief_11_2025) then
@@ -7186,6 +7359,9 @@ begin
   //          dataSet.FieldByName('EMAIL').AsString        := '';
             ClienteConsumidor := True;
 
+            if CodigoClienteAnterior <> 0 then
+              MarcarTipoEnteGovConsumidorAlterado;
+
             Dest.Delete;
             Dest.Apply;
             SalvarECalcular(False);
@@ -7195,7 +7371,13 @@ begin
           else
             Application.MessageBox('Cliente informado é Contribuinte de ICMS(Indicador de inscrição estadual = 1)', 'Atenção', MB_ICONEXCLAMATION + MB_OK);
 
-      dataSet.FieldByName('COD_CLIENTE').AsInteger := CodigoCliente;
+      // O consumidor efetivo e nulo no modo consumidor; definir antes das
+      // operacoes do destinatario para o fato ser lido com a identidade final.
+      if ClienteConsumidor then
+        dataSet.FieldByName('COD_CLIENTE').AsVariant := Null
+      else
+        dataSet.FieldByName('COD_CLIENTE').AsInteger := CodigoCliente;
+
       if Dest.IsEmpty then
         Dest.Insert
       else
@@ -7217,11 +7399,10 @@ begin
       end;
       Dest.Post;
       Dest.Apply;
+
       SalvarECalcular(False);
 
       Itens.AtualizarInfRetencao(Aiss_retido);
-      if ClienteConsumidor then
-        dataSet.FieldByName('COD_CLIENTE').AsVariant := Null;
       //if HouveAlteracao or Dest.
 
     end;
@@ -7231,6 +7412,79 @@ begin
       registraErro('TNFCe.SetCliente Erro: ' + e.Message);
     end;
   end;
+end;
+
+function TNFCe.ObterTipoEnteGovConsumidor: TipoEnteGovEnum;
+var
+  CodCliente, CodigoTipoEnteGov, CodNFCe, CodEmpresa: Integer;
+begin
+  CodNFCe    := fint('cod_nfce');
+  CodEmpresa := vDadosIni.cod_empresa;
+  CodCliente := fint('COD_CLIENTE');
+
+  // Reutiliza somente para a mesma identidade efetiva. Caminhos de navegacao
+  // seguidos de Edit nao passam por AbreRegistros; a chave evita transportar
+  // o ente de outro documento/consumidor e mantem no maximo uma consulta por
+  // identidade inalterada.
+  if (not FTipoEnteGovConsumidorCarregado)
+    or (FTipoEnteGovConsumidorCodNFCe <> CodNFCe)
+    or (FTipoEnteGovConsumidorCodEmpresa <> CodEmpresa)
+    or (FTipoEnteGovConsumidorCodCliente <> CodCliente) then
+  begin
+    if CodCliente > 0 then
+      CodigoTipoEnteGov := SqlScalar(
+        'select tipo_ente_gov from clientes' +
+        ' where cod_cliente = %d and cod_empresa = %d',
+        [CodCliente, CodEmpresa]).AsInteger
+    else
+      CodigoTipoEnteGov := 0;
+
+    // Bivalencia aprovada (TDQ-15): consumidor ausente, valor nulo ou codigo
+    // fora do catalogo resultam em "Nenhum"; nao existe estado desconhecido.
+    FTipoEnteGovConsumidor :=
+      OperacaoFiscalIbsCbsCondicoes.CodigoParaTipoEnteGov(CodigoTipoEnteGov);
+    FTipoEnteGovConsumidorCodNFCe := CodNFCe;
+    FTipoEnteGovConsumidorCodEmpresa := CodEmpresa;
+    FTipoEnteGovConsumidorCodCliente := CodCliente;
+    FTipoEnteGovConsumidorCarregado := True;
+  end;
+
+  Result := FTipoEnteGovConsumidor;
+end;
+
+procedure TNFCe.InvalidarTipoEnteGovConsumidor;
+begin
+  FTipoEnteGovConsumidorCarregado := False;
+  FTipoEnteGovConsumidor := tgvNenhum;
+  FTipoEnteGovConsumidorCodNFCe := 0;
+  FTipoEnteGovConsumidorCodEmpresa := 0;
+  FTipoEnteGovConsumidorCodCliente := 0;
+end;
+
+procedure TNFCe.MarcarTipoEnteGovConsumidorAlterado;
+begin
+  InvalidarTipoEnteGovConsumidor;
+  FTipoEnteGovConsumidorAlterado := True;
+end;
+
+procedure TNFCe.MarcarTipoEnteGovConsumidorAplicado;
+begin
+  FTipoEnteGovConsumidorAplicado := True;
+  FTipoEnteGovConsumidorAplicadoCodNFCe := fint('cod_nfce');
+  FTipoEnteGovConsumidorAplicadoCodEmpresa := vDadosIni.cod_empresa;
+  FTipoEnteGovConsumidorAplicadoCodCliente := fint('COD_CLIENTE');
+end;
+
+function TNFCe.TipoEnteGovConsumidorMudouDesdeAplicacao: Boolean;
+begin
+  Result := FTipoEnteGovConsumidorAlterado;
+  if Result or (not FTipoEnteGovConsumidorAplicado) then
+    Exit;
+
+  Result :=
+    (FTipoEnteGovConsumidorAplicadoCodNFCe <> fint('cod_nfce'))
+    or (FTipoEnteGovConsumidorAplicadoCodEmpresa <> vDadosIni.cod_empresa)
+    or (FTipoEnteGovConsumidorAplicadoCodCliente <> fint('COD_CLIENTE'));
 end;
 
 function TNFCe.SetCodigoInterno: Boolean;
@@ -7437,6 +7691,10 @@ begin
     dataSet.FieldByName('cod_cliente').Value := Null
   else
     dataSet.FieldByName('cod_cliente').AsInteger  := APedVenda.cod_cliente;
+  // A carga do pedido e bem-sucedida: reavaliar o fato de ente publico mesmo
+  // quando a identidade do cliente nao muda, pois a classificacao pode ter
+  // sido corrigida entre duas cargas.
+  MarcarTipoEnteGovConsumidorAlterado;
 
     if APedVenda.id_commerce > 0 then
     begin
@@ -9721,7 +9979,11 @@ begin
     {ISS}          ffloat('iss_vissqn'),
     {PIS}          ffloat('pis_vpis'),
     {COFINS}       ffloat('cofins_vcofins'),
-    {Quantidade}   ffloat('qcom')
+    {Quantidade}   ffloat('qcom'),
+    // Premissa funcional aprovada (R-06): propria/saida nao sao lidas de campo.
+    {TipoEmissao}  OperacaoFiscalIbsCbsCondicoes.TipoEmissaoDePropria(True),
+    {NaturezaEmissao} OperacaoFiscalIbsCbsCondicoes.NaturezaDeSaida(True),
+    {TipoOrgaoPublico} NFCeAOwer.ObterTipoEnteGovConsumidor()
   ));
   try
     FTributos.SetItem( tributosRTC, tdfoNFCe );
@@ -11458,7 +11720,8 @@ begin
     if inherited Delete then
       if Apply then
       begin
-        NFCeAOwer.dataSet.FieldByName('cod_cliente').Value := Null; 
+        NFCeAOwer.dataSet.FieldByName('cod_cliente').Value := Null;
+        NFCeAOwer.MarcarTipoEnteGovConsumidorAlterado;
         Result := NFCeAOwer.SalvarECalcular(False);
       end;
 end;
@@ -12565,7 +12828,10 @@ end;
 class function TributoDFeOrquestradorInput.Create(OpInternaId, TributoDFeId,
   GrupoFiscalId, NCMouNBS, Unidade: string; DhFatoGerador: TDateTime; CMunFBIbs,
   nItem: Integer; ValorLiquido, Acrescimos, Frete, ICMS, ISS, PIS,
-  COFINS: Currency; Quantidade: Double): TributoDFeOrquestradorInput;
+  COFINS: Currency; Quantidade: Double;
+  const TipoEmissao: TipoEmissaoOcorrencia;
+  const NaturezaEmissao: NaturezaEmissaoOcorrencia;
+  TipoOrgaoPublico: TipoEnteGovEnum): TributoDFeOrquestradorInput;
 begin
   Result.OpInternaId := OpInternaId;
   Result.TributoDFeId := TributoDFeId;
@@ -12583,6 +12849,9 @@ begin
   Result.PIS := PIS;
   Result.COFINS := COFINS;
   Result.Quantidade := Quantidade;
+  Result.TipoEmissao := TipoEmissao;
+  Result.NaturezaEmissao := NaturezaEmissao;
+  Result.TipoOrgaoPublico := TipoOrgaoPublico;
 end;
 
 end.
