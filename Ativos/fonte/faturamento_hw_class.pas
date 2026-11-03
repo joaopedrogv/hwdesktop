@@ -643,6 +643,7 @@ uses
   gs1prefix,
   ContainerUnit,
   ResolverRegraFiscalIbsCbsTypesUnit,
+  OperacaoFiscalIbsCbsCondicaoEtdUnit,
   RegraFiscalIbsCbsEtdUnit,
   CalcularTributoInputUnit,
   ItemCalculoInputUnit,
@@ -6521,6 +6522,11 @@ var
   tipoRegra    : TipoRegraTributoDFeEnum;
   TpEnteGov    : TipoEnteGovEnum;
   TpOperGov    : TipoOperEnteGovNFeEnum;
+  resultadoRegraFiscal: ResolverRegraFiscalIbsCbsResult;
+  regraFiscalDoResultado: Boolean;
+  fatoTipoEmissao: TipoEmissaoOcorrencia;
+  fatoNaturezaEmissao: NaturezaEmissaoOcorrencia;
+  fatoTipoOrgaoPublico: TipoEnteGovEnum;
 begin
   if YesNoEnum(FOwnerNF.dfe_trib_ignorar) = ynYes then
   begin
@@ -6538,6 +6544,9 @@ begin
     regraFiscalId := '';
   end;
 
+  resultadoRegraFiscal := nil;
+  regraFiscal := nil;
+
   // 1: Encontrando a regra fiscal
   case tipoRegra of
     tctAutomatica:
@@ -6547,13 +6556,37 @@ begin
         else
           grupoFiscalid := '';
 
+        if FOwnerNF.emissao_propria = 'S' then
+          fatoTipoEmissao := TipoEmissaoOcorrencia.Conhecido(tecPropria)
+        else if FOwnerNF.emissao_propria = 'N' then
+          fatoTipoEmissao := TipoEmissaoOcorrencia.Conhecido(tecTerceiros)
+        else
+          fatoTipoEmissao := TipoEmissaoOcorrencia.Desconhecido;
+
+        if FOwnerNF.natureza_nf = 'E' then
+          fatoNaturezaEmissao := NaturezaEmissaoOcorrencia.Conhecido(necEntrada)
+        else if FOwnerNF.natureza_nf = 'S' then
+          fatoNaturezaEmissao := NaturezaEmissaoOcorrencia.Conhecido(necSaida)
+        else
+          fatoNaturezaEmissao := NaturezaEmissaoOcorrencia.Desconhecido;
+
+        // O participante e lido de cliente (mesma linha de CLIENTES usada por dest_nf,
+        // conforme TDQ-01); ausente/invalido resulta em Nenhum (bivalente).
+        fatoTipoOrgaoPublico := tgvNenhum;
+        if Assigned(FOwnerNF.cliente) then
+          fatoTipoOrgaoPublico := OperacaoFiscalIbsCbsCondicoes.CodigoParaTipoEnteGov(
+            FOwnerNF.cliente.tipo_ente_gov);
+
         with Container.GetInstance().ErpFeaturesFactory.CreateResolverRegraFiscalIbsCbsUseCase() do
         try
-          regraFiscal := Executar(
+          resultadoRegraFiscal := Executar(
               ResolverRegraFiscalIbsCbsInput.Create(
                 StrDefault( op_interna_id, FOwnerNF.op_interna_id),
                 grupoFiscalid,
-                vDadosIni.cod_empresa, FOwnerNF.data_contabil
+                vDadosIni.cod_empresa, FOwnerNF.data_contabil,
+                fatoTipoEmissao,
+                fatoNaturezaEmissao,
+                fatoTipoOrgaoPublico
               )
             );
         finally
@@ -6581,12 +6614,33 @@ begin
       end;
   end;
 
-  // Falta definir se teremos um processo e onde teremos para o preenchimento dos campos da RTC
-  if regraFiscal = nil then
-  begin
-    FOwnerNF.erros.New('Regra fiscal do IBS e CBS não encontrada | Item %s - %s', [num_fab_prod, descricao_item]);
-    Exit;
-  end;
+  // Status do resultado automatico: somente rrDeterminado fornece regra.
+  // Os demais status apresentam a causa especifica e nao inventam regra/codigo.
+  regraFiscalDoResultado := False;
+  try
+    if tipoRegra = tctAutomatica then
+    begin
+      if resultadoRegraFiscal = nil then
+      begin
+        FOwnerNF.erros.New('Regra fiscal do IBS e CBS não encontrada | Item %s - %s', [num_fab_prod, descricao_item]);
+        Exit;
+      end;
+
+      if resultadoRegraFiscal.Status <> rrDeterminado then
+      begin
+        FOwnerNF.erros.New('%s', [resultadoRegraFiscal.Mensagem]);
+        Exit;
+      end;
+
+      regraFiscal := resultadoRegraFiscal.RegraFiscal;
+      regraFiscalDoResultado := True;
+    end;
+
+    if regraFiscal = nil then
+    begin
+      FOwnerNF.erros.New('Regra fiscal do IBS e CBS não encontrada | Item %s - %s', [num_fab_prod, descricao_item]);
+      Exit;
+    end;
 
   // Ente governamental, quando implementar basta ajustar
   {
@@ -6737,8 +6791,12 @@ begin
     end;
 
   finally
-    regraFiscal.Free();
     rocResult.Free();
+  end;
+  finally
+    if not regraFiscalDoResultado then
+      regraFiscal.Free();
+    resultadoRegraFiscal.Free();
   end;
 end;
 
