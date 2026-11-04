@@ -83,6 +83,8 @@ type
       AOperacoesInternas: OperacoesInternasEtd;
       AGruposFiscais: GruposFiscaisEtd
     );
+    procedure ExibirAnaliseCondicoes(const AResumo, ARelatorio: string);
+    procedure CopiarRelatorioAnalise(Sender: TObject);
   private
     procedure ShowAbaCadastro();
     procedure MapStateToForm();
@@ -99,7 +101,7 @@ uses
   FieldsConfigUnit, EntityMetadataUnit, OperacaoFiscalIbsCbsMetadataUnit,
   Contnrs, UIFormValidatorFactoryUnit, DbGridConfigUtilsUnit,
   StatusRegistroEnumUnit,
-  StringNullableUnit, DateTimeServiceUnit;
+  StringNullableUnit, DateTimeServiceUnit, Clipbrd;
 
 {$R *.dfm}
 
@@ -456,6 +458,7 @@ procedure TfrmCadOperacoesFiscaisIbsCbs.MapFormToState;
 var
   Condicoes: OperacaoFiscalIbsCbsCondicaoEtdArray;
   Condicao: OperacaoFiscalIbsCbsCondicaoEtd;
+  Item: TObject;
 begin
   // FState.OperacaoInternaId := ''; // ja atribuido no evento
   // FState.RegraFiscalId := '';
@@ -463,6 +466,28 @@ begin
   FState.InicioVigencia := StrToDate(edInicioVigencia.Text);
   FState.FimVigencia := edFinalVigencia.GetDateNullable();
   FState.EmpresasId := CheckListBoxEmpresasFrame1.GetIdsEmpresasSelecionadas();
+
+  Item := edPickerOpInterna.GetSelectedEntity();
+  if Item <> nil then
+    FState.OperacaoInternaDescricao := OperacaoInternaEtd(Item).Descricao
+  else
+    FState.OperacaoInternaDescricao := '';
+
+  Item := edPickerGrupoFiscal.GetSelectedEntity();
+  if Item <> nil then
+    FState.GrupoFiscalDescricao := GrupoFiscalEtd(Item).Descricao
+  else
+    FState.GrupoFiscalDescricao := '';
+
+  Item := ComboBoxRegrasFiscaisFrame1.GetRegraFiscal();
+  try
+    if Item <> nil then
+      FState.RegraFiscalDescricao := RegraFiscalIbsCbsEtd(Item).Descricao
+    else
+      FState.RegraFiscalDescricao := '';
+  finally
+    Item.Free();
+  end;
 
   SetLength(Condicoes, 0);
 
@@ -570,6 +595,7 @@ end;
 procedure TfrmCadOperacoesFiscaisIbsCbs.btnVerificarCondicoesClick(
   Sender: TObject);
 begin
+  MapFormToState();
   FPresenter.AnalisarCondicoes(FState);
 end;
 
@@ -659,6 +685,101 @@ begin
 
   AGruposFiscais.Insert(0, nil);
   edPickerGrupoFiscal.LoadEntities(AGruposFiscais, True);
+end;
+
+procedure TfrmCadOperacoesFiscaisIbsCbs.ExibirAnaliseCondicoes(
+  const AResumo, ARelatorio: string);
+var
+  Dialogo: TForm;
+  PanelTopo: TPanel;
+  PanelRodape: TPanel;
+  PanelRelatorio: TPanel;
+  lbResumo: TLabel;
+  MemoRelatorio: TMemo;
+  btnCopiar: TButton;
+  btnFechar: TButton;
+begin
+  Dialogo := TForm.Create(nil);
+  try
+    Dialogo.BorderStyle := bsDialog;
+    Dialogo.Position := poMainFormCenter;
+    Dialogo.Caption := 'Verificação das condições';
+    Dialogo.ClientWidth := 640;
+    Dialogo.ClientHeight := 440;
+
+    PanelTopo := TPanel.Create(Dialogo);
+    PanelTopo.Parent := Dialogo;
+    PanelTopo.Align := alTop;
+    PanelTopo.Height := 40;
+    PanelTopo.BevelOuter := bvNone;
+    PanelTopo.BorderWidth := 8;
+
+    lbResumo := TLabel.Create(Dialogo);
+    lbResumo.Parent := PanelTopo;
+    lbResumo.Align := alClient;
+    lbResumo.Font.Style := [fsBold];
+    lbResumo.Caption := AResumo;
+    lbResumo.WordWrap := True;
+
+    PanelRodape := TPanel.Create(Dialogo);
+    PanelRodape.Parent := Dialogo;
+    PanelRodape.Align := alBottom;
+    PanelRodape.Height := 48;
+    PanelRodape.BevelOuter := bvNone;
+    PanelRodape.BorderWidth := 6;
+
+    btnFechar := TButton.Create(Dialogo);
+    btnFechar.Parent := PanelRodape;
+    btnFechar.Caption := 'Fechar';
+    btnFechar.Width := 90;
+    btnFechar.Height := 28;
+    btnFechar.Top := 4;
+    btnFechar.Left := PanelRodape.ClientWidth - btnFechar.Width - 6;
+    btnFechar.ModalResult := mrOk;
+    btnFechar.Default := True;
+    btnFechar.Cancel := True;
+
+    btnCopiar := TButton.Create(Dialogo);
+    btnCopiar.Parent := PanelRodape;
+    btnCopiar.Caption := 'Copiar';
+    btnCopiar.Width := 90;
+    btnCopiar.Height := 28;
+    btnCopiar.Top := 4;
+    btnCopiar.Left := btnFechar.Left - btnCopiar.Width - 6;
+    btnCopiar.OnClick := CopiarRelatorioAnalise;
+
+    PanelRelatorio := TPanel.Create(Dialogo);
+    PanelRelatorio.Parent := Dialogo;
+    PanelRelatorio.Align := alClient;
+    PanelRelatorio.BevelOuter := bvNone;
+    PanelRelatorio.BorderWidth := 6;
+
+    MemoRelatorio := TMemo.Create(Dialogo);
+    MemoRelatorio.Name := 'MemoRelatorioAnalise';
+    MemoRelatorio.Parent := PanelRelatorio;
+    MemoRelatorio.Align := alClient;
+    MemoRelatorio.ReadOnly := True;
+    MemoRelatorio.ScrollBars := ssVertical;
+    MemoRelatorio.WordWrap := True;
+    MemoRelatorio.Text := ARelatorio;
+
+    Dialogo.ShowModal();
+  finally
+    Dialogo.Free();
+  end;
+end;
+
+procedure TfrmCadOperacoesFiscaisIbsCbs.CopiarRelatorioAnalise(
+  Sender: TObject);
+var
+  Dialogo: TForm;
+  MemoRelatorio: TMemo;
+begin
+  Dialogo := TForm(TButton(Sender).Owner);
+  MemoRelatorio := TMemo(Dialogo.FindComponent('MemoRelatorioAnalise'));
+
+  if MemoRelatorio <> nil then
+    Clipboard.AsText := MemoRelatorio.Text;
 end;
 
 procedure TfrmCadOperacoesFiscaisIbsCbs.SetupPresenter(

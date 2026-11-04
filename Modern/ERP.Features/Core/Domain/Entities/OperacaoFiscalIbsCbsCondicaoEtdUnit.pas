@@ -353,9 +353,9 @@ class function OperacaoFiscalIbsCbsCondicoes.DescricaoAtributo(
   const Atributo: OperacaoFiscalIbsCbsCondicaoAtributo): string;
 begin
   case Atributo of
-    ocaTipoEmissao: Result := 'Tipo de emissao';
-    ocaNaturezaEmissao: Result := 'Natureza da emissao';
-    ocaTipoOrgaoPublico: Result := 'Tipo de orgao publico';
+    ocaTipoEmissao: Result := 'Tipo de emissão';
+    ocaNaturezaEmissao: Result := 'Natureza';
+    ocaTipoOrgaoPublico: Result := 'Tipo de órgão público';
   else
     Result := 'Atributo desconhecido';
   end;

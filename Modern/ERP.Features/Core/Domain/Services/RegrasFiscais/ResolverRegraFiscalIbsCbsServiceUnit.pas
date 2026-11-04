@@ -185,11 +185,116 @@ end;
 { Descricoes }
 
 function IdentificacaoVinculo(const Candidato: OperacaoFiscalIbsCbsEtd): string;
+var
+  operacaoInterna: string;
+  grupoFiscal: string;
+  regraFiscal: string;
 begin
-  if Candidato.Id <> '' then
-    Result := Candidato.Id
+  operacaoInterna := Candidato.OperacaoInternaDescricao;
+  if Trim(operacaoInterna) = '' then
+    operacaoInterna := 'Operação Interna não identificada';
+
+  grupoFiscal := Candidato.GrupoFiscalDescricao;
+  if Trim(grupoFiscal) = '' then
+    grupoFiscal := 'Nenhum';
+
+  regraFiscal := Candidato.RegraFiscalDescricao;
+  if Trim(regraFiscal) = '' then
+    regraFiscal := 'Regra Fiscal não identificada';
+
+  Result := Format('%s / %s / %s / Vigência a partir de %s',
+    [operacaoInterna, grupoFiscal, regraFiscal,
+     FormatDateTime('dd/mm/yyyy', Candidato.InicioVigencia)]);
+
+  // Um rascunho ainda nao persistido nao possui Id; o prefixo o distingue dos
+  // vinculos carregados do repositorio.
+  if Trim(Candidato.Id) = '' then
+    Result := 'Nova configuração: ' + Result;
+end;
+
+function DescricaoAbrangencia(
+  const Atributo: OperacaoFiscalIbsCbsCondicaoAtributo): string;
+begin
+  case Atributo of
+    ocaTipoEmissao:
+      Result := 'emissão própria e de terceiros';
+    ocaNaturezaEmissao:
+      Result := 'entrada e saída';
+    ocaTipoOrgaoPublico:
+      Result := 'todas as opções do catálogo';
   else
-    Result := '(sem identificacao)';
+    Result := '';
+  end;
+end;
+
+function DescricaoAbrangenciaFrase(
+  const Atributo: OperacaoFiscalIbsCbsCondicaoAtributo): string;
+begin
+  case Atributo of
+    ocaTipoEmissao:
+      Result := 'tanto emissão própria quanto de terceiros';
+    ocaNaturezaEmissao:
+      Result := 'tanto entrada quanto saída';
+    ocaTipoOrgaoPublico:
+      Result := 'todas as opções do catálogo';
+  else
+    Result := '';
+  end;
+end;
+
+function AtributoDeCondicaoConhecido(
+  const Atributo: OperacaoFiscalIbsCbsCondicaoAtributo): Boolean;
+begin
+  Result := (Atributo = ocaTipoEmissao) or (Atributo = ocaNaturezaEmissao) or
+    (Atributo = ocaTipoOrgaoPublico);
+end;
+
+function DescricaoCondicaoInvalida(
+  const Condicoes: OperacaoFiscalIbsCbsCondicaoEtdArray): string;
+var
+  atributosOcupados: array[1..3] of Boolean;
+  i, j: Integer;
+  atributo: OperacaoFiscalIbsCbsCondicaoAtributo;
+  atributoAfetado: OperacaoFiscalIbsCbsCondicaoAtributo;
+begin
+  Result := 'de aplicabilidade';
+  atributoAfetado := ocaInvalida;
+
+  // Atributo sem suporte nao possui rotulo confiavel para o usuario; nesse
+  // caso a mensagem permanece generica.
+  for i := 0 to High(Condicoes) do
+    if not AtributoDeCondicaoConhecido(Condicoes[i].Atributo) then
+      Exit;
+
+  for i := 1 to 3 do
+    atributosOcupados[i] := False;
+
+  for i := 0 to High(Condicoes) do
+  begin
+    atributo := Condicoes[i].Atributo;
+
+    if atributosOcupados[Ord(atributo)] then
+    begin
+      if atributoAfetado = ocaInvalida then
+        atributoAfetado := atributo;
+      Continue;
+    end;
+
+    atributosOcupados[Ord(atributo)] := True;
+
+    if Length(Condicoes[i].Valores) = 0 then
+      if atributoAfetado = ocaInvalida then
+        atributoAfetado := atributo;
+
+    for j := 0 to High(Condicoes[i].Valores) do
+      if not OperacaoFiscalIbsCbsCondicoes.CodigoValido(
+        atributo, Condicoes[i].Valores[j]) then
+        if atributoAfetado = ocaInvalida then
+          atributoAfetado := atributo;
+  end;
+
+  if atributoAfetado <> ocaInvalida then
+    Result := OperacaoFiscalIbsCbsCondicoes.DescricaoAtributo(atributoAfetado);
 end;
 
 function DescricaoValoresMascara(const Atributo: OperacaoFiscalIbsCbsCondicaoAtributo;
@@ -935,7 +1040,7 @@ begin
 end;
 
 procedure AnalisarEscopo(const Candidatos: TList;
-  const Escopo: string;
+  const ARascunho: OperacaoFiscalIbsCbsEtd;
   Analise: ResolverRegraFiscalIbsCbsAnalise;
   const RegrasRepo: IRegrasFiscaisIbsCbsRepository;
   Cache: TStringList);
@@ -954,25 +1059,45 @@ begin
 
     if not OperacaoFiscalIbsCbsCondicoes.Validar(candidato.Condicoes, erros) then
     begin
-      for k := 0 to High(erros) do
-        Analise.Adicionar(Format('Vinculo %s (%s): configuracao invalida: %s',
-          [IdentificacaoVinculo(candidato), Escopo, erros[k]]));
+      // Um unico apontamento por configuracao invalida; os erros de validacao
+      // permanecem internos e nao sao despejados ao usuario.
+      if DescricaoCondicaoInvalida(candidato.Condicoes) = 'de aplicabilidade' then
+        Analise.AdicionarApontamento(ratValorInvalido, Format(
+          'A configuração "%s" contém uma condição com um valor que o sistema ' +
+          'não reconhece. Abra esse cadastro e selecione uma das opções disponíveis.',
+          [IdentificacaoVinculo(candidato)]))
+      else
+        Analise.AdicionarApontamento(ratValorInvalido, Format(
+          'A condição "%s" da configuração "%s" contém um valor que o sistema ' +
+          'não reconhece. Abra esse cadastro e selecione uma das opções disponíveis.',
+          [DescricaoCondicaoInvalida(candidato.Condicoes),
+           IdentificacaoVinculo(candidato)]));
       Continue;
     end;
 
     for k := 0 to High(candidato.Condicoes) do
       if OperacaoFiscalIbsCbsCondicoes.EhUniversal(candidato.Condicoes[k]) then
-        Analise.Adicionar(Format(
-          'Vinculo %s (%s): a condicao de %s nao restringe (conjunto universal).',
-          [IdentificacaoVinculo(candidato), Escopo,
-           OperacaoFiscalIbsCbsCondicoes.DescricaoAtributo(candidato.Condicoes[k].Atributo)]));
+        if candidato = ARascunho then
+          Analise.AdicionarApontamento(ratObservacaoOpcoes, Format(
+            '%s permite %s.',
+            [OperacaoFiscalIbsCbsCondicoes.DescricaoAtributo(
+               candidato.Condicoes[k].Atributo),
+             DescricaoAbrangenciaFrase(candidato.Condicoes[k].Atributo)]))
+        else
+          Analise.AdicionarApontamento(ratObservacaoOpcoes, Format(
+            'A configuração "%s" aceita todas as opções de %s (%s).',
+            [IdentificacaoVinculo(candidato),
+             OperacaoFiscalIbsCbsCondicoes.DescricaoAtributo(
+               candidato.Condicoes[k].Atributo),
+             DescricaoAbrangencia(candidato.Condicoes[k].Atributo)]));
 
     regra := ObterRegra(candidato.RegraFiscalId, RegrasRepo, Cache);
     if regra = nil then
     begin
-      Analise.Adicionar(Format(
-        'Vinculo %s (%s): regra fiscal %s nao encontrada.',
-        [IdentificacaoVinculo(candidato), Escopo, candidato.RegraFiscalId]));
+      Analise.AdicionarApontamento(ratRegraAusente, Format(
+        'A configuração "%s" está associada a uma Regra Fiscal que não foi ' +
+        'encontrada. Abra esse cadastro e selecione a regra correspondente.',
+        [IdentificacaoVinculo(candidato)]));
       Continue;
     end;
 
@@ -989,18 +1114,20 @@ begin
         Continue;
 
       if RespostasEquivalentes(validos[i].Regra, validos[j].Regra) then
-        Analise.Adicionar(Format(
-          'Vinculos %s e %s (%s): podem se sobrepor com a mesma resposta efetiva; ' +
-          'verificar se um dos vinculos e desnecessario.',
+        Analise.AdicionarApontamento(ratDuplicidade, Format(
+          'As configurações "%s" e "%s" podem atender à mesma operação e ' +
+          'produzir o mesmo resultado tributário. Confira se ambas são necessárias.',
           [IdentificacaoVinculo(validos[i].Candidato),
-           IdentificacaoVinculo(validos[j].Candidato), Escopo]))
+           IdentificacaoVinculo(validos[j].Candidato)]))
       else if (not HipoteseContida(validos[i].Hipotese, validos[j].Hipotese)) and
         (not HipoteseContida(validos[j].Hipotese, validos[i].Hipotese)) then
-        Analise.Adicionar(Format(
-          'Vinculos %s e %s (%s): podem se sobrepor com respostas distintas; ' +
-          'pode gerar conflito.',
+        Analise.AdicionarApontamento(ratConflito, Format(
+          'As configurações "%s" e "%s" podem atender à mesma operação, mas ' +
+          'indicar resultados tributários diferentes. As regras de preferência ' +
+          'podem não resolver essa combinação. Revise as condições e as regras ' +
+          'fiscais envolvidas para definir o tratamento desejado.',
           [IdentificacaoVinculo(validos[i].Candidato),
-           IdentificacaoVinculo(validos[j].Candidato), Escopo]));
+           IdentificacaoVinculo(validos[j].Candidato)]));
     end;
 end;
 
@@ -1067,6 +1194,9 @@ var
   especificos, padrao: TList;
   cache: TStringList;
   analise: ResolverRegraFiscalIbsCbsAnalise;
+  rascunho: OperacaoFiscalIbsCbsEtd;
+  idRascunho: string;
+  i: Integer;
 begin
   candidatos := nil;
   especificos := TList.Create;
@@ -1081,12 +1211,37 @@ begin
       Input.EmpresaId,
       Input.Data);
 
+    // A analise reflete o estado corrente da tela: o rascunho substitui o
+    // vinculo persistido de mesmo Id, sem que a lista passe a possuir o objeto.
+    rascunho := Input.CandidatoRascunho;
+    if Assigned(rascunho) then
+    begin
+      idRascunho := Trim(rascunho.Id);
+      if (idRascunho <> '') and Assigned(candidatos) then
+        for i := candidatos.Count - 1 downto 0 do
+          if Trim(OperacaoFiscalIbsCbsEtd(candidatos[i]).Id) = idRascunho then
+            // A lista possui seus itens; Delete libera o persistido substituido.
+            candidatos.Delete(i);
+    end;
+
     SepararCandidatos(candidatos, especificos, padrao);
+
+    if Assigned(rascunho) then
+    begin
+      // O rascunho pertence ao chamador; as listas de escopo nao possuem itens.
+      if rascunho.GrupoFiscalId.IsNull or
+        (Trim(rascunho.GrupoFiscalId.ToText('')) = '') then
+        padrao.Add(rascunho)
+      else
+        especificos.Add(rascunho);
+    end;
 
     analise := ResolverRegraFiscalIbsCbsAnalise.Create;
     try
-      AnalisarEscopo(especificos, 'grupo', analise, FRegrasFiscaisIbsCbsRepo, cache);
-      AnalisarEscopo(padrao, 'padrao', analise, FRegrasFiscaisIbsCbsRepo, cache);
+      AnalisarEscopo(especificos, Input.CandidatoRascunho, analise,
+        FRegrasFiscaisIbsCbsRepo, cache);
+      AnalisarEscopo(padrao, Input.CandidatoRascunho, analise,
+        FRegrasFiscaisIbsCbsRepo, cache);
     except
       analise.Free;
       raise;

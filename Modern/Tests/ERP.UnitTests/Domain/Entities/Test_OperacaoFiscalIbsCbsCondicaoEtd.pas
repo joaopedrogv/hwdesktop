@@ -326,11 +326,11 @@ end;
 
 procedure TTestOperacaoFiscalIbsCbsCondicaoEtd.DeveDescreverAtributoEValor;
 begin
-  Assert.AreEqual('Tipo de emissao',
+  Assert.AreEqual('Tipo de emissão',
     OperacaoFiscalIbsCbsCondicoes.DescricaoAtributo(ocaTipoEmissao));
-  Assert.AreEqual('Natureza da emissao',
+  Assert.AreEqual('Natureza',
     OperacaoFiscalIbsCbsCondicoes.DescricaoAtributo(ocaNaturezaEmissao));
-  Assert.AreEqual('Tipo de orgao publico',
+  Assert.AreEqual('Tipo de órgão público',
     OperacaoFiscalIbsCbsCondicoes.DescricaoAtributo(ocaTipoOrgaoPublico));
 
   Assert.AreEqual('Propria',

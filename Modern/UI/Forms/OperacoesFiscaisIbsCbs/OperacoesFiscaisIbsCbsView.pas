@@ -12,6 +12,7 @@ type
       AOperacoesInternas: OperacoesInternasEtd;
       AGruposFiscais: GruposFiscaisEtd
     );
+    procedure ExibirAnaliseCondicoes(const AResumo, ARelatorio: string);
   end;
 
 implementation

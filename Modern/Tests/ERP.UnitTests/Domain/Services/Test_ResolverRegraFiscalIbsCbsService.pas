@@ -115,6 +115,15 @@ type
 
     [Test]
     procedure DeveAnalisarConfiguracao;
+
+    [Test]
+    procedure DeveIdentificarVinculoPorDescricoes;
+
+    [Test]
+    procedure DeveAnalisarRascunhoNoLugarDoPersistido;
+
+    [Test]
+    procedure DeveAnalisarComRotuloSemExporIdentificador;
   end;
 
 implementation
@@ -152,6 +161,20 @@ begin
   Result := False;
   for i := 0 to High(Analise.Mensagens) do
     if Pos(LowerCase(Trecho), LowerCase(Analise.Mensagens[i])) > 0 then
+    begin
+      Result := True;
+      Exit;
+    end;
+end;
+
+function ApontamentosContemTipo(const Analise: ResolverRegraFiscalIbsCbsAnalise;
+  Tipo: ResolverRegraFiscalIbsCbsApontamentoTipo): Boolean;
+var
+  i: Integer;
+begin
+  Result := False;
+  for i := 0 to High(Analise.Apontamentos) do
+    if Analise.Apontamentos[i].Tipo = Tipo then
     begin
       Result := True;
       Exit;
@@ -247,6 +270,10 @@ begin
     EncodeDate(2024, 1, 1),
     saAtivo,
     nil);
+
+  // A descricao de operacao interna padrao do fixture reproduz o rotulo
+  // utilizado nas mensagens reais, sem depender do GUID do vinculo.
+  Result.OperacaoInternaDescricao := Id;
 
   SetLength(lista, Length(Condicoes));
   for i := 0 to High(Condicoes) do
@@ -870,16 +897,143 @@ begin
   analise := FService.Analisar(ResolverRegraFiscalIbsCbsInput.CreateParaAnalise(
     OP_INTERNA_ID, '', EMPRESA_ID, EncodeDate(2026, 1, 1)));
   try
-    Assert.IsTrue(MensagensContem(analise, 'conjunto universal'),
+    Assert.IsTrue(MensagensContem(analise, 'aceita todas as opções'),
       'condicao universal deve ser sinalizada');
-    Assert.IsTrue(MensagensContem(analise, 'mesma resposta efetiva'),
-      'redundancia deve ser sinalizada');
-    Assert.IsTrue(MensagensContem(analise, 'respostas distintas'),
+    Assert.IsTrue(MensagensContem(analise, 'mesmo resultado tributário'),
+      'possivel duplicidade deve ser sinalizada');
+    Assert.IsTrue(MensagensContem(analise, 'resultados tributários diferentes'),
       'cruzamento potencial deve ser sinalizado');
-    Assert.IsTrue(MensagensContem(analise, 'configuracao invalida'),
+    Assert.IsTrue(MensagensContem(analise, 'não reconhece'),
       'configuracao invalida deve ser reportada');
-    Assert.IsTrue(MensagensContem(analise, 'nao encontrada'),
+    Assert.IsTrue(MensagensContem(analise, 'não foi encontrada'),
       'referencia de regra ausente deve ser reportada');
+    Assert.IsFalse(MensagensContem(analise, 'R-AUSENTE'),
+      'a mensagem nao deve expor o identificador da regra ausente');
+
+    Assert.IsTrue(ApontamentosContemTipo(analise, ratObservacaoOpcoes),
+      'a observacao de opcoes deve ter tipo proprio');
+    Assert.IsTrue(ApontamentosContemTipo(analise, ratDuplicidade),
+      'a duplicidade deve ter tipo proprio');
+    Assert.IsTrue(ApontamentosContemTipo(analise, ratConflito),
+      'o conflito deve ter tipo proprio');
+    Assert.IsTrue(ApontamentosContemTipo(analise, ratRegraAusente),
+      'a regra ausente deve ter tipo proprio');
+    Assert.IsTrue(ApontamentosContemTipo(analise, ratValorInvalido),
+      'o valor invalido deve ter tipo proprio');
+    Assert.AreEqual(Length(analise.Mensagens), Length(analise.Apontamentos),
+      'cada apontamento deve espelhar uma mensagem da analise');
+  finally
+    analise.Free;
+  end;
+end;
+
+procedure TTestResolverRegraFiscalIbsCbsService.DeveIdentificarVinculoPorDescricoes;
+var
+  resultado: ResolverRegraFiscalIbsCbsResult;
+  candidato: OperacaoFiscalIbsCbsEtd;
+begin
+  AdicionarRegraSimples('R1', '000001');
+  candidato := CriarCandidato('C-GUID-NAO-EXIBIR', 'R1', 'G1',
+    [CriarCondicao(ocaTipoEmissao, [])]);
+  candidato.OperacaoInternaDescricao := 'Venda';
+  candidato.GrupoFiscalDescricao := 'Grupo A';
+  candidato.RegraFiscalDescricao := 'Regra A';
+  FOperacoesRepo.AdicionarCandidato(candidato);
+
+  resultado := Executar(
+    TipoEmissaoOcorrencia.Conhecido(tecPropria),
+    NaturezaEmissaoOcorrencia.Conhecido(necSaida),
+    tgvNenhum);
+  try
+    Assert.IsTrue(resultado.Status = rrConfiguracaoInvalida);
+    Assert.IsTrue(Pos('Venda', resultado.Mensagem) > 0);
+    Assert.IsTrue(Pos('Grupo A', resultado.Mensagem) > 0);
+    Assert.IsTrue(Pos('Regra A', resultado.Mensagem) > 0);
+    Assert.IsTrue(Pos('01/01/2024', resultado.Mensagem) > 0);
+    Assert.IsTrue(Pos('C-GUID-NAO-EXIBIR', resultado.Mensagem) = 0,
+      'a identificacao nao deve expor o GUID');
+  finally
+    resultado.Free;
+  end;
+end;
+
+procedure TTestResolverRegraFiscalIbsCbsService.DeveAnalisarRascunhoNoLugarDoPersistido;
+var
+  analise: ResolverRegraFiscalIbsCbsAnalise;
+  entrada: ResolverRegraFiscalIbsCbsInput;
+  entradaSemRascunho: ResolverRegraFiscalIbsCbsInput;
+  persistido: OperacaoFiscalIbsCbsEtd;
+  rascunho: OperacaoFiscalIbsCbsEtd;
+begin
+  AdicionarRegraSimples('R1', '000001');
+  AdicionarRegraSimples('R2', '000002');
+
+  // Vinculo persistido de mesmo Id; deve ser substituido pelo rascunho.
+  persistido := CriarCandidato('VINCULO-1', 'R1', 'G1',
+    [CriarCondicao(ocaTipoEmissao, [1])]);
+  persistido.OperacaoInternaDescricao := 'Persistido Venda';
+  persistido.GrupoFiscalDescricao := 'Grupo Persistido';
+  persistido.RegraFiscalDescricao := 'Regra Persistida';
+  FOperacoesRepo.AdicionarCandidato(persistido);
+
+  AdicionarCandidato('OUTRO', 'R2', 'G1',
+    [CriarCondicao(ocaNaturezaEmissao, [2])]);
+
+  rascunho := CriarCandidato('VINCULO-1', 'R1', 'G1',
+    [CriarCondicao(ocaTipoEmissao, [1, 2])]);
+  rascunho.OperacaoInternaDescricao := 'Rascunho Venda';
+  rascunho.GrupoFiscalDescricao := 'Grupo Rascunho';
+  rascunho.RegraFiscalDescricao := 'Regra Rascunho';
+
+  try
+    entradaSemRascunho := ResolverRegraFiscalIbsCbsInput.CreateParaAnalise(
+      OP_INTERNA_ID, 'G1', EMPRESA_ID, EncodeDate(2026, 1, 1));
+    Assert.IsTrue(entradaSemRascunho.CandidatoRascunho = nil,
+      'a sobrecarga de quatro argumentos nao deve carregar rascunho');
+
+    entrada := ResolverRegraFiscalIbsCbsInput.CreateParaAnalise(
+      OP_INTERNA_ID, 'G1', EMPRESA_ID, EncodeDate(2026, 1, 1), rascunho);
+    Assert.IsTrue(entrada.CandidatoRascunho = rascunho);
+
+    analise := FService.Analisar(entrada);
+    try
+      Assert.IsTrue(MensagensContem(analise,
+        'Tipo de emissão permite tanto emissão própria quanto de terceiros.'),
+        'a observação universal do rascunho deve ser um bullet curto');
+      Assert.IsFalse(MensagensContem(analise, 'Persistido Venda'),
+        'o vinculo persistido de mesmo Id deve ser substituido');
+      Assert.IsFalse(MensagensContem(analise, 'VINCULO-1'),
+        'a mensagem nao deve expor o identificador do vinculo');
+    finally
+      analise.Free;
+    end;
+  finally
+    rascunho.Free;
+  end;
+end;
+
+procedure TTestResolverRegraFiscalIbsCbsService.DeveAnalisarComRotuloSemExporIdentificador;
+var
+  analise: ResolverRegraFiscalIbsCbsAnalise;
+  candidato: OperacaoFiscalIbsCbsEtd;
+begin
+  AdicionarRegraSimples('R1', '000001');
+  candidato := CriarCandidato('ID-TECNICO-NAO-EXIBIR', 'R1', 'G1',
+    [CriarCondicao(ocaTipoEmissao, [1, 2])]);
+  candidato.OperacaoInternaDescricao := 'Venda';
+  candidato.GrupoFiscalDescricao := 'Grupo A';
+  candidato.RegraFiscalDescricao := 'Regra A';
+  FOperacoesRepo.AdicionarCandidato(candidato);
+
+  analise := FService.Analisar(ResolverRegraFiscalIbsCbsInput.CreateParaAnalise(
+    OP_INTERNA_ID, 'G1', EMPRESA_ID, EncodeDate(2026, 1, 1)));
+  try
+    Assert.IsTrue(MensagensContem(analise, 'Venda'),
+      'a mensagem deve identificar a configuracao pelo rotulo');
+    Assert.IsFalse(MensagensContem(analise, 'ID-TECNICO-NAO-EXIBIR'),
+      'a mensagem nao deve expor o identificador tecnico');
+    Assert.IsTrue(ApontamentosContemTipo(analise, ratObservacaoOpcoes),
+      'a condicao universal deve gerar observacao tipada');
   finally
     analise.Free;
   end;

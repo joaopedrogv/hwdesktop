@@ -75,6 +75,11 @@ begin
   // As condicoes chegam do chamador; o stub devolve copias para que cada lista
   // de candidatos tenha posse propria.
   Result.Condicoes := Copy(Origem.Condicoes, 0, Length(Origem.Condicoes));
+
+  // Descricoes aditivas usadas na identificacao do vinculo.
+  Result.OperacaoInternaDescricao := Origem.OperacaoInternaDescricao;
+  Result.GrupoFiscalDescricao := Origem.GrupoFiscalDescricao;
+  Result.RegraFiscalDescricao := Origem.RegraFiscalDescricao;
 end;
 
 { TOperacoesFiscaisIbsCbsRepositoryStub }

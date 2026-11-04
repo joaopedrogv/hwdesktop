@@ -19,6 +19,7 @@ uses
   TestInsight.DUnitX,
   {$ELSE}
   DUnitX.Loggers.Console,
+  DUnitX.Loggers.XML.NUnit,
   {$ENDIF }
   DUnitX.TestFramework,
   FakeTransactionUnit in 'Support\Fakes\FakeTransactionUnit.pas',

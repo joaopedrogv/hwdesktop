@@ -44,7 +44,8 @@ uses
   EstornoCreditoModelUnit,
   CreditoPresumidoOperacaoModelUnit,
   CreditoPresumidoIBSZFMModelUnit,
-  OperacaoConsumoModelUnit;
+  OperacaoConsumoModelUnit,
+  ValoresTotaisDomainUnit;
 
 type
   TResolverAutomaticoStub = class(TInterfacedObject, IResolverRegraFiscalIbsCbsService)
@@ -168,7 +169,7 @@ begin
          EstornoCreditoModel.NullInstance(),
          CreditoPresumidoOperacaoModel.NullInstance(),
          CreditoPresumidoIBSZFMModel.NullInstance())));
-  Result := ROCDomain.Create(OperacaoConsumoModel.NullInstance(), Itens, nil, Validacoes);
+  Result := ROCDomain.Create(OperacaoConsumoModel.NullInstance(), Itens, ValoresTotaisDomain.CreateVazio, Validacoes);
 end;
 
 { TCalculoTotaisStub }

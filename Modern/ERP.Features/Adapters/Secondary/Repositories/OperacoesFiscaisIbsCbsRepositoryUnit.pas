@@ -207,6 +207,11 @@ begin
     StatusRegistroEnum( Q.FieldAsInteger('ATIVO') ),
     E
   );
+
+  // Descricoes usadas na identificacao do vinculo nas mensagens de analise.
+  Result.OperacaoInternaDescricao := Q.FieldAsString('OP_DESCRICAO');
+  Result.GrupoFiscalDescricao := Q.FieldAsString('GRUPO_DESCRICAO');
+  Result.RegraFiscalDescricao := Q.FieldAsString('REGRA_DESCRICAO');
 end;
 
 { OperacoesFiscaisIbsCbsRepository }
@@ -226,8 +231,13 @@ begin
   Q := FConnection.CreateQuery(
     'SELECT o.ID, o.OP_INTERNA_ID, o.REGRA_FISCAL_ID, o.GRUPO_FISCAL_ID, ' +
     ' o.DATA_INI_VIGENCIA, o.DATA_FIM_VIGENCIA, o.DATA_CADASTRO, o.DATA_ALTERACAO, o.ATIVO, ' +
-    ' e.COD_EMPRESA ' +
+    ' e.COD_EMPRESA, ' +
+    ' op.DESCRICAO as OP_DESCRICAO, g.DESCRICAO as GRUPO_DESCRICAO, ' +
+    ' r.DESCRICAO as REGRA_DESCRICAO ' +
     ' FROM OP_FISCAIS_IBSCBS o ' +
+    ' INNER JOIN OP_INTERNAS op ON op.ID = o.OP_INTERNA_ID ' +
+    ' LEFT JOIN GRUPOS_FISCAIS g ON g.ID = o.GRUPO_FISCAL_ID ' +
+    ' INNER JOIN REGRAS_FISCAIS_IBSCBS r ON r.ID = o.REGRA_FISCAL_ID ' +
     ' LEFT JOIN OP_FISCAIS_IBSCBS_EMP e on E.OP_FISCAIS_ID = o.ID ' +
     ' where o.ID = :ID ',
     ParametersBuilder.Create(1).ByName('ID', Id).Build()
@@ -289,8 +299,13 @@ begin
       Q := FConnection.CreateQuery(
         'SELECT o.ID, o.OP_INTERNA_ID, o.REGRA_FISCAL_ID, o.GRUPO_FISCAL_ID, ' +
         ' o.DATA_INI_VIGENCIA, o.DATA_FIM_VIGENCIA, o.DATA_CADASTRO, o.DATA_ALTERACAO, o.ATIVO, ' +
-        ' e.COD_EMPRESA ' +
+        ' e.COD_EMPRESA, ' +
+        ' op.DESCRICAO as OP_DESCRICAO, g.DESCRICAO as GRUPO_DESCRICAO, ' +
+        ' r.DESCRICAO as REGRA_DESCRICAO ' +
         ' FROM OP_FISCAIS_IBSCBS o ' +
+        ' INNER JOIN OP_INTERNAS op ON op.ID = o.OP_INTERNA_ID ' +
+        ' LEFT JOIN GRUPOS_FISCAIS g ON g.ID = o.GRUPO_FISCAL_ID ' +
+        ' INNER JOIN REGRAS_FISCAIS_IBSCBS r ON r.ID = o.REGRA_FISCAL_ID ' +
         ' INNER JOIN OP_FISCAIS_IBSCBS_EMP e on E.OP_FISCAIS_ID = o.ID ' +
         ' where o.OP_INTERNA_ID = :OP_INTERNA_ID ' +
         ' and (o.GRUPO_FISCAL_ID = :GRUPO_FISCAL_ID or o.GRUPO_FISCAL_ID is null) ' +
