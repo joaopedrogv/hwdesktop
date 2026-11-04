@@ -317,6 +317,8 @@ type
     CheckBox4: TCheckBox;
     ckVendaOnline: TCheckBox;
     cbVendaOnline: TComboBox;
+    btIncluirItemKit: TSpeedButton;
+    btEcommerce: TSpeedButton;
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure btnCancKitLoteClick(Sender: TObject);
     procedure btSincronizarKitClick(Sender: TObject);
@@ -632,20 +634,29 @@ end;
 
 procedure TFrmCadKits.BitBtn13Click(Sender: TObject);
 begin
-  if vDadosIni.PesqPros('PRO124', 'VOLTAR', '','KITS_PROD_KITS',
-  	Kit.vItKit.dataSet.FieldByName('CODIGO_KIT').asString + ' - ' +
+  if not vDadosIni.PesqPros('PRO124', 'VOLTAR', '','KITS_PROD_KITS',
+  	 Kit.vItKit.dataSet.FieldByName('CODIGO_KIT').asString + ' - ' +
     Kit.vItKit.dataSet.FieldByName('NUM_FAB_PROD').asString, Kit.vItKit.buscas, true) then
+   	Exit;
+
+  inherited;
+
+  CheckBox2.Visible := false;
+  CheckBox2.Checked := false;
+  Label14.Visible := false;
+  CheckBox2.Font.Color := clTeal;
+  Kit.vItKit.Cancel;
+  Kit.vItKit.RollBackTransacao;
+
+  if TelaCadastro = 5 then
   begin
-    inherited;
+    PageControl1.ActivePage := tsAlterDadosKit;
+    tsAlterDadosKit.Show;
+  end
+  else
+  begin
     PageControl1.ActivePage := TabSheet2;
-//    TabSheet4.TabVisible := false;
     TabSheet2.Show;
-    CheckBox2.Visible := false;
-    CheckBox2.Checked := false;
-    Label14.Visible := false;
-    CheckBox2.Font.Color := clTeal;
-    Kit.vItKit.Cancel;
-    Kit.vItKit.RollBackTransacao;
   end;
 end;
 
@@ -854,6 +865,8 @@ begin
 
       SpeedButtonAlterarKit2.Visible := false;
       SpeedButtonAlterarKit.Visible := false;
+      btIncluirItemKit.Visible := false;
+      btEcommerce.Visible := false;
       btSincronizarKit.Visible := false;
 
       btRestaurarRegistro.Visible := true;
@@ -872,6 +885,8 @@ begin
 
       SpeedButtonAlterarKit2.Visible := true;
       SpeedButtonAlterarKit.Visible := true;
+      btIncluirItemKit.Visible := true;
+      btEcommerce.Visible := true;
       btSincronizarKit.Visible := true;
 
       btRestaurarRegistro.Visible := false;
@@ -2197,13 +2212,20 @@ end;
 
 procedure TFrmCadKits.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 var
-  vAlterDadosKit, vAlterDadosLote: boolean;
+  vAlterItensKit, vAlterDadosKit, vAlterDadosLote: boolean;
 begin
+  vAlterItensKit  := PageControl1.ActivePage = TabSheet4;
   vAlterDadosKit  := PageControl1.ActivePage = tsAlterDadosKit;
   vAlterDadosLote := PageControl1.ActivePage = tsAlterDadosLote;
   inherited;
 
-  if vAlterDadosKit then
+  if vAlterItensKit then
+  begin
+    BitBtn13Click(Sender);
+    if TelaCadastro = 5 then
+      btVoltarDadosKitClick(Sender);
+  end
+  else if vAlterDadosKit then
     btVoltarDadosKitClick(Sender)
   else if vAlterDadosLote then
   begin
@@ -2854,6 +2876,8 @@ begin
       btRestaurarRegistro.Visible := false;
       SpeedButtonAlterarKit.Visible := true;
       SpeedButtonAlterarKit2.Visible := true;
+      btIncluirItemKit.Visible := true;
+      btEcommerce.Visible := true;
       btSincronizarKit.Visible := true;
       
       ckLixeira.Enabled := false;
@@ -2872,6 +2896,8 @@ begin
       btRestaurarRegistro.Visible := true;
       SpeedButtonAlterarKit.Visible := false;
       SpeedButtonAlterarKit2.Visible := false;
+      btIncluirItemKit.Visible := false;
+      btEcommerce.Visible := false;
       btSincronizarKit.Visible := false;
 
       ckLixeira.Enabled := false;

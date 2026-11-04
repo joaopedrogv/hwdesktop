@@ -524,7 +524,7 @@ inherited FrmCadKits: TFrmCadKits
                           Left = 192
                           Top = 0
                           Width = 29
-                          Height = 18
+                          Height = 33
                           Align = alRight
                           Alignment = taRightJustify
                           Caption = '1/4'
@@ -534,6 +534,7 @@ inherited FrmCadKits: TFrmCadKits
                           Font.Name = 'Tahoma'
                           Font.Style = [fsBold]
                           ParentFont = False
+                          ExplicitHeight = 18
                         end
                       end
                       object Panel115: TPanel
@@ -1852,7 +1853,7 @@ inherited FrmCadKits: TFrmCadKits
                                   Left = 340
                                   Top = 0
                                   Width = 29
-                                  Height = 18
+                                  Height = 16
                                   Align = alRight
                                   Alignment = taRightJustify
                                   Caption = '1/1'
@@ -1862,6 +1863,7 @@ inherited FrmCadKits: TFrmCadKits
                                   Font.Name = 'Tahoma'
                                   Font.Style = [fsBold]
                                   ParentFont = False
+                                  ExplicitHeight = 18
                                 end
                                 object Panel112: TPanel
                                   Left = 369
@@ -2187,8 +2189,8 @@ inherited FrmCadKits: TFrmCadKits
                                       object lbDescrGradeImg: TLabel
                                         Left = 0
                                         Top = 0
-                                        Width = 9
-                                        Height = 13
+                                        Width = 337
+                                        Height = 19
                                         Align = alClient
                                         Alignment = taCenter
                                         Caption = '...'
@@ -2198,6 +2200,8 @@ inherited FrmCadKits: TFrmCadKits
                                         Font.Name = 'Tahoma'
                                         Font.Style = [fsBold]
                                         ParentFont = False
+                                        ExplicitWidth = 9
+                                        ExplicitHeight = 13
                                       end
                                     end
                                     object pnDescImagemProduto: TPanel
@@ -2236,10 +2240,6 @@ inherited FrmCadKits: TFrmCadKits
                       object TabSheetEC3: TTabSheet
                         Caption = 'TabSheetEC3'
                         ImageIndex = 4
-                        ExplicitLeft = 0
-                        ExplicitTop = 0
-                        ExplicitWidth = 0
-                        ExplicitHeight = 0
                         object ScrollBox5: TScrollBox
                           Left = 0
                           Top = 0
@@ -2348,10 +2348,6 @@ inherited FrmCadKits: TFrmCadKits
                       object TabSheetEC4: TTabSheet
                         Caption = 'TabSheetEC4'
                         ImageIndex = 2
-                        ExplicitLeft = 0
-                        ExplicitTop = 0
-                        ExplicitWidth = 0
-                        ExplicitHeight = 0
                         object pnGradeVaricaoEC: TPanel
                           Left = 0
                           Top = 0
@@ -2572,10 +2568,6 @@ inherited FrmCadKits: TFrmCadKits
                       object TabSheetEC5: TTabSheet
                         Caption = 'TabSheetEC5'
                         ImageIndex = 3
-                        ExplicitLeft = 0
-                        ExplicitTop = 0
-                        ExplicitWidth = 0
-                        ExplicitHeight = 0
                         object pnItensKit: TPanel
                           Left = 0
                           Top = 0
@@ -3383,10 +3375,6 @@ inherited FrmCadKits: TFrmCadKits
           Caption = 'TabSheet4'
           ImageIndex = 2
           OnShow = TabSheet4Show
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object PageControl2: TPageControl
             Left = 0
             Top = 75
@@ -3397,10 +3385,6 @@ inherited FrmCadKits: TFrmCadKits
             TabOrder = 0
             object TabSheet5: TTabSheet
               Caption = 'TabSheet5'
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object GroupBox14: TGroupBox
                 Left = 0
                 Top = 436
@@ -3822,10 +3806,6 @@ inherited FrmCadKits: TFrmCadKits
             object TabSheet6: TTabSheet
               Caption = 'TabSheet6'
               ImageIndex = 1
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object GroupBox15: TGroupBox
                 Left = 0
                 Top = 0
@@ -4394,10 +4374,6 @@ inherited FrmCadKits: TFrmCadKits
         object tsPromocaoKit: TTabSheet
           Caption = 'tsPromocaoKit'
           ImageIndex = 4
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object GroupBox5: TGroupBox
             Left = 0
             Top = 0
@@ -4848,10 +4824,6 @@ inherited FrmCadKits: TFrmCadKits
         object tsImagemKit: TTabSheet
           Caption = 'tsImagemKit'
           ImageIndex = 5
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnImagemKit: TPanel
             Left = 3
             Top = 3
@@ -4990,10 +4962,6 @@ inherited FrmCadKits: TFrmCadKits
         object tsAlterDadosKit: TTabSheet
           Caption = 'tsAlterDadosKit'
           ImageIndex = 6
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object Panel52: TPanel
             Left = 0
             Top = 0
@@ -5606,7 +5574,7 @@ inherited FrmCadKits: TFrmCadKits
                   303548CFCFCFCFCFCFCFCFCFCF4A6D45341FCFCFCFCFCFCFCFCF}
               end
               object btSincronizarKit: TSpeedButton
-                Left = 269
+                Left = 374
                 Top = 2
                 Width = 51
                 Height = 45
@@ -5786,6 +5754,138 @@ inherited FrmCadKits: TFrmCadKits
                 ParentShowHint = False
                 ShowHint = True
                 OnClick = btSincronizarKitClick
+              end
+              object btIncluirItemKit: TSpeedButton
+                Left = 268
+                Top = 2
+                Width = 51
+                Height = 45
+                Hint = 'Incluir Itens no Kit - [PRO119]'
+                Flat = True
+                Glyph.Data = {
+                  76060000424D7606000000000000360400002800000018000000180000000100
+                  08000000000040020000130B0000130B00000001000000010000CE630000D67B
+                  21002184290039B5520063A5630094DE8C00FFD6A500FFDEB500FFEFD600FFF7
+                  EF00FF00FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000A0A0A0A0A0A
+                  0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A000A0A0A0A0A0A0A0A0A
+                  0A0A0A0A0A0A0A0A0A0A0A0A0A0A000A0A0A0A0A00000000000000000A0A0A0A
+                  0A0A0A0A0A0A00000000000001090908080706000A0A0A0A0A0A0A0A0A0A000A
+                  0A0A0A0A010B0B0B080706000A0A0A0A0A0A0A0A0A0A000A0A0A0A0A01010101
+                  010101000A0A0A0A0A0A0A0A0A0A000A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A
+                  0A0A0A0A0A0A000A0A0A0A0A00000000000000000A0A0A0A0A0A0A0A0A0A0000
+                  0000000001090908080706000A0A0A0A0A0A0A0A0A0A000A0A0A0A0A010B0B0B
+                  080706000A0A0A0A0A0A0A0A0A0A000A0A0A0A0A01010101010101000A0A0A0A
+                  0A0A0A0A0A0A000A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A000A
+                  0A0A0A0A00000000000000000A0A0A0A0A0A0A0A0A0A00000000000001090908
+                  080706000A0A0A0A0A0A0A0A0A0A000A0A0A0A0A010B0B0B080706000A0A0A0A
+                  0A0A0A0A0A0A000A0A0A0A0A01010101010101000A0A0A0A0A0A0A0A0A0A000A
+                  0A0A0A0A0A0A0A0A0A0A0A0202020A0A0A0A0A00000000000000000A0A0A0A0A
+                  0A0A0A0204020A0A0A0A0A01090908080706000A0A0A0A0A0A02020203020202
+                  0A0A0A010B0B0B080706000A0A0A0A0A0A020503030304020A0A0A0101010101
+                  0101000A0A0A0A0A0A020202030202020A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A
+                  0A0A0A0205020A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0202020A0A
+                  0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A}
+                ParentShowHint = False
+                ShowHint = True
+                OnClick = SpeedButton6Click
+              end
+              object btEcommerce: TSpeedButton
+                Left = 321
+                Top = 2
+                Width = 51
+                Height = 45
+                Hint = 'E-Commerce - [PRO411]'
+                Flat = True
+                Glyph.Data = {
+                  F6060000424DF606000000000000360000002800000018000000180000000100
+                  180000000000C0060000C40E0000C40E00000000000000000000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFDFCFC8E817E6655526655526655526655526655526655526655
+                  526655526655526655526655525F4D49847774FDFCFCFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFB8B0AF513D3966524E66524E66524E66524E
+                  66524E66524E66524E66524E66524E66524E66524E66514E48342FB7AFAEFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA398964C383456423F56
+                  423F56423F56423F56423F56423F56423F56423F56423F56423F56423F56423F
+                  4F3C379B918EFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA398
+                  969D9694C6C5C5C6C5C5C6C5C5C6C5C5C6C5C5C6C5C5C6C5C5C6C5C5C6C5C5C6
+                  C5C5C6C5C5C6C5C5928A849C918FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFA39896B7B4B3EBEFF0EBEFF0E2E4E59F9993938B82938B82938B
+                  82938B829A948DDADCDBEBEFF0EBEFF0A8A49F9C918FFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFA39896B7B4B3EBEFF0EBEFF079725C78910F
+                  83A40A83A40A83A40A83A40A7D9B0D645B42EBEFF0EBEFF0A8A49F9C918FFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA39896B7B4B3EBEFF0EB
+                  EFF089847169721E7080177080177080177080176D7A1B6E6750EBEFF0EBEFF0
+                  A8A49F9C918FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA398
+                  96B7B4B3EBEFF0EBEFF0E9EDEEC5C4C4BAB6B6BAB6B6BAB6B6BAB6B6BEBCBCE6
+                  EAEBEBEFF0EBEFF0A8A49F9C918FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFA39896B7B4B3EBEFF0EBEFF0EBEFF0D4D5D5C6C5C5C6C5C5B8B5
+                  B45C52385A542C79715EE9EDEEEBEFF0A8A49F9C918FFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFA39896B7B4B3EBEFF0EBEFF0BAB6B5674B34
+                  83623C83603B48301D809E0B758C0E728419B1ACAAEBEFF0A8A49F9C918FFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA39896B7B4B3EBEFF0EB
+                  EFF0A69F9EA5793CDEA84EDDA54F5F49218AB00A6D7E0E789010A39E98EBEFF0
+                  A8A49F9C918FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA398
+                  96B7B4B3EBEFF0EBEFF0A69F9EA5793CDEA84EDEA84EA7743E5C5119707A135B
+                  5037E0E3E3EBEFF0A8A49F9C918FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFA39896B7B4B3EBEFF0EBEFF0A69F9EA5793CDEA84EDEA84EDEA6
+                  4ECC904A855934A69E9CEBEFF0EBEFF0A8A49F9C918FFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFA39896B7B4B3EBEFF0EBEFF0A69F9EA5793C
+                  C79647DEA84EDEA84EC79647A4783CA69F9EEBEFF0EBEFF0A8A49F9C918FFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA39896B7B4B3EBEFF0EB
+                  EFF0A7A09FA4783C664628DEA84EDEA84E664628A3793BA7A09FEBEFF0EBEFF0
+                  A8A49F9C918FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA398
+                  96B7B4B3EBEFF0EBEFF0D1D1D1624E42412A23624C3E624C3E412A23624E42D2
+                  D2D2EBEFF0EBEFF0A8A49F9C918FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFA39896B7B4B3EBEFF0EBEFF0EBEFF0EBEFF06B5C59E9EDEEE9ED
+                  EE6B5C59EBEFF0EBEFF0EBEFF0EBEFF0A8A49F9C918FFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFA39896B7B4B3EBEFF0EBEFF0EBEFF0EBEFF0
+                  98908F8D83828C828198908FEBEFF0EBEFF0EBEFF0EBEFF0A8A49F9C918FFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA39896B7B4B3EBEFF0EB
+                  EFF0EBEFF0EBEFF0EAEEEFB6B2B1B6B2B1EBEFF0EBEFF0EBEFF0EBEFF0EBEFF0
+                  A8A49F9C918FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA398
+                  96B7B4B3EBEFF0EBEFF0EBEFF0EBEFF0EBEFF0EBEFF0EBEFF0EBEFF0EBEFF0EB
+                  EFF0EBEFF0EBEFF0A8A49F9C918FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFA398967567658F84838F84838F84838F84838F84838F84838F84
+                  838F84838F84838F84838F84838F84837165609B908EFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFA398964E383459433F59433F59433F513B37
+                  4C36324D363257413D4F393558423F59433F59433F59433F48342F9C918FFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB8B0AF523D3966524E66
+                  524E66524E584340513C39513C39634E4A543F3B644F4C66524E66524E66514E
+                  48342FB6AEADFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDFC
+                  FC8D807D66555266555266555266555266555266555266555266555266555266
+                  5552665552604E4A847673FDFCFCFFFFFFFFFFFFFFFFFFFFFFFF}
+                ParentShowHint = False
+                ShowHint = True
+                OnClick = SpeedButtonECommerceClick
               end
               object pnCorLote: TPanel
                 Left = 614

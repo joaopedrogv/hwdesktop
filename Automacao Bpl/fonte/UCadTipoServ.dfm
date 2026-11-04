@@ -1078,6 +1078,10 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
               object tsRelTipoServ: TTabSheet
                 Caption = 'tsRelTipoServ'
                 ImageIndex = 1
+                ExplicitLeft = 0
+                ExplicitTop = 0
+                ExplicitWidth = 0
+                ExplicitHeight = 0
                 object qrpTipoServ: TQuickRep
                   Left = 1
                   Top = 0
@@ -3195,6 +3199,10 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
         object TabSheet4: TTabSheet
           Caption = 'TabSheet4'
           ImageIndex = 3
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object GroupBox68: TGroupBox
             Left = 0
             Top = 0
@@ -3626,6 +3634,10 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
         object TabSheet5: TTabSheet
           Caption = 'TabSheet5'
           ImageIndex = 4
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object GroupBox7: TGroupBox
             Left = 0
             Top = 0
@@ -4062,6 +4074,10 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
         object tsDadosComercioAberto: TTabSheet
           Caption = 'tsDadosComercioAberto'
           ImageIndex = 5
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object pnDadosComercioAberto: TPanel
             Left = 3
             Top = 3
@@ -4177,6 +4193,10 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
         object tsMultiempresa: TTabSheet
           Caption = 'tsMultiempresa'
           ImageIndex = 6
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object pnMultiempresa: TPanel
             Left = 1
             Top = 3
@@ -4301,13 +4321,11 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                 item
                   Expanded = False
                   FieldName = 'COD_EMPRESA'
-                  Width = 64
                   Visible = True
                 end
                 item
                   Expanded = False
                   FieldName = 'IDENTIFICACAO_EMP'
-                  Width = 64
                   Visible = True
                 end>
             end
@@ -4401,6 +4419,10 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
         object tsCadTipoServ: TTabSheet
           Caption = 'tsCadTipoServ'
           ImageIndex = 7
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object pnCadTipoServ: TPanel
             Left = 3
             Top = 3
@@ -6711,7 +6733,6 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                     item
                       Expanded = False
                       FieldName = 'COD_EMPRESA'
-                      Width = 64
                       Visible = True
                     end
                     item
