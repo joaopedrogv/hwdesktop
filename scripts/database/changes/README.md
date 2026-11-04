@@ -4,7 +4,10 @@ Cada demanda que precisar de alteração de banco utiliza `<identificador-da-dem
 
 Exemplo de caminho: `condicoes-operacoes-ibscbs/001-condicoes.sql`. Esse exemplo não declara uma mudança física aprovada nem cria o arquivo.
 
-Use um arquivo inicialmente e mais arquivos quando a ordem de evolução exigir etapas distintas. Identifique no registro existente da demanda a base esperada, a sequência, os comandos finais de entrega e o que foi efetivamente testado ou aplicado.
+Use um arquivo inicialmente e mais arquivos quando a ordem de evolução exigir
+etapas distintas. Identifique no resultado da tarefa ou nas notas existentes da
+demanda a base esperada, a sequência, os comandos finais de entrega e o que foi
+efetivamente testado ou aplicado.
 
 Esta pasta contém SQL pendente de incorporação. Durante o desenvolvimento, os
 arquivos acompanham a demanda no Git. O ERP executa as migrações de `scripts/versoes`.

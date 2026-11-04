@@ -16,6 +16,50 @@ Database updates are managed by the custom `pkReestrutura` package, which interp
 Follow .ai/rules/database-safety.md and the owning area's conventions.
 Modern/.ai/rules/database.md applies only when Modern contracts are affected.
 
+## Select the Requested Activity
+
+Choose the activity from the current request or assignment before applying a
+procedure below.
+
+- During feature implementation, prepare or evolve migration SQL under
+  scripts/database/changes/<demand-id>/. This is the development path and needs
+  the approved physical change, baseline and scope.
+- Incorporate finished SQL into scripts/versoes/ only when the developer's request
+  explicitly covers that activity. Use Task Inputs and Standalone Incorporation
+  and the Procedure for a Production Migration Change. The paired source removal
+  belongs to this incorporation path.
+- Execute SQL only under its own execution authority and identified environment.
+
+Loading this Skill, completing implementation, or refreshing the schema does not
+advance from preparation to incorporation or execution. A request covering more
+than one activity must establish the scope and authority for each.
+
+## Task Inputs and Standalone Incorporation
+
+For an incorporation request, establish the following from the developer's request
+and current repository evidence:
+
+- selected checkout, branch and task scope;
+- demand identifier and exact delivery SQL files;
+- preferred existing destination version file;
+- required command order, dependencies and available validation/application evidence;
+- authority for the paired file changes and, when granted, their local commit.
+
+A new conversation can invoke this Skill directly with these inputs. Ask only for
+missing information that affects safe incorporation. Use the task's result or
+handoff to record the outcome.
+
+A coordinating profile delegates the bounded work under .ai/agents/README.md and
+the common assignment contract. A standalone task uses its own context and marks
+Workflow/run/increment fields as not applicable. This also covers a separate task
+for the same demand as an earlier implementation run. That run's unfinished state
+does not block the task, establish SQL readiness or require automatic resumption.
+When a precise evidence gap requires an identified historical artifact, apply
+repository-safety.md's bounded consultation rules.
+
+A request to resume a Workflow follows that Workflow's run and lifecycle contracts.
+Preserve its history and state while performing a separate task.
+
 ## Execution Profile
 
 Default execution profile: `fast-routine` when the approved physical schema change,
@@ -173,11 +217,9 @@ Development SQL is prepared and validated against an identified development/test
 database under the applicable execution authority. Incorporation into version
 scripts is a separately requested delivery step.
 
-In the SVN/Git cycle, this step can occur in the working clone after merging the
-demand into the updated local main and before publishing main or preparing the
-SVN delivery. Consult _automation/workflow/GUIA-OPERACIONAL.md. The requested
-migration task identifies the demand, preferred destination and authority to
-commit. A documentation request only updates the procedure.
+The requested task establishes the checkout, branch, source scripts and preferred
+destination. Apply repository-preservation rules within that context. Prepare
+the incorporation independently of any delivery sequence used by the team.
 
 Do NOT place unfinished migration commands into the active production version file unless explicitly instructed.
 
@@ -198,9 +240,9 @@ schema evidence is unavailable, report the specific gap instead of inventing DDL
 Start with one migration file. Use ordered names such as 001-condicoes.sql and
 002-complemento.sql when distinct increments need an explicit application order;
 do not create a file per Agent message. Record the baseline, order, delivery
-commands, and actual validation/application status in the demand's existing plan
-or notes. Keep diagnostic queries and test fixtures distinguishable from delivery
-migration commands.
+commands and actual validation/application status in the task's result or existing
+demand notes. Keep diagnostic queries and test fixtures distinguishable from
+delivery migration commands.
 
 An unexecuted draft may be revised. SQL already applied to a shared database needs
 an identifiable subsequent change; editing an old file does not update that database.
@@ -424,8 +466,8 @@ Use explicit defensive SQL only when the requested migration has a specific comp
 
 When explicitly asked to incorporate a finished migration into version scripts:
 
-1. Confirm the checkout, branch, demand and current changes. When this is the Git
-   delivery step, work on the updated local main after the demand merge.
+1. Confirm the checkout, branch, demand and current changes for the requested task.
+   Use the Task Inputs and Standalone Incorporation section to resolve its scope.
 2. Identify the final delivery commands, their order and validation evidence under
    scripts/database/changes/<demand-id>/. Separate diagnostic SQL and fixtures.
 3. Obtain the preferred existing destination and read Ativos/dpk/manifest.txt for
@@ -453,6 +495,6 @@ When explicitly asked to incorporate a finished migration into version scripts:
     uses an authorized test database and the pkReestrutura path when its interpreter
     behavior is under verification. Preserve the identity of the starting state.
 
-The build process owns manifest and CRC updates. Creating a numbered version,
-building, executing SQL, refreshing the schema, pushing or delivering to SVN
-requires the authority for those operations.
+The build process owns manifest and CRC updates. Version advancement, compilation,
+SQL execution, schema extraction and publication use their respective authorization.
+Record only the incorporation and validation actually performed in this task.

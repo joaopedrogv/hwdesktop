@@ -87,8 +87,9 @@ Do not edit scripts/versoes implicitly; production incorporation is separately
 requested. Read .ai/skills/database-migration/SKILL.md when preparing or
 incorporating migration SQL. Incorporation uses the developer's preferred version
 file, verified dependencies and paired removal of fully incorporated demand scripts
-in the same commit. Schema extraction, SQL execution and integration tests require
-their own authority.
+in the same commit. A separately requested incorporation is a bounded Skill task
+with its own inputs. An earlier Workflow's completion status is not a prerequisite.
+Schema extraction, SQL execution and integration tests require their own authority.
 
 ## Human documentation and operations
 

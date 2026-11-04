@@ -85,6 +85,11 @@ a incorporação com a [Skill database-migration](../../.ai/skills/database-migr
 Informe o arquivo de versão preferencial do programador. Essa tarefa ocorre na
 main local atualizada, depois do merge e antes de publicar o resultado.
 
+Esse momento pertence à organização deste ciclo SVN/Git. A Skill descreve o
+procedimento reutilizável, que também pode ser solicitado diretamente em outra
+sessão com contexto próprio. Uma run anterior sem encerramento não impede esse
+pedido. Para retomar a implementação pelo Workflow, informe a run correspondente.
+
 O agente confere os comandos de entrega e os pré-requisitos, justifica a versão
 superior quando uma dependência exigir, adapta a sintaxe ao pkReestrutura e apresenta
 o diff. Após conferir a incorporação completa e as referências de testes/automações,

@@ -38,13 +38,20 @@ A extração é material de consulta; não é uma migração nem um comando de r
 
 Use `changes/<identificador-da-demanda>/`. Comece com um arquivo; use prefixos ordenados como `001-condicoes.sql` e `002-complemento.sql` quando houver etapas distintas. Não criar um arquivo por mensagem ao agente.
 
-Registre a referência de esquema usada, a ordem de aplicação e o estado de validação no plano/notas já existentes da demanda. Diferencie comandos de entrega de consultas de diagnóstico, dados de teste e tentativas descartadas.
+Registre a referência de esquema usada, a ordem de aplicação e o estado de
+validação no resultado da tarefa ou nas notas existentes da demanda. Diferencie
+comandos de entrega de consultas de diagnóstico, dados de teste e tentativas descartadas.
 
 Preparar SQL não autoriza executá-lo. Uma revisão de um rascunho ainda não aplicado pode substituir o texto anterior; depois de aplicado em uma base compartilhada, evolua por novos comandos identificáveis.
 
-A incorporação dos comandos aprovados em `scripts/versoes` é uma etapa solicitada
-para esse fim. No fluxo Git, ocorre no clone após o merge na main local atualizada
-e antes do push e da entrega ao SVN.
+A incorporação dos comandos aprovados em `scripts/versoes` é uma tarefa solicitada
+para esse fim. Ela pode ser pedida em uma nova sessão, informando a demanda, os
+scripts de entrega e o arquivo de versão preferencial. O agente confere o checkout,
+a branch e os arquivos atuais e utiliza as evidências pertinentes ao pedido.
+
+A situação de uma run anterior não é pré-requisito para essa tarefa. Consultar uma
+run é uma leitura eventual para esclarecer uma lacuna concreta. Se o pedido for
+retomar o Workflow anterior, aplicam-se os contratos daquela execução.
 
 Informe a demanda e o arquivo de versão preferencial atribuído ao programador.
 O manifesto identifica o contexto da versão ativa. Confira as dependências nos
