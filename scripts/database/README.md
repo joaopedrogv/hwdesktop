@@ -6,7 +6,7 @@ Esta área fornece contexto estrutural do banco e guarda as alterações prepara
 | --- | --- |
 | [schema/schema.sql](schema/schema.sql) | Extração completa dos metadados da base de referência, quando disponível. |
 | [schema/README.md](schema/README.md) | Origem e situação da extração. Consultar antes de usar o esquema. |
-| [changes/](changes/README.md) | SQL de desenvolvimento organizado por demanda. |
+| [changes/](changes/README.md) | SQL por demanda pendente de incorporação ao histórico executável. |
 | [scripts/versoes](../versoes/) | Histórico de migrações de produção; incorporação em etapa própria. |
 
 ## Consultar a estrutura
@@ -38,11 +38,41 @@ A extração é material de consulta; não é uma migração nem um comando de r
 
 Use `changes/<identificador-da-demanda>/`. Comece com um arquivo; use prefixos ordenados como `001-condicoes.sql` e `002-complemento.sql` quando houver etapas distintas. Não criar um arquivo por mensagem ao agente.
 
-Registre a referência de esquema usada, a ordem de aplicação e o estado de validação no plano/notas já existentes da demanda. Diferencie comandos de entrega de consultas de diagnóstico, dados de teste e tentativas descartadas.
+Registre a referência de esquema usada, a ordem de aplicação e o estado de
+validação no resultado da tarefa ou nas notas existentes da demanda. Diferencie
+comandos de entrega de consultas de diagnóstico, dados de teste e tentativas descartadas.
 
 Preparar SQL não autoriza executá-lo. Uma revisão de um rascunho ainda não aplicado pode substituir o texto anterior; depois de aplicado em uma base compartilhada, evolua por novos comandos identificáveis.
 
-Ao concluir, incorpore os comandos aprovados em `scripts/versoes` somente em uma etapa solicitada para esse fim. Observe a sintaxe do interpretador, preserve o histórico e consulte o arquivo ativo no manifesto. Não atualizar versão, manifesto ou CRC como efeito implícito da implementação.
+A incorporação dos comandos aprovados em `scripts/versoes` é uma tarefa solicitada
+para esse fim. Ela pode ser pedida em uma nova sessão, informando a demanda, os
+scripts de entrega e o arquivo de versão preferencial. O agente confere o checkout,
+a branch e os arquivos atuais e utiliza as evidências pertinentes ao pedido.
+
+A situação de uma run anterior não é pré-requisito para essa tarefa. Consultar uma
+run é uma leitura eventual para esclarecer uma lacuna concreta. Se o pedido for
+retomar o Workflow anterior, aplicam-se os contratos daquela execução.
+
+Informe a demanda e o arquivo de versão preferencial atribuído ao programador.
+O manifesto identifica o contexto da versão ativa. Confira as dependências nos
+arquivos de versão e encaminhe a sequência afetada para a versão superior adequada
+quando um pré-requisito estiver acima do destino preferencial, respeitando a divisão
+de arquivos da equipe. A Skill define como resolver um destino ainda indefinido.
+
+Depois de conferir a incorporação completa e as referências de testes/automações,
+remova os scripts de entrega correspondentes de `changes/<demanda>`. A inclusão
+em `versoes` e a remoção de `changes` devem compor o mesmo commit. O histórico Git
+preserva os arquivos originais. Trabalho ainda pendente ou parcialmente incorporado
+permanece identificado, e o histórico publicado em `versoes` é preservado.
+
+A incorporação no código, a aplicação no banco e a atualização do schema são
+momentos distintos. O schema é a referência física da base no momento da extração.
+Migrações posteriores àquele estado precisam ser consideradas, inclusive as já
+incorporadas em `versoes` e ainda não aplicadas à base de referência.
+
+A validação do conteúdo incorporado deve usar o pkReestrutura quando for necessário
+conferir seu interpretador, em base de teste identificada e com execução autorizada.
+Manifesto, CRC e versão são tratados pelo processo de build sob suas autorizações.
 
 A skill [database-migration](../../.ai/skills/database-migration/SKILL.md) é a fonte técnica do procedimento. O Workflow Fiscal.Calculos mantém sua exceção de caminho para scripts por intervalo de versões; esta organização não move seus arquivos nem altera esse contrato.
 

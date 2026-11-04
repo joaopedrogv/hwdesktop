@@ -65,8 +65,10 @@ Controla:
 Ele lê a Skill operacional aplicável, executa uma ação de script por vez e registra
 comando, resultado e evidências. Mantém as entradas externas somente leitura e os
 efeitos nos locais declarados pelo procedimento. Também pode executar um runner
-canônico de build ou testes quando houver autorização explícita e infraestrutura
-de teste confirmada. A avaliação técnica de falhas continua com os especialistas.
+canônico de build ou testes conforme a autoridade aplicável. Durante implementação
+autorizada, ERP.UnitTests já tem autorização permanente, com execução pelo runner
+oficial e isolamento de infraestrutura real. Os demais projetos e builds exigem
+autorização própria. A avaliação técnica de falhas continua com os especialistas.
 
 Ele não pesquisa o código, não cria o plano, não programa e não revisa. Normalmente
 utiliza `fast-routine` para estado e operações determinísticas. As permissões
@@ -108,8 +110,10 @@ Implementa uma única atribuição aprovada, com arquivos e limites explícitos.
 usar Skills especializadas. Seu perfil varia entre `fast-routine`, `balanced-work` e
 `quality-critical` conforme a complexidade real do incremento.
 
-O implementador não muda o plano, não amplia o escopo e não executa build ou testes
-sem autorização expressa.
+O implementador segue o plano e o escopo atribuídos. Ele pode validar mudanças
+relevantes com ERP.UnitTests pelo runner oficial durante implementação autorizada,
+registrando a autorização permanente na atribuição. Outros builds e testes exigem
+autoridade explícita conforme o projeto.
 
 ### `increment-reviewer`
 
@@ -175,7 +179,8 @@ O orquestrador não envia pedidos genéricos. Cada chamada informa:
 - fontes canônicas aplicáveis;
 - ownership e alterações permitidas;
 - perfil de execução;
-- presença ou ausência de autorização para build e testes;
+- autoridade de validação e seu alcance, distinguindo a autorização permanente de
+  ERP.UnitTests, a autorização explícita e a ausência de autorização;
 - saída esperada;
 - situações que obrigam o agente a parar.
 
@@ -329,4 +334,5 @@ A Skill define como executar uma capacidade especializada. Ela não substitui:
 - a aprovação humana;
 - o papel que possui a atribuição;
 - as Rules aplicáveis;
-- a autorização separada para build ou testes.
+- a política de autorização de build e testes, incluindo a autorização permanente
+  de ERP.UnitTests durante implementação autorizada.

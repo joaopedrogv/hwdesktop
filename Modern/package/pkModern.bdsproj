@@ -415,6 +415,8 @@
     ..\UI\Frames\Componentes\Inputs\MaskEditNullableFrameUnit.dfm;
     ..\Core\Domain\Constants\Shared\LimitesBasicosUnit.pas;
     ..\ERP.Features\Core\Domain\Entities\OperacaoFiscalIbsCbsEtdUnit.pas;
+    ..\ERP.Features\Core\Domain\Metadata\OperacaoFiscalIbsCbsMetadataUnit.pas;
+    ..\UI\DataSets\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsDataSet.pas;
     ..\ERP.Features\Adapters\Secondary\Repositories\OperacoesFiscaisIbsCbsRepositoryUnit.pas;
     ..\ERP.Features\Core\Domain\Ports\IOperacoesFiscaisIbsCbsRepositoryUnit.pas;
     ..\ERP.Features\Core\Application\UseCases\OperacoesFiscais\ObterOperacaoFiscalIbsCbsPorIdUseCaseUnit.pas;
@@ -422,6 +424,8 @@
     ..\ERP.Features\Core\Application\UseCases\OperacoesFiscais\SalvarOperacaoFiscalIbsCbsUseCaseUnit.pas;
     ..\UI\Forms\OperacoesFiscaisIbsCbs\UCadOperacoesFiscaisIbsCbs.pas;
     ..\UI\Forms\OperacoesFiscaisIbsCbs\UCadOperacoesFiscaisIbsCbs.dfm;
+    ..\UI\Forms\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsView.pas;
+    ..\UI\Forms\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsPresenter.pas;
     ..\UI\Frames\Componentes\Selecoes\ComboboxEntityPickerFrameUnit.pas;
     ..\UI\Frames\Componentes\Selecoes\ComboboxEntityPickerFrameUnit.dfm;
     ..\ERP.Features\Core\Application\UseCases\OperacoesInternas\ListarOperacoesInternasUseCaseUnit.pas;

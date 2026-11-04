@@ -229,7 +229,9 @@ to `increment-implementer` and then assigns its completed scope to an independen
 3. add only the validation, Services, repositories, adapters, and composition needed;
 4. create or update the planned tests for that same increment;
 5. end the writing assignment and return its structured result;
-6. review the increment independently against applicable Rules and Context;
+6. review the increment independently against applicable Rules and Context,
+   including new state lifetime, durable comments, user-facing communication and
+   byte-level encoding evidence for created or modified Delphi 2006 sources;
 7. record completed behavior, review findings, validation evidence, and remaining
    work.
 
@@ -329,19 +331,24 @@ Create tests alongside the corresponding functional increment. Use
 infrastructure, UI, the application Container, and `Fiscal.Calculos` are outside
 that Skill.
 
-Creating tests under an approved plan does not authorize building or running them.
-The primary Orchestrator may run explicitly authorized canonical automation and
-record its results; technical diagnosis or correction is assigned to a Specialist.
+During authorized implementation, relevant isolated ERP.UnitTests validation has
+standing authority under .ai/rules/repository-safety.md. Record it in assignments.
+Other execution requires its own authority. The primary Orchestrator may run the
+canonical automation and record its results. Technical diagnosis or correction is
+assigned to a Specialist.
 
 ### Modern `ERP.UnitTests`
 
-For Modern/Tests/ERP.UnitTests only, when explicitly authorized, use `delphi-test-runner` and:
+For Modern/Tests/ERP.UnitTests, use the standing implementation grant or an explicit
+developer request for standalone validation. Follow `delphi-test-runner` and use:
 
 `Modern/Tests/Automation/Invoke-ERPUnitTests.ps1`
 
 Do not replace the canonical script with ad hoc commands. Report its exact invocation,
-mode, exit code, and NUnit result when applicable. Without authorization, perform
-static review and record runtime validation as pending.
+mode, exit code, and NUnit result when applicable. Run against stable sources,
+serialize shared test outputs, and reuse valid evidence until relevant changes or
+failures justify another run. When execution falls outside available authority,
+record the pending validation.
 
 ### Integration tests
 

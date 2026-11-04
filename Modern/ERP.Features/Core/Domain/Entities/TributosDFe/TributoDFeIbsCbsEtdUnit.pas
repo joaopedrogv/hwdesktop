@@ -48,6 +48,8 @@ type
       ACredPresOp: TributoDFeCredPresOpIbsCbsEtd;
       ACredPresZFM: TributoDFeCredPresZfmIbsCbsEtd); overload;
 
+    destructor Destroy; override;
+
     function Clone(): TributoDFeIbsCbsEtd;
     function IsEqualTo(const Other: TributoDFeIbsCbsEtd): Boolean;
 
@@ -126,6 +128,18 @@ begin
   FAjusteCompet := AAjusteCompet;
   FCredPresOp := ACredPresOp;
   FCredPresZFM := ACredPresZFM;
+end;
+
+destructor TributoDFeIbsCbsEtd.Destroy;
+begin
+  FreeAndNil(FGIbsCbs);
+  FreeAndNil(FMonofasia);
+  FreeAndNil(FTransfCred);
+  FreeAndNil(FAjusteCompet);
+  FreeAndNil(FCredPresOp);
+  FreeAndNil(FCredPresZFM);
+
+  inherited;
 end;
 
 function TributoDFeIbsCbsEtd.IsEqualTo(const Other: TributoDFeIbsCbsEtd): Boolean;

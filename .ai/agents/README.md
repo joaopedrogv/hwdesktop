@@ -72,7 +72,8 @@ for:
 - human approval gates;
 - assignment scope and file ownership;
 - registration and integration of structured specialist results;
-- prescribed canonical operational scripts and explicitly authorized runners;
+- prescribed canonical operational scripts and runners authorized by the standing
+  ERP.UnitTests grant or the developer's explicit execution approval;
 - resolution of conflicts or material uncertainty;
 - final state and status based on independent validation evidence.
 

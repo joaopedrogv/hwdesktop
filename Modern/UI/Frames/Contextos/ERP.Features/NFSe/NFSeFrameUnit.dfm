@@ -1210,6 +1210,7 @@ object NFSeFrame: TNFSeFrame
             ItemHeight = 13
             ItemIndex = 0
             TabOrder = 1
+            OnChange = edTipoEnteGovChange
             Text = '3 - Distrito Federal'
             Items.Strings = (
               '3 - Distrito Federal')

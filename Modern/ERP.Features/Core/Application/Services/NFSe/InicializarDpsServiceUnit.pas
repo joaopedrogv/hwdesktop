@@ -33,7 +33,8 @@ implementation
 uses
   StrUtils, DateUtils, ConfiguracaoEtdUnit, ConfigFactoryUnit, IConfigReaderAndWriterUnit, ConfigLegacyTypes,
   IntegerNullableUnit, DateAndTimeNullableUnit, NFSeTypesUnit, StringNullableUnit, CurrencyNullableUnit, TipoComunsUnit,
-  StringServiceUnit, NFSeEtdUnit, ResolverRegraFiscalIbsCbsTypesUnit, RegraFiscalIbsCbsEtdUnit, TipoServicoEtdUnit,
+  StringServiceUnit, NFSeEtdUnit, ResolverRegraFiscalIbsCbsTypesUnit, OperacaoFiscalIbsCbsCondicaoEtdUnit,
+  EValidacaoNegocioUnit, RegraFiscalIbsCbsEtdUnit, TipoServicoEtdUnit,
   NFSeParticipanteEtdUnit, ClienteEtdUnit, NFSeParticipanteFactoryUnit, DFeTypesUnit, TipoRegraTributoDFeEnumUnit,
   NFSeIbsCbsFactoryUnit, ConfiguracaoNFSeModelUnit, VersaoAplicacaoUnit, DpsEmitirIbsCbsNacionalModelUnit;
 
@@ -64,7 +65,9 @@ var
   Cliente: ClienteEtd;
   TpEnteGov: TipoEnteGovEnum;
   GrupoFiscalIbsCbsId: string;
+  Propria: Boolean;
   RegraFiscal: RegraFiscalIbsCbsEtd;
+  Resultado: ResolverRegraFiscalIbsCbsResult;
   ConfigNFSe: ConfiguracaoNFSeModel;
   IndTotTrib: YesNoEnum;
   LayoutNFSe: LayoutNFSeEnum;
@@ -84,6 +87,7 @@ begin
   SetLength(RefNFSe, 0);
 
   TpEnteGov := tgvNenhum;
+  Cliente := nil;
   CodCliente := INull;
   if Input.ClienteId > 0 then
   begin
@@ -101,6 +105,7 @@ begin
       end;
     finally
       Cliente.Free();
+      Cliente := nil;
     end;
   end;
 
@@ -215,12 +220,18 @@ begin
 
     if LayoutNFSe in [ lytNacionalComIbsCbs ] then
     begin
-      RegraFiscal := FResolverRegrasFiscais.Executar(ResolverRegraFiscalIbsCbsInput.Create(
-        ConfigNFSe.OpInternaId.Value, GrupoFiscalIbsCbsId, Input.EmpresaId, Input.DataCompetencia
+      Propria := Input.Natureza in [nemtPrestadorWS, nemtPrestadorPortal];
+      Resultado := FResolverRegrasFiscais.Executar(ResolverRegraFiscalIbsCbsInput.Create(
+        ConfigNFSe.OpInternaId.Value, GrupoFiscalIbsCbsId, Input.EmpresaId, Input.DataCompetencia,
+        OperacaoFiscalIbsCbsCondicoes.TipoEmissaoDePropria(Propria),
+        OperacaoFiscalIbsCbsCondicoes.NaturezaDeSaida(Propria),
+        TpEnteGov
       ));
       try
-        if RegraFiscal = nil then
-          RegraFiscal := RegraFiscalIbsCbsEtd.Create();
+        if Resultado.Status <> rrDeterminado then
+          raise EValidacaoNegocio.Create(Resultado.Mensagem);
+
+        RegraFiscal := Resultado.RegraFiscal;
 
         IbsCbs := NFSeIbsCbsFactory.Create(
           {Id} '',
@@ -230,7 +241,7 @@ begin
         );
 
       finally
-        RegraFiscal.Free();
+        Resultado.Free();
       end;
     end;
 

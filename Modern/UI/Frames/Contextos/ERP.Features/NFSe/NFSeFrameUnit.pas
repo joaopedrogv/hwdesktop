@@ -249,6 +249,7 @@ type
 		procedure edVServ2Exit(Sender: TObject);
     procedure ckIndDestClick(Sender: TObject);
     procedure edDhemiExit(Sender: TObject);
+    procedure edTipoEnteGovChange(Sender: TObject);
     procedure btPesquisarServicoClick(Sender: TObject);
     procedure linkRemoverPartPrincipalClick(Sender: TObject);
     procedure linkPesquisarPartPrincipalClick(Sender: TObject);
@@ -263,6 +264,7 @@ type
 		procedure SetupServico();
     procedure SetupVisualValorAproxTributos();
 		procedure SetupIbsCbsNacional();
+		procedure InvalidarDeterminacaoIbsCbsNacional();
 		procedure HandleRegraFiscal();
 		procedure HandleCalculosFiscais();
 		procedure HandleCalculosFiscaisSomenteRtc();
@@ -293,6 +295,7 @@ uses
   TipoRegraTributoDFeEnumUnit, IntegerNullableUnit, CurrencyNullableUnit, ContainerUnit, ClienteEtdUnit,
   EValidacaoNegocioUnit, NFSeParticipanteFactoryUnit, TipoServicoEtdUnit, UIMasksUtilsUnit,
   ResolverRegraFiscalIbsCbsTypesUnit, DateAndTimeNullableUnit, RegraFiscalIbsCbsEtdUnit, NFSeIbsCbsFactoryUnit,
+  OperacaoFiscalIbsCbsCondicaoEtdUnit,
   NumberServiceUnit, CalculoTributosNFSeInputUnit, CalculoTributosNFSeOutputUnit, TributoNFSeRetenFederalOutputUnit,
   TributoNFSePisCofinsOutputUnit, StringServiceUnit, NFSeSubstEtdUnit, DpsEmitirIbsCbsNacionalModelUnit,
   TributoDFeIbsCbsEtdUnit, TributoDFeImpostoSeletivoEtdUnit, ValidacaoOutputUnit, NFSeOSEtdUnit, ArrayServiceUnit,
@@ -375,6 +378,34 @@ begin
     lbDhemi.Caption := edDhemi.Text;
     HandleRegraFiscal();
   end;  
+end;
+
+procedure TNFSeFrame.edTipoEnteGovChange(Sender: TObject);
+var
+  NovoTipo: TipoEnteGovEnum;
+begin
+  if (Sender <> edTipoEnteGov) or (FState = nil) or (FState.NFSe = nil)
+    or (edTipoEnteGov.ItemIndex < 0) then
+    Exit;
+
+  // Documento finalizado conserva a determinacao historica e nao e reavaliado.
+  if FNFSe.EstaFinalizada then
+    Exit;
+
+  NovoTipo := TipoEnteGovEnum(edTipoEnteGov.ItemIndex);
+  if FNFSe.TpEnteGov = NovoTipo then
+    Exit;
+
+  FNFSe.TpEnteGov := NovoTipo;
+  if NovoTipo = tgvNenhum then
+  begin
+    FNFSe.TpOper := togNaoDefinido;
+    // Sincroniza o controle como na remocao do participante: sem isso o
+    // MapFormToState restauraria a operacao governamental anterior.
+    edTpFornecimento.ItemIndex := Ord(FNFSe.TpOper);
+  end;
+
+  HandleRegraFiscal();
 end;
 
 procedure TNFSeFrame.edIssPAliqExit(Sender: TObject);
@@ -776,12 +807,18 @@ end;
 
 procedure TNFSeFrame.HandleRegraFiscal;
 var
-  RegraFiscal: RegraFiscalIbsCbsEtd;
+  Resultado: ResolverRegraFiscalIbsCbsResult;
+  Propria: Boolean;
   TipoRegra: TipoRegraTributoDFeEnum;
   CCredPres: StringNullable;
   GFId: string;
   Data: TDate;
 begin
+  // Sem estado/documento inicializado nao ha determinacao a avaliar nem a
+  // invalidar; a guarda evita a desreferencia de FNFSe antes do try.
+  if (FState = nil) or (FState.NFSe = nil) then
+    Exit;
+
   if FNFSe.LayoutNFSeComIbsCbs() and not FNFSe.EstaFinalizada and (FNFSe.NaturezaEmissao = nemtPrestadorWS) then
   begin
     TipoRegra := TipoRegraTributoDFeEnum(edTipoRegra.ItemIndex);
@@ -794,26 +831,54 @@ begin
     else
       GFId := FNFSe.Servico.GrupoFiscalIbsCbsId.Value;
 
-    CCredPres := FState.IbsCbsNacional.CCredPres;
+    if FState.IbsCbsNacional <> nil then
+      CCredPres := FState.IbsCbsNacional.CCredPres
+    else
+      CCredPres := StringNullable.NullInstance();
 
     if FNFSe.DhEmi.HasValue then
       Data := FNFSe.DhEmi.Value
     else
       Data := FNFSe.DCompet.Value;
 
-    RegraFiscal := Container.GetInstance().ErpFeaturesFactory.CreateResolverRegraFiscalIbsCbsUseCase()
-      .Executar(ResolverRegraFiscalIbsCbsInput.Create(
-        FNFSe.OpInternaId.Value, GFId, FNFSe.CodEmpresa, Data
-      ));
+    Propria := FNFSe.IsEmissaoPropria;
+    Resultado := nil;
     try
-      FState.IbsCbsNacional := NFSeIbsCbsFactory.Create(
-        FNFSe.Id,
-        TipoRegra,
-        CCredPres,
-        RegraFiscal
-      );
-    finally
-      RegraFiscal.Free();
+      try
+        Resultado := Container.GetInstance().ErpFeaturesFactory.CreateResolverRegraFiscalIbsCbsUseCase()
+          .Executar(ResolverRegraFiscalIbsCbsInput.Create(
+            FNFSe.OpInternaId.Value, GFId, FNFSe.CodEmpresa, Data,
+            OperacaoFiscalIbsCbsCondicoes.TipoEmissaoDePropria(Propria),
+            OperacaoFiscalIbsCbsCondicoes.NaturezaDeSaida(Propria),
+            FNFSe.TpEnteGov
+          ));
+
+        if Resultado.Status <> rrDeterminado then
+        begin
+          InvalidarDeterminacaoIbsCbsNacional();
+          UIUtils.ShowError(Resultado.Mensagem);
+          Exit;
+        end;
+
+        FState.IbsCbsNacional := NFSeIbsCbsFactory.Create(
+          FNFSe.Id,
+          TipoRegra,
+          CCredPres,
+          Resultado.RegraFiscal
+        );
+      finally
+        Resultado.Free();
+      end;
+    except
+      on E: Exception do
+      begin
+        // Falha de carga/resolucao apos a mudanca de fato: a determinacao
+        // anterior deixa de ser representada como atual, preservando
+        // CCredPres e os dados independentes.
+        InvalidarDeterminacaoIbsCbsNacional();
+        UIUtils.HandleError(E);
+        Exit;
+      end;
     end;
 
     SetupIbsCbsNacional();
@@ -995,9 +1060,23 @@ begin
 
     FNFSe.ParticipantePrincipal := nil;
     FNFSe.CodCliente := IntegerNullable.NullInstance();
+
     DPSPartPrincipalFrame1.Setup( FNFSe.ParticipantePrincipal );
     tabPartPrincipal.Caption := Format('  %s  ', [TipoPartDpesEnumStr[tprtTomador]]);
     linkRemoverPartPrincipal.Visible := False;
+
+    // Sem participante principal nao ha ente publico conhecido: aplica o fato
+    // aprovado "Nenhum" e invalida/reavalia a determinacao dependente. Documento
+    // finalizado permanece intocado.
+    if not FNFSe.EstaFinalizada then
+    begin
+      FNFSe.TpEnteGov := tgvNenhum;
+      FNFSe.TpOper := togNaoDefinido;
+      edTipoEnteGov.ItemIndex := Ord(FNFSe.TpEnteGov);
+      edTpFornecimento.ItemIndex := Ord(FNFSe.TpOper);
+
+      HandleRegraFiscal();
+    end;
   end
   else if Sender = linkRemoverIntermediario then
   begin
@@ -1589,6 +1668,24 @@ begin
     if FState.IbsCbsNacional = nil then
       IC.Free();
   end;
+end;
+
+procedure TNFSeFrame.InvalidarDeterminacaoIbsCbsNacional;
+var
+  CCredPres: StringNullable;
+begin
+  // A determinacao anterior deixa de ser representada como bem-sucedida sem
+  // descartar a presuncao de credito informada pelo usuario.
+  if FState.IbsCbsNacional <> nil then
+  begin
+    CCredPres := FState.IbsCbsNacional.CCredPres;
+
+    FState.IbsCbsNacional := DpsEmitirIbsCbsNacionalModel.Create();
+    FState.IbsCbsNacional.TipoRegra := tctAutomatica;
+    FState.IbsCbsNacional.CCredPres := CCredPres;
+  end;
+
+  SetupIbsCbsNacional();
 end;
 
 procedure TNFSeFrame.SetupServico;

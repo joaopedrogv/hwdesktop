@@ -33,7 +33,8 @@ implementation
 
 uses
   Sysutils, EntityValidatorFactoryUnit, IEntityValidatorUnit,
-  LimitesBasicosUnit;
+  LimitesBasicosUnit, TipoComunsUnit,
+  OperacaoFiscalIbsCbsCondicaoEtdUnit, OperacaoFiscalIbsCbsMetadataUnit;
 
 { SalvarOperacaoFiscalIbsCbsUseCase }
 
@@ -45,8 +46,14 @@ end;
 function SalvarOperacaoFiscalIbsCbsUseCase.Executar(Input: OperacaoFiscalIbsCbsEtd): CreateEntityUseCaseOutPut;
 var
   validator: IEntityValidator;
+  erros: TArrayString;
+  i: Integer;
 begin
-  validator := EntityValidatorFactory.Builder();
+  // Normaliza antes de validar: duplicatas de valor sao removidas e a ordem
+  // passa a ser canonica; o conjunto universal e mantido.
+  Input.Condicoes := OperacaoFiscalIbsCbsCondicoes.Normalizar(Input.Condicoes);
+
+  validator := EntityValidatorFactory.Builder(TOperacaoFiscalIbsCbsMetadata.GetMetadata());
 
   validator.Field('OperacaoInternaId', Input.OperacaoInternaId)
     .IsRequired();
@@ -59,6 +66,10 @@ begin
 
   validator.Field('FimVigencia', Input.FimVigencia)
     .HasMinValue( Input.InicioVigencia, 'Final da vigência [@Value] menor que início [@MinValue] ' );
+
+  if not OperacaoFiscalIbsCbsCondicoes.Validar(Input.Condicoes, erros) then
+    for i := 0 to High(erros) do
+      validator.Add('Condicoes', erros[i]);
 
   if not validator.IsValid() then
     Result := CreateEntityUseCaseOutPut.Create( validator.Result() )

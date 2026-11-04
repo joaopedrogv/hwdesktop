@@ -201,6 +201,7 @@ type
     Fid_commerce              : Integer;
     Ffinalidadeid             : Integer;
     Fret_fed                  : Integer;
+    Ftipo_ente_gov            : Integer;
   public
     constructor Create;
     destructor Destroy; override;
@@ -396,6 +397,7 @@ type
     property id_commerce              : Integer   read Fid_commerce               write Fid_commerce;
     property finalidadeid             : Integer   read Ffinalidadeid              write Ffinalidadeid;
     property ret_fed                  : Integer   read Fret_fed                   write Fret_fed;
+    property tipo_ente_gov            : Integer   read Ftipo_ente_gov             write Ftipo_ente_gov;
   end;
 
   TClientes_classList = class(TObjectList)
@@ -424,6 +426,7 @@ constructor TClientes_class.Create;
 begin
   Fobs_div := TStringList.Create;
   Fativo   := 1;
+  Ftipo_ente_gov := 0;
 end;
 
 destructor TClientes_class.Destroy;
@@ -621,6 +624,7 @@ begin
   Result.id_commerce               := Self.id_commerce;
   Result.finalidadeid              := Self.finalidadeid;
   Result.ret_fed                   := Self.ret_fed;
+  Result.tipo_ente_gov             := Self.tipo_ente_gov;
 end;
 
 class function TClientes_class.GetFieldsSql(Aalias: string): string;
@@ -650,7 +654,7 @@ begin
             ' @ondeentrevista_potveic, @tipo_prop, @data_ult_comprav, @codmodelo_potveic, @cor_potveic, @ano_potveic,' +
             ' @anomod_potveic, @modelo_potveic, @cod_vendedorv_ant, @data_ult_comprav_ant, @codmodelo_potveic_ant,' +
             ' @cor_potveic_ant, @ano_potveic_ant, @anomod_potveic_ant, @modelo_potveic_ant, @us_mod_cl, @modelo_potveiccp,' +
-            ' @cond_pag_vnd, @cond_pag_pre, @id_commerce, @finalidadeid, @ret_fed';
+            ' @cond_pag_vnd, @cond_pag_pre, @id_commerce, @finalidadeid, @ret_fed, @tipo_ente_gov';
   if (Trim(Aalias) <> '') and (Trim(Aalias) <> ':') then
     Aalias := Trim(Aalias) + '.';
   Result := StringReplace(Result, '@', Aalias, [rfReplaceAll]);
@@ -845,6 +849,7 @@ begin
     Fid_commerce               := ADataSet.FieldByName('ID_COMMERCE').AsInteger;
     Ffinalidadeid              := ADataSet.FieldByName('FINALIDADEID').AsInteger;
     Fret_fed                   := ADataSet.FieldByName('RET_FED').AsInteger;
+    Ftipo_ente_gov             := ADataSet.FieldByName('TIPO_ENTE_GOV').AsInteger;
   end
   else
   begin
@@ -1033,6 +1038,7 @@ begin
     if Assigned(ADataSet.FindField('ID_COMMERCE'              )) then Fid_commerce               := ADataSet.FieldByName('ID_COMMERCE').AsInteger;
     if Assigned(ADataSet.FindField('FINALIDADEID'             )) then Ffinalidadeid              := ADataSet.FieldByName('FINALIDADEID').AsInteger;
     if Assigned(ADataSet.FindField('RET_FED'                  )) then Fret_fed                   := ADataSet.FieldByName('RET_FED').AsInteger;
+    if Assigned(ADataSet.FindField('TIPO_ENTE_GOV'            )) then Ftipo_ente_gov             := ADataSet.FieldByName('TIPO_ENTE_GOV').AsInteger;
   end;
 end;
 

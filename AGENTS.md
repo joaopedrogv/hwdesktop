@@ -84,7 +84,11 @@ Identify the physical starting state. Read scripts/database/schema/README.md, th
 search only the required definitions in scripts/database/schema/schema.sql.
 Prepare general demand SQL in scripts/database/changes/<demand-id>/.
 Do not edit scripts/versoes implicitly; production incorporation is separately
-requested. Read .ai/skills/database-migration/SKILL.md when preparing migration SQL.
+requested. Read .ai/skills/database-migration/SKILL.md when preparing or
+incorporating migration SQL. Incorporation uses the developer's preferred version
+file, verified dependencies and paired removal of fully incorporated demand scripts
+in the same commit. A separately requested incorporation is a bounded Skill task
+with its own inputs. An earlier Workflow's completion status is not a prerequisite.
 Schema extraction, SQL execution and integration tests require their own authority.
 
 ## Human documentation and operations
@@ -98,8 +102,11 @@ Automation starts at _automation/README.md. Setup entry point:
 _automation/ai/Sync-AIProfiles.ps1. Build parameters are in _automation/build/README.md;
 SVN/Git operations are in _automation/workflow/GUIA-OPERACIONAL.md.
 
-Use checks appropriate to the change. Build, test execution, SQL, deployment and
-publication are separate authorizations. Keep feature work in the working clone.
+Use checks appropriate to the change. During authorized implementation, isolated
+ERP.UnitTests build and execution have standing authorization under
+.ai/rules/repository-safety.md#standing-erp-unit-test-validation.
+Other builds, test projects, SQL, deployment and publication require their own
+authorization. Keep feature work in the working clone.
 Do not reset, stash, discard work, rewrite history, switch branches or publish as an
 implicit investigation step.
 

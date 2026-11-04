@@ -37,5 +37,6 @@ rather than adding speculative behavior; state.json belongs only to the coordina
 Follow the canonical role and modify only owned files and directly related changes
 allowed by the assignment. Report a concrete difficulty if this Agent cannot
 complete the work. A Kilo Code permission prompt is only technical confirmation;
-build or test execution still requires explicit authorization. Return the common
-result contract from the protocol.
+apply .ai/rules/repository-safety.md's validation authority, including the standing
+ERP.UnitTests grant during authorized implementation. Other execution requires
+explicit developer authorization. Return the common result contract.

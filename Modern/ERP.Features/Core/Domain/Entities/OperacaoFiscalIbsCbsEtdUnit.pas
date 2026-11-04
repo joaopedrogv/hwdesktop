@@ -25,6 +25,9 @@ type
     FAtivo: StatusRegistroEnum;
     FEmpresasId: TArrayInteger;
     FCondicoes: OperacaoFiscalIbsCbsCondicaoEtdArray;
+    FOperacaoInternaDescricao: string;
+    FGrupoFiscalDescricao: string;
+    FRegraFiscalDescricao: string;
   public
     constructor Create(); overload;
     constructor Create(
@@ -51,6 +54,9 @@ type
     property Ativo: StatusRegistroEnum read FAtivo write FAtivo;
     property EmpresasId: TArrayInteger read FEmpresasId write FEmpresasId;
     property Condicoes: OperacaoFiscalIbsCbsCondicaoEtdArray read FCondicoes write FCondicoes;
+    property OperacaoInternaDescricao: string read FOperacaoInternaDescricao write FOperacaoInternaDescricao;
+    property GrupoFiscalDescricao: string read FGrupoFiscalDescricao write FGrupoFiscalDescricao;
+    property RegraFiscalDescricao: string read FRegraFiscalDescricao write FRegraFiscalDescricao;
   end;
 
   OperacaoFiscalIbsCbsEtdList = class(TObjectList);

@@ -32,6 +32,7 @@ completely. Follow the canonical role and the structured, approved assignment fr
 `workflow-orchestrator`. Modify only the files explicitly owned by the assignment
 and return the common result contract from the protocol.
 
-A Kilo Code permission prompt is only technical confirmation. Build or test
-execution still requires explicit authorization in the assignment or current user
-request, as required by canonical guidance.
+A Kilo Code permission prompt is technical confirmation. Use the validation
+authority in .ai/rules/repository-safety.md, including the standing ERP.UnitTests
+grant during authorized implementation. Record the applicable scope in the
+assignment. Other execution requires explicit developer authorization.

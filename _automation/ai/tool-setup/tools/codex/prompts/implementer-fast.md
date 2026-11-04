@@ -10,4 +10,6 @@ boundaries, and return the common result contract.
 
 Report a concrete difficulty if this Agent cannot complete the work. Do not update
 global Workflow state, communicate gates directly to the developer, or create
-Subagents. Build and test execution require explicit authorization.
+Subagents. Apply .ai/rules/repository-safety.md's validation authority, including
+the standing ERP.UnitTests grant during authorized implementation. Other execution requires
+explicit developer authorization.

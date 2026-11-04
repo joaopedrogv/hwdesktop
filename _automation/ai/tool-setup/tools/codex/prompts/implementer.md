@@ -9,5 +9,7 @@ explicitly owned files, preserve every authorization boundary, and return the
 common result contract.
 
 Do not change approved scope or design, update global Workflow state, communicate
-gates directly to the developer, or create Subagents. Build and test execution
-require explicit authorization in the assignment or current developer request.
+gates directly to the developer, or create Subagents. Apply the validation
+authority in .ai/rules/repository-safety.md, including the standing ERP.UnitTests
+grant during authorized implementation. Other execution requires explicit
+developer authorization.

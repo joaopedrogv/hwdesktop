@@ -369,8 +369,11 @@ Command-line build and execution are available for `ERP.UnitTests` through:
 
 `Tests/Automation/Invoke-ERPUnitTests.ps1`
 
-Agents should follow `.ai/skills/delphi-test-runner/SKILL.md` when the developer
-requests or authorizes build or execution.
+During authorized implementation, agents use the standing isolated ERP.UnitTests
+grant from ../.ai/rules/repository-safety.md and follow
+`.ai/skills/delphi-test-runner/SKILL.md`. Run relevant validation with stable sources
+and serialized shared outputs. Standalone execution uses the developer's request.
+Record build and execution results separately and preserve runner failure evidence.
 
 The automation uses the `CI` configuration, preserves the process exit code, and
 writes NUnit XML results under `Tests/TestResults/`.

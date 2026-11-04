@@ -26,7 +26,8 @@ optional; report concrete difficulty rather than silently widening the assignmen
 - allowed related changes;
 - applicable Skills, if any;
 - test creation requirements;
-- explicit build or test-execution authorization, if any.
+- validation authority and scope, identifying the standing ERP.UnitTests grant
+  when applicable or the developer's explicit authorization for other execution.
 
 ## Responsibilities
 
@@ -36,7 +37,8 @@ optional; report concrete difficulty rather than silently widening the assignmen
    affected references and tests within the assigned scope.
 3. Implement only the assigned production and test changes.
 4. Preserve architecture, compatibility, ownership, transaction, and security
-   boundaries.
+   boundaries. Apply repository-safety.md's local quality and encoding checks to
+   new state, comments, user messages and created or modified source files.
 5. Perform authorized validation and otherwise record it as pending.
 6. Return changed files, decisions, evidence, and blockers to the Workflow
    Orchestrator under the common result contract.
@@ -48,7 +50,9 @@ optional; report concrete difficulty rather than silently widening the assignmen
 - Do not modify files outside the assignment without returning the need to the
   Workflow Orchestrator.
 - Do not write concurrently to files owned by another agent.
-- Do not run build or tests unless the assignment includes explicit authorization.
+- Use the standing ERP.UnitTests grant during authorized implementation when
+  relevant. Record it in the assignment. Other execution needs the developer's
+  explicit authority and the applicable runner's infrastructure requirements.
 - Do not weaken production behavior or tests to remove a failure.
 - Do not communicate approval requests directly or declare Ready for Release.
 - Do not delegate or update the global Workflow state.

@@ -111,8 +111,12 @@ orienta avaliar a qualidade dos exemplos legados antes de reutilizá-los. Códig
 novo ou alterado deve ser claro e compatível, evitando propagar problemas concretos
 dos exemplos. Melhorias locais cabem no escopo aprovado; alterações de comportamento
 ou contrato além do aprovado e refatorações amplas precisam de definição própria.
-Esse critério não impõe a arquitetura de Modern ao legado nem acrescenta uma etapa
-ao workflow.
+Esse critério preserva a arquitetura de cada área. Na implementação e revisão,
+avalie o estado privado necessário, aproveite dados deriváveis e mantenha juntos os
+dados de um mesmo conceito quando isso melhorar a clareza. Os comentários explicam
+regras e motivos duradouros. Mensagens ajudam o usuário a localizar registros,
+entender a consequência e escolher a ação pertinente. A conferência da codificação
+inclui os bytes dos fontes Delphi 2006 criados ou alterados, além da leitura na IDE.
 
 O setup está no menu **Ferramentas de IA**, com visualização, aplicação/atualização
 e verificação do Kilo. O guia de instalação está em
@@ -176,7 +180,7 @@ Uma Command não é necessária para usar uma Skill.
 | [`delphi-cadastro-form-scaffold`](../../Modern/.ai/skills/delphi-cadastro-form-scaffold/SKILL.md) | cadastro com base selecionada, infraestrutura compartilhada e MVP quando aplicável |
 | [`delphi-ui-form-validation`](../../Modern/.ai/skills/delphi-ui-form-validation/SKILL.md) | projetar validação na UI, diretamente ou pelo feedback da View/Presenter |
 | [`delphi-usecase-testing`](../../Modern/.ai/skills/delphi-usecase-testing/SKILL.md) | testes unitários isolados de Use Cases |
-| [`delphi-test-runner`](../../Modern/.ai/skills/delphi-test-runner/SKILL.md) | executar `ERP.UnitTests` quando autorizado |
+| [`delphi-test-runner`](../../Modern/.ai/skills/delphi-test-runner/SKILL.md) | validar `ERP.UnitTests` durante implementação autorizada ou por solicitação própria |
 | [`rtc-update-inputs`](../../Modern/.ai/skills/rtc-update-inputs/SKILL.md) | obter do GitHub as tags e o pacote RTC exatos para uma execução |
 | [`rtc-implementation-evidence`](../../Modern/.ai/skills/rtc-implementation-evidence/SKILL.md) | validar e ler seletivamente o contrato estruturado da atualização RTC |
 | [`rtc-source-snapshots`](../../Modern/.ai/skills/rtc-source-snapshots/SKILL.md) | preparar snapshots das versões oficiais já adquiridas |
@@ -340,8 +344,13 @@ A arquitetura diferencia intenção, implementação e execução:
 
 - pedir análise ou discovery não autoriza alteração de código;
 - aprovar o plano da feature autoriza somente o escopo aprovado;
-- criar testes não autoriza compilá-los ou executá-los;
-- `ERP.UnitTests` só é executado quando solicitado ou autorizado;
+- durante uma implementação autorizada, compilar e executar `ERP.UnitTests` pelo
+  runner canônico já está autorizado, quando a mudança justificar a validação;
+- o agente registra essa autorização na atribuição, executa sobre fontes estáveis
+  e reaproveita o resultado até que alterações ou falhas justifiquem nova execução;
+- pedidos restritos a pesquisa, planejamento, revisão avulsa ou documentação
+  seguem as autorizações do pedido. A execução avulsa de testes pode ser solicitada
+  diretamente. Os demais builds têm autorização própria;
 - integration tests exigem autorização e configuração próprias;
 - `Fiscal.Calculos.Tests` usa automação própria e só executa após confirmação da
   infraestrutura segura de teste;

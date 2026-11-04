@@ -18,7 +18,8 @@ uses
   ConfigurationTestUnit in '..\Common\Models\ConfigurationTestUnit.pas',
   JsonResourceUnit in '..\Common\Services\JsonResourceUnit.pas',
   SetupTestUnit in 'SetupTestUnit.pas',
-  Teste_SincronizacaoFiscal in 'Synchronization\Teste_SincronizacaoFiscal.pas';
+  Teste_SincronizacaoFiscal in 'Synchronization\Teste_SincronizacaoFiscal.pas',
+  Test_OperacoesFiscaisIbsCbsRepository in 'OperacoesFiscaisIbsCbs\Test_OperacoesFiscaisIbsCbsRepository.pas';
 
 { keep comment here to protect the following conditional from being removed by the IDE when adding a unit }
 {$IFNDEF TESTINSIGHT}

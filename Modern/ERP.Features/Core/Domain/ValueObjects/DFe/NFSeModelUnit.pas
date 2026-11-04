@@ -70,6 +70,8 @@ var
   CST, CClassTrib: string;
   GIbsCbs: TributoDFeGrupoIbsCbsEtd;
 begin
+  GIbsCbs := nil;
+
   if AIbsCbsNacional <> nil then
   begin
     TipoRegra := AIbsCbsNacional.TipoRegra;
@@ -121,7 +123,7 @@ begin
       )
     );
 
-  if AIbsCbsNacional.CCredPres.HasValue then
+  if Assigned(AIbsCbsNacional) and AIbsCbsNacional.CCredPres.HasValue then
   begin
     Result.IbsCbs.CredPresOp := TributoDFeCredPresOpIbsCbsEtd.Create();
     Result.IbsCbs.CredPresOp.Ccredpres := AIbsCbsNacional.CCredPres.Value; 

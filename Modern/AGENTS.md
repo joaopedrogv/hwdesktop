@@ -6,9 +6,11 @@ remains the canonical source of module-specific constraints and knowledge.
 
 ## Authority and routing
 
-Follow the developer's requested phase, scope and authorization. A planning or
-documentation task does not authorize feature implementation, build, tests, SQL
-execution, setup application or publication.
+Follow the developer's requested phase, scope and authorization. Planning and
+documentation requests authorize their stated scope.
+During authorized implementation, the standing ERP.UnitTests validation grant in
+../.ai/rules/repository-safety.md applies. Other builds, test projects, SQL
+execution, setup application and publication require their own authorization.
 
 Start with the root routing. Use ../.ai/metadata.md when routing or maintaining
 artifacts, and read each selected artifact completely. Preserve any explicit

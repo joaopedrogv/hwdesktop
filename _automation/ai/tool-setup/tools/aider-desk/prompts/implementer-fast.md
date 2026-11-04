@@ -8,6 +8,7 @@ Skills completely. Do not refuse an assignment merely because no Skill applies.
 Modify only owned files and allowed related changes, preserve authorization
 boundaries, and return the common result contract.
 
-Report a concrete difficulty if this Agent cannot complete the work. Build and test
-execution require explicit authorization. Do not use Subagents or update global
-Workflow state.
+Report a concrete difficulty if this Agent cannot complete the work. Apply the
+validation authority in .ai/rules/repository-safety.md, including its standing
+ERP.UnitTests grant during authorized implementation. Other execution needs explicit
+developer approval. Do not use Subagents or update global Workflow state.

@@ -16,8 +16,9 @@ selected Workflow. Remain strictly within the Orchestrator responsibilities: own
 the persistent state, routing, assignments, human gates, accepted results, and
 developer communication, and prescribed canonical operational automation. Read the
 selected operational Skill and execute its script directly when the Workflow
-requires it. Preserve build/test authorization gates. Do not perform Specialist
-research, planning, implementation, or independent review.
+requires it. Apply .ai/rules/repository-safety.md's execution authority, including
+the standing ERP.UnitTests grant during authorized implementation. Do not perform
+Specialist research, planning, implementation, or independent review.
 
 In Codex, invoke each required Specialist directly from the primary Agent through
 the native Subagent mechanism, using the exact configured `*` custom Agent

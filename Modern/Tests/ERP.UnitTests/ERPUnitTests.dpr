@@ -19,12 +19,15 @@ uses
   TestInsight.DUnitX,
   {$ELSE}
   DUnitX.Loggers.Console,
+  DUnitX.Loggers.XML.NUnit,
   {$ENDIF }
   DUnitX.TestFramework,
   FakeTransactionUnit in 'Support\Fakes\FakeTransactionUnit.pas',
   FakeDatabaseConnectionUnit in 'Support\Fakes\FakeDatabaseConnectionUnit.pas',
   StubNFSeRepositoryUnit in 'Support\Fakes\StubNFSeRepositoryUnit.pas',
   StubTributosDFeRepositoryUnit in 'Support\Fakes\StubTributosDFeRepositoryUnit.pas',
+  StubOperacoesFiscaisIbsCbsRepositoryUnit in 'Support\Fakes\StubOperacoesFiscaisIbsCbsRepositoryUnit.pas',
+  StubRegrasFiscaisIbsCbsRepositoryUnit in 'Support\Fakes\StubRegrasFiscaisIbsCbsRepositoryUnit.pas',
   FakeAtualizarSituacaoNFSeServiceUnit in 'Support\Fakes\FakeAtualizarSituacaoNFSeServiceUnit.pas',
   FakeHttpJsonClientUnit in 'Support\Fakes\FakeHttpJsonClientUnit.pas',
   FakeConfiguracoesRepositoryUnit in 'Support\Fakes\FakeConfiguracoesRepositoryUnit.pas',
@@ -39,6 +42,10 @@ uses
   Test_SincronizarDadosFiscaisSemCalculadora in 'Application\UseCases\Test_SincronizarDadosFiscaisSemCalculadora.pas',
   Test_SincronizacaoCalculadoraLockService in 'Domain\Services\Test_SincronizacaoCalculadoraLockService.pas',
   Test_SincronizadorCalculadoraService in 'Domain\Services\Test_SincronizadorCalculadoraService.pas',
+  Test_OperacaoFiscalIbsCbsCondicaoEtd in 'Domain\Entities\Test_OperacaoFiscalIbsCbsCondicaoEtd.pas',
+  Test_ResolverRegraFiscalIbsCbsService in 'Domain\Services\Test_ResolverRegraFiscalIbsCbsService.pas',
+  Test_SalvarOperacaoFiscalIbsCbsUseCase in 'Application\UseCases\Test_SalvarOperacaoFiscalIbsCbsUseCase.pas',
+  Test_CalcularTributosNFSeService in 'Application\Services\Test_CalcularTributosNFSeService.pas',
   FakeTokenDecryptorUnit in 'Support\Fakes\FakeTokenDecryptorUnit.pas';
 
 { Keep this comment to prevent the IDE from removing the conditional below when adding a unit. }

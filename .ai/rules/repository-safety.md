@@ -12,7 +12,8 @@ always_apply: true
 - Preserve unrelated changes, personal configuration, ignored dependencies, file
   encoding and line endings. Do not perform incidental cleanup or normalization.
 - Planning, implementation, test creation, build/test execution, SQL execution,
-  setup changes and publication have distinct authorization boundaries.
+  setup changes and publication have distinct authorization boundaries. The
+  standing ERP.UnitTests validation grant below is the explicit limited exception.
 - Preserve existing authentication, authorization, company isolation and audit.
   Never weaken a control to simplify a task or bypass an error.
 - Do not infer a uniform architecture or stack from this checkout's directory tree.
@@ -35,6 +36,46 @@ always_apply: true
   assignment/result artifacts when needed. Ask for a decision only when a needed
   correction changes approved behavior, contracts or scope, or leaves a material
   ambiguity. Do not silently change business behavior or expand the demand.
+
+## Local Implementation Quality
+
+- Prefer existing mechanisms and the simplest correct representation within the
+  assigned scope. Before adding persistent fields, check which values can be
+  derived from existing data or held locally for the current operation.
+- Retain cross-call state only when its lifetime is needed. For new caches or
+  recalculation flags, establish their identity, invalidation and update points,
+  including failure and retry behavior. Use a cohesive representation for fields
+  that describe one concept when it improves clarity. Review state necessity as
+  well as field count, preserving compiler compatibility and existing contracts.
+- Write source comments that remain understandable without the current Workflow
+  run. Explain a business rule, ownership, compatibility constraint or a
+  non-obvious reason. Keep run-local decision IDs, increment IDs, approval
+  narratives and review history in run artifacts. Stable domain codes and
+  specification references can remain when they explain the source contract.
+- When a user must locate a record, use its recognizable business labels. Compose
+  enough identifying data to distinguish the records involved. Keep internal
+  identifiers in diagnostic evidence when needed for traceability.
+- State a finding's practical consequence and appropriate action in the user's
+  vocabulary. Describe the data actually checked, including current edits versus
+  saved data, company and date when relevant. Match severity and success claims to
+  the evidence. Respect valid precedence and intentional broad conditions when
+  describing overlaps or observations.
+
+## Source Encoding Verification
+
+- Establish the expected encoding and line endings before editing or creating a
+  source file, using the target area's compiler, explicit configuration and actual
+  neighboring files. Apply the area's compatibility Rules where present.
+- Configure the writer explicitly. Use strict encoding that reports characters
+  which cannot be represented. Preserve unrelated bytes and existing file format.
+- Before handing off created or modified Delphi 2006 sources, verify their bytes
+  against the intended single-byte encoding, including accented literals,
+  messages, captions and metadata. Include affected PAS, DFM, DPR, DPK and INC files.
+- Record the expected encoding and the byte-level check in validation evidence.
+  ASCII-only content does not establish a code page, and successful UTF-8 decoding
+  or correct display in an editor does not establish Delphi 2006 compatibility.
+- When application validation is authorized, also inspect affected rendered text.
+  Limit encoding checks and corrections to the assigned changes.
 
 ## Run Context and Repository Searches
 
@@ -73,6 +114,29 @@ always_apply: true
 - Use parameterized runtime SQL and trusted/validated dynamic identifiers through
   the data-access mechanism established for the affected component.
 - Do not suppress security failures or convert them into successful operations.
+
+## Standing ERP Unit-Test Validation
+
+- During an authorized implementation, building and running the isolated project
+  Modern/Tests/ERP.UnitTests/ERPUnitTests.dproj through
+  Modern/Tests/Automation/Invoke-ERPUnitTests.ps1 is already authorized.
+  Use Modern/.ai/skills/delphi-test-runner/SKILL.md and run when relevant changes
+  need validation, including correction reruns. A narrower developer instruction
+  takes precedence.
+- This grant covers the existing local Delphi environment and compiler/test
+  outputs. ERP.UnitTests must remain isolated from real databases, application
+  initialization, credentials and uncontrolled external services.
+- Record this standing authority and its scope in implementation assignments.
+  The Orchestrator may execute the canonical runner directly. Serialize runs and
+  writes that share the test sources or output locations, and reuse valid results
+  until a change or failure justifies another run.
+- Research, planning, standalone review and documentation requests use their own
+  stated authority. Other builds, ERP.IntegrationTests, Fiscal.Calculos.Tests,
+  database operations, infrastructure setup and publication retain their separate
+  authorization requirements.
+- Report the actual invocation, build/test outcome and available result artifacts.
+  Preserve runner or environment failure evidence and route technical diagnosis
+  within the authorized scope. A successful compile alone is build evidence.
 
 ## Validation and local tooling
 

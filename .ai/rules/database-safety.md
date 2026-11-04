@@ -33,7 +33,8 @@ do not assert that every unrelated project in the checkout uses the same engine.
 - Create, alter, rename or drop objects only within the requested change.
   Consider existing data and deployed installations for destructive operations.
 - Prepare general demand SQL under scripts/database/changes/<demand-id>/, separate
-  from the generated schema and released history.
+  from the generated schema and released history. This area contains migrations
+  pending incorporation. A refreshed schema alone does not authorize their removal.
 - Do not execute SQL, extract a new schema, or run integration tests implicitly.
 - Runtime values must be parameterized; preserve existing query semantics and
   company isolation unless the approved change explicitly modifies them.
@@ -41,8 +42,16 @@ do not assert that every unrelated project in the checkout uses the same engine.
 ## Released migration history
 
 - Released commands must not be deleted, reordered or rewritten for modernization.
-- Production incorporation is separately requested; append finished commands
-  through .ai/skills/database-migration/SKILL.md.
+- Production incorporation is separately requested. Use
+  .ai/skills/database-migration/SKILL.md to select the developer's preferred
+  existing version file and verify prerequisites in higher files before appending.
+  A required higher destination must respect the team's file assignments.
+- Incorporation and removal of fully incorporated delivery scripts from the
+  requested changes/<demand-id>/ scope form one change and one commit. Verify
+  delivery coverage and consumer references before removal. Git history preserves
+  the preparation artifacts. Keep pending or partially incorporated work explicit.
+- Record incorporation separately from actual database application. Schema
+  provenance determines which incorporated commands still postdate the snapshot.
 - Do not advance migration versions, change manifest/CRC data or build packaging
   merely because a development migration was prepared.
 - Preserve explicit specialized development-artifact exceptions, including the

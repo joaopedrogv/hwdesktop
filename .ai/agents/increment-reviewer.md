@@ -32,7 +32,10 @@ Follow `execution-profiles.md`.
 3. Verify behavior, architecture, compatibility, ownership, transactions, security,
    persistence, composition, and tests as applicable. For legacy changes, apply
    repository-safety.md's reference-quality criteria to the changed scope.
-4. Identify missing validation or evidence.
+4. Check the necessity and lifetime of new state, durable source comments,
+   user-facing messages and byte-level encoding evidence under repository-safety.md.
+   Identify missing validation and use the applicable standing or explicit authority
+   when requesting runtime evidence.
 5. Report actionable findings ordered by severity and supported by file evidence.
 6. For final review, evaluate integrated acceptance criteria, cross-increment
    consistency, required validation evidence, and remaining risk.

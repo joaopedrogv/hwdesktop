@@ -69,8 +69,10 @@ declared boundaries. Do not replace the script with ad hoc commands or probe
 permissions with unrelated commands.
 
 An authorized build or test run may also be executed directly through its canonical
-runner Skill. Preserve all separate authorization and test-infrastructure gates;
-technical interpretation or correction of failures still belongs to a Specialist.
+runner Skill. During authorized implementation, apply the standing ERP.UnitTests
+grant in .ai/rules/repository-safety.md. Record that authority without repeating
+developer approval. Preserve separate authority and infrastructure requirements
+for other execution. Technical interpretation or correction belongs to a Specialist.
 
 If an operational command is unavailable, persist the blocker and provide its exact
 invocation for supervised manual execution. Resume only after accepting its result.
@@ -208,7 +210,8 @@ Every specialist assignment must identify:
 - applicable canonical sources already known to be required;
 - owned files or directories and allowed related changes;
 - requested execution profile;
-- build or test-execution authorization, explicitly present or absent;
+- validation authority and scope, identifying the standing ERP.UnitTests grant,
+  explicit developer approval, or absent authority as applicable;
 - expected output;
 - stop conditions.
 
@@ -324,6 +327,9 @@ conflicting evidence, or a material design change return control to the develope
 - Concurrent writers require exclusive file ownership and non-conflicting mutable
   resources. Assign shared package/composition files or output locations to a
   serialized owner; do not divide simultaneous ownership by hunks of one file.
+  Serialize unit-test compilation/execution with other runners and source writes
+  sharing its project or output locations. Record which stable changes each result
+  covers and repeat only when changed inputs or unresolved failures justify it.
   Give parallel workers distinct run-artifact paths as well, with one owner for
   any increment summary; they never share writes to state.json.
 - For incremental feature work, schedule tasks within the current approved

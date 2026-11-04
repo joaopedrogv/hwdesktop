@@ -179,6 +179,15 @@ inicialização e reutilizam essa centralização, sem repetir as mesmas atribui
 O responsável relatou que os rótulos compilados só ficaram corretos após salvar a
 metadata como ANSI, embora a IDE exibisse o UTF-8 corretamente. A orientação agora
 abrange fontes novos e a operação de gravação, além da preservação dos existentes.
+Antes da entrega, a revisão confere os bytes dos arquivos criados ou alterados e
+registra a codificação esperada e a verificação realizada, conforme a
+[regra compartilhada](../../../.ai/rules/repository-safety.md#source-encoding-verification).
+A leitura correta na IDE pode coexistir com caracteres incorretos no executável.
+
+Durante implementação autorizada, a compilação e execução de ERP.UnitTests pelo
+runner canônico já têm autorização permanente. O agente registra os resultados.
+ERP.IntegrationTests e Fiscal.Calculos.Tests seguem suas autorizações próprias.
+O procedimento está na [Skill de testes](../../.ai/skills/delphi-test-runner/SKILL.md).
 
 Os contratos vigentes estão no [Context de UI](../../.ai/context/ui-integration.md),
 na [Skill de dataset](../../.ai/skills/delphi-dataset-grid/SKILL.md) e na
