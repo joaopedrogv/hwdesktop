@@ -127,9 +127,6 @@ type
     tsAlterDadosLote: TTabSheet;
     pnAlteracaoEmLote: TPanel;
     GroupBoxAlteracaoEmLote: TGroupBox;
-    Panel7: TPanel;
-    btnOKAlteracaoEmLote: TBitBtn;
-    btnCancelarAlteracaoEmLote: TBitBtn;
     pnControle: TPanel;
     lbControle: TLabel;
     EdControle: TEditHw;
@@ -274,26 +271,6 @@ type
     ckDiaFaturamento: TCheckBox;
     lbDiaFaturamento: TLabel;
     EdDiaFaturamento: TEditHw;
-    Panel21: TPanel;
-    Panel22: TPanel;
-    Label33: TLabel;
-    Panel23: TPanel;
-    pnGerarNFS: TPanel;
-    pnGerarNF: TPanel;
-    pnGerarRecLoc: TPanel;
-    pnGerarBoleto: TPanel;
-    ckGerarNFS: TCheckBox;
-    Label35: TLabel;
-    cbGerarNFS: TComboBox;
-    ckGerarNF: TCheckBox;
-    cbGerarNF: TComboBox;
-    Label36: TLabel;
-    ckGerarRecLoc: TCheckBox;
-    cbGerarRecLoc: TComboBox;
-    Label37: TLabel;
-    ckGerarBoleto: TCheckBox;
-    Label41: TLabel;
-    cbGerarBoleto: TComboBox;
     Label138: TLabel;
     ComboBox9: TComboBox;
     Bevel3: TBevel;
@@ -368,6 +345,27 @@ type
     Panel27: TPanel;
     BitBtn11: TBitBtn;
     FrameCheckListaContato: TFrameCheckListaContato;
+    pnGerarNFS: TPanel;
+    Label35: TLabel;
+    ckGerarNFS: TCheckBox;
+    cbGerarNFS: TComboBox;
+    pnGerarNF: TPanel;
+    Label36: TLabel;
+    ckGerarNF: TCheckBox;
+    cbGerarNF: TComboBox;
+    pnGerarRecLoc: TPanel;
+    Label37: TLabel;
+    ckGerarRecLoc: TCheckBox;
+    cbGerarRecLoc: TComboBox;
+    pnGerarBoleto: TPanel;
+    Label41: TLabel;
+    cbGerarBoleto: TComboBox;
+    ckGerarBoleto: TCheckBox;
+    Label473: TLabel;
+    Panel7: TPanel;
+    btnOKAlteracaoEmLote: TBitBtn;
+    btnCancelarAlteracaoEmLote: TBitBtn;
+    btSairServLote: TBitBtn;
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure EditHw9Change(Sender: TObject);
     procedure SpeedButton13Click(Sender: TObject);
@@ -1854,13 +1852,22 @@ procedure TfrmCadContratosClientes.btnCancelarAlteracaoEmLoteClick(
   Sender: TObject);
 begin
   inherited;
-	TForm(pnAlteracaoEmLote.Parent).ModalResult := IDCANCEL;
+  Contratos.Cancel;
+  Contratos.CancelUpdates;
+  Contratos.RollBackTransacao;
+
+  PageControl1.ActivePage := tsAlterDadosProc;
+  tsAlterDadosProc.Show;
 end;
 
 procedure TfrmCadContratosClientes.btnOKAlteracaoEmLoteClick(Sender: TObject);
 begin
   inherited;
   try
+   Screen.Cursor := crHourGlass;
+   frmCadContratosClientes.Enabled := false;
+   DBGrid1.Visible := false;
+
   	if (Self.Enabled) and (Self.Visible) and (btnOKAlteracaoEmLote.CanFocus) then
       btnOKAlteracaoEmLote.SetFocus;
 
@@ -1942,8 +1949,6 @@ begin
     	setFocusCampoErro(Contratos.vNomeCampoErro, Contratos.vMensagemErro);
     	exit;
     end;
-
-		TForm(pnAlteracaoEmLote.Parent).ModalResult := IDOK;
   finally
     _GravaConfiguracoesDouble(EdControle.Name, EdControle.AsValue);
     _GravaConfiguracoesDouble(EdVendedor.Name, EdVendedor.AsValue);
@@ -1977,7 +1982,14 @@ begin
     _GravaConfiguracoesBoolean(ckGerarNF.Name, ckGerarNF.Checked);
     _GravaConfiguracoesBoolean(ckGerarRecLoc.Name, ckGerarRecLoc.Checked);
     _GravaConfiguracoesBoolean(ckGerarBoleto.Name, ckGerarBoleto.Checked);
+
+    frmCadContratosClientes.Enabled := true;
+    DBGrid1.Visible := true;
+    Screen.Cursor := crDefault;
   end;
+
+  PageControl1.ActivePage := tsAlterDadosProc;
+  tsAlterDadosProc.Show;
 end;
 
 procedure TfrmCadContratosClientes.btSelectAllClick(Sender: TObject);
@@ -3229,6 +3241,18 @@ end;
 procedure TfrmCadContratosClientes.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
+  if (PageControl1.ActivePage = tsAlterDadosProc) then
+  begin
+    GroupBox3.Parent := TabSheet2;
+    btVoltarDadosProc.Parent := Panel52;
+    BitBtn2.Visible := True;
+    BitBtn3.Visible := True;
+    Panel1.Parent := TabSheet2;
+    Panel2.Visible := True;
+    PageControl1.ActivePage := TabSheet2;
+  end;
+
+  TabSheet2.show;
   inherited;
 
   gravaConfiguracoesFormRegistro;
@@ -3250,19 +3274,19 @@ end;
 procedure TfrmCadContratosClientes.FormCloseQuery(Sender: TObject;
   var CanClose: Boolean);
 var
-	vExibirPergFechar: Boolean;
+  vAlterDadosProc, vAlterDadosLote: boolean;
 begin
-	try
-  	vExibirPergFechar := Self.exibirPergFechar;
-    if (PageControl1.ActivePage = tsAlterDadosProc) or (PageControl1.ActivePage = tsAlterDadosLote) or (Self.Caption = vCaptionLote) then
-    begin
-      Self.exibirPergFechar := False;
-      btVoltarDadosProcClick(Sender);
-    end;
-    inherited;
-  finally
-    Self.exibirPergFechar := vExibirPergFechar;
-  end;
+  vAlterDadosProc := PageControl1.ActivePage = tsAlterDadosProc;
+  vAlterDadosLote := PageControl1.ActivePage = tsAlterDadosLote;
+  inherited;
+  
+  if vAlterDadosProc then
+    btVoltarDadosProcClick(Sender)
+  else if vAlterDadosLote then
+  begin
+    btnCancelarAlteracaoEmLoteClick(Sender);
+    btVoltarDadosProcClick(Sender);
+  end
 end;
 
 procedure TfrmCadContratosClientes.FormCreate(Sender: TObject);
@@ -4416,10 +4440,8 @@ begin
     Contratos.dataSet.EnableControls;
   end;
 
-  if not Contratos._abreFormContratosAlteracaoEmLote then
-  	exit;
-
-  Contratos.dataSet.Refresh;
+  PageControl1.ActivePage := tsAlterDadosLote;
+  tsAlterDadosLote.Show;
 end;
 
 procedure TfrmCadContratosClientes.SpeedButtonAlterarProdutoClick(

@@ -41,7 +41,6 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
             inherited PageControl3: TPageControl
               Width = 888
               Height = 539
-              ActivePage = tsRelTipoServ
               OnChange = PageControl3Change
               ExplicitWidth = 888
               ExplicitHeight = 539
@@ -4302,11 +4301,13 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                 item
                   Expanded = False
                   FieldName = 'COD_EMPRESA'
+                  Width = 64
                   Visible = True
                 end
                 item
                   Expanded = False
                   FieldName = 'IDENTIFICACAO_EMP'
+                  Width = 64
                   Visible = True
                 end>
             end
@@ -5152,7 +5153,7 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                 OnClick = SpeedButton68Click
               end
               object btSincronizarServicos: TSpeedButton
-                Left = 270
+                Left = 322
                 Top = 2
                 Width = 51
                 Height = 45
@@ -5333,6 +5334,67 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                 ShowHint = True
                 OnClick = btSincronizarServicosClick
               end
+              object btDefinirEmpresas: TSpeedButton
+                Left = 269
+                Top = 2
+                Width = 51
+                Height = 45
+                Hint = 'Definir tipo de servi'#231'os por empresa - [BAS530]'
+                Flat = True
+                Glyph.Data = {
+                  02060000424D0206000000000000C20300002800000018000000180000000100
+                  08000000000040020000120B0000120B0000E3000000E300000000000000FFFF
+                  FF00FF00FF00FFFEFF00A4676900A5686B00FFFEFE009365600093655E009263
+                  5D009566600093655F00986963009E6E64008469640080676200A37266009D70
+                  6500896A63009F6F6200A0706300A7756800986859009F6F6000AC796900A072
+                  6400B17E6B00BB846E00B6816C00CB917300C58C7000C0896F00CF8E6800D498
+                  7500CF967400FFFCFA00FFF8F300FFFBF800FFF4EB00FFFAF600FFEFE000FFF0
+                  E200FFF0E300FFF2E600FFF4EA00FFF6EE00FFF8F200FECC9900FFCE9C00FECE
+                  9D00FECF9F00FED1A300FFD5AA00FED4A900FED5AB00FED7AF00FFDAB500FEDA
+                  B500FFDDBA00FFDEBC00FEDDBB00FFE3C700FFE5CB00FFE7CF00FEE6CE00FFEB
+                  D800FFEEDE00FFF0E100FEEFE000FFF2E500FFF3E700FFF4E900FFF6ED00FFF7
+                  EF00FFFBF700D5812700FECB9600FECC9700FECC9800FECE9900FECE9A00FECE
+                  9C00FECF9D00FFD09F00FECF9E00FED09E00FED0A000FED3A300FFD4A500FED3
+                  A400FED4A500FED4A600FED4A700FED5A700FED5A900FED5AA00FED7AB00FFD8
+                  AD00FED7AD00FED8AD00FED8AF00FED8B000FFDAB200FED9B100FED9B200FEDA
+                  B200FEDAB400FFDCB700FEDCB600FFDDB800FEDCB700FEDDB800FFDEBB00FEDD
+                  BA00FFE0BD00FEDEBC00FEE0BF00FFE1C100FEE0C000FFE1C200FFE2C200FEE1
+                  C100FFE3C500FEE2C400FFE3C600FEE3C500FEE3C600FEE3C700FFE5C900FFE5
+                  CA00FEE5C900FFE6CB00FEE5CA00FFE6CC00FEE6CB00FEE6CC00FFE7CE00FFE9
+                  D100FFEAD300FFEAD400FFEBD500FEEAD400FEEBD700FFEDD900FFEDDA00FFEE
+                  DC00FFEFDD00FEEEDC00FFEFDE00FEEEDD00FFF0E000FEF0E100FFF3E600FEF2
+                  E500FEF3E700FEF4E900FFF7EE00F8CE9C00FED9AF00FEE0BC00FEE0BD00FEE1
+                  BF00FEE1C000FEE2C200FEE3C400FFE5C700FFE7CB00FEE6CA00FEE7CC00FEE9
+                  CF00FEE9D000FEE9D100FEEAD300FEEBD400FEEBD500FFEDD700FFEDD800FEED
+                  D900FFF0DE00FEEFDD00FFF2E200FFF3E500FFF4E700FEF3E600FFF6EB00FFF8
+                  F000F6D3A700F8D9B100FEEAD100FFF2E100FEF2E300FFF6EA00FFF7ED00FFF8
+                  EF00FEF7EE00FEF8F000FFFBF600EECE9E00F6E0C000F8E6CB00FEF6EB00FFFA
+                  F300FEFAF400EED9B500FFFBF400FEFAF300FFFCF700FFFEFC00F7EEDA00EFE6
+                  CF00FFFEFB00FFFEFA00FEFEFB00FFFFFE00AFB17400AFBA8400AFC49700648E
+                  43005484370064934C0054893E0064995600548F470032772500327A2900327D
+                  2E00008100000202020904040404040404040404040404040404040402020202
+                  02086B386764605D5A57563231504E4C4C4C4C1702020202020B736F38686460
+                  5F5B59565452514F4D4C4C1702020202020B75A0716C6965635F5C5933E25230
+                  4F4E4D1702020202020B7A7972706E6A67613635E2E2E255522F4E1702020202
+                  0207817E4B4B4B4B4B4B64E2DFD9E2DA5451501702020202020A883EA57B769F
+                  3A6C66E2BA34D6E2E29D521702020202020C8AA98582A479A0706C6A676236C5
+                  E2E2531702020202020D41ADAA40847E77743B6E396737603558331702020202
+                  021093B08DAB88867C7BA2736DE2689E605E5B170202020202159695B18C893F
+                  863DA479E2E2E26665635F1302020202021845B44B4B4B4B4B4B80E2E0DBE2DC
+                  3967621402020202021A472B294491418BABA8E2C6A3D7E2E2BB671902020202
+                  021CC02C46B444918F8CBC3FA73D78CBE2E26C1102020202021BC1C2C8469943
+                  428F8EACA987A57D79A03C1202020202021FC92E9CBFB6B7BD9490AF8BE2A882
+                  7C77A10F02020202021ECECA2E494847982AB293E2E2E288837F780E02020202
+                  021D23254B4B4B4B4B4BBEE2E1DDE2DE3F83A516020202020222CFD22527CDB9
+                  2D269AE2D094D8E2E2C7A60502020202022103CFD325C4C92EC1B847B5B428D1
+                  E2E2AA0E020202020221010106D2234ACC2E49B89B98BE9692B1AE0E02020202
+                  0221010101D5D2D425CC24C39C2CB69997B3900E020202020220202020202020
+                  20202020202020202020200E0202020202020202020202020202020202020202
+                  020202020202}
+                ParentShowHint = False
+                ShowHint = True
+                OnClick = SpeedButton9Click
+              end
               object pnCorLote: TPanel
                 Left = 614
                 Top = 4
@@ -5419,6 +5481,24 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                   '                    -                    -                    - ' +
                   '                   -                    -                    -  ' +
                   '                  -'
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clBlue
+                Font.Height = -11
+                Font.Name = 'Tahoma'
+                Font.Style = []
+                ParentFont = False
+              end
+              object Label48: TLabel
+                Left = 8
+                Top = 428
+                Width = 957
+                Height = 13
+                Caption = 
+                  'Outros        -                    -                    -       ' +
+                  '             -                    -                    -        ' +
+                  '            -                    -                    -         ' +
+                  '           -                    -                    -          ' +
+                  '          -                    -                    -'
                 Font.Charset = DEFAULT_CHARSET
                 Font.Color = clBlue
                 Font.Height = -11
@@ -6523,6 +6603,123 @@ inherited FrmCadTipoServ: TFrmCadTipoServ
                   Height = 21
                   ItemHeight = 13
                   TabOrder = 1
+                end
+              end
+              object pnEmpresas: TPanel
+                Left = 1
+                Top = 440
+                Width = 844
+                Height = 93
+                TabOrder = 25
+                object lbEmpresas: TLabel
+                  Left = 136
+                  Top = 7
+                  Width = 46
+                  Height = 13
+                  Alignment = taRightJustify
+                  Caption = 'Empresas'
+                  Font.Charset = DEFAULT_CHARSET
+                  Font.Color = clWindowText
+                  Font.Height = -11
+                  Font.Name = 'Tahoma'
+                  Font.Style = []
+                  ParentFont = False
+                end
+                object SpbSelEmpAll: TSpeedButton
+                  Left = 809
+                  Top = 5
+                  Width = 23
+                  Height = 21
+                  Hint = 'Selecionar todas'
+                  Flat = True
+                  Glyph.Data = {
+                    CE010000424DCE01000000000000CE0000002800000010000000100000000100
+                    08000000000000010000120B0000120B0000260000002600000000000000FFFF
+                    FF00FF00FF00A4262600BA414100BB444400BD4A4A00BD4B4B00BF4E4E00C050
+                    5000C0515100C1535300C1545400C55C5C00CB6C6C00CF777700D17D7D00D483
+                    8300004B0000098611000C9C19000A8615000C9518000D931A000F9E1C000F99
+                    1C000E9D1D000F9D1E0011A4220011A02100139224001CB135001CA1340024BC
+                    430029B548002EC6520035CA5E0039D465000202020202020202020202020202
+                    0202020202020202020202020202020202020202020202021212020202020202
+                    0202020202020212181B120202020202020202020202121F1C141D1202020202
+                    02020202021223211E12171A1202020202020202122425201202121519120202
+                    02020202021222120A03020212161202020202020203120C080B030202121312
+                    02020202030F0E0803070903020202121202020310110D030203050803020202
+                    12120202030E0302020202030603020202020202020302020202020203040302
+                    0202020202020202020202020202030302020202020202020202020202020203
+                    030202020202020202020202020202020202}
+                  ParentShowHint = False
+                  ShowHint = True
+                  OnClick = SpeedButtonMultiempresaSelClick
+                end
+                object SpbUnSelEmpAll: TSpeedButton
+                  Left = 809
+                  Top = 38
+                  Width = 23
+                  Height = 21
+                  Hint = 'Desfazer sele'#231#227'o'
+                  Flat = True
+                  Glyph.Data = {
+                    AA010000424DAA01000000000000AA0000002800000010000000100000000100
+                    08000000000000010000120B0000120B00001D0000001D00000000000000FFFF
+                    FF00FF00FF00CACACA00C4C4C400BFBFBF00BCBCBC00B8B8B800B5B5B500AEAE
+                    AE00ABABAB00A5A5A500A4A4A4009F9F9F009E9E9E009D9D9D009C9C9C009B9B
+                    9B009A9A9A009999990098989800979797009494940093939300929292008C8C
+                    8C008A8A8A007A7A7A0065656500020202020202020202020202020202020202
+                    02020202020202020202020202020202020202021C1C02020202020202020202
+                    0202021C12121C02020202020202020202021C0A0E15101C0202020202020202
+                    021C0508141C16131C020202020202021C04030B1C021C19141C020202020202
+                    021C081C0F1B02021C171C0202020202021B1C0D110E1B02021C1A1C02020202
+                    1B0809111B13101B0202021C1C02021B07060C1B021B16111B0202021C1C0202
+                    1B091B020202021B141B020202020202021B0202020202021B181B0202020202
+                    020202020202020202021B1B0202020202020202020202020202021B1B020202
+                    0202020202020202020202020202}
+                  ParentShowHint = False
+                  ShowHint = True
+                  OnClick = SpeedButtonMultiempresaDesmClick
+                end
+                object ckEmpresas: TCheckBox
+                  Left = 21
+                  Top = 6
+                  Width = 19
+                  Height = 17
+                  TabOrder = 0
+                  OnClick = ckEmpresasClick
+                end
+                object DBGEmpresas: TDBGrid
+                  Left = 188
+                  Top = 3
+                  Width = 615
+                  Height = 88
+                  DataSource = dtmProdutos.dsEmpresaTipoServ
+                  Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit]
+                  TabOrder = 1
+                  TitleFont.Charset = DEFAULT_CHARSET
+                  TitleFont.Color = clWindowText
+                  TitleFont.Height = -11
+                  TitleFont.Name = 'Tahoma'
+                  TitleFont.Style = []
+                  OnCellClick = DBGridMultiempresaCellClick
+                  OnDrawColumnCell = DBGridMultiempresaDrawColumnCell
+                  OnKeyDown = DBGEmpresasKeyDown
+                  Columns = <
+                    item
+                      Expanded = False
+                      FieldName = 'SEL'
+                      Visible = True
+                    end
+                    item
+                      Expanded = False
+                      FieldName = 'COD_EMPRESA'
+                      Width = 64
+                      Visible = True
+                    end
+                    item
+                      Expanded = False
+                      FieldName = 'IDENTIFICACAO_EMP'
+                      Width = 490
+                      Visible = True
+                    end>
                 end
               end
             end

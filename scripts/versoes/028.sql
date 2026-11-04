@@ -3885,11 +3885,11 @@ end;
 
 CMD:REPL|execute procedure atualizar_lista_promocao (:COD_EMPRESA);
 
-ALTER TABLE KITS_PROD ADD GUIDT CHAR(36);
+CMD:INATIVO|ALTER TABLE KITS_PROD ADD GUIDT CHAR(36);
 
-CREATE UNIQUE INDEX KITS_PROD_GUID ON KITS_PROD (GUIDT);
+CMD:INATIVO|CREATE UNIQUE INDEX KITS_PROD_GUID ON KITS_PROD (GUIDT);
 
-|BLOCO|
+|BLOCO|CMD:INATIVO|
 CREATE OR ALTER TRIGGER KITS_PROD_BI_GUID FOR KITS_PROD
 ACTIVE BEFORE INSERT POSITION 0
 as
@@ -3899,7 +3899,7 @@ begin
 end;
 |/BLOCO|
 
-CMD:REPL|UPDATE KITS_PROD SET KITS_PROD.GUIDT = (select GUID from SPDB_GUID) WHERE KITS_PROD.GUIDT IS NULL;
+CMD:INATIVO|UPDATE KITS_PROD SET KITS_PROD.GUIDT = (select GUID from SPDB_GUID) WHERE KITS_PROD.GUIDT IS NULL;
 
 ALTER TABLE CONFIG_API ADD DRIVE_TYPE VARCHAR(50);
 ALTER TABLE CONFIG_API ADD DRIVE_CHECK_MODIF CHAR(1);
@@ -4202,3 +4202,48 @@ ALTER TABLE CONFIG_API ADD USAR_API_PEDIDO CHAR(1);
 
 ALTER TABLE PROMOCAO_PRODUTO ADD SINC_HW_CLOUD CHAR(1);
 ALTER TABLE PRECO_PRODUTOS_QTDE ADD SINC_HW_CLOUD CHAR(1);
+
+|BLOCO|
+create or alter procedure GETESTOQUEKIT (
+    PCODIGO_KIT integer,
+    PCOD_EMPRESA integer)
+returns (
+    ESTOQUE T_D_QUANT)
+as
+declare variable VEXEC integer;
+declare variable VGRUPO_PROD integer;
+declare variable VCOD_PROD char(6);
+declare variable VQTDE T_D_QUANT;
+declare variable VEST_F T_D_QUANT;
+begin
+  /* Procedure Text */
+  estoque = 0;
+  vexec = 0;
+  for select kits_prod_kits.grupo_prod,
+      kits_prod_kits.cod_prod,
+      sum(coalesce(kits_prod_kits.quant_prod_kit, 0)) quant_prod_kit from kits_prod_kits
+      where kits_prod_kits.codigo_kit = :pcodigo_kit
+      and kits_prod_kits.cod_empresa = :pcod_empresa
+      group by 1, 2
+        into :vgrupo_prod, :vcod_prod, :vqtde do
+  begin
+    select estoque from getestoquedisponivel (:vgrupo_prod, :vcod_prod, 0, :pcod_empresa, 0, '', 0, 0) into :vest_f;
+
+    if (coalesce(vexec, 0) <= 0) then
+    begin
+      estoque = coalesce(vest_f, 0)/ coalesce(vqtde, 0);
+      vexec = 1;
+    end
+
+    if (coalesce(estoque, 0) > coalesce(vest_f, 0) / coalesce(vqtde, 0)) then
+      estoque = coalesce(vest_f, 0) / coalesce(vqtde, 0);
+  end
+  suspend;
+end;
+|/BLOCO|
+
+DROP TRIGGER KITS_PROD_BI_GUID;
+
+DROP INDEX KITS_PROD_GUID;
+
+ALTER TABLE KITS_PROD DROP GUIDT;

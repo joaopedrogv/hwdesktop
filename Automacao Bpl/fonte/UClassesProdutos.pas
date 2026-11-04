@@ -73,6 +73,7 @@ type
     vHabTribMun, vHabNbs, vHabIndOp: boolean;
     vHabIssRetido: boolean;
     vHabCstPisCofins, vHabCstPisCofinsEnt, vHabNatRecPisCofins: boolean;
+    vHabEmpresas: boolean;
 
     vCodCfopLote, vAliqIss: Double; vServIsento: string;
     vNaoIncidencia, vTmoSimult: string; vTmo: Double;
@@ -24656,7 +24657,7 @@ begin
         fTempListaKits := TClientDataSet.Create(nil);
         fTempListaKits.Close;
         fTempListaKits.FieldDefs.Clear;
-        fTempListaKits.FieldDefs.Add('COD_SERVICO', ftInteger, 0, false);
+        fTempListaKits.FieldDefs.Add('CODIGO_KIT', ftInteger, 0, false);
         fTempListaKits.close;
         fTempListaKits.CreateDataSet;
         fTempListaKits.EmptyDataSet;
@@ -24673,7 +24674,7 @@ begin
             if dataSet.FieldByName('sel').AsString = 'S' then
             begin
               fTempListaKits.Insert;
-              fTempListaKits.FieldByName('COD_SERVICO').AsInteger := dataSet.FieldByName('COD_SERVICO').AsInteger;
+              fTempListaKits.FieldByName('CODIGO_KIT').AsInteger := dataSet.FieldByName('CODIGO_KIT').AsInteger;
               fTempListaKits.Post;
             end;
 
@@ -24704,13 +24705,13 @@ begin
           	' DATA_MOD_KIT = :DATA_MOD_KIT ' +
           	' WHERE CODIGO_KIT = :PCODIGO_KIT ' +
             ' AND COD_EMPRESA = :PCOD_EMPRESA ';
-          buscasU.ParamByName('PCODIGO_KIT').AsInteger := fTempListaKits.FieldByName('COD_SERVICO').AsInteger;
+          buscasU.ParamByName('PCODIGO_KIT').AsInteger := fTempListaKits.FieldByName('CODIGO_KIT').AsInteger;
           buscasU.ParamByName('PCOD_EMPRESA').AsInteger  := StrToInt(vDadosIni.codEmpresa);
           buscasU.ParamByName('DATA_MOD_KIT').AsDateTime := vDadosIni.vDataHora;
           buscasU.ExecSQL;
           
           vDadosIni.GravaAuditoria('PRO462', vtempMensagem, '', 'KITS_PROD',
-            IntToStr(fTempListaKits.FieldByName('COD_SERVICO').AsInteger), buscas);
+            IntToStr(fTempListaKits.FieldByName('CODIGO_KIT').AsInteger), buscas);
 
           Inc(vinc_a_cada_reg);
 
@@ -26771,7 +26772,8 @@ begin
             and (not vHabIssRetido)
             and (not vHabCstPisCofins)
             and (not vHabCstPisCofinsEnt)
-            and (not vHabNatRecPisCofins) then
+            and (not vHabNatRecPisCofins)
+            and (not vHabEmpresas)  then
               raiseExceptionCreate('Nenhum opção selecionada!', '');
         end;
 
@@ -27006,6 +27008,42 @@ begin
 
             buscasU.ParamByName('PCOD_SERVICO').AsInteger := fTempListaTiposServicos.FieldByName('COD_SERVICO').AsInteger;
             buscasU.ExecSQL;
+
+            if vHabEmpresas then
+            begin
+              try
+                vTipoServEmpresa.dataSet.DisableControls;
+                vTipoServEmpresa.dataSet.First;
+                while not vTipoServEmpresa.dataSet.Eof do
+                begin
+                  if vTipoServEmpresa.dataSet.FieldByName('SEL').AsString = 'S' then
+                  begin
+                    buscasU.Close;
+                    buscasU.SQL.Text := ' UPDATE OR INSERT INTO TIPO_SERVICO_EMPRESA (COD_SERVICO, COD_EMPRESA) ' +
+                       ' VALUES (:PCOD_SERVICO, :PCOD_EMPRESA) ' +
+                       ' MATCHING (COD_SERVICO, COD_EMPRESA); ';
+                    buscasU.ParamByName('PCOD_SERVICO').AsInteger := fTempListaTiposServicos.FieldByName('COD_SERVICO').AsInteger;
+                    buscasU.ParamByName('PCOD_EMPRESA').AsInteger := vTipoServEmpresa.dataSet.FieldByName('COD_EMPRESA').AsInteger;
+                    buscasU.ExecSQL;
+                  end
+                  else
+                  begin
+                    buscasU.Close;
+                    buscasU.SQL.Text := ' DELETE FROM TIPO_SERVICO_EMPRESA ' +
+                       ' WHERE COD_SERVICO = :PCOD_SERVICO ' +
+                       ' AND COD_EMPRESA = :PCOD_EMPRESA; ';
+                    buscasU.ParamByName('PCOD_SERVICO').AsInteger := fTempListaTiposServicos.FieldByName('COD_SERVICO').AsInteger;
+                    buscasU.ParamByName('PCOD_EMPRESA').AsInteger := vTipoServEmpresa.dataSet.FieldByName('COD_EMPRESA').AsInteger;
+                    buscasU.ExecSQL;
+                  end;
+
+                  vTipoServEmpresa.dataSet.Next;
+                end;
+              finally
+                vTipoServEmpresa.dataSet.First;
+                vTipoServEmpresa.dataSet.EnableControls;
+              end;
+            end;
 
             vDadosIni.GravaAuditoria('BAS561', vtempMensagem, '',
               'TIPO_SERVICO', oldCodServico, buscas);

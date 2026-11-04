@@ -3,8 +3,8 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
   ClientHeight = 620
   ClientWidth = 914
   Scaled = False
-  ExplicitWidth = 922
-  ExplicitHeight = 654
+  ExplicitWidth = 930
+  ExplicitHeight = 659
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelFundo: TPanel
@@ -61,10 +61,6 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
               object tsCadastro: TTabSheet
                 Caption = 'tsCadastro'
                 ImageIndex = 1
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object ScrollBox4: TScrollBox
                   Left = 0
                   Top = 0
@@ -399,7 +395,7 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                         Height = 21
                         Style = csDropDownList
                         CharCase = ecUpperCase
-                        ItemHeight = 0
+                        ItemHeight = 13
                         TabOrder = 11
                       end
                       object EditHw5: TEditHw
@@ -643,10 +639,6 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                       object tsServicosCtrCons: TTabSheet
                         Caption = 'Servi'#231'os'
                         ImageIndex = 3
-                        ExplicitLeft = 0
-                        ExplicitTop = 0
-                        ExplicitWidth = 0
-                        ExplicitHeight = 0
                         object DBGridServCtr: TDBGrid
                           Left = 0
                           Top = 0
@@ -841,10 +833,6 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                       object tsProdutosCtrCons: TTabSheet
                         Caption = 'Produtos'
                         ImageIndex = 3
-                        ExplicitLeft = 0
-                        ExplicitTop = 0
-                        ExplicitWidth = 0
-                        ExplicitHeight = 0
                         object DBGridProdCtr: TDBGrid
                           Left = 0
                           Top = 0
@@ -881,7 +869,6 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                             item
                               Expanded = False
                               FieldName = 'NUM_FAB_PROD'
-                              Width = 64
                               Visible = True
                             end
                             item
@@ -1116,10 +1103,6 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                       end
                       object tsServicosCtrCad: TTabSheet
                         Caption = 'Servi'#231'os Cad'
-                        ExplicitLeft = 0
-                        ExplicitTop = 0
-                        ExplicitWidth = 0
-                        ExplicitHeight = 0
                         object pnCadServicosCtr: TPanel
                           Left = 0
                           Top = 0
@@ -1323,10 +1306,6 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                       object tsProdutosCtrCad: TTabSheet
                         Caption = 'Produtos Cad'
                         ImageIndex = 1
-                        ExplicitLeft = 0
-                        ExplicitTop = 0
-                        ExplicitWidth = 0
-                        ExplicitHeight = 0
                         object pnCadProdutosCtr: TPanel
                           Left = 0
                           Top = 0
@@ -1596,10 +1575,6 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                       object tabPedidoCompra: TTabSheet
                         Caption = 'tabPedidoCompra'
                         ImageIndex = 4
-                        ExplicitLeft = 0
-                        ExplicitTop = 0
-                        ExplicitWidth = 0
-                        ExplicitHeight = 0
                         object lbNotasPedido: TLabel
                           Left = 18
                           Top = 4
@@ -1984,7 +1959,7 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                 Width = 145
                 Height = 21
                 Hint = 'Campo filtro da pesquisa adicional. Informe o campo desejado'
-                ItemHeight = 0
+                ItemHeight = 13
                 TabOrder = 0
                 Text = 'ComboBox11'
                 OnEnter = ComboBox1Enter
@@ -2630,10 +2605,6 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
         object TabSheet4: TTabSheet
           Caption = 'TabSheet4'
           ImageIndex = 3
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnContratoRelatorios: TPanel
             Left = 3
             Top = 3
@@ -2653,10 +2624,6 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
               TabOrder = 0
               object TabSheet9: TTabSheet
                 Caption = 'Relat'#243'rio Contratos'
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object BitBtn29: TBitBtn
                   Left = 22
                   Top = 22
@@ -2881,10 +2848,6 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
               object TabSheet10: TTabSheet
                 Caption = 'Relat'#243'rio Gerador OS'
                 ImageIndex = 1
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object Label159: TLabel
                   Left = 20
                   Top = 4
@@ -3285,10 +3248,6 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
         object TabSheet5: TTabSheet
           Caption = 'TabSheet5'
           ImageIndex = 4
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnContratoHistorico: TPanel
             Left = 1
             Top = 3
@@ -3456,10 +3415,6 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
         object TabSheet6: TTabSheet
           Caption = 'TabSheet6'
           ImageIndex = 5
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnEquip: TPanel
             Left = 3
             Top = 7
@@ -3633,10 +3588,6 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
         object TabSheet7: TTabSheet
           Caption = 'TabSheet7'
           ImageIndex = 6
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object Panel14: TPanel
             Left = 0
             Top = 0
@@ -5229,10 +5180,6 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
         object TabSheet8: TTabSheet
           Caption = 'TabSheet8'
           ImageIndex = 7
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnAjustarContrato: TPanel
             Left = 3
             Top = 0
@@ -5394,10 +5341,6 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
         object tsAlterDadosProc: TTabSheet
           Caption = 'tsAlterDadosProc'
           ImageIndex = 9
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object Panel52: TPanel
             Left = 0
             Top = 0
@@ -5867,30 +5810,45 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
         object tsAlterDadosLote: TTabSheet
           Caption = 'tsAlterDadosLote'
           ImageIndex = 8
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnAlteracaoEmLote: TPanel
-            Left = 16
+            Left = 0
             Top = 0
-            Width = 713
-            Height = 537
+            Width = 899
+            Height = 566
+            Align = alTop
             TabOrder = 0
             object GroupBoxAlteracaoEmLote: TGroupBox
               Left = 1
               Top = 1
-              Width = 711
-              Height = 490
+              Width = 897
+              Height = 564
               Align = alClient
-              Caption = 'Altera'#231#227'o em lote de contratos'
+              Caption = 'ATUALIZAR INFORMA'#199#213'ES DO CONTRATO'
               TabOrder = 0
+              ExplicitHeight = 535
+              object Label473: TLabel
+                Left = 8
+                Top = 13
+                Width = 883
+                Height = 13
+                Caption = 
+                  'Dados  do Contrato        -                    -                ' +
+                  '    -                    -                    -                 ' +
+                  '   -                    -                    -                  ' +
+                  '  -                    -                    -                   ' +
+                  ' -                   '
+                Font.Charset = DEFAULT_CHARSET
+                Font.Color = clBlue
+                Font.Height = -11
+                Font.Name = 'Tahoma'
+                Font.Style = []
+                ParentFont = False
+              end
               object pnControle: TPanel
                 Left = 2
-                Top = 15
-                Width = 707
+                Top = 26
+                Width = 873
                 Height = 31
-                Align = alTop
                 TabOrder = 0
                 object lbControle: TLabel
                   Left = 158
@@ -5934,10 +5892,9 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
               end
               object pnVendedor: TPanel
                 Left = 2
-                Top = 46
-                Width = 707
+                Top = 57
+                Width = 873
                 Height = 31
-                Align = alTop
                 TabOrder = 1
                 object lbVendedor: TLabel
                   Left = 153
@@ -5981,10 +5938,9 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
               end
               object pnDiaVencimento: TPanel
                 Left = 2
-                Top = 77
-                Width = 707
+                Top = 88
+                Width = 873
                 Height = 31
-                Align = alTop
                 TabOrder = 2
                 object lbDiaVencimento: TLabel
                   Left = 111
@@ -6015,10 +5971,9 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
               end
               object pnTipoOS: TPanel
                 Left = 2
-                Top = 170
-                Width = 707
+                Top = 181
+                Width = 873
                 Height = 31
-                Align = alTop
                 TabOrder = 5
                 object lbTipoOS: TLabel
                   Left = 147
@@ -6034,7 +5989,7 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                   Width = 212
                   Height = 21
                   Style = csDropDownList
-                  ItemHeight = 0
+                  ItemHeight = 13
                   TabOrder = 1
                 end
                 object ckTipoOS: TCheckBox
@@ -6048,10 +6003,9 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
               end
               object pnDataInicialBoleto: TPanel
                 Left = 2
-                Top = 275
-                Width = 707
+                Top = 286
+                Width = 873
                 Height = 43
-                Align = alTop
                 TabOrder = 8
                 object ckDataInicialBoleto2: TLabel
                   Left = 55
@@ -6108,10 +6062,9 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
               end
               object pnGerarContratosAcada: TPanel
                 Left = 2
-                Top = 201
-                Width = 707
+                Top = 212
+                Width = 873
                 Height = 31
-                Align = alTop
                 TabOrder = 6
                 object lbGerarContratosAcada: TLabel
                   Left = 81
@@ -6150,10 +6103,9 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
               end
               object pnStatusContrato: TPanel
                 Left = 2
-                Top = 318
-                Width = 707
+                Top = 329
+                Width = 873
                 Height = 31
-                Align = alTop
                 TabOrder = 9
                 object lbStatusContrato: TLabel
                   Left = 107
@@ -6193,10 +6145,9 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
               end
               object pnDataInicialFinalContrato: TPanel
                 Left = 2
-                Top = 232
-                Width = 707
+                Top = 243
+                Width = 873
                 Height = 43
-                Align = alTop
                 TabOrder = 7
                 object lbDataInicialFinalContrato2: TLabel
                   Left = 39
@@ -6263,10 +6214,9 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
               end
               object pnOBS: TPanel
                 Left = 2
-                Top = 349
-                Width = 707
+                Top = 360
+                Width = 873
                 Height = 65
-                Align = alTop
                 TabOrder = 10
                 object lbOBS: TLabel
                   Left = 141
@@ -6296,10 +6246,9 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
               end
               object pnDiaFaturamento: TPanel
                 Left = 2
-                Top = 139
-                Width = 707
+                Top = 150
+                Width = 873
                 Height = 31
-                Align = alTop
                 TabOrder = 4
                 object lbDiaFaturamento: TLabel
                   Left = 104
@@ -6328,200 +6277,11 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                   FormatSize = '0.2'
                 end
               end
-              object Panel21: TPanel
-                Left = 2
-                Top = 414
-                Width = 707
-                Height = 53
-                Align = alTop
-                TabOrder = 11
-                object Panel22: TPanel
-                  Left = 1
-                  Top = 1
-                  Width = 705
-                  Height = 20
-                  Align = alTop
-                  BevelOuter = bvNone
-                  TabOrder = 0
-                  object Label33: TLabel
-                    Left = 123
-                    Top = 0
-                    Width = 32
-                    Height = 13
-                    Alignment = taRightJustify
-                    Caption = 'Gerar'
-                    Font.Charset = DEFAULT_CHARSET
-                    Font.Color = clWindowText
-                    Font.Height = -11
-                    Font.Name = 'Tahoma'
-                    Font.Style = [fsBold]
-                    ParentFont = False
-                  end
-                end
-                object Panel23: TPanel
-                  Left = 1
-                  Top = 21
-                  Width = 705
-                  Height = 31
-                  Align = alClient
-                  BevelOuter = bvNone
-                  TabOrder = 1
-                  object pnGerarNFS: TPanel
-                    Left = 0
-                    Top = 0
-                    Width = 175
-                    Height = 31
-                    Align = alLeft
-                    BevelKind = bkTile
-                    BevelOuter = bvNone
-                    TabOrder = 0
-                    object Label35: TLabel
-                      Left = 54
-                      Top = 9
-                      Width = 23
-                      Height = 13
-                      Caption = 'NFS:'
-                    end
-                    object ckGerarNFS: TCheckBox
-                      Left = 21
-                      Top = 6
-                      Width = 30
-                      Height = 17
-                      TabOrder = 0
-                      OnClick = ckGerarNFSClick
-                    end
-                    object cbGerarNFS: TComboBox
-                      Left = 105
-                      Top = 4
-                      Width = 60
-                      Height = 21
-                      Style = csDropDownList
-                      ItemHeight = 13
-                      TabOrder = 1
-                      Items.Strings = (
-                        'Sim'
-                        'N'#227'o')
-                    end
-                  end
-                  object pnGerarNF: TPanel
-                    Left = 175
-                    Top = 0
-                    Width = 175
-                    Height = 31
-                    Align = alLeft
-                    BevelKind = bkTile
-                    BevelOuter = bvNone
-                    TabOrder = 1
-                    object Label36: TLabel
-                      Left = 60
-                      Top = 9
-                      Width = 17
-                      Height = 13
-                      Caption = 'NF:'
-                    end
-                    object ckGerarNF: TCheckBox
-                      Left = 22
-                      Top = 6
-                      Width = 30
-                      Height = 17
-                      TabOrder = 0
-                      OnClick = ckGerarNFClick
-                    end
-                    object cbGerarNF: TComboBox
-                      Left = 105
-                      Top = 4
-                      Width = 60
-                      Height = 21
-                      Style = csDropDownList
-                      ItemHeight = 13
-                      TabOrder = 1
-                      Items.Strings = (
-                        'Sim'
-                        'N'#227'o')
-                    end
-                  end
-                  object pnGerarRecLoc: TPanel
-                    Left = 350
-                    Top = 0
-                    Width = 175
-                    Height = 31
-                    Align = alLeft
-                    BevelKind = bkTile
-                    BevelOuter = bvNone
-                    TabOrder = 2
-                    object Label37: TLabel
-                      Left = 60
-                      Top = 9
-                      Width = 41
-                      Height = 13
-                      Caption = 'Rec Loc:'
-                    end
-                    object ckGerarRecLoc: TCheckBox
-                      Left = 22
-                      Top = 6
-                      Width = 30
-                      Height = 17
-                      TabOrder = 0
-                      OnClick = ckGerarRecLocClick
-                    end
-                    object cbGerarRecLoc: TComboBox
-                      Left = 105
-                      Top = 4
-                      Width = 60
-                      Height = 21
-                      Style = csDropDownList
-                      ItemHeight = 13
-                      TabOrder = 1
-                      Items.Strings = (
-                        'Sim'
-                        'N'#227'o')
-                    end
-                  end
-                  object pnGerarBoleto: TPanel
-                    Left = 525
-                    Top = 0
-                    Width = 175
-                    Height = 31
-                    Align = alLeft
-                    BevelKind = bkTile
-                    BevelOuter = bvNone
-                    TabOrder = 3
-                    object Label41: TLabel
-                      Left = 60
-                      Top = 9
-                      Width = 34
-                      Height = 13
-                      Caption = 'Boleto:'
-                    end
-                    object ckGerarBoleto: TCheckBox
-                      Left = 22
-                      Top = 6
-                      Width = 30
-                      Height = 17
-                      TabOrder = 0
-                      OnClick = ckGerarBoletoClick
-                    end
-                    object cbGerarBoleto: TComboBox
-                      Left = 105
-                      Top = 4
-                      Width = 60
-                      Height = 21
-                      Style = csDropDownList
-                      ItemHeight = 13
-                      TabOrder = 1
-                      Items.Strings = (
-                        'Sim'
-                        'N'#227'o')
-                    end
-                  end
-                end
-              end
               object pnDiasAposVencimento: TPanel
                 Left = 2
-                Top = 108
-                Width = 707
+                Top = 119
+                Width = 873
                 Height = 31
-                Align = alTop
                 TabOrder = 3
                 object lbDiasAposVenc: TLabel
                   Left = 46
@@ -6551,107 +6311,281 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
                   FormatSize = '0.2'
                 end
               end
+              object pnGerarNFS: TPanel
+                Left = 0
+                Top = 424
+                Width = 218
+                Height = 31
+                BevelKind = bkTile
+                BevelOuter = bvNone
+                TabOrder = 11
+                object Label35: TLabel
+                  Left = 81
+                  Top = 8
+                  Width = 53
+                  Height = 13
+                  Caption = 'Gerar NFS:'
+                end
+                object ckGerarNFS: TCheckBox
+                  Left = 24
+                  Top = 6
+                  Width = 30
+                  Height = 17
+                  TabOrder = 0
+                  OnClick = ckGerarNFSClick
+                end
+                object cbGerarNFS: TComboBox
+                  Left = 140
+                  Top = 5
+                  Width = 60
+                  Height = 21
+                  Style = csDropDownList
+                  ItemHeight = 13
+                  TabOrder = 1
+                  Items.Strings = (
+                    'Sim'
+                    'N'#227'o')
+                end
+              end
+              object pnGerarNF: TPanel
+                Left = 219
+                Top = 424
+                Width = 218
+                Height = 31
+                BevelKind = bkTile
+                BevelOuter = bvNone
+                TabOrder = 12
+                object Label36: TLabel
+                  Left = 87
+                  Top = 8
+                  Width = 47
+                  Height = 13
+                  Caption = 'Gerar NF:'
+                end
+                object ckGerarNF: TCheckBox
+                  Left = 22
+                  Top = 6
+                  Width = 30
+                  Height = 17
+                  TabOrder = 0
+                  OnClick = ckGerarNFClick
+                end
+                object cbGerarNF: TComboBox
+                  Left = 140
+                  Top = 4
+                  Width = 60
+                  Height = 21
+                  Style = csDropDownList
+                  ItemHeight = 13
+                  TabOrder = 1
+                  Items.Strings = (
+                    'Sim'
+                    'N'#227'o')
+                end
+              end
+              object pnGerarRecLoc: TPanel
+                Left = 438
+                Top = 424
+                Width = 218
+                Height = 31
+                BevelKind = bkTile
+                BevelOuter = bvNone
+                TabOrder = 13
+                object Label37: TLabel
+                  Left = 63
+                  Top = 8
+                  Width = 71
+                  Height = 13
+                  Alignment = taRightJustify
+                  Caption = 'Gerar Rec Loc:'
+                end
+                object ckGerarRecLoc: TCheckBox
+                  Left = 22
+                  Top = 6
+                  Width = 30
+                  Height = 17
+                  TabOrder = 0
+                  OnClick = ckGerarRecLocClick
+                end
+                object cbGerarRecLoc: TComboBox
+                  Left = 140
+                  Top = 4
+                  Width = 60
+                  Height = 21
+                  Style = csDropDownList
+                  ItemHeight = 13
+                  TabOrder = 1
+                  Items.Strings = (
+                    'Sim'
+                    'N'#227'o')
+                end
+              end
+              object pnGerarBoleto: TPanel
+                Left = 657
+                Top = 424
+                Width = 218
+                Height = 31
+                BevelKind = bkTile
+                BevelOuter = bvNone
+                TabOrder = 14
+                object Label41: TLabel
+                  Left = 70
+                  Top = 7
+                  Width = 64
+                  Height = 13
+                  Alignment = taRightJustify
+                  Caption = 'Gerar Boleto:'
+                end
+                object cbGerarBoleto: TComboBox
+                  Left = 140
+                  Top = 4
+                  Width = 60
+                  Height = 21
+                  Style = csDropDownList
+                  ItemHeight = 13
+                  TabOrder = 1
+                  Items.Strings = (
+                    'Sim'
+                    'N'#227'o')
+                end
+                object ckGerarBoleto: TCheckBox
+                  Left = 22
+                  Top = 6
+                  Width = 30
+                  Height = 17
+                  TabOrder = 0
+                  OnClick = ckGerarBoletoClick
+                end
+              end
             end
-            object Panel7: TPanel
-              Left = 1
-              Top = 491
-              Width = 711
-              Height = 45
-              Align = alBottom
-              BevelKind = bkTile
-              BevelOuter = bvNone
+          end
+          object Panel7: TPanel
+            Left = 0
+            Top = 537
+            Width = 899
+            Height = 29
+            Align = alBottom
+            BevelKind = bkTile
+            BevelOuter = bvNone
+            TabOrder = 1
+            ExplicitLeft = 1
+            ExplicitTop = 536
+            ExplicitWidth = 897
+            object btnOKAlteracaoEmLote: TBitBtn
+              Left = 369
+              Top = 0
+              Width = 75
+              Height = 25
+              Hint = 'OK - [CLI263]'
+              Caption = 'OK'
+              TabOrder = 0
+              OnClick = btnOKAlteracaoEmLoteClick
+              Glyph.Data = {
+                36050000424D3605000000000000360400002800000010000000100000000100
+                08000000000000010000D30E0000D30E00000001000000010000008C00000094
+                0000009C000000A5000000940800009C100000AD100000AD180000AD210000B5
+                210000BD210018B5290000C62900319C310000CE310029AD390031B5420018C6
+                420000D6420052A54A0029AD4A0029CE5A006BB5630000FF63008CBD7B00A5C6
+                94005AE7A500FF00FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF001B1B1B1B1B13
+                04161B1B1B1B1B1B1B1B1B1B1B1B1B0B0A01181B1B1B1B1B1B1B1B1B1B1B160A
+                0C030D1B1B1B1B1B1B1B1B1B1B1B050E0C0601191B1B1B1B1B1B1B1B1B130E0C
+                170E02001B1B1B1B1B1B1B1B1B0B1517170A0C01181B1B1B1B1B1B1B1B111717
+                13130C030D1B1B1B1B1B1B1B1B1B08081B1B070C01191B1B1B1B1B1B1B1B1B1B
+                1B1B100C02001B1B1B1B1B1B1B1B1B1B1B1B1B090C01181B1B1B1B1B1B1B1B1B
+                1B1B1B130C0F101B1B1B1B1B1B1B1B1B1B1B1B1B141A0F181B1B1B1B1B1B1B1B
+                1B1B1B1B1012181B1B1B1B1B1B1B1B1B1B1B1B1B1B191B1B1B1B1B1B1B1B1B1B
+                1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B}
+            end
+            object btnCancelarAlteracaoEmLote: TBitBtn
+              Left = 450
+              Top = 0
+              Width = 75
+              Height = 25
+              Hint = 'Cancelar'
+              Caption = 'Cancela'
               TabOrder = 1
-              object btnOKAlteracaoEmLote: TBitBtn
-                Left = 276
-                Top = 8
-                Width = 75
-                Height = 25
-                Hint = 'OK - [CLI263]'
-                Caption = 'OK'
-                TabOrder = 0
-                OnClick = btnOKAlteracaoEmLoteClick
-                Glyph.Data = {
-                  36050000424D3605000000000000360400002800000010000000100000000100
-                  08000000000000010000D30E0000D30E00000001000000010000008C00000094
-                  0000009C000000A5000000940800009C100000AD100000AD180000AD210000B5
-                  210000BD210018B5290000C62900319C310000CE310029AD390031B5420018C6
-                  420000D6420052A54A0029AD4A0029CE5A006BB5630000FF63008CBD7B00A5C6
-                  94005AE7A500FF00FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF001B1B1B1B1B13
-                  04161B1B1B1B1B1B1B1B1B1B1B1B1B0B0A01181B1B1B1B1B1B1B1B1B1B1B160A
-                  0C030D1B1B1B1B1B1B1B1B1B1B1B050E0C0601191B1B1B1B1B1B1B1B1B130E0C
-                  170E02001B1B1B1B1B1B1B1B1B0B1517170A0C01181B1B1B1B1B1B1B1B111717
-                  13130C030D1B1B1B1B1B1B1B1B1B08081B1B070C01191B1B1B1B1B1B1B1B1B1B
-                  1B1B100C02001B1B1B1B1B1B1B1B1B1B1B1B1B090C01181B1B1B1B1B1B1B1B1B
-                  1B1B1B130C0F101B1B1B1B1B1B1B1B1B1B1B1B1B141A0F181B1B1B1B1B1B1B1B
-                  1B1B1B1B1012181B1B1B1B1B1B1B1B1B1B1B1B1B1B191B1B1B1B1B1B1B1B1B1B
-                  1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B}
-              end
-              object btnCancelarAlteracaoEmLote: TBitBtn
-                Left = 357
-                Top = 8
-                Width = 75
-                Height = 25
-                Hint = 'Cancelar'
-                Caption = 'Cancela'
-                TabOrder = 1
-                OnClick = btnCancelarAlteracaoEmLoteClick
-                Glyph.Data = {
-                  12020000424D1202000000000000120100002800000010000000100000000100
-                  08000000000000010000120B0000120B0000370000003700000000000000FFFF
-                  FF00FF00FF001442E4001645EB001C4BE7000430EB000C35E4000E3CEB001037
-                  DB000027EB00002AEB000027E400012CEB00052BDC00062DE300092ED9000022
-                  EB000021E7000020E200001FDC000022DC000020D900001EEB00001FEB000020
-                  EB00001DE800001BE300001EE200001FE200001BDF00001CDF00001AEB00001A
-                  E2000017DF000019DF00001ADF000011EB000016EB000012E6000010DC000013
-                  DC000010D9000009EB00000BEB000008EA000008E700000ADF000004E2000005
-                  E2000004DF000005DF000003DB000004DA0000006E0002020202020202020202
-                  0202020202020202020202020202020202020202020202020236360202020202
-                  0236360202020202361A28360202020236302E36020202023621182A36020236
-                  332B34360202020202362419293636312C353602020202020202361E11272D2B
-                  3236020202020202020202361B26252F36020202020202020202023612172022
-                  36020202020202020202360F06131C0A2336020202020202023607080E363614
-                  0B1F3602020202023603041036020236160D1D36020202023605093602020202
-                  36150C3602020202023636020202020202363602020202020202020202020202
-                  02020202020202020202020202020202020202020202}
-              end
+              OnClick = btnCancelarAlteracaoEmLoteClick
+              Glyph.Data = {
+                12020000424D1202000000000000120100002800000010000000100000000100
+                08000000000000010000120B0000120B0000370000003700000000000000FFFF
+                FF00FF00FF001442E4001645EB001C4BE7000430EB000C35E4000E3CEB001037
+                DB000027EB00002AEB000027E400012CEB00052BDC00062DE300092ED9000022
+                EB000021E7000020E200001FDC000022DC000020D900001EEB00001FEB000020
+                EB00001DE800001BE300001EE200001FE200001BDF00001CDF00001AEB00001A
+                E2000017DF000019DF00001ADF000011EB000016EB000012E6000010DC000013
+                DC000010D9000009EB00000BEB000008EA000008E700000ADF000004E2000005
+                E2000004DF000005DF000003DB000004DA0000006E0002020202020202020202
+                0202020202020202020202020202020202020202020202020236360202020202
+                0236360202020202361A28360202020236302E36020202023621182A36020236
+                332B34360202020202362419293636312C353602020202020202361E11272D2B
+                3236020202020202020202361B26252F36020202020202020202023612172022
+                36020202020202020202360F06131C0A2336020202020202023607080E363614
+                0B1F3602020202023603041036020236160D1D36020202023605093602020202
+                36150C3602020202023636020202020202363602020202020202020202020202
+                02020202020202020202020202020202020202020202}
+            end
+            object btSairServLote: TBitBtn
+              Left = 604
+              Top = 0
+              Width = 75
+              Height = 25
+              Hint = 'Sair'
+              Caption = '&Sair'
+              TabOrder = 2
+              OnClick = BitBtn2Click
+              Glyph.Data = {
+                2E020000424D2E020000000000002E0100002800000010000000100000000100
+                08000000000000010000120B0000120B00003E0000003E00000000000000FFFF
+                FF00FF00FF00BB410000BB420000FFF6EF00E69C5900E69D5900E9A36200FFF4
+                EA00FFF8F200FECA9500FFCE9C00FFD4A900FEEBD800FEF0E200FFF2E500FFF3
+                E700FFFBF700FECE9C00FED3A500FED5AA00FEDAB400FFDCB600FEDDB800FEDD
+                BA00FFE3C500FEE2C400FFE5C900FFE6CA00FEE5CA00FFEBD500FEF3E700FFDA
+                AD00FFEAD100FFFAF400FFD8A700FFD9A900FFDAAB00FFE1B800FFE7C700FEEE
+                D900FFFBF600FFDCAC00FFE1B500FFE7C400FFEFD700FFEAC200FFFAEA00FFFE
+                FB00FFFFFA00FFFFFE00315EFF002A56FF00123BFF00153DFF001841FF001A44
+                FF001D47FF00072BFF00001EFF00000D66000202020202020202020202020202
+                0202020202020202020202020202020202020204040404040404040404040402
+                020202040132302E28272125242F04020202020401050F221B1614130B260402
+                0202020401310A101F1A170D0C2B04020202020401013323110E1C18152C0402
+                02020204010101332A20291D192D040202020204010101010112093D1E2E043D
+                020202040101010101013D363D013D3C3D020204080606060606073D373D3B3D
+                0202020203040404040404043D383D0202020202020202020202023D353D393D
+                020202020202020202023D343D023D3A3D020202020202020202023D0202023D
+                020202020202020202020202020202020202}
             end
           end
         end
         object tsSelecionaGradeProd: TTabSheet
           Caption = 'tsSelecionaGradeProd'
           ImageIndex = 11
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object ScrollBox5: TScrollBox
             Left = 0
             Top = 0
@@ -6835,10 +6769,10 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
       end
     end
     inherited PanelFlash: TPanel
-      Left = 792
-      Top = 506
-      ExplicitLeft = 792
-      ExplicitTop = 506
+      Left = 804
+      Top = 566
+      ExplicitLeft = 804
+      ExplicitTop = 566
     end
   end
   inherited StatusBar1: TStatusBar
@@ -6848,11 +6782,17 @@ inherited frmCadContratosClientes: TfrmCadContratosClientes
     ExplicitWidth = 914
   end
   inherited pnStatusProcessamento: TPanel
-    Top = 531
-    ExplicitTop = 531
+    Left = 780
+    Top = 500
+    ExplicitLeft = 780
+    ExplicitTop = 500
     inherited lbStatusProcessamento: TLabel
       ExplicitLeft = 26
       ExplicitTop = 38
+    end
+    inherited lbTextoProcessamento: TLabel
+      Width = 477
+      Height = 21
     end
   end
   inherited PopupMenu1: TPopupMenu

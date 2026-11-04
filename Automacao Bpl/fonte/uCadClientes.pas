@@ -8813,7 +8813,7 @@ begin
     DBEdit200.Visible := False;
   end;
 
-  SpeedButton64.Visible := vDadosIni.vHwCloudIA.vUsarServMensageria = 'S';
+  SpeedButton64.Visible := vDadosIni.vHwCloudIA.vUsarVendaOnline = 'S';
 
 //  Por ser usado na tabela de preços removemos o teste da ordem de carregamento
 //  Label142.Visible := (vDadosIni.vEmp.vOC_UsarOrdemCarregamento = 'S') or

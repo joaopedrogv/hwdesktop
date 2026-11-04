@@ -361,6 +361,17 @@ type
     ckNatRecPisCofins: TCheckBox;
     cbNatRecPisCofins: TComboBox;
     btSincronizarServicos: TSpeedButton;
+    pnEmpresas: TPanel;
+    lbEmpresas: TLabel;
+    ckEmpresas: TCheckBox;
+    DBGEmpresas: TDBGrid;
+    SpbSelEmpAll: TSpeedButton;
+    SpbUnSelEmpAll: TSpeedButton;
+    btDefinirEmpresas: TSpeedButton;
+    Label48: TLabel;
+    procedure DBGEmpresasKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure ckEmpresasClick(Sender: TObject);
     procedure btSincronizarServicosClick(Sender: TObject);
     procedure ckNatRecPisCofinsClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -585,6 +596,7 @@ begin
 
       SpeedButtonAlterarServico2.Visible := false;
       SpeedButtonAlterarServico.Visible := false;
+      btDefinirEmpresas.Visible := false;
       btSincronizarServicos.Visible := false;
 
       btRestaurarRegistro.Visible := true;
@@ -607,6 +619,7 @@ begin
 
       SpeedButtonAlterarServico2.Visible := true;
       SpeedButtonAlterarServico.Visible := true;
+      btDefinirEmpresas.Visible := true;
       btSincronizarServicos.Visible := true;
       
       btRestaurarRegistro.Visible := false;
@@ -1050,6 +1063,7 @@ begin
     TipoServ.vAtualizarServ.vHabCstPisCofins := ckCstPisCofins.Checked;
     TipoServ.vAtualizarServ.vHabCstPisCofinsEnt := ckCstPisCofinsEnt.Checked;
     TipoServ.vAtualizarServ.vHabNatRecPisCofins := ckNatRecPisCofins.Checked;
+    TipoServ.vAtualizarServ.vHabEmpresas := ckEmpresas.Checked;
 
     TipoServ.vAtualizarServ.vCodCfopLote := Trunc(EdCodCFOP.AsValue);
     TipoServ.vAtualizarServ.vAliqIss := EdAliqIss.AsValue;
@@ -1389,6 +1403,31 @@ begin
 
   if (Self.Enabled) and (Self.Visible) and (edTribNac.CanFocus) then
   	edTribNac.SetFocus;
+end;
+
+procedure TFrmCadTipoServ.ckEmpresasClick(Sender: TObject);
+begin
+  inherited;
+  SpbSelEmpAll.Enabled := ckEmpresas.Checked;
+  SpbUnSelEmpAll.Enabled := ckEmpresas.Checked;
+  DBGEmpresas.Enabled := ckEmpresas.Checked;
+  if ckEmpresas.Checked then
+  begin
+  	 pnEmpresas.ParentBackground := False;
+	 pnEmpresas.Color := clYellow;
+    DBGEmpresas.FixedColor := clYellow;
+    DBGEmpresas.Color := clWindow;
+  end
+  else
+  begin
+  	 pnEmpresas.ParentBackground := True;
+  	 pnEmpresas.Color := clBtnFace;
+    DBGEmpresas.FixedColor := clBtnFace;
+    DBGEmpresas.Color := clBtnFace;
+  end;
+
+  if (Self.Enabled) and (Self.Visible) and (DBGEmpresas.CanFocus) then
+  	DBGEmpresas.SetFocus;
 end;
 
 procedure TFrmCadTipoServ.ckEspecieVapClick(Sender: TObject);
@@ -1895,6 +1934,14 @@ begin
   end;
 end;
 
+procedure TFrmCadTipoServ.DBGEmpresasKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  inherited;
+  if Key = VK_SPACE then
+    TipoServ.vTipoServEmpresa._marcaDesmarcaLinha
+end;
+
 procedure TFrmCadTipoServ.DBGrid1CellClick(Column: TColumn);
 begin
 	if Column.FieldName = 'SEL' then
@@ -1958,8 +2005,8 @@ end;
 procedure TFrmCadTipoServ.DBGridMultiempresaCellClick(Column: TColumn);
 begin
   inherited;
-	if Column.FieldName = 'SEL' then
-  	TipoServ.vTipoServEmpresa._marcaDesmarcaLinha;
+  if Column.FieldName = 'SEL' then
+  	 TipoServ.vTipoServEmpresa._marcaDesmarcaLinha;
 end;
 
 procedure TFrmCadTipoServ.DBGridMultiempresaDrawColumnCell(Sender: TObject;
@@ -1997,7 +2044,7 @@ begin
     R := Rect;
     InflateRect(R, 2, 0); //Diminue o tamanho do CheckBox
     DrawFrameControl(TDBGrid(sender).Canvas.Handle, R, DFC_BUTTON, DFCS_BUTTONCHECK or Check);
-  end;  
+  end;
 end;
 
 procedure TFrmCadTipoServ.DBGridMultiempresaKeyDown(Sender: TObject;
@@ -2835,6 +2882,7 @@ begin
         btRestaurarRegistro.Visible := false;
         SpeedButtonAlterarServico.Visible := true;
         SpeedButtonAlterarServico2.Visible := true;
+        btDefinirEmpresas.Visible := true;
         btSincronizarServicos.Visible := true;
 
         ckLixeira.Enabled := false;
@@ -2858,6 +2906,7 @@ begin
         btRestaurarRegistro.Visible := true;
         SpeedButtonAlterarServico.Visible := false;
         SpeedButtonAlterarServico2.Visible := false;
+        btDefinirEmpresas.Visible := false;
         btSincronizarServicos.Visible := false;
 
         ckLixeira.Enabled := false;
@@ -3035,6 +3084,7 @@ begin
   TipoServ.LocEspecieSeg.abreEspecieSeg;
   TipoServ.LocCFOP.abreCFOP;
   TipoServ.codtiposervLC.abretabela;
+  TipoServ.vTipoServEmpresa._abreTodosEmpresas(0);
 
   pnVendaOnline.Visible := vDadosIni.vHwCloudIA.vUsarVendaOnline = 'S';
 
@@ -3206,8 +3256,14 @@ begin
   if ckPermOpcaoMarcadas.Checked then
 	ckNatRecPisCofins.Checked := _LerConfiguracoesRegistroBoolean(ckNatRecPisCofins.Name)
   else
-  	ckNatRecPisCofins.Checked := false;
+  	ckNatRecPisCofins.Checked := False;
   ckNatRecPisCofinsClick(Sender);
+
+  if ckPermOpcaoMarcadas.Checked then
+   ckEmpresas.Checked := _LerConfiguracoesRegistroBoolean(ckEmpresas.Name)
+  else
+   ckEmpresas.Checked := False;
+  ckEmpresasClick(Sender);
 
   try
   	 vIndexFieldNames := TipoServ.dataSet.IndexFieldNames;

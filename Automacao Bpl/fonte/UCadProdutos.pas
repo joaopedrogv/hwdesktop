@@ -19513,7 +19513,7 @@ end;
 
 procedure TFrmCadProdutos.gravaConfiguracoesFormRegistro;
 begin
-	if (TelaCadastro <= 0) then
+  if (TelaCadastro <= 0) then
   begin
     _GravaConfiguracoesBoolean(CheckBox18.Name, CheckBox18.Checked);
   end;
@@ -19529,7 +19529,7 @@ begin
     CheckBox3.Checked := false
   else if (TelaCadastro <= 0) and (SalvarValoresConsultaAvancada.Checked) and (CheckBox3.Checked) then
   begin
-  	_GravaConfiguracoesInteger(ComboBox4.Name,  ComboBox4.ItemIndex);
+    _GravaConfiguracoesInteger(ComboBox4.Name,  ComboBox4.ItemIndex);
     _GravaConfiguracoesInteger(ComboBox5.Name,  ComboBox5.ItemIndex);
     _GravaConfiguracoesInteger(ComboBox6.Name,  ComboBox6.ItemIndex);
     _GravaConfiguracoesInteger(ComboBox10.Name, ComboBox10.ItemIndex);

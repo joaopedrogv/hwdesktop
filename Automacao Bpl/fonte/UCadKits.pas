@@ -300,7 +300,7 @@ type
     GroupBox9: TGroupBox;
     Panel119: TPanel;
     btSalvarServLote: TBitBtn;
-    btnCancServLote: TBitBtn;
+    btnCancKitLote: TBitBtn;
     btSairServLote: TBitBtn;
     ckLixeira: TCheckBox;
     SpeedButton59: TSpeedButton;
@@ -317,6 +317,8 @@ type
     CheckBox4: TCheckBox;
     ckVendaOnline: TCheckBox;
     cbVendaOnline: TComboBox;
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure btnCancKitLoteClick(Sender: TObject);
     procedure btSincronizarKitClick(Sender: TObject);
     procedure btSalvarServLoteClick(Sender: TObject);
     procedure ckVendaOnlineClick(Sender: TObject);
@@ -1135,14 +1137,25 @@ begin
   end;
 end;
 
+procedure TFrmCadKits.btnCancKitLoteClick(Sender: TObject);
+begin
+  inherited;
+  Kit.Cancel;
+  Kit.CancelUpdates;
+  Kit.RollBackTransacao;
+
+  PageControl1.ActivePage := tsAlterDadosKit;
+  tsAlterDadosKit.Show;
+end;
+
 procedure TFrmCadKits.btnDeltarItemKitClick(Sender: TObject);
 begin
 	try
-  	btnIncluirItemKit.Enabled := false;
+  	 btnIncluirItemKit.Enabled := false;
     btnAlterarItemKit.Enabled := false;
     btnDeltarItemKit.Enabled := false;
     btnImprimirItemKit.Enabled := false;
-  	btnOKAlterarDadosEC.Enabled := false;
+  	 btnOKAlterarDadosEC.Enabled := false;
     btnCancAlterarDadosEC.Enabled := false;
     sbVoltarEC.Enabled := false;
     sbAvancarEC.Enabled := false;
@@ -2151,6 +2164,18 @@ end;
 
 procedure TFrmCadKits.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
+  if (PageControl1.ActivePage = tsAlterDadosKit) then
+  begin
+    GroupBox3.Parent := TabSheet2;
+    btVoltarDadosKit.Parent := Panel52;
+    BitBtn2.Visible := True;
+    BitBtn3.Visible := True;
+    Panel1.Parent := TabSheet2;
+    Panel2.Visible := True;
+    PageControl1.ActivePage := TabSheet2;
+  end;
+
+  TabSheet2.show;
   inherited;
   if not Assigned(DBGrid2.DataSource) then
     Exit;
@@ -2168,6 +2193,23 @@ begin
   Kit.free;
   Action := caFree;
   FrmCadKits := nil;
+end;
+
+procedure TFrmCadKits.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+var
+  vAlterDadosKit, vAlterDadosLote: boolean;
+begin
+  vAlterDadosKit  := PageControl1.ActivePage = tsAlterDadosKit;
+  vAlterDadosLote := PageControl1.ActivePage = tsAlterDadosLote;
+  inherited;
+
+  if vAlterDadosKit then
+    btVoltarDadosKitClick(Sender)
+  else if vAlterDadosLote then
+  begin
+    btnCancKitLoteClick(Sender);
+    btVoltarDadosKitClick(Sender);
+  end;
 end;
 
 procedure TFrmCadKits.FormCreate(Sender: TObject);

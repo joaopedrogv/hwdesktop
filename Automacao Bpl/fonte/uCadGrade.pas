@@ -64,16 +64,6 @@ type
     lbTipo1: TLabel;
     cbTipo1: TComboBox;
     ckTipo1: TCheckBox;
-    Panel21: TPanel;
-    Panel22: TPanel;
-    pnTipo2: TPanel;
-    lbTipo2: TLabel;
-    cbTipo2: TComboBox;
-    ckTipo2: TCheckBox;
-    Panel23: TPanel;
-    Panel7: TPanel;
-    btnOKAlteracaoEmLote: TBitBtn;
-    btnCancelarAlteracaoEmLote: TBitBtn;
     btSelectAll: TSpeedButton;
     btUnSelectAll: TSpeedButton;
     MarcarTodasGradesClick: TMenuItem;
@@ -85,6 +75,16 @@ type
     SpeedBSelTodos: TSpeedButton;
     SpeedBDesmarcarTodos: TSpeedButton;
     btLixeiraVazia: TSpeedButton;
+    Panel7: TPanel;
+    btnOKAlteracaoEmLote: TBitBtn;
+    btnCancelarAlteracaoEmLote: TBitBtn;
+    btSairGradeLote: TBitBtn;
+    pnTipo2: TPanel;
+    lbTipo2: TLabel;
+    cbTipo2: TComboBox;
+    ckTipo2: TCheckBox;
+    Label473: TLabel;
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure btSincronizarServicosClick(Sender: TObject);
     procedure SpeedBDesmarcarTodosClick(Sender: TObject);
     procedure SpeedBSelTodosClick(Sender: TObject);
@@ -424,13 +424,22 @@ end;
 procedure TfrmCadGrade.btnCancelarAlteracaoEmLoteClick(Sender: TObject);
 begin
   inherited;
-	TForm(pnAlteracaoEmLote.Parent).ModalResult := IDCANCEL;
+  obGrade.Cancel;
+  obGrade.CancelUpdates;
+  obGrade.RollBackTransacao;
+
+  PageControl1.ActivePage := tsAlterDadosProc;
+  tsAlterDadosProc.Show;
 end;
 
 procedure TfrmCadGrade.btnOKAlteracaoEmLoteClick(Sender: TObject);
 begin
   inherited;
-	try
+  try
+   Screen.Cursor := crHourGlass;
+   frmCadGrade.Enabled := false;
+   DBGrid1.Visible := false;
+
   	if (Self.Enabled) and (Self.Visible) and (btnOKAlteracaoEmLote.CanFocus) then
       btnOKAlteracaoEmLote.SetFocus;
     obGrade.vAtualizarGrade.vTipo1 := trim(cbTipo1.Text);
@@ -444,15 +453,20 @@ begin
     	setFocusCampoErro(obGrade.vNomeCampoErro, obGrade.vMensagemErro);
     	exit;
     end;
-
-		TForm(pnAlteracaoEmLote.Parent).ModalResult := IDOK;
   finally
     _GravaConfiguracoesString(cbTipo1.Name, cbTipo1.Text);
     _GravaConfiguracoesString(cbTipo2.Name, cbTipo2.Text);
 
     _GravaConfiguracoesBoolean(ckTipo1.Name, ckTipo1.Checked);
     _GravaConfiguracoesBoolean(ckTipo2.Name, ckTipo2.Checked);
+
+    frmCadGrade.Enabled := true;
+    DBGrid1.Visible := true;
+    Screen.Cursor := crDefault;
   end;
+
+  PageControl1.ActivePage := tsAlterDadosProc;
+  tsAlterDadosProc.Show;
 end;
 
 procedure TfrmCadGrade.btOpcoesClick(Sender: TObject);
@@ -944,6 +958,18 @@ end;
 
 procedure TfrmCadGrade.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
+  if (PageControl1.ActivePage = tsAlterDadosProc) then
+  begin
+    GroupBox3.Parent := TabSheet2;
+    btVoltarDadosProc.Parent := Panel52;
+    BitBtn2.Visible := True;
+    BitBtn3.Visible := True;
+    Panel1.Parent := TabSheet2;
+    Panel2.Visible := True;
+    PageControl1.ActivePage := TabSheet2;
+  end;
+
+  TabSheet2.show;
   inherited;
   obGrade.Cancel;
   obGrade.RollBackTransacao;
@@ -951,6 +977,23 @@ begin
     obGrade.free;
   Action := caFree;
   FrmCadGrade := nil;
+end;
+
+procedure TfrmCadGrade.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+var
+  vAlterDadosGrade, vAlterDadosLote: boolean;
+begin
+  vAlterDadosGrade := PageControl1.ActivePage = tsAlterDadosProc;
+  vAlterDadosLote  := PageControl1.ActivePage = tsAlterDadosLote;
+  inherited;
+
+  if vAlterDadosGrade then
+    btVoltarDadosProcClick(Sender)
+  else if vAlterDadosLote then
+  begin
+    btnCancelarAlteracaoEmLoteClick(Sender);
+    btVoltarDadosProcClick(Sender);
+  end;
 end;
 
 procedure TfrmCadGrade.FormCreate(Sender: TObject);
@@ -1341,13 +1384,13 @@ begin
     end;
 
   if ckPermOpcaoMarcadas.Checked then
-	  ckTipo1.Checked := _LerConfiguracoesRegistroBoolean(ckTipo1.Name)
+	 ckTipo1.Checked := _LerConfiguracoesRegistroBoolean(ckTipo1.Name)
   else
-  	ckTipo1.Checked := false;
+  	 ckTipo1.Checked := false;
   ckTipo1Click(Sender);
 
   if ckPermOpcaoMarcadas.Checked then
-	  ckTipo2.Checked := _LerConfiguracoesRegistroBoolean(ckTipo2.Name)
+	 ckTipo2.Checked := _LerConfiguracoesRegistroBoolean(ckTipo2.Name)
   else
   	ckTipo2.Checked := false;
   ckTipo2Click(Sender);
@@ -1370,7 +1413,7 @@ begin
       exit;
     end;
   finally
-  	obGrade.dataSet.Filtered          := false;
+  	 obGrade.dataSet.Filtered          := false;
     obGrade.dataSet.IndexName         := vIndexName;
     if (trim(vIndexName) = '') and (trim(vIndexFieldNames) = '') then
     	obGrade.dataSet.IndexFieldNames := 'COD_GRADE'
@@ -1381,10 +1424,8 @@ begin
     obGrade.dataSet.EnableControls;
   end;
 
-  if not obGrade._abreFormGradesAlteracaoEmLote then
-  	exit;
-
-  obGrade.dataSet.Refresh;
+  PageControl1.ActivePage := tsAlterDadosLote;
+  tsAlterDadosLote.Show;
 end;
 
 procedure TfrmCadGrade.SpeedButtonAlterarGradeClick(Sender: TObject);

@@ -524,7 +524,7 @@ inherited FrmCadKits: TFrmCadKits
                           Left = 192
                           Top = 0
                           Width = 29
-                          Height = 33
+                          Height = 18
                           Align = alRight
                           Alignment = taRightJustify
                           Caption = '1/4'
@@ -534,7 +534,6 @@ inherited FrmCadKits: TFrmCadKits
                           Font.Name = 'Tahoma'
                           Font.Style = [fsBold]
                           ParentFont = False
-                          ExplicitHeight = 18
                         end
                       end
                       object Panel115: TPanel
@@ -1853,7 +1852,7 @@ inherited FrmCadKits: TFrmCadKits
                                   Left = 340
                                   Top = 0
                                   Width = 29
-                                  Height = 16
+                                  Height = 18
                                   Align = alRight
                                   Alignment = taRightJustify
                                   Caption = '1/1'
@@ -1863,7 +1862,6 @@ inherited FrmCadKits: TFrmCadKits
                                   Font.Name = 'Tahoma'
                                   Font.Style = [fsBold]
                                   ParentFont = False
-                                  ExplicitHeight = 18
                                 end
                                 object Panel112: TPanel
                                   Left = 369
@@ -2189,8 +2187,8 @@ inherited FrmCadKits: TFrmCadKits
                                       object lbDescrGradeImg: TLabel
                                         Left = 0
                                         Top = 0
-                                        Width = 337
-                                        Height = 19
+                                        Width = 9
+                                        Height = 13
                                         Align = alClient
                                         Alignment = taCenter
                                         Caption = '...'
@@ -2200,8 +2198,6 @@ inherited FrmCadKits: TFrmCadKits
                                         Font.Name = 'Tahoma'
                                         Font.Style = [fsBold]
                                         ParentFont = False
-                                        ExplicitWidth = 9
-                                        ExplicitHeight = 13
                                       end
                                     end
                                     object pnDescImagemProduto: TPanel
@@ -2240,6 +2236,10 @@ inherited FrmCadKits: TFrmCadKits
                       object TabSheetEC3: TTabSheet
                         Caption = 'TabSheetEC3'
                         ImageIndex = 4
+                        ExplicitLeft = 0
+                        ExplicitTop = 0
+                        ExplicitWidth = 0
+                        ExplicitHeight = 0
                         object ScrollBox5: TScrollBox
                           Left = 0
                           Top = 0
@@ -2348,6 +2348,10 @@ inherited FrmCadKits: TFrmCadKits
                       object TabSheetEC4: TTabSheet
                         Caption = 'TabSheetEC4'
                         ImageIndex = 2
+                        ExplicitLeft = 0
+                        ExplicitTop = 0
+                        ExplicitWidth = 0
+                        ExplicitHeight = 0
                         object pnGradeVaricaoEC: TPanel
                           Left = 0
                           Top = 0
@@ -2568,6 +2572,10 @@ inherited FrmCadKits: TFrmCadKits
                       object TabSheetEC5: TTabSheet
                         Caption = 'TabSheetEC5'
                         ImageIndex = 3
+                        ExplicitLeft = 0
+                        ExplicitTop = 0
+                        ExplicitWidth = 0
+                        ExplicitHeight = 0
                         object pnItensKit: TPanel
                           Left = 0
                           Top = 0
@@ -3375,6 +3383,10 @@ inherited FrmCadKits: TFrmCadKits
           Caption = 'TabSheet4'
           ImageIndex = 2
           OnShow = TabSheet4Show
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object PageControl2: TPageControl
             Left = 0
             Top = 75
@@ -3385,6 +3397,10 @@ inherited FrmCadKits: TFrmCadKits
             TabOrder = 0
             object TabSheet5: TTabSheet
               Caption = 'TabSheet5'
+              ExplicitLeft = 0
+              ExplicitTop = 0
+              ExplicitWidth = 0
+              ExplicitHeight = 0
               object GroupBox14: TGroupBox
                 Left = 0
                 Top = 436
@@ -3806,6 +3822,10 @@ inherited FrmCadKits: TFrmCadKits
             object TabSheet6: TTabSheet
               Caption = 'TabSheet6'
               ImageIndex = 1
+              ExplicitLeft = 0
+              ExplicitTop = 0
+              ExplicitWidth = 0
+              ExplicitHeight = 0
               object GroupBox15: TGroupBox
                 Left = 0
                 Top = 0
@@ -4374,6 +4394,10 @@ inherited FrmCadKits: TFrmCadKits
         object tsPromocaoKit: TTabSheet
           Caption = 'tsPromocaoKit'
           ImageIndex = 4
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object GroupBox5: TGroupBox
             Left = 0
             Top = 0
@@ -4824,6 +4848,10 @@ inherited FrmCadKits: TFrmCadKits
         object tsImagemKit: TTabSheet
           Caption = 'tsImagemKit'
           ImageIndex = 5
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object pnImagemKit: TPanel
             Left = 3
             Top = 3
@@ -4962,6 +4990,10 @@ inherited FrmCadKits: TFrmCadKits
         object tsAlterDadosKit: TTabSheet
           Caption = 'tsAlterDadosKit'
           ImageIndex = 6
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object Panel52: TPanel
             Left = 0
             Top = 0
@@ -5997,7 +6029,7 @@ inherited FrmCadKits: TFrmCadKits
                   1B1B1B1B1012181B1B1B1B1B1B1B1B1B1B1B1B1B1B191B1B1B1B1B1B1B1B1B1B
                   1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B1B}
               end
-              object btnCancServLote: TBitBtn
+              object btnCancKitLote: TBitBtn
                 Left = 445
                 Top = 0
                 Width = 75
@@ -6005,6 +6037,7 @@ inherited FrmCadKits: TFrmCadKits
                 Hint = 'Cancelar'
                 Caption = '&Cancela'
                 TabOrder = 1
+                OnClick = btnCancKitLoteClick
                 Glyph.Data = {
                   12020000424D1202000000000000120100002800000010000000100000000100
                   08000000000000010000120B0000120B0000370000003700000000000000FFFF

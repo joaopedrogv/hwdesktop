@@ -54598,7 +54598,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
               object pnGrupo: TPanel
                 Left = 1
                 Top = 25
-                Width = 440
+                Width = 430
                 Height = 28
                 TabOrder = 0
                 object lbGrupoProd: TLabel
@@ -54654,13 +54654,13 @@ inherited FrmCadProdutos: TFrmCadProdutos
                 end
               end
               object pnPerfil: TPanel
-                Left = 445
+                Left = 436
                 Top = 25
-                Width = 440
+                Width = 430
                 Height = 28
                 TabOrder = 1
                 object lbPerfilProd: TLabel
-                  Left = 101
+                  Left = 84
                   Top = 7
                   Width = 24
                   Height = 13
@@ -54673,7 +54673,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
                   ParentFont = False
                 end
                 object SpeedBPerfil: TSpeedButton
-                  Left = 405
+                  Left = 388
                   Top = 3
                   Width = 23
                   Height = 22
@@ -54724,7 +54724,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
                   OnClick = SpeedBPerfilClick
                 end
                 object EdCodPerfilProd: TEditHw
-                  Left = 130
+                  Left = 113
                   Top = 3
                   Width = 42
                   Height = 21
@@ -54737,7 +54737,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
                   FormatSize = '0.2'
                 end
                 object EdPerfilProd: TEdit
-                  Left = 178
+                  Left = 161
                   Top = 3
                   Width = 221
                   Height = 21
@@ -54761,7 +54761,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
               object pnSubGrupo: TPanel
                 Left = 1
                 Top = 53
-                Width = 440
+                Width = 430
                 Height = 28
                 TabOrder = 2
                 object lbSubGrupoProd: TLabel
@@ -54817,13 +54817,13 @@ inherited FrmCadProdutos: TFrmCadProdutos
                 end
               end
               object pnMarca: TPanel
-                Left = 445
+                Left = 436
                 Top = 53
-                Width = 440
+                Width = 430
                 Height = 28
                 TabOrder = 3
                 object lbMarcaProd: TLabel
-                  Left = 94
+                  Left = 79
                   Top = 7
                   Width = 29
                   Height = 13
@@ -54836,7 +54836,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
                   ParentFont = False
                 end
                 object EdCodMarca: TEditHw
-                  Left = 130
+                  Left = 113
                   Top = 4
                   Width = 42
                   Height = 21
@@ -54851,7 +54851,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
                   FormatSize = '0.2'
                 end
                 object DBLMarca: TDBLookupComboBox
-                  Left = 178
+                  Left = 161
                   Top = 4
                   Width = 250
                   Height = 21
@@ -54973,7 +54973,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
               object pnCEST: TPanel
                 Left = 676
                 Top = 93
-                Width = 180
+                Width = 177
                 Height = 28
                 TabOrder = 6
                 object lbCEST: TLabel
@@ -55232,7 +55232,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
               object pnAliqPisCofinsDif: TPanel
                 Left = 1
                 Top = 200
-                Width = 352
+                Width = 347
                 Height = 28
                 TabOrder = 14
                 object lbAliqPisDif: TLabel
@@ -55281,9 +55281,9 @@ inherited FrmCadProdutos: TFrmCadProdutos
                 end
               end
               object pnAliqCredPisCofins: TPanel
-                Left = 359
+                Left = 354
                 Top = 200
-                Width = 342
+                Width = 347
                 Height = 28
                 TabOrder = 15
                 object lbAliqCredPis: TLabel
@@ -55332,9 +55332,9 @@ inherited FrmCadProdutos: TFrmCadProdutos
                 end
               end
               object pnIsento: TPanel
-                Left = 708
+                Left = 706
                 Top = 200
-                Width = 153
+                Width = 147
                 Height = 28
                 TabOrder = 16
                 object lbIsento: TLabel
@@ -56406,7 +56406,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
               object pnComissaoFaixaDesconto: TPanel
                 Left = 523
                 Top = 587
-                Width = 333
+                Width = 330
                 Height = 28
                 TabOrder = 47
                 object Label454: TLabel
@@ -56447,7 +56447,7 @@ inherited FrmCadProdutos: TFrmCadProdutos
                 object DBLComissaoFaixaDesc: TDBLookupComboBox
                   Left = 167
                   Top = 4
-                  Width = 156
+                  Width = 151
                   Height = 21
                   Hint = '[F3: Consultar] Descri'#231#227'o do regra comiss'#227'o faixa desconto'
                   KeyField = 'CODIGO'
