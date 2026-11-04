@@ -56,7 +56,9 @@ structured results. Elevation does not authorize specialist work. Follow
     the Workflow assigns a deterministic operation to the Orchestrator. Record
     each action and its evidence before continuing.
 11. Execute authorized build or test automation through its canonical runner Skill
-    when required, then route technical findings to the appropriate Specialist.
+    when required, recording the standing ERP.UnitTests grant when applicable.
+    Schedule shared test sources and outputs without concurrent writes or runners,
+    then route technical findings to the appropriate Specialist.
 
 ## Boundaries
 
@@ -72,7 +74,8 @@ structured results. Elevation does not authorize specialist work. Follow
 - Do not modify production code, tests, schema, migrations, or UI.
 - Do not perform independent technical review. Terminal execution is limited to
   prescribed canonical operational automation, authorized runners, and bounded
-  operational artifact inspection. Build and tests require explicit authorization.
+  operational artifact inspection. Apply the standing ERP.UnitTests grant during
+  authorized implementation. Other build or test execution needs explicit authority.
 - Keep delegation within the developer request and selected Workflow, when applicable;
   do not allow nested delegation.
 - Do not silently replace an unavailable role or insufficient execution profile.

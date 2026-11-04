@@ -33,7 +33,16 @@ other real infrastructure.
 
 ## Authorization
 
-Building and executing tests can read the developer's local Delphi environment and write compiler outputs and test results. Execute the script only when the user requests or authorizes compilation or test execution.
+During authorized implementation, compilation and execution of ERP.UnitTests through
+this runner have standing authority under
+../.ai/rules/repository-safety.md#standing-erp-unit-test-validation.
+Run when relevant changes need validation and record that authority in the
+assignment. A narrower developer instruction takes precedence. Standalone execution
+uses the developer's explicit request.
+
+The grant covers the existing local Delphi environment and compiler/test outputs.
+Keep the unit-test isolation defined in .ai/rules/testing.md. Schedule stable sources
+and serialize shared build/results locations before running.
 
 If the execution environment requires approval to access the Delphi installation or user profile, request that approval for the exact script invocation. Do not bypass the environment setup.
 
@@ -42,19 +51,19 @@ If the execution environment requires approval to access the Delphi installation
 From the repository root, build without executing:
 
 ```powershell
-& .\Tests\Automation\Invoke-ERPUnitTests.ps1 -BuildOnly
+& .\Modern\Tests\Automation\Invoke-ERPUnitTests.ps1 -BuildOnly
 ```
 
 Build and execute:
 
 ```powershell
-& .\Tests\Automation\Invoke-ERPUnitTests.ps1
+& .\Modern\Tests\Automation\Invoke-ERPUnitTests.ps1
 ```
 
 When automatic Delphi discovery is unavailable, accept a developer-provided path to the directory containing `rsvars.bat`:
 
 ```powershell
-& .\Tests\Automation\Invoke-ERPUnitTests.ps1 -DelphiBin '<delphi-bin-directory>'
+& .\Modern\Tests\Automation\Invoke-ERPUnitTests.ps1 -DelphiBin '<delphi-bin-directory>'
 ```
 
 Do not hardcode that local path in a project, script, rule, context file, or Skill.
@@ -74,8 +83,13 @@ For a test run, read the NUnit XML path printed by the script under `Tests/TestR
 - failing fixture/test names and concise failure messages;
 - whether the failure occurred during build, runner startup, or test execution.
 
-Do not change production code, weaken assertions, suppress failures, or repair tests merely because execution failed unless the user separately asks for diagnosis or a fix.
+Preserve failure evidence and route diagnosis or correction to the appropriate
+implementation assignment within its approved scope. Report environment/runner
+blockers with the actual command and exit code. Keep assertions and expected
+production behavior intact.
 
 ## Handoff
 
-State the exact command executed and whether it was build-only or build-and-run. If execution was not authorized, do not run it; describe the pending validation instead.
+State the authority used, exact invocation and whether it was build-only or
+build-and-run. Record actual test totals when execution completes. If authority or
+execution capability is unavailable, describe the pending validation and its cause.

@@ -55,6 +55,8 @@ which take precedence for maintaining compliance with Java.
 - Comments SHOULD explain why a non-obvious decision, business rule, compatibility constraint, or workaround exists.
 - Do not add comments that merely restate the code.
 - Preserve meaningful existing comments.
+- Apply the shared durable-comment guidance in ../.ai/rules/repository-safety.md.
+  Keep Workflow-run decisions and review history in the run's artifacts.
 
 ## Formatting
 
@@ -62,6 +64,12 @@ which take precedence for maintaining compliance with Java.
 - New or modified lines SHOULD NOT exceed 120 characters unless a longer line improves readability or preserves an established construct.
 - Delphi keywords MUST be lowercase.
 - Do not reformat unrelated code solely to enforce formatting rules.
+
+## State and User Communication
+
+Apply ../.ai/rules/repository-safety.md's Local Implementation Quality to state
+lifetime, coherent data, record identification and user-facing findings.
+Prefer existing mechanisms and local derived values when they preserve behavior.
 
 ## Visibility and Public APIs
 

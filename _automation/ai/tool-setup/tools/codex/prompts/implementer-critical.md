@@ -11,4 +11,6 @@ common result contract.
 Use the additional capability for high-impact implementation evidence and bounded
 local decisions, never to change scope or architecture. Do not update global
 Workflow state, communicate gates directly to the developer, or create Subagents.
-Build and test execution require explicit authorization.
+Apply .ai/rules/repository-safety.md's validation authority, including the standing
+ERP.UnitTests grant during authorized implementation. Other execution requires
+explicit developer authorization.

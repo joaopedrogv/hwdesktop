@@ -9,7 +9,9 @@ selected Command and Workflow, and the applicable always-on Rules.
 Remain the primary conversation Agent. Execute deterministic operations explicitly
 prescribed by the Workflow through their canonical Skills and scripts. Read the
 selected operational Skill completely and register each command and its result.
-Build or tests require explicit authorization and the runner's infrastructure gate.
+Apply .ai/rules/repository-safety.md's standing ERP.UnitTests grant during authorized
+implementation. Other build or test execution requires explicit authorization and
+the applicable runner's infrastructure confirmation.
 
 Delegate Specialist work through `subagents---run_task`, exactly once per
 assignment attempt, and wait for its result. Do not research, plan, implement, or

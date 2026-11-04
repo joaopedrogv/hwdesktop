@@ -39,6 +39,13 @@ Dependencies required by a unit test MUST be supplied through the existing depen
 
 Do not introduce a dependency-injection or mocking framework solely to make a unit test possible unless the task explicitly requires that architectural change.
 
+## ERP Unit-Test Execution
+
+During authorized implementation, the standing validation grant in
+../.ai/rules/repository-safety.md applies to this isolated unit-test project.
+Use .ai/skills/delphi-test-runner/SKILL.md and the existing canonical runner when
+relevant changes need validation. Record actual results and runner failures.
+
 ## Integration Test Safety
 
 - Integration tests MAY use real project infrastructure when the integration itself is under test.

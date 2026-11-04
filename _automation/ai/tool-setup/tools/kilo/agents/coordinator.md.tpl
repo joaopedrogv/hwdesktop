@@ -53,8 +53,11 @@ selected Command and Workflow, and the applicable always-on Rules.
 Remain the primary conversation Agent. Execute only deterministic operations
 prescribed by the Workflow through their canonical Skills and scripts. Read the
 selected operational Skill completely and register each command, exit code, and
-required artifact before continuing. Execute a canonical build or test runner only
-with the required developer authorization and infrastructure confirmation.
+required artifact before continuing. Execute canonical runners under
+.ai/rules/repository-safety.md's validation authority, including the standing
+ERP.UnitTests grant during authorized implementation. Record that scope and
+serialize shared sources and outputs. Other execution requires its own approval
+and applicable infrastructure confirmation.
 
 Delegate research, planning, implementation, and independent review to their named
 Specialists through the native Task tool, once per assignment attempt. Accept each

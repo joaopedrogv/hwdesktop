@@ -51,11 +51,12 @@ ANSI is not ASCII, and ISO-8859-1 is not a synonym for Windows-1252. If required
 characters are outside the selected encoding or local evidence conflicts, resolve
 that mismatch before writing; do not silently change the file format.
 
-Configure the write operation explicitly. Reopen edited/generated text using the
-intended encoding and check accented literals, captions and metadata labels.
-Correct rendering in an editor alone does not prove the compiled strings are
-correct. Respect existing BOM and format conventions for verified Rio-only files
-and UTF-8 documentation; do not normalize neighboring files.
+Follow ../.ai/rules/repository-safety.md's Source Encoding Verification for the
+write operation and review. Verify the actual bytes of created and modified
+Delphi 2006 sources using the identified encoding, including accented literals,
+captions and metadata labels. Record the chosen encoding and check result.
+UTF-8 validity or correct display in the IDE alone cannot establish compatibility.
+Preserve verified Rio-only files and UTF-8 documentation under their own formats.
 
 Apply the same preservation to supporting DFM, DPR, DPK and INC text touched by
 the change. Source editing does not authorize compilation; when build/manual
