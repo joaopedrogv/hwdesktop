@@ -69,7 +69,18 @@ means the active production migration script is:
 scripts/versoes/029.sql
 ```
 
-Do NOT infer the active file only from the highest filename. Read `manifest.txt`.
+Read `manifest.txt` to identify the active version context. The developer may
+assign different existing version files to different programmers. For an
+incorporation request, obtain the preferred destination from the developer and
+respect those assignments. The `last` entry supplies context rather than silently
+overriding that destination.
+
+Check the prerequisites of the delivery commands in the version scripts. If a
+prerequisite is in a higher file, the affected delivery sequence must go into the
+highest applicable existing version authorized for the integration. Explain the
+dependency and destination. Ask only when the request leaves the destination or
+another programmer's file ownership unresolved. A filename alone does not prove
+the version is active, authorized or applied in a database.
 
 ---
 
@@ -158,7 +169,15 @@ Developers normally prepare and test migration SQL outside:
 scripts/versoes/
 ```
 
-During development, SQL is tested against the developer's database before it is incorporated into the production version script during the release process.
+Development SQL is prepared and validated against an identified development/test
+database under the applicable execution authority. Incorporation into version
+scripts is a separately requested delivery step.
+
+In the SVN/Git cycle, this step can occur in the working clone after merging the
+demand into the updated local main and before publishing main or preparing the
+SVN delivery. Consult _automation/workflow/GUIA-OPERACIONAL.md. The requested
+migration task identifies the demand, preferred destination and authority to
+commit. A documentation request only updates the procedure.
 
 Do NOT place unfinished migration commands into the active production version file unless explicitly instructed.
 
@@ -186,8 +205,24 @@ migration commands.
 An unexecuted draft may be revised. SQL already applied to a shared database needs
 an identifiable subsequent change; editing an old file does not update that database.
 Do not execute SQL, refresh the schema snapshot, or incorporate commands into
-scripts/versoes/ implicitly during implementation. Preserve the source link when
-commands are incorporated so that completed scripts are not treated as pending.
+scripts/versoes/ implicitly during implementation.
+
+This directory contains pending incorporation work. In a requested incorporation,
+append the final commands and remove their fully incorporated delivery files as
+one paired change in the same commit. Check source coverage, command order,
+interpreter boundaries and any test/automation consumers before removing files.
+Resolve consumer references within the authorized scope or report the dependency
+before completing incorporation.
+
+The commit and Git history retain the source paths, prior content and destination.
+Keep unfinished, partially incorporated or unrelated files explicit and preserved.
+Apply this cleanup only to the requested general demand scripts. Specialized
+development-artifact exceptions retain their own contracts.
+
+The schema snapshot remains the primary physical reference at its extraction.
+Track relevant commands that postdate that baseline, including commands already
+in version files but not yet applied to the reference database. Incorporation,
+database application and schema refresh are separate recorded events.
 
 Prepare commands with the documented pkReestrutura interpreter in mind. A DDL
 extraction or a script containing client directives is not automatically valid input
@@ -387,21 +422,37 @@ Use explicit defensive SQL only when the requested migration has a specific comp
 
 ## Procedure for a Production Migration Change
 
-When explicitly asked to incorporate a finished migration into the production version script:
+When explicitly asked to incorporate a finished migration into version scripts:
 
-1. Read `Ativos/dpk/manifest.txt`.
-2. Resolve the value of `last`.
-3. Open the corresponding file under `scripts/versoes/`.
-4. Treat the existing released migration history as immutable.
-5. Determine whether the new command is:
+1. Confirm the checkout, branch, demand and current changes. When this is the Git
+   delivery step, work on the updated local main after the demand merge.
+2. Identify the final delivery commands, their order and validation evidence under
+   scripts/database/changes/<demand-id>/. Separate diagnostic SQL and fixtures.
+3. Obtain the preferred existing destination and read Ativos/dpk/manifest.txt for
+   version context. Ask for a missing destination instead of assuming file ownership.
+4. Trace affected-object prerequisites in the schema baseline, version files and
+   relevant pending demand SQL. A prerequisite still present only in pending SQL
+   must be incorporated in the approved order or reported as unresolved.
+   If a prerequisite is above the preferred file, resolve the authorized higher
+   destination and explain the dependency before writing.
+5. Check for commands already incorporated. Preserve released commands and append
+   new commands after their prerequisites without reordering historical content.
+6. Adapt each delivery command to the interpreter's single-line, explicit block or
+   CREATE TABLE handling. Preserve its intended behavior, Firebird 2.5 compatibility,
+   identifier limits and the destination file's encoding and line endings.
+7. Verify that the destination contains the complete final delivery sequence.
+   Check references from tests and automation before deleting the source scripts.
+   Unresolved consumers or partial incorporation remain explicit pending work.
+8. Remove only the fully incorporated delivery files under the requested demand.
+   Review additions and removals together. Avoid a second archive copy in changes.
+9. When a commit is authorized, include the destination additions and source
+   removals in that same commit. Otherwise hand off the paired diff for the
+   developer to commit together. Record demand, source paths, destinations and
+   reasons in the commit/handoff without creating a parallel permanent SQL copy.
+10. Report incorporation and actual SQL validation separately. Runtime validation
+    uses an authorized test database and the pkReestrutura path when its interpreter
+    behavior is under verification. Preserve the identity of the starting state.
 
-   * single-line;
-   * explicit multi-line block;
-   * `CREATE TABLE`.
-6. Generate Firebird 2.5-compatible SQL.
-7. Apply current database naming conventions to new objects.
-8. Respect the 31-character identifier limit.
-9. Append the new migration command without reorganizing existing commands.
-10. Do not create a new numbered version file unless explicitly instructed by the developer.
-
-The build process is responsible for updating `manifest.txt` and CRC information.
+The build process owns manifest and CRC updates. Creating a numbered version,
+building, executing SQL, refreshing the schema, pushing or delivering to SVN
+requires the authority for those operations.

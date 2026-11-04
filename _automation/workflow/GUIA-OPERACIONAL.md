@@ -74,13 +74,37 @@ No clone:
 ~~~powershell
 Set-Location 'D:\Hw\githw\hwdesktop'
 .\_automation\workflow\merge-demand.ps1 -Branch 'nome-da-demanda'
-
-# Confira, compile e valide o resultado antes de publicar.
-git status
-git push origin main
 ~~~
 
 O merge pode ser fast-forward e não precisar de um commit adicional. Se houver conflito, resolva no clone, prepare os arquivos resolvidos com git add e conclua com git commit. O script mantém o merge em andamento para essa resolução.
+
+#### Migrações da demanda antes do push
+
+Se a demanda possui SQL em `scripts/database/changes/<demanda>`, solicite ao agente
+a incorporação com a [Skill database-migration](../../.ai/skills/database-migration/SKILL.md).
+Informe o arquivo de versão preferencial do programador. Essa tarefa ocorre na
+main local atualizada, depois do merge e antes de publicar o resultado.
+
+O agente confere os comandos de entrega e os pré-requisitos, justifica a versão
+superior quando uma dependência exigir, adapta a sintaxe ao pkReestrutura e apresenta
+o diff. Após conferir a incorporação completa e as referências de testes/automações,
+remove os scripts da demanda incorporados. A inclusão em `scripts/versoes` e a
+remoção em `changes` devem compor o mesmo commit, autorizado pelo desenvolvedor.
+O histórico Git mantém a preparação original.
+
+A incorporação segue a Skill e é solicitada à parte do merge-demand.ps1.
+Execução de SQL, atualização do schema, build e manifesto/CRC seguem suas
+autorizações.
+
+#### Validar e publicar
+
+Confira o resultado e realize as compilações e validações autorizadas. Conclua o
+commit da incorporação, quando houver migrações, antes do envio da main.
+
+~~~powershell
+git status
+git push origin main
+~~~
 
 ### 5. Preparar e confirmar a entrega SVN
 

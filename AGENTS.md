@@ -84,8 +84,11 @@ Identify the physical starting state. Read scripts/database/schema/README.md, th
 search only the required definitions in scripts/database/schema/schema.sql.
 Prepare general demand SQL in scripts/database/changes/<demand-id>/.
 Do not edit scripts/versoes implicitly; production incorporation is separately
-requested. Read .ai/skills/database-migration/SKILL.md when preparing migration SQL.
-Schema extraction, SQL execution and integration tests require their own authority.
+requested. Read .ai/skills/database-migration/SKILL.md when preparing or
+incorporating migration SQL. Incorporation uses the developer's preferred version
+file, verified dependencies and paired removal of fully incorporated demand scripts
+in the same commit. Schema extraction, SQL execution and integration tests require
+their own authority.
 
 ## Human documentation and operations
 
