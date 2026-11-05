@@ -1,7 +1,7 @@
 object frmPrincipalS: TfrmPrincipalS
   Left = 301
   Top = 0
-  ClientHeight = 925
+  ClientHeight = 945
   ClientWidth = 784
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -27,7 +27,7 @@ object frmPrincipalS: TfrmPrincipalS
     Left = 192
     Top = 0
     Width = 592
-    Height = 906
+    Height = 926
     Align = alClient
     Center = True
     ExplicitLeft = 230
@@ -38,31 +38,34 @@ object frmPrincipalS: TfrmPrincipalS
     Left = 177
     Top = 0
     Width = 15
-    Height = 906
+    Height = 926
     Align = alLeft
     TabOrder = 4
     Visible = False
+    ExplicitHeight = 906
   end
   object Panel1: TPanel
     Left = 0
     Top = 0
     Width = 177
-    Height = 906
+    Height = 926
     Align = alLeft
     BevelInner = bvRaised
     BevelOuter = bvLowered
     ParentBackground = False
     TabOrder = 0
+    ExplicitHeight = 906
     object ScrollBox1: TScrollBox
       Left = 2
       Top = 2
       Width = 173
-      Height = 871
+      Height = 891
       Align = alClient
       Color = clBtnFace
       ParentBackground = True
       ParentColor = False
       TabOrder = 0
+      ExplicitHeight = 871
       object cbAutomacao: TCategoryButtons
         Left = 0
         Top = 48
@@ -401,12 +404,13 @@ object frmPrincipalS: TfrmPrincipalS
     end
     object Panel2: TPanel
       Left = 2
-      Top = 873
+      Top = 893
       Width = 173
       Height = 31
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 1
+      ExplicitTop = 873
       object SpeedButton1: TSpeedButton
         Tag = 1
         Left = 158
@@ -494,7 +498,7 @@ object frmPrincipalS: TfrmPrincipalS
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 906
+    Top = 926
     Width = 784
     Height = 19
     Panels = <
@@ -518,6 +522,7 @@ object frmPrincipalS: TfrmPrincipalS
         Text = '127.0.0.1:C:\BasesAuto\Hw.fdb'
         Width = 50
       end>
+    ExplicitTop = 906
   end
   object FileListBox1: TFileListBox
     Left = 198
@@ -5306,6 +5311,11 @@ object frmPrincipalS: TfrmPrincipalS
           Tag = 1
           Caption = 'NFSe/DPS'
           OnClick = NFSeDPS1Click
+        end
+        object EventosDFe1: TMenuItem
+          Tag = 1
+          Caption = 'Eventos DFe'
+          OnClick = EventosDFe1Click
         end
         object N13: TMenuItem
           Caption = '-'

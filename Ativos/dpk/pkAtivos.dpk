@@ -255,6 +255,8 @@ contains
   notafiscal_sped_c195_c197_cls in '..\fonte\notafiscal_sped_c195_c197_cls.pas',
   estoque_ajuste_class in '..\fonte\estoque_ajuste_class.pas',
   efd_icmsst_cr_apuracao_class in '..\fonte\efd_icmsst_cr_apuracao_class.pas',
+  HwNextViewApi in '..\..\Next\Interop\Contracts\HwNextViewApi.pas',
+  HwNextHostUnit in '..\..\Next\Interop\Host\HwNextHostUnit.pas',
   MD5 in '..\..\Fiscal Bpl\fonte\MD5.pas',
   Types_OOP in '..\fonte\Types_OOP.pas',
   hw_enum_utils in '..\fonte\hw_enum_utils.pas',
