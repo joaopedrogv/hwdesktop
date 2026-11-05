@@ -43,9 +43,10 @@ proposing changes. Evaluate their quality under the Legacy References and Local
 Changes section of .ai/rules/repository-safety.md before reusing them. A cross-area
 task uses each area's guidance for its own files.
 
-For Next/ work or a source with a `// Next - ...` header, also read Next/AGENTS.md.
-Next is under construction and reuses Modern business code. Its header does not
-relocate the source or replace the owning area's guidance.
+For Next/ work or a Modern source marked `// Next` (including an explicit
+Next compatibility header), also read Next/AGENTS.md. Next is under construction
+and reuses Modern business code. A header does not relocate the source or replace
+the owning area's guidance.
 
 Read the supplied functional design and relevant product context. Distinguish
 observed behavior, proposals, approved decisions and unverified assumptions.

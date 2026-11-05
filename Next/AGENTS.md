@@ -32,14 +32,39 @@ or copy Modern's instruction system.
   Cross that boundary through an explicit ABI, not Delphi objects, datasets or
   containers. Sharing source does not share objects between the two runtimes.
 
+## Window lifecycle direction
+
+These are approved capabilities to develop through the current delivery plan,
+not a claim that the existing bridge already implements them.
+
+- Open forms through a stable textual identifier and an internal module registry;
+  do not add a public bridge method or DLL export for each form.
+- Keep MDI/modal presentation, single/multiple instances and hide/destroy-on-close
+  policies distinct. Queries default to a reusable single instance with hiding.
+  Modal openings use their own instance, normally destroyed when closed, without
+  converting an existing MDI instance into a modal.
+- Common window management coordinates the Delphi 2006 host wrapper and Rio
+  content. It finds reusable instances before construction; the Next base form
+  supplies common integration so descendants do not repeat lifecycle machinery.
+- The ERP changes users, not companies. User changes invalidate all retained
+  windows, including hidden ones. Collective shutdown releases those instances
+  regardless of their individual close policy; do not reuse an old user's view.
+- Hidden instances still own resources. Do not unload the DLL merely because no
+  windows are visible. Preserve module ownership and safe callback/message lifetimes.
+
 ## Compatibility and continuity
 
-Read ../Modern/.ai/rules/delphi-compatibility.md for the source-header contract
-when creating or adapting Next-marked sources. Preserve the owning area's
-encoding and actual consumer targets; a Next header neither relocates a file
-nor replaces its owner's rules. Do not annotate or convert existing sources
-in bulk. Follow the root execution-authority boundaries; this entry grants
-no additional build, test or database execution.
+Within Next/, Delphi Rio 10.3.3 is the default. Do not add a redundant Next header.
+Use `// Delphi 2006` on the first line for sources that must preserve Delphi 2006
+compatibility. This is a compatibility requirement, not a prohibition on Rio use:
+shared ABI contracts must support both actual consumers and their dependencies.
+
+For sources owned by Modern/, follow ../Modern/.ai/rules/delphi-compatibility.md,
+including its Next marker and explicit dual-target exception. A marker does not
+relocate a source or replace its owner's rules. Preserve encoding and line endings;
+do not annotate or convert existing sources in bulk. Follow the root execution
+authority boundaries; this entry grants no additional build, test or database
+execution.
 
 Use the approved plan for the current delivery. Context and reasons are in
 D:/Hw/ai-docs/hwdesktop/temas/modernizacao-delphi/README.md; consult only the

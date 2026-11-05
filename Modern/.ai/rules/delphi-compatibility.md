@@ -11,28 +11,32 @@ applies_to:
 
 ## Compatibility Target
 
-**Delphi 2006 is the default compatibility target.**
+**Within Modern/, Delphi 2006 is the default compatibility target.**
 
-The following single first-line headers declare the source target:
+The following single first-line headers declare exceptions:
 
 | First line | Compatibility |
 | --- | --- |
-| `// Delphi Rio` | Existing Rio-only declaration; remains valid |
-| `// Next - Delphi Rio` | Next development context, Rio-only |
-| `// Next - Delphi 2006 e Delphi Rio` | Next development context, both Delphi 2006 and Rio |
+| `// Delphi Rio` | Rio-only source |
+| `// Next` | Next development context, Rio-only |
+| `// Next - Delphi 2006 e Delphi Rio` | Next context with explicit compatibility for both compilers |
 
-The explicit dual-target header requires compatibility with both compilers,
-including dependencies. Otherwise, files inside `Tests/` retain their existing
-Rio target. Without a recognized Rio-only header or that test exception, the
-file MUST remain compatible with Delphi 2006.
+The explicit dual-target header requires both compilers, including dependencies.
+Use it when a Next-context source also needs a real Delphi 2006 consumer.
+The earlier `// Next - Delphi Rio` header retains its Rio-only meaning; do not
+rewrite existing headers in bulk. Files inside `Tests/` retain their existing
+Rio target. Without a recognized Rio-only header or that test exception, a Modern
+source MUST remain compatible with Delphi 2006.
 
-A header occupies only the first line. Next identifies development context,
-not a new location or permission to bypass the owning area's rules.
-When compatibility is uncertain, assume Delphi 2006.
+A marker occupies only the first line. Next identifies development context, not
+a new location or permission to bypass the owning area's rules. These Modern
+defaults do not override Next/AGENTS.md: Next/ has a Rio default and marks its
+Delphi 2006 compatibility exceptions. When a Modern source's target is uncertain,
+assume Delphi 2006.
 
 ## Compatibility Boundaries
 
-- Determine compatibility at the source-file level, not from its module, architectural layer, directory, or consuming project.
+- Determine each source's target from its owning area's default, explicit first-line marker and actual consumers; an architectural layer or a Rio consumer does not make a shared source Rio-only.
 - A directory MAY contain both Delphi 2006-compatible and Delphi Rio-only files.
 - Delphi 2006-compatible units MAY be consumed by both Delphi 2006 and Delphi Rio projects.
 - Do not introduce Delphi Rio-only language features, APIs, libraries, components, or dependencies into Delphi 2006-compatible files.
