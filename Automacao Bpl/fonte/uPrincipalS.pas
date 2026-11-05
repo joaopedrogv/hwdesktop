@@ -4002,8 +4002,21 @@ begin
 end;
 
 procedure TfrmPrincipalS.EventosDFe1Click(Sender: TObject);
+var
+  opt: THwNextOpenOptions;
 begin
-  OpenNextView(Self);
+  Randomize();
+  case Random(4) of
+    0: opt := NextQueryOptions();
+    1: opt := NextModalOptions();
+    2: opt := NextMultipleOptions(False);
+    3: opt := NextMultipleOptions(True);
+  end;
+
+  if Random(2) = 1 then
+    OpenNextView(Self, 'next.validation', opt)
+  else
+    OpenNextView(Self, 'next.validation.second', opt);
 end;
 
 procedure TfrmPrincipalS.ExibirMensagemChavePeriodica;
@@ -4579,6 +4592,7 @@ begin
                                        MB_YESNO + MB_ICONQUESTION) = IDYES;
   if CanClose then
   begin
+    ShutdownNextHost;
   	if MDIChildCount > 0 then
       for X := Pred(MDIChildCount) Downto 0 do
       begin
@@ -4655,6 +4669,7 @@ begin
   if Assigned(vProcessamentos) then
     FreeAndNil(vProcessamentos);
 
+  ShutdownNextHost;
   SetupModernShutdown();
 
 //  LiberarDtmsAndUnloadPackage(hdConfig);
@@ -7188,6 +7203,7 @@ begin
     with vDadosIni do if GetIni('MD', 'SLA', 'N') = 'S' then //SALVAR LOGIN AUTOMATICAMENTE
       _GravaConfiguracoesString('LA', 'N');
 
+    InvalidateNextViews;
     FechaJanelasMDI(0);
 
     MenusReset;

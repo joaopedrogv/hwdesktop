@@ -6,7 +6,11 @@ implementation
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes,
-  Vcl.Forms, Vcl.Controls, HwNextViewApi, HwNextValidationFormUnit;
+  Vcl.Forms, Vcl.Controls, HwNextViewApi, HwNextBaseFormUnit,
+  HwNextViewCatalogUnit;
+
+const
+  KnownOptionsMask: Cardinal = HW_NEXT_OPT_KNOWN;
 
 var
   Views: TList;
@@ -32,7 +36,27 @@ begin
   HostApplication := 0;
 end;
 
-function RequireView(AView: HWND): TfrmHwNextValidation;
+procedure ValidateIdentifier(const AIdentifier: string);
+var
+  I: Integer;
+  Code: Integer;
+begin
+  if AIdentifier = '' then
+    raise Exception.Create('O identificador do formulário Next não pode ser vazio.');
+  if Length(AIdentifier) > HW_NEXT_IDENTIFIER_MAX_CHARS then
+    raise Exception.CreateFmt(
+      'O identificador do formulário Next deve ter no máximo %d caracteres.',
+      [HW_NEXT_IDENTIFIER_MAX_CHARS]);
+  for I := 1 to Length(AIdentifier) do
+  begin
+    Code := Ord(AIdentifier[I]);
+    if (Code < 32) or (Code > 126) then
+      raise Exception.Create(
+        'O identificador do formulário Next deve conter apenas caracteres ASCII imprimíveis.');
+  end;
+end;
+
+function RequireView(AView: HWND): TfrmHwNextBase;
 var
   I: Integer;
 begin
@@ -43,7 +67,7 @@ begin
     raise Exception.Create('A tela Next deve ser acessada pela thread visual que a criou.');
   for I := 0 to Views.Count - 1 do
   begin
-    Result := TfrmHwNextValidation(Views[I]);
+    Result := TfrmHwNextBase(Views[I]);
     if Result.Handle = AView then
       Exit;
   end;
@@ -55,10 +79,11 @@ begin
   Result := HW_NEXT_VIEW_API_VERSION;
 end;
 
-function HwNextCreateView(AParent, ACloseTarget, AApplication: HWND;
-  AInstanceNumber: Integer): HWND; stdcall;
+function HwNextOpenView(AIdentifier: PWideChar; AParent, ACloseTarget,
+  AApplication: HWND; AOptions: Cardinal; AInstanceNumber: Integer): HWND; stdcall;
 var
-  View: TfrmHwNextValidation;
+  Identifier: string;
+  View: TfrmHwNextBase;
   ClientRect: TRect;
   InitialBinding: Boolean;
   OriginalError: string;
@@ -68,6 +93,19 @@ begin
   View := nil;
   InitialBinding := False;
   try
+    if AIdentifier = nil then
+      raise Exception.Create('O identificador do formulário Next não foi informado.');
+    Identifier := AIdentifier;
+    ValidateIdentifier(Identifier);
+    if (AOptions and not KnownOptionsMask) <> 0 then
+      raise Exception.Create('As opções de abertura do formulário Next são inválidas.');
+    if (AOptions and HW_NEXT_OPT_MODAL) <> 0 then
+      if ((AOptions and HW_NEXT_OPT_MULTIPLE) = 0) or
+        ((AOptions and HW_NEXT_OPT_DESTROY) = 0) then
+        raise Exception.Create(
+          'A abertura modal exige múltiplas instâncias e destruição no fechamento.');
+    if AInstanceNumber <= 0 then
+      raise Exception.Create('O número da instância Next deve ser positivo.');
     if not IsWindow(AParent) or not IsWindow(ACloseTarget) or
       not IsWindow(AApplication) then
       raise Exception.Create('A janela hospedeira não está disponível.');
@@ -84,17 +122,13 @@ begin
       (HostApplication <> AApplication) then
       raise Exception.Create('O módulo Next usa uma única aplicação e thread visual.');
 
-    View := TfrmHwNextValidation.CreateParented(AParent);
-    View.InitializeView(ACloseTarget, AInstanceNumber);
+    View := NextViewCreate(Identifier, AParent);
+    View.InitializeNextView(Identifier, AInstanceNumber, ACloseTarget,
+      (AOptions and HW_NEXT_OPT_DESTROY) <> 0);
     GetClientRect(AParent, ClientRect);
     View.SetBounds(0, 0, ClientRect.Right, ClientRect.Bottom);
     Views.Add(View);
-    try
-      View.Show;
-    except
-      Views.Remove(View);
-      raise;
-    end;
+    View.Show;
     Result := View.Handle;
   except
     on E: Exception do
@@ -126,7 +160,7 @@ end;
 
 function HwNextResizeView(AView: HWND; AWidth, AHeight: Integer): LongBool; stdcall;
 var
-  View: TfrmHwNextValidation;
+  View: TfrmHwNextBase;
 begin
   Result := False;
   ClearError;
@@ -157,7 +191,7 @@ end;
 
 function HwNextDestroyView(AView: HWND): LongBool; stdcall;
 var
-  View: TfrmHwNextValidation;
+  View: TfrmHwNextBase;
 begin
   Result := False;
   ClearError;
@@ -183,7 +217,7 @@ end;
 function HwNextProcessKey(AView, ATarget: HWND; AMessage: Cardinal;
   AWParam: WPARAM; ALParam: LPARAM): LongBool; stdcall;
 var
-  View: TfrmHwNextValidation;
+  View: TfrmHwNextBase;
   Control: TWinControl;
   Target: HWND;
   Msg: TMsg;
@@ -252,6 +286,24 @@ begin
   end;
 end;
 
+function HwNextCanCloseView(AView: HWND): LongBool; stdcall;
+var
+  View: TfrmHwNextBase;
+begin
+  Result := False;
+  ClearError;
+  try
+    View := RequireView(AView);
+    Result := View.ConfirmClose;
+  except
+    on E: Exception do
+    begin
+      RecordError(E.Message);
+      Result := False;
+    end;
+  end;
+end;
+
 function HwNextViewCount: Integer; stdcall;
 begin
   Result := Views.Count;
@@ -259,14 +311,14 @@ end;
 
 function HwNextShutdown: LongBool; stdcall;
 var
-  View: TfrmHwNextValidation;
+  View: TfrmHwNextBase;
 begin
   Result := False;
   ClearError;
   try
     while Views.Count > 0 do
     begin
-      View := TfrmHwNextValidation(Views[Views.Count - 1]);
+      View := TfrmHwNextBase(Views[Views.Count - 1]);
       Views.Delete(Views.Count - 1);
       try
         View.Free;
@@ -313,10 +365,11 @@ end;
 
 exports
   HwNextApiVersion name 'HwNextApiVersion',
-  HwNextCreateView name 'HwNextCreateView',
+  HwNextOpenView name 'HwNextOpenView',
   HwNextResizeView name 'HwNextResizeView',
   HwNextFocusView name 'HwNextFocusView',
   HwNextDestroyView name 'HwNextDestroyView',
+  HwNextCanCloseView name 'HwNextCanCloseView',
   HwNextProcessKey name 'HwNextProcessKey',
   HwNextViewCount name 'HwNextViewCount',
   HwNextShutdown name 'HwNextShutdown',
@@ -328,7 +381,7 @@ initialization
 finalization
   while Views.Count > 0 do
   begin
-    TfrmHwNextValidation(Views[Views.Count - 1]).Free;
+    TfrmHwNextBase(Views[Views.Count - 1]).Free;
     Views.Delete(Views.Count - 1);
   end;
   Views.Free;

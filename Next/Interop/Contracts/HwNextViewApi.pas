@@ -3,19 +3,36 @@ unit HwNextViewApi;
 
 interface
 
-uses Windows;
+uses
+  {$IFDEF VER180}
+  Windows
+  {$ELSE}
+  Winapi.Windows
+  {$ENDIF};
 
 const
-  HW_NEXT_VIEW_API_VERSION = 1;
-  HW_NEXT_ERROR_CAPACITY  = 1024; // buffer do chamador, incluindo o #0
+  HW_NEXT_VIEW_API_VERSION     = 3;
+  HW_NEXT_ERROR_CAPACITY       = 1024; // buffer do chamador, incluindo #0
+  HW_NEXT_IDENTIFIER_MAX_CHARS = 63;
+
+  // Bits de opcao passados em AOptions. Zero e o padrao das consultas:
+  // MDI, instancia unica, ocultar no fechamento individual.
+  HW_NEXT_OPT_MODAL    = $00000001;
+  HW_NEXT_OPT_MULTIPLE = $00000002;
+  HW_NEXT_OPT_DESTROY  = $00000004;
+  HW_NEXT_OPT_KNOWN    = $00000007;
 
 type
   THwNextApiVersion = function: Integer; stdcall;
-  THwNextCreateView = function(AParent, ACloseTarget, AApplication: HWND;
-    AInstanceNumber: Integer): HWND; stdcall;
+  THwNextOpenView = function(AIdentifier: PWideChar; AParent, ACloseTarget,
+    AApplication: HWND; AOptions: Cardinal; AInstanceNumber: Integer): HWND; stdcall;
   THwNextResizeView = function(AView: HWND; AWidth, AHeight: Integer): LongBool; stdcall;
   THwNextFocusView = function(AView: HWND): LongBool; stdcall;
   THwNextDestroyView = function(AView: HWND): LongBool; stdcall;
+  // Returns True when the view can be closed now. The module/base asks the
+  // user only when the view reports pending changes. False means "do not
+  // close" (cancel, query failure, or unknown view).
+  THwNextCanCloseView = function(AView: HWND): LongBool; stdcall;
   THwNextProcessKey = function(AView, ATarget: HWND; AMessage: Cardinal;
     AWParam: WPARAM; ALParam: LPARAM): LongBool; stdcall;
   THwNextViewCount = function: Integer; stdcall;

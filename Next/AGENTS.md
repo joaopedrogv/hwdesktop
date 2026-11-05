@@ -1,8 +1,8 @@
 # Next — AI working instructions
 
 These instructions supplement ../AGENTS.md for Next work, including sources
-identified with a Next header. Next is under construction; these directions do
-not imply that its forms, services or APIs already exist.
+identified with a Next header. See [Next screens](README.md) for the host API,
+screen registration and build pairing.
 
 ## Scope and delivery
 
@@ -32,13 +32,14 @@ or copy Modern's instruction system.
   Cross that boundary through an explicit ABI, not Delphi objects, datasets or
   containers. Sharing source does not share objects between the two runtimes.
 
-## Window lifecycle direction
+## Window lifecycle
 
-These are approved capabilities to develop through the current delivery plan,
-not a claim that the existing bridge already implements them.
-
-- Open forms through a stable textual identifier and an internal module registry;
-  do not add a public bridge method or DLL export for each form.
+- Open forms through the shared bridge API and a stable textual identifier.
+  Register a creation function in the DLL catalog. It composes dependencies
+  when a new instance is needed.
+- Editable forms report pending edits through HasPendingChanges. The base
+  confirms individual closes and the host applies the instance's close policy.
+  User changes and ERP shutdown use collective closure.
 - Keep MDI/modal presentation, single/multiple instances and hide/destroy-on-close
   policies distinct. Queries default to a reusable single instance with hiding.
   Modal openings use their own instance, normally destroyed when closed, without

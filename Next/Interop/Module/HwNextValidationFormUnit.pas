@@ -3,11 +3,11 @@ unit HwNextValidationFormUnit;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes,
-  Vcl.Controls, Vcl.Forms, Vcl.StdCtrls;
+  System.SysUtils, System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls,
+  HwNextBaseFormUnit;
 
 type
-  TfrmHwNextValidation = class(TForm)
+  TfrmHwNextValidation = class(TfrmHwNextBase)
     lblNome: TLabel;
     edtNome: TEdit;
     lblObservacoes: TLabel;
@@ -20,27 +20,33 @@ type
     procedure chkEstadoClick(Sender: TObject);
     procedure btnFecharClick(Sender: TObject);
   private
-    FCloseTarget: HWND;
-    FInstanceNumber: Integer;
+    FInitialNome: string;
+    FInitialObservacoes: string;
+    FInitialEstado: Boolean;
     procedure UpdateStateLabel;
+  protected
+    procedure DoInitializeView; override;
   public
-    procedure InitializeView(ACloseTarget: HWND; AInstanceNumber: Integer);
-    procedure FocusView;
+    function HasPendingChanges: Boolean; override;
+    procedure FocusView; override;
   end;
 
 implementation
 
 {$R *.dfm}
 
-procedure TfrmHwNextValidation.InitializeView(ACloseTarget: HWND;
-  AInstanceNumber: Integer);
+procedure TfrmHwNextValidation.DoInitializeView;
 begin
-  FCloseTarget := ACloseTarget;
-  FInstanceNumber := AInstanceNumber;
-  Caption := Format('Eventos DFe - Next %d', [FInstanceNumber]);
+  // Called once by InitializeNextView when the host creates a new instance.
+  // Re-presenting a retained-hidden view reuses this instance and does not
+  // re-run this method.
+  Caption := Format('Eventos DFe - Next %d', [InstanceNumber]);
   edtNome.Clear;
   memObservacoes.Clear;
   chkEstado.Checked := False;
+  FInitialNome := edtNome.Text;
+  FInitialObservacoes := memObservacoes.Text;
+  FInitialEstado := chkEstado.Checked;
   UpdateStateLabel;
 end;
 
@@ -49,7 +55,7 @@ const
   StateText: array[Boolean] of string = ('desmarcado', 'marcado');
 begin
   lblInstancia.Caption := Format('Instância %d: %s',
-    [FInstanceNumber, StateText[chkEstado.Checked]]);
+    [InstanceNumber, StateText[chkEstado.Checked]]);
 end;
 
 procedure TfrmHwNextValidation.edtNomeChange(Sender: TObject);
@@ -69,8 +75,8 @@ end;
 
 procedure TfrmHwNextValidation.btnFecharClick(Sender: TObject);
 begin
-  // Closing belongs to the Delphi 2006 MDI host; the Rio view never vetoes.
-  PostMessage(FCloseTarget, WM_CLOSE, 0, 0);
+  // Closing belongs to the Delphi 2006 host; the Rio view never vetoes.
+  RequestClose;
 end;
 
 procedure TfrmHwNextValidation.FocusView;
@@ -79,6 +85,13 @@ begin
     ActiveControl.SetFocus
   else
     edtNome.SetFocus;
+end;
+
+function TfrmHwNextValidation.HasPendingChanges: Boolean;
+begin
+  Result := (edtNome.Text <> FInitialNome) or
+    (memObservacoes.Text <> FInitialObservacoes) or
+    (chkEstado.Checked <> FInitialEstado);
 end;
 
 end.

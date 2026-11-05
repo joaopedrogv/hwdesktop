@@ -4,72 +4,113 @@ unit HwNextHostUnit;
 interface
 
 uses
-  Windows, Forms;
+  Windows, Classes, Forms, HwNextViewApi;
 
-function OpenNextView(AMdiParent: TForm): Boolean;
+type
+  THwNextPresentation = (npMdi, npModal);
+  THwNextInstancePolicy = (nipSingle, nipMultiple);
+  THwNextClosePolicy = (ncpHide, ncpDestroy);
+
+  THwNextOpenOptions = record
+    Presentation: THwNextPresentation;
+    InstancePolicy: THwNextInstancePolicy;
+    ClosePolicy: THwNextClosePolicy;
+  end;
+
+function NextQueryOptions: THwNextOpenOptions;
+function NextMultipleOptions(ADestroyOnClose: Boolean): THwNextOpenOptions;
+function NextModalOptions: THwNextOpenOptions;
+
+function OpenNextView(AOwner: TForm; const AIdentifier: string;
+  const AOptions: THwNextOpenOptions): Boolean;
+
+function CloseAllNextViews: Boolean;
+function InvalidateNextViews: Boolean;
+function ShutdownNextHost: Boolean;
 
 implementation
 
 uses
-  SysUtils, Messages, ExtCtrls, Dialogs, Controls,
-  HwNextViewApi;
+  SysUtils, Messages, ExtCtrls, Dialogs, Controls;
 
 const
   HW_NEXT_DLL_NAME = 'hw.next.dll';
   EXPORT_API_VERSION: AnsiString = 'HwNextApiVersion';
-  EXPORT_CREATE_VIEW: AnsiString = 'HwNextCreateView';
+  EXPORT_OPEN_VIEW: AnsiString = 'HwNextOpenView';
   EXPORT_RESIZE_VIEW: AnsiString = 'HwNextResizeView';
   EXPORT_FOCUS_VIEW: AnsiString = 'HwNextFocusView';
   EXPORT_DESTROY_VIEW: AnsiString = 'HwNextDestroyView';
+  EXPORT_CAN_CLOSE_VIEW: AnsiString = 'HwNextCanCloseView';
   EXPORT_PROCESS_KEY: AnsiString = 'HwNextProcessKey';
   EXPORT_VIEW_COUNT: AnsiString = 'HwNextViewCount';
   EXPORT_SHUTDOWN: AnsiString = 'HwNextShutdown';
   EXPORT_LAST_ERROR: AnsiString = 'HwNextLastError';
 
 type
+  // An individual window close is always user-initiated. The remaining
+  // reasons are reserved for collective operations, which free MDI wrappers
+  // directly instead of going through the form close event.
+  THwNextCloseReason = (ncrUser, ncrCollective, ncrInvalidate, ncrShutdown);
+
   THwNextApi = record
     Version: THwNextApiVersion;
-    CreateView: THwNextCreateView;
+    OpenView: THwNextOpenView;
     ResizeView: THwNextResizeView;
     FocusView: THwNextFocusView;
     DestroyView: THwNextDestroyView;
+    CanCloseView: THwNextCanCloseView;
     ProcessKey: THwNextProcessKey;
     ViewCount: THwNextViewCount;
     Shutdown: THwNextShutdown;
     LastError: THwNextLastError;
   end;
 
+  TfrmHwNextHost = class;
+
   THwNextHostBridge = class(TObject)
   private
     FLibraryHandle: HMODULE;
     FApi: THwNextApi;
     FPreviousOnMessage: TMessageEvent;
-    FOpenViewCount: Integer;
+    FInstances: TList;
     FNextInstanceNumber: Integer;
     FOpening: Boolean;
+    FCollectiveClose: Boolean;
+    FLastCloseReason: THwNextCloseReason;
     FMdiParent: TForm;
     FHookInstalled: Boolean;
+    constructor Create;
+    destructor Destroy; override;
     procedure EnsureLibrary;
     function ResolveExport(const AName: AnsiString): Pointer;
     function LastErrorDetail: string;
     procedure InstallMessageHook;
     procedure RestoreMessageHook;
-    function FindHostWindow(AWindow: HWND): TForm;
+    function FindHostWindow(AWindow: HWND): TfrmHwNextHost;
+    function FindReusableInstance(const AIdentifier: string): TfrmHwNextHost;
+    function GetInstanceCount: Integer;
     procedure ShowFailure(const AContext, ADetail: string);
+    function CloseInstances(AReason: THwNextCloseReason): Boolean;
   public
-    function OpenView(AMdiParent: TForm): Boolean;
+    function OpenView(AOwner: TForm; const AIdentifier: string;
+      const AOptions: THwNextOpenOptions): Boolean;
     procedure ApplicationMessage(var Msg: TMsg; var Handled: Boolean);
     function CreateView(AParent, ACloseTarget, AApplication: HWND;
+      const AIdentifier: string; const AOptions: THwNextOpenOptions;
       AInstanceNumber: Integer): HWND;
     function ResizeView(AView: HWND; AWidth, AHeight: Integer): Boolean;
     function FocusView(AView: HWND): Boolean;
     function DestroyView(AView: HWND): Boolean;
+    function CanCloseView(AView: HWND): Boolean;
     function ProcessKey(AView: HWND; const AMsg: TMsg): Boolean;
     function ViewCount: Integer;
     function Shutdown: Boolean;
-    procedure NotifyViewClosed;
-    procedure ReleaseLibrary;
-    property OpenViewCount: Integer read FOpenViewCount;
+    function CloseAll(AReason: THwNextCloseReason): Boolean;
+    function Invalidate: Boolean;
+    function ShutdownHost: Boolean;
+    procedure NotifyInstanceClosed(AHost: TfrmHwNextHost);
+    function ReleaseLibrary: Boolean;
+    property InstanceCount: Integer read GetInstanceCount;
   end;
 
   TfrmHwNextHost = class(TForm)
@@ -77,19 +118,29 @@ type
     FBridge: THwNextHostBridge;
     FSurface: TPanel;
     FView: HWND;
-    FViewCounted: Boolean;
+    FIdentifier: string;
+    FOptions: THwNextOpenOptions;
+    FIsClosing: Boolean;
+    FRetainedHidden: Boolean;
+    FCollectiveCloseRequested: Boolean;
     procedure SurfaceResize(Sender: TObject);
     procedure HostActivate(Sender: TObject);
     procedure HostCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure HostClose(Sender: TObject; var Action: TCloseAction);
+    function GetIsModal: Boolean;
   public
-    constructor CreateHosted(AMdiParent: TForm; ABridge: THwNextHostBridge;
+    constructor CreateHosted(AOwner: TForm; ABridge: THwNextHostBridge;
+      const AIdentifier: string; const AOptions: THwNextOpenOptions;
       AInstanceNumber: Integer);
     destructor Destroy; override;
+    procedure Represent;
+    procedure MarkCollectiveCloseRequested;
     function OwnsWindow(AWindow: HWND): Boolean;
     function ProcessKey(const AMsg: TMsg): Boolean;
-    property ViewHandle: HWND read FView;
-    property ViewCounted: Boolean read FViewCounted write FViewCounted;
+    property Identifier: string read FIdentifier;
+    property Options: THwNextOpenOptions read FOptions;
+    property IsModal: Boolean read GetIsModal;
+    property IsClosing: Boolean read FIsClosing;
   end;
 
 var
@@ -107,9 +158,118 @@ begin
   OutputDebugString(PChar('HwNextHostUnit: ' + AText));
 end;
 
-function OpenNextView(AMdiParent: TForm): Boolean;
+function CloseReasonName(AReason: THwNextCloseReason): string;
 begin
-  Result := FBridge.OpenView(AMdiParent);
+  case AReason of
+    ncrCollective: Result := 'collective';
+    ncrInvalidate: Result := 'invalidate';
+    ncrShutdown: Result := 'shutdown';
+  else
+    Result := 'user';
+  end;
+end;
+
+function ValidateHostIdentifier(const AIdentifier: string;
+  out AError: string): Boolean;
+var
+  I: Integer;
+  Code: Integer;
+begin
+  AError := '';
+  if AIdentifier = '' then
+  begin
+    AError := 'O identificador da tela Next n'#227'o pode ser vazio.';
+    Result := False;
+    Exit;
+  end;
+  if Length(AIdentifier) > HW_NEXT_IDENTIFIER_MAX_CHARS then
+  begin
+    AError := Format(
+      'O identificador da tela Next deve ter no m'#225'ximo %d caracteres.',
+      [HW_NEXT_IDENTIFIER_MAX_CHARS]);
+    Result := False;
+    Exit;
+  end;
+  for I := 1 to Length(AIdentifier) do
+  begin
+    Code := Ord(AIdentifier[I]);
+    if (Code < 32) or (Code > 126) then
+    begin
+      AError := 'O identificador da tela Next deve conter apenas ' +
+        'caracteres ASCII imprim'#237'veis.';
+      Result := False;
+      Exit;
+    end;
+  end;
+  Result := True;
+end;
+
+function EncodeOptions(const AOptions: THwNextOpenOptions): Cardinal;
+begin
+  Result := 0;
+  if AOptions.Presentation = npModal then
+    Result := Result or HW_NEXT_OPT_MODAL;
+  if AOptions.InstancePolicy = nipMultiple then
+    Result := Result or HW_NEXT_OPT_MULTIPLE;
+  if AOptions.ClosePolicy = ncpDestroy then
+    Result := Result or HW_NEXT_OPT_DESTROY;
+end;
+
+function NextQueryOptions: THwNextOpenOptions;
+begin
+  Result.Presentation := npMdi;
+  Result.InstancePolicy := nipSingle;
+  Result.ClosePolicy := ncpHide;
+end;
+
+function NextMultipleOptions(ADestroyOnClose: Boolean): THwNextOpenOptions;
+begin
+  Result.Presentation := npMdi;
+  Result.InstancePolicy := nipMultiple;
+  if ADestroyOnClose then
+    Result.ClosePolicy := ncpDestroy
+  else
+    Result.ClosePolicy := ncpHide;
+end;
+
+function NextModalOptions: THwNextOpenOptions;
+begin
+  Result.Presentation := npModal;
+  Result.InstancePolicy := nipMultiple;
+  Result.ClosePolicy := ncpDestroy;
+end;
+
+function OpenNextView(AOwner: TForm; const AIdentifier: string;
+  const AOptions: THwNextOpenOptions): Boolean;
+begin
+  Result := FBridge.OpenView(AOwner, AIdentifier, AOptions);
+end;
+
+function CloseAllNextViews: Boolean;
+begin
+  Result := FBridge.CloseAll(ncrCollective);
+end;
+
+function InvalidateNextViews: Boolean;
+begin
+  Result := FBridge.Invalidate;
+end;
+
+function ShutdownNextHost: Boolean;
+begin
+  Result := FBridge.ShutdownHost;
+end;
+
+constructor THwNextHostBridge.Create;
+begin
+  inherited Create;
+  FInstances := TList.Create;
+end;
+
+destructor THwNextHostBridge.Destroy;
+begin
+  FInstances.Free;
+  inherited Destroy;
 end;
 
 function THwNextHostBridge.ResolveExport(const AName: AnsiString): Pointer;
@@ -155,10 +315,11 @@ begin
         'Vers'#227'o incompat'#237'vel da interface de hw.next.dll: ' +
         'esperada %d, encontrada %d.',
         [HW_NEXT_VIEW_API_VERSION, VersionFound]);
-    FApi.CreateView := THwNextCreateView(ResolveExport(EXPORT_CREATE_VIEW));
+    FApi.OpenView := THwNextOpenView(ResolveExport(EXPORT_OPEN_VIEW));
     FApi.ResizeView := THwNextResizeView(ResolveExport(EXPORT_RESIZE_VIEW));
     FApi.FocusView := THwNextFocusView(ResolveExport(EXPORT_FOCUS_VIEW));
     FApi.DestroyView := THwNextDestroyView(ResolveExport(EXPORT_DESTROY_VIEW));
+    FApi.CanCloseView := THwNextCanCloseView(ResolveExport(EXPORT_CAN_CLOSE_VIEW));
     FApi.ProcessKey := THwNextProcessKey(ResolveExport(EXPORT_PROCESS_KEY));
     FApi.ViewCount := THwNextViewCount(ResolveExport(EXPORT_VIEW_COUNT));
     FApi.Shutdown := THwNextShutdown(ResolveExport(EXPORT_SHUTDOWN));
@@ -215,24 +376,52 @@ begin
   FPreviousOnMessage := nil;
 end;
 
-function THwNextHostBridge.FindHostWindow(AWindow: HWND): TForm;
+function THwNextHostBridge.FindHostWindow(
+  AWindow: HWND): TfrmHwNextHost;
+var
+  I: Integer;
+begin
+  Result := nil;
+  if FInstances = nil then
+    Exit;
+  for I := 0 to FInstances.Count - 1 do
+    if TfrmHwNextHost(FInstances[I]).OwnsWindow(AWindow) then
+    begin
+      Result := TfrmHwNextHost(FInstances[I]);
+      Exit;
+    end;
+end;
+
+function THwNextHostBridge.FindReusableInstance(
+  const AIdentifier: string): TfrmHwNextHost;
 var
   I: Integer;
   Host: TfrmHwNextHost;
 begin
   Result := nil;
-  if FMdiParent = nil then
+  if FInstances = nil then
     Exit;
-  for I := 0 to FMdiParent.MDIChildCount - 1 do
-    if FMdiParent.MDIChildren[I] is TfrmHwNextHost then
+  for I := 0 to FInstances.Count - 1 do
+  begin
+    Host := TfrmHwNextHost(FInstances[I]);
+    if (not Host.IsModal) and
+       (Host.Options.Presentation = npMdi) and
+       (Host.Options.InstancePolicy = nipSingle) and
+       SameText(Host.Identifier, AIdentifier) and
+       (not Host.IsClosing) then
     begin
-      Host := TfrmHwNextHost(FMdiParent.MDIChildren[I]);
-      if Host.OwnsWindow(AWindow) then
-      begin
-        Result := Host;
-        Exit;
-      end;
+      Result := Host;
+      Exit;
     end;
+  end;
+end;
+
+function THwNextHostBridge.GetInstanceCount: Integer;
+begin
+  if FInstances = nil then
+    Result := 0
+  else
+    Result := FInstances.Count;
 end;
 
 procedure THwNextHostBridge.ShowFailure(const AContext, ADetail: string);
@@ -244,26 +433,51 @@ begin
       mtError, [mbOK], 0);
 end;
 
-function THwNextHostBridge.OpenView(AMdiParent: TForm): Boolean;
+function THwNextHostBridge.OpenView(AOwner: TForm;
+  const AIdentifier: string;
+  const AOptions: THwNextOpenOptions): Boolean;
 var
   Host: TfrmHwNextHost;
   InstanceNumber: Integer;
+  IdentifierError: string;
 begin
   Result := False;
   if FOpening then
     Exit;
 
-  if (AMdiParent = nil) or not AMdiParent.HandleAllocated then
+  // The complete host string is validated before any reuse lookup, library
+  // load or wrapper construction. This rejects embedded #0, control and
+  // non-ASCII characters, which a null-terminated ABI conversion would
+  // otherwise truncate or alter.
+  if not ValidateHostIdentifier(AIdentifier, IdentifierError) then
+  begin
+    ShowFailure('N'#227'o foi poss'#237'vel abrir a tela Next.', IdentifierError);
+    Exit;
+  end;
+
+  if (AOwner = nil) or not AOwner.HandleAllocated then
   begin
     ShowFailure('N'#227'o foi poss'#237'vel abrir a tela Next.',
       'O formul'#225'rio principal do ERP n'#227'o est'#225' dispon'#237'vel.');
     Exit;
   end;
 
-  if (FMdiParent <> nil) and (FMdiParent <> AMdiParent) then
+  if (FMdiParent <> nil) and (FMdiParent <> AOwner) then
   begin
     ShowFailure('N'#227'o foi poss'#237'vel abrir a tela Next.',
       'A tela Next j'#225' est'#225' vinculada a outra janela principal.');
+    Exit;
+  end;
+
+  if (AOptions.Presentation = npModal) and
+     ((AOptions.InstancePolicy <> nipMultiple) or
+      (AOptions.ClosePolicy <> ncpDestroy)) then
+  begin
+    // A modal wrapper is always a new, own instance destroyed by the caller
+    // after ShowModal. Rejecting other combinations prevents converting an
+    // existing MDI instance into a modal presentation.
+    ShowFailure('N'#227'o foi poss'#237'vel abrir a tela Next.',
+      'A abertura modal exige m'#250'ltiplas inst'#226'ncias e destrui'#231#227'o no fechamento.');
     Exit;
   end;
 
@@ -271,20 +485,62 @@ begin
   try
     try
       EnsureLibrary;
-      FMdiParent := AMdiParent;
-      Inc(FNextInstanceNumber);
-      InstanceNumber := FNextInstanceNumber;
-      Host := TfrmHwNextHost.CreateHosted(AMdiParent, Self, InstanceNumber);
-      try
-        Inc(FOpenViewCount);
-        Host.ViewCounted := True;
-        if FOpenViewCount = 1 then
-          InstallMessageHook;
-        Host.Show;
-        Result := True;
-      except
-        Host.Free;
-        raise;
+      FMdiParent := AOwner;
+
+      if AOptions.Presentation = npModal then
+      begin
+        // A modal opening always builds a new, own instance. It never reuses
+        // an MDI wrapper and never converts an existing MDI instance.
+        Inc(FNextInstanceNumber);
+        InstanceNumber := FNextInstanceNumber;
+        Host := TfrmHwNextHost.CreateHosted(AOwner, Self, AIdentifier,
+          AOptions, InstanceNumber);
+        try
+          FInstances.Add(Host);
+          if FInstances.Count = 1 then
+            InstallMessageHook;
+          try
+            Host.ShowModal;
+            Result := True;
+          finally
+            // ShowModal re-enables the owner and ends when the wrapper hides
+            // itself. The caller frees the wrapper after the modal loop
+            // returns; its destructor destroys the Rio view before removing
+            // the bridge registration.
+            FreeAndNil(Host);
+          end;
+        except
+          Host.Free;
+          raise;
+        end;
+      end
+      else
+      begin
+        if AOptions.InstancePolicy = nipSingle then
+        begin
+          Host := FindReusableInstance(AIdentifier);
+          if Host <> nil then
+          begin
+            Host.Represent;
+            Result := True;
+            Exit;
+          end;
+        end;
+
+        Inc(FNextInstanceNumber);
+        InstanceNumber := FNextInstanceNumber;
+        Host := TfrmHwNextHost.CreateHosted(AOwner, Self, AIdentifier,
+          AOptions, InstanceNumber);
+        try
+          FInstances.Add(Host);
+          if FInstances.Count = 1 then
+            InstallMessageHook;
+          Host.Show;
+          Result := True;
+        except
+          Host.Free;
+          raise;
+        end;
       end;
     except
       on E: Exception do
@@ -315,30 +571,33 @@ begin
   if (Msg.message < WM_KEYFIRST) or (Msg.message > WM_KEYLAST) then
     Exit;
 
-  Host := TfrmHwNextHost(FindHostWindow(Msg.hwnd));
+  Host := FindHostWindow(Msg.hwnd);
   if Host = nil then
     Exit;
 
-  if (FMdiParent <> nil) and FMdiParent.HandleAllocated and
-    TranslateMDISysAccel(FMdiParent.ClientHandle, Msg) then
+  if not Host.IsModal then
   begin
-    Handled := True;
-    Exit;
-  end;
-
-  if ((Msg.message = WM_KEYDOWN) or (Msg.message = WM_SYSKEYDOWN)) and
-    (FMdiParent <> nil) and FMdiParent.HandleAllocated and
-    IsWindowEnabled(FMdiParent.Handle) then
-  begin
-    KeyMessage.Msg := Msg.message;
-    KeyMessage.CharCode := Word(Msg.wParam);
-    KeyMessage.Unused := Word(Msg.wParam shr 16);
-    KeyMessage.KeyData := Msg.lParam;
-    KeyMessage.Result := 0;
-    if FMdiParent.IsShortCut(KeyMessage) then
+    if (FMdiParent <> nil) and FMdiParent.HandleAllocated and
+      TranslateMDISysAccel(FMdiParent.ClientHandle, Msg) then
     begin
       Handled := True;
       Exit;
+    end;
+
+    if ((Msg.message = WM_KEYDOWN) or (Msg.message = WM_SYSKEYDOWN)) and
+      (FMdiParent <> nil) and FMdiParent.HandleAllocated and
+      IsWindowEnabled(FMdiParent.Handle) then
+    begin
+      KeyMessage.Msg := Msg.message;
+      KeyMessage.CharCode := Word(Msg.wParam);
+      KeyMessage.Unused := Word(Msg.wParam shr 16);
+      KeyMessage.KeyData := Msg.lParam;
+      KeyMessage.Result := 0;
+      if FMdiParent.IsShortCut(KeyMessage) then
+      begin
+        Handled := True;
+        Exit;
+      end;
     end;
   end;
 
@@ -356,14 +615,23 @@ begin
 end;
 
 function THwNextHostBridge.CreateView(AParent, ACloseTarget,
-  AApplication: HWND; AInstanceNumber: Integer): HWND;
+  AApplication: HWND; const AIdentifier: string;
+  const AOptions: THwNextOpenOptions; AInstanceNumber: Integer): HWND;
+var
+  Bits: Cardinal;
+  IdentifierText: WideString;
 begin
   Result := 0;
-  if not Assigned(FApi.CreateView) then
+  if not Assigned(FApi.OpenView) then
     raise Exception.Create(
       'A interface de hw.next.dll n'#227'o foi inicializada.');
-  Result := FApi.CreateView(AParent, ACloseTarget, AApplication,
-    AInstanceNumber);
+  Bits := EncodeOptions(AOptions);
+  // OpenView validates the complete host string before reaching this point,
+  // so the null-terminated UTF-16 buffer below carries exactly the same
+  // characters that were used for the reuse lookup.
+  IdentifierText := AIdentifier;
+  Result := FApi.OpenView(PWideChar(IdentifierText), AParent,
+    ACloseTarget, AApplication, Bits, AInstanceNumber);
   if Result = 0 then
     raise Exception.Create(LastErrorDetail);
 end;
@@ -451,30 +719,156 @@ begin
   end;
 end;
 
-procedure THwNextHostBridge.NotifyViewClosed;
+function THwNextHostBridge.CloseInstances(
+  AReason: THwNextCloseReason): Boolean;
+var
+  I: Integer;
+  Host: TfrmHwNextHost;
+  PreviousCollectiveClose: Boolean;
 begin
-  if FOpenViewCount > 0 then
-    Dec(FOpenViewCount);
-  if FOpenViewCount = 0 then
-  begin
-    RestoreMessageHook;
-    // The module clears its Application.Handle and releases residual views.
-    // A failure keeps the library loaded; the result is not presented as
-    // success and no dialog is shown from the destruction path.
-    Shutdown;
+  FLastCloseReason := AReason;
+  // Suppress the per-wrapper automatic shutdown while the collective command
+  // disposes every instance. The command performs the single hook restoration,
+  // module shutdown and library release after the disposal loop.
+  PreviousCollectiveClose := FCollectiveClose;
+  FCollectiveClose := True;
+  try
+    LogDiagnostic('Fechamento ' + CloseReasonName(FLastCloseReason) +
+      ' de ' + IntToStr(FInstances.Count) + ' instancia(s) Next.');
+    for I := FInstances.Count - 1 downto 0 do
+    begin
+      // A nested disposal may already have removed a registration.
+      if I >= FInstances.Count then
+        Continue;
+      Host := TfrmHwNextHost(FInstances[I]);
+      if Host.IsClosing then
+        // The VCL is already releasing this wrapper; its destructor removes
+        // the registration when it finishes.
+        Continue;
+      if Host.IsModal then
+      begin
+        // VCL runs the modal close query after Close returns, when the
+        // bridge-wide flag has already been restored. The per-wrapper marker
+        // keeps the collective intent through the deferred query and the
+        // caller-owned destruction; it is never cleared before that query.
+        Host.MarkCollectiveCloseRequested;
+        // End the modal loop; the ShowModal caller frees the wrapper in its
+        // finally block. The registration remains until that happens.
+        Host.Close;
+      end
+      else
+        // Synchronous free: the destructor destroys the Rio view before
+        // removing the registration. It also releases retained-hidden
+        // wrappers, whose HWND is hidden while VCL Visible is still True.
+        Host.Free;
+    end;
+    Result := FInstances.Count = 0;
+  finally
+    FCollectiveClose := PreviousCollectiveClose;
   end;
 end;
 
-procedure THwNextHostBridge.ReleaseLibrary;
+function THwNextHostBridge.CanCloseView(AView: HWND): Boolean;
 begin
+  Result := True;
+  // Collective user change/exit/invalidate is not an individual decision.
+  // MDI wrappers are freed directly; modal wrappers still pass through
+  // Host.Close/OnCloseQuery, so this flag is required.
+  if FCollectiveClose or (AView = 0) then
+    Exit;
+  if not Assigned(FApi.CanCloseView) then
+  begin
+    // EnsureLibrary requires the export for version 3. This branch is a
+    // defensive fail-closed guard if the API was cleared.
+    LogDiagnostic('Consulta de fechamento indispon'#237'vel na interface Next.');
+    Result := False;
+    Exit;
+  end;
+  try
+    Result := FApi.CanCloseView(AView) <> False;
+  except
+    on E: Exception do
+    begin
+      // Never show a second dialog from the close-query path. Keep the view
+      // open and leave the diagnostic in the host log / module last error.
+      LogDiagnostic('Falha ao consultar o fechamento da view Next: ' + E.Message);
+      Result := False;
+    end;
+  end;
+end;
+
+function THwNextHostBridge.CloseAll(
+  AReason: THwNextCloseReason): Boolean;
+begin
+  Result := CloseInstances(AReason);
+  if Result then
+  begin
+    RestoreMessageHook;
+    // Exactly one module shutdown and unload gate for the whole operation.
+    Result := ReleaseLibrary;
+  end;
+end;
+
+function THwNextHostBridge.Invalidate: Boolean;
+begin
+  Result := CloseAll(ncrInvalidate);
+  if Result then
+  begin
+    // Force the next opening to build a new instance instead of reusing any
+    // identity from the previous user session.
+    FNextInstanceNumber := 0;
+    FMdiParent := nil;
+  end;
+end;
+
+function THwNextHostBridge.ShutdownHost: Boolean;
+begin
+  Result := CloseInstances(ncrShutdown);
+  if not Result then
+    // A modal wrapper is still registered. Leave the hook, the bridge and the
+    // library in place; the caller of ShowModal still owns the wrapper.
+    Exit;
+  RestoreMessageHook;
+  Result := ReleaseLibrary;
+  // Zero instances were reached. Even when cleanup uncertainty keeps the
+  // library loaded, the next opening must not reuse the previous identity.
+  FNextInstanceNumber := 0;
+  FMdiParent := nil;
+end;
+
+procedure THwNextHostBridge.NotifyInstanceClosed(AHost: TfrmHwNextHost);
+begin
+  if FInstances <> nil then
+    FInstances.Remove(AHost);
+  // A collective command performs the final shutdown itself. Do not unload
+  // in the middle of its disposal loop.
+  if FCollectiveClose then
+    Exit;
+  if (FInstances = nil) or (FInstances.Count = 0) then
+  begin
+    RestoreMessageHook;
+    // The module clears its Application.Handle and releases residual views.
+    // A failure keeps the library loaded and is not reported as success.
+    ReleaseLibrary;
+  end;
+end;
+
+function THwNextHostBridge.ReleaseLibrary: Boolean;
+begin
+  Result := False;
   if FLibraryHandle = 0 then
+  begin
+    Result := True;
+    Exit;
+  end;
+
+  // A hidden wrapper still owns module resources. Never call into the module
+  // or unload the library while a registered instance remains, and never
+  // unload while the module still reports a live view.
+  if InstanceCount > 0 then
     Exit;
 
   if not Shutdown then
-    Exit;
-
-  // Never unload while a host wrapper can still call the module.
-  if FOpenViewCount > 0 then
     Exit;
 
   if ViewCount <> 0 then
@@ -483,15 +877,18 @@ begin
   FreeLibrary(FLibraryHandle);
   FLibraryHandle := 0;
   FillChar(FApi, SizeOf(FApi), 0);
+  Result := True;
 end;
 
-constructor TfrmHwNextHost.CreateHosted(AMdiParent: TForm;
-  ABridge: THwNextHostBridge; AInstanceNumber: Integer);
+constructor TfrmHwNextHost.CreateHosted(AOwner: TForm;
+  ABridge: THwNextHostBridge; const AIdentifier: string;
+  const AOptions: THwNextOpenOptions; AInstanceNumber: Integer);
 begin
-  inherited CreateNew(AMdiParent);
+  inherited CreateNew(AOwner);
   FBridge := ABridge;
-  Caption := Format('Eventos DFe - Next %d', [AInstanceNumber]);
-  Position := poDefault;
+  FIdentifier := AIdentifier;
+  FOptions := AOptions;
+  Caption := Format('%s - Next %d', [AIdentifier, AInstanceNumber]);
   Width := 680;
   Height := 470;
   Constraints.MinWidth := 440;
@@ -499,7 +896,21 @@ begin
   OnActivate := HostActivate;
   OnCloseQuery := HostCloseQuery;
   OnClose := HostClose;
-  FormStyle := fsMDIChild;
+
+  if AOptions.Presentation = npModal then
+  begin
+    // A modal presentation is a regular owned window driven by ShowModal,
+    // never an MDI child and never shared with an MDI wrapper of the view.
+    FormStyle := fsNormal;
+    BorderStyle := bsSizeable;
+    BorderIcons := [biSystemMenu];
+    Position := poMainFormCenter;
+  end
+  else
+  begin
+    FormStyle := fsMDIChild;
+    Position := poDefault;
+  end;
 
   FSurface := TPanel.Create(Self);
   FSurface.Parent := Self;
@@ -509,18 +920,24 @@ begin
   FSurface.OnResize := SurfaceResize;
 
   // If view creation fails, the constructor raises and the partially
-  // constructed form is destroyed; Destroy releases any view already created
-  // and the owned surface before the wrapper window disappears.
-  FView := FBridge.CreateView(FSurface.Handle, Handle, AMdiParent.Handle,
-    AInstanceNumber);
+  // constructed form is destroyed. The destructor releases any view already
+  // created and only then removes the wrapper from the bridge registry.
+  FView := FBridge.CreateView(FSurface.Handle, Handle, Application.Handle,
+    FIdentifier, FOptions, AInstanceNumber);
 end;
 
 destructor TfrmHwNextHost.Destroy;
+var
+  Bridge: THwNextHostBridge;
 begin
-  if (FView <> 0) and (FBridge <> nil) then
+  Bridge := FBridge;
+
+  // The module owns the Rio form. Destroy the view before removing the
+  // registration, because reaching zero instances may unload the library.
+  if (FView <> 0) and (Bridge <> nil) then
   begin
     try
-      FBridge.DestroyView(FView);
+      Bridge.DestroyView(FView);
     except
       on E: Exception do
         // Never propagate from the destructor; the module removes the view
@@ -530,11 +947,10 @@ begin
     FView := 0;
   end;
 
-  if FViewCounted and (FBridge <> nil) then
+  if Bridge <> nil then
   begin
-    FViewCounted := False;
     try
-      FBridge.NotifyViewClosed;
+      Bridge.NotifyInstanceClosed(Self);
     except
       on E: Exception do
         // Lifecycle cleanup must not raise from a destructor.
@@ -543,6 +959,38 @@ begin
   end;
 
   inherited Destroy;
+end;
+
+procedure TfrmHwNextHost.Represent;
+begin
+  if IsModal then
+    Exit;
+  if FRetainedHidden then
+  begin
+    // Retained hide keeps fsMDIChild, the wrapper window, the panel and the
+    // Rio view. VCL Visible was not changed, so this state drives the
+    // re-presentation instead of the Visible property.
+    FRetainedHidden := False;
+    ShowWindow(Handle, SW_SHOW);
+  end
+  else if not Visible then
+    Show;
+  if WindowState = wsMinimized then
+    WindowState := wsNormal;
+  BringToFront;
+  if CanFocus then
+    SetFocus;
+  if FView <> 0 then
+    FBridge.FocusView(FView);
+end;
+
+procedure TfrmHwNextHost.MarkCollectiveCloseRequested;
+begin
+  // Collective disposal owns this wrapper until the ShowModal caller frees it.
+  // VCL defers the modal close query until after CloseInstances returns, so
+  // this marker, unlike the bridge-wide flag, covers the whole deferred
+  // lifecycle. It must not be cleared before the close query runs.
+  FCollectiveCloseRequested := True;
 end;
 
 procedure TfrmHwNextHost.SurfaceResize(Sender: TObject);
@@ -560,13 +1008,57 @@ end;
 procedure TfrmHwNextHost.HostCloseQuery(Sender: TObject;
   var CanClose: Boolean);
 begin
-  CanClose := True;
+  // A collective operation already decided this wrapper's fate. The bridge
+  // restores its collective flag before this deferred modal close query runs,
+  // so the per-wrapper marker is the only surviving intent. Check it before
+  // the module so no individual question can veto the collective close.
+  if FCollectiveCloseRequested then
+  begin
+    CanClose := True;
+    Exit;
+  end;
+  // The hosted view decides whether pending edits require a question. The
+  // wrapper never asks by itself and never applies the policy before this
+  // answer is known.
+  CanClose := FBridge.CanCloseView(FView);
 end;
 
 procedure TfrmHwNextHost.HostClose(Sender: TObject;
   var Action: TCloseAction);
 begin
-  Action := caFree;
+  if IsModal then
+  begin
+    // ShowModal owns the modal loop: hiding and returning mrOk ends it, and
+    // the caller frees the wrapper afterwards. caFree here would destroy the
+    // form inside its own modal loop and leave the caller with a dead object.
+    ModalResult := mrOk;
+    Action := caHide;
+    Exit;
+  end;
+
+  if FOptions.ClosePolicy = ncpDestroy then
+  begin
+    FIsClosing := True;
+    Action := caFree;
+  end
+  else
+  begin
+    // A VCL MDI child cannot be hidden through TCustomForm.Hide/SetVisible:
+    // TCustomForm.VisibleChanging raises "Cannot hide an MDI Child Form" for
+    // FormStyle = fsMDIChild. Cancel the structural close and hide the
+    // wrapper window directly. FormStyle, the wrapper instance, the panel,
+    // the Rio view and the window state are all kept, so Represent presents
+    // the same instance again.
+    FIsClosing := False;
+    FRetainedHidden := True;
+    Action := caNone;
+    ShowWindow(Handle, SW_HIDE);
+  end;
+end;
+
+function TfrmHwNextHost.GetIsModal: Boolean;
+begin
+  Result := FOptions.Presentation = npModal;
 end;
 
 function TfrmHwNextHost.OwnsWindow(AWindow: HWND): Boolean;
@@ -586,13 +1078,15 @@ initialization
 finalization
   if FBridge <> nil then
   begin
-    FBridge.RestoreMessageHook;
-    FBridge.ReleaseLibrary;
-    // A live wrapper still references the bridge. If it exists at this point,
-    // leave the bridge and library to process exit instead of risking a
-    // dangling reference.
-    if FBridge.OpenViewCount = 0 then
+    if FBridge.InstanceCount = 0 then
+    begin
+      FBridge.RestoreMessageHook;
+      FBridge.ReleaseLibrary;
       FreeAndNil(FBridge);
+    end;
+    // A live wrapper still references the bridge. If one exists at this
+    // point, leave the bridge, the message hook and the loaded library to
+    // process exit instead of risking a dangling reference.
   end;
 
 end.

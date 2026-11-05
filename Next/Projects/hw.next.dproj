@@ -89,10 +89,13 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
+        <DCCReference Include="..\Interop\Module\HwNextBaseFormUnit.pas"/>
+        <DCCReference Include="..\Interop\Module\HwNextViewRegistryUnit.pas"/>
         <DCCReference Include="..\Interop\Module\HwNextValidationFormUnit.pas">
             <Form>frmHwNextValidation</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\Interop\Module\HwNextViewCatalogUnit.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
