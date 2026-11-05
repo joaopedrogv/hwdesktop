@@ -59,6 +59,7 @@ Utilitario/*
 # !/HWSDK # O projeto ficou com muitas dependencias
 !/lib
 !/Modern
+!/Next
 !/Relatorios
 !/scripts
 !/SPED

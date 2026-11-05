@@ -13,13 +13,21 @@ applies_to:
 
 **Delphi 2006 is the default compatibility target.**
 
-A source file is Delphi Rio 10.3.3 code only when:
+The following single first-line headers declare the source target:
 
-- its first line is `// Delphi Rio`; or
-- it is located inside `Tests/`.
+| First line | Compatibility |
+| --- | --- |
+| `// Delphi Rio` | Existing Rio-only declaration; remains valid |
+| `// Next - Delphi Rio` | Next development context, Rio-only |
+| `// Next - Delphi 2006 e Delphi Rio` | Next development context, both Delphi 2006 and Rio |
 
-If neither condition applies, the file MUST remain compatible with Delphi 2006.
+The explicit dual-target header requires compatibility with both compilers,
+including dependencies. Otherwise, files inside `Tests/` retain their existing
+Rio target. Without a recognized Rio-only header or that test exception, the
+file MUST remain compatible with Delphi 2006.
 
+A header occupies only the first line. Next identifies development context,
+not a new location or permission to bypass the owning area's rules.
 When compatibility is uncertain, assume Delphi 2006.
 
 ## Compatibility Boundaries
@@ -29,6 +37,14 @@ When compatibility is uncertain, assume Delphi 2006.
 - Delphi 2006-compatible units MAY be consumed by both Delphi 2006 and Delphi Rio projects.
 - Do not introduce Delphi Rio-only language features, APIs, libraries, components, or dependencies into Delphi 2006-compatible files.
 - Do not migrate a Delphi 2006-compatible file to Delphi Rio unless explicitly required by the task.
+
+When a demand introduces a real Delphi 2006 consumer for a Rio-only source,
+check syntax, APIs, transitive dependencies, encoding and behavior before widening
+its target. Make the necessary adaptation within the requested scope, preserving
+results and contracts. Record compatibility evidence and unperformed compiler
+checks; a Rio build alone does not prove Delphi 2006 compatibility. Surface
+material behavioral or dependency changes instead of forcing the adaptation.
+Do not change existing headers or migrate sources in bulk.
 
 ## Project Compatibility
 
