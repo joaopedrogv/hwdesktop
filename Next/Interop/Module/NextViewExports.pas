@@ -1,4 +1,4 @@
-unit HwNextViewExportsUnit;
+unit NextViewExports;
 
 interface
 
@@ -6,8 +6,8 @@ implementation
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes,
-  Vcl.Forms, Vcl.Controls, HwNextViewApi, HwNextBaseFormUnit,
-  HwNextViewCatalogUnit;
+  Vcl.Forms, Vcl.Controls, HwNextViewApi, NextBaseForm,
+  NextViewCatalog;
 
 const
   KnownOptionsMask: Cardinal = HW_NEXT_OPT_KNOWN;
@@ -56,7 +56,7 @@ begin
   end;
 end;
 
-function RequireView(AView: HWND): TfrmHwNextBase;
+function RequireView(AView: HWND): TfrmNextBase;
 var
   I: Integer;
 begin
@@ -67,7 +67,7 @@ begin
     raise Exception.Create('A tela Next deve ser acessada pela thread visual que a criou.');
   for I := 0 to Views.Count - 1 do
   begin
-    Result := TfrmHwNextBase(Views[I]);
+    Result := TfrmNextBase(Views[I]);
     if Result.Handle = AView then
       Exit;
   end;
@@ -83,7 +83,7 @@ function HwNextOpenView(AIdentifier: PWideChar; AParent, ACloseTarget,
   AApplication: HWND; AOptions: Cardinal; AInstanceNumber: Integer): HWND; stdcall;
 var
   Identifier: string;
-  View: TfrmHwNextBase;
+  View: TfrmNextBase;
   ClientRect: TRect;
   InitialBinding: Boolean;
   OriginalError: string;
@@ -160,7 +160,7 @@ end;
 
 function HwNextResizeView(AView: HWND; AWidth, AHeight: Integer): LongBool; stdcall;
 var
-  View: TfrmHwNextBase;
+  View: TfrmNextBase;
 begin
   Result := False;
   ClearError;
@@ -191,7 +191,7 @@ end;
 
 function HwNextDestroyView(AView: HWND): LongBool; stdcall;
 var
-  View: TfrmHwNextBase;
+  View: TfrmNextBase;
 begin
   Result := False;
   ClearError;
@@ -217,7 +217,7 @@ end;
 function HwNextProcessKey(AView, ATarget: HWND; AMessage: Cardinal;
   AWParam: WPARAM; ALParam: LPARAM): LongBool; stdcall;
 var
-  View: TfrmHwNextBase;
+  View: TfrmNextBase;
   Control: TWinControl;
   Target: HWND;
   Msg: TMsg;
@@ -288,7 +288,7 @@ end;
 
 function HwNextCanCloseView(AView: HWND): LongBool; stdcall;
 var
-  View: TfrmHwNextBase;
+  View: TfrmNextBase;
 begin
   Result := False;
   ClearError;
@@ -311,14 +311,14 @@ end;
 
 function HwNextShutdown: LongBool; stdcall;
 var
-  View: TfrmHwNextBase;
+  View: TfrmNextBase;
 begin
   Result := False;
   ClearError;
   try
     while Views.Count > 0 do
     begin
-      View := TfrmHwNextBase(Views[Views.Count - 1]);
+      View := TfrmNextBase(Views[Views.Count - 1]);
       Views.Delete(Views.Count - 1);
       try
         View.Free;
@@ -381,7 +381,7 @@ initialization
 finalization
   while Views.Count > 0 do
   begin
-    TfrmHwNextBase(Views[Views.Count - 1]).Free;
+    TfrmNextBase(Views[Views.Count - 1]).Free;
     Views.Delete(Views.Count - 1);
   end;
   Views.Free;

@@ -22,14 +22,14 @@ OpenNextView(Self, 'next.validation', NextQueryOptions());
 
 ## Registrar uma tela
 
-1. Crie um descendente de `TfrmHwNextBase` e adicione sua unit ao projeto
+1. Crie um descendente de `TfrmNextBase` e adicione sua unit ao projeto
    [hw.next.dproj](Projects/hw.next.dproj).
 2. Inclua a unit no `uses` da composição interna da DLL. A função de criação
-   recebe `AParent: HWND` e retorna `TfrmHwNextBase`. Use `CreateParented` na
+   recebe `AParent: HWND` e retorna `TfrmNextBase`. Use `CreateParented` na
    classe concreta e entregue as dependências à tela antes de retorná-la.
    Se o preparo falhar após a construção, libere a tela na função e propague o erro.
 3. Associe a função a um identificador no
-   [catálogo](Interop/Module/HwNextViewCatalogUnit.pas). Use um nome único,
+   [catálogo](Interop/Module/NextViewCatalog.pas). Use um nome único,
    com até 63 caracteres ASCII imprimíveis. A busca ignora maiúsculas e minúsculas.
 
 O registro existente é um exemplo de tela com a construção padrão.

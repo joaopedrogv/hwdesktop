@@ -4,10 +4,10 @@ interface
 
 uses
   System.SysUtils, System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls,
-  HwNextBaseFormUnit;
+  NextBaseForm;
 
 type
-  TfrmHwNextValidation = class(TfrmHwNextBase)
+  TfrmHwNextValidation = class(TfrmNextBase)
     lblNome: TLabel;
     edtNome: TEdit;
     lblObservacoes: TLabel;

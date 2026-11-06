@@ -1,32 +1,32 @@
-unit HwNextViewRegistryUnit;
+unit NextViewRegistry;
 
 interface
 
 uses
   Winapi.Windows, System.SysUtils, System.Generics.Collections, HwNextViewApi,
-  HwNextBaseFormUnit;
+  NextBaseForm;
 
 type
   // The common signature: the function receives the host parent HWND, builds
   // the concrete screen, performs the dependency injection owned by the
   // catalog and returns it as the base type.
-  THwNextViewCreateFunc = function(AParent: HWND): TfrmHwNextBase;
+  TNextViewCreateFunc = function(AParent: HWND): TfrmNextBase;
 
-  THwNextViewEntry = record
+  TNextViewEntry = record
     Identifier: string;
-    CreateFunc: THwNextViewCreateFunc;
+    CreateFunc: TNextViewCreateFunc;
   end;
 
-  THwNextViewRegistry = class
+  TNextViewRegistry = class
   private
-    FEntries: TList<THwNextViewEntry>;
+    FEntries: TList<TNextViewEntry>;
     function IndexOfIdentifier(const AIdentifier: string): Integer;
   public
     constructor Create;
     destructor Destroy; override;
     procedure Register(const AIdentifier: string;
-      ACreateFunc: THwNextViewCreateFunc);
-    function CreateView(const AIdentifier: string; AParent: HWND): TfrmHwNextBase;
+      ACreateFunc: TNextViewCreateFunc);
+    function CreateView(const AIdentifier: string; AParent: HWND): TfrmNextBase;
     function IsRegistered(const AIdentifier: string): Boolean;
   end;
 
@@ -52,24 +52,24 @@ begin
   end;
 end;
 
-constructor THwNextViewRegistry.Create;
+constructor TNextViewRegistry.Create;
 begin
   inherited Create;
-  FEntries := TList<THwNextViewEntry>.Create;
+  FEntries := TList<TNextViewEntry>.Create;
 end;
 
-destructor THwNextViewRegistry.Destroy;
+destructor TNextViewRegistry.Destroy;
 begin
   if FEntries <> nil then
     FEntries.Free;
   inherited;
 end;
 
-function THwNextViewRegistry.IndexOfIdentifier(
+function TNextViewRegistry.IndexOfIdentifier(
   const AIdentifier: string): Integer;
 var
   I: Integer;
-  Entry: THwNextViewEntry;
+  Entry: TNextViewEntry;
 begin
   for I := 0 to FEntries.Count - 1 do
   begin
@@ -83,10 +83,10 @@ begin
   Result := -1;
 end;
 
-procedure THwNextViewRegistry.Register(const AIdentifier: string;
-  ACreateFunc: THwNextViewCreateFunc);
+procedure TNextViewRegistry.Register(const AIdentifier: string;
+  ACreateFunc: TNextViewCreateFunc);
 var
-  Entry: THwNextViewEntry;
+  Entry: TNextViewEntry;
 begin
   ValidateIdentifier(AIdentifier);
   if not Assigned(ACreateFunc) then
@@ -100,12 +100,12 @@ begin
   FEntries.Add(Entry);
 end;
 
-function THwNextViewRegistry.CreateView(const AIdentifier: string;
-  AParent: HWND): TfrmHwNextBase;
+function TNextViewRegistry.CreateView(const AIdentifier: string;
+  AParent: HWND): TfrmNextBase;
 var
   Index: Integer;
-  Entry: THwNextViewEntry;
-  CreateFunc: THwNextViewCreateFunc;
+  Entry: TNextViewEntry;
+  CreateFunc: TNextViewCreateFunc;
 begin
   Index := IndexOfIdentifier(AIdentifier);
   if Index < 0 then
@@ -126,7 +126,7 @@ begin
       [AIdentifier]);
 end;
 
-function THwNextViewRegistry.IsRegistered(const AIdentifier: string): Boolean;
+function TNextViewRegistry.IsRegistered(const AIdentifier: string): Boolean;
 begin
   Result := IndexOfIdentifier(AIdentifier) >= 0;
 end;

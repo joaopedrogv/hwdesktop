@@ -51,7 +51,7 @@
         <GenDll>true</GenDll>
         <DCC_CodePage>1252</DCC_CodePage>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_UnitSearchPath>..\Interop\Contracts;..\Interop\Module;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\Interop\Contracts;..\Interop\Module;..\UI\Forms;..\UI\Frames;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <SanitizedProjectName>hw_next</SanitizedProjectName>
         <DCC_DcpOutput>output</DCC_DcpOutput>
         <DCC_BplOutput>..\..\bpl</DCC_BplOutput>
@@ -89,13 +89,21 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="..\Interop\Module\HwNextBaseFormUnit.pas"/>
-        <DCCReference Include="..\Interop\Module\HwNextViewRegistryUnit.pas"/>
+        <DCCReference Include="..\Interop\Module\NextBaseForm.pas"/>
+        <DCCReference Include="..\Interop\Module\NextViewRegistry.pas"/>
         <DCCReference Include="..\Interop\Module\HwNextValidationFormUnit.pas">
             <Form>frmHwNextValidation</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="..\Interop\Module\HwNextViewCatalogUnit.pas"/>
+        <DCCReference Include="..\UI\Frames\DataGridFrame.pas">
+            <Form>frmHwNextGridFrame</Form>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\UI\Forms\QueryStandardForm.pas">
+            <Form>frmHwNextStandardQuery</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\Interop\Module\NextViewCatalog.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

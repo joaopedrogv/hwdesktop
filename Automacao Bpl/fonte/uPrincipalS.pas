@@ -4002,21 +4002,8 @@ begin
 end;
 
 procedure TfrmPrincipalS.EventosDFe1Click(Sender: TObject);
-var
-  opt: THwNextOpenOptions;
 begin
-  Randomize();
-  case Random(4) of
-    0: opt := NextQueryOptions();
-    1: opt := NextModalOptions();
-    2: opt := NextMultipleOptions(False);
-    3: opt := NextMultipleOptions(True);
-  end;
-
-  if Random(2) = 1 then
-    OpenNextView(Self, 'next.validation', opt)
-  else
-    OpenNextView(Self, 'next.validation.second', opt);
+  OpenNextView(Self, 'next.query.standard', NextQueryOptions());
 end;
 
 procedure TfrmPrincipalS.ExibirMensagemChavePeriodica;

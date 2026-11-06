@@ -1,4 +1,4 @@
-unit HwNextBaseFormUnit;
+unit NextBaseForm;
 
 interface
 
@@ -7,7 +7,7 @@ uses
   Vcl.Forms, Vcl.Controls, Vcl.Dialogs;
 
 type
-  TfrmHwNextBase = class(TForm)
+  TfrmNextBase = class(TForm)
   private
     FViewIdentifier: string;
     FInstanceNumber: Integer;
@@ -29,16 +29,16 @@ type
 
 implementation
 
-procedure TfrmHwNextBase.DoInitializeView;
+procedure TfrmNextBase.DoInitializeView;
 begin
 end;
 
-function TfrmHwNextBase.HasPendingChanges: Boolean;
+function TfrmNextBase.HasPendingChanges: Boolean;
 begin
   Result := False;
 end;
 
-function TfrmHwNextBase.ConfirmClose: Boolean;
+function TfrmNextBase.ConfirmClose: Boolean;
 const
   DiscardMessage =
     'H'#225' altera'#231#245'es pendentes. Fechar esta tela descartar'#225' a ' +
@@ -56,7 +56,7 @@ begin
     Result := MessageDlg(RetainMessage, mtConfirmation, [mbYes, mbNo], 0, mbNo) = mrYes;
 end;
 
-procedure TfrmHwNextBase.InitializeNextView(const AIdentifier: string;
+procedure TfrmNextBase.InitializeNextView(const AIdentifier: string;
   AInstanceNumber: Integer; ACloseTarget: HWND;
   ACloseDiscardsEdits: Boolean);
 begin
@@ -67,14 +67,14 @@ begin
   DoInitializeView;
 end;
 
-procedure TfrmHwNextBase.RequestClose;
+procedure TfrmNextBase.RequestClose;
 begin
   // Closing belongs to the Delphi 2006 host; the Rio view only asks for it.
   if IsWindow(FCloseTarget) then
     PostMessage(FCloseTarget, WM_CLOSE, 0, 0);
 end;
 
-procedure TfrmHwNextBase.FocusView;
+procedure TfrmNextBase.FocusView;
 begin
   if (ActiveControl <> nil) and ActiveControl.CanFocus then
     ActiveControl.SetFocus

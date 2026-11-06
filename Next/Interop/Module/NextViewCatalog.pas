@@ -1,23 +1,24 @@
-unit HwNextViewCatalogUnit;
+unit NextViewCatalog;
 
 interface
 
 uses
-  Winapi.Windows, HwNextBaseFormUnit;
+  Winapi.Windows, NextBaseForm;
 
 // Generic entry point used by the exports unit. The registry and the concrete
 // screens are intentionally not exposed here.
-function NextViewCreate(const AIdentifier: string; AParent: HWND): TfrmHwNextBase;
+function NextViewCreate(const AIdentifier: string; AParent: HWND): TfrmNextBase;
 
 implementation
 
 uses
-  HwNextViewRegistryUnit, HwNextValidationFormUnit, HwNextValidationSecondFormUnit;
+  NextViewRegistry, HwNextValidationFormUnit,
+  HwNextValidationSecondFormUnit, QueryStandardForm;
 
 var
-  FRegistry: THwNextViewRegistry;
+  FRegistry: TNextViewRegistry;
 
-function CreateValidationView(AParent: HWND): TfrmHwNextBase;
+function CreateValidationView(AParent: HWND): TfrmNextBase;
 var
   View: TfrmHwNextValidation;
 begin
@@ -33,7 +34,7 @@ begin
   end;
 end;
 
-function CreateValidationSecondView(AParent: HWND): TfrmHwNextBase;
+function CreateValidationSecondView(AParent: HWND): TfrmNextBase;
 var
   View: TfrmHwNextValidationSecond;
 begin
@@ -49,16 +50,32 @@ begin
   end;
 end;
 
+function CreateStandardQueryView(AParent: HWND): TfrmNextBase;
+var
+  View: TfrmQueryStandard;
+begin
+  View := TfrmQueryStandard.CreateParented(AParent);
+  try
+    // Composition point. The form owns its frame and empty DataSource; this
+    // visual slice injects nothing else.
+    Result := View;
+  except
+    View.Free;
+    raise;
+  end;
+end;
+
 function NextViewCreate(const AIdentifier: string;
-  AParent: HWND): TfrmHwNextBase;
+  AParent: HWND): TfrmNextBase;
 begin
   Result := FRegistry.CreateView(AIdentifier, AParent);
 end;
 
 initialization
-  FRegistry := THwNextViewRegistry.Create;
+  FRegistry := TNextViewRegistry.Create;
   FRegistry.Register('next.validation', CreateValidationView);
   FRegistry.Register('next.validation.second', CreateValidationSecondView);
+  FRegistry.Register('next.query.standard', CreateStandardQueryView);
 
 finalization
   FRegistry.Free;
