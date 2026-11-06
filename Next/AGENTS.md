@@ -14,6 +14,9 @@ or copy Modern's instruction system.
 
 ## Responsibilities
 
+Next follows Hexagonal Architecture (Ports and Adapters) and applies SOLID to
+separate responsibilities and invert dependencies at infrastructure boundaries.
+
 - Keep business domains, Use Cases, validations, Ports and reusable adapters in
   their owning Modern contexts, with one source of maintenance. Read
   ../Modern/AGENTS.md for that scope; Rio-only sources may also live in Modern.
@@ -22,9 +25,11 @@ or copy Modern's instruction system.
   uCadPadraoModal, uDataSet_OOP or legacy-backed Modern bases, or import the
   legacy global singleton as Next's context.
 - The chosen stack is Delphi Rio 10.3.3/Win32, native VCL/TDBGrid and FireDAC.
-  Grid-only reads use an encapsulated native dataset with the complete filtered
-  result; no mandatory business Use Case, Port or intermediate record list.
-  Business operations continue through their Modern contracts.
+- In screen reads, the form requests the search and presents the complete
+  filtered result as a native `TDataSet`. Feature queries use a driver-independent
+  read contract. The adapter executes the read. Composition selects the adapter
+  and owns the connection lifecycle. Keep Setup and driver details behind that
+  boundary. Business operations use their Modern contracts.
 - Use Spring4D only in composition and supply dependencies to consumers. Do not
   resolve dependencies from a global container in forms, presenters or Use Cases.
 - The ERP host supplies session and connection data. Keep resource ownership
