@@ -6,14 +6,10 @@ uses
   ITransactionUnit,
   {$IFNDEF VER180}IBX.IBDatabase{$ELSE}IBDatabase{$ENDIF};
 
-type                                     
+type
   IBXTransactionGetEvent = function(): TIBTransaction of object;
-                                
-  {$IFDEF INTF_ON}
-  IBXTransactionBase = class(TInterfacedObject)
-  {$ELSE}                                      
+
   IBXTransactionBase = class(ITransaction)
-  {$ENDIF}
   protected
     FId: string;
     FOnNeedTransaction: IBXTransactionGetEvent;
@@ -23,17 +19,10 @@ type
     constructor Create(); overload;
     constructor Create(NeedTransactionEvent: IBXTransactionGetEvent); overload;
 
-    {$IFDEF INTF_ON}        
-    procedure Commit();
-    procedure Rollback();
-    function GetId(): string;
-    procedure FreeTransaction();
-    {$ELSE}
     procedure Commit(); override;
     procedure Rollback(); override;
     function GetId(): string; override;
     procedure FreeTransaction(); override;
-    {$ENDIF}
 
     property IBTransaction: TIBTransaction read GetIBTransaction;
     property OnNeedTransaction: IBXTransactionGetEvent read FOnNeedTransaction write FOnNeedTransaction;
@@ -65,9 +54,7 @@ end;
 
 procedure IBXTransactionBase.FreeTransaction;
 begin
-  {$IFNDEF INTF_ON}
   Self.Free()
-  {$ENDIF}
 end;
 
 function IBXTransactionBase.GetIBTransaction: TIBTransaction;
@@ -75,7 +62,7 @@ begin
   if Assigned(FOnNeedTransaction) then
     Result := FOnNeedTransaction()
   else
-    Result := FTransaction;  
+    Result := FTransaction;
 end;
 
 function IBXTransactionBase.GetId: string;

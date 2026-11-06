@@ -14,11 +14,7 @@ uses
   Classes;
 
 type
-  {$IFDEF INTF_ON}
-  IBXDatabaseConnection = class(BaseDatabaseConnection, IDataBaseConnection)
-  {$ELSE}
   IBXDatabaseConnection = class(BaseDatabaseConnection)
-  {$ENDIF}
   private
     FTransactionStack: TStrings;
     FDatabase: TIBDatabase;
@@ -32,24 +28,7 @@ type
     /// </summary>
     constructor Create(const Database: TIBDatabase);
     destructor Destroy; override;
-    
-    {$IFDEF INTF_ON}
-    procedure Connect(const ConnectionString: string);
-    procedure Disconnect();
-    function BeginTransaction(): ITransaction;
-    procedure UseTransaction(const Transaction: ITransaction);
-    procedure ReleaseTransaction(const TransactionId: string);
-    function CreateQuery(const SQL: string): QueryResult; overload;
-    function CreateQuery(const SQL: string; const Params: array of const): QueryResult; overload;
-    function CreateQuery(const SQL: string; const Params: ParametersValues): QueryResult; overload;
-    function ExecuteScalar(const SQL: string): ScalarResult; overload;
-    function ExecuteScalar(const SQL: string; const Params: array of const): ScalarResult; overload;
-    function ExecuteScalar(const SQL: string; const Params: ParametersValues): ScalarResult; overload;
-    procedure ExecuteCommand(const SQL: string); overload;
-    procedure ExecuteCommand(const SQL: string; const Params: array of const); overload;
-    procedure ExecuteCommand(const SQL: string; const Params: ParametersValues); overload;
-    procedure ExecuteBatch(const SQL: string; const ParamsList: array of ParametersValues);
-    {$ELSE}
+
     procedure Connect(const ConnectionString: string); override;
     procedure Disconnect(); override;
     function BeginTransaction(): ITransaction; override;
@@ -66,7 +45,6 @@ type
     procedure ExecuteCommand(const SQL: string; const Params: ParametersValues); overload; override;
     procedure ExecuteBatch(const SQL: string; const ParamsList: array of ParametersValues); override;
     function GetDatabaseName(): string; override;
-    {$ENDIF}
   end;
 
 implementation
@@ -131,13 +109,6 @@ begin
         qParam.Clear();
     end;
   end;
-
-//  if Assigned(FSqlLogger) then
-//  begin
-//    FSqlLogger.WriteToLog('depois');
-//    for I := 0 to Query.Params.Count - 1 do
-//      FSqlLogger.WriteToLog(Format(' Queryparam %s = %s', [Query.Params[I].Name, Query.Params[I].AsString]));
-//  end;
 end;
 
 function IBXDatabaseConnection.BeginTransaction: ITransaction;
@@ -345,7 +316,7 @@ begin
 
       if Assigned(FSqlLogger) then
         FSqlLogger.EndQuerySuccess();
-    
+
     except on E: Exception do
       begin
         LogError(E.Message);
@@ -371,6 +342,14 @@ begin
   ExecuteCommand( Format(SQL, Params) );
 end;
 
+procedure IBXDatabaseConnection.ExecuteCommand(const SQL: string);
+var
+  Query: TIBQuery;
+begin
+  Query := TIBQuery( CreateAndExecuteQuery( SQL, rcExec, PARAMS_VAZIO ) );
+  Query.Free;
+end;
+
 function IBXDatabaseConnection.ExecuteScalar(const SQL: string; const Params: array of const): ScalarResult;
 begin
   Result := ExecuteScalar( Format(SQL, Params) );
@@ -393,12 +372,21 @@ begin
   end;
 end;
 
-procedure IBXDatabaseConnection.ExecuteCommand(const SQL: string);
+function IBXDatabaseConnection.ExecuteScalar(const SQL: string; const Params: ParametersValues): ScalarResult;
 var
   Query: TIBQuery;
 begin
-  Query := TIBQuery( CreateAndExecuteQuery( SQL, rcExec, PARAMS_VAZIO ) );
-  Query.Free;
+  Query := TIBQuery( CreateAndExecuteQuery(SQL, rcOpen, Params) );
+  try
+    if Query.IsEmpty then
+      Result := ScalarResult.Null()
+
+    else
+      Result := GetScalarFromField( Query.Fields[0] );
+
+  finally
+    Query.Free;
+  end;
 end;
 
 function IBXDatabaseConnection.GetCurrentTransaction: TIBTransaction;
@@ -501,22 +489,6 @@ end;
 //    if FDatabase.DefaultTransaction = nil then // Caso o compente nao tenha a transacao definida
 //      FDefaultTransaction := BeginTransaction(); // cria uma transacao na stack e sera liberada apenas quando a class for destruida
 
-function IBXDatabaseConnection.ExecuteScalar(const SQL: string; const Params: ParametersValues): ScalarResult;
-var
-  Query: TIBQuery;
-begin
-  Query := TIBQuery( CreateAndExecuteQuery(SQL, rcOpen, Params) );
-  try
-    if Query.IsEmpty then
-      Result := ScalarResult.Null()
-
-    else
-      Result := GetScalarFromField( Query.Fields[0] );
-
-  finally
-    Query.Free;
-  end;
-end;
 
 initialization
   SetLength(PARAMS_VAZIO, 0);

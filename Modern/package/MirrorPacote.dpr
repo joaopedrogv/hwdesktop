@@ -727,7 +727,9 @@ uses
   LocalIncidenciaEnumUnit in '..\Fiscal.Calculos\Core\Domain\Entities\LocalIncidenciaEnumUnit.pas',
   LocalFornecimentoEnumUnit in '..\Fiscal.Calculos\Core\Domain\Entities\LocalFornecimentoEnumUnit.pas',
   ConsultarLocaisFornecimentoUseCaseUnit in '..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocaisFornecimentoUseCaseUnit.pas',
-  ConsultarLocaisIncidenciaUseCaseUnit in '..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocaisIncidenciaUseCaseUnit.pas';
+  ConsultarLocaisIncidenciaUseCaseUnit in '..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocaisIncidenciaUseCaseUnit.pas',
+  FireDACTransactionUnit in '..\Adapters\Secondary\Database\FireDAC\FireDACTransactionUnit.pas',
+  FireDACDatabaseConnectionUnit in '..\Adapters\Secondary\Database\FireDAC\FireDACDatabaseConnectionUnit.pas';
 
 var
   observer: IProgressObserver;

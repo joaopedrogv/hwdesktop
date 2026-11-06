@@ -14,11 +14,7 @@ uses
   ParameterValueUnit;
 
 type
-  {$IFDEF INTF_ON}
-  ZeosLibDatabaseConnection = class(BaseDatabaseConnection, IDataBaseConnection)
-  {$ELSE}
   ZeosLibDatabaseConnection = class(BaseDatabaseConnection)
-  {$ENDIF}
   private
     FConnection: TZConnection;
     FTransactionStack: TStrings;
@@ -32,28 +28,9 @@ type
     constructor Create(const Connection: TZConnection);
     destructor Destroy; override;
 
-
     // Eu nao posso usar QueryResult para criar SQL, isso mistura com a finalidade da classe
     // Se necessario eu preciso de outra classe ou record builder, e os repositorios usaria para criar o SQL
 
-  {$IFDEF INTF_ON}
-    procedure Connect(const ConnectionString: string);
-    procedure Disconnect();
-
-    function BeginTransaction(): ITransaction;
-    procedure UseTransaction(const Transaction: ITransaction);
-    procedure ReleaseTransaction(const TransactionId: string);
-    function CreateQuery(const SQL: string): QueryResult; overload;
-    function CreateQuery(const SQL: string; const Params: array of const): QueryResult; overload;
-    function CreateQuery(const SQL: string; const Params: ParametersValues): QueryResult; overload;
-    function ExecuteScalar(const SQL: string): ScalarResult; overload;
-    function ExecuteScalar(const SQL: string; const Params: array of const): ScalarResult; overload;
-    function ExecuteScalar(const SQL: string; const Params: ParametersValues): ScalarResult; overload;
-    procedure ExecuteCommand(const SQL: string); overload;
-    procedure ExecuteCommand(const SQL: string; const Params: array of const); overload;
-    procedure ExecuteCommand(const SQL: string; const Params: ParametersValues); overload;
-    procedure ExecuteBatch(const SQL: string; const ParamsList: array of ParametersValues);
-  {$ELSE}
     procedure Connect(const ConnectionString: string); override;
     procedure Disconnect(); override;
 
@@ -71,7 +48,6 @@ type
     procedure ExecuteCommand(const SQL: string; const Params: ParametersValues); overload; override;
     procedure ExecuteBatch(const SQL: string; const ParamsList: array of ParametersValues); override;
     function GetDatabaseName(): string; override;
-  {$ENDIF}
   end;
 
 implementation
@@ -83,7 +59,7 @@ uses
   ZDatasetUtils,
   {$ENDIF}
   ZDataset,
-  ZeosLibTransactionUnit, ISqlLoggerUnit, ZCompatibility;      
+  ZeosLibTransactionUnit, ISqlLoggerUnit, ZCompatibility;
 
 var
   PARAMS_VAZIO: ParametersValues;
@@ -308,13 +284,16 @@ begin
         Query.ExecSQL();
       end;
 
-    except on E: Exception do
-      begin
+
+    except on E: Exception do
+
+      begin
         LogError(E.Message);
         raise;
       end;
     end;
-  finally
+
+  finally
     Query.Free();
   end;
 end;
@@ -334,7 +313,7 @@ end;
 
 function ZeosLibDatabaseConnection.ExecuteScalar(const SQL: string; const Params: array of const): ScalarResult;
 begin
-  Result := ExecuteScalar( Format(SQL, Params) ); 
+  Result := ExecuteScalar( Format(SQL, Params) );
 end;
 
 function ZeosLibDatabaseConnection.ExecuteScalar(const SQL: string): ScalarResult;
@@ -407,7 +386,7 @@ begin
     try
       Parametros.LineBreak := ';';
       Parametros.Text := FConnectionString;
-                             
+
       connStr := Parametros.Values['ConnectionString'];
       server := Parametros.Values['Server'];
       port := Parametros.Values['Port'];
@@ -493,7 +472,7 @@ begin
   finally
     Query.Free;
   end;
-end;   
+end;
 
 initialization
   SetLength(PARAMS_VAZIO, 0);

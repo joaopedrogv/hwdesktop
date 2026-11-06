@@ -11,11 +11,7 @@ uses
 type
   ZeosLibTransactionEvent = function(): TZTransaction of object;
 
-  {$IFDEF INTF_ON}
-  ZeosLibTransaction = class(TInterfacedObject, ITransaction)
-  {$ELSE}
   ZeosLibTransaction = class(ITransaction)
-  {$ENDIF}
   private
     //FDatabase: TZConnection;
     FId: string;
@@ -27,17 +23,10 @@ type
     constructor Create(const Database: TZConnection; const Connection: ZeosLibDatabaseConnection);
     destructor Destroy; override;
 
-  {$IFDEF INTF_ON}
-    procedure Commit();
-    procedure Rollback();
-    function GetId(): string;
-    procedure FreeTransaction();
-  {$ELSE}
     procedure Commit(); override;
     procedure Rollback(); override;
     function GetId(): string; override;
     procedure FreeTransaction(); override;
-  {$ENDIF}
 
     property Transaction: TZTransaction read FTransaction;
     //property BeforeDestroy: ZeosLibTransactionEvent write FBeforeDestroy;
@@ -76,9 +65,7 @@ end;
 
 procedure ZeosLibTransaction.FreeTransaction;
 begin
-  {$IFNDEF INTF_ON}
   Self.Free()
-  {$ENDIF}
 end;
 
 function ZeosLibTransaction.GetId: string;
