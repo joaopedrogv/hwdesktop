@@ -22,16 +22,23 @@ which take precedence for maintaining compliance with Java.
 
 ### Units
 
+- Start new unit and file names with the subject or responsibility to support prefix searches.
+  Put the role at the end when it identifies the artifact. Include the module name only when it clarifies scope or resolves ambiguity.
 - Unit names MUST NOT use the `U` prefix or dotted namespaces.
-- A unit with a clear primary type SHOULD use the type name without `T` or `I`, followed by `Unit` when required by the established module convention or to avoid identifier conflicts.
-  - `TClienteEtd` → `ClienteEtdUnit.pas`
-  - `IClientesRepository` → `ClientesRepositoryUnit.pas`
-- Otherwise, follow the naming convention established by the module.
+- For a unit with a clear primary type, default to its name without the leading `T` or `I`.
+  - `TClienteEtd` → `ClienteEtd.pas`
+  - `TClienteModel` → `ClienteModel.pas`
+  - `IClientesRepository` → `ClientesRepository.pas`
+- Use `Unit` only when required by an established convention in the owning area or to resolve a concrete identifier conflict.
+  When a variable collides with a unit name, prefer a descriptive variable name such as `ConnectionWrapper`.
+- For new forms and frames, use `Form` or `Frame` as the final suffix. Match the base name of the `.pas` and `.dfm` to the unit name.
+  - `ClientesCadastroForm.pas` and `ClientesCadastroForm.dfm` → `TfrmClientesCadastro`
+  - `ClientesFiltroFrame.pas` and `ClientesFiltroFrame.dfm` → `TfrmClientesFiltroFrame`
 - Do not rename existing units solely to enforce these conventions.
 
 ### Types
 
-- Concrete classes and custom records MUST use the `T` prefix.
+- Concrete classes and custom records MUST use the `T` prefix. New form and frame classes use `Tfrm`.
 - Interfaces MUST use the `I` prefix.
 - Database entity types MUST use the `Etd` suffix.
 - Data models and DTO-like types MUST use the `Model` suffix.

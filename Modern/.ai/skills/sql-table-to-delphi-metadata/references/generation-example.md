@@ -31,7 +31,7 @@ end;
 ## Output
 
 ```delphi
-unit NFSeMetadataUnit;
+unit NFSeMetadata;
 
 interface
 

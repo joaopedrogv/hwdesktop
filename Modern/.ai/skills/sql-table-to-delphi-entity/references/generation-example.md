@@ -14,7 +14,7 @@ CREATE TABLE PRODUTOS (
 ## Output
 
 ```delphi
-unit ProdutoEtdUnit;
+unit ProdutoEtd;
 
 interface
 

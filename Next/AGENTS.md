@@ -32,6 +32,22 @@ or copy Modern's instruction system.
   Cross that boundary through an explicit ABI, not Delphi objects, datasets or
   containers. Sharing source does not share objects between the two runtimes.
 
+## Naming
+
+- Start new unit and file names with the subject or responsibility to support
+  prefix searches. Use the module name only when it clarifies scope or resolves
+  ambiguity.
+- Use `T` for classes and custom records and `I` for interfaces. For a unit with
+  a clear primary type, default to its name without the leading `T` or `I`.
+- For new visual units, use `Form` or `Frame` as the final suffix and match the
+  base name of the `.pas` and `.dfm` to the unit name. Use `Tfrm` for the class,
+  as in `QueryStandardForm.pas` with `TfrmQueryStandard` and `DataGridFrame.pas`
+  with `TfrmDataGridFrame`.
+- Use the `Unit` suffix only when the owning area's convention requires it or
+  it resolves a concrete identifier conflict. When a variable collides with a
+  unit name, prefer a descriptive variable name. Apply this guidance to new
+  names and preserve existing names during unrelated changes.
+
 ## Window lifecycle
 
 - Open forms through the shared bridge API and a stable textual identifier.
