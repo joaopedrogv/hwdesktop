@@ -47,6 +47,9 @@ always_apply: true
   including failure and retry behavior. Use a cohesive representation for fields
   that describe one concept when it improves clarity. Review state necessity as
   well as field count, preserving compiler compatibility and existing contracts.
+- Write new or substantively revised source comments in Brazilian Portuguese.
+  Preserve the established spelling of technical identifiers, compiler
+  directives and tool-recognized markers.
 - Write source comments that remain understandable without the current Workflow
   run. Explain a business rule, ownership, compatibility constraint or a
   non-obvious reason. Keep run-local decision IDs, increment IDs, approval
