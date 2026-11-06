@@ -11,7 +11,7 @@ uses
   {$ENDIF};
 
 const
-  HW_NEXT_VIEW_API_VERSION     = 3;
+  HW_NEXT_VIEW_API_VERSION     = 4;
   HW_NEXT_ERROR_CAPACITY       = 1024; // buffer do chamador, incluindo #0
   HW_NEXT_IDENTIFIER_MAX_CHARS = 63;
 
@@ -38,6 +38,10 @@ type
   THwNextViewCount = function: Integer; stdcall;
   THwNextShutdown = function: LongBool; stdcall;
   THwNextLastError = function(ABuffer: PWideChar; ACapacity: Integer): Integer; stdcall;
+  // Contexto ERP de uso unico. Apenas valores: os tres buffers de caracteres
+  // pertencem ao chamador e sao validos somente durante a chamada.
+  THwNextSetContext = function(ACompanyCode: Integer;
+    ADatabaseName, AUserName, APassword: PWideChar): LongBool; stdcall;
 
 implementation
 

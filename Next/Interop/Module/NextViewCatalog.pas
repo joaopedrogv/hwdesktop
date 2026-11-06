@@ -12,8 +12,9 @@ function NextViewCreate(const AIdentifier: string; AParent: HWND): TfrmNextBase;
 implementation
 
 uses
-  NextViewRegistry, HwNextValidationFormUnit,
-  HwNextValidationSecondFormUnit, QueryStandardForm;
+  System.SysUtils, NextViewRegistry, HwNextValidationFormUnit,
+  HwNextValidationSecondFormUnit, QueryStandardForm,
+  NextSetup, EventosRtcQuery, EventosRtcForm;
 
 var
   FRegistry: TNextViewRegistry;
@@ -65,6 +66,38 @@ begin
   end;
 end;
 
+function CreateEventosRtcView(AParent: HWND): TfrmNextBase;
+var
+  View: TfrmEventosRtc;
+  Query: TEventosRtcQuery;
+begin
+  if (not NextSetupInstance.HasContext) or
+    (NextSetupInstance.Connection = nil) then
+    raise Exception.Create('O contexto da empresa nao foi informado.');
+
+  NextSetupInstance.AcquireContext;
+  try
+    Query := TEventosRtcQuery.Create(NextSetupInstance.Connection,
+      NextSetupInstance.CompanyCode);
+    try
+      View := TfrmEventosRtc.CreateParented(AParent);
+      try
+        View.Attach(Query, NextSetupInstance);
+        Query := nil; // a propriedade foi transferida para a tela
+        Result := View;
+      except
+        View.Free;
+        raise;
+      end;
+    finally
+      Query.Free;
+    end;
+  except
+    NextSetupInstance.ReleaseContext;
+    raise;
+  end;
+end;
+
 function NextViewCreate(const AIdentifier: string;
   AParent: HWND): TfrmNextBase;
 begin
@@ -76,6 +109,7 @@ initialization
   FRegistry.Register('next.validation', CreateValidationView);
   FRegistry.Register('next.validation.second', CreateValidationSecondView);
   FRegistry.Register('next.query.standard', CreateStandardQueryView);
+  FRegistry.Register('next.rtc.events', CreateEventosRtcView);
 
 finalization
   FRegistry.Free;

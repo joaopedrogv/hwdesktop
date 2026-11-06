@@ -7,10 +7,13 @@ implementation
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes,
   Vcl.Forms, Vcl.Controls, HwNextViewApi, NextBaseForm,
-  NextViewCatalog;
+  NextViewCatalog, NextSetup;
 
 const
   KnownOptionsMask: Cardinal = HW_NEXT_OPT_KNOWN;
+  ContextRejectedMessage = 'O contexto da empresa nao foi aceito.';
+  ContextInUseMessage = 'A tela Next ja esta em uso com outro contexto de empresa.';
+  ContextBusyMessage = 'A tela Eventos RTC ainda possui consultas ativas; a biblioteca nao pode ser descarregada.';
 
 var
   Views: TList;
@@ -77,6 +80,56 @@ end;
 function HwNextApiVersion: Integer; stdcall;
 begin
   Result := HW_NEXT_VIEW_API_VERSION;
+end;
+
+function HwNextSetContext(ACompanyCode: Integer;
+  ADatabaseName, AUserName, APassword: PWideChar): LongBool; stdcall;
+var
+  DatabaseName: string;
+  UserName: string;
+  Password: string;
+begin
+  Result := False;
+  ClearError;
+  DatabaseName := '';
+  UserName := '';
+  Password := '';
+  try
+    try
+      if ADatabaseName <> nil then
+        DatabaseName := ADatabaseName;
+      if AUserName <> nil then
+        UserName := AUserName;
+      if APassword <> nil then
+        Password := APassword;
+
+      if ACompanyCode <= 0 then
+        raise Exception.Create(ContextRejectedMessage);
+      if DatabaseName = '' then
+        raise Exception.Create(ContextRejectedMessage);
+
+      if NextSetupInstance.ContextInUse then
+      begin
+        if NextSetupInstance.MatchesContext(ACompanyCode, DatabaseName,
+          UserName, Password) then
+          Result := True
+        else
+          RecordError(ContextInUseMessage);
+      end
+      else
+      begin
+        NextSetupInstance.SetContext(ACompanyCode, DatabaseName, UserName,
+          Password);
+        Result := True;
+      end;
+    except
+      RecordError(ContextRejectedMessage);
+    end;
+  finally
+    DatabaseName := '';
+    UserName := '';
+    Password := '';
+  end;
 end;
 
 function HwNextOpenView(AIdentifier: PWideChar; AParent, ACloseTarget,
@@ -336,6 +389,13 @@ begin
         RecordError('A limpeza anterior da tela Next não foi concluída; a biblioteca não pode ser descarregada.');
       Exit;
     end;
+    if NextSetupInstance.ContextInUse then
+    begin
+      CleanupIncomplete := True;
+      RecordError(ContextBusyMessage);
+      Exit;
+    end;
+    NextSetupInstance.Release;
     ClearModuleBinding;
     Result := True;
   except
@@ -365,6 +425,7 @@ end;
 
 exports
   HwNextApiVersion name 'HwNextApiVersion',
+  HwNextSetContext name 'HwNextSetContext',
   HwNextOpenView name 'HwNextOpenView',
   HwNextResizeView name 'HwNextResizeView',
   HwNextFocusView name 'HwNextFocusView',

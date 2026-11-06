@@ -15,11 +15,21 @@ type
     Presentation: THwNextPresentation;
     InstancePolicy: THwNextInstancePolicy;
     ClosePolicy: THwNextClosePolicy;
+    DisplayTitle: string;
+  end;
+
+  THwNextErpContext = record
+    CompanyCode: Integer;
+    DatabaseName: string;
+    UserName: string;
+    Password: string;
   end;
 
 function NextQueryOptions: THwNextOpenOptions;
 function NextMultipleOptions(ADestroyOnClose: Boolean): THwNextOpenOptions;
 function NextModalOptions: THwNextOpenOptions;
+
+function SetNextHostContext(const AContext: THwNextErpContext): Boolean;
 
 function OpenNextView(AOwner: TForm; const AIdentifier: string;
   const AOptions: THwNextOpenOptions): Boolean;
@@ -36,6 +46,7 @@ uses
 const
   HW_NEXT_DLL_NAME = 'hw.next.dll';
   EXPORT_API_VERSION: AnsiString = 'HwNextApiVersion';
+  EXPORT_SET_CONTEXT: AnsiString = 'HwNextSetContext';
   EXPORT_OPEN_VIEW: AnsiString = 'HwNextOpenView';
   EXPORT_RESIZE_VIEW: AnsiString = 'HwNextResizeView';
   EXPORT_FOCUS_VIEW: AnsiString = 'HwNextFocusView';
@@ -63,6 +74,7 @@ type
     ViewCount: THwNextViewCount;
     Shutdown: THwNextShutdown;
     LastError: THwNextLastError;
+    SetContext: THwNextSetContext;
   end;
 
   TfrmHwNextHost = class;
@@ -105,6 +117,7 @@ type
     function ProcessKey(AView: HWND; const AMsg: TMsg): Boolean;
     function ViewCount: Integer;
     function Shutdown: Boolean;
+    function SetContext(const AContext: THwNextErpContext): Boolean;
     function CloseAll(AReason: THwNextCloseReason): Boolean;
     function Invalidate: Boolean;
     function ShutdownHost: Boolean;
@@ -220,6 +233,7 @@ begin
   Result.Presentation := npMdi;
   Result.InstancePolicy := nipSingle;
   Result.ClosePolicy := ncpHide;
+  Result.DisplayTitle := '';
 end;
 
 function NextMultipleOptions(ADestroyOnClose: Boolean): THwNextOpenOptions;
@@ -230,6 +244,7 @@ begin
     Result.ClosePolicy := ncpDestroy
   else
     Result.ClosePolicy := ncpHide;
+  Result.DisplayTitle := '';
 end;
 
 function NextModalOptions: THwNextOpenOptions;
@@ -237,6 +252,7 @@ begin
   Result.Presentation := npModal;
   Result.InstancePolicy := nipMultiple;
   Result.ClosePolicy := ncpDestroy;
+  Result.DisplayTitle := '';
 end;
 
 function OpenNextView(AOwner: TForm; const AIdentifier: string;
@@ -258,6 +274,11 @@ end;
 function ShutdownNextHost: Boolean;
 begin
   Result := FBridge.ShutdownHost;
+end;
+
+function SetNextHostContext(const AContext: THwNextErpContext): Boolean;
+begin
+  Result := FBridge.SetContext(AContext);
 end;
 
 constructor THwNextHostBridge.Create;
@@ -324,6 +345,7 @@ begin
     FApi.ViewCount := THwNextViewCount(ResolveExport(EXPORT_VIEW_COUNT));
     FApi.Shutdown := THwNextShutdown(ResolveExport(EXPORT_SHUTDOWN));
     FApi.LastError := THwNextLastError(ResolveExport(EXPORT_LAST_ERROR));
+    FApi.SetContext := THwNextSetContext(ResolveExport(EXPORT_SET_CONTEXT));
   except
     FreeLibrary(FLibraryHandle);
     FLibraryHandle := 0;
@@ -719,6 +741,69 @@ begin
   end;
 end;
 
+function THwNextHostBridge.SetContext(
+  const AContext: THwNextErpContext): Boolean;
+const
+  ContextFailure = 'Nao foi possivel preparar a tela Eventos RTC.';
+  ContextRejected = 'O contexto da empresa nao foi aceito.';
+var
+  DatabaseName: WideString;
+  UserName: WideString;
+  Password: WideString;
+begin
+  Result := False;
+  DatabaseName := '';
+  UserName := '';
+  Password := '';
+  try
+    // O buffer PWideChar termina em nulo; um #0 interno truncaria o valor
+    // silenciosamente antes que o modulo pudesse valida-lo.
+    if (Pos(#0, AContext.DatabaseName) > 0) or
+       (Pos(#0, AContext.UserName) > 0) or
+       (Pos(#0, AContext.Password) > 0) then
+    begin
+      ShowFailure(ContextFailure, ContextRejected);
+      Exit;
+    end;
+
+    try
+      EnsureLibrary;
+    except
+      on E: Exception do
+      begin
+        // Diagnosticos de carga, versao e exportacao nunca contem valores do contexto.
+        ShowFailure(ContextFailure, E.Message);
+        Exit;
+      end;
+    end;
+
+    if not Assigned(FApi.SetContext) then
+    begin
+      ShowFailure(ContextFailure, ContextRejected);
+      Exit;
+    end;
+
+    DatabaseName := AContext.DatabaseName;
+    UserName := AContext.UserName;
+    Password := AContext.Password;
+
+    // O host nao armazena uma copia do contexto. O modulo possui os valores
+    // recebidos e estes buffers locais sao limpos antes do retorno.
+    if FApi.SetContext(AContext.CompanyCode, PWideChar(DatabaseName),
+      PWideChar(UserName), PWideChar(Password)) = False then
+    begin
+      ShowFailure(ContextFailure, ContextRejected);
+      Exit;
+    end;
+
+    Result := True;
+  finally
+    DatabaseName := '';
+    UserName := '';
+    Password := '';
+  end;
+end;
+
 function THwNextHostBridge.CloseInstances(
   AReason: THwNextCloseReason): Boolean;
 var
@@ -888,7 +973,10 @@ begin
   FBridge := ABridge;
   FIdentifier := AIdentifier;
   FOptions := AOptions;
-  Caption := Format('%s - Next %d', [AIdentifier, AInstanceNumber]);
+  if Trim(AOptions.DisplayTitle) <> '' then
+    Caption := AOptions.DisplayTitle
+  else
+    Caption := Format('%s - Next %d', [AIdentifier, AInstanceNumber]);
   Width := 680;
   Height := 470;
   Constraints.MinWidth := 440;

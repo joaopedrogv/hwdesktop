@@ -54,6 +54,8 @@ uses
   FireDACTransactionUnit,
   FireDAC.Stan.Param,
   FireDAC.Stan.Option,
+  FireDAC.Stan.Def,
+  FireDAC.Stan.Async,
   ISqlLoggerUnit;
 
 var
@@ -486,6 +488,7 @@ begin
 end;
 
 initialization
+  FDManager.SilentMode := True;
   SetLength(PARAMS_VAZIO, 0);
 
 finalization
