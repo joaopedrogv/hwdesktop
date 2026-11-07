@@ -100,6 +100,22 @@ form base belongs in `Interop/Module/`.
   unit name, prefer a descriptive variable name. Apply this guidance to new
   names and preserve existing names during unrelated changes.
 
+## User feedback
+
+- Use `TfrmNextBase` to present information, warnings and errors in Rio forms.
+  Write dialog titles and messages in Brazilian Portuguese. Use
+  `Application.MessageBox` for standard buttons in the Windows UI language.
+  Avoid `MessageDlg` with VCL-supplied button captions.
+- Reusable frames report validation or feedback to their host form, which
+  presents the message.
+- Preserve default buttons, focus and cancellation semantics. A confirmation
+  accepts only an explicit affirmative action. Make the negative answer the
+  default when confirming the discard of pending edits.
+- Keep VCL dialog creation in the UI. Presenters can request feedback through
+  their view or a presentation contract when needed. Business code returns
+  results and validation failures. Keep the Modern `UIUtilsUnit` and its
+  setup and validation dependencies outside Next's dialog implementation.
+
 ## Window lifecycle
 
 - Open forms through the shared bridge API and a stable textual identifier.
