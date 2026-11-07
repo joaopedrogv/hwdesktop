@@ -4056,8 +4056,8 @@ begin
     Context.Password := '';
 
     Options := NextQueryOptions();
-    Options.DisplayTitle := 'Eventos RTC';
-    OpenNextView(Self, 'next.rtc.events', Options);
+    Options.DisplayTitle := 'Eventos RTC ss';
+    OpenNextView(Self, 'next.query.standard', Options);
   finally
     Password := '';
     Context.Password := '';

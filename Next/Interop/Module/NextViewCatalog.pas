@@ -15,7 +15,8 @@ uses
   System.SysUtils, NextViewRegistry, HwNextValidationFormUnit,
   HwNextValidationSecondFormUnit, QueryStandardForm, QueryResultForm,
   EventosRtcForm, NextSetup, NextQueryDefinition, IDatabaseReaderUnit,
-  ReaderContextLease, EventosRtcDefinition;
+  ReaderContextLease, EventosRtcDefinition, LocalPreferences,
+  WindowsRegistryLocalPreferences, StandardQueryFilterDefinition;
 
 var
   FRegistry: TNextViewRegistry;
@@ -55,11 +56,16 @@ end;
 function CreateStandardQueryView(AParent: HWND): TfrmNextBase;
 var
   View: TfrmQueryStandard;
+  Preferences: ILocalPreferences;
 begin
   View := TfrmQueryStandard.CreateParented(AParent);
   try
-    // Composition point. The form owns its frame and empty DataSource; this
-    // visual slice injects nothing else.
+    // A prévia recebe a definição de exemplo e o adaptador de preferências. A
+    // identidade é dedicada a esta entrada e não é compartilhada com telas de
+    // produto. A interface é contada por referência e o frame a mantém viva.
+    Preferences := TWindowsRegistryLocalPreferences.Create;
+    View.ConfigureFilters(CreateStandardQueryFilterDefinition, Preferences,
+      'next.query.standard.filter');
     Result := View;
   except
     View.Free;

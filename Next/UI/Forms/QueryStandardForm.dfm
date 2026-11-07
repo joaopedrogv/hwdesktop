@@ -26,14 +26,26 @@ object frmQueryStandard: TfrmQueryStandard
     BevelOuter = bvNone
     Caption = ''
     TabOrder = 0
+    inline fraFiltros: TfrmFilterFrame
+      Left = 0
+      Top = 2
+      Width = 420
+      Height = 60
+      Visible = True
+      TabOrder = 0
+      ExplicitLeft = 0
+      ExplicitTop = 2
+      ExplicitWidth = 420
+      ExplicitHeight = 60
+    end
     object btnPesquisar: TButton
-      Left = 16
+      Left = 624
       Top = 16
       Width = 120
       Height = 32
       Caption = 'Pesquisar'
       Enabled = False
-      TabOrder = 0
+      TabOrder = 1
     end
   end
   inline fraGrid: TfrmDataGridFrame

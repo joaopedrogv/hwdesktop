@@ -37,6 +37,53 @@ separate responsibilities and invert dependencies at infrastructure boundaries.
   Cross that boundary through an explicit ABI, not Delphi objects, datasets or
   containers. Sharing source does not share objects between the two runtimes.
 
+## Source organization
+
+Use this layout for new assignments and planned relocations. Preserve the
+locations agreed for work already in progress. Create folders when they have
+source files and keep related units together.
+
+```text
+Next/
+  Contracts/
+  Composition/
+  Infrastructure/
+    Database/
+    Authorization/
+    Auditing/
+    Preferences/
+  Queries/
+    Shared/
+      Filters/
+    Features/
+      <Feature>/
+  UI/
+    Forms/
+      Base/
+      Validation/
+      Features/
+        <Feature>/
+    Frames/
+      Shared/
+        Filters/
+        Grid/
+      Features/
+        <Feature>/
+    Components/
+  Interop/
+    Contracts/
+    Host/
+    Module/
+  Projects/
+  Tests/
+```
+
+Group a feature's queries together and use the same feature folder name under
+queries, forms, and frames. Keep shared filter definitions and criteria under
+`Queries/Shared/Filters/`. Use `UI/Frames/Shared/Filters/` for search frames and
+`UI/Frames/Shared/Grid/` for grid and quick-filter frames. The host-integrated
+form base belongs in `Interop/Module/`.
+
 ## Naming
 
 - Start new unit and file names with the subject or responsibility to support

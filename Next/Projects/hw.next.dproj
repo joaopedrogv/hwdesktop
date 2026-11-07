@@ -51,7 +51,7 @@
         <GenDll>true</GenDll>
         <DCC_CodePage>1252</DCC_CodePage>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_UnitSearchPath>..\Interop\Contracts;..\Interop\Module;..\UI\Forms;..\UI\Frames;..\Queries;..\Composition;..\..\Modern\Adapters\Secondary\Database;..\..\Modern\Adapters\Secondary\Database\FireDAC;..\..\Modern\Core\Infrastructure\Interfaces;..\..\Modern\Core\Infrastructure\Data;..\..\Modern\Core\Infrastructure\Services;..\..\Modern\Core\Domain\Types\Shared;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\Interop\Contracts;..\Interop\Module;..\UI\Forms;..\UI\Frames;..\Filters;..\Queries;..\Composition;..\..\Modern\Adapters\Secondary\Database;..\..\Modern\Adapters\Secondary\Database\FireDAC;..\..\Modern\Adapters\Secondary\Preferences;..\..\Modern\Core\Infrastructure\Interfaces;..\..\Modern\Core\Infrastructure\Data;..\..\Modern\Core\Infrastructure\Services;..\..\Modern\Core\Domain\Types\Shared;..\..\Modern\Core\Domain\Ports\Shared;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <SanitizedProjectName>hw_next</SanitizedProjectName>
         <DCC_DcpOutput>output</DCC_DcpOutput>
         <DCC_BplOutput>..\..\bpl</DCC_BplOutput>
@@ -104,6 +104,12 @@
             <Form>frmHwNextGridFrame</Form>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
+        <DCCReference Include="..\Filters\FilterDefinition.pas"/>
+        <DCCReference Include="..\Filters\FilterCriterion.pas"/>
+        <DCCReference Include="..\UI\Frames\FilterFrame.pas">
+            <Form>frmFilterFrame</Form>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <DCCReference Include="..\UI\Forms\QueryStandardForm.pas">
             <Form>frmHwNextStandardQuery</Form>
         </DCCReference>
@@ -117,6 +123,7 @@
         <DCCReference Include="..\Composition\ReaderContextLease.pas"/>
         <DCCReference Include="..\Queries\NextQueryDefinition.pas"/>
         <DCCReference Include="..\Queries\EventosRtcDefinition.pas"/>
+        <DCCReference Include="..\Queries\StandardQueryFilterDefinition.pas"/>
         <DCCReference Include="..\Interop\Module\NextViewCatalog.pas"/>
         <DCCReference Include="..\Interop\Module\NextViewExports.pas"/>
         <BuildConfiguration Include="Release">

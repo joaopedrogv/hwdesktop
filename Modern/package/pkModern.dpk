@@ -566,6 +566,8 @@ contains
   NFSExecutorCoordinatorUnit in '..\ERP.Features\Core\Application\Services\NFSe\NFSExecutorCoordinatorUnit.pas',
   ISessionContextUnit in '..\Core\Domain\Ports\Shared\ISessionContextUnit.pas',
   SessionContextUnit in '..\Core\Application\Contexts\SessionContextUnit.pas',
+  LocalPreferences in '..\Core\Domain\Ports\Shared\LocalPreferences.pas',
+  WindowsRegistryLocalPreferences in '..\Adapters\Secondary\Preferences\WindowsRegistryLocalPreferences.pas',
   ICriarEmitirNFSeAgrupadasUseCaseUnit in '..\ERP.Features\Core\Application\UseCases\NFSe\ICriarEmitirNFSeAgrupadasUseCaseUnit.pas',
   CriarAnexosEmailUseCaseUnit in '..\ERP.Features\Core\Application\UseCases\NFSe\CriarAnexosEmailUseCaseUnit.pas',
   ICriarAnexosEmailUseCaseUnit in '..\ERP.Features\Core\Application\UseCases\NFSe\ICriarAnexosEmailUseCaseUnit.pas',
