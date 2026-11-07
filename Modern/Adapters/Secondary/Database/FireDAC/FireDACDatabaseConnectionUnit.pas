@@ -6,6 +6,7 @@ interface
 uses
   BaseDatabaseConnectionUnit,
   IDataBaseConnectionUnit,
+  IDatabaseReaderUnit,
   ITransactionUnit,
   QueryResultUnit,
   ScalarResultUnit,
@@ -45,6 +46,11 @@ type
     procedure ExecuteCommand(const SQL: string; const Params: ParametersValues); overload; override;
     procedure ExecuteBatch(const SQL: string; const ParamsList: array of ParametersValues); override;
     function GetDatabaseName(): string; override;
+
+    procedure SetConnectionString(const AConnectionString: string);
+    procedure EnsureConnection;
+    function CreateReader(const SQL: string;
+      const Params: ParametersValues): IDatabaseReader; override;
   end;
 
 implementation
@@ -58,8 +64,136 @@ uses
   FireDAC.Stan.Async,
   ISqlLoggerUnit;
 
+const
+  ReaderConnectionNotConfiguredMessage =
+    'A conexao da leitura nao foi configurada.';
+  ReaderConnectionFailedMessage =
+    'Nao foi possivel conectar ao banco de dados da empresa.';
+
+type
+  TReaderEnsureConnection = procedure of object;
+  TReaderBindParameters = procedure(Query: TFDQuery;
+    const Params: ParametersValues) of object;
+
+  TFireDACDatabaseReader = class(TInterfacedObject, IDatabaseReader)
+  private
+    FParams: ParametersValues;
+    FQuery: TFDQuery;
+    FTransaction: TFDTransaction;
+    FEnsureConnection: TReaderEnsureConnection;
+    FBindParameters: TReaderBindParameters;
+  public
+    constructor Create(AConnection: TFDConnection; const ASQL: string;
+      const AParams: ParametersValues;
+      const AEnsureConnection: TReaderEnsureConnection;
+      const ABindParameters: TReaderBindParameters);
+    destructor Destroy; override;
+    procedure Pesquisar;
+    procedure Limpar;
+    function DataSet: TDataSet;
+  end;
+
 var
   PARAMS_VAZIO: ParametersValues;
+
+{ TFireDACDatabaseReader }
+
+constructor TFireDACDatabaseReader.Create(AConnection: TFDConnection;
+  const ASQL: string; const AParams: ParametersValues;
+  const AEnsureConnection: TReaderEnsureConnection;
+  const ABindParameters: TReaderBindParameters);
+var
+  Query: TFDQuery;
+  Transaction: TFDTransaction;
+begin
+  inherited Create;
+
+  if AConnection = nil then
+    raise Exception.Create('A conexao da leitura nao foi informada.');
+  if not Assigned(AEnsureConnection) then
+    raise Exception.Create('A abertura da conexao da leitura nao foi informada.');
+  if not Assigned(ABindParameters) then
+    raise Exception.Create('O vinculo dos parametros da leitura nao foi informado.');
+  if Trim(ASQL) = '' then
+    raise Exception.Create('A consulta nao possui SQL.');
+
+  Query := TFDQuery.Create(nil);
+  try
+    Query.Connection := AConnection;
+    Query.SQL.Text := ASQL;
+    Query.FetchOptions.Mode := fmAll;
+    Query.UpdateOptions.ReadOnly := True;
+
+    // A transacao nasce com a query como owner; uma falha abaixo e limpa pelo
+    // Free da query, sem liberacao dupla.
+    Transaction := TFDTransaction.Create(Query);
+    Transaction.Connection := AConnection;
+    Transaction.Options.ReadOnly := True;
+    Transaction.Options.Params.Add('read_committed');
+    Transaction.Options.Params.Add('rec_version');
+    Transaction.Options.Params.Add('nowait');
+    Query.Transaction := Transaction;
+
+    FParams := AParams;
+    FEnsureConnection := AEnsureConnection;
+    FBindParameters := ABindParameters;
+    FTransaction := Transaction;
+    FQuery := Query;
+    Query := nil;
+  finally
+    Query.Free;
+  end;
+end;
+
+procedure TFireDACDatabaseReader.Pesquisar;
+begin
+  Limpar;
+  try
+    FEnsureConnection();
+    FBindParameters(FQuery, FParams);
+    if not FTransaction.Active then
+      FTransaction.StartTransaction;
+    FQuery.Open;
+  except
+    Limpar;
+    raise;
+  end;
+end;
+
+procedure TFireDACDatabaseReader.Limpar;
+begin
+  try
+    if (FQuery <> nil) and FQuery.Active then
+      FQuery.Close;
+  except
+  end;
+  try
+    if (FTransaction <> nil) and FTransaction.Active then
+      FTransaction.Rollback;
+  except
+  end;
+end;
+
+function TFireDACDatabaseReader.DataSet: TDataSet;
+begin
+  Result := FQuery;
+end;
+
+destructor TFireDACDatabaseReader.Destroy;
+begin
+  try
+    Limpar;
+    FTransaction := nil;
+    try
+      FreeAndNil(FQuery);
+    finally
+      FEnsureConnection := nil;
+      FBindParameters := nil;
+    end;
+  finally
+    inherited;
+  end;
+end;
 
 { FireDACDatabaseConnection }
 
@@ -485,6 +619,47 @@ begin
   finally
     Parametros.Free();
   end;
+end;
+
+procedure FireDACDatabaseConnection.SetConnectionString(
+  const AConnectionString: string);
+begin
+  // Configura sem abrir. A abertura continua sob demanda na primeira pesquisa.
+  FConnectionString := AConnectionString;
+end;
+
+procedure FireDACDatabaseConnection.EnsureConnection;
+begin
+  if FDatabase.Connected then
+    Exit;
+
+  if Trim(FConnectionString) = '' then
+    raise Exception.Create(ReaderConnectionNotConfiguredMessage);
+
+  try
+    Connect(FConnectionString);
+  except
+    try
+      if FDatabase.Connected then
+        FDatabase.Connected := False;
+    except
+    end;
+    // Nao propaga a mensagem original do FireDAC: ela pode conter caminho,
+    // usuario ou outros dados da conexao.
+    raise Exception.Create(ReaderConnectionFailedMessage);
+  end;
+end;
+
+function FireDACDatabaseConnection.CreateReader(const SQL: string;
+  const Params: ParametersValues): IDatabaseReader;
+begin
+  if FDatabase = nil then
+    raise Exception.Create(ReaderConnectionNotConfiguredMessage);
+  if Trim(SQL) = '' then
+    raise Exception.Create('A consulta nao possui SQL.');
+
+  Result := TFireDACDatabaseReader.Create(FDatabase, SQL, Params,
+    EnsureConnection, ApplyParameters);
 end;
 
 initialization

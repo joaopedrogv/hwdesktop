@@ -61,6 +61,7 @@ contains
   ScalarResultUnit in '..\Core\Infrastructure\Data\ScalarResultUnit.pas',
   IDatabaseConnectionFactoryUnit in '..\Core\Infrastructure\Interfaces\IDatabaseConnectionFactoryUnit.pas',
   IDataBaseConnectionUnit in '..\Core\Infrastructure\Interfaces\IDataBaseConnectionUnit.pas',
+  IDatabaseReaderUnit in '..\Core\Infrastructure\Interfaces\IDatabaseReaderUnit.pas',
   IObjectCacheUnit in '..\Core\Infrastructure\Interfaces\IObjectCacheUnit.pas',
   IProgressObserverUnit in '..\Core\Infrastructure\Interfaces\IProgressObserverUnit.pas',
   IRecordCacheUnit in '..\Core\Infrastructure\Interfaces\IRecordCacheUnit.pas',

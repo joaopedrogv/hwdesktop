@@ -3,7 +3,7 @@ unit IDataBaseConnectionUnit;
 interface
 
 uses
-  ITransactionUnit, ISqlLoggerUnit, QueryResultUnit, ScalarResultUnit, ParameterValueUnit, IErrorLoggerUnit;
+  ITransactionUnit, ISqlLoggerUnit, QueryResultUnit, ScalarResultUnit, ParameterValueUnit, IErrorLoggerUnit, IDatabaseReaderUnit;
 
 type
   IDataBaseConnection = class abstract
@@ -40,6 +40,7 @@ type
     function CreateQuery(const SQL: string): QueryResult; overload; virtual; abstract;
     function CreateQuery(const SQL: string; const Params: array of const): QueryResult; overload; virtual; abstract;
     function CreateQuery(const SQL: string; const Params: ParametersValues): QueryResult; overload; virtual; abstract;
+    function CreateReader(const SQL: string; const Params: ParametersValues): IDatabaseReader; virtual;
     function ExecuteScalar(const SQL: string): ScalarResult; overload; virtual; abstract;
     function ExecuteScalar(const SQL: string; const Params: array of const): ScalarResult; overload; virtual; abstract;
     function ExecuteScalar(const SQL: string; const Params: ParametersValues): ScalarResult; overload; virtual; abstract;
@@ -51,5 +52,12 @@ type
   end;
 
 implementation
+
+function IDataBaseConnection.CreateReader(const SQL: string;
+  const Params: ParametersValues): IDatabaseReader;
+begin
+  raise EDatabaseReaderUnavailable.Create(
+    'A leitura sob demanda nao esta disponivel para este adaptador de banco de dados.');
+end;
 
 end.

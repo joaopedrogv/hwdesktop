@@ -11,9 +11,12 @@ uses
   HwNextValidationSecondFormUnit in '..\Interop\Module\HwNextValidationSecondFormUnit.pas' {frmHwNextValidationSecond},
   DataGridFrame in '..\UI\Frames\DataGridFrame.pas' {frmHwNextGridFrame: TFrame},
   QueryStandardForm in '..\UI\Forms\QueryStandardForm.pas' {frmHwNextStandardQuery},
+  QueryResultForm in '..\UI\Forms\QueryResultForm.pas' {frmQueryResult},
   EventosRtcForm in '..\UI\Forms\EventosRtcForm.pas' {frmEventosRtc},
   NextSetup in '..\Composition\NextSetup.pas',
-  EventosRtcQuery in '..\Queries\EventosRtcQuery.pas',
+  ReaderContextLease in '..\Composition\ReaderContextLease.pas',
+  NextQueryDefinition in '..\Queries\NextQueryDefinition.pas',
+  EventosRtcDefinition in '..\Queries\EventosRtcDefinition.pas',
   NextViewCatalog in '..\Interop\Module\NextViewCatalog.pas',
   NextViewExports in '..\Interop\Module\NextViewExports.pas';
 

@@ -197,6 +197,7 @@
     ..\Core\Infrastructure\Data\ScalarResultUnit.pas;
     ..\Core\Infrastructure\Interfaces\IDatabaseConnectionFactoryUnit.pas;
     ..\Core\Infrastructure\Interfaces\IDataBaseConnectionUnit.pas;
+    ..\Core\Infrastructure\Interfaces\IDatabaseReaderUnit.pas;
     ..\Core\Infrastructure\Interfaces\IObjectCacheUnit.pas;
     ..\Core\Infrastructure\Interfaces\IProgressObserverUnit.pas;
     ..\Core\Infrastructure\Interfaces\IRecordCacheUnit.pas;

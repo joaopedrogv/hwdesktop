@@ -107,11 +107,16 @@
         <DCCReference Include="..\UI\Forms\QueryStandardForm.pas">
             <Form>frmHwNextStandardQuery</Form>
         </DCCReference>
+        <DCCReference Include="..\UI\Forms\QueryResultForm.pas">
+            <Form>frmQueryResult</Form>
+        </DCCReference>
         <DCCReference Include="..\UI\Forms\EventosRtcForm.pas">
             <Form>frmEventosRtc</Form>
         </DCCReference>
         <DCCReference Include="..\Composition\NextSetup.pas"/>
-        <DCCReference Include="..\Queries\EventosRtcQuery.pas"/>
+        <DCCReference Include="..\Composition\ReaderContextLease.pas"/>
+        <DCCReference Include="..\Queries\NextQueryDefinition.pas"/>
+        <DCCReference Include="..\Queries\EventosRtcDefinition.pas"/>
         <DCCReference Include="..\Interop\Module\NextViewCatalog.pas"/>
         <DCCReference Include="..\Interop\Module\NextViewExports.pas"/>
         <BuildConfiguration Include="Release">

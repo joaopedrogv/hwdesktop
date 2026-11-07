@@ -13,8 +13,9 @@ implementation
 
 uses
   System.SysUtils, NextViewRegistry, HwNextValidationFormUnit,
-  HwNextValidationSecondFormUnit, QueryStandardForm,
-  NextSetup, EventosRtcQuery, EventosRtcForm;
+  HwNextValidationSecondFormUnit, QueryStandardForm, QueryResultForm,
+  EventosRtcForm, NextSetup, NextQueryDefinition, IDatabaseReaderUnit,
+  ReaderContextLease, EventosRtcDefinition;
 
 var
   FRegistry: TNextViewRegistry;
@@ -69,32 +70,50 @@ end;
 function CreateEventosRtcView(AParent: HWND): TfrmNextBase;
 var
   View: TfrmEventosRtc;
-  Query: TEventosRtcQuery;
+  Reader: IDatabaseReader;
+  Lease: IDatabaseReader;
+  Definition: TNextQueryDefinition;
+  ContextOwnedByComposition: Boolean;
 begin
   if (not NextSetupInstance.HasContext) or
-    (NextSetupInstance.Connection = nil) then
+    (NextSetupInstance.Adapter = nil) then
     raise Exception.Create('O contexto da empresa nao foi informado.');
 
   NextSetupInstance.AcquireContext;
+  ContextOwnedByComposition := True;
+  Reader := nil;
+  Lease := nil;
   try
-    Query := TEventosRtcQuery.Create(NextSetupInstance.Connection,
-      NextSetupInstance.CompanyCode);
+    Definition := CreateEventosRtcDefinition(NextSetupInstance.CompanyCode);
+    Reader := NextSetupInstance.Adapter.CreateReader(
+      Definition.Sql, Definition.Parameters);
+
+    Lease := TReaderContextLease.Create(Reader,
+      procedure
+      begin
+        NextSetupInstance.ReleaseContext;
+      end);
+    // A reserva passa a pertencer ao wrapper. A composicao nao a libera mais
+    // diretamente a partir daqui.
+    ContextOwnedByComposition := False;
+    Reader := nil;
+
+    View := TfrmEventosRtc.CreateParented(AParent);
     try
-      View := TfrmEventosRtc.CreateParented(AParent);
-      try
-        View.Attach(Query, NextSetupInstance);
-        Query := nil; // a propriedade foi transferida para a tela
-        Result := View;
-      except
-        View.Free;
-        raise;
-      end;
-    finally
-      Query.Free;
+      View.Attach(Lease, Definition.Columns, 'Eventos RTC');
+      // A tela possui o wrapper e, com ele, o leitor e a reserva.
+      Lease := nil;
+      Result := View;
+    except
+      View.Free;
+      raise;
     end;
-  except
-    NextSetupInstance.ReleaseContext;
-    raise;
+  finally
+    Reader := nil;
+    if Lease <> nil then
+      Lease := nil; // libera leitor interno/query/transacao e depois o contexto
+    if ContextOwnedByComposition then
+      NextSetupInstance.ReleaseContext;
   end;
 end;
 

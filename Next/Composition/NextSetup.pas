@@ -3,7 +3,8 @@ unit NextSetup;
 interface
 
 uses
-  System.SysUtils, FireDAC.Comp.Client, FireDACDatabaseConnectionUnit;
+  System.SysUtils, FireDAC.Comp.Client, FireDACDatabaseConnectionUnit,
+  IDataBaseConnectionUnit;
 
 type
   // Possui o contexto ERP recebido e a conexao/adaptador FireDAC do Next. Nunca
@@ -20,6 +21,7 @@ type
     FAdapter: FireDACDatabaseConnection;
     FContextSet: Boolean;
     FActiveConsumers: Integer;
+    function GetAdapter: IDataBaseConnection;
     function GetContextInUse: Boolean;
     function BuildConnectionString: string;
     procedure ClearContext;
@@ -33,6 +35,7 @@ type
     procedure ReleaseContext;
     procedure EnsureConnection;
     procedure Release;
+    property Adapter: IDataBaseConnection read GetAdapter;
     property CompanyCode: Integer read FCompanyCode;
     property Connection: TFDConnection read FConnection;
     property HasContext: Boolean read FContextSet;
@@ -55,9 +58,13 @@ const
   InvalidContextMessage = 'O contexto da empresa nao foi aceito.';
   InvalidValueMessage = 'O contexto da empresa contem caracteres nao suportados.';
   ContextInUseMessage = 'A conexao Next esta em uso e nao pode ser substituida.';
-  ConnectionFailedMessage = 'Nao foi possivel conectar ao banco de dados da empresa.';
 
 { TNextSetup }
+
+function TNextSetup.GetAdapter: IDataBaseConnection;
+begin
+  Result := FAdapter;
+end;
 
 function TNextSetup.GetContextInUse: Boolean;
 begin
@@ -123,6 +130,7 @@ begin
   try
     FConnection := TFDConnection.Create(nil);
     FAdapter := FireDACDatabaseConnection.Create(FConnection);
+    FAdapter.SetConnectionString(BuildConnectionString);
   except
     FreeAndNil(FAdapter);
     FreeAndNil(FConnection);
@@ -155,21 +163,10 @@ procedure TNextSetup.EnsureConnection;
 begin
   if (not FContextSet) or (FConnection = nil) or (FAdapter = nil) then
     raise Exception.Create(NoContextMessage);
-  if FConnection.Connected then
-    Exit;
 
-  try
-    FAdapter.Connect(BuildConnectionString);
-  except
-    try
-      if FConnection.Connected then
-        FConnection.Connected := False;
-    except
-    end;
-    // A mensagem original do FireDAC e descartada: pode conter o caminho, o
-    // nome do usuario ou outros dados da conexao.
-    raise Exception.Create(ConnectionFailedMessage);
-  end;
+  // A abertura efetiva e do adaptador, que preserva a conexao preguicosa e
+  // substitui a mensagem original do FireDAC por uma mensagem generica.
+  FAdapter.EnsureConnection;
 end;
 
 procedure TNextSetup.Release;
