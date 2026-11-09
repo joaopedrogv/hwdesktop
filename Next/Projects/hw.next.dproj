@@ -99,25 +99,31 @@
         </DCCReference>
         <DCCReference Include="..\UI\Forms\Validation\HwNextValidationSecondFormUnit.pas">
             <Form>frmHwNextValidationSecond</Form>
+            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\UI\Frames\Shared\Grid\DataGridFrame.pas">
-            <Form>frmHwNextGridFrame</Form>
+            <Form>frmDataGridFrame</Form>
+            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\Queries\Shared\Filters\FilterDefinition.pas"/>
         <DCCReference Include="..\Queries\Shared\Filters\FilterCriterion.pas"/>
         <DCCReference Include="..\UI\Frames\Shared\Filters\FilterFrame.pas">
             <Form>frmFilterFrame</Form>
+            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\UI\Forms\Base\QueryStandardForm.pas">
-            <Form>frmHwNextStandardQuery</Form>
+            <Form>frmQueryStandard</Form>
+            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\UI\Forms\Base\QueryResultForm.pas">
             <Form>frmQueryResult</Form>
+            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\UI\Forms\Features\EventosRtc\EventosRtcForm.pas">
             <Form>frmEventosRtc</Form>
+            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\Composition\NextSetup.pas"/>
         <DCCReference Include="..\Composition\ReaderContextLease.pas"/>
