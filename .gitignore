@@ -95,11 +95,15 @@ scripts/database/**/*.gdb
 scripts/database/**/*.gbk
 
 # Exclusões especificas
+_automation/config/ai-models.local.json
 _automation/config/config-paths.bat
 _automation/config/segredos.md
 _automation/config/workflow.local.psd1
+_automation/config/database.local.psd1
 _automation/config/dependencies.local.psd1
 _automation/temp/
+Next/Projects/hw.next.prjmgc
+scripts/database/schema/.export-*/
 
 ### Permite exclusivo para RAIZ, arquivos e extensoes
 !/*.pas
@@ -112,6 +116,3 @@ _automation/temp/
 
 ### Permite exclusivos especificos.
 !/Hw Gestor/fontes/html.res
-_automation/config/database.local.psd1
-scripts/database/schema/.export-*/
-_automation/config/ai-models.local.json

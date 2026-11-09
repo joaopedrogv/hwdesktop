@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls,
-  NextBaseForm;
+  NextBaseForm, Data.DB, Vcl.Grids, Vcl.DBGrids, System.Types;
 
 type
   TfrmHwNextValidation = class(TfrmNextBase)
@@ -15,6 +15,7 @@ type
     chkEstado: TCheckBox;
     lblInstancia: TLabel;
     btnFechar: TButton;
+    DBGrid1: TDBGrid;
     procedure edtNomeChange(Sender: TObject);
     procedure memObservacoesChange(Sender: TObject);
     procedure chkEstadoClick(Sender: TObject);

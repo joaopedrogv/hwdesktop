@@ -5,7 +5,8 @@ interface
 uses
   System.SysUtils, System.Classes, System.UITypes, Data.DB, Vcl.Controls,
   Vcl.Forms, Vcl.Dialogs, Vcl.DBGrids, NextBaseForm, QueryStandardForm,
-  DataGridFrame, NextQueryDefinition, IDatabaseReaderUnit;
+  DataGridFrame, GridColumnDefinition, IDatabaseReaderUnit, QueryResultOperations, Vcl.StdCtrls, FilterFrame,
+  Vcl.ExtCtrls;
 
 type
   // Apresentacao generica de uma leitura. Recebe o leitor, as colunas e o titulo;
@@ -15,7 +16,8 @@ type
   TfrmQueryResult = class(TfrmQueryStandard)
   private
     FReader: IDatabaseReader;
-    FColumns: TNextQueryColumns;
+    FColumns: TGridColumnDefinitions;
+    FOperations: IQueryResultOperations;
     FTitle: string;
     FPesquisando: Boolean;
     procedure ConfigureColumns;
@@ -26,7 +28,8 @@ type
   public
     destructor Destroy; override;
     procedure Attach(const AReader: IDatabaseReader;
-      const AColumns: TNextQueryColumns; const ATitle: string);
+      const AColumns: TGridColumnDefinitions; const ATitle: string;
+      AOperations: IQueryResultOperations = nil);
   end;
 
 implementation
@@ -45,7 +48,8 @@ const
   FailureMessage = 'Nao foi possivel consultar os dados de %s.';
 
 procedure TfrmQueryResult.Attach(const AReader: IDatabaseReader;
-  const AColumns: TNextQueryColumns; const ATitle: string);
+  const AColumns: TGridColumnDefinitions; const ATitle: string;
+  AOperations: IQueryResultOperations = nil);
 begin
   if AReader = nil then
     raise Exception.Create(MissingReaderMessage);
@@ -59,12 +63,18 @@ begin
   FReader := AReader;
   FColumns := AColumns;
   FTitle := ATitle;
+  FOperations := AOperations;
+  FOperations := AOperations;
+
+  fraGrid.Configure(AOperations);
+
+  //fraGrid.Configure(AFieldMark, AOperations);
 end;
 
 procedure TfrmQueryResult.ConfigureColumns;
 var
   I: Integer;
-  Column: TNextQueryColumn;
+  Column: TGridColumnDefinition;
   GridColumn: TColumn;
 begin
   fraGrid.dbgDados.Columns.Clear;

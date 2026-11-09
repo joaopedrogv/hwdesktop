@@ -34,12 +34,6 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
-        <Cfg_2_Win32>true</Cfg_2_Win32>
-        <CfgParent>Cfg_2</CfgParent>
-        <Cfg_2>true</Cfg_2>
-        <Base>true</Base>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
         <DCC_DcuOutput>output\dcu-rio</DCC_DcuOutput>
         <DCC_ExeOutput>..\..\bpl</DCC_ExeOutput>
@@ -79,6 +73,9 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>(None)</Manifest_File>
+        <Debugger_HostApplication>D:\Hw\githw\hwdesktop\bpl\HwSistemas.exe</Debugger_HostApplication>
+        <Debugger_CWD>D:\Hw\githw\hwdesktop\bpl\</Debugger_CWD>
+        <Debugger_RunParams>pkAutomacao TfrmPrincipalS</Debugger_RunParams>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -132,6 +129,9 @@
         <DCCReference Include="..\Queries\Shared\Filters\StandardQueryFilterDefinition.pas"/>
         <DCCReference Include="..\Interop\Module\NextViewCatalog.pas"/>
         <DCCReference Include="..\Interop\Module\NextViewExports.pas"/>
+        <DCCReference Include="..\Queries\Shared\QueryResultOperations.pas"/>
+        <DCCReference Include="..\Contracts\GridColumnDefinition.pas"/>
+        <DCCReference Include="..\Composition\QueryPreviewReader.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -152,21 +152,11 @@
                 <Source>
                     <Source Name="MainSource">hw.next.dpr</Source>
                 </Source>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
             </Delphi.Personality>
-            <Deployment Version="3">
-                <DeployFile LocalName="..\..\bpl\hw.next.dll" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>hw.next.dll</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployClass Required="true" Name="ProjectOutput">
-                    <Platform Name="Win32">
-                        <Operation>0</Operation>
-                    </Platform>
-                </DeployClass>
-                <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
-            </Deployment>
             <Platforms>
                 <Platform value="Linux64">False</Platform>
                 <Platform value="Win32">True</Platform>

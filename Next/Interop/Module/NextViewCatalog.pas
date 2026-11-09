@@ -16,7 +16,8 @@ uses
   HwNextValidationSecondFormUnit, QueryStandardForm, QueryResultForm,
   EventosRtcForm, NextSetup, NextQueryDefinition, IDatabaseReaderUnit,
   ReaderContextLease, EventosRtcDefinition, LocalPreferences,
-  WindowsRegistryLocalPreferences, StandardQueryFilterDefinition;
+  WindowsRegistryLocalPreferences, StandardQueryFilterDefinition,
+  QueryPreviewReader, QueryResultOperations, GridColumnDefinition;
 
 var
   FRegistry: TNextViewRegistry;
@@ -40,12 +41,29 @@ end;
 function CreateValidationSecondView(AParent: HWND): TfrmNextBase;
 var
   View: TfrmHwNextValidationSecond;
+  Leitor: IDatabaseReader;
+  Operacoes: IQueryResultOperations;
+  Preferences: ILocalPreferences;
 begin
   View := TfrmHwNextValidationSecond.CreateParented(AParent);
   try
-    // Composition point. next.validation currently has no injected dependency;
-    // when it gains one, compose it here and pass it to View before returning
-    // the base type.
+    var CampoMarcacao := 'SEL';
+    Leitor := TQueryPreviewReader.Create(CampoMarcacao);
+    Operacoes := TQueryResultOperations.Create(Leitor, CampoMarcacao);
+    Preferences := TWindowsRegistryLocalPreferences.Create;
+
+    var columns := GridColumns([
+      GridColumn(CampoMarcacao, 'Marcação', 48),
+      GridColumn('documento', 'Documento', 140),
+      GridColumn('descricao', 'Descricao', 220),
+      GridColumn('codigo', 'Codigo', 80, qcaRight),
+      GridColumn('valor', 'Valor', 110, qcaRight),
+      GridColumn('data', 'Data', 100, qcaCenter)]);
+
+    View.Attach(Leitor, columns, 'Secondsss', Operacoes);
+
+    View.ConfigureFilters(CreateStandardQueryFilterDefinition, Preferences,'next.validation.second');
+
     Result := View;
   except
     View.Free;
@@ -106,7 +124,7 @@ begin
 
     View := TfrmEventosRtc.CreateParented(AParent);
     try
-      View.Attach(Lease, Definition.Columns, 'Eventos RTC');
+//      View.Attach(Lease, Definition.Columns, 'Eventos RTC');
       // A tela possui o wrapper e, com ele, o leitor e a reserva.
       Lease := nil;
       Result := View;

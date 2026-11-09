@@ -22,7 +22,10 @@ uses
   EventosRtcDefinition in '..\Queries\Features\EventosRtc\EventosRtcDefinition.pas',
   StandardQueryFilterDefinition in '..\Queries\Shared\Filters\StandardQueryFilterDefinition.pas',
   NextViewCatalog in '..\Interop\Module\NextViewCatalog.pas',
-  NextViewExports in '..\Interop\Module\NextViewExports.pas';
+  NextViewExports in '..\Interop\Module\NextViewExports.pas',
+  QueryResultOperations in '..\Queries\Shared\QueryResultOperations.pas',
+  GridColumnDefinition in '..\Contracts\GridColumnDefinition.pas',
+  QueryPreviewReader in '..\Composition\QueryPreviewReader.pas';
 
 {$R *.res}
 

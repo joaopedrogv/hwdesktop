@@ -15,14 +15,33 @@ object frmHwNextValidation: TfrmHwNextValidation
   OldCreateOrder = False
   Position = poDesigned
   Scaled = False
+  DesignSize = (
+    640
+    420)
   PixelsPerInch = 96
   TextHeight = 16
   object lblNome: TLabel
     Left = 20
     Top = 24
-    Width = 42
+    Width = 38
     Height = 16
     Caption = 'Nome:'
+  end
+  object lblObservacoes: TLabel
+    Left = 20
+    Top = 84
+    Width = 78
+    Height = 16
+    Caption = 'Observa'#231#245'es:'
+  end
+  object lblInstancia: TLabel
+    Left = 20
+    Top = 350
+    Width = 600
+    Height = 16
+    Anchors = [akLeft, akRight, akBottom]
+    AutoSize = False
+    Caption = 'Inst'#226'ncia'
   end
   object edtNome: TEdit
     Left = 20
@@ -32,13 +51,6 @@ object frmHwNextValidation: TfrmHwNextValidation
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 0
     OnChange = edtNomeChange
-  end
-  object lblObservacoes: TLabel
-    Left = 20
-    Top = 84
-    Width = 78
-    Height = 16
-    Caption = 'Observa'#231#245'es:'
   end
   object memObservacoes: TMemo
     Left = 20
@@ -60,15 +72,6 @@ object frmHwNextValidation: TfrmHwNextValidation
     TabOrder = 2
     OnClick = chkEstadoClick
   end
-  object lblInstancia: TLabel
-    Left = 20
-    Top = 350
-    Width = 600
-    Height = 16
-    Anchors = [akLeft, akRight, akBottom]
-    AutoSize = False
-    Caption = 'Inst'#226'ncia'
-  end
   object btnFechar: TButton
     Left = 20
     Top = 374
@@ -78,5 +81,17 @@ object frmHwNextValidation: TfrmHwNextValidation
     Caption = 'Fechar'
     TabOrder = 3
     OnClick = btnFecharClick
+  end
+  object DBGrid1: TDBGrid
+    Left = 160
+    Top = 152
+    Width = 320
+    Height = 120
+    TabOrder = 4
+    TitleFont.Charset = DEFAULT_CHARSET
+    TitleFont.Color = clWindowText
+    TitleFont.Height = -13
+    TitleFont.Name = 'Tahoma'
+    TitleFont.Style = []
   end
 end
