@@ -22,6 +22,9 @@ type
   protected
     function CollectFilters: TFilterCriteriaResult;
     procedure DoInitializeView; override;
+    // Indica se CollectFilters esta disponivel. Telas que executam a pesquisa
+    // com dados usam esta informacao para decidir se devem coletar criterios.
+    property FiltersConfigured: Boolean read FFiltersConfigured;
   public
     // Recebe a definição, as preferências locais e a identidade estável da tela.
     // Configura a instância inline de fraFiltros somente quando chamado; a tela

@@ -13,11 +13,11 @@ implementation
 
 uses
   System.SysUtils, NextViewRegistry, HwNextValidationFormUnit,
-  HwNextValidationSecondFormUnit, QueryStandardForm, QueryResultForm,
-  EventosRtcForm, NextSetup, NextQueryDefinition, IDatabaseReaderUnit,
-  ReaderContextLease, EventosRtcDefinition, LocalPreferences,
+  HwNextValidationSecondFormUnit, QueryStandardForm, EventosRtcForm,
+  EventosRtcDefinition, IDatabaseReaderUnit, LocalPreferences,
   WindowsRegistryLocalPreferences, StandardQueryFilterDefinition,
-  QueryPreviewReader, QueryResultOperations, GridColumnDefinition;
+  QueryPreviewReader, QueryResultOperations, GridColumnDefinition,
+  EventosRtcQueryComposition;
 
 var
   FRegistry: TNextViewRegistry;
@@ -94,74 +94,20 @@ end;
 function CreateEventosRtcView(AParent: HWND): TfrmNextBase;
 var
   View: TfrmEventosRtc;
-  Reader: IDatabaseReader;
-  Lease: IDatabaseReader;
-  Definition: TNextQueryDefinition;
-  ContextOwnedByComposition: Boolean;
-begin
-  if (not NextSetupInstance.HasContext) or
-    (NextSetupInstance.Adapter = nil) then
-    raise Exception.Create('O contexto da empresa nao foi informado.');
-
-  NextSetupInstance.AcquireContext;
-  ContextOwnedByComposition := True;
-  Reader := nil;
-  Lease := nil;
-  try
-    //Definition := CreateEventosRtcDefinition(NextSetupInstance.CompanyCode);
-    Reader := NextSetupInstance.Adapter.CreateReader(
-      Definition.Sql, Definition.Parameters);
-
-    Lease := TReaderContextLease.Create(Reader,
-      procedure
-      begin
-        NextSetupInstance.ReleaseContext;
-      end);
-    // A reserva passa a pertencer ao wrapper. A composicao nao a libera mais
-    // diretamente a partir daqui.
-    ContextOwnedByComposition := False;
-    Reader := nil;
-
-    View := TfrmEventosRtc.CreateParented(AParent);
-    try
-//      View.Attach(Lease, Definition.Columns, 'Eventos RTC');
-      // A tela possui o wrapper e, com ele, o leitor e a reserva.
-      Lease := nil;
-      Result := View;
-    except
-      View.Free;
-      raise;
-    end;
-  finally
-    Reader := nil;
-    if Lease <> nil then
-      Lease := nil; // libera leitor interno/query/transacao e depois o contexto
-    if ContextOwnedByComposition then
-      NextSetupInstance.ReleaseContext;
-  end;
-end;
-
-function CreateEventosRtcViewNovo(AParent: HWND): TfrmNextBase;
-var
-  View: TfrmEventosRtc;
-  Leitor: IDatabaseReader;
-  Operacoes: IQueryResultOperations;
   Preferences: ILocalPreferences;
-  Reader: IDatabaseReader;
-  Definition: TNextQueryDefinition;
 begin
-  var CampoMarcacao := 'SEL';
-  Definition := CreateEventosRtcDefinition(1);
-
-  Reader      := NextSetupInstance.Adapter.CreateReader(Definition.Sql, Definition.Parameters);
-  Operacoes   := TQueryResultOperations.Create(Leitor, CampoMarcacao);
   Preferences := TWindowsRegistryLocalPreferences.Create;
 
   View := TfrmEventosRtc.CreateParented(AParent);
   try
-    View.Attach(Reader, CreateEventosRtcColumns, 'Eventos RTC', Operacoes);
+    // A tela coleta os criterios, le a opcao de autorizacao e recebe um leitor
+    // novo a cada pesquisa. A criacao do leitor e a reserva do contexto ficam
+    // na composicao.
+    View.AttachEventosRtcReaderFactory(CreateEventosRtcReader,
+      CreateEventosRtcColumns, 'Eventos RTC');
 
-    View.ConfigureFilters(CreateEventosRtcFilters(), Preferences, 'next.rtc.events');
+    View.ConfigureFilters(CreateEventosRtcFilters(), Preferences,
+      'next.rtc.events');
 
     Result := View;
   except
@@ -181,7 +127,7 @@ initialization
   FRegistry.Register('next.validation', CreateValidationView);
   FRegistry.Register('next.validation.second', CreateValidationSecondView);
   FRegistry.Register('next.query.standard', CreateStandardQueryView);
-  FRegistry.Register('next.rtc.events', CreateEventosRtcViewNovo);
+  FRegistry.Register('next.rtc.events', CreateEventosRtcView);
 
 finalization
   FRegistry.Free;
