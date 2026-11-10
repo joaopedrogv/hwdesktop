@@ -108,7 +108,7 @@ begin
   Reader := nil;
   Lease := nil;
   try
-    Definition := CreateEventosRtcDefinition(NextSetupInstance.CompanyCode);
+    //Definition := CreateEventosRtcDefinition(NextSetupInstance.CompanyCode);
     Reader := NextSetupInstance.Adapter.CreateReader(
       Definition.Sql, Definition.Parameters);
 
@@ -141,6 +141,35 @@ begin
   end;
 end;
 
+function CreateEventosRtcViewNovo(AParent: HWND): TfrmNextBase;
+var
+  View: TfrmEventosRtc;
+  Leitor: IDatabaseReader;
+  Operacoes: IQueryResultOperations;
+  Preferences: ILocalPreferences;
+  Reader: IDatabaseReader;
+  Definition: TNextQueryDefinition;
+begin
+  var CampoMarcacao := 'SEL';
+  Definition := CreateEventosRtcDefinition(1);
+
+  Reader      := NextSetupInstance.Adapter.CreateReader(Definition.Sql, Definition.Parameters);
+  Operacoes   := TQueryResultOperations.Create(Leitor, CampoMarcacao);
+  Preferences := TWindowsRegistryLocalPreferences.Create;
+
+  View := TfrmEventosRtc.CreateParented(AParent);
+  try
+    View.Attach(Reader, CreateEventosRtcColumns, 'Eventos RTC', Operacoes);
+
+    View.ConfigureFilters(CreateEventosRtcFilters(), Preferences, 'next.rtc.events');
+
+    Result := View;
+  except
+    View.Free;
+    raise;
+  end;
+end;
+
 function NextViewCreate(const AIdentifier: string;
   AParent: HWND): TfrmNextBase;
 begin
@@ -152,7 +181,7 @@ initialization
   FRegistry.Register('next.validation', CreateValidationView);
   FRegistry.Register('next.validation.second', CreateValidationSecondView);
   FRegistry.Register('next.query.standard', CreateStandardQueryView);
-  FRegistry.Register('next.rtc.events', CreateEventosRtcView);
+  FRegistry.Register('next.rtc.events', CreateEventosRtcViewNovo);
 
 finalization
   FRegistry.Free;

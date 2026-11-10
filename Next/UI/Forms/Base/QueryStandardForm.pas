@@ -18,9 +18,9 @@ type
   private
     FFiltersConfigured: Boolean;
     FFilterDefinition: TFilterDefinition;
-    function CollectFilters: TFilterCriteriaResult;
     procedure DoPesquisarPreview(Sender: TObject);
   protected
+    function CollectFilters: TFilterCriteriaResult;
     procedure DoInitializeView; override;
   public
     // Recebe a definição, as preferências locais e a identidade estável da tela.

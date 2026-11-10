@@ -4056,8 +4056,8 @@ begin
     Context.Password := '';
 
     Options := NextQueryOptions();
-    Options.DisplayTitle := 'Validacao Second2';
-    OpenNextView(Self, 'next.validation.second', Options);
+    Options.DisplayTitle := 'Eventos RTC';
+    OpenNextView(Self, 'next.rtc.events', Options);
   finally
     Password := '';
     Context.Password := '';
