@@ -12,7 +12,6 @@ uses
 const
   KnownOptionsMask: Cardinal = HW_NEXT_OPT_KNOWN;
   ContextRejectedMessage = 'O contexto da empresa nao foi aceito.';
-  ContextInUseMessage = 'A tela Next ja esta em uso com outro contexto de empresa ou usuario.';
 
 var
   Views: TList;
@@ -89,6 +88,9 @@ var
   DatabaseName: string;
   DatabaseUserName: string;
   DatabasePassword: string;
+  View: TfrmNextBase;
+  I: Integer;
+  IdentityChanged: Boolean;
 begin
   Result := False;
   ClearError;
@@ -98,45 +100,78 @@ begin
   DatabasePassword := '';
   try
     try
-      if AUserLogin <> nil then
-        UserLogin := AUserLogin;
-      if ADatabaseName <> nil then
-        DatabaseName := ADatabaseName;
-      if ADatabaseUserName <> nil then
-        DatabaseUserName := ADatabaseUserName;
-      if ADatabasePassword <> nil then
-        DatabasePassword := ADatabasePassword;
+      try
+        if AUserLogin <> nil then
+          UserLogin := AUserLogin;
+        if ADatabaseName <> nil then
+          DatabaseName := ADatabaseName;
+        if ADatabaseUserName <> nil then
+          DatabaseUserName := ADatabaseUserName;
+        if ADatabasePassword <> nil then
+          DatabasePassword := ADatabasePassword;
 
-      if ACompanyCode <= 0 then
-        raise Exception.Create(ContextRejectedMessage);
-      if UserLogin = '' then
-        raise Exception.Create(ContextRejectedMessage);
-      if DatabaseName = '' then
-        raise Exception.Create(ContextRejectedMessage);
-      if DatabaseUserName = '' then
-        raise Exception.Create(ContextRejectedMessage);
-      if DatabasePassword = '' then
-        raise Exception.Create(ContextRejectedMessage);
+        if ACompanyCode <= 0 then
+          raise Exception.Create(ContextRejectedMessage);
+        if UserLogin = '' then
+          raise Exception.Create(ContextRejectedMessage);
+        if DatabaseName = '' then
+          raise Exception.Create(ContextRejectedMessage);
+        if DatabaseUserName = '' then
+          raise Exception.Create(ContextRejectedMessage);
+        if DatabasePassword = '' then
+          raise Exception.Create(ContextRejectedMessage);
 
-      // Enquanto houver telas abertas, a sessao e a conexao do adaptador devem
-      // permanecer as mesmas. A troca de empresa/login e recusada sem substituir
-      // a conexao em uso; a proxima sessao so e aceita sem telas abertas.
-      if Views.Count > 0 then
-      begin
-        if NextSetupInstance.MatchesContext(ACompanyCode, UserLogin,
-          DatabaseName, DatabaseUserName, DatabasePassword) then
-          Result := True
-        else
-          RecordError(ContextInUseMessage);
-      end
-      else
-      begin
+        IdentityChanged := not NextSetupInstance.HasContext;
+        if not IdentityChanged then
+          IdentityChanged :=
+            (NextSetupInstance.SessionContext.EmpresaId <> ACompanyCode) or
+            (NextSetupInstance.SessionContext.UsuarioLogin <> UserLogin);
+
+        // A identidade e aplicada mesmo com telas abertas. Em um banco ja
+        // configurado, o Setup preserva adaptador, container e a instancia de
+        // sessao, atualizando somente empresa e login.
         NextSetupInstance.SetContext(ACompanyCode, UserLogin, DatabaseName,
           DatabaseUserName, DatabasePassword);
-        Result := True;
+      except
+        RecordError(ContextRejectedMessage);
+        Exit;
+      end;
+
+      // A identidade ja foi publicada e nao e desfeita por falhas de limpeza.
+      Result := True;
+
+      if IdentityChanged then
+      begin
+        // Toda tela registrada, inclusive oculta, descarta o resultado da
+        // identidade anterior. Uma falha bloqueia o descarregamento do modulo
+        // e desabilita a tela afetada, mas as demais continuam sendo processadas.
+        for I := 0 to Views.Count - 1 do
+        begin
+          View := TfrmNextBase(Views[I]);
+          try
+            View.ResetForSessionChange;
+          except
+            on E: Exception do
+            begin
+              CleanupIncomplete := True;
+              RecordError(E.Message);
+              try
+                View.Enabled := False;
+              except
+              end;
+            end;
+          end;
+        end;
       end;
     except
-      RecordError(ContextRejectedMessage);
+      on E: Exception do
+      begin
+        // Falha inesperada depois da identidade: a sessao nova permanece
+        // aplicada e o descarregamento fica bloqueado.
+        CleanupIncomplete := True;
+        if LastErrorText = '' then
+          RecordError(E.Message);
+      end;
     end;
   finally
     UserLogin := '';

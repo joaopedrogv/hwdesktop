@@ -16,6 +16,8 @@ type
   // SetContext; o adaptador a abre na primeira busca.
   // A identidade da empresa/usuario fica em SessionContext. As credenciais
   // tecnicas ficam somente na string de conexao mantida pelo adaptador.
+  // O adaptador e o container sao montados no primeiro contexto e reutilizados
+  // enquanto o banco, identificado por um resumo da conexao, permanecer o mesmo.
   // Nenhum logger e associado, portanto falhas do adaptador nao sao registradas
   // e sao substituidas por mensagens constantes.
   TNextSetup = class
@@ -24,9 +26,11 @@ type
     FAdapter: FireDACDatabaseConnection;
     FContainer: TContainer;
     FContextSet: Boolean;
+    FDatabaseFingerprint: string;
     function GetAdapter: IDataBaseConnection;
     function BuildConnectionString(const ADatabaseName, ADatabaseUserName,
       ADatabasePassword: string): string;
+    function BuildDatabaseFingerprint(const AConnectionString: string): string;
     procedure ClearContext;
     procedure ValidateValue(const AValue: string);
   public
@@ -34,9 +38,6 @@ type
     procedure SetContext(ACompanyCode: Integer;
       const AUserLogin, ADatabaseName, ADatabaseUserName,
       ADatabasePassword: string);
-    function MatchesContext(ACompanyCode: Integer;
-      const AUserLogin, ADatabaseName, ADatabaseUserName,
-      ADatabasePassword: string): Boolean;
     procedure Release;
     function Resolve<T: class>: T;
     property Adapter: IDataBaseConnection read GetAdapter;
@@ -52,8 +53,9 @@ implementation
 uses
   // Registra o driver fisico Firebird no modulo Rio; sem esta unit o DriverID=FB
   // nao e resolvido na primeira conexao. FireDAC.DApt fornece o suporte usado
-  // por TFDQuery e TFDTransaction.
-  FireDAC.DApt, FireDAC.Phys.FB, NextFeaturesComposition;
+  // por TFDQuery e TFDTransaction. System.Hash gera a identificacao da
+  // configuracao do banco sem reter usuario ou senha.
+  System.Hash, FireDAC.DApt, FireDAC.Phys.FB, NextFeaturesComposition;
 
 const
   InvalidContextMessage = 'O contexto da empresa nao foi aceito.';
@@ -94,9 +96,19 @@ begin
     ADatabaseUserName + ';Password=' + ADatabasePassword;
 end;
 
+function TNextSetup.BuildDatabaseFingerprint(
+  const AConnectionString: string): string;
+begin
+  // A identificacao resume a configuracao completa recebida. Ela permite
+  // comparar o banco entre contextos sem reter a string de conexao, que contem
+  // as credenciais tecnicas.
+  Result := THashSHA2.GetHashString(AConnectionString);
+end;
+
 procedure TNextSetup.ClearContext;
 begin
   FContextSet := False;
+  FDatabaseFingerprint := '';
   if FSessionContext <> nil then
   begin
     // A SessionContext guarda somente a identidade; credenciais nao passam por ela.
@@ -110,6 +122,7 @@ procedure TNextSetup.SetContext(ACompanyCode: Integer;
   ADatabasePassword: string);
 var
   ConnectionString: string;
+  DatabaseFingerprint: string;
 begin
   if ACompanyCode <= 0 then
     raise Exception.Create(InvalidContextMessage);
@@ -126,16 +139,37 @@ begin
   ValidateValue(ADatabaseUserName);
   ValidateValue(ADatabasePassword);
 
-  Release;
-
   ConnectionString := BuildConnectionString(ADatabaseName, ADatabaseUserName,
     ADatabasePassword);
+  DatabaseFingerprint := BuildDatabaseFingerprint(ConnectionString);
+
+  if FContextSet then
+  begin
+    // A empresa e o login podem mudar durante a vida do modulo, mas o banco
+    // permanece o mesmo. O adaptador, o container e a instancia de sessao sao
+    // preservados; somente a identidade e atualizada.
+    if (FAdapter = nil) or (FContainer = nil) or (FSessionContext = nil) or
+      (FDatabaseFingerprint = '') then
+      raise Exception.Create(InvalidContextMessage);
+    if DatabaseFingerprint <> FDatabaseFingerprint then
+      raise Exception.Create(InvalidContextMessage);
+
+    FSessionContext.SetEmpresa(ACompanyCode, '', '');
+    FSessionContext.SetUsuario(0, AUserLogin, '');
+    Exit;
+  end;
+
+  // Primeiro contexto: remove qualquer estado parcial de uma tentativa anterior
+  // antes de montar a conexao e o container.
+  Release;
+
   try
     FAdapter := FireDACDatabaseConnection.Create(nil);
     FAdapter.SetConnectionString(ConnectionString);
 
-    // O container e recriado a cada contexto. Ele apenas compoe as instancias
-    // recebidas e nao abre a conexao; a abertura continua sob demanda.
+    // O container e montado somente no primeiro contexto. Ele compoe as
+    // instancias recebidas e nao abre a conexao; a abertura continua sob
+    // demanda. Trocas posteriores de empresa/login reutilizam esta composicao.
     FContainer := TContainer.Create;
     FContainer.RegisterInstance<ISessionContext>(FSessionContext);
     FContainer.RegisterInstance<IDataBaseConnection>(FAdapter);
@@ -159,21 +193,10 @@ begin
   // A identidade so e publicada depois da validacao e da montagem da conexao e
   // do container. Somente empresa e login pertencem a sessao Next; nome, CNPJ,
   // id e email nao sao recebidos pelo modulo.
+  FDatabaseFingerprint := DatabaseFingerprint;
   FSessionContext.SetEmpresa(ACompanyCode, '', '');
   FSessionContext.SetUsuario(0, AUserLogin, '');
   FContextSet := True;
-end;
-
-function TNextSetup.MatchesContext(ACompanyCode: Integer;
-  const AUserLogin, ADatabaseName, ADatabaseUserName,
-  ADatabasePassword: string): Boolean;
-begin
-  Result := False;
-  if (not FContextSet) or (FSessionContext = nil) or (FAdapter = nil) then
-    Exit;
-
-  Result := (FSessionContext.EmpresaId = ACompanyCode) and
-    (FSessionContext.UsuarioLogin = AUserLogin);
 end;
 
 function TNextSetup.Resolve<T>: T;

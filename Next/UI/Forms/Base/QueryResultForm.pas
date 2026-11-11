@@ -34,6 +34,7 @@ type
     procedure DoInitializeView; override;
   public
     destructor Destroy; override;
+    procedure ResetForSessionChange; override;
     procedure Attach(const AReader: IDatabaseReader;
       const AColumns: TGridColumnDefinitions; const ATitle: string;
       AOperations: IQueryResultOperations = nil);
@@ -140,6 +141,14 @@ begin
     if Assigned(FReaderFactory) then
       FReader := nil;
   end;
+end;
+
+procedure TfrmQueryResult.ResetForSessionChange;
+begin
+  // A proxima pesquisa deve usar a empresa da sessao atual. O caminho existente
+  // desvincula o conjunto e libera o leitor conforme a fabrica ou o modo direto,
+  // sem deixar resultado ou marcacoes anteriores disponiveis na grade.
+  ClearResult;
 end;
 
 procedure TfrmQueryResult.DoPesquisar(Sender: TObject);

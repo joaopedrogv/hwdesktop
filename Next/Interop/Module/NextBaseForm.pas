@@ -22,6 +22,9 @@ type
     function HasPendingChanges: Boolean; virtual;
     function ConfirmClose: Boolean;
     procedure RequestClose;
+    // Descartar resultados e selecoes que pertenciam a sessao anterior. A base
+    // nao possui estado de consulta; cada descendente sobrescreve o necessario.
+    procedure ResetForSessionChange; virtual;
     procedure FocusView; virtual;
     property ViewIdentifier: string read FViewIdentifier;
     property InstanceNumber: Integer read FInstanceNumber;
@@ -36,6 +39,10 @@ end;
 function TfrmNextBase.HasPendingChanges: Boolean;
 begin
   Result := False;
+end;
+
+procedure TfrmNextBase.ResetForSessionChange;
+begin
 end;
 
 function TfrmNextBase.ConfirmClose: Boolean;
