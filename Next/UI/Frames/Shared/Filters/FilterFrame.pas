@@ -37,6 +37,7 @@ type
     FContadorMenu: TPopupMenu;
     FTodosSelected: Boolean;
     FConfigured: Boolean;
+    FSingleMode: Boolean;
     FUpdating: Boolean;
     // Campo real correspondente ao estado atual dos editores. O OnChange do
     // combo ja entrega o novo item selecionado, por isso a persistencia do
@@ -63,6 +64,11 @@ type
     procedure SelectOperator(const AOperator: TFilterOperator);
     procedure UpdateArity;
     procedure UpdateCounter;
+    procedure PopulateOperators(const AField: TFilterFieldDefinition);
+    procedure ApplyCriterionValues(const AField: TFilterFieldDefinition;
+      const ACriterion: TFilterCriterion);
+    function FormatCriterionValue(const AValue: TFilterValue;
+      const AValueType: TFilterFieldType): string;
     procedure ClearValues;
     function ReadCurrentCriterion(out ACriterion: TFilterCriterion;
       out AMessage: string): Boolean;
@@ -82,7 +88,11 @@ type
   public
     procedure Configure(const ADefinition: TFilterDefinition;
       const APreferences: ILocalPreferences; const AIdentity: string);
+    procedure ConfigureSingle(const ADefinition: TFilterDefinition;
+      const ACriterion: TFilterCriterion);
     function CollectCriteria: TFilterCriteriaResult;
+    function CollectSingleCriterion(out ACriterion: TFilterCriterion;
+      out AMessage: string): Boolean;
     property Definition: TFilterDefinition read FDefinition;
     property Identity: string read FIdentity;
   end;
@@ -244,6 +254,20 @@ begin
 
   if not TryParseFilterValue(AEdit.EditText, AValueType, ParsedValue) then
     AEdit.Clear;
+end;
+
+procedure AssignCriterionText(const AEdit: TMaskEdit; const AText: string);
+begin
+  // O criterio ja validado e apenas transportado para o editor; um valor
+  // incompativel com a mascara ativa nao interrompe a abertura do modal.
+  try
+    if AText = '' then
+      AEdit.Clear
+    else
+      AEdit.Text := AText;
+  except
+    AEdit.Clear;
+  end;
 end;
 
 function TfrmFilterFrame.FieldKey(const AFieldId, ASuffix: string): string;
@@ -545,7 +569,8 @@ begin
     ClearValues;
 end;
 
-procedure TfrmFilterFrame.ApplyField(const AField: TFilterFieldDefinition);
+procedure TfrmFilterFrame.PopulateOperators(
+  const AField: TFilterFieldDefinition);
 var
   Operators: TFilterOperatorSet;
   Operator: TFilterOperator;
@@ -569,6 +594,13 @@ begin
   finally
     FUpdating := PreviousUpdating;
   end;
+end;
+
+procedure TfrmFilterFrame.ApplyField(const AField: TFilterFieldDefinition);
+var
+  PreviousUpdating: Boolean;
+begin
+  PopulateOperators(AField);
 
   if cbCondicao.Items.Count = 0 then
   begin
@@ -722,6 +754,64 @@ procedure TfrmFilterFrame.ClearValues;
 begin
   edValor1.Clear;
   edValor2.Clear;
+end;
+
+function TfrmFilterFrame.FormatCriterionValue(const AValue: TFilterValue;
+  const AValueType: TFilterFieldType): string;
+begin
+  Result := '';
+  if not FilterValueMatchesFieldType(AValue, AValueType) then
+    Exit;
+
+  case AValueType of
+    fftString:
+      Result := AValue.StringValue;
+    fftInteger:
+      Result := IntToStr(AValue.IntegerValue);
+    fftInt64:
+      Result := IntToStr(AValue.Int64Value);
+    fftCurrency:
+      Result := CurrToStr(AValue.CurrencyValue);
+    fftDate:
+      Result := FormatDateTime('dd/mm/yyyy', AValue.DateTimeValue);
+    fftDateTime:
+      Result := FormatDateTime('dd/mm/yyyy hh:nn:ss', AValue.DateTimeValue);
+  else
+    Result := '';
+  end;
+end;
+
+procedure TfrmFilterFrame.ApplyCriterionValues(
+  const AField: TFilterFieldDefinition; const ACriterion: TFilterCriterion);
+var
+  Arity: Integer;
+  ValueText: string;
+begin
+  Arity := FilterOperatorArity(ACriterion.Operator);
+  if Length(ACriterion.Values) <> Arity then
+  begin
+    ClearValues;
+    Exit;
+  end;
+
+  if Arity >= 1 then
+  begin
+    ValueText := FormatCriterionValue(ACriterion.Values[0], AField.ValueType);
+    AssignCriterionText(edValor1, ValueText);
+  end
+  else
+    edValor1.Clear;
+
+  if Arity >= 2 then
+  begin
+    ValueText := FormatCriterionValue(ACriterion.Values[1], AField.ValueType);
+    AssignCriterionText(edValor2, ValueText);
+  end
+  else
+    edValor2.Clear;
+
+  if Arity = 0 then
+    ClearValues;
 end;
 
 function TfrmFilterFrame.ReadCurrentCriterion(
@@ -964,6 +1054,9 @@ var
   Message: string;
   I: Integer;
 begin
+  if FSingleMode then
+    Exit;
+
   PersistCurrentIfValid;
 
   Criterion := Default(TFilterCriterion);
@@ -1084,6 +1177,7 @@ begin
   FPreferences := APreferences;
   FIdentity := AIdentity;
   FActiveFieldId := '';
+  FSingleMode := False;
 
   PreviousUpdating := FUpdating;
   FUpdating := True;
@@ -1111,6 +1205,69 @@ begin
   FConfigured := True;
 end;
 
+procedure TfrmFilterFrame.ConfigureSingle(const ADefinition: TFilterDefinition;
+  const ACriterion: TFilterCriterion);
+var
+  I: Integer;
+  FieldIndex: Integer;
+  Field: TFilterFieldDefinition;
+  PreviousUpdating: Boolean;
+begin
+  if FConfigured then
+    raise Exception.Create('O frame de filtros já foi configurado.');
+
+  FieldIndex := ADefinition.FieldIndex(ACriterion.FieldId);
+  if FieldIndex < 0 then
+    raise Exception.Create(
+      'O campo do filtro não pertence à definição informada.');
+
+  FDefinition := ADefinition;
+  FPreferences := nil;
+  FIdentity := '';
+  FActiveFieldId := '';
+  FSingleMode := True;
+  FTodosSelected := False;
+  FAccumulated := nil;
+
+  PreviousUpdating := FUpdating;
+  FUpdating := True;
+  try
+    cbCampo.Items.BeginUpdate;
+    try
+      cbCampo.Items.Clear;
+      for I := 0 to High(FDefinition.Fields) do
+        cbCampo.Items.AddObject(FrameFieldCaption(FDefinition.Fields[I]),
+          TObject(NativeInt(I)));
+
+      cbCampo.ItemIndex := FieldIndex;
+    finally
+      cbCampo.Items.EndUpdate;
+    end;
+  finally
+    FUpdating := PreviousUpdating;
+  end;
+
+  // O campo e fixo: o modal representa um criterio vinculado a celula ou ao
+  // criterio existente. A inclusao acumulada e o contador nao se aplicam.
+  cbCampo.Enabled := False;
+  btnAdicionar.Visible := False;
+  btnAdicionar.Enabled := False;
+  lblContador.Visible := False;
+  pnBotoes.Visible := False;
+  spliterBtn.Visible := False;
+
+  Field := FDefinition.Fields[FieldIndex];
+  if not FilterFieldSupportsOperator(Field, ACriterion.Operator) then
+    raise Exception.Create(
+      'A condição do filtro não é permitida para o campo informado.');
+
+  PopulateOperators(Field);
+  SelectOperator(ACriterion.Operator);
+  ApplyCriterionValues(Field, ACriterion);
+  FActiveFieldId := Field.Id;
+  FConfigured := True;
+end;
+
 function TfrmFilterFrame.CollectCriteria: TFilterCriteriaResult;
 var
   CurrentCriterion: TFilterCriterion;
@@ -1123,6 +1280,10 @@ var
 begin
   if not FConfigured then
     raise Exception.Create('O frame de filtros ainda não foi configurado.');
+
+  if FSingleMode then
+    raise Exception.Create(
+      'O frame de filtros está no modo de critério único.');
 
   // A coleta tambem grava o criterio corrente valido, mesmo sem "+".
   PersistCurrentIfValid;
@@ -1163,6 +1324,19 @@ begin
     Result := TFilterCriteriaResult.NoUserFilters(False)
   else
     Result := TFilterCriteriaResult.Valid(Collected);
+end;
+
+function TfrmFilterFrame.CollectSingleCriterion(
+  out ACriterion: TFilterCriterion; out AMessage: string): Boolean;
+begin
+  if not FConfigured then
+    raise Exception.Create('O frame de filtros ainda não foi configurado.');
+
+  // No modo de criterio unico a coleta usa somente os editores correntes; a
+  // lista acumulada e as preferencias locais nao participam.
+  Result := ReadCurrentCriterion(ACriterion, AMessage);
+  if (not Result) and (Trim(AMessage) = '') then
+    AMessage := 'Informe o valor do filtro.';
 end;
 
 end.

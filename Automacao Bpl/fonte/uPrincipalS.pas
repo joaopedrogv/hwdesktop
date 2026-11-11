@@ -4007,7 +4007,7 @@ var
 begin
   Options := NextQueryOptions();
   Options.DisplayTitle := 'Eventos RTC';
-  OpenNextView(Self, 'next.validation.second', Options);
+  OpenNextView(Self, 'next.rtc.events', Options);
 end;
 
 procedure TfrmPrincipalS.ExibirMensagemChavePeriodica;

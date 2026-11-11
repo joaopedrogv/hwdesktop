@@ -5,7 +5,8 @@ interface
 uses
   Vcl.Forms, Vcl.Graphics, Vcl.Controls, Vcl.Buttons, Vcl.Grids, Vcl.StdCtrls, Vcl.ExtCtrls,
   Vcl.DBGrids, Vcl.Menus, System.Classes, System.SysUtils, System.Types,
-  System.UITypes, System.Generics.Collections, Data.DB, QueryResultOperations;
+  System.UITypes, System.Generics.Collections, Data.DB, FilterDefinition,
+  FilterCriterion, FilterFrame, QueryResultOperations;
 
 type
   // Controles de um criterio na faixa. Os slots sao reaproveitados na ordem
@@ -19,6 +20,7 @@ type
     CaptionLabel: TLabel;
     Splitter: TSplitter;
     Menu: TPopupMenu;
+    AlterarItem: TMenuItem;
     MenuItem: TMenuItem;
   end;
 
@@ -32,6 +34,7 @@ type
     btnMaisFiltro: TSpeedButton;
     dbgDados: TDBGrid;
     pmCelula: TPopupMenu;
+    miFiltrarQuando: TMenuItem;
     miFiltrarValor: TMenuItem;
     miLimparFiltros1: TMenuItem;
     procedure DrawCheckboxCell(const Rect: TRect;
@@ -45,6 +48,7 @@ type
     procedure dbgDadosKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure dbgDadosMouseActivate(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y, HitTest: Integer;
       var MouseActivate: TMouseActivate);
+    procedure miFiltrarQuandoClick(Sender: TObject);
     procedure miFiltrarValorClick(Sender: TObject);
     procedure miLimparFiltros1Click(Sender: TObject);
   private
@@ -66,7 +70,14 @@ type
     procedure UpdateCommandBandLayout();
     procedure DoMarkOperation(AOperation: TMarkOperation);
     procedure btnCriterioClick(Sender: TObject);
+    procedure miAlterarCriterioClick(Sender: TObject);
     procedure miRemoverCriterioClick(Sender: TObject);
+    function BuildQuickFilterDefinition: TFilterDefinition;
+    function ShowQuickFilterModal(const ACaption: string;
+      const ADefinition: TFilterDefinition;
+      const ACriterion: TFilterCriterion;
+      out AResult: TFilterCriterion): Boolean;
+    procedure ShowQuickFilterMessage(const AMessage: string);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -89,6 +100,16 @@ const
   QuickFilterTitle = 'Filtro r'#225'pido';
   QuickFilterFailureMessage =
     'N'#227'o foi poss'#237'vel filtrar pelo valor selecionado.';
+  QuickFilterValueMessage =
+    'O valor da c'#233'lula est'#225' vazio e n'#227'o pode ser filtrado.';
+  QuickFilterAddFailureMessage =
+    'N'#227'o foi poss'#237'vel adicionar o filtro. Verifique se ele j'#225' est'#225' aplicado.';
+  QuickFilterUpdateFailureMessage =
+    'N'#227'o foi poss'#237'vel alterar o filtro. Verifique se ele j'#225' est'#225' aplicado.';
+  QuickFilterMissingMessage =
+    'O filtro selecionado n'#227'o est'#225' mais ativo.';
+  QuickFilterInvalidMessage =
+    'O filtro informado n'#227'o '#233' v'#225'lido.';
 
 type
   // Acesso as coordenadas de celula da grade. MouseCoord e protegido; o
@@ -118,6 +139,20 @@ begin
     Exit;
 
   Result := Columns[DataCol];
+end;
+
+function QuickFilterMaskPolicy(
+  const AValueType: TFilterFieldType): TFilterMaskPolicy;
+begin
+  // O modal usa a mesma mascara do frame de filtros: data completa para o
+  // limite unico e data/hora completa para o intervalo.
+  if AValueType = fftDateTime then
+    Result := TFilterMaskPolicy.FromMasks(
+      '!99/99/0000 99:99:99;1;_', '!99/99/0000 99:99:99;1;_', '')
+  else if AValueType = fftDate then
+    Result := TFilterMaskPolicy.DateMask
+  else
+    Result := TFilterMaskPolicy.None;
 end;
 
 constructor TfrmDataGridFrame.Create(AOwner: TComponent);
@@ -277,11 +312,16 @@ begin
     // O menu pertence ao slot e recebe o criterio corrente pelo Tag, sem
     // OnPopup para preservar a ligacao RLINK32.
     Slot.Menu := TPopupMenu.Create(Self);
+    Slot.AlterarItem := TMenuItem.Create(Slot.Menu);
+    Slot.AlterarItem.Caption := 'Alterar filtro';
+    Slot.AlterarItem.OnClick := miAlterarCriterioClick;
+    Slot.Menu.Items.Add(Slot.AlterarItem);
     Slot.MenuItem := TMenuItem.Create(Slot.Menu);
     Slot.MenuItem.Caption := 'Remover';
     Slot.MenuItem.OnClick := miRemoverCriterioClick;
     Slot.Menu.Items.Add(Slot.MenuItem);
     Slot.Button.PopupMenu := Slot.Menu;
+    Slot.AlterarItem.Tag := 0;
     Slot.MenuItem.Tag := 0;
 
     FCriterionSlots.Add(Slot);
@@ -319,6 +359,7 @@ begin
 
     Slot.Panel.Visible := True;
     Slot.Splitter.Visible := True;
+    Slot.AlterarItem.Tag := AId;
     Slot.MenuItem.Tag := AId;
   end;
 
@@ -335,6 +376,7 @@ begin
     Slot.CaptionLabel.Visible := False;
     Slot.Panel.Visible := False;
     Slot.Splitter.Visible := False;
+    Slot.AlterarItem.Tag := 0;
     Slot.MenuItem.Tag := 0;
   end;
 end;
@@ -465,6 +507,7 @@ begin
     Exit;
 
   miFiltrarValor.Enabled := False;
+  miFiltrarQuando.Enabled := False;
   FQuickFilterColumnName := '';
   Column := TDBGridCellAccess(dbgDados).ColumnAt(X, Y);
   if (Column = nil) or (Column.Field = nil) then
@@ -472,6 +515,7 @@ begin
 
   FQuickFilterColumnName := Column.FieldName;
   miFiltrarValor.Enabled := QuickFilterField() <> nil;
+  miFiltrarQuando.Enabled := miFiltrarValor.Enabled;
 end;
 
 procedure TfrmDataGridFrame.miFiltrarValorClick(Sender: TObject);
@@ -492,6 +536,211 @@ begin
   else
     Application.MessageBox(PChar(QuickFilterFailureMessage),
       PChar(QuickFilterTitle), MB_OK or MB_ICONWARNING);
+end;
+
+function TfrmDataGridFrame.BuildQuickFilterDefinition: TFilterDefinition;
+var
+  Fields: TFilterFieldDefinitions;
+  I: Integer;
+  Column: TColumn;
+  ValueType: TFilterFieldType;
+  FieldDefinition: TFilterFieldDefinition;
+  CaptionText: string;
+begin
+  SetLength(Fields, 0);
+  if (dbgDados.DataSource = nil) or (dbgDados.DataSource.DataSet = nil) then
+  begin
+    Result := FilterDefinitionOf(Fields, False);
+    Exit;
+  end;
+
+  // A definicao do modal usa as colunas de dados visiveis, sem a coluna de
+  // marcacao. Igualdade atende todos os campos; data e data/hora tambem
+  // aceitam intervalo, sempre sem negacao.
+  for I := 0 to dbgDados.Columns.Count - 1 do
+  begin
+    Column := dbgDados.Columns[I];
+    if (Column.Field = nil) or
+      ((FMarkingColumn <> '') and
+       SameText(Column.FieldName, FMarkingColumn)) then
+      Continue;
+
+    ValueType := QuickFilterFieldTypeFor(Column.Field);
+    CaptionText := Trim(Column.Title.Caption);
+    if CaptionText = '' then
+      CaptionText := Column.Field.DisplayLabel;
+
+    if ValueType in [fftDate, fftDateTime] then
+      FieldDefinition := FilterField(Column.FieldName, CaptionText, ValueType,
+        [foEquals, foRange], QuickFilterMaskPolicy(ValueType))
+    else
+      FieldDefinition := FilterField(Column.FieldName, CaptionText, ValueType,
+        [foEquals]);
+
+    SetLength(Fields, Length(Fields) + 1);
+    Fields[High(Fields)] := FieldDefinition;
+  end;
+
+  Result := FilterDefinitionOf(Fields, False);
+end;
+
+procedure TfrmDataGridFrame.ShowQuickFilterMessage(const AMessage: string);
+begin
+  Application.MessageBox(PChar(AMessage), PChar(QuickFilterTitle),
+    MB_OK or MB_ICONWARNING);
+end;
+
+function TfrmDataGridFrame.ShowQuickFilterModal(const ACaption: string;
+  const ADefinition: TFilterDefinition; const ACriterion: TFilterCriterion;
+  out AResult: TFilterCriterion): Boolean;
+var
+  ModalForm: TForm;
+  FilterView: TfrmFilterFrame;
+  ButtonsPanel: TPanel;
+  OkButton: TButton;
+  CancelButton: TButton;
+  MessageText: string;
+  CollectedCriterion: TFilterCriterion;
+begin
+  Result := False;
+  AResult := Default(TFilterCriterion);
+
+  ModalForm := TForm.CreateNew(nil);
+  try
+    ModalForm.Caption := ACaption;
+    ModalForm.BorderStyle := bsDialog;
+    ModalForm.Position := poMainFormCenter;
+    ModalForm.ClientWidth := 560;
+    ModalForm.ClientHeight := 112;
+
+    FilterView := TfrmFilterFrame.Create(ModalForm);
+    FilterView.Parent := ModalForm;
+    FilterView.Align := alTop;
+    FilterView.Height := 70;
+
+    try
+      FilterView.ConfigureSingle(ADefinition, ACriterion);
+    except
+      on E: Exception do
+      begin
+        ShowQuickFilterMessage(E.Message);
+        Exit;
+      end;
+    end;
+
+    ButtonsPanel := TPanel.Create(ModalForm);
+    ButtonsPanel.Parent := ModalForm;
+    ButtonsPanel.Align := alBottom;
+    ButtonsPanel.Height := 42;
+    ButtonsPanel.BevelOuter := bvNone;
+
+    CancelButton := TButton.Create(ButtonsPanel);
+    CancelButton.Parent := ButtonsPanel;
+    CancelButton.Caption := 'Cancelar';
+    CancelButton.ModalResult := mrCancel;
+    CancelButton.Cancel := True;
+    CancelButton.AlignWithMargins := True;
+    CancelButton.Margins.Top := 6;
+    CancelButton.Margins.Bottom := 6;
+    CancelButton.Margins.Right := 12;
+    CancelButton.Align := alRight;
+    CancelButton.Width := 84;
+
+    OkButton := TButton.Create(ButtonsPanel);
+    OkButton.Parent := ButtonsPanel;
+    OkButton.Caption := 'OK';
+    OkButton.Default := True;
+    OkButton.ModalResult := mrOk;
+    OkButton.AlignWithMargins := True;
+    OkButton.Margins.Top := 6;
+    OkButton.Margins.Bottom := 6;
+    OkButton.Align := alRight;
+    OkButton.Width := 84;
+    if ModalForm.ShowModal = mrOk then
+    begin
+      if FilterView.CollectSingleCriterion(CollectedCriterion, MessageText) then
+      begin
+        AResult := CollectedCriterion;
+        Result := True;
+      end
+      else
+      begin
+        if Trim(MessageText) = '' then
+          MessageText := QuickFilterInvalidMessage;
+        ShowQuickFilterMessage(MessageText);
+      end;
+    end;
+  finally
+    ModalForm.Free;
+  end;
+end;
+
+procedure TfrmDataGridFrame.miFiltrarQuandoClick(Sender: TObject);
+var
+  DataField: TField;
+  InitialCriterion: TFilterCriterion;
+  NewCriterion: TFilterCriterion;
+  Definition: TFilterDefinition;
+begin
+  DataField := QuickFilterField();
+  if DataField = nil then
+    Exit;
+
+  if not TryBuildEqualityCriterion(DataField, InitialCriterion) then
+  begin
+    ShowQuickFilterMessage(QuickFilterValueMessage);
+    Exit;
+  end;
+
+  Definition := BuildQuickFilterDefinition();
+  if not ShowQuickFilterModal('Filtrar quando', Definition, InitialCriterion,
+    NewCriterion) then
+    Exit;
+
+  if not FOperations.AddQuickFilterCriterion(NewCriterion) then
+  begin
+    ShowQuickFilterMessage(QuickFilterAddFailureMessage);
+    Exit;
+  end;
+
+  UpdateCommandBandLayout();
+  dbgDados.Invalidate();
+end;
+
+procedure TfrmDataGridFrame.miAlterarCriterioClick(Sender: TObject);
+var
+  AId: Integer;
+  CurrentCriterion: TFilterCriterion;
+  NewCriterion: TFilterCriterion;
+  Definition: TFilterDefinition;
+begin
+  if not (Sender is TMenuItem) then
+    Exit;
+
+  AId := Integer(TMenuItem(Sender).Tag);
+  if (FOperations = nil) or (AId = 0) then
+    Exit;
+
+  if not FOperations.GetQuickFilterCriterion(AId, CurrentCriterion) then
+  begin
+    ShowQuickFilterMessage(QuickFilterMissingMessage);
+    UpdateCommandBandLayout();
+    Exit;
+  end;
+
+  Definition := BuildQuickFilterDefinition();
+  if not ShowQuickFilterModal('Alterar filtro', Definition, CurrentCriterion,
+    NewCriterion) then
+    Exit;
+
+  if not FOperations.UpdateQuickFilter(AId, NewCriterion) then
+  begin
+    ShowQuickFilterMessage(QuickFilterUpdateFailureMessage);
+    Exit;
+  end;
+
+  UpdateCommandBandLayout();
+  dbgDados.Invalidate();
 end;
 
 procedure TfrmDataGridFrame.dbgDadosCellClick(Column: TColumn);

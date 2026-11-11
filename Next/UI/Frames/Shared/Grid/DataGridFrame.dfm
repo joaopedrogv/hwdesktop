@@ -217,6 +217,10 @@ object frmDataGridFrame: TfrmDataGridFrame
   object pmCelula: TPopupMenu
     Left = 16
     Top = 96
+    object miFiltrarQuando: TMenuItem
+      Caption = 'Filtrar quando'
+      OnClick = miFiltrarQuandoClick
+    end
     object miFiltrarValor: TMenuItem
       Caption = 'Filtrar por este valor'
       OnClick = miFiltrarValorClick
