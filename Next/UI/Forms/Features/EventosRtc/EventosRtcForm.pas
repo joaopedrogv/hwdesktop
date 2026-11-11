@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, Vcl.StdCtrls, QueryResultForm, FilterCriterion,
-  IDatabaseReaderUnit, GridColumnDefinition, EventosRtcPresenter;
+  IDataSetReaderUnit, GridColumnDefinition, EventosRtcPresenter;
 
 type
   // Tela de Eventos RTC. Herda a apresentacao generica e acrescenta apenas a
@@ -15,7 +15,7 @@ type
   private
     FPresenter: TEventosRtcPresenter;
     function PesquisarEventos(
-      const ACriteria: TFilterCriteria): IDatabaseReader;
+      const ACriteria: TFilterCriteria): IDataSetReader;
   public
     destructor Destroy; override;
     procedure AttachPresenter(APresenter: TEventosRtcPresenter;
@@ -53,7 +53,7 @@ begin
 end;
 
 function TfrmEventosRtc.PesquisarEventos(
-  const ACriteria: TFilterCriteria): IDatabaseReader;
+  const ACriteria: TFilterCriteria): IDataSetReader;
 begin
   if FPresenter = nil then
     raise Exception.Create(MissingPresenterMessage);

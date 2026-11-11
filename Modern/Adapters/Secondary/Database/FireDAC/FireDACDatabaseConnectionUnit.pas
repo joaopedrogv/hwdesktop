@@ -6,7 +6,7 @@ interface
 uses
   BaseDatabaseConnectionUnit,
   IDataBaseConnectionUnit,
-  IDatabaseReaderUnit,
+  IDataSetReaderUnit,
   ITransactionUnit,
   QueryResultUnit,
   ScalarResultUnit,
@@ -50,7 +50,7 @@ type
     procedure SetConnectionString(const AConnectionString: string);
     procedure EnsureConnection;
     function CreateReader(const SQL: string;
-      const Params: ParametersValues): IDatabaseReader; override;
+      const Params: ParametersValues): IDataSetReader; override;
   end;
 
 implementation
@@ -75,7 +75,7 @@ type
   TReaderBindParameters = procedure(Query: TFDQuery;
     const Params: ParametersValues) of object;
 
-  TFireDACDatabaseReader = class(TInterfacedObject, IDatabaseReader)
+  TFireDACDatabaseReader = class(TInterfacedObject, IDataSetReader)
   private
     FParams: ParametersValues;
     FQuery: TFDQuery;
@@ -651,7 +651,7 @@ begin
 end;
 
 function FireDACDatabaseConnection.CreateReader(const SQL: string;
-  const Params: ParametersValues): IDatabaseReader;
+  const Params: ParametersValues): IDataSetReader;
 begin
   if FDatabase = nil then
     raise Exception.Create(ReaderConnectionNotConfiguredMessage);

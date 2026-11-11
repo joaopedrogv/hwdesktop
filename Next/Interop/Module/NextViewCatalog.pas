@@ -14,7 +14,7 @@ implementation
 uses
   System.SysUtils, NextViewRegistry, HwNextValidationFormUnit,
   HwNextValidationSecondFormUnit, QueryStandardForm, EventosRtcForm,
-  EventosRtcDefinition, IDatabaseReaderUnit, LocalPreferences,
+  EventosRtcDefinition, LocalPreferences,
   WindowsRegistryLocalPreferences, StandardQueryFilterDefinition,
   QueryPreviewReader, QueryResultOperations, GridColumnDefinition,
   NextSetup, EventosRtcPresenter;
@@ -31,39 +31,6 @@ begin
     // Composition point. next.validation currently has no injected dependency;
     // when it gains one, compose it here and pass it to View before returning
     // the base type.
-    Result := View;
-  except
-    View.Free;
-    raise;
-  end;
-end;
-
-function CreateValidationSecondView(AParent: HWND): TfrmNextBase;
-var
-  View: TfrmHwNextValidationSecond;
-  Leitor: IDatabaseReader;
-  Operacoes: IQueryResultOperations;
-  Preferences: ILocalPreferences;
-begin
-  View := TfrmHwNextValidationSecond.CreateParented(AParent);
-  try
-    var CampoMarcacao := 'SEL';
-    Leitor := TQueryPreviewReader.Create(CampoMarcacao);
-    Operacoes := TQueryResultOperations.Create(Leitor, CampoMarcacao);
-    Preferences := TWindowsRegistryLocalPreferences.Create;
-
-    var columns := GridColumns([
-      GridColumn(CampoMarcacao, 'Marcação', 48),
-      GridColumn('documento', 'Documento', 140),
-      GridColumn('descricao', 'Descricao', 220),
-      GridColumn('codigo', 'Codigo', 80, qcaRight),
-      GridColumn('valor', 'Valor', 110, qcaRight),
-      GridColumn('data', 'Data', 100, qcaCenter)]);
-
-    View.Attach(Leitor, columns, 'Secondsss', Operacoes);
-
-    View.ConfigureFilters(CreateStandardQueryFilterDefinition, Preferences,'next.validation.second');
-
     Result := View;
   except
     View.Free;
@@ -133,7 +100,6 @@ end;
 initialization
   FRegistry := TNextViewRegistry.Create;
   FRegistry.Register('next.validation', CreateValidationView);
-  FRegistry.Register('next.validation.second', CreateValidationSecondView);
   FRegistry.Register('next.query.standard', CreateStandardQueryView);
   FRegistry.Register('next.rtc.events', CreateEventosRtcView);
 

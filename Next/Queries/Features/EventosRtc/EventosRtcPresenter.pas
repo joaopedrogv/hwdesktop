@@ -3,7 +3,7 @@ unit EventosRtcPresenter;
 interface
 
 uses
-  FilterCriterion, IDatabaseReaderUnit, ISessionContextUnit, EventosRtcQuery;
+  FilterCriterion, IDataSetReaderUnit, ISessionContextUnit, EventosRtcQuery;
 
 type
   // Apresentador da consulta de Eventos RTC. Le a empresa atual da sessao a cada
@@ -15,7 +15,7 @@ type
   public
     constructor Create(ASession: ISessionContext; AQuery: IEventosRtcQuery);
     function CriarLeitor(const ACriteria: TFilterCriteria;
-      ASomenteNFeAutorizada: Boolean): IDatabaseReader;
+      ASomenteNFeAutorizada: Boolean): IDataSetReader;
   end;
 
 implementation
@@ -47,7 +47,7 @@ begin
 end;
 
 function TEventosRtcPresenter.CriarLeitor(const ACriteria: TFilterCriteria;
-  ASomenteNFeAutorizada: Boolean): IDatabaseReader;
+  ASomenteNFeAutorizada: Boolean): IDataSetReader;
 var
   CompanyCode: Integer;
 begin

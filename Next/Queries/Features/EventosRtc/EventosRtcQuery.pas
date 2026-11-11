@@ -3,7 +3,7 @@ unit EventosRtcQuery;
 interface
 
 uses
-  IDataBaseConnectionUnit, IDatabaseReaderUnit, FilterCriterion;
+  IDataBaseConnectionUnit, IDataSetReaderUnit, FilterCriterion;
 
 type
   // Contrato de leitura de Eventos RTC. A empresa e recebida em cada chamada;
@@ -12,7 +12,7 @@ type
     ['{A26E8DD7-E18F-4E1A-BE52-784128F37299}']
     function CriarLeitor(ACompanyCode: Integer;
       const ACriteria: TFilterCriteria;
-      ASomenteNFeAutorizada: Boolean): IDatabaseReader;
+      ASomenteNFeAutorizada: Boolean): IDataSetReader;
   end;
 
   // Consulta de Eventos RTC. Usa a conexao do adaptador recebida na composicao;
@@ -24,7 +24,7 @@ type
     constructor Create(AConnection: IDataBaseConnection);
     function CriarLeitor(ACompanyCode: Integer;
       const ACriteria: TFilterCriteria;
-      ASomenteNFeAutorizada: Boolean): IDatabaseReader;
+      ASomenteNFeAutorizada: Boolean): IDataSetReader;
   end;
 
 implementation
@@ -49,7 +49,7 @@ end;
 
 function TEventosRtcQuery.CriarLeitor(ACompanyCode: Integer;
   const ACriteria: TFilterCriteria;
-  ASomenteNFeAutorizada: Boolean): IDatabaseReader;
+  ASomenteNFeAutorizada: Boolean): IDataSetReader;
 var
   Definition: TNextQueryDefinition;
 begin

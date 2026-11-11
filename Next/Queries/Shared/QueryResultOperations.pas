@@ -3,7 +3,7 @@ unit QueryResultOperations;
 interface
 
 uses
- IDatabaseReaderUnit;
+ IDataSetReaderUnit;
 
 type
   IQueryResultOperations = interface
@@ -19,11 +19,11 @@ type
 
   TQueryResultOperations = class(TInterfacedObject, IQueryResultOperations)
   private
-    FReader: IDatabaseReader;
+    FReader: IDataSetReader;
     FMarkingColumn: string;
     procedure DoMarkOperation(AOperation: TMarkOperation);
   public
-    constructor Create(AReader: IDatabaseReader; const AMarkingColumn: string);
+    constructor Create(AReader: IDataSetReader; const AMarkingColumn: string);
     procedure MarkAll();
     procedure UnmarkAll();
     procedure InverterAllMarks();
@@ -38,7 +38,7 @@ uses
 
 { TQueryResultOperations }
 
-constructor TQueryResultOperations.Create(AReader: IDatabaseReader; const AMarkingColumn: string);
+constructor TQueryResultOperations.Create(AReader: IDataSetReader; const AMarkingColumn: string);
 begin
   FReader := AReader;
   FMarkingColumn := AMarkingColumn;

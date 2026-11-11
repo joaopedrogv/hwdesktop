@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, System.SysUtils, System.Classes, System.UITypes, Data.DB,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.DBGrids, NextBaseForm,
-  QueryStandardForm, DataGridFrame, GridColumnDefinition, IDatabaseReaderUnit,
+  QueryStandardForm, DataGridFrame, GridColumnDefinition, IDataSetReaderUnit,
   QueryResultOperations, Vcl.StdCtrls, FilterFrame, FilterCriterion,
   Vcl.ExtCtrls;
 
@@ -13,7 +13,7 @@ type
   // Fabrica de leitores para consultas que montam o SQL a partir dos criterios
   // coletados. A forma de criar o leitor permanece na composicao.
   TQueryResultReaderFactory = reference to function(
-    const ACriteria: TFilterCriteria): IDatabaseReader;
+    const ACriteria: TFilterCriteria): IDataSetReader;
 
   // Apresentacao generica de uma leitura. Recebe o leitor, as colunas e o titulo;
   // nao conhece SQL, driver, Setup nem a composicao. A tela possui o leitor
@@ -21,7 +21,7 @@ type
   // esse wrapper e e liberada junto com ele.
   TfrmQueryResult = class(TfrmQueryStandard)
   private
-    FReader: IDatabaseReader;
+    FReader: IDataSetReader;
     FReaderFactory: TQueryResultReaderFactory;
     FColumns: TGridColumnDefinitions;
     FOperations: IQueryResultOperations;
@@ -35,7 +35,7 @@ type
   public
     destructor Destroy; override;
     procedure ResetForSessionChange; override;
-    procedure Attach(const AReader: IDatabaseReader;
+    procedure Attach(const AReader: IDataSetReader;
       const AColumns: TGridColumnDefinitions; const ATitle: string;
       AOperations: IQueryResultOperations = nil);
     procedure AttachReaderFactory(const AFactory: TQueryResultReaderFactory;
@@ -62,7 +62,7 @@ const
   EmptyResultTitle = 'Consulta sem resultados';
   QueryFailureTitle = 'Falha na consulta';
 
-procedure TfrmQueryResult.Attach(const AReader: IDatabaseReader;
+procedure TfrmQueryResult.Attach(const AReader: IDataSetReader;
   const AColumns: TGridColumnDefinitions; const ATitle: string;
   AOperations: IQueryResultOperations = nil);
 begin
@@ -155,7 +155,7 @@ procedure TfrmQueryResult.DoPesquisar(Sender: TObject);
 var
   Collected: TFilterCriteriaResult;
   Criteria: TFilterCriteria;
-  NewReader: IDatabaseReader;
+  NewReader: IDataSetReader;
 begin
   if FPesquisando then
     Exit;

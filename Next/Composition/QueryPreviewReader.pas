@@ -3,10 +3,10 @@
 interface
 
 uses
-  Data.DB, IDatabaseReaderUnit, FireDAC.Comp.Client, FireDAC.Comp.DataSet;
+  Data.DB, IDataSetReaderUnit, FireDAC.Comp.Client, FireDAC.Comp.DataSet;
 
 type
-  TQueryPreviewReader = class(TInterfacedObject, IDatabaseReader)
+  TQueryPreviewReader = class(TInterfacedObject, IDataSetReader)
   private
     FDataSet: TFDMemTable;
     FCampoMarcacao: string;
