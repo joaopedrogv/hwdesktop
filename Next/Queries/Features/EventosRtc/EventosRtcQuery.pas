@@ -3,7 +3,7 @@ unit EventosRtcQuery;
 interface
 
 uses
-  IDataBaseConnectionUnit, IDataSetReaderUnit, FilterCriterion;
+  IDataSetReaderUnit, FilterCriterion;
 
 type
   // Contrato de leitura de Eventos RTC. A empresa e recebida em cada chamada;
@@ -15,13 +15,13 @@ type
       ASomenteNFeAutorizada: Boolean): IDataSetReader;
   end;
 
-  // Consulta de Eventos RTC. Usa a conexao do adaptador recebida na composicao;
+  // Consulta de Eventos RTC. Usa a fabrica de leitores recebida na composicao;
   // nao abre conexao, nao conhece sessao nem tela e nao possui o leitor devolvido.
   TEventosRtcQuery = class(TInterfacedObject, IEventosRtcQuery)
   private
-    FConnection: IDataBaseConnection;
+    FReaderFactory: ISqlDataSetReaderFactory;
   public
-    constructor Create(AConnection: IDataBaseConnection);
+    constructor Create(const AReaderFactory: ISqlDataSetReaderFactory);
     function CriarLeitor(ACompanyCode: Integer;
       const ACriteria: TFilterCriteria;
       ASomenteNFeAutorizada: Boolean): IDataSetReader;
@@ -33,18 +33,19 @@ uses
   System.SysUtils, NextQueryDefinition, EventosRtcDefinition;
 
 const
-  MissingConnectionMessage =
-    'A conexao da consulta de Eventos RTC nao foi informada.';
+  MissingFactoryMessage =
+    'A fabrica de leitores da consulta de Eventos RTC nao foi informada.';
 
 { TEventosRtcQuery }
 
-constructor TEventosRtcQuery.Create(AConnection: IDataBaseConnection);
+constructor TEventosRtcQuery.Create(
+  const AReaderFactory: ISqlDataSetReaderFactory);
 begin
   inherited Create;
-  if AConnection = nil then
-    raise Exception.Create(MissingConnectionMessage);
+  if AReaderFactory = nil then
+    raise Exception.Create(MissingFactoryMessage);
 
-  FConnection := AConnection;
+  FReaderFactory := AReaderFactory;
 end;
 
 function TEventosRtcQuery.CriarLeitor(ACompanyCode: Integer;
@@ -53,11 +54,11 @@ function TEventosRtcQuery.CriarLeitor(ACompanyCode: Integer;
 var
   Definition: TNextQueryDefinition;
 begin
-  // A definicao monta SQL e parametros; a conexao apenas cria o leitor. Os
+  // A definicao monta SQL e parametros; a fabrica apenas cria o leitor. Os
   // criterios e a opcao de autorizacao seguem o contrato da tela.
   Definition := CreateEventosRtcDefinition(ACompanyCode, ACriteria,
     ASomenteNFeAutorizada);
-  Result := FConnection.CreateReader(Definition.Sql, Definition.Parameters);
+  Result := FReaderFactory.CreateReader(Definition.Sql, Definition.Parameters);
 end;
 
 end.

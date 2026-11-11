@@ -49,8 +49,17 @@ type
 
     procedure SetConnectionString(const AConnectionString: string);
     procedure EnsureConnection;
+  end;
+
+  // Cria leitores sob demanda reutilizando a conexao ja configurada no
+  // adaptador FireDAC. Nao possui a conexao nem o leitor devolvido.
+  TFireDACDataSetReaderFactory = class(TInterfacedObject, ISqlDataSetReaderFactory)
+  private
+    FConnection: FireDACDatabaseConnection;
+  public
+    constructor Create(const AConnection: FireDACDatabaseConnection);
     function CreateReader(const SQL: string;
-      const Params: ParametersValues): IDataSetReader; override;
+      const Params: ParametersValues): IDataSetReader;
   end;
 
 implementation
@@ -193,6 +202,33 @@ begin
   finally
     inherited;
   end;
+end;
+
+{ TFireDACDataSetReaderFactory }
+
+constructor TFireDACDataSetReaderFactory.Create(
+  const AConnection: FireDACDatabaseConnection);
+begin
+  inherited Create;
+
+  if AConnection = nil then
+    raise Exception.Create(ReaderConnectionNotConfiguredMessage);
+
+  FConnection := AConnection;
+end;
+
+function TFireDACDataSetReaderFactory.CreateReader(const SQL: string;
+  const Params: ParametersValues): IDataSetReader;
+begin
+  // Mesmas validacoes do adaptador: a conexao precisa existir e o SQL nao pode
+  // estar vazio. A abertura continua sob demanda, na primeira pesquisa.
+  if FConnection.FDatabase = nil then
+    raise Exception.Create(ReaderConnectionNotConfiguredMessage);
+  if Trim(SQL) = '' then
+    raise Exception.Create('A consulta nao possui SQL.');
+
+  Result := TFireDACDatabaseReader.Create(FConnection.FDatabase, SQL, Params,
+    FConnection.EnsureConnection, FConnection.ApplyParameters);
 end;
 
 { FireDACDatabaseConnection }
@@ -648,18 +684,6 @@ begin
     // usuario ou outros dados da conexao.
     raise Exception.Create(ReaderConnectionFailedMessage);
   end;
-end;
-
-function FireDACDatabaseConnection.CreateReader(const SQL: string;
-  const Params: ParametersValues): IDataSetReader;
-begin
-  if FDatabase = nil then
-    raise Exception.Create(ReaderConnectionNotConfiguredMessage);
-  if Trim(SQL) = '' then
-    raise Exception.Create('A consulta nao possui SQL.');
-
-  Result := TFireDACDatabaseReader.Create(FDatabase, SQL, Params,
-    EnsureConnection, ApplyParameters);
 end;
 
 initialization

@@ -4,26 +4,28 @@ interface
 
 uses
   System.SysUtils, FireDACDatabaseConnectionUnit,
-  IDataBaseConnectionUnit, ISessionContextUnit, SessionContextUnit,
-  Spring.Container;
+  IDataBaseConnectionUnit, IDataSetReaderUnit, ISessionContextUnit,
+  SessionContextUnit, Spring.Container;
 
 const
   MissingContextMessage = 'O contexto da empresa nao foi informado.';
 
 type
-  // Possui o contexto ERP recebido, a conexao/adaptador FireDAC do Next e o
-  // container Spring4D usado somente na composicao. Nunca abre a conexao em
-  // SetContext; o adaptador a abre na primeira busca.
+  // Possui o contexto ERP recebido, a conexao/adaptador FireDAC do Next, a
+  // fabrica de leitores e o container Spring4D usado somente na composicao.
+  // Nunca abre a conexao em SetContext; o adaptador a abre na primeira busca.
   // A identidade da empresa/usuario fica em SessionContext. As credenciais
   // tecnicas ficam somente na string de conexao mantida pelo adaptador.
-  // O adaptador e o container sao montados no primeiro contexto e reutilizados
-  // enquanto o banco, identificado por um resumo da conexao, permanecer o mesmo.
+  // O adaptador, a fabrica e o container sao montados no primeiro contexto e
+  // reutilizados enquanto o banco, identificado por um resumo da conexao,
+  // permanecer o mesmo.
   // Nenhum logger e associado, portanto falhas do adaptador nao sao registradas
   // e sao substituidas por mensagens constantes.
   TNextSetup = class
   private
     FSessionContext: ISessionContext;
     FAdapter: FireDACDatabaseConnection;
+    FReaderFactory: ISqlDataSetReaderFactory;
     FContainer: TContainer;
     FContextSet: Boolean;
     FDatabaseFingerprint: string;
@@ -146,10 +148,10 @@ begin
   if FContextSet then
   begin
     // A empresa e o login podem mudar durante a vida do modulo, mas o banco
-    // permanece o mesmo. O adaptador, o container e a instancia de sessao sao
-    // preservados; somente a identidade e atualizada.
-    if (FAdapter = nil) or (FContainer = nil) or (FSessionContext = nil) or
-      (FDatabaseFingerprint = '') then
+    // permanece o mesmo. O adaptador, a fabrica de leitores, o container e a
+    // instancia de sessao sao preservados; somente a identidade e atualizada.
+    if (FAdapter = nil) or (FReaderFactory = nil) or (FContainer = nil) or
+      (FSessionContext = nil) or (FDatabaseFingerprint = '') then
       raise Exception.Create(InvalidContextMessage);
     if DatabaseFingerprint <> FDatabaseFingerprint then
       raise Exception.Create(InvalidContextMessage);
@@ -167,24 +169,35 @@ begin
     FAdapter := FireDACDatabaseConnection.Create(nil);
     FAdapter.SetConnectionString(ConnectionString);
 
+    // A fabrica reutiliza a conexao do adaptador; nenhum dos dois abre a
+    // conexao aqui. A mesma fabrica e o mesmo adaptador sao preservados nos
+    // contextos seguintes.
+    FReaderFactory := TFireDACDataSetReaderFactory.Create(FAdapter);
+
     // O container e montado somente no primeiro contexto. Ele compoe as
     // instancias recebidas e nao abre a conexao; a abertura continua sob
     // demanda. Trocas posteriores de empresa/login reutilizam esta composicao.
     FContainer := TContainer.Create;
     FContainer.RegisterInstance<ISessionContext>(FSessionContext);
     FContainer.RegisterInstance<IDataBaseConnection>(FAdapter);
+    FContainer.RegisterInstance<ISqlDataSetReaderFactory>(FReaderFactory);
     RegisterNextFeatures(FContainer);
     FContainer.Build;
   except
-    // Sem servicos parciais: o container e liberado antes do adaptador e o
-    // contexto permanece vazio para a proxima tentativa de login.
+    // Sem servicos parciais: o container e liberado antes da fabrica e do
+    // adaptador, que possui a conexao; o contexto permanece vazio para a
+    // proxima tentativa de login.
     try
       FreeAndNil(FContainer);
     finally
       try
-        FreeAndNil(FAdapter);
+        FReaderFactory := nil;
       finally
-        ClearContext;
+        try
+          FreeAndNil(FAdapter);
+        finally
+          ClearContext;
+        end;
       end;
     end;
     raise;
@@ -212,10 +225,11 @@ var
   Adapter: FireDACDatabaseConnection;
   Container: TContainer;
 begin
-  // Uma consulta ativa depende da conexao. O chamador deve liberar as telas e
-  // os leitores antes que o Setup libere o adaptador, que possui a conexao.
+  // Uma consulta ativa depende da conexao e da fabrica de leitores. O chamador
+  // deve liberar as telas e os leitores antes que o Setup libere o adaptador.
   // O container e liberado primeiro porque pode manter a consulta, que referencia
-  // o adaptador; depois o adaptador e a conexao sao liberados.
+  // a fabrica e o adaptador; depois a fabrica e, por ultimo, o adaptador, que
+  // possui a conexao.
   Container := FContainer;
   FContainer := nil;
   if Container <> nil then
@@ -230,6 +244,10 @@ begin
   FAdapter := nil;
 
   try
+    // A fabrica e liberada antes do adaptador, pois cria leitores que usam a
+    // conexao dele.
+    FReaderFactory := nil;
+
     if Adapter <> nil then
     begin
       try
