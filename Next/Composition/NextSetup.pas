@@ -4,11 +4,16 @@ interface
 
 uses
   System.SysUtils, FireDACDatabaseConnectionUnit,
-  IDataBaseConnectionUnit, ISessionContextUnit, SessionContextUnit;
+  IDataBaseConnectionUnit, ISessionContextUnit, SessionContextUnit,
+  Spring.Container;
+
+const
+  MissingContextMessage = 'O contexto da empresa nao foi informado.';
 
 type
-  // Possui o contexto ERP recebido e a conexao/adaptador FireDAC do Next. Nunca
-  // abre a conexao em SetContext; o adaptador a abre na primeira busca.
+  // Possui o contexto ERP recebido, a conexao/adaptador FireDAC do Next e o
+  // container Spring4D usado somente na composicao. Nunca abre a conexao em
+  // SetContext; o adaptador a abre na primeira busca.
   // A identidade da empresa/usuario fica em SessionContext. As credenciais
   // tecnicas ficam somente na string de conexao mantida pelo adaptador.
   // Nenhum logger e associado, portanto falhas do adaptador nao sao registradas
@@ -17,6 +22,7 @@ type
   private
     FSessionContext: ISessionContext;
     FAdapter: FireDACDatabaseConnection;
+    FContainer: TContainer;
     FContextSet: Boolean;
     function GetAdapter: IDataBaseConnection;
     function BuildConnectionString(const ADatabaseName, ADatabaseUserName,
@@ -32,6 +38,7 @@ type
       const AUserLogin, ADatabaseName, ADatabaseUserName,
       ADatabasePassword: string): Boolean;
     procedure Release;
+    function Resolve<T: class>: T;
     property Adapter: IDataBaseConnection read GetAdapter;
     property SessionContext: ISessionContext read FSessionContext;
     property HasContext: Boolean read FContextSet;
@@ -46,7 +53,7 @@ uses
   // Registra o driver fisico Firebird no modulo Rio; sem esta unit o DriverID=FB
   // nao e resolvido na primeira conexao. FireDAC.DApt fornece o suporte usado
   // por TFDQuery e TFDTransaction.
-  FireDAC.DApt, FireDAC.Phys.FB;
+  FireDAC.DApt, FireDAC.Phys.FB, NextFeaturesComposition;
 
 const
   InvalidContextMessage = 'O contexto da empresa nao foi aceito.';
@@ -126,15 +133,32 @@ begin
   try
     FAdapter := FireDACDatabaseConnection.Create(nil);
     FAdapter.SetConnectionString(ConnectionString);
+
+    // O container e recriado a cada contexto. Ele apenas compoe as instancias
+    // recebidas e nao abre a conexao; a abertura continua sob demanda.
+    FContainer := TContainer.Create;
+    FContainer.RegisterInstance<ISessionContext>(FSessionContext);
+    FContainer.RegisterInstance<IDataBaseConnection>(FAdapter);
+    RegisterNextFeatures(FContainer);
+    FContainer.Build;
   except
-    FreeAndNil(FAdapter);
-    ClearContext;
+    // Sem servicos parciais: o container e liberado antes do adaptador e o
+    // contexto permanece vazio para a proxima tentativa de login.
+    try
+      FreeAndNil(FContainer);
+    finally
+      try
+        FreeAndNil(FAdapter);
+      finally
+        ClearContext;
+      end;
+    end;
     raise;
   end;
 
-  // A identidade so e publicada depois da validacao e da montagem da conexao.
-  // Somente empresa e login pertencem a sessao Next; nome, CNPJ, id e email
-  // nao sao recebidos pelo modulo.
+  // A identidade so e publicada depois da validacao e da montagem da conexao e
+  // do container. Somente empresa e login pertencem a sessao Next; nome, CNPJ,
+  // id e email nao sao recebidos pelo modulo.
   FSessionContext.SetEmpresa(ACompanyCode, '', '');
   FSessionContext.SetUsuario(0, AUserLogin, '');
   FContextSet := True;
@@ -152,12 +176,33 @@ begin
     (FSessionContext.UsuarioLogin = AUserLogin);
 end;
 
+function TNextSetup.Resolve<T>: T;
+begin
+  if (not FContextSet) or (FContainer = nil) then
+    raise Exception.Create(MissingContextMessage);
+
+  Result := FContainer.Resolve<T>;
+end;
+
 procedure TNextSetup.Release;
 var
   Adapter: FireDACDatabaseConnection;
+  Container: TContainer;
 begin
   // Uma consulta ativa depende da conexao. O chamador deve liberar as telas e
   // os leitores antes que o Setup libere o adaptador, que possui a conexao.
+  // O container e liberado primeiro porque pode manter a consulta, que referencia
+  // o adaptador; depois o adaptador e a conexao sao liberados.
+  Container := FContainer;
+  FContainer := nil;
+  if Container <> nil then
+  begin
+    try
+      Container.Free;
+    except
+    end;
+  end;
+
   Adapter := FAdapter;
   FAdapter := nil;
 

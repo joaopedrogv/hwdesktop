@@ -9,6 +9,7 @@
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Library</AppType>
+        <SPRING4D_ROOT Condition="'$(SPRING4D_ROOT)'==''">D:\Hw\pac\spring4d</SPRING4D_ROOT>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
@@ -60,6 +61,7 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_UnitSearchPath>$(SPRING4D_ROOT)\Library\Delphi10Rio\Win32\Release;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
@@ -130,11 +132,13 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\Composition\NextSetup.pas"/>
+        <DCCReference Include="..\Composition\NextFeaturesComposition.pas"/>
         <DCCReference Include="..\..\Modern\Core\Domain\Ports\Shared\ISessionContextUnit.pas"/>
         <DCCReference Include="..\..\Modern\Core\Application\Contexts\SessionContextUnit.pas"/>
         <DCCReference Include="..\Queries\Shared\NextQueryDefinition.pas"/>
         <DCCReference Include="..\Queries\Features\EventosRtc\EventosRtcDefinition.pas"/>
-        <DCCReference Include="..\Composition\EventosRtcQueryComposition.pas"/>
+        <DCCReference Include="..\Queries\Features\EventosRtc\EventosRtcQuery.pas"/>
+        <DCCReference Include="..\Queries\Features\EventosRtc\EventosRtcPresenter.pas"/>
         <DCCReference Include="..\Queries\Shared\Filters\StandardQueryFilterDefinition.pas"/>
         <DCCReference Include="..\Interop\Module\NextViewCatalog.pas"/>
         <DCCReference Include="..\Interop\Module\NextViewExports.pas"/>

@@ -4,27 +4,21 @@ interface
 
 uses
   System.SysUtils, Vcl.StdCtrls, QueryResultForm, FilterCriterion,
-  IDatabaseReaderUnit, GridColumnDefinition;
+  IDatabaseReaderUnit, GridColumnDefinition, EventosRtcPresenter;
 
 type
-  // Fabrica especifica da tela. O formulario decide a opcao de autorizacao a
-  // cada pesquisa e a composicao fornece o leitor correspondente.
-  TEventosRtcReaderFactory = reference to function(
-    const ACriteria: TFilterCriteria;
-    ASomenteNFeAutorizada: Boolean): IDatabaseReader;
-
   // Tela de Eventos RTC. Herda a apresentacao generica e acrescenta apenas a
-  // identidade da consulta e a opcao de restringir aos eventos autorizados; a
-  // definicao, o leitor e a reserva do contexto sao injetados pela composicao.
+  // identidade da consulta e a opcao de restringir aos eventos autorizados; o
+  // apresentador e o leitor correspondente sao injetados pela composicao.
   TfrmEventosRtc = class(TfrmQueryResult)
     chkSomenteAutorizada: TCheckBox;
   private
-    FEventosRtcReaderFactory: TEventosRtcReaderFactory;
-    function PesquisarComOpcao(
+    FPresenter: TEventosRtcPresenter;
+    function PesquisarEventos(
       const ACriteria: TFilterCriteria): IDatabaseReader;
   public
-    procedure AttachEventosRtcReaderFactory(
-      const AFactory: TEventosRtcReaderFactory;
+    destructor Destroy; override;
+    procedure AttachPresenter(APresenter: TEventosRtcPresenter;
       const AColumns: TGridColumnDefinitions; const ATitle: string);
   end;
 
@@ -33,30 +27,38 @@ implementation
 {$R *.dfm}
 
 const
-  MissingEventosRtcReaderFactoryMessage =
-    'A fabrica de leitores de Eventos RTC nao foi informada.';
+  MissingPresenterMessage =
+    'O apresentador de Eventos RTC nao foi informado.';
 
-procedure TfrmEventosRtc.AttachEventosRtcReaderFactory(
-  const AFactory: TEventosRtcReaderFactory;
-  const AColumns: TGridColumnDefinitions; const ATitle: string);
+destructor TfrmEventosRtc.Destroy;
 begin
-  if not Assigned(AFactory) then
-    raise Exception.Create(MissingEventosRtcReaderFactoryMessage);
-
-  // A base recebe apenas uma fabrica de criterios. Este metodo consulta a opcao
-  // atual da tela em cada chamada e a repassa para a fabrica especifica.
-  AttachReaderFactory(PesquisarComOpcao, AColumns, ATitle);
-
-  FEventosRtcReaderFactory := AFactory;
+  try
+    FreeAndNil(FPresenter);
+  finally
+    inherited;
+  end;
 end;
 
-function TfrmEventosRtc.PesquisarComOpcao(
+procedure TfrmEventosRtc.AttachPresenter(APresenter: TEventosRtcPresenter;
+  const AColumns: TGridColumnDefinitions; const ATitle: string);
+begin
+  if APresenter = nil then
+    raise Exception.Create(MissingPresenterMessage);
+
+  // A base recebe apenas o metodo de pesquisa; a opcao atual e consultada a
+  // cada busca. A tela assume o apresentador transiente so depois da associacao
+  // aceita, para que uma falha nao deixe posse parcial.
+  AttachReaderFactory(PesquisarComPresenter, AColumns, ATitle);
+  FPresenter := APresenter;
+end;
+
+function TfrmEventosRtc.PesquisarEventos(
   const ACriteria: TFilterCriteria): IDatabaseReader;
 begin
-  if not Assigned(FEventosRtcReaderFactory) then
-    raise Exception.Create(MissingEventosRtcReaderFactoryMessage);
+  if FPresenter = nil then
+    raise Exception.Create(MissingPresenterMessage);
 
-  Result := FEventosRtcReaderFactory(ACriteria, chkSomenteAutorizada.Checked);
+  Result := FPresenter.CriarLeitor(ACriteria, chkSomenteAutorizada.Checked);
 end;
 
 end.

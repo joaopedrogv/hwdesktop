@@ -17,7 +17,7 @@ uses
   EventosRtcDefinition, IDatabaseReaderUnit, LocalPreferences,
   WindowsRegistryLocalPreferences, StandardQueryFilterDefinition,
   QueryPreviewReader, QueryResultOperations, GridColumnDefinition,
-  EventosRtcQueryComposition;
+  NextSetup, EventosRtcPresenter;
 
 var
   FRegistry: TNextViewRegistry;
@@ -95,16 +95,24 @@ function CreateEventosRtcView(AParent: HWND): TfrmNextBase;
 var
   View: TfrmEventosRtc;
   Preferences: ILocalPreferences;
+  Presenter: TEventosRtcPresenter;
 begin
   Preferences := TWindowsRegistryLocalPreferences.Create;
 
   View := TfrmEventosRtc.CreateParented(AParent);
   try
-    // A tela coleta os criterios, le a opcao de autorizacao e recebe um leitor
-    // novo a cada pesquisa. A criacao do leitor e a reserva do contexto ficam
-    // na composicao.
-    View.AttachEventosRtcReaderFactory(CreateEventosRtcReader,
-      CreateEventosRtcColumns, 'Eventos RTC');
+    // A composicao resolve o apresentador do contexto atual. A tela o possui,
+    // consulta a empresa e a opcao de autorizacao a cada pesquisa e permanece
+    // responsavel pelo leitor e pelo conjunto retornado.
+    Presenter := NextSetupInstance.Resolve<TEventosRtcPresenter>;
+    try
+      View.AttachPresenter(Presenter, CreateEventosRtcColumns, 'Eventos RTC');
+    except
+      // Se a associacao nao foi aceita, a tela nao assumiu a posse; liberar
+      // evita deixar uma instancia orfa do apresentador.
+      Presenter.Free;
+      raise;
+    end;
 
     View.ConfigureFilters(CreateEventosRtcFilters(), Preferences,
       'next.rtc.events');
