@@ -17,7 +17,7 @@ uses
   EventosRtcDefinition, LocalPreferences,
   WindowsRegistryLocalPreferences, StandardQueryFilterDefinition,
   QueryPreviewReader, QueryResultOperations, GridColumnDefinition,
-  NextSetup, EventosRtcPresenter;
+  NextSetup, EventosRtcPresenter, IDataSetReaderUnit;
 
 var
   FRegistry: TNextViewRegistry;
@@ -51,6 +51,34 @@ begin
     Preferences := TWindowsRegistryLocalPreferences.Create;
     View.ConfigureFilters(CreateStandardQueryFilterDefinition, Preferences,
       'next.query.standard.filter');
+    Result := View;
+  except
+    View.Free;
+    raise;
+  end;
+end;
+
+function CreateValidationSecondView(AParent: HWND): TfrmNextBase;
+var
+  View: TfrmHwNextValidationSecond;
+  Reader: IDataSetReader;
+  Operations: IQueryResultOperations;
+begin
+  View := TfrmHwNextValidationSecond.CreateParented(AParent);
+  try
+    // A segunda previa usa o leitor de exemplo e as operacoes de marcacao para
+    // validar o filtro rapido sobre o mesmo conjunto ja carregado. As colunas
+    // seguem os campos criados pelo leitor de previa.
+    Reader := TQueryPreviewReader.Create('sel');
+    Operations := TQueryResultOperations.Create(Reader, 'sel');
+    View.Attach(Reader, GridColumns([
+      GridColumn('sel', 'Sel', 50, qcaCenter),
+      GridColumn('documento', 'Documento', 120),
+      GridColumn('descricao', 'Descri'#231#227'o', 220),
+      GridColumn('codigo', 'C'#243'digo', 90, qcaRight),
+      GridColumn('valor', 'Valor', 110, qcaRight),
+      GridColumn('data', 'Data', 110, qcaCenter)
+    ]), 'Valida'#231#227'o Next 2', Operations, True);
     Result := View;
   except
     View.Free;
@@ -100,6 +128,7 @@ end;
 initialization
   FRegistry := TNextViewRegistry.Create;
   FRegistry.Register('next.validation', CreateValidationView);
+  FRegistry.Register('next.validation.second', CreateValidationSecondView);
   FRegistry.Register('next.query.standard', CreateStandardQueryView);
   FRegistry.Register('next.rtc.events', CreateEventosRtcView);
 

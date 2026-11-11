@@ -8,6 +8,7 @@ uses
   NextBaseForm in '..\Interop\Module\NextBaseForm.pas',
   NextViewRegistry in '..\Interop\Module\NextViewRegistry.pas',
   HwNextValidationFormUnit in '..\UI\Forms\Validation\HwNextValidationFormUnit.pas' {frmHwNextValidation},
+  HwNextValidationSecondFormUnit in '..\UI\Forms\Validation\HwNextValidationSecondFormUnit.pas' {frmHwNextValidationSecond},
   DataGridFrame in '..\UI\Frames\Shared\Grid\DataGridFrame.pas' {frmDataGridFrame: TFrame},
   FilterDefinition in '..\Queries\Shared\Filters\FilterDefinition.pas',
   FilterCriterion in '..\Queries\Shared\Filters\FilterCriterion.pas',

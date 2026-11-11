@@ -26,6 +26,7 @@ type
     FColumns: TGridColumnDefinitions;
     FOperations: IQueryResultOperations;
     FTitle: string;
+    FQuickFilterEnabled: Boolean;
     FPesquisando: Boolean;
     procedure ConfigureColumns;
     procedure ClearResult;
@@ -37,9 +38,11 @@ type
     procedure ResetForSessionChange; override;
     procedure Attach(const AReader: IDataSetReader;
       const AColumns: TGridColumnDefinitions; const ATitle: string;
-      AOperations: IQueryResultOperations = nil);
+      AOperations: IQueryResultOperations = nil;
+      AQuickFilterEnabled: Boolean = False);
     procedure AttachReaderFactory(const AFactory: TQueryResultReaderFactory;
-      const AColumns: TGridColumnDefinitions; const ATitle: string);
+      const AColumns: TGridColumnDefinitions; const ATitle: string;
+      AQuickFilterEnabled: Boolean = False);
   end;
 
 implementation
@@ -64,7 +67,8 @@ const
 
 procedure TfrmQueryResult.Attach(const AReader: IDataSetReader;
   const AColumns: TGridColumnDefinitions; const ATitle: string;
-  AOperations: IQueryResultOperations = nil);
+  AOperations: IQueryResultOperations = nil;
+  AQuickFilterEnabled: Boolean = False);
 begin
   if AReader = nil then
     raise Exception.Create(MissingReaderMessage);
@@ -79,15 +83,17 @@ begin
   FColumns := AColumns;
   FTitle := ATitle;
   FOperations := AOperations;
+  FQuickFilterEnabled := AQuickFilterEnabled;
 
-  fraGrid.Configure(AOperations);
+  fraGrid.Configure(AOperations, FQuickFilterEnabled);
 
   //fraGrid.Configure(AFieldMark, AOperations);
 end;
 
 procedure TfrmQueryResult.AttachReaderFactory(
   const AFactory: TQueryResultReaderFactory;
-  const AColumns: TGridColumnDefinitions; const ATitle: string);
+  const AColumns: TGridColumnDefinitions; const ATitle: string;
+  AQuickFilterEnabled: Boolean = False);
 begin
   if not Assigned(AFactory) then
     raise Exception.Create(MissingReaderFactoryMessage);
@@ -98,13 +104,15 @@ begin
 
   // A consulta cria um novo leitor a cada pesquisa; nenhum leitor e recebido
   // nesta associacao. Sem operacoes de marcacao, a grade nao exibe a coluna SEL
-  // nem os comandos de selecao.
+  // nem os comandos de selecao. O filtro rapido tambem depende das operacoes;
+  // nesta fatia a opcao permanece desabilitada quando elas nao existem.
   FReaderFactory := AFactory;
   FColumns := AColumns;
   FTitle := ATitle;
   FOperations := nil;
+  FQuickFilterEnabled := AQuickFilterEnabled;
 
-  fraGrid.Configure(nil);
+  fraGrid.Configure(nil, FQuickFilterEnabled);
 end;
 
 procedure TfrmQueryResult.ConfigureColumns;
@@ -133,6 +141,10 @@ end;
 
 procedure TfrmQueryResult.ClearResult;
 begin
+  // Cada pesquisa comeca sem criterio rapido; o filtro pertence ao resultado
+  // anterior e nao deve sobreviver a troca do conjunto.
+  fraGrid.ClearQuickFilter();
+
   // Desvincular antes de limpar impede que a grade retenha um dataset liberado.
   dsConsulta.DataSet := nil;
   if FReader <> nil then

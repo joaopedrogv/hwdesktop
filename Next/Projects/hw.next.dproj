@@ -102,6 +102,10 @@
             <Form>frmHwNextValidation</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\UI\Forms\Validation\HwNextValidationSecondFormUnit.pas">
+            <Form>frmHwNextValidationSecond</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <DCCReference Include="..\UI\Frames\Shared\Grid\DataGridFrame.pas">
             <Form>frmDataGridFrame</Form>
             <FormType>dfm</FormType>

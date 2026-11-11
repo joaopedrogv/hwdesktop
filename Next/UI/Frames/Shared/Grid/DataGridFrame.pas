@@ -3,8 +3,9 @@ unit DataGridFrame;
 interface
 
 uses
-  Vcl.Forms, Vcl.Graphics, Vcl.Controls, Vcl.Grids, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.DBGrids,
-  System.Classes, System.Types, Data.DB, QueryResultOperations;
+  Vcl.Forms, Vcl.Graphics, Vcl.Controls, Vcl.Grids, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.DBGrids, Vcl.Menus, System.Classes, System.SysUtils, System.Types,
+  System.UITypes, Data.DB, QueryResultOperations;
 
 type
   TfrmDataGridFrame = class(TFrame)
@@ -12,7 +13,12 @@ type
     btnSelecionarTodos: TButton;
     btnDesmarcarTodos: TButton;
     btnInverterSelecao: TButton;
+    pnFiltroRapido: TPanel;
+    lblFiltroRapido: TLabel;
+    btnLimparFiltro: TButton;
     dbgDados: TDBGrid;
+    pmCelula: TPopupMenu;
+    miFiltrarValor: TMenuItem;
     procedure DrawCheckboxCell(const Rect: TRect;
       const State: TGridDrawState; AState: Boolean);
     procedure dbgDadosDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
@@ -22,25 +28,73 @@ type
     procedure btnDesmarcarTodosClick(Sender: TObject);
     procedure btnInverterSelecaoClick(Sender: TObject);
     procedure dbgDadosKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure dbgDadosMouseActivate(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y, HitTest: Integer;
+      var MouseActivate: TMouseActivate);
+    procedure miFiltrarValorClick(Sender: TObject);
+    procedure btnLimparFiltroClick(Sender: TObject);
   private
     FMarkingColumn: string;
     FOperations: IQueryResultOperations;
+    FQuickFilterEnabled: Boolean;
+    FQuickFilterColumnName: string;
 
     function GetDataSource: TDataSource;
     procedure SetDataSource(const Value: TDataSource);
     function MarkingActive(): Boolean;
+    function QuickFilterAvailable(): Boolean;
+    function QuickFilterField(): TField;
+    procedure HideQuickFilterBand();
     procedure DoMarkOperation(AOperation: TMarkOperation);
   public
-    procedure Configure(AOperations: IQueryResultOperations = nil);
+    procedure Configure(AOperations: IQueryResultOperations = nil;
+      AQuickFilterEnabled: Boolean = False);
+    // Remove o criterio rapido sem alterar as marcacoes. Usado pela tela antes
+    // de cada pesquisa, para o novo resultado comecar completo.
+    procedure ClearQuickFilter();
     property DataSource: TDataSource read GetDataSource write SetDataSource;
   end;
 
 implementation
 
 uses
-  SysUtils, Winapi.Windows;
+  Winapi.Windows;
 
 {$R *.dfm}
+
+const
+  QuickFilterTitle = 'Filtro r'#225'pido';
+  QuickFilterFailureMessage =
+    'N'#227'o foi poss'#237'vel filtrar pelo valor selecionado.';
+
+type
+  // Acesso as coordenadas de celula da grade. MouseCoord e protegido; o
+  // descendente local identifica a coluna sob o mouse sem forcar a coluna 0
+  // nem alterar a linha atual.
+  TDBGridCellAccess = class(TDBGrid)
+  public
+    function ColumnAt(const X, Y: Integer): TColumn;
+  end;
+
+function TDBGridCellAccess.ColumnAt(const X, Y: Integer): TColumn;
+var
+  Cell: TGridCoord;
+  DataCol: Integer;
+begin
+  Result := nil;
+  Cell := MouseCoord(X, Y);
+  if (Cell.Y < 0) or (Cell.X < IndicatorOffset) then
+    Exit;
+
+  // A linha de titulos nao representa um valor de dados.
+  if (dgTitles in Options) and (Cell.Y = 0) then
+    Exit;
+
+  DataCol := Cell.X - IndicatorOffset;
+  if (DataCol < 0) or (DataCol >= Columns.Count) then
+    Exit;
+
+  Result := Columns[DataCol];
+end;
 
 function TfrmDataGridFrame.GetDataSource: TDataSource;
 begin
@@ -56,8 +110,39 @@ begin
     and dbgDados.DataSource.DataSet.Active;
 end;
 
+function TfrmDataGridFrame.QuickFilterAvailable: Boolean;
+begin
+  Result := FQuickFilterEnabled
+    and (FOperations <> nil)
+    and (dbgDados.DataSource <> nil)
+    and (dbgDados.DataSource.DataSet <> nil)
+    and dbgDados.DataSource.DataSet.Active;
+end;
+
+function TfrmDataGridFrame.QuickFilterField: TField;
+begin
+  Result := nil;
+  if not QuickFilterAvailable() then
+    Exit;
+  if (FQuickFilterColumnName = '')
+    or SameText(FQuickFilterColumnName, FMarkingColumn) then
+    Exit;
+
+  Result := dbgDados.DataSource.DataSet.FindField(FQuickFilterColumnName);
+end;
+
+procedure TfrmDataGridFrame.HideQuickFilterBand;
+begin
+  lblFiltroRapido.Caption := '';
+  pnFiltroRapido.Visible := False;
+end;
+
 procedure TfrmDataGridFrame.SetDataSource(const Value: TDataSource);
 begin
+  // Uma nova origem de dados comeca sem criterio rapido; a faixa do resultado
+  // anterior nao sobrevive a troca do conjunto.
+  ClearQuickFilter();
+  FQuickFilterColumnName := '';
   dbgDados.DataSource := Value;
 end;
 
@@ -76,16 +161,76 @@ begin
   DoMarkOperation(moMarkAll);
 end;
 
-procedure TfrmDataGridFrame.Configure(AOperations: IQueryResultOperations = nil);
+procedure TfrmDataGridFrame.Configure(AOperations: IQueryResultOperations = nil;
+  AQuickFilterEnabled: Boolean = False);
 begin
   FOperations := AOperations;
+  FQuickFilterEnabled := AQuickFilterEnabled;
+  FQuickFilterColumnName := '';
 
   if FOperations <> nil then
     FMarkingColumn := FOperations.MarkingColumnName()
   else
     FMarkingColumn := '';
 
+  // Marcacao e filtro rapido sao independentes. A coluna SEL controla apenas os
+  // comandos de marcacao e nao e elegivel para o filtro.
   pnComandos.Visible := (FMarkingColumn <> '') and (FOperations <> nil);
+
+  if (not FQuickFilterEnabled) or (FOperations = nil) then
+    ClearQuickFilter();
+end;
+
+procedure TfrmDataGridFrame.ClearQuickFilter;
+begin
+  // Retira somente o criterio rapido; as marcacoes existentes sao preservadas.
+  if FOperations <> nil then
+    FOperations.ClearQuickFilter();
+  HideQuickFilterBand();
+  dbgDados.Invalidate();
+end;
+
+procedure TfrmDataGridFrame.dbgDadosMouseActivate(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y,
+  HitTest: Integer; var MouseActivate: TMouseActivate);
+var
+  Column: TColumn;
+begin
+  // O evento dbgDadosMouseDown não responde no formulario, por isso o uso desse evento substituto
+  if Button <> mbRight then
+    Exit;
+
+  miFiltrarValor.Enabled := False;
+  FQuickFilterColumnName := '';
+  Column := TDBGridCellAccess(dbgDados).ColumnAt(X, Y);
+  if (Column = nil) or (Column.Field = nil) then
+    Exit;
+
+  FQuickFilterColumnName := Column.FieldName;
+  miFiltrarValor.Enabled := QuickFilterField() <> nil;
+end;
+
+procedure TfrmDataGridFrame.miFiltrarValorClick(Sender: TObject);
+var
+  DataField: TField;
+begin
+  DataField := QuickFilterField();
+  if DataField = nil then
+    Exit;
+
+  if FOperations.ApplyQuickFilter(DataField) then
+  begin
+    lblFiltroRapido.Caption := 'Filtro: ' + FOperations.QuickFilterDescription();
+    pnFiltroRapido.Visible := True;
+    dbgDados.Invalidate();
+  end
+  else
+    Application.MessageBox(PChar(QuickFilterFailureMessage),
+      PChar(QuickFilterTitle), MB_OK or MB_ICONWARNING);
+end;
+
+procedure TfrmDataGridFrame.btnLimparFiltroClick(Sender: TObject);
+begin
+  ClearQuickFilter();
 end;
 
 procedure TfrmDataGridFrame.dbgDadosCellClick(Column: TColumn);
