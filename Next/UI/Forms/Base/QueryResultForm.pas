@@ -141,9 +141,9 @@ end;
 
 procedure TfrmQueryResult.ClearResult;
 begin
-  // Cada pesquisa comeca sem criterio rapido; o filtro pertence ao resultado
+  // Cada pesquisa comeca sem criterios rapidos; o filtro pertence ao resultado
   // anterior e nao deve sobreviver a troca do conjunto.
-  fraGrid.ClearQuickFilter();
+  fraGrid.ClearQuickFilters();
 
   // Desvincular antes de limpar impede que a grade retenha um dataset liberado.
   dsConsulta.DataSet := nil;

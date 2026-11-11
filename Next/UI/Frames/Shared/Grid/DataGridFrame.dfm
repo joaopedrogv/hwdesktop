@@ -14,6 +14,38 @@ object frmDataGridFrame: TfrmDataGridFrame
     BevelOuter = bvNone
     TabOrder = 1
     Visible = False
+    object btnMaisFiltro: TSpeedButton
+      AlignWithMargins = True
+      Left = 90
+      Top = 7
+      Width = 23
+      Height = 22
+      Cursor = crHandPoint
+      Hint = 'Op'#231#245'es do filtro'
+      Margins.Top = 7
+      Margins.Bottom = 7
+      Flat = True
+      Glyph.Data = {
+        E6010000424DE60100000000000036000000280000000C0000000C0000000100
+        180000000000B0010000120B0000120B00000000000000000000FFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7E4BDE5A629F7E4BEFFFFFFEAB853
+        EAB754FFFFFFF7E4BDE5A629F7E4BEFFFFFFFFFFFFF7E3BCE5A629F7E4BDFFFF
+        FFE9B650EAB853FFFFFFF7E3BCE5A629F7E4BDFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        FFFFFFFFFFFFFFFFFFFF}
+      ParentShowHint = False
+      ShowHint = True
+      Visible = False
+    end
     object pnMarcacao: TPanel
       Left = 0
       Top = 0
@@ -23,18 +55,15 @@ object frmDataGridFrame: TfrmDataGridFrame
       BevelOuter = bvNone
       TabOrder = 0
       object btnSelecionarTodos: TSpeedButton
+        AlignWithMargins = True
         Left = 3
         Top = 7
         Width = 23
         Height = 22
-        AlignWithMargins = True
-        Margins.Left = 3
-        Margins.Top = 7
-        Margins.Right = 3
-        Margins.Bottom = 7
         Cursor = crHandPoint
         Hint = 'Selecionar todos'
-        ShowHint = True
+        Margins.Top = 7
+        Margins.Bottom = 7
         Align = alLeft
         Flat = True
         Glyph.Data = {
@@ -63,23 +92,21 @@ object frmDataGridFrame: TfrmDataGridFrame
           FD99CBFD99CBFD99CBFD99D2FDA7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
           FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
           FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        }
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+        ParentShowHint = False
+        ShowHint = True
         OnClick = btnSelecionarTodosClick
       end
       object btnDesmarcarTodos: TSpeedButton
+        AlignWithMargins = True
         Left = 32
         Top = 7
         Width = 23
         Height = 22
-        AlignWithMargins = True
-        Margins.Left = 3
-        Margins.Top = 7
-        Margins.Right = 3
-        Margins.Bottom = 7
         Cursor = crHandPoint
         Hint = 'Desmarcar todos'
-        ShowHint = True
+        Margins.Top = 7
+        Margins.Bottom = 7
         Align = alLeft
         Flat = True
         Glyph.Data = {
@@ -108,23 +135,21 @@ object frmDataGridFrame: TfrmDataGridFrame
           FD99CBFD99CBFD99CBFD99D2FDA7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
           FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
           FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        }
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+        ParentShowHint = False
+        ShowHint = True
         OnClick = btnDesmarcarTodosClick
       end
       object btnInverterSelecao: TSpeedButton
+        AlignWithMargins = True
         Left = 61
         Top = 7
         Width = 23
         Height = 22
-        AlignWithMargins = True
-        Margins.Left = 3
-        Margins.Top = 7
-        Margins.Right = 3
-        Margins.Bottom = 7
         Cursor = crHandPoint
         Hint = 'Inverter sele'#231#227'o'
-        ShowHint = True
+        Margins.Top = 7
+        Margins.Bottom = 7
         Align = alLeft
         Flat = True
         Glyph.Data = {
@@ -153,72 +178,20 @@ object frmDataGridFrame: TfrmDataGridFrame
           EEEEEBBB55F4CA3CF4C93BF4C83AF3C739ECB72EF5E0B8FFFFFFFFFFFFFFFFFF
           FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBF4E5F5DDB2F5DDB2F5DDB2F5DD
           B2F5E0B8FEFCF9FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        }
+          FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+        ParentShowHint = False
+        ShowHint = True
         OnClick = btnInverterSelecaoClick
       end
     end
-    object btnMaisFiltro: TSpeedButton
-      Left = 90
-      Top = 7
-      Width = 23
-      Height = 22
-      AlignWithMargins = True
-      Margins.Left = 3
-      Margins.Top = 7
-      Margins.Right = 3
-      Margins.Bottom = 7
-      Cursor = crHandPoint
-      Hint = 'Op'#231#245'es do filtro'
-      ShowHint = True
-      Align = alLeft
-      Flat = True
-      Glyph.Data = {
-        E6010000424DE60100000000000036000000280000000C0000000C0000000100
-        180000000000B0010000120B0000120B00000000000000000000FFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7E4BDE5A629F7E4BEFFFFFFEAB853
-        EAB754FFFFFFF7E4BDE5A629F7E4BEFFFFFFFFFFFFF7E3BCE5A629F7E4BDFFFF
-        FFE9B650EAB853FFFFFFF7E3BCE5A629F7E4BDFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-        FFFFFFFFFFFFFFFFFFFF
-      }
-      Visible = False
-      OnClick = btnMaisFiltroClick
-    end
-    object lblFiltroRapido: TLabel
-      Left = 116
-      Top = 3
-      Width = 150
-      Height = 30
-      AlignWithMargins = True
-      Margins.Left = 0
-      Margins.Top = 3
-      Margins.Right = 0
-      Margins.Bottom = 3
-      Align = alLeft
-      AutoSize = False
-      EllipsisPosition = epEndEllipsis
-      Layout = tlCenter
-      Visible = False
-    end
-    object spFiltro: TSplitter
-      Left = 266
+    object pnCriterios: TPanel
+      Left = 87
       Top = 0
-      Width = 5
+      Width = 673
       Height = 36
-      Align = alLeft
-      MinSize = 60
-      ResizeStyle = rsUpdate
-      Visible = False
+      Align = alClient
+      BevelOuter = bvNone
+      TabOrder = 1
     end
   end
   object dbgDados: TDBGrid
@@ -248,13 +221,10 @@ object frmDataGridFrame: TfrmDataGridFrame
       Caption = 'Filtrar por este valor'
       OnClick = miFiltrarValorClick
     end
-  end
-  object pmFiltro: TPopupMenu
-    Left = 16
-    Top = 136
-    object miRemoverFiltro: TMenuItem
-      Caption = 'Remover'
-      OnClick = miRemoverFiltroClick
+    object miLimparFiltros1: TMenuItem
+      Caption = 'Limpar filtros'
+      Enabled = False
+      OnClick = miLimparFiltros1Click
     end
   end
 end

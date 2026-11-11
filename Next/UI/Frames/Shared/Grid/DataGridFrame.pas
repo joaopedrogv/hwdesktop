@@ -5,23 +5,35 @@ interface
 uses
   Vcl.Forms, Vcl.Graphics, Vcl.Controls, Vcl.Buttons, Vcl.Grids, Vcl.StdCtrls, Vcl.ExtCtrls,
   Vcl.DBGrids, Vcl.Menus, System.Classes, System.SysUtils, System.Types,
-  System.UITypes, Data.DB, QueryResultOperations;
+  System.UITypes, System.Generics.Collections, Data.DB, QueryResultOperations;
 
 type
+  // Controles de um criterio na faixa. Os slots sao reaproveitados na ordem
+  // dos criterios, evitando recriar a faixa inteira a cada remocao. O painel
+  // agrupa botao e rotulo para que o splitter nao dispute o alinhamento a
+  // esquerda com controles irmaos.
+  TCriterionBandSlot = record
+    Panel: TPanel;
+    FilterPanel: TPanel;
+    Button: TSpeedButton;
+    CaptionLabel: TLabel;
+    Splitter: TSplitter;
+    Menu: TPopupMenu;
+    MenuItem: TMenuItem;
+  end;
+
   TfrmDataGridFrame = class(TFrame)
     pnComandos: TPanel;
     pnMarcacao: TPanel;
+    pnCriterios: TPanel;
     btnSelecionarTodos: TSpeedButton;
     btnDesmarcarTodos: TSpeedButton;
     btnInverterSelecao: TSpeedButton;
     btnMaisFiltro: TSpeedButton;
-    lblFiltroRapido: TLabel;
-    spFiltro: TSplitter;
     dbgDados: TDBGrid;
     pmCelula: TPopupMenu;
     miFiltrarValor: TMenuItem;
-    pmFiltro: TPopupMenu;
-    miRemoverFiltro: TMenuItem;
+    miLimparFiltros1: TMenuItem;
     procedure DrawCheckboxCell(const Rect: TRect;
       const State: TGridDrawState; AState: Boolean);
     procedure dbgDadosDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
@@ -34,13 +46,13 @@ type
     procedure dbgDadosMouseActivate(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y, HitTest: Integer;
       var MouseActivate: TMouseActivate);
     procedure miFiltrarValorClick(Sender: TObject);
-    procedure btnMaisFiltroClick(Sender: TObject);
-    procedure miRemoverFiltroClick(Sender: TObject);
+    procedure miLimparFiltros1Click(Sender: TObject);
   private
     FMarkingColumn: string;
     FOperations: IQueryResultOperations;
     FQuickFilterEnabled: Boolean;
     FQuickFilterColumnName: string;
+    FCriterionSlots: TList<TCriterionBandSlot>;
 
     function GetDataSource: TDataSource;
     procedure SetDataSource(const Value: TDataSource);
@@ -48,14 +60,21 @@ type
     function MarkingEnabled(): Boolean;
     function QuickFilterAvailable(): Boolean;
     function QuickFilterField(): TField;
+    function CriteriaCount(): Integer;
+    procedure EnsureCriterionSlot(AIndex: Integer);
+    procedure UpdateCriterionControls();
     procedure UpdateCommandBandLayout();
     procedure DoMarkOperation(AOperation: TMarkOperation);
+    procedure btnCriterioClick(Sender: TObject);
+    procedure miRemoverCriterioClick(Sender: TObject);
   public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     procedure Configure(AOperations: IQueryResultOperations = nil;
       AQuickFilterEnabled: Boolean = False);
-    // Remove o criterio rapido sem alterar as marcacoes. Usado pela tela antes
-    // de cada pesquisa, para o novo resultado comecar completo.
-    procedure ClearQuickFilter();
+    // Remove todos os criterios rapidos sem alterar as marcacoes. Usado pela
+    // tela antes de cada pesquisa, para o novo resultado comecar completo.
+    procedure ClearQuickFilters();
     property DataSource: TDataSource read GetDataSource write SetDataSource;
   end;
 
@@ -101,6 +120,33 @@ begin
   Result := Columns[DataCol];
 end;
 
+constructor TfrmDataGridFrame.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FCriterionSlots := TList<TCriterionBandSlot>.Create;
+end;
+
+destructor TfrmDataGridFrame.Destroy;
+var
+  I: Integer;
+begin
+  // Os menus pertencem ao frame; liberar antes dos controles evita referencias
+  // pendentes. Painel, botao e rotulo pertencem a cadeia de pais do VCL e sao
+  // destruidos por ela, sem liberacao duplicada aqui.
+  if FCriterionSlots <> nil then
+  begin
+    for I := 0 to FCriterionSlots.Count - 1 do
+    begin
+      if FCriterionSlots[I].Button <> nil then
+        FCriterionSlots[I].Button.PopupMenu := nil;
+      if FCriterionSlots[I].Menu <> nil then
+        FCriterionSlots[I].Menu.Free;
+    end;
+    FCriterionSlots.Free;
+  end;
+  inherited;
+end;
+
 function TfrmDataGridFrame.GetDataSource: TDataSource;
 begin
   Result := dbgDados.DataSource;
@@ -142,6 +188,157 @@ begin
   Result := dbgDados.DataSource.DataSet.FindField(FQuickFilterColumnName);
 end;
 
+function TfrmDataGridFrame.CriteriaCount: Integer;
+begin
+  if FOperations <> nil then
+    Result := FOperations.QuickFilterCount()
+  else
+    Result := 0;
+end;
+
+procedure TfrmDataGridFrame.EnsureCriterionSlot(AIndex: Integer);
+var
+  Slot: TCriterionBandSlot;
+begin
+  while FCriterionSlots.Count <= AIndex do
+  begin
+    Slot.Panel := TPanel.Create(pnCriterios);
+    Slot.Panel.Parent := pnCriterios;
+    Slot.Panel.Visible := False;
+    Slot.Panel.Width := 150;
+    Slot.Panel.Height := 30;
+    Slot.Panel.BevelOuter := bvNone;
+    Slot.Panel.AlignWithMargins := True;
+    Slot.Panel.Margins.Top := 3;
+    Slot.Panel.Margins.Bottom := 3;
+    Slot.Panel.Align := alLeft;
+
+    Slot.FilterPanel := TPanel.Create(Slot.Panel);
+    Slot.FilterPanel.Parent := Slot.Panel;
+    Slot.FilterPanel.Align := alClient;
+    Slot.FilterPanel.AlignWithMargins := True;
+    Slot.FilterPanel.Margins.Left := 3;
+    Slot.FilterPanel.Margins.Top := 3;
+    Slot.FilterPanel.Margins.Right := 3;
+    Slot.FilterPanel.Margins.Bottom := 3;
+    Slot.FilterPanel.BevelOuter := bvNone;
+
+    Slot.Button := TSpeedButton.Create(Slot.FilterPanel);
+    Slot.Button.Parent := Slot.FilterPanel;
+    Slot.Button.Visible := False;
+    Slot.Button.Width := 23;
+    Slot.Button.Height := 18;
+    Slot.Button.Align := alLeft;
+    Slot.Button.AlignWithMargins := True;
+    Slot.Button.Margins.Left := 3;
+    Slot.Button.Margins.Top := 3;
+    Slot.Button.Margins.Right := 3;
+    Slot.Button.Margins.Bottom := 3;
+    Slot.Button.Cursor := crHandPoint;
+    Slot.Button.Flat := True;
+    Slot.Button.ShowHint := True;
+    Slot.Button.OnClick := btnCriterioClick;
+    if btnMaisFiltro <> nil then
+    begin
+      Slot.Button.Glyph.Assign(btnMaisFiltro.Glyph);
+      Slot.Button.NumGlyphs := btnMaisFiltro.NumGlyphs;
+    end;
+
+    Slot.CaptionLabel := TLabel.Create(Slot.FilterPanel);
+    Slot.CaptionLabel.Parent := Slot.FilterPanel;
+    Slot.CaptionLabel.Visible := False;
+    Slot.CaptionLabel.Align := alClient;
+    Slot.CaptionLabel.AlignWithMargins := True;
+    Slot.CaptionLabel.Margins.Left := 3;
+    Slot.CaptionLabel.Margins.Top := 3;
+    Slot.CaptionLabel.Margins.Right := 3;
+    Slot.CaptionLabel.Margins.Bottom := 3;
+    Slot.CaptionLabel.AutoSize := False;
+    Slot.CaptionLabel.EllipsisPosition := epEndEllipsis;
+    Slot.CaptionLabel.Layout := tlCenter;
+    Slot.CaptionLabel.ShowHint := True;
+
+    Slot.Splitter := TSplitter.Create(pnCriterios);
+    Slot.Splitter.Parent := pnCriterios;
+    Slot.Splitter.Visible := False;
+    // Slot.Splitter.Width := 5;
+    // Slot.Splitter.Height := 36;
+    // Slot.Splitter.MinSize := 60;
+    // Slot.Splitter.ResizeStyle := rsUpdate;
+    Slot.Splitter.Align := alLeft;
+    Slot.Splitter.Left := Slot.Panel.Left + Slot.Panel.Width + 5;
+    Slot.Splitter.Beveled := True;
+    Slot.Splitter.AlignWithMargins := True;
+    Slot.Splitter.Margins.Left := 0;
+    Slot.Splitter.Margins.Right := 0;
+    Slot.Splitter.Margins.Top := 6;
+    Slot.Splitter.Margins.Bottom := 6;
+
+    // O menu pertence ao slot e recebe o criterio corrente pelo Tag, sem
+    // OnPopup para preservar a ligacao RLINK32.
+    Slot.Menu := TPopupMenu.Create(Self);
+    Slot.MenuItem := TMenuItem.Create(Slot.Menu);
+    Slot.MenuItem.Caption := 'Remover';
+    Slot.MenuItem.OnClick := miRemoverCriterioClick;
+    Slot.Menu.Items.Add(Slot.MenuItem);
+    Slot.Button.PopupMenu := Slot.Menu;
+    Slot.MenuItem.Tag := 0;
+
+    FCriterionSlots.Add(Slot);
+  end;
+end;
+
+procedure TfrmDataGridFrame.UpdateCriterionControls;
+var
+  I: Integer;
+  Count: Integer;
+  AId: Integer;
+  Description: string;
+  Slot: TCriterionBandSlot;
+begin
+  Count := CriteriaCount();
+
+  // Cada linha da lista ocupa um slot proprio e mantem a ordem de insercao.
+  for I := 0 to Count - 1 do
+  begin
+    EnsureCriterionSlot(I);
+    AId := FOperations.QuickFilterId(I);
+    Description := FOperations.QuickFilterDescription(AId);
+
+    Slot := FCriterionSlots[I];
+    Slot.Button.Tag := AId;
+    if Description <> '' then
+      Slot.Button.Hint := 'Remover filtro: ' + Description
+    else
+      Slot.Button.Hint := 'Remover filtro';
+    Slot.Button.Visible := True;
+
+    Slot.CaptionLabel.Caption := Description;
+    Slot.CaptionLabel.Hint := Description;
+    Slot.CaptionLabel.Visible := True;
+
+    Slot.Panel.Visible := True;
+    Slot.Splitter.Visible := True;
+    Slot.MenuItem.Tag := AId;
+  end;
+
+  // Slots que excedem a quantidade atual ficam ocultos, mas preservados para
+  // reutilizacao quando um novo criterio for inserido.
+  for I := Count to FCriterionSlots.Count - 1 do
+  begin
+    Slot := FCriterionSlots[I];
+    Slot.Button.Tag := 0;
+    Slot.Button.Hint := '';
+    Slot.Button.Visible := False;
+    Slot.CaptionLabel.Caption := '';
+    Slot.CaptionLabel.Hint := '';
+    Slot.CaptionLabel.Visible := False;
+    Slot.Panel.Visible := False;
+    Slot.Splitter.Visible := False;
+    Slot.MenuItem.Tag := 0;
+  end;
+end;
+
 procedure TfrmDataGridFrame.UpdateCommandBandLayout;
 var
   MarkingOn: Boolean;
@@ -153,15 +350,10 @@ begin
   // Os botoes de marcacao formam um bloco unico para que o alinhamento a
   // esquerda nao os reordene ao alternar entre os estados da faixa.
   pnMarcacao.Visible := MarkingOn;
+  pnCriterios.Visible := FilterOn;
 
-  btnMaisFiltro.Visible := FilterOn;
-  lblFiltroRapido.Visible := FilterOn;
-  spFiltro.Visible := FilterOn;
-
-  if FilterOn then
-    lblFiltroRapido.Caption := 'Filtro: ' + FOperations.QuickFilterDescription()
-  else
-    lblFiltroRapido.Caption := '';
+  UpdateCriterionControls();
+  miLimparFiltros1.Enabled := FilterOn;
 
   pnComandos.Visible := MarkingOn or FilterOn;
   Realign;
@@ -169,11 +361,53 @@ end;
 
 procedure TfrmDataGridFrame.SetDataSource(const Value: TDataSource);
 begin
-  // Uma nova origem de dados comeca sem criterio rapido; a faixa do resultado
+  // Uma nova origem de dados comeca sem criterios; a faixa do resultado
   // anterior nao sobrevive a troca do conjunto.
-  ClearQuickFilter();
+  if FOperations <> nil then
+    FOperations.ClearQuickFilters();
   FQuickFilterColumnName := '';
   dbgDados.DataSource := Value;
+  UpdateCommandBandLayout();
+end;
+
+procedure TfrmDataGridFrame.btnCriterioClick(Sender: TObject);
+var
+  Button: TSpeedButton;
+  PopupPoint: TPoint;
+begin
+  if not (Sender is TSpeedButton) then
+    Exit;
+
+  Button := TSpeedButton(Sender);
+  if (Button.Tag = 0) or (Button.PopupMenu = nil) then
+    Exit;
+
+  // O menu e aberto pelo clique; o Tag do item identifica somente este
+  // criterio e nao ha OnPopup para preservar a ligacao RLINK32.
+  PopupPoint := Button.ClientToScreen(Point(0, Button.Height));
+  Button.PopupMenu.Popup(PopupPoint.X, PopupPoint.Y);
+end;
+
+procedure TfrmDataGridFrame.miRemoverCriterioClick(Sender: TObject);
+var
+  AId: Integer;
+begin
+  if not (Sender is TMenuItem) then
+    Exit;
+
+  AId := Integer(TMenuItem(Sender).Tag);
+  if (FOperations = nil) or (AId = 0) then
+    Exit;
+
+  // Remove apenas o criterio escolhido; a faixa e recalculada na ordem restante.
+  FOperations.RemoveQuickFilter(AId);
+  UpdateCommandBandLayout();
+  dbgDados.Invalidate();
+end;
+
+procedure TfrmDataGridFrame.miLimparFiltros1Click(Sender: TObject);
+begin
+  ClearQuickFilters();
 end;
 
 procedure TfrmDataGridFrame.btnDesmarcarTodosClick(Sender: TObject);
@@ -203,18 +437,20 @@ begin
   else
     FMarkingColumn := '';
 
-  // Marcacao e filtro rapido sao independentes. A coluna SEL controla apenas os
-  // comandos de marcacao e nao e elegivel para o filtro.
-  // Uma nova configuracao comeca sem criterio rapido e recalcula a faixa.
-  ClearQuickFilter();
+  // Marcacao e filtros rapidos sao independentes. A coluna SEL controla apenas
+  // os comandos de marcacao e nao e elegivel para o filtro.
+  // Uma nova configuracao comeca sem criterios e recalcula a faixa.
+  if FOperations <> nil then
+    FOperations.ClearQuickFilters();
   UpdateCommandBandLayout();
 end;
 
-procedure TfrmDataGridFrame.ClearQuickFilter;
+procedure TfrmDataGridFrame.ClearQuickFilters;
 begin
-  // Retira somente o criterio rapido; as marcacoes existentes sao preservadas.
+  // Retira somente os criterios rapidos; as marcacoes existentes sao
+  // preservadas.
   if FOperations <> nil then
-    FOperations.ClearQuickFilter();
+    FOperations.ClearQuickFilters();
   UpdateCommandBandLayout();
   dbgDados.Invalidate();
 end;
@@ -241,12 +477,14 @@ end;
 procedure TfrmDataGridFrame.miFiltrarValorClick(Sender: TObject);
 var
   DataField: TField;
+  AId: Integer;
 begin
   DataField := QuickFilterField();
   if DataField = nil then
     Exit;
 
-  if FOperations.ApplyQuickFilter(DataField) then
+  // Cada aceite acrescenta um criterio; os anteriores continuam ativos.
+  if FOperations.AddQuickFilter(DataField, AId) then
   begin
     UpdateCommandBandLayout();
     dbgDados.Invalidate();
@@ -254,20 +492,6 @@ begin
   else
     Application.MessageBox(PChar(QuickFilterFailureMessage),
       PChar(QuickFilterTitle), MB_OK or MB_ICONWARNING);
-end;
-
-procedure TfrmDataGridFrame.btnMaisFiltroClick(Sender: TObject);
-var
-  PopupPoint: TPoint;
-begin
-  // O menu e aberto pelo clique; nao ha OnPopup para preservar a ligacao RLINK32.
-  PopupPoint := btnMaisFiltro.ClientToScreen(Point(0, btnMaisFiltro.Height));
-  pmFiltro.Popup(PopupPoint.X, PopupPoint.Y);
-end;
-
-procedure TfrmDataGridFrame.miRemoverFiltroClick(Sender: TObject);
-begin
-  ClearQuickFilter();
 end;
 
 procedure TfrmDataGridFrame.dbgDadosCellClick(Column: TColumn);
