@@ -48,7 +48,7 @@ begin
   // A base recebe apenas o metodo de pesquisa; a opcao atual e consultada a
   // cada busca. A tela assume o apresentador transiente so depois da associacao
   // aceita, para que uma falha nao deixe posse parcial.
-  AttachReaderFactory(PesquisarComPresenter, AColumns, ATitle);
+  AttachReaderFactory(PesquisarEventos, AColumns, ATitle);
   FPresenter := APresenter;
 end;
 
