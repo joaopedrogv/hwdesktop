@@ -5,57 +5,38 @@ interface
 uses
   FilterCriterion, IDatabaseReaderUnit;
 
-// Cria o leitor de Eventos RTC na composicao. A empresa 1 e provisoria nesta
-// etapa. Cada leitor recebe uma reserva propria do contexto, devolvida depois de
-// o leitor interno ser liberado.
+// Cria o leitor de Eventos RTC na composicao. A empresa vem da sessao recebida
+// no login e e obrigatoria. O adaptador devolve o leitor diretamente; a tela
+// possui o leitor e o libera ao desvincular o conjunto.
 function CreateEventosRtcReader(const ACriteria: TFilterCriteria;
   ASomenteNFeAutorizada: Boolean): IDatabaseReader;
 
 implementation
 
 uses
-  System.SysUtils, NextSetup, NextQueryDefinition, EventosRtcDefinition,
-  ReaderContextLease;
+  System.SysUtils, NextSetup, NextQueryDefinition, EventosRtcDefinition;
 
 const
   MissingContextMessage = 'O contexto da empresa nao foi informado.';
-  ProvisionalCompanyCode = 1;
 
 function CreateEventosRtcReader(const ACriteria: TFilterCriteria;
   ASomenteNFeAutorizada: Boolean): IDatabaseReader;
 var
   Definition: TNextQueryDefinition;
-  InnerReader: IDatabaseReader;
-  ContextAcquired: Boolean;
+  CompanyCode: Integer;
 begin
-  if (not NextSetupInstance.HasContext) or (NextSetupInstance.Adapter = nil) then
+  if (not NextSetupInstance.HasContext) or (NextSetupInstance.Adapter = nil) or
+    (NextSetupInstance.SessionContext = nil) then
     raise Exception.Create(MissingContextMessage);
 
-  // A reserva e adquirida antes de criar o leitor. O wrapper passa a possuir o
-  // leitor interno e a devolucao da reserva.
-  NextSetupInstance.AcquireContext;
-  ContextAcquired := True;
-  InnerReader := nil;
-  try
-    Definition := CreateEventosRtcDefinition(ProvisionalCompanyCode, ACriteria,
-      ASomenteNFeAutorizada);
-    InnerReader := NextSetupInstance.Adapter.CreateReader(Definition.Sql,
-      Definition.Parameters);
+  CompanyCode := NextSetupInstance.SessionContext.EmpresaId;
+  if CompanyCode <= 0 then
+    raise Exception.Create(MissingContextMessage);
 
-    Result := TReaderContextLease.Create(InnerReader,
-      procedure
-      begin
-        NextSetupInstance.ReleaseContext;
-      end);
-    // Somente a partir da transferencia o wrapper responde pela reserva.
-    ContextAcquired := False;
-  finally
-    // Sem transferencia, o leitor nao entregue e liberado antes de a reserva
-    // ser devolvida uma unica vez pela composicao.
-    InnerReader := nil;
-    if ContextAcquired then
-      NextSetupInstance.ReleaseContext;
-  end;
+  Definition := CreateEventosRtcDefinition(CompanyCode, ACriteria,
+    ASomenteNFeAutorizada);
+  Result := NextSetupInstance.Adapter.CreateReader(Definition.Sql,
+    Definition.Parameters);
 end;
 
 end.

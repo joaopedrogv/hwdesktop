@@ -20,9 +20,10 @@ type
 
   THwNextErpContext = record
     CompanyCode: Integer;
+    UserLogin: string;
     DatabaseName: string;
-    UserName: string;
-    Password: string;
+    DatabaseUserName: string;
+    DatabasePassword: string;
   end;
 
 function NextQueryOptions: THwNextOpenOptions;
@@ -747,20 +748,23 @@ const
   ContextFailure = 'Nao foi possivel preparar a tela Eventos RTC.';
   ContextRejected = 'O contexto da empresa nao foi aceito.';
 var
+  UserLogin: WideString;
   DatabaseName: WideString;
-  UserName: WideString;
-  Password: WideString;
+  DatabaseUserName: WideString;
+  DatabasePassword: WideString;
 begin
   Result := False;
+  UserLogin := '';
   DatabaseName := '';
-  UserName := '';
-  Password := '';
+  DatabaseUserName := '';
+  DatabasePassword := '';
   try
     // O buffer PWideChar termina em nulo; um #0 interno truncaria o valor
     // silenciosamente antes que o modulo pudesse valida-lo.
-    if (Pos(#0, AContext.DatabaseName) > 0) or
-       (Pos(#0, AContext.UserName) > 0) or
-       (Pos(#0, AContext.Password) > 0) then
+    if (Pos(#0, AContext.UserLogin) > 0) or
+       (Pos(#0, AContext.DatabaseName) > 0) or
+       (Pos(#0, AContext.DatabaseUserName) > 0) or
+       (Pos(#0, AContext.DatabasePassword) > 0) then
     begin
       ShowFailure(ContextFailure, ContextRejected);
       Exit;
@@ -783,14 +787,16 @@ begin
       Exit;
     end;
 
+    UserLogin := AContext.UserLogin;
     DatabaseName := AContext.DatabaseName;
-    UserName := AContext.UserName;
-    Password := AContext.Password;
+    DatabaseUserName := AContext.DatabaseUserName;
+    DatabasePassword := AContext.DatabasePassword;
 
     // O host nao armazena uma copia do contexto. O modulo possui os valores
     // recebidos e estes buffers locais sao limpos antes do retorno.
-    if FApi.SetContext(AContext.CompanyCode, PWideChar(DatabaseName),
-      PWideChar(UserName), PWideChar(Password)) = False then
+    if FApi.SetContext(AContext.CompanyCode, PWideChar(UserLogin),
+      PWideChar(DatabaseName), PWideChar(DatabaseUserName),
+      PWideChar(DatabasePassword)) = False then
     begin
       ShowFailure(ContextFailure, ContextRejected);
       Exit;
@@ -798,9 +804,10 @@ begin
 
     Result := True;
   finally
+    UserLogin := '';
     DatabaseName := '';
-    UserName := '';
-    Password := '';
+    DatabaseUserName := '';
+    DatabasePassword := '';
   end;
 end;
 
@@ -925,17 +932,14 @@ procedure THwNextHostBridge.NotifyInstanceClosed(AHost: TfrmHwNextHost);
 begin
   if FInstances <> nil then
     FInstances.Remove(AHost);
-  // A collective command performs the final shutdown itself. Do not unload
-  // in the middle of its disposal loop.
+  // O fechamento individual da ultima tela nao encerra a sessao Next. O modulo,
+  // o contexto recebido no login e a conexao preguicosa permanecem carregados
+  // para a proxima abertura. Apenas os comandos coletivos (Invalidate/Shutdown)
+  // ou a finalizacao do host descarregam a biblioteca.
   if FCollectiveClose then
     Exit;
   if (FInstances = nil) or (FInstances.Count = 0) then
-  begin
     RestoreMessageHook;
-    // The module clears its Application.Handle and releases residual views.
-    // A failure keeps the library loaded and is not reported as success.
-    ReleaseLibrary;
-  end;
 end;
 
 function THwNextHostBridge.ReleaseLibrary: Boolean;

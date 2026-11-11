@@ -4002,66 +4002,12 @@ begin
 end;
 
 procedure TfrmPrincipalS.EventosDFe1Click(Sender: TObject);
-const
-  ContextUnavailable = 'Nao foi possivel preparar a tela Eventos RTC.';
 var
-  CompanyCode: Integer;
-  DatabaseName: string;
-  UserName: string;
-  Password: string;
-  Context: THwNextErpContext;
   Options: THwNextOpenOptions;
 begin
-  CompanyCode := 0;
-  DatabaseName := '';
-  UserName := '';
-  Password := '';
-  Context.CompanyCode := 0;
-  Context.DatabaseName := '';
-  Context.UserName := '';
-  Context.Password := '';
-  try
-    if (not TryStrToInt(Trim(vDadosIni.codEmpresa), CompanyCode)) or
-       (CompanyCode <= 0) then
-    begin
-      MessageDlg(ContextUnavailable, mtError, [mbOK], 0);
-      Exit;
-    end;
-
-    if (dtmAtivo = nil) or (dtmAtivo.bancoHw = nil) then
-    begin
-      MessageDlg(ContextUnavailable, mtError, [mbOK], 0);
-      Exit;
-    end;
-
-    DatabaseName := dtmAtivo.bancoHw.DatabaseName;
-    UserName := dtmAtivo.bancoHw.Params.Values['user_name'];
-    Password := dtmAtivo.bancoHw.Params.Values['password'];
-
-    if (Trim(DatabaseName) = '') or (Trim(UserName) = '') or
-       (Trim(Password) = '') then
-    begin
-      MessageDlg(ContextUnavailable, mtError, [mbOK], 0);
-      Exit;
-    end;
-
-    Context.CompanyCode := CompanyCode;
-    Context.DatabaseName := DatabaseName;
-    Context.UserName := UserName;
-    Context.Password := Password;
-
-    if not SetNextHostContext(Context) then
-      Exit;
-
-    Context.Password := '';
-
-    Options := NextQueryOptions();
-    Options.DisplayTitle := 'Eventos RTC';
-    OpenNextView(Self, 'next.rtc.events', Options);
-  finally
-    Password := '';
-    Context.Password := '';
-  end;
+  Options := NextQueryOptions();
+  Options.DisplayTitle := 'Eventos RTC';
+  OpenNextView(Self, 'next.rtc.events', Options);
 end;
 
 procedure TfrmPrincipalS.ExibirMensagemChavePeriodica;

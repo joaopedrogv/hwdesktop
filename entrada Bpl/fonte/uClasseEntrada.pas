@@ -55,7 +55,8 @@ implementation
 
 uses
   SysUtils, DBClient, uDtmEntrada, Dialogs, DB, uDtmAtivo, IBQuery, Forms,
-  uDadosIni, Classes, USenha, Windows, funcoes, ContainerUnit, ISessionContextUnit, DFeDLLAdapterUnit, DFeHwLibUnit;
+  uDadosIni, Classes, USenha, Windows, funcoes, ContainerUnit, ISessionContextUnit, DFeDLLAdapterUnit, DFeHwLibUnit,
+  HwNextHostUnit;
 
 { TUsuario }
 
@@ -85,7 +86,7 @@ begin
     ' where usuario = ' + QuotedStr(Trim(pUsuario)) +
     ' and emp_padrao <> ' + IntToStr(pEmpPadrao);
   buscas.ExecSQL;
-  
+
   buscas.Close;
   buscas.SQL.Text := 'update senhas set emp_padrao = ' + IntToStr(pEmpPadrao) +
     ' where usuario = ' + QuotedStr(Trim(pUsuario)) +
@@ -190,7 +191,7 @@ begin
      buscas.ParamByName('contra_senha').AsString := Copy(Trim(vDadosIni.vSenhaUsuario),1,6);
      buscas.ParamByName('ativo').AsInteger := 1;
      buscas.ExecSQL;
-     
+
      if buscas.Transaction.InTransaction then
        buscas.Transaction.Commit;
   end;
@@ -286,6 +287,7 @@ var
   vRetornoEmailValido: Integer;
   setPadraoEmpresaId: TsetPadraoEmpresaId;
   Session: ISessionContext;
+  NextContext: THwNextErpContext;
 begin
   vDadosIni.codEmpresa := vEmpresa.dataSet.FieldByName('cod_empresa').AsString;
 
@@ -369,6 +371,26 @@ begin
     Session.CaixaUnificado, Session.UnificadoraId
   );
   DFeHwLib.Setup(vDadosIni.vBancoHW, vDadosIni.cod_empresa);
+
+  if (dtmAtivo <> nil) and (dtmAtivo.bancoHw <> nil) then
+  begin
+    NextContext.CompanyCode := Session.EmpresaId;
+    NextContext.UserLogin := Session.UsuarioLogin;
+    NextContext.DatabaseName := dtmAtivo.bancoHw.DatabaseName;
+    NextContext.DatabaseUserName := dtmAtivo.bancoHw.Params.Values['user_name'];
+    try
+      NextContext.DatabasePassword := dtmAtivo.bancoHw.Params.Values['password'];
+
+      if (NextContext.CompanyCode > 0) and
+         (Trim(NextContext.UserLogin) <> '') and
+         (Trim(NextContext.DatabaseName) <> '') and
+         (Trim(NextContext.DatabaseUserName) <> '') and
+         (Trim(NextContext.DatabasePassword) <> '') then
+        SetNextHostContext(NextContext);
+    finally
+      NextContext.DatabasePassword := '';
+    end;
+  end;
 
   if vDadosIni.vCodPerfilHorasTrab > 0 then
   begin
@@ -730,7 +752,7 @@ begin
 //    vDadosIni.vAltImp := trim(DataSet.FieldByName('alt_imp').AsString);
 //    vDadosIni.vImp_Us := trim(DataSet.FieldByName('Imp_us').AsString);
 //    vDadosIni.vEstoqueNegativo := trim(DataSet.FieldByName('estoq_neg').AsString);
-//    
+//
 //    if Trim(DataSet.FieldByName('USUARIO').AsString) = 'HW' then
 //      vEmpresa.getTodos
 //    else
@@ -758,7 +780,7 @@ begin
     end;
 
     Result := True;
-     
+
   except
     on e : exception do
     begin
@@ -1016,13 +1038,13 @@ begin
         Exit;
 
       vDadosIni.vSenhaUsuario := vDadosIni.codifica(senha);
-      
+
       if Trim(usuario) = 'HW' then
         vEmpresa.getTodos
       else
         vEmpresa.selecionaEmpresa(buscas.FieldByName('COD_EMPRESA').AsString);
       vCodEmpPadrao := buscas.FieldByName('cod_empresa').AsInteger;
-      
+
       Result := True;
     end;
     Exit;
@@ -1070,7 +1092,7 @@ begin
     vDadosIni.vAvisoFechaExibido   := False;
   	vDadosIni.vAvisoFechaHorasTrab := False;
     vDadosIni.vFecharSistema       := False;
-    
+
     if vDadosIni.vCodPerfilHorasTrab > 0 then
     begin
       buscas.Close;
@@ -1191,4 +1213,3 @@ begin
 end;
 
 end.
-

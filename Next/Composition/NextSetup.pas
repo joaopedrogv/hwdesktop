@@ -3,43 +3,38 @@ unit NextSetup;
 interface
 
 uses
-  System.SysUtils, FireDAC.Comp.Client, FireDACDatabaseConnectionUnit,
-  IDataBaseConnectionUnit;
+  System.SysUtils, FireDACDatabaseConnectionUnit,
+  IDataBaseConnectionUnit, ISessionContextUnit, SessionContextUnit;
 
 type
   // Possui o contexto ERP recebido e a conexao/adaptador FireDAC do Next. Nunca
-  // abre a conexao em SetContext; EnsureConnection faz isso na primeira busca.
+  // abre a conexao em SetContext; o adaptador a abre na primeira busca.
+  // A identidade da empresa/usuario fica em SessionContext. As credenciais
+  // tecnicas ficam somente na string de conexao mantida pelo adaptador.
   // Nenhum logger e associado, portanto falhas do adaptador nao sao registradas
   // e sao substituidas por mensagens constantes.
   TNextSetup = class
   private
-    FCompanyCode: Integer;
-    FDatabaseName: string;
-    FUserName: string;
-    FPassword: string;
-    FConnection: TFDConnection;
+    FSessionContext: ISessionContext;
     FAdapter: FireDACDatabaseConnection;
     FContextSet: Boolean;
-    FActiveConsumers: Integer;
     function GetAdapter: IDataBaseConnection;
-    function GetContextInUse: Boolean;
-    function BuildConnectionString: string;
+    function BuildConnectionString(const ADatabaseName, ADatabaseUserName,
+      ADatabasePassword: string): string;
     procedure ClearContext;
     procedure ValidateValue(const AValue: string);
   public
+    constructor Create;
     procedure SetContext(ACompanyCode: Integer;
-      const ADatabaseName, AUserName, APassword: string);
+      const AUserLogin, ADatabaseName, ADatabaseUserName,
+      ADatabasePassword: string);
     function MatchesContext(ACompanyCode: Integer;
-      const ADatabaseName, AUserName, APassword: string): Boolean;
-    procedure AcquireContext;
-    procedure ReleaseContext;
-    procedure EnsureConnection;
+      const AUserLogin, ADatabaseName, ADatabaseUserName,
+      ADatabasePassword: string): Boolean;
     procedure Release;
     property Adapter: IDataBaseConnection read GetAdapter;
-    property CompanyCode: Integer read FCompanyCode;
-    property Connection: TFDConnection read FConnection;
+    property SessionContext: ISessionContext read FSessionContext;
     property HasContext: Boolean read FContextSet;
-    property ContextInUse: Boolean read GetContextInUse;
   end;
 
 var
@@ -54,21 +49,20 @@ uses
   FireDAC.DApt, FireDAC.Phys.FB;
 
 const
-  NoContextMessage = 'O contexto da empresa nao foi informado.';
   InvalidContextMessage = 'O contexto da empresa nao foi aceito.';
   InvalidValueMessage = 'O contexto da empresa contem caracteres nao suportados.';
-  ContextInUseMessage = 'A conexao Next esta em uso e nao pode ser substituida.';
 
 { TNextSetup }
+
+constructor TNextSetup.Create;
+begin
+  inherited Create;
+  FSessionContext := SessionContextUnit.SessionContext.Create;
+end;
 
 function TNextSetup.GetAdapter: IDataBaseConnection;
 begin
   Result := FAdapter;
-end;
-
-function TNextSetup.GetContextInUse: Boolean;
-begin
-  Result := FActiveConsumers > 0;
 end;
 
 procedure TNextSetup.ValidateValue(const AValue: string);
@@ -81,108 +75,91 @@ begin
     raise Exception.Create(InvalidValueMessage);
 end;
 
-function TNextSetup.BuildConnectionString: string;
+function TNextSetup.BuildConnectionString(const ADatabaseName,
+  ADatabaseUserName, ADatabasePassword: string): string;
 begin
-  ValidateValue(FDatabaseName);
-  ValidateValue(FUserName);
-  ValidateValue(FPassword);
+  ValidateValue(ADatabaseName);
+  ValidateValue(ADatabaseUserName);
+  ValidateValue(ADatabasePassword);
   // Mapeamento exato: nenhum Server, Port ou Charset e criado. O proprio
   // adaptador define SQLDialect=3.
-  Result := 'DriverID=FB;DatabaseName=' + FDatabaseName + ';UserName=' +
-    FUserName + ';Password=' + FPassword;
+  Result := 'DriverID=FB;DatabaseName=' + ADatabaseName + ';UserName=' +
+    ADatabaseUserName + ';Password=' + ADatabasePassword;
 end;
 
 procedure TNextSetup.ClearContext;
 begin
   FContextSet := False;
-  FCompanyCode := 0;
-  FDatabaseName := '';
-  FUserName := '';
-  FPassword := '';
+  if FSessionContext <> nil then
+  begin
+    // A SessionContext guarda somente a identidade; credenciais nao passam por ela.
+    FSessionContext.SetEmpresa(0, '', '');
+    FSessionContext.SetUsuario(0, '', '');
+  end;
 end;
 
 procedure TNextSetup.SetContext(ACompanyCode: Integer;
-  const ADatabaseName, AUserName, APassword: string);
+  const AUserLogin, ADatabaseName, ADatabaseUserName,
+  ADatabasePassword: string);
+var
+  ConnectionString: string;
 begin
   if ACompanyCode <= 0 then
     raise Exception.Create(InvalidContextMessage);
+  if Trim(AUserLogin) = '' then
+    raise Exception.Create(InvalidContextMessage);
   if Trim(ADatabaseName) = '' then
     raise Exception.Create(InvalidContextMessage);
-  if Trim(AUserName) = '' then
+  if Trim(ADatabaseUserName) = '' then
     raise Exception.Create(InvalidContextMessage);
-  if Trim(APassword) = '' then
+  if Trim(ADatabasePassword) = '' then
     raise Exception.Create(InvalidContextMessage);
 
   ValidateValue(ADatabaseName);
-  ValidateValue(AUserName);
-  ValidateValue(APassword);
-
-  if ContextInUse then
-    raise Exception.Create(ContextInUseMessage);
+  ValidateValue(ADatabaseUserName);
+  ValidateValue(ADatabasePassword);
 
   Release;
 
-  FCompanyCode := ACompanyCode;
-  FDatabaseName := ADatabaseName;
-  FUserName := AUserName;
-  FPassword := APassword;
-
+  ConnectionString := BuildConnectionString(ADatabaseName, ADatabaseUserName,
+    ADatabasePassword);
   try
-    FConnection := TFDConnection.Create(nil);
-    FAdapter := FireDACDatabaseConnection.Create(FConnection);
-    FAdapter.SetConnectionString(BuildConnectionString);
+    FAdapter := FireDACDatabaseConnection.Create(nil);
+    FAdapter.SetConnectionString(ConnectionString);
   except
     FreeAndNil(FAdapter);
-    FreeAndNil(FConnection);
     ClearContext;
     raise;
   end;
+
+  // A identidade so e publicada depois da validacao e da montagem da conexao.
+  // Somente empresa e login pertencem a sessao Next; nome, CNPJ, id e email
+  // nao sao recebidos pelo modulo.
+  FSessionContext.SetEmpresa(ACompanyCode, '', '');
+  FSessionContext.SetUsuario(0, AUserLogin, '');
   FContextSet := True;
 end;
 
 function TNextSetup.MatchesContext(ACompanyCode: Integer;
-  const ADatabaseName, AUserName, APassword: string): Boolean;
+  const AUserLogin, ADatabaseName, ADatabaseUserName,
+  ADatabasePassword: string): Boolean;
 begin
-  Result := FContextSet and (FCompanyCode = ACompanyCode) and
-    (FDatabaseName = ADatabaseName) and (FUserName = AUserName) and
-    (FPassword = APassword);
-end;
+  Result := False;
+  if (not FContextSet) or (FSessionContext = nil) or (FAdapter = nil) then
+    Exit;
 
-procedure TNextSetup.AcquireContext;
-begin
-  Inc(FActiveConsumers);
-end;
-
-procedure TNextSetup.ReleaseContext;
-begin
-  if FActiveConsumers > 0 then
-    Dec(FActiveConsumers);
-end;
-
-procedure TNextSetup.EnsureConnection;
-begin
-  if (not FContextSet) or (FConnection = nil) or (FAdapter = nil) then
-    raise Exception.Create(NoContextMessage);
-
-  // A abertura efetiva e do adaptador, que preserva a conexao preguicosa e
-  // substitui a mensagem original do FireDAC por uma mensagem generica.
-  FAdapter.EnsureConnection;
+  Result := (FSessionContext.EmpresaId = ACompanyCode) and
+    (FSessionContext.UsuarioLogin = AUserLogin);
 end;
 
 procedure TNextSetup.Release;
 var
   Adapter: FireDACDatabaseConnection;
-  Conn: TFDConnection;
 begin
-  // Uma consulta ativa depende da conexao. O chamador deve liberar as telas
-  // antes que o Setup possa libera-la.
-  if ContextInUse then
-    Exit;
-
+  // Uma consulta ativa depende da conexao. O chamador deve liberar as telas e
+  // os leitores antes que o Setup libere o adaptador, que possui a conexao.
   Adapter := FAdapter;
   FAdapter := nil;
-  Conn := FConnection;
-  FConnection := nil;
 
   try
     if Adapter <> nil then
@@ -197,18 +174,6 @@ begin
       end;
     end;
   finally
-    if Conn <> nil then
-    begin
-      try
-        if Conn.Connected then
-          Conn.Connected := False;
-      except
-      end;
-      try
-        Conn.Free;
-      except
-      end;
-    end;
     ClearContext;
   end;
 end;

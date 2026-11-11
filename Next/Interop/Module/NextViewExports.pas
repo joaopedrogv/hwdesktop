@@ -12,8 +12,7 @@ uses
 const
   KnownOptionsMask: Cardinal = HW_NEXT_OPT_KNOWN;
   ContextRejectedMessage = 'O contexto da empresa nao foi aceito.';
-  ContextInUseMessage = 'A tela Next ja esta em uso com outro contexto de empresa.';
-  ContextBusyMessage = 'A tela Eventos RTC ainda possui consultas ativas; a biblioteca nao pode ser descarregada.';
+  ContextInUseMessage = 'A tela Next ja esta em uso com outro contexto de empresa ou usuario.';
 
 var
   Views: TList;
@@ -83,52 +82,67 @@ begin
 end;
 
 function HwNextSetContext(ACompanyCode: Integer;
-  ADatabaseName, AUserName, APassword: PWideChar): LongBool; stdcall;
+  AUserLogin, ADatabaseName, ADatabaseUserName,
+  ADatabasePassword: PWideChar): LongBool; stdcall;
 var
+  UserLogin: string;
   DatabaseName: string;
-  UserName: string;
-  Password: string;
+  DatabaseUserName: string;
+  DatabasePassword: string;
 begin
   Result := False;
   ClearError;
+  UserLogin := '';
   DatabaseName := '';
-  UserName := '';
-  Password := '';
+  DatabaseUserName := '';
+  DatabasePassword := '';
   try
     try
+      if AUserLogin <> nil then
+        UserLogin := AUserLogin;
       if ADatabaseName <> nil then
         DatabaseName := ADatabaseName;
-      if AUserName <> nil then
-        UserName := AUserName;
-      if APassword <> nil then
-        Password := APassword;
+      if ADatabaseUserName <> nil then
+        DatabaseUserName := ADatabaseUserName;
+      if ADatabasePassword <> nil then
+        DatabasePassword := ADatabasePassword;
 
       if ACompanyCode <= 0 then
         raise Exception.Create(ContextRejectedMessage);
+      if UserLogin = '' then
+        raise Exception.Create(ContextRejectedMessage);
       if DatabaseName = '' then
         raise Exception.Create(ContextRejectedMessage);
+      if DatabaseUserName = '' then
+        raise Exception.Create(ContextRejectedMessage);
+      if DatabasePassword = '' then
+        raise Exception.Create(ContextRejectedMessage);
 
-      if NextSetupInstance.ContextInUse then
+      // Enquanto houver telas abertas, a sessao e a conexao do adaptador devem
+      // permanecer as mesmas. A troca de empresa/login e recusada sem substituir
+      // a conexao em uso; a proxima sessao so e aceita sem telas abertas.
+      if Views.Count > 0 then
       begin
-        if NextSetupInstance.MatchesContext(ACompanyCode, DatabaseName,
-          UserName, Password) then
+        if NextSetupInstance.MatchesContext(ACompanyCode, UserLogin,
+          DatabaseName, DatabaseUserName, DatabasePassword) then
           Result := True
         else
           RecordError(ContextInUseMessage);
       end
       else
       begin
-        NextSetupInstance.SetContext(ACompanyCode, DatabaseName, UserName,
-          Password);
+        NextSetupInstance.SetContext(ACompanyCode, UserLogin, DatabaseName,
+          DatabaseUserName, DatabasePassword);
         Result := True;
       end;
     except
       RecordError(ContextRejectedMessage);
     end;
   finally
+    UserLogin := '';
     DatabaseName := '';
-    UserName := '';
-    Password := '';
+    DatabaseUserName := '';
+    DatabasePassword := '';
   end;
 end;
 
@@ -389,12 +403,8 @@ begin
         RecordError('A limpeza anterior da tela Next não foi concluída; a biblioteca não pode ser descarregada.');
       Exit;
     end;
-    if NextSetupInstance.ContextInUse then
-    begin
-      CleanupIncomplete := True;
-      RecordError(ContextBusyMessage);
-      Exit;
-    end;
+    // Cada tela devolveu seu leitor ao ser liberada. Somente depois disso o
+    // adaptador libera a conexao compartilhada que os leitores utilizavam.
     NextSetupInstance.Release;
     ClearModuleBinding;
     Result := True;

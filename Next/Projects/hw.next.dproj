@@ -51,7 +51,7 @@
         <GenDll>true</GenDll>
         <DCC_CodePage>1252</DCC_CodePage>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_UnitSearchPath>..\Contracts;..\Interop\Contracts;..\Interop\Module;..\Queries\Shared;..\Queries\Shared\Filters;..\Queries\Features\EventosRtc;..\UI\Forms\Base;..\UI\Forms\Validation;..\UI\Forms\Features\EventosRtc;..\UI\Frames\Shared\Filters;..\UI\Frames\Shared\Grid;..\Composition;..\..\Modern\Adapters\Secondary\Database;..\..\Modern\Adapters\Secondary\Database\FireDAC;..\..\Modern\Adapters\Secondary\Preferences;..\..\Modern\Core\Infrastructure\Interfaces;..\..\Modern\Core\Infrastructure\Data;..\..\Modern\Core\Infrastructure\Services;..\..\Modern\Core\Domain\Types\Shared;..\..\Modern\Core\Domain\Ports\Shared;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\Contracts;..\Interop\Contracts;..\Interop\Module;..\Queries\Shared;..\Queries\Shared\Filters;..\Queries\Features\EventosRtc;..\UI\Forms\Base;..\UI\Forms\Validation;..\UI\Forms\Features\EventosRtc;..\UI\Frames\Shared\Filters;..\UI\Frames\Shared\Grid;..\Composition;..\..\Modern\Adapters\Secondary\Database;..\..\Modern\Adapters\Secondary\Database\FireDAC;..\..\Modern\Adapters\Secondary\Preferences;..\..\Modern\Core\Infrastructure\Interfaces;..\..\Modern\Core\Infrastructure\Data;..\..\Modern\Core\Infrastructure\Services;..\..\Modern\Core\Domain\Types\Shared;..\..\Modern\Core\Domain\Ports\Shared;..\..\Modern\Core\Application\Contexts;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <SanitizedProjectName>hw_next</SanitizedProjectName>
         <DCC_DcpOutput>output</DCC_DcpOutput>
         <DCC_BplOutput>..\..\bpl</DCC_BplOutput>
@@ -130,7 +130,8 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\Composition\NextSetup.pas"/>
-        <DCCReference Include="..\Composition\ReaderContextLease.pas"/>
+        <DCCReference Include="..\..\Modern\Core\Domain\Ports\Shared\ISessionContextUnit.pas"/>
+        <DCCReference Include="..\..\Modern\Core\Application\Contexts\SessionContextUnit.pas"/>
         <DCCReference Include="..\Queries\Shared\NextQueryDefinition.pas"/>
         <DCCReference Include="..\Queries\Features\EventosRtc\EventosRtcDefinition.pas"/>
         <DCCReference Include="..\Composition\EventosRtcQueryComposition.pas"/>
