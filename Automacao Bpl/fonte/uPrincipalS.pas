@@ -510,6 +510,8 @@ type
     NotasfiscaisSuzuki: TMenuItem;
     Timer9: TTimer;
     EventosDFe1: TMenuItem;
+    PreviewNext1: TMenuItem;
+    procedure PreviewNext1Click(Sender: TObject);
     procedure EventosDFe1Click(Sender: TObject);
     procedure Timer9Timer(Sender: TObject);
     procedure NotasfiscaisSuzukiClick(Sender: TObject);
@@ -4007,6 +4009,15 @@ var
 begin
   Options := NextMultipleOptions(True);
   Options.DisplayTitle := 'Eventos RTC';
+  OpenNextView(Self, 'next.rtc.events', Options);
+end;
+
+procedure TfrmPrincipalS.PreviewNext1Click(Sender: TObject);
+var
+  Options: THwNextOpenOptions;
+begin
+  Options := NextMultipleOptions(True);
+  Options.DisplayTitle := 'Preview Next';
   OpenNextView(Self, 'next.validation.second', Options);
 end;
 

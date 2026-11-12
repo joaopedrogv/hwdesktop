@@ -19,6 +19,7 @@ type
     FFiltersConfigured: Boolean;
     FFilterDefinition: TFilterDefinition;
     procedure DoPesquisarPreview(Sender: TObject);
+    procedure GridTitleCtrlClick(Sender: TObject; const AFieldName: string);
   protected
     function CollectFilters: TFilterCriteriaResult;
     procedure DoInitializeView; override;
@@ -92,6 +93,15 @@ begin
   Result := fraFiltros.CollectCriteria;
 end;
 
+procedure TfrmQueryStandard.GridTitleCtrlClick(Sender: TObject;
+  const AFieldName: string);
+begin
+  // O atalho apenas prepara o editor de pesquisa. Sem filtros configurados, o
+  // gesto nao altera a ordem nem o resultado ja carregado.
+  if FFiltersConfigured then
+    fraFiltros.TrySelectField(AFieldName);
+end;
+
 procedure TfrmQueryStandard.DoPesquisarPreview(Sender: TObject);
 var
   Collected: TFilterCriteriaResult;
@@ -128,6 +138,7 @@ procedure TfrmQueryStandard.DoInitializeView;
 begin
   Caption := Format('Consulta - Next %d', [InstanceNumber]);
   fraGrid.DataSource := dsConsulta;
+  fraGrid.OnTitleCtrlClick := GridTitleCtrlClick;
 
   // A tela só exibe filtros quando ConfigureFilters foi chamado. A instância
   // herdada de Eventos RTC mantém o frame oculto e instala, no próprio

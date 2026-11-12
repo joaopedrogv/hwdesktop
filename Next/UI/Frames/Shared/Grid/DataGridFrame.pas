@@ -32,6 +32,11 @@ type
     FontStyle: TFontStyles;
   end;
 
+  // Ctrl+clique no titulo encaminha o campo da coluna para a tela, que decide
+  // se o gesto prepara o filtro em vez de ordenar.
+  TColumnTitleCtrlClickEvent = procedure(Sender: TObject;
+    const AFieldName: string) of object;
+
   TfrmDataGridFrame = class(TFrame)
     pnComandos: TPanel;
     pnMarcacao: TPanel;
@@ -72,6 +77,7 @@ type
     FObservedDataSet: TDataSet;
     FDataLink: TDataLink;
     FSuppressDataSetChange: Boolean;
+    FOnTitleCtrlClick: TColumnTitleCtrlClickEvent;
 
     function GetDataSource: TDataSource;
     procedure SetDataSource(const Value: TDataSource);
@@ -117,6 +123,9 @@ type
     // consulta, preservando filtro, marcacoes e linha corrente.
     procedure ClearSorting();
     property DataSource: TDataSource read GetDataSource write SetDataSource;
+    // Campo da coluna clicada com Ctrl; a tela decide se prepara o filtro.
+    property OnTitleCtrlClick: TColumnTitleCtrlClickEvent
+      read FOnTitleCtrlClick write FOnTitleCtrlClick;
   end;
 
 implementation
@@ -737,6 +746,15 @@ var
   NewSorts: TQuerySortFields;
   Index: Integer;
 begin
+  // Ctrl+clique prepara o filtro da coluna antes de qualquer ordenacao. O
+  // gesto nunca altera a ordem, mesmo quando a tela nao trata o campo.
+  if GetKeyState(VK_CONTROL) < 0 then
+  begin
+    if Assigned(FOnTitleCtrlClick) and (Column <> nil) then
+      FOnTitleCtrlClick(Self, Column.FieldName);
+    Exit;
+  end;
+
   if not IsSortableColumn(Column) then
     Exit;
 

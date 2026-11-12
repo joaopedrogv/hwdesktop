@@ -77,6 +77,9 @@ type
     function IsEditorBlank(const AText, AMask: string): Boolean;
     // Evento atribuido em codigo; nao precisa de visibilidade publicada.
     procedure RemoverItemClick(Sender: TObject);
+    procedure PersistActiveField;
+    procedure SelectFieldIndex(AFieldIndex: Integer);
+    procedure FocusFirstContentField;
   published
     // Eventos referenciados pelo DFM precisam ser publicados para que o
     // streaming do VCL resolva os metodos ao carregar o frame.
@@ -90,6 +93,9 @@ type
       const APreferences: ILocalPreferences; const AIdentity: string);
     procedure ConfigureSingle(const ADefinition: TFilterDefinition;
       const ACriterion: TFilterCriterion);
+    // Seleciona o campo pelo Id sem coletar nem alterar os criterios ja
+    // adicionados. Devolve False quando o campo nao pertence a definicao.
+    function TrySelectField(const AFieldId: string): Boolean;
     function CollectCriteria: TFilterCriteriaResult;
     function CollectSingleCriterion(out ACriterion: TFilterCriterion;
       out AMessage: string): Boolean;
@@ -975,21 +981,85 @@ begin
   Result := FilterMaskTextIsBlank(AMask, AText);
 end;
 
-procedure TfrmFilterFrame.CampoChange(Sender: TObject);
+procedure TfrmFilterFrame.PersistActiveField;
 var
   Field: TFilterFieldDefinition;
   Operator: TFilterOperator;
-  Selected: Integer;
 begin
-  if FUpdating then
-    Exit;
-
   // O OnChange ja aponta para o novo campo, mas os editores e a condicao ainda
   // representam o campo anterior. Persiste esse estado antes de trocar.
   if FConfigured and (not FTodosSelected) and
     FDefinition.FindField(FActiveFieldId, Field) and
     CurrentOperator(Operator) then
     PersistFieldIfValid(Field, Operator);
+end;
+
+procedure TfrmFilterFrame.SelectFieldIndex(AFieldIndex: Integer);
+var
+  PreviousUpdating: Boolean;
+begin
+  PreviousUpdating := FUpdating;
+  FUpdating := True;
+  try
+    cbCampo.ItemIndex := AFieldIndex;
+  finally
+    FUpdating := PreviousUpdating;
+  end;
+end;
+
+procedure TfrmFilterFrame.FocusFirstContentField;
+begin
+  // O foco vai para o primeiro campo de conteudo disponivel; operadores sem
+  // valor mantem o foco onde estava.
+  if edValor1.Visible and edValor1.Enabled and edValor1.CanFocus then
+    edValor1.SetFocus;
+end;
+
+function TfrmFilterFrame.TrySelectField(const AFieldId: string): Boolean;
+var
+  FieldIndex: Integer;
+  Field: TFilterFieldDefinition;
+begin
+  Result := False;
+
+  // A tela sem definicao configurada nao possui campo para preparar.
+  if (not FConfigured) or FSingleMode then
+    Exit;
+
+  FieldIndex := FDefinition.FieldIndex(AFieldId);
+  if FieldIndex < 0 then
+    Exit;
+
+  // O mesmo campo preserva o conteudo digitado e apenas recebe o foco.
+  if cbCampo.ItemIndex = FieldIndex then
+  begin
+    FocusFirstContentField;
+    Exit(True);
+  end;
+
+  // A troca segue o caminho do combo Campo: persiste o campo anterior valido,
+  // seleciona o novo item e aplica condicao, mascara e preferencias.
+  PersistActiveField;
+  FTodosSelected := False;
+  SelectFieldIndex(FieldIndex);
+  if CurrentField(Field) then
+    ApplyField(Field)
+  else
+    UpdateArity;
+
+  FocusFirstContentField;
+  Result := True;
+end;
+
+procedure TfrmFilterFrame.CampoChange(Sender: TObject);
+var
+  Field: TFilterFieldDefinition;
+  Selected: Integer;
+begin
+  if FUpdating then
+    Exit;
+
+  PersistActiveField;
 
   Selected := cbCampo.ItemIndex;
 
