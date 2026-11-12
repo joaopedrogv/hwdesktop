@@ -4021,6 +4021,15 @@ begin
   OpenNextView(Self, 'next.validation.second', Options);
 end;
 
+procedure TfrmPrincipalS.PreviewNext1Click(Sender: TObject);
+var
+  Options: THwNextOpenOptions;
+begin
+  Options := NextMultipleOptions(True);
+  Options.DisplayTitle := 'Preview Next';
+  OpenNextView(Self, 'next.validation.second', Options);
+end;
+
 procedure TfrmPrincipalS.ExibirMensagemChavePeriodica;
 var
   AStrDataRegistroAviso: string;
