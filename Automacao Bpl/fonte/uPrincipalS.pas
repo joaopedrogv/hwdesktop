@@ -8811,11 +8811,11 @@ end;
 
 procedure TfrmPrincipalS.RTC_GruposFiscais1Click(Sender: TObject);
 var
-  ShowModelExecute: TShowForm;
+  Options: THwNextOpenOptions;
 begin
-  @ShowModelExecute := GetProcAddress(vDadosIni.vModern.AHandle, 'ShowGruposFiscais');
-  if Assigned(ShowModelExecute) then
-    ShowModelExecute( False );
+  Options := NextQueryOptions();
+  Options.DisplayTitle := 'Grupos Fiscais';
+  OpenNextView(Self, 'next.grupos.fiscais', Options);
 end;
 
 procedure TfrmPrincipalS.RTC_OperaccoesInternas1Click(Sender: TObject);
