@@ -68,9 +68,11 @@ begin
   try
     // A segunda previa usa o leitor de exemplo e as operacoes de marcacao para
     // validar o filtro rapido sobre o mesmo conjunto ja carregado. As colunas
-    // seguem os campos criados pelo leitor de previa.
+    // seguem os campos criados pelo leitor de previa e o Setup fornece o
+    // ordenador usado pela grade.
     Reader := TQueryPreviewReader.Create('sel');
-    Operations := TQueryResultOperations.Create(Reader, 'sel');
+    Operations := TQueryResultOperations.Create(Reader, 'sel',
+      NextSetupInstance.DataSetSorter);
     View.Attach(Reader, GridColumns([
       GridColumn('sel', 'Sel', 50, qcaCenter),
       GridColumn('documento', 'Documento', 120),
@@ -91,6 +93,7 @@ var
   View: TfrmEventosRtc;
   Preferences: ILocalPreferences;
   Presenter: TEventosRtcPresenter;
+  Operations: IQueryResultOperations;
 begin
   Preferences := TWindowsRegistryLocalPreferences.Create;
 
@@ -101,7 +104,13 @@ begin
     // responsavel pelo leitor e pelo conjunto retornado.
     Presenter := NextSetupInstance.Resolve<TEventosRtcPresenter>;
     try
-      View.AttachPresenter(Presenter, CreateEventosRtcColumns, 'Eventos RTC');
+      // A ordenacao usa as mesmas operacoes da previa, sem coluna de marcacao:
+      // o conjunto e criado a cada pesquisa e o Setup fornece o ordenador que
+      // aplica a ordem nativa.
+      Operations := TQueryResultOperations.Create(nil, '',
+        NextSetupInstance.DataSetSorter);
+      View.AttachPresenter(Presenter, CreateEventosRtcColumns, 'Eventos RTC',
+        Operations);
     except
       // Se a associacao nao foi aceita, a tela nao assumiu a posse; liberar
       // evita deixar uma instancia orfa do apresentador.

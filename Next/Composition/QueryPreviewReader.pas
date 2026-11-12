@@ -1,4 +1,4 @@
-﻿unit QueryPreviewReader;
+unit QueryPreviewReader;
 
 interface
 
@@ -72,7 +72,10 @@ begin
       else
       begin
         Selecao := False;
-        Documento := Format('DOC-%.4d', [I]);
+        if (I = 4) or (I = 5) then
+          Documento := 'DOC-0004'
+        else
+          Documento := Format('DOC-%.4d', [I]);
         Descricao := Format('Documento de exemplo %d', [I]);
         Codigo := I;
         Valor := I * 10.00;

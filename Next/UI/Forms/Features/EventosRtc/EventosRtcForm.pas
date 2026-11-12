@@ -4,7 +4,8 @@ interface
 
 uses
   System.SysUtils, Vcl.StdCtrls, QueryResultForm, FilterCriterion,
-  IDataSetReaderUnit, GridColumnDefinition, EventosRtcPresenter;
+  IDataSetReaderUnit, GridColumnDefinition, EventosRtcPresenter,
+  QueryResultOperations;
 
 type
   // Tela de Eventos RTC. Herda a apresentacao generica e acrescenta apenas a
@@ -19,7 +20,8 @@ type
   public
     destructor Destroy; override;
     procedure AttachPresenter(APresenter: TEventosRtcPresenter;
-      const AColumns: TGridColumnDefinitions; const ATitle: string);
+      const AColumns: TGridColumnDefinitions; const ATitle: string;
+      AOperations: IQueryResultOperations = nil);
   end;
 
 implementation
@@ -40,15 +42,17 @@ begin
 end;
 
 procedure TfrmEventosRtc.AttachPresenter(APresenter: TEventosRtcPresenter;
-  const AColumns: TGridColumnDefinitions; const ATitle: string);
+  const AColumns: TGridColumnDefinitions; const ATitle: string;
+  AOperations: IQueryResultOperations = nil);
 begin
   if APresenter = nil then
     raise Exception.Create(MissingPresenterMessage);
 
   // A base recebe apenas o metodo de pesquisa; a opcao atual e consultada a
   // cada busca. A tela assume o apresentador transiente so depois da associacao
-  // aceita, para que uma falha nao deixe posse parcial.
-  AttachReaderFactory(PesquisarEventos, AColumns, ATitle);
+  // aceita, para que uma falha nao deixe posse parcial. As operacoes recebidas
+  // seguem o mesmo caminho de ordenacao da previa e nao habilitam marcacao.
+  AttachReaderFactory(PesquisarEventos, AColumns, ATitle, AOperations, False);
   FPresenter := APresenter;
 end;
 

@@ -29,6 +29,8 @@ uses
   NextViewCatalog in '..\Interop\Module\NextViewCatalog.pas',
   NextViewExports in '..\Interop\Module\NextViewExports.pas',
   QueryResultOperations in '..\Queries\Shared\QueryResultOperations.pas',
+  IDataSetSorterUnit in '..\..\Modern\Core\Infrastructure\Interfaces\IDataSetSorterUnit.pas',
+  FireDACDataSetSorterUnit in '..\..\Modern\Adapters\Secondary\Database\FireDAC\FireDACDataSetSorterUnit.pas',
   GridColumnDefinition in '..\Contracts\GridColumnDefinition.pas',
   QueryPreviewReader in '..\Composition\QueryPreviewReader.pas';
 

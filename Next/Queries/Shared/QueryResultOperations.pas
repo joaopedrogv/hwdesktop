@@ -3,8 +3,8 @@ unit QueryResultOperations;
 interface
 
 uses
-  Data.DB, IDataSetReaderUnit, System.Generics.Collections, FilterDefinition,
-  FilterCriterion;
+  Data.DB, IDataSetReaderUnit, IDataSetSorterUnit, System.Generics.Collections,
+  FilterDefinition, FilterCriterion;
 
 type
   // Criterio do filtro rapido. Id e a identidade estavel na faixa; FieldName,
@@ -19,6 +19,15 @@ type
   end;
 
   TMarkOperation = (moMarkAll, moUnmarkAll, moInvertAll, moToggle);
+
+  // Especificacao neutra de ordenacao. A prioridade segue a ordem do array; o
+  // adaptador do conjunto carregado traduz cada item para a ordenacao nativa.
+  TQuerySortField = record
+    FieldName: string;
+    Ascending: Boolean;
+  end;
+
+  TQuerySortFields = TArray<TQuerySortField>;
 
   IQueryResultOperations = interface
     ['{76045AA4-FE97-4A2E-87CA-85077589168B}']
@@ -43,11 +52,20 @@ type
     function QuickFilterId(AIndex: Integer): Integer;
     function QuickFilterDescription(AId: Integer): string;
     function QuickFilterActive(): Boolean;
+    // Ordena o conjunto informado pela ordenacao nativa, preservando os dados,
+    // o filtro, as marcacoes e a linha corrente. A lista vazia remove a
+    // ordenacao e devolve o conjunto a ordem padrao da consulta. A coluna de
+    // marcacao nunca participa.
+    function CanSortField(const ADataSet: TDataSet;
+      const AFieldName: string): Boolean;
+    function ApplySort(const ADataSet: TDataSet;
+      const ASorts: TQuerySortFields): Boolean;
   end;
 
   TQueryResultOperations = class(TInterfacedObject, IQueryResultOperations)
   private
     FReader: IDataSetReader;
+    FDataSetSorter: IDataSetSorter;
     FMarkingColumn: string;
     FQuickFilters: TList<TQuickFilterCriterion>;
     FNextQuickFilterId: Integer;
@@ -71,7 +89,8 @@ type
       out ACriterion: TQuickFilterCriterion): Boolean;
     procedure ResetQuickFilterState();
   public
-    constructor Create(AReader: IDataSetReader; const AMarkingColumn: string);
+    constructor Create(AReader: IDataSetReader; const AMarkingColumn: string;
+      const ADataSetSorter: IDataSetSorter = nil);
     destructor Destroy; override;
     procedure MarkAll();
     procedure UnmarkAll();
@@ -91,6 +110,10 @@ type
     function QuickFilterId(AIndex: Integer): Integer;
     function QuickFilterDescription(AId: Integer): string;
     function QuickFilterActive(): Boolean;
+    function CanSortField(const ADataSet: TDataSet;
+      const AFieldName: string): Boolean;
+    function ApplySort(const ADataSet: TDataSet;
+      const ASorts: TQuerySortFields): Boolean;
   end;
 
 // Mapeia o tipo fisico do campo para o tipo tipado usado pelo catalogo de
@@ -236,10 +259,11 @@ end;
 { TQueryResultOperations }
 
 constructor TQueryResultOperations.Create(AReader: IDataSetReader;
-  const AMarkingColumn: string);
+  const AMarkingColumn: string; const ADataSetSorter: IDataSetSorter);
 begin
   FReader := AReader;
   FMarkingColumn := AMarkingColumn;
+  FDataSetSorter := ADataSetSorter;
   FQuickFilters := TList<TQuickFilterCriterion>.Create;
   FNextQuickFilterId := 1;
 end;
@@ -797,6 +821,44 @@ end;
 function TQueryResultOperations.MarkingColumnName: string;
 begin
   Result := FMarkingColumn;
+end;
+
+function TQueryResultOperations.CanSortField(const ADataSet: TDataSet;
+  const AFieldName: string): Boolean;
+begin
+  // A coluna de marcacao controla apenas os comandos de selecao e nunca e
+  // elegivel para ordenacao, mesmo que o conjunto aceitasse o campo.
+  if (FMarkingColumn <> '') and SameText(Trim(AFieldName), FMarkingColumn) then
+    Exit(False);
+
+  Result := (FDataSetSorter <> nil) and
+    FDataSetSorter.CanSort(ADataSet, AFieldName);
+end;
+
+function TQueryResultOperations.ApplySort(const ADataSet: TDataSet;
+  const ASorts: TQuerySortFields): Boolean;
+var
+  DataSetSorts: TDataSetSortFields;
+  I: Integer;
+begin
+  for I := 0 to High(ASorts) do
+    if (FMarkingColumn <> '') and
+      SameText(Trim(ASorts[I].FieldName), FMarkingColumn) then
+      Exit(False);
+
+  if FDataSetSorter = nil then
+    Exit(False);
+
+  // A especificacao permanece neutra: a traducao para o formato do contrato de
+  // ordenacao e a aplicacao nativa ficam atras de IDataSetSorter.
+  SetLength(DataSetSorts, Length(ASorts));
+  for I := 0 to High(ASorts) do
+  begin
+    DataSetSorts[I].FieldName := ASorts[I].FieldName;
+    DataSetSorts[I].Ascending := ASorts[I].Ascending;
+  end;
+
+  Result := FDataSetSorter.ApplySort(ADataSet, DataSetSorts);
 end;
 
 procedure TQueryResultOperations.ToggleCurrentMark;

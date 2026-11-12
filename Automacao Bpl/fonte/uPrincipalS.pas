@@ -4005,9 +4005,9 @@ procedure TfrmPrincipalS.EventosDFe1Click(Sender: TObject);
 var
   Options: THwNextOpenOptions;
 begin
-  Options := NextQueryOptions();
+  Options := NextMultipleOptions(True);
   Options.DisplayTitle := 'Eventos RTC';
-  OpenNextView(Self, 'next.rtc.events', Options);
+  OpenNextView(Self, 'next.validation.second', Options);
 end;
 
 procedure TfrmPrincipalS.ExibirMensagemChavePeriodica;

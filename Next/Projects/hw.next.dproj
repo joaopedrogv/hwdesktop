@@ -143,6 +143,8 @@
         <DCCReference Include="..\Interop\Module\NextViewCatalog.pas"/>
         <DCCReference Include="..\Interop\Module\NextViewExports.pas"/>
         <DCCReference Include="..\Queries\Shared\QueryResultOperations.pas"/>
+        <DCCReference Include="..\..\Modern\Core\Infrastructure\Interfaces\IDataSetSorterUnit.pas"/>
+        <DCCReference Include="..\..\Modern\Adapters\Secondary\Database\FireDAC\FireDACDataSetSorterUnit.pas"/>
         <DCCReference Include="..\Contracts\GridColumnDefinition.pas"/>
         <DCCReference Include="..\Composition\QueryPreviewReader.pas"/>
         <BuildConfiguration Include="Release">

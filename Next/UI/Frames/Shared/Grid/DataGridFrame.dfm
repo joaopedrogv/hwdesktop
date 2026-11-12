@@ -200,7 +200,7 @@ object frmDataGridFrame: TfrmDataGridFrame
     Width = 760
     Height = 340
     Align = alClient
-    Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs]
+    Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgTitleClick]
     PopupMenu = pmCelula
     ReadOnly = True
     TabOrder = 0
@@ -211,8 +211,10 @@ object frmDataGridFrame: TfrmDataGridFrame
     TitleFont.Style = []
     OnCellClick = dbgDadosCellClick
     OnDrawColumnCell = dbgDadosDrawColumnCell
+    OnExit = dbgDadosExit
     OnKeyDown = dbgDadosKeyDown
     OnMouseActivate = dbgDadosMouseActivate
+    OnTitleClick = dbgDadosTitleClick
   end
   object pmCelula: TPopupMenu
     Left = 16

@@ -4,21 +4,23 @@ interface
 
 uses
   System.SysUtils, FireDACDatabaseConnectionUnit,
-  IDataBaseConnectionUnit, IDataSetReaderUnit, ISessionContextUnit,
-  SessionContextUnit, Spring.Container;
+  IDataBaseConnectionUnit, IDataSetReaderUnit, IDataSetSorterUnit,
+  ISessionContextUnit, SessionContextUnit, Spring.Container;
 
 const
   MissingContextMessage = 'O contexto da empresa nao foi informado.';
 
 type
   // Possui o contexto ERP recebido, a conexao/adaptador FireDAC do Next, a
-  // fabrica de leitores e o container Spring4D usado somente na composicao.
+  // fabrica de leitores, o ordenador de conjuntos e o container Spring4D usado
+  // somente na composicao.
   // Nunca abre a conexao em SetContext; o adaptador a abre na primeira busca.
   // A identidade da empresa/usuario fica em SessionContext. As credenciais
   // tecnicas ficam somente na string de conexao mantida pelo adaptador.
   // O adaptador, a fabrica e o container sao montados no primeiro contexto e
   // reutilizados enquanto o banco, identificado por um resumo da conexao,
-  // permanecer o mesmo.
+  // permanecer o mesmo. O ordenador e criado com o Setup e nao depende da
+  // conexao, pois apenas traduz a ordenacao para o conjunto carregado.
   // Nenhum logger e associado, portanto falhas do adaptador nao sao registradas
   // e sao substituidas por mensagens constantes.
   TNextSetup = class
@@ -26,10 +28,12 @@ type
     FSessionContext: ISessionContext;
     FAdapter: FireDACDatabaseConnection;
     FReaderFactory: ISqlDataSetReaderFactory;
+    FDataSetSorter: IDataSetSorter;
     FContainer: TContainer;
     FContextSet: Boolean;
     FDatabaseFingerprint: string;
     function GetAdapter: IDataBaseConnection;
+    function GetDataSetSorter: IDataSetSorter;
     function BuildConnectionString(const ADatabaseName, ADatabaseUserName,
       ADatabasePassword: string): string;
     function BuildDatabaseFingerprint(const AConnectionString: string): string;
@@ -44,6 +48,7 @@ type
     function Resolve<T: class>: T;
     property Adapter: IDataBaseConnection read GetAdapter;
     property SessionContext: ISessionContext read FSessionContext;
+    property DataSetSorter: IDataSetSorter read GetDataSetSorter;
     property HasContext: Boolean read FContextSet;
   end;
 
@@ -57,7 +62,8 @@ uses
   // nao e resolvido na primeira conexao. FireDAC.DApt fornece o suporte usado
   // por TFDQuery e TFDTransaction. System.Hash gera a identificacao da
   // configuracao do banco sem reter usuario ou senha.
-  System.Hash, FireDAC.DApt, FireDAC.Phys.FB, NextFeaturesComposition;
+  System.Hash, FireDAC.DApt, FireDAC.Phys.FB, NextFeaturesComposition,
+  FireDACDataSetSorterUnit;
 
 const
   InvalidContextMessage = 'O contexto da empresa nao foi aceito.';
@@ -69,11 +75,17 @@ constructor TNextSetup.Create;
 begin
   inherited Create;
   FSessionContext := SessionContextUnit.SessionContext.Create;
+  FDataSetSorter := TFireDACDataSetSorter.Create;
 end;
 
 function TNextSetup.GetAdapter: IDataBaseConnection;
 begin
   Result := FAdapter;
+end;
+
+function TNextSetup.GetDataSetSorter: IDataSetSorter;
+begin
+  Result := FDataSetSorter;
 end;
 
 procedure TNextSetup.ValidateValue(const AValue: string);

@@ -42,6 +42,7 @@ type
       AQuickFilterEnabled: Boolean = False);
     procedure AttachReaderFactory(const AFactory: TQueryResultReaderFactory;
       const AColumns: TGridColumnDefinitions; const ATitle: string;
+      AOperations: IQueryResultOperations = nil;
       AQuickFilterEnabled: Boolean = False);
   end;
 
@@ -93,6 +94,7 @@ end;
 procedure TfrmQueryResult.AttachReaderFactory(
   const AFactory: TQueryResultReaderFactory;
   const AColumns: TGridColumnDefinitions; const ATitle: string;
+  AOperations: IQueryResultOperations = nil;
   AQuickFilterEnabled: Boolean = False);
 begin
   if not Assigned(AFactory) then
@@ -103,16 +105,17 @@ begin
     raise Exception.Create(AlreadyAttachedMessage);
 
   // A consulta cria um novo leitor a cada pesquisa; nenhum leitor e recebido
-  // nesta associacao. Sem operacoes de marcacao, a grade nao exibe a coluna SEL
-  // nem os comandos de selecao. O filtro rapido tambem depende das operacoes;
-  // nesta fatia a opcao permanece desabilitada quando elas nao existem.
+  // nesta associacao. Sem coluna de marcacao nas operacoes recebidas, os
+  // comandos de selecao ficam desabilitados. O filtro rapido tambem depende das
+  // operacoes; nesta fatia a opcao permanece desabilitada quando elas nao
+  // existem.
   FReaderFactory := AFactory;
   FColumns := AColumns;
   FTitle := ATitle;
-  FOperations := nil;
+  FOperations := AOperations;
   FQuickFilterEnabled := AQuickFilterEnabled;
 
-  fraGrid.Configure(nil, FQuickFilterEnabled);
+  fraGrid.Configure(AOperations, FQuickFilterEnabled);
 end;
 
 procedure TfrmQueryResult.ConfigureColumns;
@@ -141,8 +144,9 @@ end;
 
 procedure TfrmQueryResult.ClearResult;
 begin
-  // Cada pesquisa comeca sem criterios rapidos; o filtro pertence ao resultado
-  // anterior e nao deve sobreviver a troca do conjunto.
+  // Cada pesquisa comeca sem criterios rapidos e sem a ordenacao do resultado
+  // anterior; ambos pertencem ao conjunto que sera substituido.
+  fraGrid.ClearSorting();
   fraGrid.ClearQuickFilters();
 
   // Desvincular antes de limpar impede que a grade retenha um dataset liberado.

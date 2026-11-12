@@ -24,6 +24,14 @@ type
     MenuItem: TMenuItem;
   end;
 
+  // Estado original do titulo de uma coluna ordenada. A legenda e o estilo sao
+  // restaurados quando a coluna deixa de participar da ordem.
+  TSortedColumnState = record
+    FieldName: string;
+    Caption: string;
+    FontStyle: TFontStyles;
+  end;
+
   TfrmDataGridFrame = class(TFrame)
     pnComandos: TPanel;
     pnMarcacao: TPanel;
@@ -51,12 +59,19 @@ type
     procedure miFiltrarQuandoClick(Sender: TObject);
     procedure miFiltrarValorClick(Sender: TObject);
     procedure miLimparFiltros1Click(Sender: TObject);
+    procedure dbgDadosExit(Sender: TObject);
+    procedure dbgDadosTitleClick(Column: TColumn);
   private
     FMarkingColumn: string;
     FOperations: IQueryResultOperations;
     FQuickFilterEnabled: Boolean;
     FQuickFilterColumnName: string;
     FCriterionSlots: TList<TCriterionBandSlot>;
+    FSortFields: TQuerySortFields;
+    FSortedColumns: TArray<TSortedColumnState>;
+    FObservedDataSet: TDataSet;
+    FDataLink: TDataLink;
+    FSuppressDataSetChange: Boolean;
 
     function GetDataSource: TDataSource;
     procedure SetDataSource(const Value: TDataSource);
@@ -78,14 +93,29 @@ type
       const ACriterion: TFilterCriterion;
       out AResult: TFilterCriterion): Boolean;
     procedure ShowQuickFilterMessage(const AMessage: string);
+    function SortingAvailable(): Boolean;
+    function IsSortableColumn(Column: TColumn): Boolean;
+    function FindColumnByFieldName(const AFieldName: string): TColumn;
+    function FindSortFieldIndex(const AFieldName: string): Integer;
+    procedure ResetSortState();
+    procedure RestoreSortedTitles();
+    procedure ApplySortedTitles();
+    function TryApplySort(const ASorts: TQuerySortFields): Boolean;
+    procedure ObserveDataSetChange();
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    // Marcacao, filtro rapido e ordenacao sao configuracoes independentes. A
+    // ordenacao e automatica para toda coluna visivel cujo campo o conjunto
+    // aceita ordenar; a coluna SEL nunca participa.
     procedure Configure(AOperations: IQueryResultOperations = nil;
       AQuickFilterEnabled: Boolean = False);
     // Remove todos os criterios rapidos sem alterar as marcacoes. Usado pela
     // tela antes de cada pesquisa, para o novo resultado comecar completo.
     procedure ClearQuickFilters();
+    // Retira a ordenacao exibida e devolve o conjunto corrente a ordem padrao da
+    // consulta, preservando filtro, marcacoes e linha corrente.
+    procedure ClearSorting();
     property DataSource: TDataSource read GetDataSource write SetDataSource;
   end;
 
@@ -119,6 +149,30 @@ type
   public
     function ColumnAt(const X, Y: Integer): TColumn;
   end;
+
+  // Observa a troca do conjunto para limpar a ordenacao exibida quando a tela
+  // apresenta um novo resultado. O frame nao instala eventos na origem.
+  TGridDataLink = class(TDataLink)
+  private
+    FFrame: TfrmDataGridFrame;
+  protected
+    procedure ActiveChanged; override;
+  public
+    constructor Create(AFrame: TfrmDataGridFrame);
+  end;
+
+constructor TGridDataLink.Create(AFrame: TfrmDataGridFrame);
+begin
+  inherited Create;
+  FFrame := AFrame;
+end;
+
+procedure TGridDataLink.ActiveChanged;
+begin
+  inherited;
+  if FFrame <> nil then
+    FFrame.ObserveDataSetChange();
+end;
 
 function TDBGridCellAccess.ColumnAt(const X, Y: Integer): TColumn;
 var
@@ -159,12 +213,20 @@ constructor TfrmDataGridFrame.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FCriterionSlots := TList<TCriterionBandSlot>.Create;
+  FDataLink := TGridDataLink.Create(Self);
 end;
 
 destructor TfrmDataGridFrame.Destroy;
 var
   I: Integer;
 begin
+  if FDataLink <> nil then
+  begin
+    FDataLink.DataSource := nil;
+    FDataLink.Free;
+    FDataLink := nil;
+  end;
+
   // Os menus pertencem ao frame; liberar antes dos controles evita referencias
   // pendentes. Painel, botao e rotulo pertencem a cadeia de pais do VCL e sao
   // destruidos por ela, sem liberacao duplicada aqui.
@@ -403,12 +465,16 @@ end;
 
 procedure TfrmDataGridFrame.SetDataSource(const Value: TDataSource);
 begin
-  // Uma nova origem de dados comeca sem criterios; a faixa do resultado
-  // anterior nao sobrevive a troca do conjunto.
+  // Uma nova origem de dados comeca sem criterios e sem ordenacao exibida; a
+  // faixa e o titulo do resultado anterior nao sobrevivem a troca do conjunto.
   if FOperations <> nil then
     FOperations.ClearQuickFilters();
   FQuickFilterColumnName := '';
+  ResetSortState();
+  FObservedDataSet := nil;
   dbgDados.DataSource := Value;
+  if FDataLink <> nil then
+    FDataLink.DataSource := Value;
   UpdateCommandBandLayout();
 end;
 
@@ -470,6 +536,7 @@ end;
 procedure TfrmDataGridFrame.Configure(AOperations: IQueryResultOperations = nil;
   AQuickFilterEnabled: Boolean = False);
 begin
+  ResetSortState();
   FOperations := AOperations;
   FQuickFilterEnabled := AQuickFilterEnabled;
   FQuickFilterColumnName := '';
@@ -479,8 +546,9 @@ begin
   else
     FMarkingColumn := '';
 
-  // Marcacao e filtros rapidos sao independentes. A coluna SEL controla apenas
-  // os comandos de marcacao e nao e elegivel para o filtro.
+  // Marcacao, filtros rapidos e ordenacao sao independentes. A coluna SEL
+  // controla apenas os comandos de marcacao e nao e elegivel para filtro nem
+  // para ordenacao.
   // Uma nova configuracao comeca sem criterios e recalcula a faixa.
   if FOperations <> nil then
     FOperations.ClearQuickFilters();
@@ -497,12 +565,224 @@ begin
   dbgDados.Invalidate();
 end;
 
+function TfrmDataGridFrame.SortingAvailable: Boolean;
+begin
+  Result := (FOperations <> nil)
+    and (dbgDados.DataSource <> nil)
+    and (dbgDados.DataSource.DataSet <> nil)
+    and dbgDados.DataSource.DataSet.Active;
+end;
+
+function TfrmDataGridFrame.IsSortableColumn(Column: TColumn): Boolean;
+var
+  dts: TDataSet;
+begin
+  Result := False;
+  if (Column = nil) or (Column.Field = nil) or (not Column.Visible) then
+    Exit;
+
+  // A coluna de marcacao nunca ordena, ainda que seja informada por engano.
+  if (FMarkingColumn <> '') and SameText(Column.FieldName, FMarkingColumn) then
+    Exit;
+
+  if not SortingAvailable() then
+    Exit;
+
+  dts := dbgDados.DataSource.DataSet;
+  Result := FOperations.CanSortField(dts, Column.FieldName);
+end;
+
+function TfrmDataGridFrame.FindColumnByFieldName(
+  const AFieldName: string): TColumn;
+var
+  I: Integer;
+begin
+  Result := nil;
+  if AFieldName = '' then
+    Exit;
+
+  // A busca pelo nome do campo evita manter uma referencia a TColumn, que pode
+  // ser recriada quando as colunas sao reconstruidas.
+  for I := 0 to dbgDados.Columns.Count - 1 do
+    if SameText(dbgDados.Columns[I].FieldName, AFieldName) then
+      Exit(dbgDados.Columns[I]);
+end;
+
+function TfrmDataGridFrame.FindSortFieldIndex(
+  const AFieldName: string): Integer;
+var
+  I: Integer;
+begin
+  for I := 0 to High(FSortFields) do
+    if SameText(FSortFields[I].FieldName, AFieldName) then
+      Exit(I);
+  Result := -1;
+end;
+
+procedure TfrmDataGridFrame.ResetSortState;
+begin
+  RestoreSortedTitles();
+  FSortFields := nil;
+end;
+
+procedure TfrmDataGridFrame.RestoreSortedTitles;
+var
+  I: Integer;
+  Column: TColumn;
+begin
+  for I := 0 to High(FSortedColumns) do
+  begin
+    Column := FindColumnByFieldName(FSortedColumns[I].FieldName);
+    if Column <> nil then
+    begin
+      Column.Title.Caption := FSortedColumns[I].Caption;
+      Column.Title.Font.Style := FSortedColumns[I].FontStyle;
+    end;
+  end;
+
+  SetLength(FSortedColumns, 0);
+end;
+
+procedure TfrmDataGridFrame.ApplySortedTitles;
+var
+  I: Integer;
+  Column: TColumn;
+  State: TSortedColumnState;
+  DirectionMark: string;
+begin
+  // As legendas e os estilos originais sao recuperados antes de marcar o novo
+  // conjunto; assim somente as colunas da ordem atual ficam destacadas.
+  RestoreSortedTitles();
+
+  for I := 0 to High(FSortFields) do
+  begin
+    Column := FindColumnByFieldName(FSortFields[I].FieldName);
+    if Column = nil then
+      Continue;
+
+    State.FieldName := Column.FieldName;
+    State.Caption := Column.Title.Caption;
+    State.FontStyle := Column.Title.Font.Style;
+
+    SetLength(FSortedColumns, Length(FSortedColumns) + 1);
+    FSortedColumns[High(FSortedColumns)] := State;
+
+    if FSortFields[I].Ascending then
+      DirectionMark := #9650
+    else
+      DirectionMark := #9660;
+
+    Column.Title.Caption := Format('%s %s', [State.Caption, DirectionMark]);
+    Column.Title.Font.Style := State.FontStyle + [fsBold];
+  end;
+end;
+
+function TfrmDataGridFrame.TryApplySort(
+  const ASorts: TQuerySortFields): Boolean;
+var
+  dts: TDataSet;
+begin
+  // Caminho unico: o frame apenas encaminha a especificacao; o contrato de
+  // operacoes aplica a ordenacao ao conjunto carregado.
+  if FOperations = nil then
+    Exit(False);
+  if not SortingAvailable() then
+    Exit(False);
+
+  dts := dbgDados.DataSource.DataSet;
+  Result := FOperations.ApplySort(dts, ASorts);
+end;
+
+procedure TfrmDataGridFrame.ObserveDataSetChange;
+var
+  Current: TDataSet;
+begin
+  if FSuppressDataSetChange then
+    Exit;
+
+  if dbgDados.DataSource = nil then
+    Current := nil
+  else
+    Current := dbgDados.DataSource.DataSet;
+
+  if Current = FObservedDataSet then
+    Exit;
+
+  // Um conjunto novo comeca na ordem padrao da consulta, sem seta, prioridade
+  // ou negrito do resultado anterior.
+  FObservedDataSet := Current;
+  ResetSortState();
+end;
+
+procedure TfrmDataGridFrame.ClearSorting;
+var
+  dts: TDataSet;
+  SortApplied: Boolean;
+begin
+  SortApplied := Length(FSortFields) > 0;
+  ResetSortState();
+
+  if not SortApplied then
+    Exit;
+  if (FOperations = nil) or (dbgDados.DataSource = nil) then
+    Exit;
+
+  dts := dbgDados.DataSource.DataSet;
+  if (dts <> nil) and dts.Active then
+    FOperations.ApplySort(dts, nil);
+end;
+
+procedure TfrmDataGridFrame.dbgDadosTitleClick(Column: TColumn);
+var
+  NewSorts: TQuerySortFields;
+  Index: Integer;
+begin
+  if not IsSortableColumn(Column) then
+    Exit;
+
+  // O clique simples alterna a direcao somente quando a coluna e a unica da
+  // ordem; qualquer outra combinacao recomeca com essa coluna ascendente.
+  // Shift+clique acrescenta a coluna ao fim ou alterna sua direcao sem mudar
+  // sua prioridade.
+  if GetKeyState(VK_SHIFT) < 0 then
+  begin
+    NewSorts := Copy(FSortFields);
+    Index := FindSortFieldIndex(Column.FieldName);
+    if Index < 0 then
+    begin
+      SetLength(NewSorts, Length(NewSorts) + 1);
+      NewSorts[High(NewSorts)].FieldName := Column.FieldName;
+      NewSorts[High(NewSorts)].Ascending := True;
+    end
+    else
+      NewSorts[Index].Ascending := not NewSorts[Index].Ascending;
+  end
+  else
+  begin
+    SetLength(NewSorts, 1);
+    NewSorts[0].FieldName := Column.FieldName;
+    if (Length(FSortFields) = 1) and
+      SameText(FSortFields[0].FieldName, Column.FieldName) then
+      NewSorts[0].Ascending := not FSortFields[0].Ascending
+    else
+      NewSorts[0].Ascending := True;
+  end;
+
+  // A ordenacao e efetivada antes do titulo. Uma recusa mantem a ordem, as
+  // setas, as prioridades e o negrito anteriores.
+  if not TryApplySort(NewSorts) then
+    Exit;
+
+  FSortFields := Copy(NewSorts);
+  ApplySortedTitles();
+end;
+
 procedure TfrmDataGridFrame.dbgDadosMouseActivate(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y,
   HitTest: Integer; var MouseActivate: TMouseActivate);
 var
   Column: TColumn;
 begin
-  // O evento dbgDadosMouseDown não responde no formulario, por isso o uso desse evento substituto
+  // O menu de filtro usa a coluna sob o mouse sem alterar a linha corrente.
   if Button <> mbRight then
     Exit;
 
@@ -766,6 +1046,11 @@ begin
   DrawCheckboxCell(Rect, State, not MarkField.IsNull and MarkField.AsBoolean);
 end;
 
+procedure TfrmDataGridFrame.dbgDadosExit(Sender: TObject);
+begin
+//
+end;
+
 procedure TfrmDataGridFrame.dbgDadosKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if (Key = VK_SPACE) and (Shift = []) and MarkingActive then
@@ -783,16 +1068,24 @@ begin
     Exit;
 
   dset := dbgDados.DataSource.DataSet;
-  dbgDados.DataSource.DataSet := nil;
+
+  // O desvinculo transitorio nao e uma nova pesquisa: a ordenacao exibida e as
+  // marcacoes continuam valendo apos os comandos.
+  FSuppressDataSetChange := True;
   try
-    case AOperation of
-      moMarkAll  : FOperations.MarkAll();
-      moUnmarkAll: FOperations.UnmarkAll();
-      moInvertAll: FOperations.InverterAllMarks();
-      moToggle   : FOperations.ToggleCurrentMark();
+    dbgDados.DataSource.DataSet := nil;
+    try
+      case AOperation of
+        moMarkAll  : FOperations.MarkAll();
+        moUnmarkAll: FOperations.UnmarkAll();
+        moInvertAll: FOperations.InverterAllMarks();
+        moToggle   : FOperations.ToggleCurrentMark();
+      end;
+    finally
+      dbgDados.DataSource.DataSet := dset;
     end;
   finally
-    dbgDados.DataSource.DataSet := dset;
+    FSuppressDataSetChange := False;
   end;
 end;
 
