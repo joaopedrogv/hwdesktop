@@ -5,26 +5,17 @@ interface
 uses
   BaseUseCaseUnit,
   IGruposFiscaisRepositoryUnit,
+  IDataBaseConnectionUnit,
   GrupoFiscalEtdUnit,
   CreateEntityUseCaseOutputUnit;
 
-type      
-  {$IFDEF INTF_ON}
-  IRemoverGrupoFiscalUseCase = interface
-    ['{3F67136A-0B5D-4CD2-AE56-B597CBF07449}']
-    procedure Executar(const Id: string);
-  end;
-  {$ENDIF}
-         
-  {$IFDEF INTF_ON}
-  RemoverGrupoFiscalUseCase = class(BaseUseCase, IRemoverGrupoFiscalUseCase)
-  {$ELSE}
+type
   RemoverGrupoFiscalUseCase = class(BaseUseCase)
-  {$ENDIF}
   private
     FGruposFiscaisRepo: IGruposFiscaisRepository;
+    FConnection: IDataBaseConnection;
   public
-    constructor Create(const GruposFiscaisRepo: IGruposFiscaisRepository);
+    constructor Create(AConnection: IDataBaseConnection; AGruposFiscaisRepo: IGruposFiscaisRepository);
 
     procedure Executar(const Id: string);
   end;
@@ -32,18 +23,20 @@ type
 implementation
 
 uses
-  Sysutils, EValidacaoNegocioUnit, StatusRegistroEnumUnit;
+  Sysutils, EValidacaoNegocioUnit, StatusRegistroEnumUnit, ITransactionUnit;
 
 { RemoverGrupoFiscalUseCase }
 
-constructor RemoverGrupoFiscalUseCase.Create(const GruposFiscaisRepo: IGruposFiscaisRepository);
+constructor RemoverGrupoFiscalUseCase.Create(AConnection: IDataBaseConnection; AGruposFiscaisRepo: IGruposFiscaisRepository);
 begin
-  FGruposFiscaisRepo := GruposFiscaisRepo;
+  FGruposFiscaisRepo := AGruposFiscaisRepo;
+  FConnection := AConnection;
 end;
 
 procedure RemoverGrupoFiscalUseCase.Executar(const Id: string);
 var
   grupoFiscal: GrupoFiscalEtd;
+  transaction: ITransaction;
 begin
   grupoFiscal := FGruposFiscaisRepo.GetById(Id);
 
@@ -55,7 +48,23 @@ begin
 
   grupoFiscal.Ativo := saLixeira;
 
-  FGruposFiscaisRepo.Put(grupoFiscal);
+  // A remocao logica altera somente o status; descricao e vinculos de empresa
+  // permanecem no cadastro.
+  transaction := FConnection.BeginTransaction();
+  try try
+    FGruposFiscaisRepo.RemoverLogicamente(grupoFiscal.Id);
+
+    transaction.Commit();
+  except
+    on E: Exception do
+      begin
+        transaction.Rollback();
+        raise;
+      end;
+  end;
+  finally
+    transaction.FreeTransaction();
+  end;
 end;
 
 end.

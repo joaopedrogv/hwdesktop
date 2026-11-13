@@ -6,12 +6,15 @@ interface
 uses
   HwNextViewApi;
 
-// Callback sincrono consultado pelo modulo Next. Recebe apenas o codigo do
-// processo e a acao textual ja convertida pelo modulo. A verificacao usa
-// TAudit_OOP, que obtem a empresa, o usuario e a conexao da sessao ERP corrente.
-// Nenhuma excecao atravessa a fronteira da DLL.
+// Callback sincrono consultado pelo modulo Next. O processo, a acao textual e a
+// tabela vem do chamador: quais processos e acoes cada tela usa pertencem a
+// funcionalidade, nao ao host. A verificacao usa TAudit_OOP, que obtem a
+// empresa, o usuario e a conexao da sessao ERP corrente e aplica a regra do
+// processo recebido. O host nao abre dialogo; negativa, senha de gerente e
+// cancelamento continuam sendo apresentados pelo mecanismo legado. Nenhuma
+// excecao atravessa a fronteira da DLL.
 
-function HwNextAuthorize(AProcessCode, AAction: PWideChar): Integer; stdcall;
+function HwNextAuthorize(AProcessCode, AAction, ATable: PWideChar): Integer; stdcall;
 
 implementation
 
@@ -28,28 +31,30 @@ begin
     Result := string(WideString(AValue));
 end;
 
-function HwNextAuthorize(AProcessCode, AAction: PWideChar): Integer; stdcall;
+function HwNextAuthorize(AProcessCode, AAction, ATable: PWideChar): Integer; stdcall;
 var
-  ProcessCode, Action: string;
+  ProcessCode, Action, TableName: string;
   Auditor: TAudit_OOP;
 begin
-  // Padrao seguro: somente a combinacao conhecida pode liberar a consulta.
+  // Padrao seguro: dado incompleto ou falha mantem a operacao bloqueada.
   Result := HW_NEXT_AUTH_UNAVAILABLE;
   try
     ProcessCode := CallbackText(AProcessCode);
     Action := CallbackText(AAction);
+    TableName := CallbackText(ATable);
 
-    if (ProcessCode <> 'MOD008') or (Action <> 'VISUALIZAR') then
+    // O processo e a acao identificam a regra consultada; a tabela apenas
+    // acompanha a auditoria e pode vir vazia.
+    if (ProcessCode = '') or (Action = '') then
       Exit;
 
-    // O auditor usa a sessao ERP corrente; a conexao vem de dtmAtivo.bancoHw,
-    // obtida internamente pelo TAudit_OOP. A negativa ou o cancelamento do
-    // legado (Permitido/PesqPros) e apresentado ao usuario pelo proprio
-    // mecanismo; o host nao abre dialogo.
     Auditor := TAudit_OOP.Create;
     try
-      Auditor.Tabela := 'GRUPOS_FISCAIS';
-      if Auditor.Processo('MOD008').Visualizar().Permitido() then
+      Auditor.Tabela := TableName;
+      // AcaoPermitida aplica a acao recebida ao processo informado usando a
+      // sessao corrente. A liberacao da senha de gerente e a mensagem de
+      // negativa ou cancelamento pertencem a esse mecanismo.
+      if Auditor.Processo(ProcessCode).AcaoPermitida(Action) then
         Result := HW_NEXT_AUTH_ALLOWED
       else
         Result := HW_NEXT_AUTH_DENIED;

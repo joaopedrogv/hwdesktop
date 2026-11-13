@@ -3,22 +3,20 @@ unit GruposFiscaisForm;
 interface
 
 uses
-  System.SysUtils, Data.DB, Vcl.Controls, Vcl.Forms,
+  Winapi.Windows, System.SysUtils, Data.DB, Vcl.Controls, Vcl.Forms,
   Vcl.StdCtrls, QueryResultForm, FilterCriterion, IDataSetReaderUnit,
-  GridColumnDefinition, GruposFiscaisPresenter, QueryResultOperations,
-  AuthorizationService;
+  GridColumnDefinition, GruposFiscaisPresenter, QueryResultOperations;
 
 type
   // Tela de consulta de Grupos Fiscais. Herda a apresentacao generica e
-  // acrescenta a identidade da consulta e a simulacao de exclusao da linha
-  // corrente (ponto de extensao da operacao real). O apresentador e o leitor
-  // sao injetados pela composicao.
+  // acrescenta a identidade da consulta e o envio da linha corrente para a
+  // lixeira. O apresentador e o leitor sao injetados pela composicao.
   TfrmGruposFiscais = class(TfrmQueryResult)
-    btnSimularExclusao: TButton;
-    procedure btnSimularExclusaoClick(Sender: TObject);
+    btnEnviarLixeira: TButton;
+    procedure btnEnviarLixeiraClick(Sender: TObject);
   private
     FPresenter: TGruposFiscaisPresenter;
-    function IdLinhaCorrente: string;
+    function LerLinhaCorrente(out AId, ADescricao: string): Boolean;
     function PesquisarGrupos(
       const ACriteria: TFilterCriteria): IDataSetReader;
   protected
@@ -38,9 +36,15 @@ implementation
 const
   MissingPresenterMessage =
     'O apresentador de Grupos Fiscais nao foi informado.';
-  AutorizacaoTitle = 'Autoriza'#231#227'o';
-  PermissaoIndisponivelMessage =
-    'N'#227'o foi poss'#237'vel verificar a permiss'#227'o de consulta.';
+  LixeiraTitle = 'Enviar para a lixeira';
+  SemRegistroMessage = 'Selecione um grupo fiscal na grade.';
+  ConfirmacaoMessage =
+    'Deseja enviar o grupo fiscal "%s" para a lixeira?';
+  AtualizacaoFalhouMessage =
+    'O grupo fiscal j'#225' foi enviado para a lixeira. Refa'#231'a a pesquisa para' +
+    ' atualizar a consulta.';
+  FalhaMessage =
+    'N'#227'o foi poss'#237'vel enviar o grupo fiscal para a lixeira.';
 
 destructor TfrmGruposFiscais.Destroy;
 begin
@@ -74,58 +78,34 @@ begin
 end;
 
 function TfrmGruposFiscais.CanPesquisar: Boolean;
-var
-  Autorizacao: TAuthorizationResult;
 begin
-  Result := False;
-  if FPresenter = nil then
-  begin
-    ShowError(MissingPresenterMessage, AutorizacaoTitle);
-    Exit;
-  end;
-
-  try
-    Autorizacao := FPresenter.AutorizarPesquisa;
-  except
-    // Falha na verificacao equivale a indisponibilidade: interrompe a pesquisa
-    // e preserva o resultado atual.
-    ShowWarning(PermissaoIndisponivelMessage, AutorizacaoTitle);
-    Exit;
-  end;
-
-  case Autorizacao.Outcome of
-    aoAllowed:
-      Result := True;
-    aoDenied:
-      // Negativa ou cancelamento ja apresentado pelo legado; nao repetir.
-      Result := False;
-    aoUnavailable:
-      begin
-        ShowWarning(PermissaoIndisponivelMessage, AutorizacaoTitle);
-        Result := False;
-      end;
-  end;
+  // A decisao e as mensagens de indisponibilidade pertencem ao apresentador, que
+  // recebe esta tela como feedback. Sem apresentador a pesquisa nao prossegue.
+  Result := (FPresenter <> nil) and FPresenter.AutorizarPesquisa(Self);
 end;
 
 procedure TfrmGruposFiscais.DoInitializeView;
 begin
   inherited;
-  // O botao de simulacao fica a esquerda do Pesquisar, com a mesma ancora
-  // direita. ConfigureFilters (chamado pela composicao antes desta
+  // O botao de envio para a lixeira fica a esquerda do Pesquisar, com a mesma
+  // ancora direita. ConfigureFilters (chamado pela composicao antes desta
   // inicializacao) ja reposicionou btnPesquisar a 16 px da borda direita.
-  btnSimularExclusao.Anchors := [akTop, akRight];
-  btnSimularExclusao.Top := btnPesquisar.Top;
-  btnSimularExclusao.Left := btnPesquisar.Left - btnSimularExclusao.Width - 8;
-  Constraints.MinWidth := btnSimularExclusao.Left +
-    btnSimularExclusao.Width + 8 + btnPesquisar.Width + 16;
+  btnEnviarLixeira.Anchors := [akTop, akRight];
+  btnEnviarLixeira.Top := btnPesquisar.Top;
+  btnEnviarLixeira.Left := btnPesquisar.Left - btnEnviarLixeira.Width - 8;
+  Constraints.MinWidth := btnEnviarLixeira.Left +
+    btnEnviarLixeira.Width + 8 + btnPesquisar.Width + 16;
 end;
 
-function TfrmGruposFiscais.IdLinhaCorrente: string;
+function TfrmGruposFiscais.LerLinhaCorrente(out AId, ADescricao: string): Boolean;
 var
   DataSet: TDataSet;
-  Campo: TField;
+  CampoId, CampoDescricao: TField;
 begin
-  Result := '';
+  AId := '';
+  ADescricao := '';
+  Result := False;
+
   if dsConsulta = nil then
     Exit;
 
@@ -133,50 +113,59 @@ begin
   if (DataSet = nil) or (not DataSet.Active) or DataSet.IsEmpty then
     Exit;
 
-  Campo := DataSet.FindField('ID');
-  if Campo = nil then
+  // A linha corrente e lida uma unica vez: a identidade identifica o registro a
+  // alterar e a descricao identifica a linha na confirmacao e nas mensagens.
+  CampoId := DataSet.FindField('ID');
+  CampoDescricao := DataSet.FindField('DESCRICAO');
+  if (CampoId = nil) or (CampoDescricao = nil) then
     Exit;
 
-  Result := Trim(Campo.AsString);
+  AId := Trim(CampoId.AsString);
+  ADescricao := Trim(CampoDescricao.AsString);
+  Result := AId <> '';
 end;
 
-procedure TfrmGruposFiscais.btnSimularExclusaoClick(Sender: TObject);
-const
-  SemRegistroMessage = 'Selecione um grupo fiscal na grade.';
-  SemRegistroTitle = 'Simula'#231#227'o de exclus'#227'o';
-  SucessoMessage = 'Exclus'#227'o simulada com sucesso.';
-  SucessoTitle = 'Exclus'#227'o simulada';
-  FalhaMessage =
-    'N'#227'o foi poss'#237'vel concluir a simula'#231#227'o de exclus'#227'o.';
-  FalhaTitle = 'Simula'#231#227'o de exclus'#227'o';
+procedure TfrmGruposFiscais.btnEnviarLixeiraClick(Sender: TObject);
 var
-  Id: string;
+  Id, Descricao: string;
 begin
-  Id := IdLinhaCorrente;
-  if Id = '' then
+  if not LerLinhaCorrente(Id, Descricao) then
   begin
-    ShowInformation(SemRegistroMessage, SemRegistroTitle);
+    ShowInformation(SemRegistroMessage, LixeiraTitle);
     Exit;
   end;
 
-  btnSimularExclusao.Enabled := False;
+  // O envio para a lixeira retira o grupo da consulta: somente a afirmacao
+  // explicita prossegue, e o padrao do dialogo e "Nao".
+  if Application.MessageBox(PChar(Format(ConfirmacaoMessage, [Descricao])),
+    PChar(LixeiraTitle),
+    MB_YESNO or MB_ICONWARNING or MB_DEFBUTTON2) <> IDYES then
+    Exit;
+
+  btnEnviarLixeira.Enabled := False;
   try
     if FPresenter = nil then
+      ShowError(MissingPresenterMessage, LixeiraTitle)
+    else
     begin
-      ShowError(FalhaMessage, FalhaTitle);
-      Exit;
-    end;
+      try
+        // O apresentador interpreta a autorizacao e apresenta a mensagem
+        // correspondente; False interrompe sem repetir o que o legado mostrou.
+        if not FPresenter.EnviarParaLixeira(Id, Self) then
+          Exit;
+      except
+        // O apresentador traduz as falhas esperadas; este resguardo impede que
+        // uma excecao inesperada atravesse o manipulador de evento.
+        ShowError(FalhaMessage, LixeiraTitle);
+        Exit;
+      end;
 
-    try
-      if FPresenter.SimularExclusao(Id) then
-        ShowInformation(SucessoMessage, SucessoTitle)
-      else
-        ShowError(FalhaMessage, FalhaTitle);
-    except
-      ShowError(FalhaMessage, FalhaTitle);
+      // A grade atualizada e a confirmacao do envio; nao ha dialogo de sucesso.
+      if not RepetirPesquisa then
+        ShowWarning(AtualizacaoFalhouMessage, LixeiraTitle);
     end;
   finally
-    btnSimularExclusao.Enabled := True;
+    btnEnviarLixeira.Enabled := True;
   end;
 end;
 

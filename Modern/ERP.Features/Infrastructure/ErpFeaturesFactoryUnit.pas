@@ -1,6 +1,6 @@
 unit ErpFeaturesFactoryUnit;
 
-interface     
+interface
 
 uses
   ErpFeaturesFactoryBaseUnit,
@@ -783,7 +783,7 @@ function ErpFeaturesFactory.CreateListarTributosNFePorIdUseCase(): IListarTribut
 begin
   Result := ListarTributosNFe.Create(
     ErpFeaturesRepoContainer.GetInstance().TributosDFeRepo
-  );          
+  );
 end;
 
 function ErpFeaturesFactory.CreateListarTributosNFePorItemUseCase: IListarTributosNFePorItemUseCase;
@@ -1020,6 +1020,7 @@ end;
 function ErpFeaturesFactory.CreateRemoverGruposFiscaisUseCase: IRemoverGrupoFiscalUseCase;
 begin
   Result := RemoverGrupoFiscalUseCase.Create(
+    FDatabaseConnection,
     ErpFeaturesRepoContainer.GetInstance().GruposFiscaisRepo
   );
 end;

@@ -73,8 +73,6 @@ begin
   FTransaction.Options.Params.Add('rec_version');
   FTransaction.Options.Params.Add('nowait');
   FTransaction.StartTransaction;
-
-  FOnNeedTransaction := GetFDTransaction;
 end;
 
 destructor FireDACTransaction.Destroy;
