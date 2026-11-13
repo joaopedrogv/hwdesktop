@@ -6,9 +6,10 @@ os diretórios gerados não são fontes de manutenção manual.
 
 ## Organização
 
-- agents.json: nomes locais, papéis, perfis de capacidade, IDs e participação por cliente.
-- shared/: pontes, wrappers e entradas compartilhadas.
-- tools/: fontes específicas de Kilo, AiderDesk e Codex.
+- agents.json: nomes locais, papéis, perfis de capacidade e participação por cliente.
+- shared/: pontes e wrappers de descoberta.
+- shared/markdown/: sete perfis e três comandos gerados para Kilo e OpenCode.
+- tools/: manifestos de Kilo, OpenCode e Codex e prompts específicos do Codex.
 - Configurações individuais ficam em _automation/config/ai-models.local.json.
 - O exemplo versionado é [ai-models.exemplo.json](../../config/ai-models.exemplo.json).
 
@@ -31,8 +32,8 @@ Shared não pode ser removido enquanto houver clientes que dependem dele.
 
 A descoberta de Commands e Skills abrange .ai/ e Modern/.ai/. Cada wrapper aponta
 para o arquivo canônico exato, sem copiar seu procedimento. Nomes duplicados são recusados.
-projectDir e destinos são calculados a partir do checkout; caminhos absolutos não
-são fixados nas fontes. Manifestos validam fontes e destinos dentro do projeto.
+Os destinos são calculados a partir do checkout. Manifestos validam fontes e
+destinos dentro do projeto.
 
 ## Modelos e preferências individuais
 
@@ -55,12 +56,13 @@ aceitos como aliases, inclusive orchestrator para coordinator. Configurações
 conflitantes para o mesmo perfil final são recusadas antes de escrever.
 Não inclua credenciais, tokens ou segredos nessa configuração.
 
-AiderDesk e Codex, quando solicitados, precisam de seus próprios modelos e parâmetros
-individuais. A aplicação do Kilo não aplica nem remove esses clientes.
+No OpenCode, `opencodeAgents` permite definir modelos opcionais por agente,
+independentes de `kiloAgents`. O Codex usa os modelos e parâmetros individuais
+em `executionProfiles`.
 
 ## Perfis e controle local
 
-O Kilo gera coordinator, planner, researcher, researcher-critical, implementer,
+Kilo e OpenCode geram coordinator, planner, researcher, researcher-critical, implementer,
 implementer-fast e reviewer. implementer atende balanced-work e quality-critical;
 a escolha do modelo deve satisfazer a capacidade exigida pela atribuição.
 

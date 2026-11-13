@@ -331,11 +331,19 @@ Create tests alongside the corresponding functional increment. Use
 infrastructure, UI, the application Container, and `Fiscal.Calculos` are outside
 that Skill.
 
-During authorized implementation, relevant isolated ERP.UnitTests validation has
-standing authority under .ai/rules/repository-safety.md. Record it in assignments.
-Other execution requires its own authority. The primary Orchestrator may run the
-canonical automation and record its results. Technical diagnosis or correction is
-assigned to a Specialist.
+During authorized implementation, use the applicable standing validation grants
+in .ai/rules/repository-safety.md and record them in assignments. The primary
+Orchestrator may run the canonical automation and record its results. Assign
+technical diagnosis or correction to a Specialist. Execution outside those grants
+requires its own authority.
+
+### Next DLL
+
+For changes that affect hw.next.dll, apply the standing build grant and use
+`pwsh -NoProfile -File ./_automation/build/build-next.ps1` from the working clone.
+Collect a successful build of the affected implementation before handoff, or
+record the concrete blocker as pending validation. Route compiler errors caused
+by the assignment to the implementer and rerun after correction.
 
 ### Modern `ERP.UnitTests`
 

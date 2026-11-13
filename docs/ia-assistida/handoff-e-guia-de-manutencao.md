@@ -38,12 +38,12 @@ O repositório possui uma arquitetura de instruções independente de ferramenta
 - `.ai/` contém Rules, Context, Skills, Workflows, Commands e papéis de Agents;
 - `docs/ia-assistida/` explica a arquitetura para desenvolvedores;
 - `_automation/ai/tool-setup/` contém as fontes versionadas dos
-  adapters de Kilo, AiderDesk e Codex;
+  adapters de Kilo, OpenCode e Codex;
 - `_automation/ai/Sync-AIProfiles.ps1` instala, verifica, troca e remove os setups;
-- `.agents/`, `.aider-desk/`, `.kilo/`, `.opencode/` e `.codex/` são diretórios
+- `.agents/`, `.kilo/`, `.opencode/` e `.codex/` são diretórios
   locais ignorados pelo Git;
-- Codex possui setup ativo gerado; OpenCode e Antigravity continuam como integrações
-  não impeditivas a serem reconciliadas antes de receberem setup ativo.
+- Kilo, OpenCode e Codex têm fontes para setup gerado. Antigravity continua
+  como integração a reconciliar.
 
 O objetivo maior permanece permitir que diferentes ferramentas de IA trabalhem com
 as mesmas regras, conhecimento, procedimentos e papéis, sem fazer de uma IDE,
@@ -82,9 +82,8 @@ explicitamente manutenção da documentação ou das fontes versionadas dos setu
 Executar uma operação já definida de setup não exige sua leitura: a Command
 `manage-ai-tool-setup` chama diretamente `_automation/ai/Sync-AIProfiles.ps1`.
 
-Os prompts e templates ativos de Kilo, AiderDesk e Codex devem ser verificados: todos
-encaminham para `AGENTS.md` e `.ai/`, e nenhum encaminha para
-`docs/ia-assistida/`.
+Os prompts e templates dos agentes encaminham para `AGENTS.md` e para o papel,
+o protocolo e os perfis em `.ai/agents/`.
 
 O script possui uma dependência mecânica de
 `_automation/ai/tool-setup/`, onde estão seus JSONs e templates. Essa
@@ -239,15 +238,13 @@ O componente `Shared` instala em `.agents/`:
 - adapters das Commands como Skills em `.agents/skills/`;
 - o ponto de entrada do Workflow em `.agents/workflows/`.
 
-Kilo, AiderDesk e Codex dependem de Shared. Remover apenas uma ferramenta não remove
-`.agents/`. Remover `All` processa Kilo, AiderDesk, Codex e Shared nessa ordem. Remover
-Shared isoladamente é recusado enquanto existir state instalado de uma dependente.
+Kilo, OpenCode e Codex dependem de Shared. Remover `All` processa Kilo, OpenCode,
+Codex e Shared nessa ordem. Remover Shared isoladamente é recusado enquanto houver
+uma dependente instalada.
 
-O Kilo recebe Agents e Commands em `.kilo/`. O AiderDesk recebe perfis, ordem,
-Commands e wrappers de Skills em `.aider-desk/`. O Codex recebe Custom Agents TOML
-em `.codex/agents/` e usa as Commands expostas como Skills compartilhadas. Os três
-setups são descritos por
-manifestos e usam o inventário comum de `agents.json`.
+Kilo e OpenCode recebem Agents e Commands Markdown em `.kilo/` e `.opencode/`,
+gerados das mesmas fontes. O Codex recebe Custom Agents TOML em `.codex/agents/`
+e usa as Commands expostas como Skills compartilhadas.
 
 ### Modelos e dados variáveis
 
@@ -255,9 +252,8 @@ Modelos concretos são individuais, em _automation/config/ai-models.local.json.
 O exemplo versionado ai-models.exemplo.json, na mesma pasta, não contém escolhas
 concretas. O gerador não usa catálogo compartilhado. Sem override, perfis do Kilo
 são emitidos sem model, e subagentes herdam a escolha do principal.
-IDs, ordem, presets, permissões e templates continuam nas fontes do setup.
-projectDir é calculado a partir do checkout. Nomes locais antigos são aceitos
-como aliases e os arquivos pessoais antigos continuam como fallback de leitura.
+O inventário e os templates ficam nas fontes do setup. Nomes locais antigos são
+aceitos como aliases, e arquivos pessoais antigos continuam como fallback de leitura.
 
 ### Estados e ownership
 
@@ -270,9 +266,8 @@ remoção, apaga arquivos do state e apenas os artefatos declarados explicitamen
 `disposablePaths`. Diretórios desconhecidos ou arquivos locais são preservados.
 
 No Kilo, a allowlist descartável inclui os arquivos de runtime Node e
-`node_modules`, que a extensão recria. No AiderDesk, extensões, tasks, históricos,
-prompts ou outras configurações locais não pertencem ao setup gerenciado e são
-preservados. A raiz de uma ferramenta só é apagada quando fica vazia.
+`node_modules`, que a extensão recria. A raiz de uma ferramenta só é apagada
+quando fica vazia.
 
 O ciclo de remoção é idempotente: repetir `Remove` com states ausentes não deve
 falhar. Coleções de caminhos gerenciados podem estar vazias.
@@ -285,7 +280,7 @@ falhar. Coleções de caminhos gerenciados podem estar vazias.
 ./_automation/ai/Sync-AIProfiles.ps1 -Tool Kilo -Action Check
 ./_automation/ai/Sync-AIProfiles.ps1 -Tool Kilo -Action Remove -WhatIf
 ./_automation/ai/Sync-AIProfiles.ps1 -Tool Kilo -Action Remove
-./_automation/ai/Sync-AIProfiles.ps1 -Tool AiderDesk -Action Switch
+./_automation/ai/Sync-AIProfiles.ps1 -Tool Codex -Action Switch
 ./_automation/ai/Sync-AIProfiles.ps1 -Tool All -Action Remove
 ```
 
@@ -349,11 +344,11 @@ pedidas.
 9. testar `Plan`, `Apply`, `Check`, `Remove`, repetição de `Remove` e conflitos;
 10. só então retirar o status de pendente.
 
-OpenCode possui material preliminar em
-`docs/ia-assistida/pendencias-de-integracao/`. Esse material não deve ser copiado
-diretamente para a raiz: pode conter modelos, permissões e formatos antigos. O
-material preliminar do Codex também é histórico e foi substituído pelas fontes
-ativas em `_automation/ai/tool-setup/tools/codex/`.
+Os adapters preliminares de OpenCode e Codex em
+`docs/ia-assistida/pendencias-de-integracao/` são registros históricos. Para instalar,
+use `Sync-AIProfiles.ps1`. As fontes ativas do OpenCode ficam em
+`_automation/ai/tool-setup/shared/markdown/` e as do Codex em
+`_automation/ai/tool-setup/tools/codex/`.
 
 ## Checklist de revisão após mudanças
 
@@ -379,11 +374,9 @@ O estado autoritativo das pendências está em
 deste handoff são:
 
 - piloto completo do Workflow no Kilo;
-- validação dos nove perfis e da delegação real no AiderDesk;
-- comparação operacional entre Kilo e AiderDesk;
 - calibração posterior dos modelos por evidência;
 - piloto operacional do Workflow completo no Codex;
-- reconciliação e automação futura de OpenCode e Antigravity;
+- reconciliação e automação futura do Antigravity;
 - estratégia de versionamento de fontes externas sincronizadas;
 - execução real e calibração do Caso Gold por meio de `fiscal-calculos-update`;
 - automação ainda não definida para `ERP.IntegrationTests`;

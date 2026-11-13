@@ -10,6 +10,8 @@ Requerem PowerShell 7.5+. Abra `..\menu.bat` e escolha **Build / Deploy** ou exe
 | `clean.ps1` | Remove DCUs do primeiro nível de `dcu` e os DCPs/BPLs do catálogo geral. |
 | `deploy-all.ps1` | Copia as BPLs disponíveis do catálogo para o destino indicado ou configurado. |
 | `build-and-deploy.ps1` | Executa compilação completa e publica somente após seu sucesso. |
+| `build-next.ps1` | Compila a DLL do Next em Delphi Rio/Win32. |
+| `deploy-next.ps1` | Copia apenas a DLL do Next para o destino indicado ou configurado. |
 
 ## Parâmetros opcionais para testes por linha de comando
 
@@ -42,6 +44,18 @@ Exemplos a partir da raiz do repositório:
 - `-NonInteractive` nos comandos de compilação fecha a entrada do núcleo BAT, evitando suas pausas/perguntas de erro. Em `build-select`, exige `-Packages`; em `build-and-deploy`, permite uma chamada automatizada sem a confirmação S/N. No uso normal, a confirmação do fluxo combinado e as interações do núcleo são preservadas.
 - Para uso via `pwsh -File`, passe vários nomes como um único argumento separado por vírgulas, por exemplo `-Packages 'pkModern,pkAtivos'`.
 - `-Confirm` permite solicitar a confirmação padrão do PowerShell nas operações; na combinação, compilação e publicação são etapas distintas.
+
+## Compilar e publicar Next
+
+Execute o comando abaixo na raiz do clone. Ele compila somente `Next/Projects/hw.next.dproj` em Debug/Win32 e gera `bpl/hw.next.dll`.
+
+```powershell
+.\_automation\build\build-next.ps1
+```
+
+Use `-DelphiBin` para indicar outra instalação do Delphi Rio e `SPRING4D_ROOT` para indicar outra pasta do Spring4D já compilado para Rio/Win32. O build usa a biblioteca padrão do Rio para evitar o limite de tamanho do comando do compilador. A compilação deixa o ERP disponível para validação manual com a DLL gerada.
+
+No submenu **Build / Deploy**, escolha **7 · Compilar Next** para gerar a DLL ou **8 · Publicar Next** para copiar a DLL já compilada do clone. A publicação usa o mesmo destino configurado para **Publicar BPLs** e copia apenas `hw.next.dll`. Pela linha de comando, `deploy-next.ps1` também aceita `-Destination` e `-WhatIf`.
 
 ## Compatibilidade com a implementação existente
 

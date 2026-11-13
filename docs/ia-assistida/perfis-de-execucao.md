@@ -221,11 +221,10 @@ cada ferramenta.
 | `increment-implementer` | `balanced-work` | usar `fast-routine` apenas em trabalho mecânico; tarefas críticas exigem atribuição explícita e revisão equivalente |
 | `increment-reviewer` | `balanced-work` | usar `quality-critical` para schema, segurança, fiscal, transações, arquitetura ou revisão integrada de alto risco |
 
-Nos setups atuais de Kilo Code e AiderDesk, `repository-researcher` possui variantes
-`fast-routine` e `quality-critical`. `increment-implementer` possui variantes
-`fast-routine`, `balanced-work` e `quality-critical`. Essas variantes são adapters
-do mesmo papel canônico e permitem cumprir exatamente o perfil solicitado pelo
-Workflow sem elevar todas as tarefas comuns.
+Kilo e Codex disponibilizam variantes `fast-routine` e `quality-critical` para
+`repository-researcher`. Para `increment-implementer`, o Kilo tem dois perfis locais,
+e `implementer` atende também atribuições `balanced-work`. O Codex tem três perfis
+locais, um para cada nível de implementação.
 
 ## Como um adapter deve mapear os perfis
 

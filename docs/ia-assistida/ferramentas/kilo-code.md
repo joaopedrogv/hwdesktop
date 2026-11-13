@@ -4,7 +4,8 @@
 
 O Kilo Code carrega `AGENTS.md` e descobre Skills em `.agents/skills/`. As fontes
 versionadas de seus Agents e Commands ficam em
-`_automation/ai/tool-setup/tools/kilo/`; `.kilo/agents/` e
+`_automation/ai/tool-setup/shared/markdown/`, em conjunto com o manifesto em
+`_automation/ai/tool-setup/tools/kilo/`. `.kilo/agents/` e
 `.kilo/commands/` são destinos gerados e ignorados pelo Git.
 
 O arquivo `/.kilo/kilo.jsonc` permanece local e ignorado porque pode conter

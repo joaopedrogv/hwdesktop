@@ -197,8 +197,8 @@ function Invoke-MenuCommand {
             $commandArguments = @()
             $scriptPath = Join-Path $PSScriptRoot 'database\export-schema.ps1'
         }
-        elseif ($Item.Id -in @('ai-plan', 'ai-apply', 'ai-check')) {
-            $commandArguments = @('-Tool', 'Kilo', '-Action', $Item.Id.Substring(3))
+        elseif ($Item.Id -eq 'ai-setup') {
+            $commandArguments = @('-Tool', $Item.Tool, '-Action', $Item.Action)
             $scriptPath = Join-Path $PSScriptRoot 'ai\Sync-AIProfiles.ps1'
         }
         elseif ($Item.Id -eq 'dependencies') {
@@ -206,7 +206,7 @@ function Invoke-MenuCommand {
             $scriptPath = Join-Path $PSScriptRoot 'workflow\prepare-dependencies.ps1'
         }
         else {
-            $commandArguments = @('-ProjectRoot', $ProjectRoot)
+            $commandArguments = if ($Item.Id -ne 'next-build') { @('-ProjectRoot', $ProjectRoot) } else { @() }
             $scriptPath = Join-Path $PSScriptRoot "build\$($Item.ScriptName)"
         }
         $engine = (Get-Process -Id $PID).Path
@@ -228,7 +228,7 @@ function Invoke-AutomationMenu {
 
     $projectRoot = Split-Path -Parent $PSScriptRoot
     $mainItems = @(
-        [pscustomobject]@{ Label = 'Build / Deploy'; Description = 'Compilar, limpar e publicar BPLs.'; Status = 'Disponível'; Id = 'build' }
+        [pscustomobject]@{ Label = 'Build / Deploy'; Description = 'Compilar, limpar e publicar binários.'; Status = 'Disponível'; Id = 'build' }
         [pscustomobject]@{ Label = 'Sincronizar integração'; Description = 'Atualizar pelo SVN e publicar seu estado no Git.'; Status = 'Disponível'; Id = 'sync' }
         [pscustomobject]@{ Label = 'Iniciar demanda'; Description = 'Atualizar a base Git e criar a branch de trabalho.'; Status = 'Disponível'; Id = 'start' }
         [pscustomobject]@{ Label = 'Integrar demanda'; Description = 'Atualizar a main e incorporar a demanda local, sem push.'; Status = 'Disponível'; Id = 'integrate' }
@@ -236,7 +236,7 @@ function Invoke-AutomationMenu {
         [pscustomobject]@{ Label = 'Entregar ao SVN'; Description = 'Preparar a entrega; commit SVN por chamada separada com -Commit.'; Status = 'Disponível'; Id = 'deliver' }
         [pscustomobject]@{ Label = 'Informações do ambiente'; Description = 'Consultar caminhos e a versão do PowerShell.'; Status = 'Disponível'; Id = 'environment' }
         [pscustomobject]@{ Label = 'Banco de dados'; Description = 'Ferramentas da base de referência.'; Status = 'Disponível'; Id = 'database' }
-        [pscustomobject]@{ Label = 'Ferramentas de IA'; Description = 'Planejar, aplicar e conferir o setup local do Kilo.'; Status = 'Disponível'; Id = 'ai' }
+        [pscustomobject]@{ Label = 'Ferramentas de IA'; Description = 'Planejar, aplicar e conferir os setups locais de IA.'; Status = 'Disponível'; Id = 'ai' }
     )
     $buildItems = @(
         [pscustomobject]@{ Label = 'Compilar todos'; Description = 'Limpeza geral e compilação do catálogo completo.'; Status = 'Disponível'; Id = 'all'; ScriptName = 'build-all.ps1' }
@@ -245,14 +245,19 @@ function Invoke-AutomationMenu {
         [pscustomobject]@{ Label = 'Limpar saídas'; Description = 'DCUs globais e DCPs/BPLs do catálogo.'; Status = 'Disponível'; Id = 'clean'; ScriptName = 'clean.ps1' }
         [pscustomobject]@{ Label = 'Publicar BPLs'; Description = 'Copiar as BPLs disponíveis para o destino.'; Status = 'Disponível'; Id = 'deploy'; ScriptName = 'deploy-all.ps1' }
         [pscustomobject]@{ Label = 'Compilar e publicar'; Description = 'Publicar após a compilação terminar com sucesso.'; Status = 'Disponível'; Id = 'combined'; ScriptName = 'build-and-deploy.ps1' }
+        [pscustomobject]@{ Label = 'Compilar Next'; Description = 'Compilar hw.next.dll em Delphi Rio/Win32.'; Status = 'Disponível'; Id = 'next-build'; ScriptName = 'build-next.ps1' }
+        [pscustomobject]@{ Label = 'Publicar Next'; Description = 'Copiar hw.next.dll para o destino configurado.'; Status = 'Disponível'; Id = 'next-deploy'; ScriptName = 'deploy-next.ps1' }
     )
     $databaseItems = @(
         [pscustomobject]@{ Label = 'Atualizar schema'; Description = 'Extrair metadados da base configurada, sem aplicar migrações.'; Status = 'Disponível'; Id = 'schema' }
     )
     $aiItems = @(
-        [pscustomobject]@{ Label = 'Visualizar setup do Kilo'; Description = 'Conferir o plano de instalação sem alterar arquivos.'; Status = 'Disponível'; Id = 'ai-plan' }
-        [pscustomobject]@{ Label = 'Aplicar / atualizar Kilo'; Description = 'Aplicar os adapters na raiz e conferir o resultado.'; Status = 'Disponível'; Id = 'ai-apply' }
-        [pscustomobject]@{ Label = 'Verificar setup do Kilo'; Description = 'Identificar diferenças sem modificar a instalação.'; Status = 'Disponível'; Id = 'ai-check' }
+        [pscustomobject]@{ Label = 'Visualizar setup do Kilo'; Description = 'Conferir o plano de instalação sem alterar arquivos.'; Status = 'Disponível'; Id = 'ai-setup'; Tool = 'Kilo'; Action = 'Plan' }
+        [pscustomobject]@{ Label = 'Aplicar / atualizar Kilo'; Description = 'Aplicar os adapters na raiz e conferir o resultado.'; Status = 'Disponível'; Id = 'ai-setup'; Tool = 'Kilo'; Action = 'Apply' }
+        [pscustomobject]@{ Label = 'Verificar setup do Kilo'; Description = 'Identificar diferenças sem modificar a instalação.'; Status = 'Disponível'; Id = 'ai-setup'; Tool = 'Kilo'; Action = 'Check' }
+        [pscustomobject]@{ Label = 'Visualizar setup do OpenCode'; Description = 'Conferir o plano de instalação sem alterar arquivos.'; Status = 'Disponível'; Id = 'ai-setup'; Tool = 'OpenCode'; Action = 'Plan' }
+        [pscustomobject]@{ Label = 'Aplicar / atualizar OpenCode'; Description = 'Aplicar os adapters na raiz e conferir o resultado.'; Status = 'Disponível'; Id = 'ai-setup'; Tool = 'OpenCode'; Action = 'Apply' }
+        [pscustomobject]@{ Label = 'Verificar setup do OpenCode'; Description = 'Identificar diferenças sem modificar a instalação.'; Status = 'Disponível'; Id = 'ai-setup'; Tool = 'OpenCode'; Action = 'Check' }
     )
     $items = if ($Section -eq 'Build') { $buildItems } elseif ($Section -eq 'Database') { $databaseItems } elseif ($Section -eq 'AI') { $aiItems } else { $mainItems }
     $plain = $NoColor -or [Console]::IsOutputRedirected -or (Test-Path Env:NO_COLOR)

@@ -8,8 +8,9 @@ remains the canonical source of module-specific constraints and knowledge.
 
 Follow the developer's requested phase, scope and authorization. Planning and
 documentation requests authorize their stated scope.
-During authorized implementation, the standing ERP.UnitTests validation grant in
-../.ai/rules/repository-safety.md applies. Other builds, test projects, SQL
+During authorized implementation, follow the standing validation grants in
+../.ai/rules/repository-safety.md for isolated ERP.UnitTests and, when a change
+affects hw.next.dll, the local Next DLL build. Other builds, test projects, SQL
 execution, setup application and publication require their own authorization.
 
 Start with the root routing. Use ../.ai/metadata.md when routing or maintaining

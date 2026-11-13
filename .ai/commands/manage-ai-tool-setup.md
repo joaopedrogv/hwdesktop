@@ -11,7 +11,7 @@ Provide a stable, tool-independent entry point for managing generated AI tool
 setups without editing tool directories ad hoc.
 
 Use this Command when the developer asks to configure, add, update, verify, switch,
-or remove the setup of Kilo, AiderDesk, or Codex. The same intent may be expressed in
+or remove the setup of Kilo, OpenCode, or Codex. The same intent may be expressed in
 natural language without naming this Command.
 
 ## Canonical Automation

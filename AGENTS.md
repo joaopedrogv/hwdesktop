@@ -107,11 +107,11 @@ Automation starts at _automation/README.md. Setup entry point:
 _automation/ai/Sync-AIProfiles.ps1. Build parameters are in _automation/build/README.md;
 SVN/Git operations are in _automation/workflow/GUIA-OPERACIONAL.md.
 
-Use checks appropriate to the change. During authorized implementation, isolated
-ERP.UnitTests build and execution have standing authorization under
-.ai/rules/repository-safety.md#standing-erp-unit-test-validation.
-Other builds, test projects, SQL, deployment and publication require their own
-authorization. Keep feature work in the working clone.
+Use checks appropriate to the change. During authorized implementation, follow the
+standing validation grants in .ai/rules/repository-safety.md for isolated
+ERP.UnitTests and for the local Next DLL build. Other builds, test projects, SQL,
+deployment and publication require their own authorization. Keep feature work in
+the working clone.
 Do not reset, stash, discard work, rewrite history, switch branches or publish as an
 implicit investigation step.
 

@@ -13,7 +13,8 @@ always_apply: true
   encoding and line endings. Do not perform incidental cleanup or normalization.
 - Planning, implementation, test creation, build/test execution, SQL execution,
   setup changes and publication have distinct authorization boundaries. The
-  standing ERP.UnitTests validation grant below is the explicit limited exception.
+  standing validation grants below cover isolated ERP.UnitTests and the local
+  Next DLL build.
 - Preserve existing authentication, authorization, company isolation and audit.
   Never weaken a control to simplify a task or bypass an error.
 - Do not infer a uniform architecture or stack from this checkout's directory tree.
@@ -134,12 +135,31 @@ always_apply: true
   writes that share the test sources or output locations, and reuse valid results
   until a change or failure justifies another run.
 - Research, planning, standalone review and documentation requests use their own
-  stated authority. Other builds, ERP.IntegrationTests, Fiscal.Calculos.Tests,
-  database operations, infrastructure setup and publication retain their separate
-  authorization requirements.
+  stated authority. Builds outside the standing grants, ERP.IntegrationTests,
+  Fiscal.Calculos.Tests, database operations, infrastructure setup and publication
+  retain their separate authorization requirements.
 - Report the actual invocation, build/test outcome and available result artifacts.
   Preserve runner or environment failure evidence and route technical diagnosis
   within the authorized scope. A successful compile alone is build evidence.
+
+## Standing Next DLL Build Validation
+
+- During authorized implementation that affects hw.next.dll, compile it with
+  Delphi Rio/Win32 from the working clone using
+  `pwsh -NoProfile -File ./_automation/build/build-next.ps1`. This includes changes
+  to shared Modern sources used by that DLL. The script writes compiler outputs
+  in the working clone.
+- Run the build before handing off the affected implementation. Intermediate
+  builds and reruns are authorized. Fix compiler errors caused by the assignment
+  and rerun on the corrected sources. Reuse a successful build while the relevant
+  inputs are unchanged.
+- The implementer or the Orchestrator may run the script. In a Workflow, record
+  the scope in the assignment and serialize builds with other builds and writes
+  that share the DLL's sources or outputs. Report the command, result and any
+  concrete blocker.
+- A narrower developer instruction takes precedence. Legacy BPL builds, ERP
+  execution, database operations, deployment and publication require their own
+  authorization. A successful DLL build is compilation evidence.
 
 ## Validation and local tooling
 

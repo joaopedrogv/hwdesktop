@@ -12,6 +12,15 @@ validate the result. Do not finish entire layers before providing usable behavio
 Grow documentation from implemented, verified contracts; do not anticipate Skills
 or copy Modern's instruction system.
 
+## Build validation
+
+When an authorized implementation affects hw.next.dll, compile it in the working
+clone before handing off the affected changes. From the clone root, run
+`pwsh -NoProfile -File ./_automation/build/build-next.ps1`. Fix compiler errors
+caused by the assigned changes and rerun. Report the outcome or the concrete
+blocker. See the standing Next DLL build grant in
+../.ai/rules/repository-safety.md.
+
 ## Responsibilities
 
 Next follows Hexagonal Architecture (Ports and Adapters) and applies SOLID to
@@ -147,9 +156,8 @@ shared ABI contracts must support both actual consumers and their dependencies.
 For sources owned by Modern/, follow ../Modern/.ai/rules/delphi-compatibility.md,
 including its Next marker and explicit dual-target exception. A marker does not
 relocate a source or replace its owner's rules. Preserve encoding and line endings;
-do not annotate or convert existing sources in bulk. Follow the root execution
-authority boundaries; this entry grants no additional build, test or database
-execution.
+do not annotate or convert existing sources in bulk. Follow the execution
+authority in ../.ai/rules/repository-safety.md.
 
 Use the approved plan for the current delivery. Context and reasons are in
 D:/Hw/ai-docs/hwdesktop/temas/modernizacao-delphi/README.md; consult only the
