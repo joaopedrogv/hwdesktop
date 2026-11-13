@@ -5,10 +5,15 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes,
   System.UITypes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, Vcl.Mask,
-  Vcl.Menus, Vcl.ExtCtrls, Vcl.Graphics, Vcl.Buttons, Vcl.Dialogs,
+  Vcl.Menus, Vcl.ExtCtrls, Vcl.Graphics, Vcl.Buttons,
   FilterDefinition, FilterCriterion, LocalPreferences;
 
 type
+  // Contrato minimo frame -> host para o host apresentar a mensagem. O frame
+  // reutilizavel nao cria dialogo proprio.
+  TFrameFeedbackEvent = procedure(Sender: TObject;
+    const ATitulo, AMensagem: string) of object;
+
   TfrmFilterFrame = class(TFrame)
     pnCampo: TPanel;
     lbCampo: TLabel;
@@ -33,6 +38,8 @@ type
     FDefinition: TFilterDefinition;
     FPreferences: ILocalPreferences;
     FIdentity: string;
+    FPath: TFilterPath;
+    FOnFeedback: TFrameFeedbackEvent;
     FAccumulated: TFilterCriteria;
     FContadorMenu: TPopupMenu;
     FTodosSelected: Boolean;
@@ -80,6 +87,7 @@ type
     procedure PersistActiveField;
     procedure SelectFieldIndex(AFieldIndex: Integer);
     procedure FocusFirstContentField;
+    procedure ReportarFeedback(const AMensagem: string);
   published
     // Eventos referenciados pelo DFM precisam ser publicados para que o
     // streaming do VCL resolva os metodos ao carregar o frame.
@@ -90,9 +98,10 @@ type
     procedure ContadorClick(Sender: TObject);
   public
     procedure Configure(const ADefinition: TFilterDefinition;
-      const APreferences: ILocalPreferences; const AIdentity: string);
+      const APreferences: ILocalPreferences; const AIdentity: string;
+      APath: TFilterPath);
     procedure ConfigureSingle(const ADefinition: TFilterDefinition;
-      const ACriterion: TFilterCriterion);
+      const ACriterion: TFilterCriterion; APath: TFilterPath);
     // Seleciona o campo pelo Id sem coletar nem alterar os criterios ja
     // adicionados. Devolve False quando o campo nao pertence a definicao.
     function TrySelectField(const AFieldId: string): Boolean;
@@ -101,6 +110,8 @@ type
       out AMessage: string): Boolean;
     property Definition: TFilterDefinition read FDefinition;
     property Identity: string read FIdentity;
+    property OnFeedback: TFrameFeedbackEvent
+      read FOnFeedback write FOnFeedback;
   end;
 
 implementation
@@ -113,6 +124,7 @@ uses
 const
   // Espacos nunca representam conteudo digitado em um valor mascarado.
   MaskWhitespaceChars: TSysCharSet = [' ', #9, #10, #13];
+  FilterFeedbackTitle = 'Filtro';
 
 function FrameFieldCaption(const AField: TFilterFieldDefinition): string;
 begin
@@ -412,7 +424,7 @@ begin
   if FPreferences = nil then
     Exit;
 
-  Operators := FilterFieldOperators(AField);
+  Operators := FilterPathFieldOperators(FPath, AField);
   if Operators = [] then
     Exit;
 
@@ -582,7 +594,7 @@ var
   Operator: TFilterOperator;
   PreviousUpdating: Boolean;
 begin
-  Operators := FilterFieldOperators(AField);
+  Operators := FilterPathFieldOperators(FPath, AField);
 
   PreviousUpdating := FUpdating;
   FUpdating := True;
@@ -860,7 +872,8 @@ begin
   if Arity = 0 then
   begin
     AHasInput := True;
-    AIsValid := ValidateFilterCriterion(ACriterion, FDefinition, AMessage);
+    AIsValid := ValidateFilterCriterion(ACriterion, FDefinition, FPath,
+      AMessage);
     Result := AIsValid;
     Exit;
   end;
@@ -938,7 +951,8 @@ begin
   end;
 
   ACriterion.Values := Values;
-  AIsValid := ValidateFilterCriterion(ACriterion, FDefinition, AMessage);
+  AIsValid := ValidateFilterCriterion(ACriterion, FDefinition, FPath,
+    AMessage);
   Result := AIsValid;
 end;
 
@@ -1013,6 +1027,13 @@ begin
   // valor mantem o foco onde estava.
   if edValor1.Visible and edValor1.Enabled and edValor1.CanFocus then
     edValor1.SetFocus;
+end;
+
+procedure TfrmFilterFrame.ReportarFeedback(const AMensagem: string);
+begin
+  // O frame reutilizavel nao abre dialogo proprio; o host apresenta.
+  if Assigned(FOnFeedback) then
+    FOnFeedback(Self, FilterFeedbackTitle, AMensagem);
 end;
 
 function TfrmFilterFrame.TrySelectField(const AFieldId: string): Boolean;
@@ -1144,7 +1165,7 @@ begin
     if Trim(Message) = '' then
       Message := 'O filtro informado não é válido.';
 
-    MessageDlg(Message, mtWarning, [mbOK], 0);
+    ReportarFeedback(Message);
     Exit;
   end;
 
@@ -1227,7 +1248,8 @@ begin
 end;
 
 procedure TfrmFilterFrame.Configure(const ADefinition: TFilterDefinition;
-  const APreferences: ILocalPreferences; const AIdentity: string);
+  const APreferences: ILocalPreferences; const AIdentity: string;
+  APath: TFilterPath);
 var
   I: Integer;
   PreviousUpdating: Boolean;
@@ -1246,6 +1268,7 @@ begin
   FDefinition := ADefinition;
   FPreferences := APreferences;
   FIdentity := AIdentity;
+  FPath := APath;
   FActiveFieldId := '';
   FSingleMode := False;
 
@@ -1276,7 +1299,7 @@ begin
 end;
 
 procedure TfrmFilterFrame.ConfigureSingle(const ADefinition: TFilterDefinition;
-  const ACriterion: TFilterCriterion);
+  const ACriterion: TFilterCriterion; APath: TFilterPath);
 var
   I: Integer;
   FieldIndex: Integer;
@@ -1294,6 +1317,7 @@ begin
   FDefinition := ADefinition;
   FPreferences := nil;
   FIdentity := '';
+  FPath := APath;
   FActiveFieldId := '';
   FSingleMode := True;
   FTodosSelected := False;
@@ -1327,7 +1351,7 @@ begin
   spliterBtn.Visible := False;
 
   Field := FDefinition.Fields[FieldIndex];
-  if not FilterFieldSupportsOperator(Field, ACriterion.Operator) then
+  if not (ACriterion.Operator in FilterPathFieldOperators(FPath, Field)) then
     raise Exception.Create(
       'A condição do filtro não é permitida para o campo informado.');
 

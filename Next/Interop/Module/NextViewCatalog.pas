@@ -13,9 +13,9 @@ implementation
 
 uses
   System.SysUtils, NextViewRegistry, HwNextValidationFormUnit,
-  HwNextValidationSecondFormUnit, QueryStandardForm, EventosRtcForm,
-  EventosRtcDefinition, GruposFiscaisForm, GruposFiscaisDefinition,
-  LocalPreferences,
+  HwNextValidationSecondFormUnit, QueryStandardForm, QueryResultForm,
+  EventosRtcForm, EventosRtcDefinition, GruposFiscaisForm,
+  GruposFiscaisDefinition, LocalPreferences,
   WindowsRegistryLocalPreferences, StandardQueryFilterDefinition,
   QueryPreviewReader, QueryResultOperations, GridColumnDefinition,
   NextSetup, EventosRtcPresenter, GruposFiscaisPresenter, IDataSetReaderUnit;
@@ -41,15 +41,31 @@ end;
 
 function CreateStandardQueryView(AParent: HWND): TfrmNextBase;
 var
-  View: TfrmQueryStandard;
+  View: TfrmQueryResult;
   Preferences: ILocalPreferences;
+  Reader: IDataSetReader;
+  Operations: IQueryResultOperations;
 begin
-  View := TfrmQueryStandard.CreateParented(AParent);
+  View := TfrmQueryResult.CreateParented(AParent);
   try
     // A prévia recebe a definição de exemplo e o adaptador de preferências. A
     // identidade é dedicada a esta entrada e não é compartilhada com telas de
     // produto. A interface é contada por referência e o frame a mantém viva.
     Preferences := TWindowsRegistryLocalPreferences.Create;
+
+    // A entrada apresenta o conjunto de prévia e habilita o filtro rápido sobre
+    // o resultado carregado. Não há coluna de marcação nesta tela: o campo
+    // 'sel' do leitor de exemplo permanece fora das colunas da grade.
+    Reader := TQueryPreviewReader.Create('');
+    Operations := TQueryResultOperations.Create(Reader, '',
+      NextSetupInstance.DataSetSorter);
+    View.Attach(Reader, GridColumns([
+      GridColumn('documento', 'Documento', 120),
+      GridColumn('descricao', 'Descri'#231#227'o', 220),
+      GridColumn('codigo', 'C'#243'digo', 90, qcaRight),
+      GridColumn('valor', 'Valor', 110, qcaRight),
+      GridColumn('data', 'Data', 110, qcaCenter)
+    ]), 'Consulta Next', Operations, True);
     View.ConfigureFilters(CreateStandardQueryFilterDefinition, Preferences,
       'next.query.standard.filter');
     Result := View;
@@ -129,6 +145,12 @@ begin
   end;
 end;
 
+function NextViewCreate(const AIdentifier: string;
+  AParent: HWND): TfrmNextBase;
+begin
+  Result := FRegistry.CreateView(AIdentifier, AParent);
+end;
+
 function CreateGruposFiscaisView(AParent: HWND): TfrmNextBase;
 var
   View: TfrmGruposFiscais;
@@ -166,12 +188,6 @@ begin
     View.Free;
     raise;
   end;
-end;
-
-function NextViewCreate(const AIdentifier: string;
-  AParent: HWND): TfrmNextBase;
-begin
-  Result := FRegistry.CreateView(AIdentifier, AParent);
 end;
 
 initialization

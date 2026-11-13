@@ -39,11 +39,12 @@ type
     // Filtros rapidos sobre o mesmo conjunto ja carregado. Cada aceite e
     // combinado com os anteriores por AND e so substitui a lista apos o
     // conjunto aceitar o filtro.
-    function AddQuickFilter(const AField: TField; out AId: Integer): Boolean;
+    function AddQuickFilter(const AField: TField; out AId: Integer;
+      out AMessage: string): Boolean;
     function AddQuickFilterCriterion(
-      const ACriterion: TFilterCriterion): Boolean;
+      const ACriterion: TFilterCriterion; out AMessage: string): Boolean;
     function UpdateQuickFilter(AId: Integer;
-      const ACriterion: TFilterCriterion): Boolean;
+      const ACriterion: TFilterCriterion; out AMessage: string): Boolean;
     function GetQuickFilterCriterion(AId: Integer;
       out ACriterion: TFilterCriterion): Boolean;
     function RemoveQuickFilter(AId: Integer): Boolean;
@@ -76,9 +77,11 @@ type
     function BuildCriterionDescription(const AField: TField;
       const ACriterion: TFilterCriterion): string;
     function TryValidateCriterion(const ACriterion: TFilterCriterion;
-      out AField: TField; out AValueType: TFilterFieldType): Boolean;
+      out AField: TField; out AValueType: TFilterFieldType;
+      out AMessage: string): Boolean;
     function AddQuickFilterCriterionInternal(
-      const ACriterion: TFilterCriterion; out AId: Integer): Boolean;
+      const ACriterion: TFilterCriterion; out AId: Integer;
+      out AMessage: string): Boolean;
     function BuildCombinedFilter(
       const ACriteria: TList<TQuickFilterCriterion>): string;
     function TryApplyFilter(const ADataSet: TDataSet;
@@ -97,11 +100,12 @@ type
     procedure InverterAllMarks();
     procedure ToggleCurrentMark();
     function MarkingColumnName(): string;
-    function AddQuickFilter(const AField: TField; out AId: Integer): Boolean;
+    function AddQuickFilter(const AField: TField; out AId: Integer;
+      out AMessage: string): Boolean;
     function AddQuickFilterCriterion(
-      const ACriterion: TFilterCriterion): Boolean;
+      const ACriterion: TFilterCriterion; out AMessage: string): Boolean;
     function UpdateQuickFilter(AId: Integer;
-      const ACriterion: TFilterCriterion): Boolean;
+      const ACriterion: TFilterCriterion; out AMessage: string): Boolean;
     function GetQuickFilterCriterion(AId: Integer;
       out ACriterion: TFilterCriterion): Boolean;
     function RemoveQuickFilter(AId: Integer): Boolean;
@@ -126,6 +130,15 @@ function QuickFilterFieldTypeFor(const AField: TField): TFilterFieldType;
 function TryBuildEqualityCriterion(const AField: TField;
   out ACriterion: TFilterCriterion): Boolean;
 
+// Operadores que o filtro rapido executa para o tipo fisico do campo. Tipos
+// sem suporte confirmado no motor carregado mantem apenas a igualdade.
+function QuickFilterOperators(const AField: TField): TFilterOperatorSet;
+
+// Criterio inicial usado quando a celula nao tem valor: o campo com o operador
+// padrao do tipo ou o primeiro disponivel, sem valores.
+function TryBuildDefaultQuickFilterCriterion(const AField: TField;
+  out ACriterion: TFilterCriterion): Boolean;
+
 implementation
 
 uses
@@ -141,6 +154,22 @@ const
     'O valor da celula nao pode ser usado no filtro rapido.';
   UnsupportedFilterCriterionMessage =
     'O criterio informado nao pode ser aplicado ao conjunto.';
+  QuickFilterNoDataSetMessage =
+    'O conjunto de dados nao esta disponivel para o filtro rapido.';
+  QuickFilterMissingFieldMessage = 'Campo de filtro nao informado.';
+  QuickFilterUnknownFieldMessage =
+    'O campo "%s" nao pertence ao conjunto atual.';
+  QuickFilterNotAppliedMessage =
+    'O conjunto nao aceitou o filtro informado. O filtro anterior foi mantido.';
+  QuickFilterDuplicateMessage = 'Este filtro ja esta aplicado.';
+  QuickFilterUpdateDuplicateMessage =
+    'Ja existe outro filtro com estes valores.';
+  QuickFilterWildcardMessage =
+    'O filtro rapido nao consegue tratar "%" ou "_" como texto literal. ' +
+    'Use outro criterio ou a pesquisa SQL.';
+  QuickFilterBooleanMessage = 'Informe True ou False para o campo "%s".';
+  QuickFilterTimeMessage =
+    'Informe um horario valido (hh:nn:ss) para o campo "%s".';
 
 function QuickFilterFieldTypeFor(const AField: TField): TFilterFieldType;
 begin
@@ -160,6 +189,32 @@ begin
       Result := fftDateTime;
   else
     Result := fftString;
+  end;
+end;
+
+function QuickFilterOperators(const AField: TField): TFilterOperatorSet;
+begin
+  if AField = nil then
+  begin
+    Result := [foEquals];
+    Exit;
+  end;
+
+  case AField.DataType of
+    ftString, ftWideString:
+      Result := [foEquals, foStartsWith, foContains, foEndsWith, foNotEquals,
+        foIsEmpty, foNotEmpty, foIsNull, foNotNull];
+    ftSmallint, ftInteger, ftWord, ftAutoInc, ftLargeint,
+    ftFloat, ftCurrency, ftBCD, ftExtended, ftSingle:
+      Result := [foEquals, foNotEquals, foGreaterThan, foGreaterOrEqual,
+        foLessThan, foLessOrEqual, foRange, foIsEmpty, foNotEmpty];
+    ftDate, ftDateTime, ftTimeStamp:
+      Result := [foEquals, foNotEquals, foGreaterThan, foGreaterOrEqual,
+        foLessThan, foLessOrEqual, foRange, foIsEmpty, foNotEmpty];
+  else
+    // Memo, booleano, hora, tipos fixos, guid, bytes e demais: o motor local
+    // so tem suporte confirmado para igualdade.
+    Result := [foEquals];
   end;
 end;
 
@@ -224,8 +279,52 @@ begin
   ACriterion.Values[0] := Value;
 end;
 
+function TryBuildDefaultQuickFilterCriterion(const AField: TField;
+  out ACriterion: TFilterCriterion): Boolean;
+var
+  Operators: TFilterOperatorSet;
+  Operator: TFilterOperator;
+begin
+  ACriterion := Default(TFilterCriterion);
+  Result := False;
+  if AField = nil then
+    Exit;
+
+  Operators := QuickFilterOperators(AField);
+  Operator := FilterDefaultOperator(QuickFilterFieldTypeFor(AField));
+
+  if not (Operator in Operators) then
+    for Operator := Low(TFilterOperator) to High(TFilterOperator) do
+      if Operator in Operators then
+        Break;
+
+  if not (Operator in Operators) then
+    Exit;
+
+  ACriterion.FieldId := AField.FieldName;
+  ACriterion.Operator := Operator;
+  ACriterion.Values := nil;
+  Result := True;
+end;
+
+function QuickFilterIsTextType(const AField: TField): Boolean;
+begin
+  Result := (AField <> nil) and
+    (AField.DataType in [ftString, ftWideString]);
+end;
+
+procedure CheckQuickFilterFragment(const AValue: string);
+begin
+  // O filtro local nao tem escape confirmado para '%' e '_'; sem isso eles
+  // seriam interpretados como curinga. O criterio e recusado.
+  if (Pos('%', AValue) > 0) or (Pos('_', AValue) > 0) then
+    raise EQuickFilterValue.Create(QuickFilterWildcardMessage);
+end;
+
 function QuickFilterLiteral(const AField: TField;
   const AValue: TFilterValue): string;
+var
+  ParsedTime: TDateTime;
 begin
   case AField.DataType of
     ftSmallint, ftInteger, ftWord, ftAutoInc:
@@ -248,9 +347,17 @@ begin
         (AValue.StringValue = '0') then
         Result := 'False'
       else
-        raise EQuickFilterValue.Create(UnsupportedFilterValueMessage);
+        raise EQuickFilterValue.Create(Format(QuickFilterBooleanMessage,
+          [AField.FieldName]));
     ftTime:
-      Result := QuotedStr(AValue.StringValue);
+      begin
+        if not TryStrToTime(AValue.StringValue, ParsedTime,
+          TFormatSettings.Invariant) then
+          raise EQuickFilterValue.Create(Format(QuickFilterTimeMessage,
+            [AField.FieldName]));
+        Result := QuotedStr(FormatDateTime('hh:nn:ss', ParsedTime,
+          TFormatSettings.Invariant));
+      end;
   else
     Result := QuotedStr(AValue.StringValue);
   end;
@@ -408,59 +515,47 @@ end;
 
 function TQueryResultOperations.TryValidateCriterion(
   const ACriterion: TFilterCriterion; out AField: TField;
-  out AValueType: TFilterFieldType): Boolean;
+  out AValueType: TFilterFieldType; out AMessage: string): Boolean;
 var
-  StartDate: TDateTime;
-  EndDate: TDateTime;
+  Definition: TFilterDefinition;
 begin
   Result := False;
   AField := nil;
   AValueType := fftString;
+  AMessage := '';
 
   if (FReader = nil) or (FReader.DataSet = nil) or
     (not FReader.DataSet.Active) then
-    Exit;
-
-  if Trim(ACriterion.FieldId) = '' then
-    Exit;
-
-  AField := FReader.DataSet.FindField(ACriterion.FieldId);
-  if AField = nil then
-    Exit;
-
-  AValueType := QuickFilterFieldTypeFor(AField);
-  case ACriterion.Operator of
-    foEquals:
-      begin
-        if Length(ACriterion.Values) <> 1 then
-          Exit;
-        if not FilterValueMatchesFieldType(ACriterion.Values[0],
-          AValueType) then
-          Exit;
-      end;
-    foRange:
-      begin
-        if not (AValueType in [fftDate, fftDateTime]) then
-          Exit;
-        if Length(ACriterion.Values) <> 2 then
-          Exit;
-        if not FilterValueMatchesFieldType(ACriterion.Values[0],
-          AValueType) then
-          Exit;
-        if not FilterValueMatchesFieldType(ACriterion.Values[1],
-          AValueType) then
-          Exit;
-
-        StartDate := DateOf(ACriterion.Values[0].DateTimeValue);
-        EndDate := DateOf(ACriterion.Values[1].DateTimeValue);
-        if StartDate > EndDate then
-          Exit;
-      end;
-  else
+  begin
+    AMessage := QuickFilterNoDataSetMessage;
     Exit;
   end;
 
-  Result := True;
+  if Trim(ACriterion.FieldId) = '' then
+  begin
+    AMessage := QuickFilterMissingFieldMessage;
+    Exit;
+  end;
+
+  AField := FReader.DataSet.FindField(ACriterion.FieldId);
+  if AField = nil then
+  begin
+    AMessage := Format(QuickFilterUnknownFieldMessage,
+      [ACriterion.FieldId]);
+    Exit;
+  end;
+
+  AValueType := QuickFilterFieldTypeFor(AField);
+
+  // A definicao de um campo reproduz o conjunto efetivo do modal, permitindo
+  // que a validacao comum decida operador, aridade, tipo, texto e ordem.
+  Definition := FilterDefinitionOf([
+    FilterField(AField.FieldName, AField.DisplayLabel, AValueType,
+      QuickFilterOperators(AField))
+  ], False);
+
+  Result := ValidateFilterCriterion(ACriterion, Definition, fpLoadedDataSet,
+    AMessage);
 end;
 
 function TQueryResultOperations.BuildCriterionExpression(const AField: TField;
@@ -468,29 +563,83 @@ function TQueryResultOperations.BuildCriterionExpression(const AField: TField;
 var
   ValidatedField: TField;
   ValueType: TFilterFieldType;
-  StartDate: TDateTime;
-  EndDate: TDateTime;
+  ValidationMessage: string;
+  Fragment: string;
 begin
   ValidatedField := AField;
-  if not TryValidateCriterion(ACriterion, ValidatedField, ValueType) then
-    raise EQuickFilterValue.Create(UnsupportedFilterCriterionMessage);
+  if not TryValidateCriterion(ACriterion, ValidatedField, ValueType,
+    ValidationMessage) then
+    raise EQuickFilterValue.Create(ValidationMessage);
 
+  // A combinacao envolve cada expressao em parenteses; Vazio/Nao vazio ainda
+  // levam parenteses proprios por conterem OR.
   case ACriterion.Operator of
     foEquals:
       Result := Format('%s = %s', [ACriterion.FieldId,
         QuickFilterLiteral(ValidatedField, ACriterion.Values[0])]);
-    foRange:
+    foNotEquals:
+      Result := Format('%s <> %s', [ACriterion.FieldId,
+        QuickFilterLiteral(ValidatedField, ACriterion.Values[0])]);
+    foGreaterThan:
+      Result := Format('%s > %s', [ACriterion.FieldId,
+        QuickFilterLiteral(ValidatedField, ACriterion.Values[0])]);
+    foGreaterOrEqual:
+      Result := Format('%s >= %s', [ACriterion.FieldId,
+        QuickFilterLiteral(ValidatedField, ACriterion.Values[0])]);
+    foLessThan:
+      Result := Format('%s < %s', [ACriterion.FieldId,
+        QuickFilterLiteral(ValidatedField, ACriterion.Values[0])]);
+    foLessOrEqual:
+      Result := Format('%s <= %s', [ACriterion.FieldId,
+        QuickFilterLiteral(ValidatedField, ACriterion.Values[0])]);
+    foStartsWith, foContains, foEndsWith:
       begin
-        StartDate := DateOf(ACriterion.Values[0].DateTimeValue);
-        EndDate := DateOf(ACriterion.Values[1].DateTimeValue) + 1;
+        Fragment := ACriterion.Values[0].StringValue;
+        CheckQuickFilterFragment(Fragment);
+        case ACriterion.Operator of
+          foStartsWith:
+            Fragment := Fragment + '%';
+          foContains:
+            Fragment := '%' + Fragment + '%';
+        else
+          Fragment := '%' + Fragment;
+        end;
+        Result := Format('%s like %s', [ACriterion.FieldId,
+          QuotedStr(Fragment)]);
+      end;
+    foRange:
+      if ValueType in [fftDate, fftDateTime] then
         Result := Format('%s >= %s and %s < %s', [
           ACriterion.FieldId,
-          QuotedStr(FormatDateTime('yyyy-mm-dd', StartDate,
+          QuotedStr(FormatDateTime('yyyy-mm-dd',
+            DateOf(ACriterion.Values[0].DateTimeValue),
             TFormatSettings.Invariant)),
           ACriterion.FieldId,
-          QuotedStr(FormatDateTime('yyyy-mm-dd', EndDate,
-            TFormatSettings.Invariant))]);
-      end;
+          QuotedStr(FormatDateTime('yyyy-mm-dd',
+            DateOf(ACriterion.Values[1].DateTimeValue) + 1,
+            TFormatSettings.Invariant))])
+      else
+        Result := Format('%s >= %s and %s <= %s', [
+          ACriterion.FieldId,
+          QuickFilterLiteral(ValidatedField, ACriterion.Values[0]),
+          ACriterion.FieldId,
+          QuickFilterLiteral(ValidatedField, ACriterion.Values[1])]);
+    foIsEmpty:
+      if QuickFilterIsTextType(ValidatedField) then
+        Result := Format('(%s is null or %s = %s)', [
+          ACriterion.FieldId, ACriterion.FieldId, QuotedStr('')])
+      else
+        Result := Format('%s is null', [ACriterion.FieldId]);
+    foNotEmpty:
+      if QuickFilterIsTextType(ValidatedField) then
+        Result := Format('not (%s is null or %s = %s)', [
+          ACriterion.FieldId, ACriterion.FieldId, QuotedStr('')])
+      else
+        Result := Format('%s is not null', [ACriterion.FieldId]);
+    foIsNull:
+      Result := Format('%s is null', [ACriterion.FieldId]);
+    foNotNull:
+      Result := Format('%s is not null', [ACriterion.FieldId]);
   else
     raise EQuickFilterValue.Create(UnsupportedFilterCriterionMessage);
   end;
@@ -501,37 +650,42 @@ function TQueryResultOperations.BuildCriterionDescription(const AField: TField;
 var
   ValidatedField: TField;
   ValueType: TFilterFieldType;
+  ValidationMessage: string;
   CaptionText: string;
-  ValueText: string;
-  I: Integer;
+  OperatorText: string;
 begin
   ValidatedField := AField;
-  if not TryValidateCriterion(ACriterion, ValidatedField, ValueType) then
-    raise EQuickFilterValue.Create(UnsupportedFilterCriterionMessage);
+  if not TryValidateCriterion(ACriterion, ValidatedField, ValueType,
+    ValidationMessage) then
+    raise EQuickFilterValue.Create(ValidationMessage);
 
   CaptionText := Trim(ValidatedField.DisplayLabel);
   if CaptionText = '' then
     CaptionText := ACriterion.FieldId;
 
-  ValueText := '';
-  for I := 0 to High(ACriterion.Values) do
-  begin
-    if I > 0 then
-      ValueText := ValueText + ' e ';
-    ValueText := ValueText + ACriterion.Values[I].DisplayText;
-  end;
+  OperatorText := LowerCase(FilterOperatorLabel(ACriterion.Operator));
 
-  // Igualdade mantem a descricao curta usada pelo comando direto; o intervalo
-  // explicita a condicao e os dois limites.
-  if ACriterion.Operator = foEquals then
-    Result := Format('%s = %s', [CaptionText, ValueText])
+  // Aridade 0 nao exibe valor residual; Igualdade mantem a forma curta usada
+  // pelo comando direto; as demais condicoes mostram rotulo e limites.
+  case FilterOperatorArity(ACriterion.Operator) of
+    0:
+      Result := Format('%s %s', [CaptionText, OperatorText]);
+    1:
+      if ACriterion.Operator = foEquals then
+        Result := Format('%s = %s', [CaptionText,
+          ACriterion.Values[0].DisplayText])
+      else
+        Result := Format('%s %s %s', [CaptionText, OperatorText,
+          ACriterion.Values[0].DisplayText]);
   else
-    Result := Format('%s %s %s', [CaptionText,
-      LowerCase(FilterOperatorLabel(ACriterion.Operator)), ValueText]);
+    Result := Format('%s %s %s e %s', [CaptionText, OperatorText,
+      ACriterion.Values[0].DisplayText, ACriterion.Values[1].DisplayText]);
+  end;
 end;
 
 function TQueryResultOperations.AddQuickFilterCriterionInternal(
-  const ACriterion: TFilterCriterion; out AId: Integer): Boolean;
+  const ACriterion: TFilterCriterion; out AId: Integer;
+  out AMessage: string): Boolean;
 var
   dts: TDataSet;
   Candidate: TList<TQuickFilterCriterion>;
@@ -540,36 +694,51 @@ var
   NewDescription: string;
   DataField: TField;
   ValueType: TFilterFieldType;
+  ValidationMessage: string;
   I: Integer;
 begin
   Result := False;
   AId := 0;
+  AMessage := '';
 
   SyncQuickFilterDataSet();
   if FReader = nil then
+  begin
+    AMessage := QuickFilterNoDataSetMessage;
     Exit;
+  end;
 
   dts := FReader.DataSet;
   if (dts = nil) or (not dts.Active) then
+  begin
+    AMessage := QuickFilterNoDataSetMessage;
     Exit;
+  end;
 
   // A expressao e a descricao sao validadas antes de alterar o conjunto. Uma
   // falha mantem os criterios anteriores ou a ausencia de filtro.
   try
-    if not TryValidateCriterion(ACriterion, DataField, ValueType) then
-      raise EQuickFilterValue.Create(UnsupportedFilterCriterionMessage);
+    if not TryValidateCriterion(ACriterion, DataField, ValueType,
+      ValidationMessage) then
+      raise EQuickFilterValue.Create(ValidationMessage);
 
     NewFilter := BuildCriterionExpression(DataField, ACriterion);
     NewDescription := BuildCriterionDescription(DataField, ACriterion);
   except
     on E: EQuickFilterValue do
+    begin
+      AMessage := E.Message;
       Exit;
+    end;
   end;
 
   // A duplicidade usa igualdade tipada, nao o texto exibido.
   for I := 0 to FQuickFilters.Count - 1 do
     if SameFilterCriterion(FQuickFilters[I].Criterion, ACriterion) then
+    begin
+      AMessage := QuickFilterDuplicateMessage;
       Exit;
+    end;
 
   NewCriterion.Id := FNextQuickFilterId;
   NewCriterion.FieldName := ACriterion.FieldId;
@@ -586,7 +755,10 @@ begin
     // A lista candidata so substitui a atual depois de o conjunto aceitar o
     // filtro combinado. Marcacao e linha corrente nao sao alteradas.
     if not TryApplyFilter(dts, BuildCombinedFilter(Candidate)) then
+    begin
+      AMessage := QuickFilterNotAppliedMessage;
       Exit;
+    end;
 
     FQuickFilters.Clear;
     for I := 0 to Candidate.Count - 1 do
@@ -601,27 +773,31 @@ begin
 end;
 
 function TQueryResultOperations.AddQuickFilter(const AField: TField;
-  out AId: Integer): Boolean;
+  out AId: Integer; out AMessage: string): Boolean;
 var
   Criterion: TFilterCriterion;
 begin
   AId := 0;
+  AMessage := '';
   if not TryBuildEqualityCriterion(AField, Criterion) then
+  begin
+    AMessage := UnsupportedFilterValueMessage;
     Exit(False);
+  end;
 
-  Result := AddQuickFilterCriterionInternal(Criterion, AId);
+  Result := AddQuickFilterCriterionInternal(Criterion, AId, AMessage);
 end;
 
 function TQueryResultOperations.AddQuickFilterCriterion(
-  const ACriterion: TFilterCriterion): Boolean;
+  const ACriterion: TFilterCriterion; out AMessage: string): Boolean;
 var
   AId: Integer;
 begin
-  Result := AddQuickFilterCriterionInternal(ACriterion, AId);
+  Result := AddQuickFilterCriterionInternal(ACriterion, AId, AMessage);
 end;
 
 function TQueryResultOperations.UpdateQuickFilter(AId: Integer;
-  const ACriterion: TFilterCriterion): Boolean;
+  const ACriterion: TFilterCriterion; out AMessage: string): Boolean;
 var
   dts: TDataSet;
   Candidate: TList<TQuickFilterCriterion>;
@@ -630,17 +806,25 @@ var
   NewDescription: string;
   DataField: TField;
   ValueType: TFilterFieldType;
+  ValidationMessage: string;
   Index: Integer;
   I: Integer;
 begin
   Result := False;
+  AMessage := '';
   SyncQuickFilterDataSet();
   if FReader = nil then
+  begin
+    AMessage := QuickFilterNoDataSetMessage;
     Exit;
+  end;
 
   dts := FReader.DataSet;
   if (dts = nil) or (not dts.Active) then
+  begin
+    AMessage := QuickFilterNoDataSetMessage;
     Exit;
+  end;
 
   Index := FindQuickFilterIndex(AId);
   if Index < 0 then
@@ -649,21 +833,28 @@ begin
   // A alteracao constroi uma lista candidata na mesma posicao. Qualquer falha
   // preserva a lista e o filtro anteriores.
   try
-    if not TryValidateCriterion(ACriterion, DataField, ValueType) then
-      raise EQuickFilterValue.Create(UnsupportedFilterCriterionMessage);
+    if not TryValidateCriterion(ACriterion, DataField, ValueType,
+      ValidationMessage) then
+      raise EQuickFilterValue.Create(ValidationMessage);
 
     NewFilter := BuildCriterionExpression(DataField, ACriterion);
     NewDescription := BuildCriterionDescription(DataField, ACriterion);
   except
     on E: EQuickFilterValue do
+    begin
+      AMessage := E.Message;
       Exit;
+    end;
   end;
 
   // Duplicidade contra os demais criterios; o proprio id nao participa.
   for I := 0 to FQuickFilters.Count - 1 do
     if (FQuickFilters[I].Id <> AId) and
       SameFilterCriterion(FQuickFilters[I].Criterion, ACriterion) then
+    begin
+      AMessage := QuickFilterUpdateDuplicateMessage;
       Exit;
+    end;
 
   Updated := FQuickFilters[Index];
   Updated.FieldName := ACriterion.FieldId;
@@ -680,7 +871,10 @@ begin
         Candidate.Add(FQuickFilters[I]);
 
     if not TryApplyFilter(dts, BuildCombinedFilter(Candidate)) then
+    begin
+      AMessage := QuickFilterNotAppliedMessage;
       Exit;
+    end;
 
     FQuickFilters.Clear;
     for I := 0 to Candidate.Count - 1 do
