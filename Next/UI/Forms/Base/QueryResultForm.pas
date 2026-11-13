@@ -28,7 +28,6 @@ type
     FTitle: string;
     FQuickFilterEnabled: Boolean;
     FPesquisando: Boolean;
-    procedure ConfigureColumns;
     procedure ClearResult;
     procedure DoPesquisar(Sender: TObject);
   protected
@@ -119,30 +118,6 @@ begin
   FQuickFilterEnabled := AQuickFilterEnabled;
 
   fraGrid.Configure(AOperations, FQuickFilterEnabled);
-end;
-
-procedure TfrmQueryResult.ConfigureColumns;
-var
-  I: Integer;
-  Column: TGridColumnDefinition;
-  GridColumn: TColumn;
-begin
-  fraGrid.dbgDados.Columns.Clear;
-  for I := 0 to High(FColumns) do
-  begin
-    Column := FColumns[I];
-    GridColumn := fraGrid.dbgDados.Columns.Add;
-    GridColumn.FieldName := Column.FieldName;
-    GridColumn.Title.Caption := Column.Title;
-    if Column.Width > 0 then
-      GridColumn.Width := Column.Width;
-    case Column.Alignment of
-      qcaDefault: ;
-      qcaLeft: GridColumn.Alignment := taLeftJustify;
-      qcaCenter: GridColumn.Alignment := taCenter;
-      qcaRight: GridColumn.Alignment := taRightJustify;
-    end;
-  end;
 end;
 
 procedure TfrmQueryResult.ClearResult;
@@ -242,7 +217,7 @@ begin
   Caption := FTitle;
   btnPesquisar.Enabled := True;
   btnPesquisar.OnClick := DoPesquisar;
-  ConfigureColumns;
+  fraGrid.ConfigureColumns(FColumns);
 end;
 
 destructor TfrmQueryResult.Destroy;

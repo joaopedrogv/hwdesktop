@@ -7,7 +7,8 @@ uses
   Vcl.StdCtrls, Vcl.ExtCtrls,
   Vcl.DBGrids, Vcl.Menus, System.Classes, System.SysUtils, System.Types,
   System.UITypes, System.Generics.Collections, Data.DB, FilterDefinition,
-  FilterCriterion, FilterFrame, QueryResultOperations;
+  FilterCriterion, FilterFrame, QueryResultOperations, GridColumnDefinition,
+  ColumnSelectionFrame;
 
 type
   // Controles de um criterio na faixa. Os slots sao reaproveitados na ordem
@@ -53,6 +54,7 @@ type
     miFiltrarValor: TMenuItem;
     miLimparFiltros1: TMenuItem;
     miReajustarColunas: TMenuItem;
+    miConfigurarColunas: TMenuItem;
     procedure DrawCheckboxCell(const Rect: TRect;
       const State: TGridDrawState; AState: Boolean);
     procedure dbgDadosDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
@@ -69,6 +71,7 @@ type
     procedure miFiltrarValorClick(Sender: TObject);
     procedure miLimparFiltros1Click(Sender: TObject);
     procedure miReajustarColunasClick(Sender: TObject);
+    procedure miConfigurarColunasClick(Sender: TObject);
     procedure dbgDadosExit(Sender: TObject);
     procedure dbgDadosTitleClick(Column: TColumn);
   private
@@ -84,6 +87,9 @@ type
     FSuppressDataSetChange: Boolean;
     FOnTitleCtrlClick: TColumnTitleCtrlClickEvent;
     FOnFeedback: TFrameFeedbackEvent;
+    // Definicoes recebidas da tela. Sao a fonte da lista de configuracao de
+    // colunas, inclusive quando o conjunto esta vazio ou desvinculado.
+    FColumnDefinitions: TGridColumnDefinitions;
 
     function GetDataSource: TDataSource;
     procedure SetDataSource(const Value: TDataSource);
@@ -117,6 +123,10 @@ type
     function CopiaDisponivel: Boolean;
     procedure CopiarCelulaAtual;
     procedure ReajustarLarguraColunas;
+    function IsMarkingColumn(const AFieldName: string): Boolean;
+    function ColumnSelectionAvailable: Boolean;
+    function BuildColumnSelectionEntries: TColumnSelectionEntries;
+    procedure ApplyColumnSelection(const ASelection: TColumnSelectionResults);
     procedure ReportarFeedback(const ATitulo, AMensagem: string);
     procedure ModalFeedback(Sender: TObject;
       const ATitulo, AMensagem: string);
@@ -128,6 +138,10 @@ type
     // aceita ordenar; a coluna SEL nunca participa.
     procedure Configure(AOperations: IQueryResultOperations = nil;
       AQuickFilterEnabled: Boolean = False);
+    // Cria as colunas a partir das definicoes e guarda os metadados que a
+    // configuracao de colunas usa. A visibilidade inicial vem do comportamento;
+    // a coluna de marcacao permanece sempre visivel.
+    procedure ConfigureColumns(const AColumns: TGridColumnDefinitions);
     // Remove todos os criterios rapidos sem alterar as marcacoes. Usado pela
     // tela antes de cada pesquisa, para o novo resultado comecar completo.
     procedure ClearQuickFilters();
@@ -145,7 +159,7 @@ type
 implementation
 
 uses
-  Winapi.Windows;
+  Winapi.Windows, ColumnSelectionForm;
 
 {$R *.dfm}
 
@@ -164,6 +178,9 @@ const
   CopyTitle = 'Copiar';
   CopyFailureMessage =
     'N'#227'o foi poss'#237'vel copiar o valor da c'#233'lula.';
+  ColumnsTitle = 'Configurar colunas';
+  ColumnsFailureMessage =
+    'N'#227'o foi poss'#237'vel configurar as colunas.';
   // Respiro horizontal somado a largura calculada, como no reajuste de colunas
   // do cadastro padrao legado.
   ColumnWidthPadding = 10;
@@ -698,6 +715,121 @@ begin
   ReajustarLarguraColunas;
 end;
 
+function TfrmDataGridFrame.IsMarkingColumn(
+  const AFieldName: string): Boolean;
+begin
+  Result := (FMarkingColumn <> '') and SameText(AFieldName, FMarkingColumn);
+end;
+
+function TfrmDataGridFrame.ColumnSelectionAvailable: Boolean;
+var
+  I: Integer;
+begin
+  // A disponibilidade vem da definicao, sem exigir conjunto ativo ou linhas.
+  for I := 0 to High(FColumnDefinitions) do
+    if (not IsMarkingColumn(FColumnDefinitions[I].FieldName)) and
+      (FColumnDefinitions[I].Behavior <> gcbAlwaysHidden) then
+      Exit(True);
+
+  Result := False;
+end;
+
+function TfrmDataGridFrame.BuildColumnSelectionEntries: TColumnSelectionEntries;
+var
+  I: Integer;
+  Count: Integer;
+  Definition: TGridColumnDefinition;
+  Column: TColumn;
+begin
+  SetLength(Result, 0);
+  Count := 0;
+
+  for I := 0 to High(FColumnDefinitions) do
+  begin
+    Definition := FColumnDefinitions[I];
+    if IsMarkingColumn(Definition.FieldName) then
+      Continue;
+    if Definition.Behavior = gcbAlwaysHidden then
+      Continue;
+
+    SetLength(Result, Count + 1);
+    Result[Count].Key := Definition.FieldName;
+
+    // O titulo vem da definicao; o titulo da coluna pode conter a seta de
+    // ordenacao acrescentada na grade.
+    if Trim(Definition.Title) <> '' then
+      Result[Count].Title := Definition.Title
+    else
+      Result[Count].Title := Definition.FieldName;
+
+    Result[Count].Enabled := GridColumnConfigurable(Definition.Behavior);
+
+    // A marcacao reflete a visibilidade corrente da grade; sem coluna criada,
+    // vale a visibilidade inicial do comportamento.
+    Column := FindColumnByFieldName(Definition.FieldName);
+    if Column <> nil then
+      Result[Count].Checked := Column.Visible
+    else
+      Result[Count].Checked := GridColumnVisibleByDefault(Definition.Behavior);
+
+    Inc(Count);
+  end;
+end;
+
+procedure TfrmDataGridFrame.ApplyColumnSelection(
+  const ASelection: TColumnSelectionResults);
+var
+  I: Integer;
+  J: Integer;
+  Definition: TGridColumnDefinition;
+  Column: TColumn;
+begin
+  // Somente a visibilidade das colunas configuraveis muda. Ordem, largura,
+  // conjunto, filtros, ordenacao e marcacoes permanecem intactos.
+  for I := 0 to High(FColumnDefinitions) do
+  begin
+    Definition := FColumnDefinitions[I];
+    if IsMarkingColumn(Definition.FieldName) then
+      Continue;
+    if not GridColumnConfigurable(Definition.Behavior) then
+      Continue;
+
+    Column := FindColumnByFieldName(Definition.FieldName);
+    if Column = nil then
+      Continue;
+
+    for J := 0 to High(ASelection) do
+      if SameText(ASelection[J].Key, Definition.FieldName) then
+      begin
+        Column.Visible := ASelection[J].Checked;
+        Break;
+      end;
+  end;
+
+  dbgDados.Invalidate;
+end;
+
+procedure TfrmDataGridFrame.miConfigurarColunasClick(Sender: TObject);
+var
+  Dialog: TfrmColumnSelection;
+begin
+  if not ColumnSelectionAvailable then
+    Exit;
+
+  Dialog := TfrmColumnSelection.Create(nil);
+  try
+    try
+      Dialog.Configure(BuildColumnSelectionEntries);
+      if Dialog.ShowModal = mrOk then
+        ApplyColumnSelection(Dialog.CollectSelection);
+    except
+      ReportarFeedback(ColumnsTitle, ColumnsFailureMessage);
+    end;
+  finally
+    Dialog.Free;
+  end;
+end;
+
 procedure TfrmDataGridFrame.btnDesmarcarTodosClick(Sender: TObject);
 begin
   DoMarkOperation(moUnmarkAll);
@@ -733,6 +865,45 @@ begin
   if FOperations <> nil then
     FOperations.ClearQuickFilters();
   UpdateCommandBandLayout();
+end;
+
+procedure TfrmDataGridFrame.ConfigureColumns(
+  const AColumns: TGridColumnDefinitions);
+var
+  I: Integer;
+  Definition: TGridColumnDefinition;
+  NewColumn: TColumn;
+begin
+  // As definicoes passam a ser a fonte da configuracao de colunas; a tela nao
+  // mantem uma copia propria para a grade.
+  FColumnDefinitions := Copy(AColumns);
+
+  dbgDados.Columns.BeginUpdate;
+  try
+    dbgDados.Columns.Clear;
+    for I := 0 to High(FColumnDefinitions) do
+    begin
+      Definition := FColumnDefinitions[I];
+      NewColumn := dbgDados.Columns.Add;
+      NewColumn.FieldName := Definition.FieldName;
+      NewColumn.Title.Caption := Definition.Title;
+      if Definition.Width > 0 then
+        NewColumn.Width := Definition.Width;
+      case Definition.Alignment of
+        qcaDefault: ;
+        qcaLeft: NewColumn.Alignment := taLeftJustify;
+        qcaCenter: NewColumn.Alignment := taCenter;
+        qcaRight: NewColumn.Alignment := taRightJustify;
+      end;
+
+      // A coluna de marcacao permanece visivel mesmo que a definicao declare
+      // outro comportamento; ela tambem fica fora da lista de configuracao.
+      NewColumn.Visible := GridColumnVisibleByDefault(Definition.Behavior)
+        or IsMarkingColumn(Definition.FieldName);
+    end;
+  finally
+    dbgDados.Columns.EndUpdate;
+  end;
 end;
 
 procedure TfrmDataGridFrame.ClearQuickFilters;
@@ -981,6 +1152,7 @@ begin
   miReajustarColunas.Enabled := (dbgDados.DataSource <> nil) and
     (dbgDados.DataSource.DataSet <> nil) and
     dbgDados.DataSource.DataSet.Active;
+  miConfigurarColunas.Enabled := ColumnSelectionAvailable;
   miFiltrarValor.Enabled := False;
   miFiltrarQuando.Enabled := False;
   FQuickFilterColumnName := '';
@@ -1039,8 +1211,10 @@ begin
     Exit;
   end;
 
-  // A definicao do modal usa as colunas de dados visiveis, sem a coluna de
+  // A definicao do modal usa as colunas de dados da grade, sem a coluna de
   // marcacao, com os operadores que o filtro local executa para o tipo fisico.
+  // A visibilidade atual nao e considerada: colunas ocultas na grade tambem
+  // entram na definicao.
   for I := 0 to dbgDados.Columns.Count - 1 do
   begin
     Column := dbgDados.Columns[I];

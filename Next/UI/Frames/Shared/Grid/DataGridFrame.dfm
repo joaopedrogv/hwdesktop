@@ -248,5 +248,10 @@ object frmDataGridFrame: TfrmDataGridFrame
       Enabled = False
       OnClick = miReajustarColunasClick
     end
+    object miConfigurarColunas: TMenuItem
+      Caption = 'Configurar colunas'
+      Enabled = False
+      OnClick = miConfigurarColunasClick
+    end
   end
 end

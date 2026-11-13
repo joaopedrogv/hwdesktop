@@ -90,13 +90,15 @@ begin
     Reader := TQueryPreviewReader.Create('sel');
     Operations := TQueryResultOperations.Create(Reader, 'sel',
       NextSetupInstance.DataSetSorter);
+    // A previa declara os quatro comportamentos para validar a configuracao de
+    // colunas. A coluna 'sel' continua sendo a marcacao, visivel e fora da lista.
     View.Attach(Reader, GridColumns([
       GridColumn('sel', 'Sel', 50, qcaCenter),
-      GridColumn('documento', 'Documento', 120),
+      GridColumn('documento', 'Documento', 120, qcaDefault, gcbAlwaysVisible),
       GridColumn('descricao', 'Descri'#231#227'o', 220),
       GridColumn('codigo', 'C'#243'digo', 90, qcaRight),
-      GridColumn('valor', 'Valor', 110, qcaRight),
-      GridColumn('data', 'Data', 110, qcaCenter)
+      GridColumn('valor', 'Valor', 110, qcaRight, gcbConfigurableHidden),
+      GridColumn('data', 'Data', 110, qcaCenter, gcbAlwaysHidden)
     ]), 'Valida'#231#227'o Next 2', Operations, True);
     Result := View;
   except
