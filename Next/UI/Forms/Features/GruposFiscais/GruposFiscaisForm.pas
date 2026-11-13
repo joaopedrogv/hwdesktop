@@ -3,9 +3,10 @@ unit GruposFiscaisForm;
 interface
 
 uses
-  System.SysUtils, System.UITypes, Data.DB, Vcl.Controls, Vcl.Forms,
+  System.SysUtils, Data.DB, Vcl.Controls, Vcl.Forms,
   Vcl.StdCtrls, QueryResultForm, FilterCriterion, IDataSetReaderUnit,
-  GridColumnDefinition, GruposFiscaisPresenter, QueryResultOperations;
+  GridColumnDefinition, GruposFiscaisPresenter, QueryResultOperations,
+  AuthorizationService;
 
 type
   // Tela de consulta de Grupos Fiscais. Herda a apresentacao generica e
@@ -21,6 +22,7 @@ type
     function PesquisarGrupos(
       const ACriteria: TFilterCriteria): IDataSetReader;
   protected
+    function CanPesquisar: Boolean; override;
     procedure DoInitializeView; override;
   public
     destructor Destroy; override;
@@ -36,6 +38,9 @@ implementation
 const
   MissingPresenterMessage =
     'O apresentador de Grupos Fiscais nao foi informado.';
+  AutorizacaoTitle = 'Autoriza'#231#227'o';
+  PermissaoIndisponivelMessage =
+    'N'#227'o foi poss'#237'vel verificar a permiss'#227'o de consulta.';
 
 destructor TfrmGruposFiscais.Destroy;
 begin
@@ -66,6 +71,40 @@ begin
     raise Exception.Create(MissingPresenterMessage);
 
   Result := FPresenter.CriarLeitor(ACriteria);
+end;
+
+function TfrmGruposFiscais.CanPesquisar: Boolean;
+var
+  Autorizacao: TAuthorizationResult;
+begin
+  Result := False;
+  if FPresenter = nil then
+  begin
+    ShowError(MissingPresenterMessage, AutorizacaoTitle);
+    Exit;
+  end;
+
+  try
+    Autorizacao := FPresenter.AutorizarPesquisa;
+  except
+    // Falha na verificacao equivale a indisponibilidade: interrompe a pesquisa
+    // e preserva o resultado atual.
+    ShowWarning(PermissaoIndisponivelMessage, AutorizacaoTitle);
+    Exit;
+  end;
+
+  case Autorizacao.Outcome of
+    aoAllowed:
+      Result := True;
+    aoDenied:
+      // Negativa ou cancelamento ja apresentado pelo legado; nao repetir.
+      Result := False;
+    aoUnavailable:
+      begin
+        ShowWarning(PermissaoIndisponivelMessage, AutorizacaoTitle);
+        Result := False;
+      end;
+  end;
 end;
 
 procedure TfrmGruposFiscais.DoInitializeView;
@@ -116,8 +155,7 @@ begin
   Id := IdLinhaCorrente;
   if Id = '' then
   begin
-    Application.MessageBox(PChar(SemRegistroMessage), PChar(SemRegistroTitle),
-      MB_OK or MB_ICONINFORMATION);
+    ShowInformation(SemRegistroMessage, SemRegistroTitle);
     Exit;
   end;
 
@@ -125,21 +163,17 @@ begin
   try
     if FPresenter = nil then
     begin
-      Application.MessageBox(PChar(FalhaMessage), PChar(FalhaTitle),
-        MB_OK or MB_ICONERROR);
+      ShowError(FalhaMessage, FalhaTitle);
       Exit;
     end;
 
     try
       if FPresenter.SimularExclusao(Id) then
-        Application.MessageBox(PChar(SucessoMessage), PChar(SucessoTitle),
-          MB_OK or MB_ICONINFORMATION)
+        ShowInformation(SucessoMessage, SucessoTitle)
       else
-        Application.MessageBox(PChar(FalhaMessage), PChar(FalhaTitle),
-          MB_OK or MB_ICONERROR);
+        ShowError(FalhaMessage, FalhaTitle);
     except
-      Application.MessageBox(PChar(FalhaMessage), PChar(FalhaTitle),
-        MB_OK or MB_ICONERROR);
+      ShowError(FalhaMessage, FalhaTitle);
     end;
   finally
     btnSimularExclusao.Enabled := True;

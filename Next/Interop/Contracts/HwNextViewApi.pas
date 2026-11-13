@@ -11,9 +11,15 @@ uses
   {$ENDIF};
 
 const
-  HW_NEXT_VIEW_API_VERSION     = 6;
+  HW_NEXT_VIEW_API_VERSION     = 9;
   HW_NEXT_ERROR_CAPACITY       = 1024; // buffer do chamador, incluindo #0
   HW_NEXT_IDENTIFIER_MAX_CHARS = 63;
+
+  // Resultado da consulta de autorizacao devolvido pelo callback do host.
+  // Qualquer outro valor e tratado pelo modulo como indisponivel.
+  HW_NEXT_AUTH_UNAVAILABLE = 0;
+  HW_NEXT_AUTH_DENIED      = 1;
+  HW_NEXT_AUTH_ALLOWED     = 2;
 
   // Bits de opcao passados em AOptions. Zero e o padrao das consultas:
   // MDI, instancia unica, ocultar no fechamento individual.
@@ -43,6 +49,14 @@ type
   THwNextSetContext = function(ACompanyCode: Integer;
     AUserLogin, ADatabaseName, ADatabaseUserName,
     ADatabasePassword: PWideChar): LongBool; stdcall;
+  // Callback sincrono de autorizacao. Recebe apenas o codigo do processo e a
+  // acao ja convertida em texto pelo modulo. Os buffers de caracteres
+  // pertencem ao chamador e sao validos somente durante a chamada. O retorno
+  // usa HW_NEXT_AUTH_*; o host aplica as regras do processo informado.
+  THwNextAuthorizationCallback = function(
+    AProcessCode, AAction: PWideChar): Integer; stdcall;
+  THwNextSetAuthorizationCallback = function(
+    ACallback: THwNextAuthorizationCallback): LongBool; stdcall;
 
 implementation
 

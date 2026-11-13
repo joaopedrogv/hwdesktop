@@ -32,6 +32,8 @@ uses
   StandardQueryFilterDefinition in '..\Queries\Shared\Filters\StandardQueryFilterDefinition.pas',
   NextViewCatalog in '..\Interop\Module\NextViewCatalog.pas',
   NextViewExports in '..\Interop\Module\NextViewExports.pas',
+  NextAuthorizationBridge in '..\Interop\Module\NextAuthorizationBridge.pas',
+  NextAuthorizationAdapter in '..\Infrastructure\Authorization\NextAuthorizationAdapter.pas',
   QueryResultOperations in '..\Queries\Shared\QueryResultOperations.pas',
   IDataSetSorterUnit in '..\..\Modern\Core\Infrastructure\Interfaces\IDataSetSorterUnit.pas',
   FireDACDataSetSorterUnit in '..\..\Modern\Adapters\Secondary\Database\FireDAC\FireDACDataSetSorterUnit.pas',
@@ -39,6 +41,8 @@ uses
   TipoComunsUnit in '..\..\Modern\Core\Domain\Types\Shared\TipoComunsUnit.pas',
   StatusRegistroEnumUnit in '..\..\Modern\Core\Domain\Types\Shared\StatusRegistroEnumUnit.pas',
   GridColumnDefinition in '..\Contracts\GridColumnDefinition.pas',
+  ViewFeedback in '..\Contracts\ViewFeedback.pas',
+  AuthorizationService in '..\Contracts\AuthorizationService.pas',
   QueryPreviewReader in '..\Composition\QueryPreviewReader.pas';
 
 {$R *.res}

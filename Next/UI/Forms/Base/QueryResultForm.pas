@@ -32,6 +32,9 @@ type
     procedure ClearResult;
     procedure DoPesquisar(Sender: TObject);
   protected
+    // Permite que a tela filha interrompa a pesquisa antes de limpar o
+    // resultado ou criar um novo leitor. A validacao dos filtros ocorre antes.
+    function CanPesquisar: Boolean; virtual;
     procedure DoInitializeView; override;
   public
     destructor Destroy; override;
@@ -167,6 +170,11 @@ begin
   ClearResult;
 end;
 
+function TfrmQueryResult.CanPesquisar: Boolean;
+begin
+  Result := True;
+end;
+
 procedure TfrmQueryResult.DoPesquisar(Sender: TObject);
 var
   Collected: TFilterCriteriaResult;
@@ -192,6 +200,9 @@ begin
       if Collected.Status = fcsValidCriteria then
         Criteria := Collected.Criteria;
     end;
+
+    if not CanPesquisar then
+      Exit;
 
     ClearResult;
     try
