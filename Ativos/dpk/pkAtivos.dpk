@@ -256,6 +256,7 @@ contains
   estoque_ajuste_class in '..\fonte\estoque_ajuste_class.pas',
   efd_icmsst_cr_apuracao_class in '..\fonte\efd_icmsst_cr_apuracao_class.pas',
   HwNextViewApi in '..\..\Next\Interop\Contracts\HwNextViewApi.pas',
+  HwNextAuthorizationUnit in '..\..\Next\Interop\Host\HwNextAuthorizationUnit.pas',
   HwNextHostUnit in '..\..\Next\Interop\Host\HwNextHostUnit.pas',
   MD5 in '..\..\Fiscal Bpl\fonte\MD5.pas',
   Types_OOP in '..\fonte\Types_OOP.pas',

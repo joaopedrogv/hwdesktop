@@ -14,10 +14,11 @@ implementation
 uses
   System.SysUtils, NextViewRegistry, HwNextValidationFormUnit,
   HwNextValidationSecondFormUnit, QueryStandardForm, EventosRtcForm,
-  EventosRtcDefinition, LocalPreferences,
+  EventosRtcDefinition, GruposFiscaisForm, GruposFiscaisDefinition,
+  LocalPreferences,
   WindowsRegistryLocalPreferences, StandardQueryFilterDefinition,
   QueryPreviewReader, QueryResultOperations, GridColumnDefinition,
-  NextSetup, EventosRtcPresenter, IDataSetReaderUnit;
+  NextSetup, EventosRtcPresenter, GruposFiscaisPresenter, IDataSetReaderUnit;
 
 var
   FRegistry: TNextViewRegistry;
@@ -128,6 +129,45 @@ begin
   end;
 end;
 
+function CreateGruposFiscaisView(AParent: HWND): TfrmNextBase;
+var
+  View: TfrmGruposFiscais;
+  Preferences: ILocalPreferences;
+  Presenter: TGruposFiscaisPresenter;
+  Operations: IQueryResultOperations;
+begin
+  Preferences := TWindowsRegistryLocalPreferences.Create;
+
+  View := TfrmGruposFiscais.CreateParented(AParent);
+  try
+    // A composicao resolve o apresentador do contexto atual. A tela o possui e
+    // permanece responsavel pelo leitor e pelo conjunto retornado.
+    Presenter := NextSetupInstance.Resolve<TGruposFiscaisPresenter>;
+    try
+      // Ordenacao no conjunto carregado, sem coluna de marcacao e sem filtro
+      // rapido; a ordem inicial continua sendo a da consulta (SEQID).
+      Operations := TQueryResultOperations.Create(nil, '',
+        NextSetupInstance.DataSetSorter);
+      View.AttachPresenter(Presenter, CreateGruposFiscaisColumns,
+        'Grupos Fiscais', Operations);
+    except
+      // Associacao recusada: a tela nao assumiu a posse.
+      Presenter.Free;
+      raise;
+    end;
+
+    // A identidade da tela e tambem a identidade das preferencias de filtro,
+    // seguindo o padrao do EventosRtc.
+    View.ConfigureFilters(CreateGruposFiscaisFilters(), Preferences,
+      'next.grupos.fiscais');
+
+    Result := View;
+  except
+    View.Free;
+    raise;
+  end;
+end;
+
 function NextViewCreate(const AIdentifier: string;
   AParent: HWND): TfrmNextBase;
 begin
@@ -140,6 +180,7 @@ initialization
   FRegistry.Register('next.validation.second', CreateValidationSecondView);
   FRegistry.Register('next.query.standard', CreateStandardQueryView);
   FRegistry.Register('next.rtc.events', CreateEventosRtcView);
+  FRegistry.Register('next.grupos.fiscais', CreateGruposFiscaisView);
 
 finalization
   FRegistry.Free;

@@ -7,7 +7,7 @@ implementation
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes,
   Vcl.Forms, Vcl.Controls, HwNextViewApi, NextBaseForm,
-  NextViewCatalog, NextSetup;
+  NextViewCatalog, NextSetup, NextAuthorizationBridge;
 
 const
   KnownOptionsMask: Cardinal = HW_NEXT_OPT_KNOWN;
@@ -438,6 +438,9 @@ begin
         RecordError('A limpeza anterior da tela Next não foi concluída; a biblioteca não pode ser descarregada.');
       Exit;
     end;
+    // O callback pertence ao host: a biblioteca nao o mantem depois de
+    // encerrar as telas, antes de liberar a conexao compartilhada.
+    NextAuthorizationBridge.SetAuthorizationCallback(nil);
     // Cada tela devolveu seu leitor ao ser liberada. Somente depois disso o
     // adaptador libera a conexao compartilhada que os leitores utilizavam.
     NextSetupInstance.Release;
@@ -450,6 +453,15 @@ begin
       RecordError(E.Message);
     end;
   end;
+end;
+
+function HwNextSetAuthorizationCallback(
+  ACallback: THwNextAuthorizationCallback): LongBool; stdcall;
+begin
+  // O host informa o callback na carga e o remove antes de descarregar a
+  // biblioteca; a ponte apenas guarda o ponteiro e nao assume sua propriedade.
+  NextAuthorizationBridge.SetAuthorizationCallback(ACallback);
+  Result := True;
 end;
 
 function HwNextLastError(ABuffer: PWideChar; ACapacity: Integer): Integer; stdcall;
@@ -479,12 +491,15 @@ exports
   HwNextProcessKey name 'HwNextProcessKey',
   HwNextViewCount name 'HwNextViewCount',
   HwNextShutdown name 'HwNextShutdown',
+  HwNextSetAuthorizationCallback name 'HwNextSetAuthorizationCallback',
   HwNextLastError name 'HwNextLastError';
 
 initialization
   Views := TList.Create;
 
 finalization
+  // A descarga do modulo nao deixa ponteiro para o callback do host.
+  NextAuthorizationBridge.SetAuthorizationCallback(nil);
   while Views.Count > 0 do
   begin
     TfrmNextBase(Views[Views.Count - 1]).Free;
