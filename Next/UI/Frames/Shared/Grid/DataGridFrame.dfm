@@ -219,6 +219,14 @@ object frmDataGridFrame: TfrmDataGridFrame
   object pmCelula: TPopupMenu
     Left = 16
     Top = 96
+    object miCopiar: TMenuItem
+      Caption = 'Copiar (Ctrl+C)'
+      Enabled = False
+      OnClick = miCopiarClick
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
     object miFiltrarQuando: TMenuItem
       Caption = 'Filtrar quando'
       OnClick = miFiltrarQuandoClick

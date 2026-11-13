@@ -6,15 +6,19 @@ type
   TFilterFieldType = (fftString, fftInteger, fftInt64, fftCurrency,
     fftDate, fftDateTime);
 
-  // Ordem e rotulos preservam o catalogo ativo legado de filtros.
+  // A ordem preserva o catalogo ativo legado de filtros.
   TFilterOperator = (foEquals, foStartsWith, foContains, foEndsWith, foRange,
     foNotEquals, foGreaterThan, foGreaterOrEqual, foLessThan, foLessOrEqual,
     foIsEmpty, foNotEmpty, foIsNull, foNotNull);
 
   TFilterOperatorSet = set of TFilterOperator;
 
+  // Caminho que executa o criterio. Cada caminho declara apenas os operadores
+  // que sabe traduzir.
+  TFilterPath = (fpQuerySql, fpLoadedDataSet);
+
   // Politica de mascara por operador. A mascara de fragmento e usada por
-  // Comeca/Esta contido/Termina com; a de valor completo por Igual/Diferente/
+  // Comeca/Contem/Termina com; a de valor completo por Igual/Diferente/
   // Entre; as demais condicoes usam a mascara padrao.
   TFilterMaskPolicy = record
   private
@@ -74,6 +78,10 @@ function FilterDefaultOperators(
   const AValueType: TFilterFieldType): TFilterOperatorSet;
 function FilterFieldOperators(
   const AField: TFilterFieldDefinition): TFilterOperatorSet;
+function FilterPathOperators(const APath: TFilterPath;
+  const AValueType: TFilterFieldType): TFilterOperatorSet;
+function FilterPathFieldOperators(const APath: TFilterPath;
+  const AField: TFilterFieldDefinition): TFilterOperatorSet;
 function FilterDefaultOperator(
   const AValueType: TFilterFieldType): TFilterOperator;
 function FilterFieldSupportsOperator(const AField: TFilterFieldDefinition;
@@ -87,10 +95,9 @@ uses
   System.SysUtils;
 
 const
-  AllFilterOperators: TFilterOperatorSet = [
-    foEquals, foStartsWith, foContains, foEndsWith, foRange, foNotEquals,
-    foGreaterThan, foGreaterOrEqual, foLessThan, foLessOrEqual, foIsEmpty,
-    foNotEmpty, foIsNull, foNotNull
+  TextFilterOperators: TFilterOperatorSet = [
+    foEquals, foStartsWith, foContains, foEndsWith, foNotEquals,
+    foIsEmpty, foNotEmpty, foIsNull, foNotNull
   ];
 
   NonNullFilterOperators: TFilterOperatorSet = [
@@ -99,8 +106,8 @@ const
   ];
 
   OperatorLabels: array[TFilterOperator] of string = (
-    'Igual', 'Começa', 'Esta contido', 'Termina com', 'Entre', 'Diferente',
-    'Maior', 'Maior ou Igual', 'Menor', 'Menor ou Igual', 'Vazio',
+    'Igual', 'Começa', 'Contém', 'Termina com', 'Entre', 'Diferente',
+    'Maior', 'Maior ou igual', 'Menor', 'Menor ou igual', 'Vazio',
     'Não vazio', 'Nulo', 'Não nulo'
   );
 
@@ -268,12 +275,46 @@ function FilterDefaultOperators(
 begin
   case AValueType of
     fftString:
-      Result := AllFilterOperators;
+      Result := TextFilterOperators;
     fftInteger, fftInt64, fftCurrency, fftDate, fftDateTime:
       Result := NonNullFilterOperators;
   else
     Result := [];
   end;
+end;
+
+function TypedFilterOperators(
+  const AValueType: TFilterFieldType): TFilterOperatorSet;
+begin
+  case AValueType of
+    fftString:
+      Result := TextFilterOperators;
+    fftInteger, fftInt64, fftCurrency, fftDate, fftDateTime:
+      Result := NonNullFilterOperators;
+  else
+    Result := [];
+  end;
+end;
+
+function FilterPathOperators(const APath: TFilterPath;
+  const AValueType: TFilterFieldType): TFilterOperatorSet;
+begin
+  // Os dois caminhos executam os mesmos conjuntos tipados. A restricao por
+  // tipo fisico do filtro rapido pertence ao conjunto explicito montado pela
+  // grade a partir de QuickFilterOperators.
+  case APath of
+    fpQuerySql, fpLoadedDataSet:
+      Result := TypedFilterOperators(AValueType);
+  else
+    Result := [];
+  end;
+end;
+
+function FilterPathFieldOperators(const APath: TFilterPath;
+  const AField: TFilterFieldDefinition): TFilterOperatorSet;
+begin
+  Result := FilterFieldOperators(AField) *
+    FilterPathOperators(APath, AField.ValueType);
 end;
 
 function FilterFieldOperators(

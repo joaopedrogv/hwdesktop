@@ -3,7 +3,8 @@ unit DataGridFrame;
 interface
 
 uses
-  Vcl.Forms, Vcl.Graphics, Vcl.Controls, Vcl.Buttons, Vcl.Grids, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.Forms, Vcl.Graphics, Vcl.Controls, Vcl.Buttons, Vcl.Clipbrd, Vcl.Grids,
+  Vcl.StdCtrls, Vcl.ExtCtrls,
   Vcl.DBGrids, Vcl.Menus, System.Classes, System.SysUtils, System.Types,
   System.UITypes, System.Generics.Collections, Data.DB, FilterDefinition,
   FilterCriterion, FilterFrame, QueryResultOperations;
@@ -47,6 +48,7 @@ type
     btnMaisFiltro: TSpeedButton;
     dbgDados: TDBGrid;
     pmCelula: TPopupMenu;
+    miCopiar: TMenuItem;
     miFiltrarQuando: TMenuItem;
     miFiltrarValor: TMenuItem;
     miLimparFiltros1: TMenuItem;
@@ -61,6 +63,7 @@ type
     procedure dbgDadosKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure dbgDadosMouseActivate(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y, HitTest: Integer;
       var MouseActivate: TMouseActivate);
+    procedure miCopiarClick(Sender: TObject);
     procedure miFiltrarQuandoClick(Sender: TObject);
     procedure miFiltrarValorClick(Sender: TObject);
     procedure miLimparFiltros1Click(Sender: TObject);
@@ -78,6 +81,7 @@ type
     FDataLink: TDataLink;
     FSuppressDataSetChange: Boolean;
     FOnTitleCtrlClick: TColumnTitleCtrlClickEvent;
+    FOnFeedback: TFrameFeedbackEvent;
 
     function GetDataSource: TDataSource;
     procedure SetDataSource(const Value: TDataSource);
@@ -108,6 +112,11 @@ type
     procedure ApplySortedTitles();
     function TryApplySort(const ASorts: TQuerySortFields): Boolean;
     procedure ObserveDataSetChange();
+    function CopiaDisponivel: Boolean;
+    procedure CopiarCelulaAtual;
+    procedure ReportarFeedback(const ATitulo, AMensagem: string);
+    procedure ModalFeedback(Sender: TObject;
+      const ATitulo, AMensagem: string);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -126,6 +135,8 @@ type
     // Campo da coluna clicada com Ctrl; a tela decide se prepara o filtro.
     property OnTitleCtrlClick: TColumnTitleCtrlClickEvent
       read FOnTitleCtrlClick write FOnTitleCtrlClick;
+    property OnFeedback: TFrameFeedbackEvent
+      read FOnFeedback write FOnFeedback;
   end;
 
 implementation
@@ -139,8 +150,6 @@ const
   QuickFilterTitle = 'Filtro r'#225'pido';
   QuickFilterFailureMessage =
     'N'#227'o foi poss'#237'vel filtrar pelo valor selecionado.';
-  QuickFilterValueMessage =
-    'O valor da c'#233'lula est'#225' vazio e n'#227'o pode ser filtrado.';
   QuickFilterAddFailureMessage =
     'N'#227'o foi poss'#237'vel adicionar o filtro. Verifique se ele j'#225' est'#225' aplicado.';
   QuickFilterUpdateFailureMessage =
@@ -149,6 +158,12 @@ const
     'O filtro selecionado n'#227'o est'#225' mais ativo.';
   QuickFilterInvalidMessage =
     'O filtro informado n'#227'o '#233' v'#225'lido.';
+  CopyTitle = 'Copiar';
+  CopyFailureMessage =
+    'N'#227'o foi poss'#237'vel copiar o valor da c'#233'lula.';
+  // Codigo da tecla C no atalho Ctrl+C da grade. A constante VK_C nao existe
+  // na unit Winapi.Windows desta versao do compilador.
+  KeyC = Ord('C');
 
 type
   // Acesso as coordenadas de celula da grade. MouseCoord e protegido; o
@@ -527,6 +542,66 @@ begin
   ClearQuickFilters();
 end;
 
+function TfrmDataGridFrame.CopiaDisponivel: Boolean;
+begin
+  // Condicao unica do menu e do atalho. A copia nao exige marcacao configurada;
+  // apenas exclui a coluna SEL, que nao tem texto de celula.
+  Result := False;
+  if (dbgDados.DataSource = nil) or (dbgDados.DataSource.DataSet = nil) then
+    Exit;
+  if not dbgDados.DataSource.DataSet.Active then
+    Exit;
+  if dbgDados.DataSource.DataSet.IsEmpty then
+    Exit;
+  if dbgDados.SelectedField = nil then
+    Exit;
+  if (FMarkingColumn <> '') and
+    SameText(dbgDados.SelectedField.FieldName, FMarkingColumn) then
+    Exit;
+  Result := True;
+end;
+
+procedure TfrmDataGridFrame.CopiarCelulaAtual;
+var
+  Campo: TField;
+  Texto: string;
+begin
+  if not CopiaDisponivel then
+    Exit;
+
+  Campo := dbgDados.SelectedField;
+  if Campo = nil then
+    Exit;
+
+  try
+    // Convencao legada aprovada; nao e DisplayText.
+    Texto := Campo.AsString;
+    Clipboard.AsText := Texto;
+  except
+    // Cobre falha de conversao e de abertura/escrita do clipboard.
+    ReportarFeedback(CopyTitle, CopyFailureMessage);
+  end;
+end;
+
+procedure TfrmDataGridFrame.ReportarFeedback(const ATitulo, AMensagem: string);
+begin
+  // O frame nao abre dialogo proprio; o host apresenta a mensagem.
+  if Assigned(FOnFeedback) then
+    FOnFeedback(Self, ATitulo, AMensagem);
+end;
+
+procedure TfrmDataGridFrame.ModalFeedback(Sender: TObject;
+  const ATitulo, AMensagem: string);
+begin
+  // O modal de filtro usa o mesmo destino de feedback da grade.
+  ReportarFeedback(ATitulo, AMensagem);
+end;
+
+procedure TfrmDataGridFrame.miCopiarClick(Sender: TObject);
+begin
+  CopiarCelulaAtual;
+end;
+
 procedure TfrmDataGridFrame.btnDesmarcarTodosClick(Sender: TObject);
 begin
   DoMarkOperation(moUnmarkAll);
@@ -799,11 +874,14 @@ procedure TfrmDataGridFrame.dbgDadosMouseActivate(Sender: TObject; Button: TMous
   HitTest: Integer; var MouseActivate: TMouseActivate);
 var
   Column: TColumn;
+  DataField: TField;
+  TempCriterion: TFilterCriterion;
 begin
   // O menu de filtro usa a coluna sob o mouse sem alterar a linha corrente.
   if Button <> mbRight then
     Exit;
 
+  miCopiar.Enabled := CopiaDisponivel;
   miFiltrarValor.Enabled := False;
   miFiltrarQuando.Enabled := False;
   FQuickFilterColumnName := '';
@@ -812,28 +890,37 @@ begin
     Exit;
 
   FQuickFilterColumnName := Column.FieldName;
-  miFiltrarValor.Enabled := QuickFilterField() <> nil;
-  miFiltrarQuando.Enabled := miFiltrarValor.Enabled;
+  DataField := QuickFilterField();
+  // Filtrar por este valor exige um valor de celula; Filtrar quando abre o
+  // modal tambem sobre celula nula para escolher Vazio/Nulo.
+  miFiltrarValor.Enabled := (DataField <> nil) and
+    TryBuildEqualityCriterion(DataField, TempCriterion);
+  miFiltrarQuando.Enabled := DataField <> nil;
 end;
 
 procedure TfrmDataGridFrame.miFiltrarValorClick(Sender: TObject);
 var
   DataField: TField;
   AId: Integer;
+  Msg: string;
 begin
   DataField := QuickFilterField();
   if DataField = nil then
     Exit;
 
-  // Cada aceite acrescenta um criterio; os anteriores continuam ativos.
-  if FOperations.AddQuickFilter(DataField, AId) then
+  // Cada aceite acrescenta um criterio; os anteriores continuam ativos. A
+  // mensagem especifica do filtro substitui a generica quando disponivel.
+  if FOperations.AddQuickFilter(DataField, AId, Msg) then
   begin
     UpdateCommandBandLayout();
     dbgDados.Invalidate();
   end
   else
-    Application.MessageBox(PChar(QuickFilterFailureMessage),
-      PChar(QuickFilterTitle), MB_OK or MB_ICONWARNING);
+  begin
+    if Trim(Msg) = '' then
+      Msg := QuickFilterFailureMessage;
+    ReportarFeedback(QuickFilterTitle, Msg);
+  end;
 end;
 
 function TfrmDataGridFrame.BuildQuickFilterDefinition: TFilterDefinition;
@@ -842,6 +929,7 @@ var
   I: Integer;
   Column: TColumn;
   ValueType: TFilterFieldType;
+  Operators: TFilterOperatorSet;
   FieldDefinition: TFilterFieldDefinition;
   CaptionText: string;
 begin
@@ -853,8 +941,7 @@ begin
   end;
 
   // A definicao do modal usa as colunas de dados visiveis, sem a coluna de
-  // marcacao. Igualdade atende todos os campos; data e data/hora tambem
-  // aceitam intervalo, sempre sem negacao.
+  // marcacao, com os operadores que o filtro local executa para o tipo fisico.
   for I := 0 to dbgDados.Columns.Count - 1 do
   begin
     Column := dbgDados.Columns[I];
@@ -864,16 +951,16 @@ begin
       Continue;
 
     ValueType := QuickFilterFieldTypeFor(Column.Field);
+    Operators := QuickFilterOperators(Column.Field);
+    if Operators = [] then
+      Continue;
+
     CaptionText := Trim(Column.Title.Caption);
     if CaptionText = '' then
       CaptionText := Column.Field.DisplayLabel;
 
-    if ValueType in [fftDate, fftDateTime] then
-      FieldDefinition := FilterField(Column.FieldName, CaptionText, ValueType,
-        [foEquals, foRange], QuickFilterMaskPolicy(ValueType))
-    else
-      FieldDefinition := FilterField(Column.FieldName, CaptionText, ValueType,
-        [foEquals]);
+    FieldDefinition := FilterField(Column.FieldName, CaptionText, ValueType,
+      Operators, QuickFilterMaskPolicy(ValueType));
 
     SetLength(Fields, Length(Fields) + 1);
     Fields[High(Fields)] := FieldDefinition;
@@ -884,8 +971,8 @@ end;
 
 procedure TfrmDataGridFrame.ShowQuickFilterMessage(const AMessage: string);
 begin
-  Application.MessageBox(PChar(AMessage), PChar(QuickFilterTitle),
-    MB_OK or MB_ICONWARNING);
+  // O frame nao abre dialogo proprio; a mensagem segue para o host.
+  ReportarFeedback(QuickFilterTitle, AMessage);
 end;
 
 function TfrmDataGridFrame.ShowQuickFilterModal(const ACaption: string;
@@ -915,9 +1002,10 @@ begin
     FilterView.Parent := ModalForm;
     FilterView.Align := alTop;
     FilterView.Height := 70;
+    FilterView.OnFeedback := ModalFeedback;
 
     try
-      FilterView.ConfigureSingle(ADefinition, ACriterion);
+      FilterView.ConfigureSingle(ADefinition, ACriterion, fpLoadedDataSet);
     except
       on E: Exception do
       begin
@@ -979,25 +1067,28 @@ var
   InitialCriterion: TFilterCriterion;
   NewCriterion: TFilterCriterion;
   Definition: TFilterDefinition;
+  Msg: string;
 begin
   DataField := QuickFilterField();
   if DataField = nil then
     Exit;
 
+  // Celula sem valor abre o modal com o campo e o operador padrao/primeiro
+  // disponivel, para o usuario escolher Vazio, Nulo ou informar o valor.
   if not TryBuildEqualityCriterion(DataField, InitialCriterion) then
-  begin
-    ShowQuickFilterMessage(QuickFilterValueMessage);
-    Exit;
-  end;
+    if not TryBuildDefaultQuickFilterCriterion(DataField, InitialCriterion) then
+      Exit;
 
   Definition := BuildQuickFilterDefinition();
   if not ShowQuickFilterModal('Filtrar quando', Definition, InitialCriterion,
     NewCriterion) then
     Exit;
 
-  if not FOperations.AddQuickFilterCriterion(NewCriterion) then
+  if not FOperations.AddQuickFilterCriterion(NewCriterion, Msg) then
   begin
-    ShowQuickFilterMessage(QuickFilterAddFailureMessage);
+    if Trim(Msg) = '' then
+      Msg := QuickFilterAddFailureMessage;
+    ReportarFeedback(QuickFilterTitle, Msg);
     Exit;
   end;
 
@@ -1011,6 +1102,7 @@ var
   CurrentCriterion: TFilterCriterion;
   NewCriterion: TFilterCriterion;
   Definition: TFilterDefinition;
+  Msg: string;
 begin
   if not (Sender is TMenuItem) then
     Exit;
@@ -1021,7 +1113,7 @@ begin
 
   if not FOperations.GetQuickFilterCriterion(AId, CurrentCriterion) then
   begin
-    ShowQuickFilterMessage(QuickFilterMissingMessage);
+    ReportarFeedback(QuickFilterTitle, QuickFilterMissingMessage);
     UpdateCommandBandLayout();
     Exit;
   end;
@@ -1031,9 +1123,11 @@ begin
     NewCriterion) then
     Exit;
 
-  if not FOperations.UpdateQuickFilter(AId, NewCriterion) then
+  if not FOperations.UpdateQuickFilter(AId, NewCriterion, Msg) then
   begin
-    ShowQuickFilterMessage(QuickFilterUpdateFailureMessage);
+    if Trim(Msg) = '' then
+      Msg := QuickFilterUpdateFailureMessage;
+    ReportarFeedback(QuickFilterTitle, Msg);
     Exit;
   end;
 
@@ -1071,7 +1165,14 @@ end;
 
 procedure TfrmDataGridFrame.dbgDadosKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if (Key = VK_SPACE) and (Shift = []) and MarkingActive then
+  // Ctrl+C so existe na grade; editores de digitacao mantem o atalho nativo do
+  // VCL porque nao passam por este manipulador.
+  if (Key = KeyC) and (Shift = [ssCtrl]) then
+  begin
+    CopiarCelulaAtual;
+    Key := 0;
+  end
+  else if (Key = VK_SPACE) and (Shift = []) and MarkingActive then
   begin
     DoMarkOperation(moToggle);
     Key := 0;

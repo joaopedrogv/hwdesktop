@@ -104,9 +104,13 @@ end;
 
 function CreateEventosRtcFilters: TFilterDefinition;
 begin
+  // A tela oferece todo o conjunto textual e de data/hora que a pesquisa SQL
+  // executa. A definicao apenas declara os campos, sem restringir operadores.
   Result := FilterDefinitionOf([
-    FilterField('CHNFE', 'Chave da NF-e', fftString, [foEquals, foNotEquals]),
-    FilterField('DHEVENTO', 'Data/hora do evento', fftDateTime, [foRange])
+    FilterField('CHNFE', 'Chave da NF-e', fftString,
+      FilterDefaultOperators(fftString)),
+    FilterField('DHEVENTO', 'Data/hora do evento', fftDateTime,
+      FilterDefaultOperators(fftDateTime))
   ], True);
 end;
 

@@ -34,10 +34,40 @@ const
     'O campo do filtro nao faz parte da definicao da consulta.';
   UnsupportedFilterMessage =
     'O filtro informado nao pode ser traduzido para a consulta.';
+  UnsupportedOperatorMessage =
+    'A condicao "%s" nao pode ser aplicada ao campo "%s" na pesquisa SQL.';
 
-function IsDateValueKind(const AKind: TFilterValueKind): Boolean;
+function EscapeLikeLiteral(const AValue: string): string;
 begin
-  Result := AKind in [fvkDate, fvkDateTime];
+  // Escapa o escape e os curingas para que o texto digitado seja literal no
+  // LIKE; o padrao continua sendo enviado por parametro.
+  Result := StringReplace(AValue, '\', '\\', [rfReplaceAll]);
+  Result := StringReplace(Result, '%', '\%', [rfReplaceAll]);
+  Result := StringReplace(Result, '_', '\_', [rfReplaceAll]);
+end;
+
+function AddSingleValueParameter(const ABuilder: IParametersBuilder;
+  const AField: TFilterFieldDefinition; const AParameterName: string;
+  const AValue: TFilterValue): Boolean;
+begin
+  Result := True;
+  case AField.ValueType of
+    fftString:
+      ABuilder.ByName(AParameterName, AValue.StringValue);
+    fftInteger:
+      ABuilder.ByName(AParameterName, AValue.IntegerValue);
+    fftInt64:
+      ABuilder.ByNameI64(AParameterName, AValue.Int64Value);
+    fftCurrency:
+      ABuilder.ByNameC(AParameterName, AValue.CurrencyValue);
+    fftDate:
+      ABuilder.ByName(AParameterName,
+        DateNullable.Create(DateOf(AValue.DateTimeValue)));
+    fftDateTime:
+      ABuilder.ByName(AParameterName, AValue.DateTimeValue);
+  else
+    Result := False;
+  end;
 end;
 
 function ParameterNameExists(const AParameters: ParametersValues;
@@ -78,6 +108,8 @@ var
   I: Integer;
   ParameterIndex: Integer;
   Condition: string;
+  OperatorText: string;
+  Pattern: string;
   ParameterName: string;
   InitialName: string;
   FinalName: string;
@@ -91,13 +123,16 @@ begin
     if not ADefinition.FindField(Criterion.FieldId, Field) then
       raise Exception.Create(UnknownFilterFieldMessage);
 
-    if not FilterFieldSupportsOperator(Field, Criterion.Operator) then
-      raise Exception.Create(UnsupportedFilterMessage);
+    if not (Criterion.Operator in
+      FilterPathFieldOperators(fpQuerySql, Field)) then
+      raise Exception.Create(Format(UnsupportedOperatorMessage,
+        [FilterOperatorLabel(Criterion.Operator), Field.Id]));
 
     ParameterIndex := I + 1;
 
     case Criterion.Operator of
-      foEquals:
+      foEquals, foNotEquals, foGreaterThan, foGreaterOrEqual, foLessThan,
+      foLessOrEqual:
         begin
           if Length(Criterion.Values) <> 1 then
             raise Exception.Create(UnsupportedFilterMessage);
@@ -110,35 +145,68 @@ begin
           if ParameterNameExists(AParameters, ParameterName) then
             raise Exception.Create(DuplicatedParameterNameMessage);
 
-          Condition := Field.Id + ' = :' + ParameterName;
-          case Field.ValueType of
-            fftString:
-              ABuilder.ByName(ParameterName, Value.StringValue);
-            fftInteger:
-              ABuilder.ByName(ParameterName, Value.IntegerValue);
-            fftInt64:
-              ABuilder.ByNameI64(ParameterName, Value.Int64Value);
-            fftCurrency:
-              ABuilder.ByNameC(ParameterName, Value.CurrencyValue);
-            fftDate:
-              ABuilder.ByName(ParameterName,
-                DateNullable.Create(DateOf(Value.DateTimeValue)));
-            fftDateTime:
-              ABuilder.ByName(ParameterName, Value.DateTimeValue);
+          case Criterion.Operator of
+            foEquals:
+              OperatorText := ' = ';
+            foNotEquals:
+              OperatorText := ' <> ';
+            foGreaterThan:
+              OperatorText := ' > ';
+            foGreaterOrEqual:
+              OperatorText := ' >= ';
+            foLessThan:
+              OperatorText := ' < ';
+            foLessOrEqual:
+              OperatorText := ' <= ';
           else
             raise Exception.Create(UnsupportedFilterMessage);
           end;
+
+          Condition := Field.Id + OperatorText + ':' + ParameterName;
+          if not AddSingleValueParameter(ABuilder, Field, ParameterName,
+            Value) then
+            raise Exception.Create(UnsupportedFilterMessage);
+        end;
+      foStartsWith, foContains, foEndsWith:
+        begin
+          if Field.ValueType <> fftString then
+            raise Exception.Create(UnsupportedFilterMessage);
+
+          if Length(Criterion.Values) <> 1 then
+            raise Exception.Create(UnsupportedFilterMessage);
+
+          Value := Criterion.Values[0];
+          if not FilterValueMatchesFieldType(Value, Field.ValueType) then
+            raise Exception.Create(UnsupportedFilterMessage);
+
+          ParameterName := Field.Id + '_' + IntToStr(ParameterIndex);
+          if ParameterNameExists(AParameters, ParameterName) then
+            raise Exception.Create(DuplicatedParameterNameMessage);
+
+          case Criterion.Operator of
+            foStartsWith:
+              Pattern := EscapeLikeLiteral(Value.StringValue) + '%';
+            foContains:
+              Pattern := '%' + EscapeLikeLiteral(Value.StringValue) + '%';
+            foEndsWith:
+              Pattern := '%' + EscapeLikeLiteral(Value.StringValue);
+          else
+            raise Exception.Create(UnsupportedFilterMessage);
+          end;
+
+          ABuilder.ByName(ParameterName, Pattern);
+          Condition := Field.Id + ' like :' + ParameterName +
+            ' escape ' + QuotedStr('\');
         end;
       foRange:
         begin
           if Length(Criterion.Values) <> 2 then
             raise Exception.Create(UnsupportedFilterMessage);
 
-          if not (Field.ValueType in [fftDate, fftDateTime]) then
-            raise Exception.Create(UnsupportedFilterMessage);
-
-          if (not IsDateValueKind(Criterion.Values[0].Kind)) or
-            (not IsDateValueKind(Criterion.Values[1].Kind)) then
+          if (not FilterValueMatchesFieldType(Criterion.Values[0],
+            Field.ValueType)) or
+            (not FilterValueMatchesFieldType(Criterion.Values[1],
+            Field.ValueType)) then
             raise Exception.Create(UnsupportedFilterMessage);
 
           InitialName := Field.Id + '_INI_' + IntToStr(ParameterIndex);
@@ -147,14 +215,87 @@ begin
             ParameterNameExists(AParameters, FinalName) then
             raise Exception.Create(DuplicatedParameterNameMessage);
 
-          // O limite final e o dia seguinte ao ultimo dia informado, exclusivo,
-          // para incluir todo o ultimo dia sem truncar a hora da coluna.
-          Condition := Field.Id + ' >= :' + InitialName + ' and ' + Field.Id +
-            ' < :' + FinalName;
-          ABuilder.ByName(InitialName,
-            DateOf(Criterion.Values[0].DateTimeValue));
-          ABuilder.ByName(FinalName,
-            DateOf(Criterion.Values[1].DateTimeValue) + 1);
+          if Field.ValueType in [fftDate, fftDateTime] then
+          begin
+            // O limite final e o dia seguinte ao ultimo dia informado,
+            // exclusivo, para incluir todo o ultimo dia sem truncar a hora.
+            Condition := Field.Id + ' >= :' + InitialName + ' and ' +
+              Field.Id + ' < :' + FinalName;
+            ABuilder.ByName(InitialName, DateNullable.Create(
+              DateOf(Criterion.Values[0].DateTimeValue)));
+            ABuilder.ByName(FinalName, DateNullable.Create(
+              DateOf(Criterion.Values[1].DateTimeValue) + 1));
+          end
+          else
+          begin
+            // Nos numeros os dois limites sao inclusivos.
+            Condition := Field.Id + ' >= :' + InitialName + ' and ' +
+              Field.Id + ' <= :' + FinalName;
+            case Field.ValueType of
+              fftInteger:
+                begin
+                  ABuilder.ByName(InitialName,
+                    Criterion.Values[0].IntegerValue);
+                  ABuilder.ByName(FinalName,
+                    Criterion.Values[1].IntegerValue);
+                end;
+              fftInt64:
+                begin
+                  ABuilder.ByNameI64(InitialName,
+                    Criterion.Values[0].Int64Value);
+                  ABuilder.ByNameI64(FinalName,
+                    Criterion.Values[1].Int64Value);
+                end;
+              fftCurrency:
+                begin
+                  ABuilder.ByNameC(InitialName,
+                    Criterion.Values[0].CurrencyValue);
+                  ABuilder.ByNameC(FinalName,
+                    Criterion.Values[1].CurrencyValue);
+                end;
+            else
+              raise Exception.Create(UnsupportedFilterMessage);
+            end;
+          end;
+        end;
+      foIsEmpty:
+        begin
+          if Length(Criterion.Values) <> 0 then
+            raise Exception.Create(UnsupportedFilterMessage);
+
+          if Field.ValueType = fftString then
+            Condition := '(' + Field.Id + ' is null or ' + Field.Id +
+              ' = ' + QuotedStr('') + ')'
+          else
+            Condition := Field.Id + ' is null';
+        end;
+      foNotEmpty:
+        begin
+          if Length(Criterion.Values) <> 0 then
+            raise Exception.Create(UnsupportedFilterMessage);
+
+          if Field.ValueType = fftString then
+            Condition := 'not (' + Field.Id + ' is null or ' + Field.Id +
+              ' = ' + QuotedStr('') + ')'
+          else
+            Condition := Field.Id + ' is not null';
+        end;
+      foIsNull:
+        begin
+          // A distincao entre vazio e nulo so existe no texto.
+          if (Field.ValueType <> fftString) or
+            (Length(Criterion.Values) <> 0) then
+            raise Exception.Create(UnsupportedFilterMessage);
+
+          Condition := Field.Id + ' is null';
+        end;
+      foNotNull:
+        begin
+          if (Field.ValueType <> fftString) or
+            (Length(Criterion.Values) <> 0) then
+            raise Exception.Create(UnsupportedFilterMessage);
+
+          Condition := Field.Id + ' is not null';
         end;
     else
       raise Exception.Create(UnsupportedFilterMessage);
@@ -162,7 +303,7 @@ begin
 
     if Result <> '' then
       Result := Result + ' and ';
-    Result := Result + Condition;
+    Result := Result + '(' + Condition + ')';
   end;
 end;
 

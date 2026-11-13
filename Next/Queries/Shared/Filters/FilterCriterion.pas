@@ -58,7 +58,8 @@ function SameFilterCriterion(const ALeft, ARight: TFilterCriterion): Boolean;
 function FilterCriterionDisplayText(const ACriterion: TFilterCriterion;
   const ADefinition: TFilterDefinition): string;
 function ValidateFilterCriterion(const ACriterion: TFilterCriterion;
-  const ADefinition: TFilterDefinition; out AMessage: string): Boolean;
+  const ADefinition: TFilterDefinition; APath: TFilterPath;
+  out AMessage: string): Boolean;
 function TryParseFilterValue(const AText: string; AValueType: TFilterFieldType;
   out AValue: TFilterValue): Boolean;
 function FilterValueMatchesFieldType(const AValue: TFilterValue;
@@ -67,7 +68,7 @@ function FilterValueMatchesFieldType(const AValue: TFilterValue;
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils, System.DateUtils;
 
 { TFilterValue }
 
@@ -311,7 +312,8 @@ end;
 { Validacao }
 
 function ValidateFilterCriterion(const ACriterion: TFilterCriterion;
-  const ADefinition: TFilterDefinition; out AMessage: string): Boolean;
+  const ADefinition: TFilterDefinition; APath: TFilterPath;
+  out AMessage: string): Boolean;
 var
   Definition: TFilterDefinition;
   Field: TFilterFieldDefinition;
@@ -338,9 +340,10 @@ begin
   FieldCaptionText := FieldCaption(Field);
   OperatorLabel := FilterOperatorLabel(ACriterion.Operator);
 
-  if not FilterFieldSupportsOperator(Field, ACriterion.Operator) then
+  if not (ACriterion.Operator in FilterPathFieldOperators(APath, Field)) then
   begin
-    AMessage := Format('A condição "%s" não é permitida para o campo "%s".',
+    AMessage := Format(
+      'A condição "%s" não está disponível para o campo "%s" nesta consulta.',
       [OperatorLabel, FieldCaptionText]);
     Exit;
   end;
@@ -417,8 +420,8 @@ begin
     else if (Field.ValueType = fftDate) or
       (Field.ValueType = fftDateTime) then
     begin
-      if ACriterion.Values[0].DateTimeValue >
-        ACriterion.Values[1].DateTimeValue then
+      if DateOf(ACriterion.Values[0].DateTimeValue) >
+        DateOf(ACriterion.Values[1].DateTimeValue) then
         AMessage := 'A data inicial deve ser menor ou igual à data final.';
     end;
 

@@ -3,8 +3,8 @@ unit QueryStandardForm;
 interface
 
 uses
-  System.SysUtils, System.Classes, System.UITypes, Data.DB, Vcl.Controls,
-  Vcl.ExtCtrls, Vcl.Forms, Vcl.StdCtrls, Vcl.Dialogs, NextBaseForm,
+  Winapi.Windows, System.SysUtils, System.Classes, System.UITypes, Data.DB,
+  Vcl.Controls, Vcl.ExtCtrls, Vcl.Forms, Vcl.StdCtrls, Vcl.Dialogs, NextBaseForm,
   DataGridFrame, FilterDefinition, FilterCriterion, FilterFrame,
   LocalPreferences;
 
@@ -20,6 +20,8 @@ type
     FFilterDefinition: TFilterDefinition;
     procedure DoPesquisarPreview(Sender: TObject);
     procedure GridTitleCtrlClick(Sender: TObject; const AFieldName: string);
+    procedure FrameFeedback(Sender: TObject;
+      const ATitulo, AMensagem: string);
   protected
     function CollectFilters: TFilterCriteriaResult;
     procedure DoInitializeView; override;
@@ -68,7 +70,7 @@ begin
   // O frame já faz parte do formulário (inline no DFM). A configuração apenas
   // injeta a definição e as preferências na instância existente, sem criar ou
   // liberar o frame: a tela é a proprietária.
-  fraFiltros.Configure(ADefinition, APreferences, AIdentity);
+  fraFiltros.Configure(ADefinition, APreferences, AIdentity, fpQuerySql);
   FFilterDefinition := ADefinition;
   FFiltersConfigured := True;
 
@@ -100,6 +102,15 @@ begin
   // gesto nao altera a ordem nem o resultado ja carregado.
   if FFiltersConfigured then
     fraFiltros.TrySelectField(AFieldName);
+end;
+
+procedure TfrmQueryStandard.FrameFeedback(Sender: TObject;
+  const ATitulo, AMensagem: string);
+begin
+  // O host apresenta o feedback dos frames reutilizaveis, que nao criam
+  // dialogo proprio.
+  Application.MessageBox(PChar(AMensagem), PChar(ATitulo),
+    MB_OK or MB_ICONWARNING);
 end;
 
 procedure TfrmQueryStandard.DoPesquisarPreview(Sender: TObject);
@@ -139,6 +150,8 @@ begin
   Caption := Format('Consulta - Next %d', [InstanceNumber]);
   fraGrid.DataSource := dsConsulta;
   fraGrid.OnTitleCtrlClick := GridTitleCtrlClick;
+  fraGrid.OnFeedback := FrameFeedback;
+  fraFiltros.OnFeedback := FrameFeedback;
 
   // A tela só exibe filtros quando ConfigureFilters foi chamado. A instância
   // herdada de Eventos RTC mantém o frame oculto e instala, no próprio
