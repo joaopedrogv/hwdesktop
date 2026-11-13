@@ -16,7 +16,8 @@ uses
   HwNextValidationSecondFormUnit, QueryStandardForm, QueryResultForm,
   EventosRtcForm, EventosRtcDefinition, GruposFiscaisForm,
   GruposFiscaisDefinition, LocalPreferences,
-  WindowsRegistryLocalPreferences, StandardQueryFilterDefinition,
+  WindowsRegistryLocalPreferences, ColumnLayoutPreferences,
+  ColumnLayoutPreferencesRepository, StandardQueryFilterDefinition,
   QueryPreviewReader, QueryResultOperations, GridColumnDefinition,
   NextSetup, EventosRtcPresenter, GruposFiscaisPresenter, IDataSetReaderUnit;
 
@@ -90,13 +91,15 @@ begin
     Reader := TQueryPreviewReader.Create('sel');
     Operations := TQueryResultOperations.Create(Reader, 'sel',
       NextSetupInstance.DataSetSorter);
+    // A previa declara os quatro comportamentos para validar a configuracao de
+    // colunas. A coluna 'sel' continua sendo a marcacao, visivel e fora da lista.
     View.Attach(Reader, GridColumns([
       GridColumn('sel', 'Sel', 50, qcaCenter),
-      GridColumn('documento', 'Documento', 120),
+      GridColumn('documento', 'Documento', 120, qcaDefault, gcbAlwaysVisible),
       GridColumn('descricao', 'Descri'#231#227'o', 220),
       GridColumn('codigo', 'C'#243'digo', 90, qcaRight),
-      GridColumn('valor', 'Valor', 110, qcaRight),
-      GridColumn('data', 'Data', 110, qcaCenter)
+      GridColumn('valor', 'Valor', 110, qcaRight, gcbConfigurableHidden),
+      GridColumn('data', 'Data', 110, qcaCenter, gcbAlwaysHidden)
     ]), 'Valida'#231#227'o Next 2', Operations, True);
     Result := View;
   except
@@ -109,6 +112,7 @@ function CreateEventosRtcView(AParent: HWND): TfrmNextBase;
 var
   View: TfrmEventosRtc;
   Preferences: ILocalPreferences;
+  LayoutPreferences: IColumnLayoutPreferences;
   Presenter: TEventosRtcPresenter;
   Operations: IQueryResultOperations;
 begin
@@ -134,6 +138,13 @@ begin
       Presenter.Free;
       raise;
     end;
+
+    // O repositório é transiente: a composição cede conexão/sessão do Setup e a
+    // grade o mantém enquanto a tela existir.
+    LayoutPreferences := TColumnLayoutPreferencesRepository.Create(
+      NextSetupInstance.Adapter, NextSetupInstance.SessionContext,
+      'next.rtc.events');
+    View.AttachColumnLayout(LayoutPreferences);
 
     View.ConfigureFilters(CreateEventosRtcFilters(), Preferences,
       'next.rtc.events');

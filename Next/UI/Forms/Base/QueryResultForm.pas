@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.DBGrids, NextBaseForm,
   QueryStandardForm, DataGridFrame, GridColumnDefinition, IDataSetReaderUnit,
   QueryResultOperations, Vcl.StdCtrls, FilterFrame, FilterCriterion,
-  Vcl.ExtCtrls;
+  Vcl.ExtCtrls, ColumnLayoutPreferences;
 
 type
   // Fabrica de leitores para consultas que montam o SQL a partir dos criterios
@@ -28,7 +28,6 @@ type
     FTitle: string;
     FQuickFilterEnabled: Boolean;
     FPesquisando: Boolean;
-    procedure ConfigureColumns;
     procedure ClearResult;
     procedure DoPesquisar(Sender: TObject);
   protected
@@ -47,6 +46,8 @@ type
       const AColumns: TGridColumnDefinitions; const ATitle: string;
       AOperations: IQueryResultOperations = nil;
       AQuickFilterEnabled: Boolean = False);
+    // A grade le e aplica o layout; a tela nao conhece banco nem sessao.
+    procedure AttachColumnLayout(const APreferences: IColumnLayoutPreferences);
   end;
 
 implementation
@@ -62,6 +63,8 @@ const
     'O leitor de dados da consulta ja foi associado a esta tela.';
   MissingDependencyMessage =
     'A tela de consulta nao recebeu seu leitor de dados.';
+  MissingColumnLayoutPreferencesMessage =
+    'As preferencias de colunas nao foram informadas.';
   EmptyResultMessage =
     'Nenhum registro foi encontrado para a consulta de %s.';
   FailureMessage = 'Nao foi possivel consultar os dados de %s.';
@@ -121,28 +124,13 @@ begin
   fraGrid.Configure(AOperations, FQuickFilterEnabled);
 end;
 
-procedure TfrmQueryResult.ConfigureColumns;
-var
-  I: Integer;
-  Column: TGridColumnDefinition;
-  GridColumn: TColumn;
+procedure TfrmQueryResult.AttachColumnLayout(
+  const APreferences: IColumnLayoutPreferences);
 begin
-  fraGrid.dbgDados.Columns.Clear;
-  for I := 0 to High(FColumns) do
-  begin
-    Column := FColumns[I];
-    GridColumn := fraGrid.dbgDados.Columns.Add;
-    GridColumn.FieldName := Column.FieldName;
-    GridColumn.Title.Caption := Column.Title;
-    if Column.Width > 0 then
-      GridColumn.Width := Column.Width;
-    case Column.Alignment of
-      qcaDefault: ;
-      qcaLeft: GridColumn.Alignment := taLeftJustify;
-      qcaCenter: GridColumn.Alignment := taCenter;
-      qcaRight: GridColumn.Alignment := taRightJustify;
-    end;
-  end;
+  if APreferences = nil then
+    raise Exception.Create(MissingColumnLayoutPreferencesMessage);
+
+  fraGrid.AttachColumnLayout(APreferences);
 end;
 
 procedure TfrmQueryResult.ClearResult;
@@ -168,6 +156,10 @@ begin
   // desvincula o conjunto e libera o leitor conforme a fabrica ou o modo direto,
   // sem deixar resultado ou marcacoes anteriores disponiveis na grade.
   ClearResult;
+
+  // O layout pertence ao login corrente: recarregar evita reapresentar, em uma
+  // janela oculta, a preferencia do usuario anterior.
+  fraGrid.ReloadColumnLayout;
 end;
 
 function TfrmQueryResult.CanPesquisar: Boolean;
@@ -242,7 +234,7 @@ begin
   Caption := FTitle;
   btnPesquisar.Enabled := True;
   btnPesquisar.OnClick := DoPesquisar;
-  ConfigureColumns;
+  fraGrid.ConfigureColumns(FColumns);
 end;
 
 destructor TfrmQueryResult.Destroy;
