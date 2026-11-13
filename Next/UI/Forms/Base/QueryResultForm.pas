@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.DBGrids, NextBaseForm,
   QueryStandardForm, DataGridFrame, GridColumnDefinition, IDataSetReaderUnit,
   QueryResultOperations, Vcl.StdCtrls, FilterFrame, FilterCriterion,
-  Vcl.ExtCtrls;
+  Vcl.ExtCtrls, ColumnLayoutPreferences;
 
 type
   // Fabrica de leitores para consultas que montam o SQL a partir dos criterios
@@ -46,6 +46,8 @@ type
       const AColumns: TGridColumnDefinitions; const ATitle: string;
       AOperations: IQueryResultOperations = nil;
       AQuickFilterEnabled: Boolean = False);
+    // A grade le e aplica o layout; a tela nao conhece banco nem sessao.
+    procedure AttachColumnLayout(const APreferences: IColumnLayoutPreferences);
   end;
 
 implementation
@@ -61,6 +63,8 @@ const
     'O leitor de dados da consulta ja foi associado a esta tela.';
   MissingDependencyMessage =
     'A tela de consulta nao recebeu seu leitor de dados.';
+  MissingColumnLayoutPreferencesMessage =
+    'As preferencias de colunas nao foram informadas.';
   EmptyResultMessage =
     'Nenhum registro foi encontrado para a consulta de %s.';
   FailureMessage = 'Nao foi possivel consultar os dados de %s.';
@@ -120,6 +124,15 @@ begin
   fraGrid.Configure(AOperations, FQuickFilterEnabled);
 end;
 
+procedure TfrmQueryResult.AttachColumnLayout(
+  const APreferences: IColumnLayoutPreferences);
+begin
+  if APreferences = nil then
+    raise Exception.Create(MissingColumnLayoutPreferencesMessage);
+
+  fraGrid.AttachColumnLayout(APreferences);
+end;
+
 procedure TfrmQueryResult.ClearResult;
 begin
   // Cada pesquisa comeca sem criterios rapidos e sem a ordenacao do resultado
@@ -143,6 +156,10 @@ begin
   // desvincula o conjunto e libera o leitor conforme a fabrica ou o modo direto,
   // sem deixar resultado ou marcacoes anteriores disponiveis na grade.
   ClearResult;
+
+  // O layout pertence ao login corrente: recarregar evita reapresentar, em uma
+  // janela oculta, a preferencia do usuario anterior.
+  fraGrid.ReloadColumnLayout;
 end;
 
 function TfrmQueryResult.CanPesquisar: Boolean;

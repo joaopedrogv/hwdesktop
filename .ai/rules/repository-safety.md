@@ -51,6 +51,9 @@ always_apply: true
 - Write new or substantively revised source comments in Brazilian Portuguese.
   Preserve the established spelling of technical identifiers, compiler
   directives and tool-recognized markers.
+- Make names and structures self-explanatory. Write comments that add motives,
+  restrictions or contract guarantees the code does not make evident; do not
+  restate method names, conditions or assignments.
 - Prefer writing a user-facing message directly in the method that uses it.
   Use a named constant when the same message is reused.
 - Write source comments that remain understandable without the current Workflow

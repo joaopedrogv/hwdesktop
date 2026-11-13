@@ -45,6 +45,8 @@ uses
   GridColumnDefinition in '..\Contracts\GridColumnDefinition.pas',
   ViewFeedback in '..\Contracts\ViewFeedback.pas',
   AuthorizationService in '..\Contracts\AuthorizationService.pas',
+  ColumnLayoutPreferences in '..\..\Modern\Core\Domain\Ports\Shared\ColumnLayoutPreferences.pas',
+  ColumnLayoutPreferencesRepository in '..\..\Modern\Adapters\Secondary\Preferences\ColumnLayoutPreferencesRepository.pas',
   QueryPreviewReader in '..\Composition\QueryPreviewReader.pas';
 
 {$R *.res}

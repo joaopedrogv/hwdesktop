@@ -253,5 +253,18 @@ object frmDataGridFrame: TfrmDataGridFrame
       Enabled = False
       OnClick = miConfigurarColunasClick
     end
+    object N3: TMenuItem
+      Caption = '-'
+    end
+    object miSalvarConfigColunas: TMenuItem
+      Caption = 'Salvar configura'#231#227'o das colunas'
+      Enabled = False
+      OnClick = miSalvarConfigColunasClick
+    end
+    object miRestaurarColunasPadrao: TMenuItem
+      Caption = 'Restaurar padr'#227'o das colunas'
+      Enabled = False
+      OnClick = miRestaurarColunasPadraoClick
+    end
   end
 end
