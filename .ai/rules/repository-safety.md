@@ -51,6 +51,8 @@ always_apply: true
 - Write new or substantively revised source comments in Brazilian Portuguese.
   Preserve the established spelling of technical identifiers, compiler
   directives and tool-recognized markers.
+- Prefer writing a user-facing message directly in the method that uses it.
+  Use a named constant when the same message is reused.
 - Write source comments that remain understandable without the current Workflow
   run. Explain a business rule, ownership, compatibility constraint or a
   non-obvious reason. Keep run-local decision IDs, increment IDs, approval
@@ -72,6 +74,12 @@ always_apply: true
   neighboring files. Apply the area's compatibility Rules where present.
 - Configure the writer explicitly. Use strict encoding that reports characters
   which cannot be represented. Preserve unrelated bytes and existing file format.
+- In Delphi 2006 and Rio `.pas` files, write accented messages and labels as
+  readable string literals, such as `'Autorização'`, using the file's encoding.
+  Reserve numeric escapes such as `#231` for technical needs. In textual `.dfm`
+  files, preserve the Delphi designer's serialized form, including numeric
+  escapes. Check the readability of changed literals alongside the byte-level
+  verification.
 - Before handing off created or modified Delphi 2006 sources, verify their bytes
   against the intended single-byte encoding, including accented literals,
   messages, captions and metadata. Include affected PAS, DFM, DPR, DPK and INC files.

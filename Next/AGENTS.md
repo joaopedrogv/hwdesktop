@@ -41,6 +41,14 @@ separate responsibilities and invert dependencies at infrastructure boundaries.
   boundary. Business operations use their Modern contracts.
 - Use Spring4D only in composition and supply dependencies to consumers. Do not
   resolve dependencies from a global container in forms, presenters or Use Cases.
+- Choose Spring4D lifetimes based on the intended ownership and sharing. Prefer
+  `AsTransient` for Presenters and for lightweight queries and Use Cases that
+  follow a Presenter instance. With reference-counted dependencies, inject and
+  retain the interface so the object is released when its last reference ends.
+  For class references, define who frees a transient instance. A form can own
+  its Presenter. Use `AsSingleton` when a shared instance should live with the
+  container, such as a shared connection. Statelessness makes sharing possible.
+  Explain non-obvious ownership or sharing decisions at the registration.
 - The ERP host supplies session and connection data. Keep resource ownership
   explicit. The host side targets Delphi 2006; the module side targets Rio.
   Cross that boundary through an explicit ABI, not Delphi objects, datasets or
