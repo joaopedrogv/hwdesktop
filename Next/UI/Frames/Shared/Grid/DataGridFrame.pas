@@ -52,6 +52,7 @@ type
     miFiltrarQuando: TMenuItem;
     miFiltrarValor: TMenuItem;
     miLimparFiltros1: TMenuItem;
+    miReajustarColunas: TMenuItem;
     procedure DrawCheckboxCell(const Rect: TRect;
       const State: TGridDrawState; AState: Boolean);
     procedure dbgDadosDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
@@ -67,6 +68,7 @@ type
     procedure miFiltrarQuandoClick(Sender: TObject);
     procedure miFiltrarValorClick(Sender: TObject);
     procedure miLimparFiltros1Click(Sender: TObject);
+    procedure miReajustarColunasClick(Sender: TObject);
     procedure dbgDadosExit(Sender: TObject);
     procedure dbgDadosTitleClick(Column: TColumn);
   private
@@ -114,6 +116,7 @@ type
     procedure ObserveDataSetChange();
     function CopiaDisponivel: Boolean;
     procedure CopiarCelulaAtual;
+    procedure ReajustarLarguraColunas;
     procedure ReportarFeedback(const ATitulo, AMensagem: string);
     procedure ModalFeedback(Sender: TObject;
       const ATitulo, AMensagem: string);
@@ -161,6 +164,9 @@ const
   CopyTitle = 'Copiar';
   CopyFailureMessage =
     'N'#227'o foi poss'#237'vel copiar o valor da c'#233'lula.';
+  // Respiro horizontal somado a largura calculada, como no reajuste de colunas
+  // do cadastro padrao legado.
+  ColumnWidthPadding = 10;
   // Codigo da tecla C no atalho Ctrl+C da grade. A constante VK_C nao existe
   // na unit Winapi.Windows desta versao do compilador.
   KeyC = Ord('C');
@@ -583,6 +589,91 @@ begin
   end;
 end;
 
+procedure TfrmDataGridFrame.ReajustarLarguraColunas;
+var
+  dts: TDataSet;
+  // Winapi.Windows declara TBitmap como tagBITMAP no escopo da implementacao;
+  // o tipo qualificado garante o bitmap do VCL usado na medicao.
+  Bitmap: Vcl.Graphics.TBitmap;
+  Bookmark: TBookmark;
+  I: Integer;
+  Column: TColumn;
+  Largura: Integer;
+  LarguraTexto: Integer;
+  Texto: string;
+begin
+  if dbgDados.DataSource = nil then
+    Exit;
+
+  dts := dbgDados.DataSource.DataSet;
+  if (dts = nil) or (not dts.Active) or (dts.State <> dsBrowse) then
+    Exit;
+
+  // A medicao usa um canvas proprio para nao alterar a fonte da grade. Cada
+  // largura parte do titulo; o conteudo formatado das linhas visiveis prevalece
+  // quando for maior. O filtro rapido restringe o proprio conjunto, entao a
+  // navegacao considera apenas as linhas que a grade apresenta.
+  Bitmap := Vcl.Graphics.TBitmap.Create;
+  try
+    // O canvas do bitmap precisa de um contexto valido para medir o texto.
+    Bitmap.SetSize(1, 1);
+    Bookmark := dts.Bookmark;
+    dts.DisableControls;
+    try
+      try
+        for I := 0 to dbgDados.Columns.Count - 1 do
+        begin
+          Column := dbgDados.Columns[I];
+          if (not Column.Visible) or (Column.Field = nil) then
+            Continue;
+
+          // A coluna de marcacao desenha o checkbox e mantem a largura atual.
+          if (FMarkingColumn <> '') and
+            SameText(Column.FieldName, FMarkingColumn) then
+            Continue;
+
+          Bitmap.Canvas.Font.Assign(Column.Title.Font);
+          Largura := Bitmap.Canvas.TextWidth(Column.Title.Caption);
+
+          Bitmap.Canvas.Font.Assign(Column.Font);
+          dts.First;
+          while not dts.Eof do
+          begin
+            Texto := Column.Field.DisplayText;
+            LarguraTexto := Bitmap.Canvas.TextWidth(Texto);
+            if LarguraTexto > Largura then
+              Largura := LarguraTexto;
+            dts.Next;
+          end;
+
+          // Sem linhas, a largura fica restrita ao titulo. O respiro garante uma
+          // coluna utilizavel mesmo para um titulo vazio.
+          Column.Width := Largura + ColumnWidthPadding;
+        end;
+      finally
+        // A posicao original e restaurada sem editar, filtrar ou ordenar. Um
+        // bookmark invalido apenas deixa o conjunto na posicao em que terminou.
+        // A memoria do bookmark e liberada mesmo se a restauracao falhar.
+        if Bookmark <> nil then
+        begin
+          try
+            if dts.BookmarkValid(Bookmark) then
+              dts.GotoBookmark(Bookmark);
+          finally
+            dts.FreeBookmark(Bookmark);
+          end;
+        end;
+      end;
+    finally
+      // Os controles voltam a acompanhar o conjunto mesmo se a medicao ou a
+      // restauracao da posicao falhar.
+      dts.EnableControls;
+    end;
+  finally
+    Bitmap.Free;
+  end;
+end;
+
 procedure TfrmDataGridFrame.ReportarFeedback(const ATitulo, AMensagem: string);
 begin
   // O frame nao abre dialogo proprio; o host apresenta a mensagem.
@@ -600,6 +691,11 @@ end;
 procedure TfrmDataGridFrame.miCopiarClick(Sender: TObject);
 begin
   CopiarCelulaAtual;
+end;
+
+procedure TfrmDataGridFrame.miReajustarColunasClick(Sender: TObject);
+begin
+  ReajustarLarguraColunas;
 end;
 
 procedure TfrmDataGridFrame.btnDesmarcarTodosClick(Sender: TObject);
@@ -882,6 +978,9 @@ begin
     Exit;
 
   miCopiar.Enabled := CopiaDisponivel;
+  miReajustarColunas.Enabled := (dbgDados.DataSource <> nil) and
+    (dbgDados.DataSource.DataSet <> nil) and
+    dbgDados.DataSource.DataSet.Active;
   miFiltrarValor.Enabled := False;
   miFiltrarQuando.Enabled := False;
   FQuickFilterColumnName := '';

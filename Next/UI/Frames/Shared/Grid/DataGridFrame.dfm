@@ -240,5 +240,13 @@ object frmDataGridFrame: TfrmDataGridFrame
       Enabled = False
       OnClick = miLimparFiltros1Click
     end
+    object N2: TMenuItem
+      Caption = '-'
+    end
+    object miReajustarColunas: TMenuItem
+      Caption = 'Reajustar largura das colunas'
+      Enabled = False
+      OnClick = miReajustarColunasClick
+    end
   end
 end
