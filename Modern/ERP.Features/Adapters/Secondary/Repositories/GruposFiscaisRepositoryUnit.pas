@@ -1,6 +1,6 @@
 unit GruposFiscaisRepositoryUnit;
 
-interface      
+interface
 
 uses
   IGruposFiscaisRepositoryUnit,
@@ -9,12 +9,8 @@ uses
   TipoComunsUnit,
   GrupoFiscalEtdUnit;
 
-type                                                                      
-  {$IFDEF INTF_ON}
-  GruposFiscaisRepository = class(BaseRepository, IGruposFiscaisRepository)
-  {$ELSE}
+type
   GruposFiscaisRepository = class(IGruposFiscaisRepository)
-  {$ENDIF}
   private
     function CreateItemFromQuery(Q: QueryResult; const E: TArrayInteger): GrupoFiscalEtd;
     function CreateListFromQuery(Q: QueryResult): GruposFiscaisEtd;
@@ -24,6 +20,7 @@ type
     function GetById(const Id: string): GrupoFiscalEtd; override;
     function ListCurrentAndActives(const CurrentId: string): GruposFiscaisEtd; override;
     function ListarComAnexoVinculado(): GruposFiscaisEtd; override;
+    procedure RemoverLogicamente(const Id: string); override;
   end;
 
 implementation
@@ -150,22 +147,22 @@ begin
         AddEmpresa( Q );                               // Add empresa já do novo registro
         registro := CreateItemFromQuery( Q, EVazio );  // criar o novo registro
       end;
-        
+
       Q.DataSet.Next();
     end;
 
     // ultimo registro
     SetLength(EmpresasId, count);
     registro.EmpresasId := EmpresasId;
-    Result.Add( registro );                 
-      
+    Result.Add( registro );
+
   except on E: Exception do
     begin
       registro.Free();
       Result.Free();
       raise;
     end;
-  end;      
+  end;
 end;
 
 function GruposFiscaisRepository.ListCurrentAndActives(
@@ -176,7 +173,7 @@ var
   registroId: string;
   qryResult: QueryResult;
   count: Integer;
-  
+
   {$REGION 'AddEmpresa'}
   procedure AddEmpresa(Q: QueryResult);
   begin
@@ -196,7 +193,7 @@ begin
   SetLength(EVazio, 0);
 
   qryResult := FConnection.CreateQuery(
-    'select g.id, g.seqid, g.descricao, g.tipo_tributo, g.data_cadastro, g.data_alteracao, g.ativo, ' +   
+    'select g.id, g.seqid, g.descricao, g.tipo_tributo, g.data_cadastro, g.data_alteracao, g.ativo, ' +
     'g.gerido_sistema, g.anexo, ' +
     'e.cod_empresa ' +
     'from GRUPOS_FISCAIS g ' +
@@ -228,15 +225,15 @@ begin
           AddEmpresa( qryResult );                               // Add empresa já do novo registro
           registro := CreateItemFromQuery( qryResult, EVazio );  // criar o novo registro
         end;
-        
+
         qryResult.DataSet.Next();
       end;
 
       // ultimo registro
       SetLength(EmpresasId, count);
       registro.EmpresasId := EmpresasId;
-      Result.Add( registro );                 
-      
+      Result.Add( registro );
+
     except on E: Exception do
       begin
         registro.Free();
@@ -285,12 +282,12 @@ begin
       );
 
     transacao.Commit();
-    {$IFNDEF INTF_ON} transacao.Free(); {$ENDIF}
+    transacao.Free();
 
   except on E: Exception do
     begin
       transacao.Rollback();
-      {$IFNDEF INTF_ON} transacao.Free(); {$ENDIF}
+      transacao.Free();
       raise;
     end;
   end;
@@ -353,18 +350,38 @@ begin
     end;
 
     transacao.Commit();
-    {$IFNDEF INTF_ON} transacao.Free(); {$ENDIF}
+    transacao.Free();
 
   except on E: Exception do
     begin
       transacao.Rollback();
-      {$IFNDEF INTF_ON} transacao.Free(); {$ENDIF}
+      transacao.Free();
       raise;
     end;
   end;
 
   Result := GetById( Input.Id );
 
+end;
+
+procedure GruposFiscaisRepository.RemoverLogicamente(const Id: string);
+var
+  Params: ParametersValues;
+begin
+  // Exclusao logica: somente o status e a data de alteracao mudam. A descricao e
+  // os vinculos de empresa permanecem, pois o registro na lixeira conserva o
+  // cadastro para consulta e restauracao.
+  Params := ParametersBuilder.Create(2)
+      .ByName('ATIVO', Ord( saLixeira ))
+      .ByName('ID', Id )
+      .Build();
+
+  FConnection.ExecuteCommand(
+    'UPDATE GRUPOS_FISCAIS ' +
+    'SET ATIVO = :ATIVO, DATA_ALTERACAO = CURRENT_TIMESTAMP ' +
+    'WHERE ID = :ID',
+    Params
+  );
 end;
 
 end.

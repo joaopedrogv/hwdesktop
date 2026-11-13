@@ -2,15 +2,15 @@ inherited frmGruposFiscais: TfrmGruposFiscais
   PixelsPerInch = 96
   TextHeight = 16
   inherited pnFiltros: TPanel
-    object btnSimularExclusao: TButton
-      Left = 476
+    object btnEnviarLixeira: TButton
+      Left = 466
       Top = 16
-      Width = 140
+      Width = 150
       Height = 32
       Anchors = [akTop, akRight]
-      Caption = 'Simular exclus'#227'o'
+      Caption = 'Enviar para a lixeira'
       TabOrder = 2
-      OnClick = btnSimularExclusaoClick
+      OnClick = btnEnviarLixeiraClick
     end
   end
 end

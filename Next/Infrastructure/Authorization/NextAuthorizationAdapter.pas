@@ -8,12 +8,12 @@ uses
 type
   // Adaptador da porta de autorizacao sobre o callback sincrono do host. Nao
   // acessa banco, dataset, sessao, UI, SQL nem auditoria: converte a acao
-  // tipada em texto, encaminha ao callback e traduz o retorno, protegendo a
-  // tela contra excecoes da fronteira externa.
+  // tipada em texto, repassa processo, acao e tabela ao callback e traduz o
+  // retorno, protegendo a tela contra excecoes da fronteira externa.
   TNextAuthorizationAdapter = class(TInterfacedObject, IAuthorizationService)
   public
-    function Authorize(const AProcessCode: string;
-      AAction: TAuthorizationAction): TAuthorizationResult;
+    function Authorize(const AProcessCode: string; AAction: TAuthorizationAction;
+      const ATable: string): TAuthorizationResult;
   end;
 
 implementation
@@ -22,7 +22,7 @@ uses
   HwNextViewApi, NextAuthorizationBridge;
 
 function TNextAuthorizationAdapter.Authorize(const AProcessCode: string;
-  AAction: TAuthorizationAction): TAuthorizationResult;
+  AAction: TAuthorizationAction; const ATable: string): TAuthorizationResult;
 var
   Callback: THwNextAuthorizationCallback;
   ActionText: string;
@@ -42,6 +42,8 @@ begin
   case AAction of
     aaVisualizar:
       ActionText := 'VISUALIZAR';
+    aaExcluir:
+      ActionText := 'EXCLUIR';
   else
     ActionText := '';
   end;
@@ -50,7 +52,10 @@ begin
     Exit;
 
   try
-    AuthResult := Callback(PWideChar(AProcessCode), PWideChar(ActionText));
+    // A tabela identifica o recurso auditado e e repassada como recebida; o
+    // host nao a interpreta.
+    AuthResult := Callback(PWideChar(AProcessCode), PWideChar(ActionText),
+      PWideChar(ATable));
     case AuthResult of
       HW_NEXT_AUTH_ALLOWED:
         Result.Outcome := aoAllowed;

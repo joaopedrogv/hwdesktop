@@ -15,6 +15,7 @@ type
     function GetById(const Id: string): GrupoFiscalEtd;
     function ListCurrentAndActives(const CurrentId: string): GruposFiscaisEtd;
     function ListarComAnexoVinculado(): GruposFiscaisEtd;
+    procedure RemoverLogicamente(const Id: string);
   end;
   {$ELSE}
   IGruposFiscaisRepository = class(BaseRepository)
@@ -24,6 +25,7 @@ type
     function GetById(const Id: string): GrupoFiscalEtd; virtual; abstract;
     function ListCurrentAndActives(const CurrentId: string): GruposFiscaisEtd; virtual; abstract;
     function ListarComAnexoVinculado(): GruposFiscaisEtd; virtual; abstract;
+    procedure RemoverLogicamente(const Id: string); virtual; abstract;
   end;
   {$ENDIF}
 

@@ -30,10 +30,16 @@ type
     FPesquisando: Boolean;
     procedure ClearResult;
     procedure DoPesquisar(Sender: TObject);
+    function Pesquisar(const AExibirFalha: Boolean): Boolean;
   protected
     // Permite que a tela filha interrompa a pesquisa antes de limpar o
     // resultado ou criar um novo leitor. A validacao dos filtros ocorre antes.
     function CanPesquisar: Boolean; virtual;
+    // Repete a pesquisa atual pela mesma sequencia de filtros, autorizacao e
+    // leitura, sem o dialogo generico da falha. Retorna True quando a grade
+    // reflete a consulta, incluindo resultado vazio. Destina-se as telas que
+    // alteram dados e precisam atualizar o resultado com mensagem propria.
+    function RepetirPesquisa: Boolean;
     procedure DoInitializeView; override;
   public
     destructor Destroy; override;
@@ -167,12 +173,13 @@ begin
   Result := True;
 end;
 
-procedure TfrmQueryResult.DoPesquisar(Sender: TObject);
+function TfrmQueryResult.Pesquisar(const AExibirFalha: Boolean): Boolean;
 var
   Collected: TFilterCriteriaResult;
   Criteria: TFilterCriteria;
   NewReader: IDataSetReader;
 begin
+  Result := False;
   if FPesquisando then
     Exit;
   FPesquisando := True;
@@ -209,6 +216,9 @@ begin
 
       FReader.Pesquisar;
       dsConsulta.DataSet := FReader.DataSet;
+      // A sequencia terminou e a grade reflete a consulta; resultado vazio
+      // tambem conclui a pesquisa.
+      Result := True;
       if FReader.DataSet.IsEmpty then
       begin
         ClearResult;
@@ -216,14 +226,28 @@ begin
           PChar(EmptyResultTitle), MB_OK or MB_ICONINFORMATION);
       end;
     except
+      Result := False;
       ClearResult;
-      Application.MessageBox(PChar(Format(FailureMessage, [FTitle])),
-        PChar(QueryFailureTitle), MB_OK or MB_ICONERROR);
+      // A falha generica pertence ao botao; a repeticao programatica deixa a
+      // mensagem especifica para o chamador.
+      if AExibirFalha then
+        Application.MessageBox(PChar(Format(FailureMessage, [FTitle])),
+          PChar(QueryFailureTitle), MB_OK or MB_ICONERROR);
     end;
   finally
     FPesquisando := False;
     btnPesquisar.Enabled := True;
   end;
+end;
+
+procedure TfrmQueryResult.DoPesquisar(Sender: TObject);
+begin
+  Pesquisar(True);
+end;
+
+function TfrmQueryResult.RepetirPesquisa: Boolean;
+begin
+  Result := Pesquisar(False);
 end;
 
 procedure TfrmQueryResult.DoInitializeView;
