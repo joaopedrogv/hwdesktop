@@ -5,8 +5,9 @@ interface
 uses
   Winapi.Windows, System.SysUtils, Data.DB, Vcl.Controls, Vcl.Forms,
   Vcl.StdCtrls, ConsultaBaseForm, FilterCriterion, IDataSetReaderUnit,
-  GridColumnDefinition, GruposFiscaisPresenter, QueryResultOperations,
-  GrupoFiscalCadastro, GrupoFiscalEtdUnit, GrupoFiscalCadastroFrame;
+  GridColumnDefinition, GruposFiscaisPresenter, GruposFiscaisView,
+  QueryResultOperations, GrupoFiscalCadastro, GrupoFiscalEtdUnit,
+  GrupoFiscalCadastroFrame;
 
 type
   // Tela de consulta e inclusao de Grupos Fiscais. Herda a apresentacao
@@ -14,7 +15,7 @@ type
   // e a inclusao em uma aba dinamica. O apresentador e o leitor sao injetados
   // pela composicao; o rascunho pertence a esta tela e o editor pertence a aba
   // criada pela base.
-  TfrmGruposFiscais = class(TfrmConsultaBase)
+  TfrmGruposFiscais = class(TfrmConsultaBase, IGruposFiscaisView)
     btnNovo: TButton;
     btnEnviarLixeira: TButton;
     procedure btnNovoClick(Sender: TObject);
@@ -42,12 +43,15 @@ type
     procedure AoAbrirAbaInclusao; override;
     procedure AoFecharAbaInclusao; override;
     procedure AoFalharAberturaAbaInclusao; override;
-    function SalvarInclusao: TResultadoComandoInclusao; override;
+    function SalvarInclusao: Boolean; override;
     procedure AvisarSalvamentoSemAtualizacao; override;
   public
     destructor Destroy; override;
     function HasPendingChanges: Boolean; override;
     procedure FocusView; override;
+    // Encaminha ao editor da inclusao os erros de campo produzidos pelo
+    // apresentador e posiciona o foco no primeiro campo invalido.
+    procedure ExibirErrosDeCampo(const AErros: TGrupoFiscalFieldErrors);
     procedure AttachPresenter(APresenter: TGruposFiscaisPresenter;
       const AColumns: TGridColumnDefinitions; const ATitle: string;
       AOperations: IQueryResultOperations = nil);
@@ -61,22 +65,7 @@ const
   MissingPresenterMessage =
     'O apresentador de Grupos Fiscais nao foi informado.';
   LixeiraTitle = 'Enviar para a lixeira';
-  SemRegistroMessage = 'Selecione um grupo fiscal na grade.';
-  ConfirmacaoMessage =
-    'Deseja enviar o grupo fiscal "%s" para a lixeira?';
-  AtualizacaoFalhouMessage =
-    'O grupo fiscal j'#225' foi enviado para a lixeira. Refa'#231'a a pesquisa para' +
-    ' atualizar a consulta.';
-  FalhaMessage =
-    'N'#227'o foi poss'#237'vel enviar o grupo fiscal para a lixeira.';
   InclusaoTitle = 'Novo grupo fiscal';
-  SalvarTitle = 'Salvar grupo fiscal';
-  NovaInclusaoFalhaMessage =
-    'N'#227'o foi poss'#237'vel iniciar a inclus'#227'o do grupo fiscal.';
-  GrupoSalvoAtualizacaoFalhouMessage =
-    'O grupo fiscal foi salvo. Refa'#231'a a pesquisa para atualizar a consulta.';
-  SalvarFalhaMessage =
-    'N'#227'o foi poss'#237'vel salvar o grupo fiscal.';
 
 destructor TfrmGruposFiscais.Destroy;
 begin
@@ -115,9 +104,10 @@ end;
 
 function TfrmGruposFiscais.CanPesquisar: Boolean;
 begin
-  // A decisao e as mensagens de indisponibilidade pertencem ao apresentador, que
-  // recebe esta tela como feedback. Sem apresentador a pesquisa nao prossegue.
-  Result := (FPresenter <> nil) and FPresenter.AutorizarPesquisa(Self);
+  // A decisao e as mensagens de indisponibilidade pertencem ao apresentador,
+  // que apresenta o feedback na propria tela. Sem apresentador a pesquisa nao
+  // prossegue.
+  Result := (FPresenter <> nil) and FPresenter.AutorizarPesquisa;
 end;
 
 function TfrmGruposFiscais.CriarEditorInclusao(
@@ -161,11 +151,9 @@ begin
   FOpcoesEmpresas := nil;
 end;
 
-function TfrmGruposFiscais.SalvarInclusao: TResultadoComandoInclusao;
-var
-  Resultado: TGrupoFiscalSaveResult;
+function TfrmGruposFiscais.SalvarInclusao: Boolean;
 begin
-  Result := rciFalha;
+  Result := False;
   if (FDraft = nil) or (FEditor = nil) or (FPresenter = nil) then
     Exit;
 
@@ -176,50 +164,33 @@ begin
   FDraft.EmpresasId := FEditor.EmpresasSelecionadas;
   FEditor.LimparValidacao;
 
-  try
-    Resultado := FPresenter.Salvar(FDraft, Self);
-  except
-    // O apresentador traduz as falhas esperadas; este resguardo impede que uma
-    // excecao inesperada atravesse o manipulador de evento.
-    ShowError(SalvarFalhaMessage, SalvarTitle);
+  if not FPresenter.Salvar(FDraft) then
     Exit;
-  end;
 
   // Uma mensagem modal do apresentador pode despachar uma troca de sessao, que
-  // encerra a inclusao. Sem rascunho e sem editor nao existe aba para corrigir:
-  // encerrar aqui evita tocar em objetos ja liberados.
-  if (FDraft = nil) or (FEditor = nil) then
-  begin
-    Result := rciEncerrado;
-    Exit;
-  end;
+  // encerra a inclusao. Sem rascunho e sem editor nao existe aba a encerrar: a
+  // base nao deve receber o pedido de fechamento.
+  Result := (FDraft <> nil) and (FEditor <> nil);
+end;
 
-  case Resultado.Outcome of
-    gfsoSalvo:
-      // A base registra o pedido e so fecha a aba e reconsulta depois que o
-      // evento de clique retornar; a grade nao e atualizada aqui.
-      Result := rciConcluido;
-    gfsoValidacao:
-      begin
-        // O erro fica no proprio campo e a aba permanece com o digitado.
-        FEditor.ExibirValidacao(Resultado.Erros);
-        FEditor.FocarPrimeiroCampoInvalido;
-        Result := rciValidacao;
-      end;
-    gfsoNegado:
-      Result := rciNegado;
-    gfsoIndisponivel:
-      Result := rciIndisponivel;
-    gfsoFalha:
-      Result := rciFalha;
-  end;
+procedure TfrmGruposFiscais.ExibirErrosDeCampo(
+  const AErros: TGrupoFiscalFieldErrors);
+begin
+  // A inclusao pode ter sido encerrada por uma troca de sessao antes desta
+  // chamada: sem editor nao existe aba para exibir o erro.
+  if FEditor = nil then
+    Exit;
+
+  FEditor.ExibirValidacao(AErros);
+  FEditor.FocarPrimeiroCampoInvalido;
 end;
 
 procedure TfrmGruposFiscais.AvisarSalvamentoSemAtualizacao;
 begin
   // A base ja fechou a aba e descartou o rascunho; a mensagem confirma a
   // gravacao e orienta a atualizar a consulta.
-  ShowWarning(GrupoSalvoAtualizacaoFalhouMessage, SalvarTitle);
+  ShowWarning('O grupo fiscal foi salvo. Refaça a pesquisa para atualizar a consulta.',
+    'Salvar grupo fiscal');
 end;
 
 function TfrmGruposFiscais.HasPendingChanges: Boolean;
@@ -261,11 +232,11 @@ begin
 
   // A negativa ou o cancelamento da autorizacao de inclusao ja foi apresentado
   // pelo legado: a tela permanece na consulta sem repetir a mensagem.
-  if not FPresenter.AutorizarInclusao(Self) then
+  if not FPresenter.AutorizarInclusao then
     Exit;
 
   // Sem as empresas nao ha o que incluir; o apresentador ja informou a falha.
-  if not FPresenter.CarregarEmpresas(Self, Opcoes) then
+  if not FPresenter.CarregarEmpresas(Opcoes) then
     Exit;
 
   FOpcoesEmpresas := Opcoes;
@@ -274,7 +245,8 @@ begin
   except
     // A base ja liberou a aba parcial e o hook de falha limpou FEditor/FDraft;
     // aqui resta informar a falha ao usuario.
-    ShowError(NovaInclusaoFalhaMessage, InclusaoTitle);
+    ShowError('Não foi possível iniciar a inclusão do grupo fiscal.',
+      InclusaoTitle);
   end;
 end;
 
@@ -312,14 +284,15 @@ var
 begin
   if not LerLinhaCorrente(Id, Descricao) then
   begin
-    ShowInformation(SemRegistroMessage, LixeiraTitle);
+    ShowInformation('Selecione um grupo fiscal na grade.', LixeiraTitle);
     Exit;
   end;
 
   // O envio para a lixeira retira o grupo da consulta: somente a afirmacao
   // explicita prossegue, e o padrao do dialogo e "Nao".
-  if Application.MessageBox(PChar(Format(ConfirmacaoMessage, [Descricao])),
-    PChar(LixeiraTitle),
+  if Application.MessageBox(
+    PChar(Format('Deseja enviar o grupo fiscal "%s" para a lixeira?',
+      [Descricao])), PChar(LixeiraTitle),
     MB_YESNO or MB_ICONWARNING or MB_DEFBUTTON2) <> IDYES then
     Exit;
 
@@ -329,21 +302,15 @@ begin
       ShowError(MissingPresenterMessage, LixeiraTitle)
     else
     begin
-      try
-        // O apresentador interpreta a autorizacao e apresenta a mensagem
-        // correspondente; False interrompe sem repetir o que o legado mostrou.
-        if not FPresenter.EnviarParaLixeira(Id, Self) then
-          Exit;
-      except
-        // O apresentador traduz as falhas esperadas; este resguardo impede que
-        // uma excecao inesperada atravesse o manipulador de evento.
-        ShowError(FalhaMessage, LixeiraTitle);
+      // O apresentador interpreta a autorizacao e apresenta a mensagem
+      // correspondente; False interrompe sem repetir o que o legado mostrou.
+      if not FPresenter.EnviarParaLixeira(Id) then
         Exit;
-      end;
 
       // A grade atualizada e a confirmacao do envio; nao ha dialogo de sucesso.
       if not RepetirPesquisa then
-        ShowWarning(AtualizacaoFalhouMessage, LixeiraTitle);
+        ShowWarning('O grupo fiscal já foi enviado para a lixeira. Refaça a pesquisa para atualizar a consulta.',
+          LixeiraTitle);
     end;
   finally
     btnEnviarLixeira.Enabled := True;

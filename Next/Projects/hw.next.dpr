@@ -43,6 +43,7 @@ uses
   StatusRegistroEnumUnit in '..\..\Modern\Core\Domain\Types\Shared\StatusRegistroEnumUnit.pas',
   GridColumnDefinition in '..\Contracts\GridColumnDefinition.pas',
   ViewFeedback in '..\Contracts\ViewFeedback.pas',
+  GruposFiscaisView in '..\Contracts\GruposFiscaisView.pas',
   AuthorizationService in '..\Contracts\AuthorizationService.pas',
   GrupoFiscalCadastro in '..\Contracts\GrupoFiscalCadastro.pas',
   ColumnLayoutPreferences in '..\..\Modern\Core\Domain\Ports\Shared\ColumnLayoutPreferences.pas',

@@ -4,20 +4,23 @@ interface
 
 uses
   FilterCriterion, IDataSetReaderUnit, GruposFiscaisQuery, AuthorizationService,
-  RemoverGrupoFiscalUseCaseUnit, ViewFeedback, SalvarGrupoFiscalUseCaseUnit,
+  RemoverGrupoFiscalUseCaseUnit, GruposFiscaisView, SalvarGrupoFiscalUseCaseUnit,
   ListarEmpresasUseCaseUnit, ISessionContextUnit, GrupoFiscalEtdUnit,
   GrupoFiscalCadastro;
 
 type
   // Apresentador da consulta e da inclusao de Grupos Fiscais. Encaminha a
   // leitura para a consulta injetada, verifica a autorizacao antes das
-  // operacoes e executa a remocao logica e a gravacao. As decisoes e as
-  // mensagens sao apresentadas pelo feedback recebido na chamada; a negativa
-  // ou o cancelamento ja apresentado pelo legado nao e repetido. Le o login da
+  // operacoes e executa a remocao logica e a gravacao. As mensagens e os erros
+  // de campo sao apresentados pela view recebida no construtor; a negativa ou o
+  // cancelamento ja apresentado pelo legado nao e repetido. Le o login da
   // sessao a cada inclusao e traduz empresas e validacoes para o contrato da
   // tela, sem entregar entidades ou listas do contexto Modern.
   TGruposFiscaisPresenter = class
   private
+    // A view pertence a tela e as demais dependencias ao container de
+    // composicao: o apresentador apenas as utiliza e nunca as libera.
+    FView: IGruposFiscaisView;
     FQuery: IGruposFiscaisQuery;
     FAuthorization: IAuthorizationService;
     FRemoverGrupoFiscal: IRemoverGrupoFiscalUseCase;
@@ -25,21 +28,19 @@ type
     FListarEmpresas: ListarEmpresasUseCase;
     FSession: ISessionContext;
   public
-    constructor Create(AQuery: IGruposFiscaisQuery;
+    constructor Create(AView: IGruposFiscaisView;
+      AQuery: IGruposFiscaisQuery;
       AAuthorization: IAuthorizationService;
       ARemoverGrupoFiscal: IRemoverGrupoFiscalUseCase;
       ASalvarGrupoFiscal: ISalvarGrupoFiscalUseCase;
       AListarEmpresas: ListarEmpresasUseCase;
       ASession: ISessionContext);
-    function AutorizarPesquisa(const AFeedback: IViewFeedback): Boolean;
+    function AutorizarPesquisa: Boolean;
     function CriarLeitor(const ACriteria: TFilterCriteria): IDataSetReader;
-    function EnviarParaLixeira(const AId: string;
-      const AFeedback: IViewFeedback): Boolean;
-    function AutorizarInclusao(const AFeedback: IViewFeedback): Boolean;
-    function CarregarEmpresas(const AFeedback: IViewFeedback;
-      out AOpcoes: TGrupoFiscalEmpresaOptions): Boolean;
-    function Salvar(const ARascunho: GrupoFiscalEtd;
-      const AFeedback: IViewFeedback): TGrupoFiscalSaveResult;
+    function EnviarParaLixeira(const AId: string): Boolean;
+    function AutorizarInclusao: Boolean;
+    function CarregarEmpresas(out AOpcoes: TGrupoFiscalEmpresaOptions): Boolean;
+    function Salvar(const ARascunho: GrupoFiscalEtd): Boolean;
   end;
 
 implementation
@@ -57,54 +58,21 @@ const
   ProcessoGravacao    = 'MOD011';
   TabelaGruposFiscais = 'GRUPOS_FISCAIS';
 
-  MissingQueryMessage =
-    'A consulta de Grupos Fiscais nao foi informada.';
-  MissingRemoverMessage =
-    'O caso de uso de remocao de Grupos Fiscais nao foi informado.';
-  MissingSalvarMessage =
-    'O caso de uso de gravacao de Grupos Fiscais nao foi informado.';
-  MissingEmpresasMessage =
-    'A consulta de empresas nao foi informada.';
-  MissingSessionMessage =
-    'A sessao de Grupos Fiscais nao foi informada.';
-  MissingIdMessage =
-    'O grupo fiscal a enviar para a lixeira n'#227'o foi identificado.';
+  // Mensagens repetidas na mesma operacao (indisponibilidade e empresas).
   ConsultaIndisponivelMessage =
-    'N'#227'o foi poss'#237'vel verificar a permiss'#227'o de consulta.';
+    'Não foi possível verificar a permissão de consulta.';
   ExclusaoIndisponivelMessage =
-    'N'#227'o foi poss'#237'vel verificar a permiss'#227'o de exclus'#227'o.';
+    'Não foi possível verificar a permissão de exclusão.';
   InclusaoIndisponivelMessage =
-    'N'#227'o foi poss'#237'vel verificar a permiss'#227'o de inclus'#227'o.';
+    'Não foi possível verificar a permissão de inclusão.';
   GravacaoIndisponivelMessage =
-    'N'#227'o foi poss'#237'vel verificar a permiss'#227'o de grava'#231#227'o.';
+    'Não foi possível verificar a permissão de gravação.';
   EmpresasFalhaMessage =
-    'N'#227'o foi poss'#237'vel carregar as empresas para a inclus'#227'o.';
-  RascunhoAusenteMessage =
-    'O rascunho do grupo fiscal n'#227'o foi informado.';
-  RemoveFailureMessage =
-    'N'#227'o foi poss'#237'vel enviar o grupo fiscal para a lixeira.';
-  SalvarFalhaMessage =
-    'N'#227'o foi poss'#237'vel salvar o grupo fiscal.';
-  AutorizacaoTitle = 'Autoriza'#231#227'o';
+    'Não foi possível carregar as empresas para a inclusão.';
+  AutorizacaoTitle = 'Autorização';
   LixeiraTitle = 'Enviar para a lixeira';
   InclusaoTitle = 'Novo grupo fiscal';
   SalvarTitle = 'Salvar grupo fiscal';
-
-// O feedback pertence a tela e pode faltar em usos sem interface; nesse caso a
-// mensagem e omitida e o retorno da operacao e preservado.
-procedure Avisar(const AFeedback: IViewFeedback; const AMessage,
-  ATitle: string);
-begin
-  if AFeedback <> nil then
-    AFeedback.ShowWarning(AMessage, ATitle);
-end;
-
-procedure InformarErro(const AFeedback: IViewFeedback; const AMessage,
-  ATitle: string);
-begin
-  if AFeedback <> nil then
-    AFeedback.ShowError(AMessage, ATitle);
-end;
 
 // Traduz a validacao do caso de uso para o contrato da tela preservando a ordem
 // produzida pelo validador. O texto ja vem pronto de GetMessage, que usa o
@@ -124,7 +92,8 @@ end;
 
 { TGruposFiscaisPresenter }
 
-constructor TGruposFiscaisPresenter.Create(AQuery: IGruposFiscaisQuery;
+constructor TGruposFiscaisPresenter.Create(AView: IGruposFiscaisView;
+  AQuery: IGruposFiscaisQuery;
   AAuthorization: IAuthorizationService;
   ARemoverGrupoFiscal: IRemoverGrupoFiscalUseCase;
   ASalvarGrupoFiscal: ISalvarGrupoFiscalUseCase;
@@ -132,32 +101,32 @@ constructor TGruposFiscaisPresenter.Create(AQuery: IGruposFiscaisQuery;
   ASession: ISessionContext);
 begin
   inherited Create;
+  if AView = nil then
+    raise Exception.Create('A view de Grupos Fiscais não foi informada.');
   if AQuery = nil then
-    raise Exception.Create(MissingQueryMessage);
+    raise Exception.Create('A consulta de Grupos Fiscais não foi informada.');
   if ARemoverGrupoFiscal = nil then
-    raise Exception.Create(MissingRemoverMessage);
+    raise Exception.Create('O caso de uso de remoção de Grupos Fiscais não foi informado.');
   if ASalvarGrupoFiscal = nil then
-    raise Exception.Create(MissingSalvarMessage);
+    raise Exception.Create('O caso de uso de gravação de Grupos Fiscais não foi informado.');
   if AListarEmpresas = nil then
-    raise Exception.Create(MissingEmpresasMessage);
+    raise Exception.Create('A consulta de empresas não foi informada.');
   if ASession = nil then
-    raise Exception.Create(MissingSessionMessage);
+    raise Exception.Create('A sessão de Grupos Fiscais não foi informada.');
 
+  FView := AView;
   FQuery := AQuery;
   // A ausencia do servico de autorizacao nao impede a tela de abrir; cada
   // operacao sera interrompida como indisponivel quando a permissao for
   // consultada.
   FAuthorization := AAuthorization;
-  // Os casos de uso e a sessao pertencem ao container de composicao: o
-  // apresentador apenas os utiliza e nunca os libera.
   FRemoverGrupoFiscal := ARemoverGrupoFiscal;
   FSalvarGrupoFiscal := ASalvarGrupoFiscal;
   FListarEmpresas := AListarEmpresas;
   FSession := ASession;
 end;
 
-function TGruposFiscaisPresenter.AutorizarPesquisa(
-  const AFeedback: IViewFeedback): Boolean;
+function TGruposFiscaisPresenter.AutorizarPesquisa: Boolean;
 var
   Autorizacao: TAuthorizationResult;
 begin
@@ -165,7 +134,7 @@ begin
 
   if FAuthorization = nil then
   begin
-    Avisar(AFeedback, ConsultaIndisponivelMessage, AutorizacaoTitle);
+    FView.ShowWarning(ConsultaIndisponivelMessage, AutorizacaoTitle);
     Exit;
   end;
 
@@ -174,7 +143,7 @@ begin
       TabelaGruposFiscais);
   except
     // Falha na consulta da permissao equivale a indisponibilidade.
-    Avisar(AFeedback, ConsultaIndisponivelMessage, AutorizacaoTitle);
+    FView.ShowWarning(ConsultaIndisponivelMessage, AutorizacaoTitle);
     Exit;
   end;
 
@@ -186,7 +155,7 @@ begin
       // mensagem Next para repetir.
       ;
   else
-    Avisar(AFeedback, ConsultaIndisponivelMessage, AutorizacaoTitle);
+    FView.ShowWarning(ConsultaIndisponivelMessage, AutorizacaoTitle);
   end;
 end;
 
@@ -197,8 +166,7 @@ begin
   Result := FQuery.CriarLeitor(ACriteria);
 end;
 
-function TGruposFiscaisPresenter.EnviarParaLixeira(const AId: string;
-  const AFeedback: IViewFeedback): Boolean;
+function TGruposFiscaisPresenter.EnviarParaLixeira(const AId: string): Boolean;
 var
   Autorizacao: TAuthorizationResult;
 begin
@@ -206,13 +174,14 @@ begin
 
   if Trim(AId) = '' then
   begin
-    InformarErro(AFeedback, MissingIdMessage, LixeiraTitle);
+    FView.ShowError('O grupo fiscal a enviar para a lixeira não foi identificado.',
+      LixeiraTitle);
     Exit;
   end;
 
   if FAuthorization = nil then
   begin
-    Avisar(AFeedback, ExclusaoIndisponivelMessage, AutorizacaoTitle);
+    FView.ShowWarning(ExclusaoIndisponivelMessage, AutorizacaoTitle);
     Exit;
   end;
 
@@ -220,7 +189,7 @@ begin
     Autorizacao := FAuthorization.Authorize(ProcessoExclusao, aaExcluir,
       TabelaGruposFiscais);
   except
-    Avisar(AFeedback, ExclusaoIndisponivelMessage, AutorizacaoTitle);
+    FView.ShowWarning(ExclusaoIndisponivelMessage, AutorizacaoTitle);
     Exit;
   end;
 
@@ -231,7 +200,7 @@ begin
       // A negativa ou o cancelamento ja foi apresentado pelo legado.
       Exit;
   else
-    Avisar(AFeedback, ExclusaoIndisponivelMessage, AutorizacaoTitle);
+    FView.ShowWarning(ExclusaoIndisponivelMessage, AutorizacaoTitle);
     Exit;
   end;
 
@@ -240,15 +209,15 @@ begin
     Result := True;
   except
     on E: EValidacaoNegocio do
-      InformarErro(AFeedback, E.Message, LixeiraTitle);
+      FView.ShowError(E.Message, LixeiraTitle);
     on E: Exception do
       // O texto tecnico do banco nao deve chegar a interface.
-      InformarErro(AFeedback, RemoveFailureMessage, LixeiraTitle);
+      FView.ShowError('Não foi possível enviar o grupo fiscal para a lixeira.',
+        LixeiraTitle);
   end;
 end;
 
-function TGruposFiscaisPresenter.AutorizarInclusao(
-  const AFeedback: IViewFeedback): Boolean;
+function TGruposFiscaisPresenter.AutorizarInclusao: Boolean;
 var
   Autorizacao: TAuthorizationResult;
 begin
@@ -256,7 +225,7 @@ begin
 
   if FAuthorization = nil then
   begin
-    Avisar(AFeedback, InclusaoIndisponivelMessage, AutorizacaoTitle);
+    FView.ShowWarning(InclusaoIndisponivelMessage, AutorizacaoTitle);
     Exit;
   end;
 
@@ -265,7 +234,7 @@ begin
       TabelaGruposFiscais);
   except
     // Falha na consulta da permissao equivale a indisponibilidade.
-    Avisar(AFeedback, InclusaoIndisponivelMessage, AutorizacaoTitle);
+    FView.ShowWarning(InclusaoIndisponivelMessage, AutorizacaoTitle);
     Exit;
   end;
 
@@ -277,12 +246,11 @@ begin
       // mensagem Next para repetir.
       ;
   else
-    Avisar(AFeedback, InclusaoIndisponivelMessage, AutorizacaoTitle);
+    FView.ShowWarning(InclusaoIndisponivelMessage, AutorizacaoTitle);
   end;
 end;
 
 function TGruposFiscaisPresenter.CarregarEmpresas(
-  const AFeedback: IViewFeedback;
   out AOpcoes: TGrupoFiscalEmpresaOptions): Boolean;
 var
   TodasEmpresas: EmpresasEtd;
@@ -301,7 +269,7 @@ begin
   Login := Trim(FSession.UsuarioLogin);
   if Login = '' then
   begin
-    Avisar(AFeedback, EmpresasFalhaMessage, InclusaoTitle);
+    FView.ShowWarning(EmpresasFalhaMessage, InclusaoTitle);
     Exit;
   end;
 
@@ -315,7 +283,7 @@ begin
 
         if (TodasEmpresas = nil) or (EmpresasPermitidas = nil) then
         begin
-          Avisar(AFeedback, EmpresasFalhaMessage, InclusaoTitle);
+          FView.ShowWarning(EmpresasFalhaMessage, InclusaoTitle);
           Exit;
         end;
 
@@ -350,32 +318,30 @@ begin
       // Falha de leitura ou de montagem interrompe a inclusao; nenhuma opcao
       // parcial e devolvida.
       SetLength(AOpcoes, 0);
-      Avisar(AFeedback, EmpresasFalhaMessage, InclusaoTitle);
+      FView.ShowWarning(EmpresasFalhaMessage, InclusaoTitle);
     end;
   finally
     TodasEmpresas.Free;
   end;
 end;
 
-function TGruposFiscaisPresenter.Salvar(const ARascunho: GrupoFiscalEtd;
-  const AFeedback: IViewFeedback): TGrupoFiscalSaveResult;
+function TGruposFiscaisPresenter.Salvar(
+  const ARascunho: GrupoFiscalEtd): Boolean;
 var
   Autorizacao: TAuthorizationResult;
   Resultado: CreateEntityUseCaseOutPut;
 begin
-  Result.Outcome := gfsoFalha;
-  SetLength(Result.Erros, 0);
+  Result := False;
 
   if ARascunho = nil then
   begin
-    InformarErro(AFeedback, RascunhoAusenteMessage, SalvarTitle);
+    FView.ShowError('O rascunho do grupo fiscal não foi informado.', SalvarTitle);
     Exit;
   end;
 
   if FAuthorization = nil then
   begin
-    Avisar(AFeedback, GravacaoIndisponivelMessage, AutorizacaoTitle);
-    Result.Outcome := gfsoIndisponivel;
+    FView.ShowWarning(GravacaoIndisponivelMessage, AutorizacaoTitle);
     Exit;
   end;
 
@@ -383,8 +349,7 @@ begin
     Autorizacao := FAuthorization.Authorize(ProcessoGravacao, aaSalvar,
       TabelaGruposFiscais);
   except
-    Avisar(AFeedback, GravacaoIndisponivelMessage, AutorizacaoTitle);
-    Result.Outcome := gfsoIndisponivel;
+    FView.ShowWarning(GravacaoIndisponivelMessage, AutorizacaoTitle);
     Exit;
   end;
 
@@ -392,14 +357,10 @@ begin
     aoAllowed:
       ;
     aoDenied:
-      begin
-        // A negativa ou o cancelamento ja foi apresentado pelo legado.
-        Result.Outcome := gfsoNegado;
-        Exit;
-      end;
+      // A negativa ou o cancelamento ja foi apresentado pelo legado.
+      Exit;
   else
-    Avisar(AFeedback, GravacaoIndisponivelMessage, AutorizacaoTitle);
-    Result.Outcome := gfsoIndisponivel;
+    FView.ShowWarning(GravacaoIndisponivelMessage, AutorizacaoTitle);
     Exit;
   end;
 
@@ -409,26 +370,15 @@ begin
       Resultado := FSalvarGrupoFiscal.Executar(ARascunho);
 
       if Resultado.Validation.IsValid then
-        Result.Outcome := gfsoSalvo
+        Result := True
       else
-      begin
-        Result.Erros := TraduzirValidacao(Resultado.Validation);
-        Result.Outcome := gfsoValidacao;
-      end;
+        FView.ExibirErrosDeCampo(TraduzirValidacao(Resultado.Validation));
     except
       on E: EValidacaoNegocio do
-      begin
-        Result.Outcome := gfsoFalha;
-        SetLength(Result.Erros, 0);
-        InformarErro(AFeedback, E.Message, SalvarTitle);
-      end;
+        FView.ShowError(E.Message, SalvarTitle);
       on E: Exception do
-      begin
         // O texto tecnico do banco nao deve chegar a interface.
-        Result.Outcome := gfsoFalha;
-        SetLength(Result.Erros, 0);
-        InformarErro(AFeedback, SalvarFalhaMessage, SalvarTitle);
-      end;
+        FView.ShowError('Não foi possível salvar o grupo fiscal.', SalvarTitle);
     end;
   finally
     // O resultado do caso de uso libera a entidade persistida; o apresentador

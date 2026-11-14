@@ -19,7 +19,9 @@ uses
   WindowsRegistryLocalPreferences, ColumnLayoutPreferences,
   ColumnLayoutPreferencesRepository, StandardQueryFilterDefinition,
   QueryPreviewReader, QueryResultOperations, GridColumnDefinition,
-  NextSetup, EventosRtcPresenter, GruposFiscaisPresenter, IDataSetReaderUnit;
+  NextSetup, EventosRtcPresenter, GruposFiscaisPresenter, GruposFiscaisQuery,
+  AuthorizationService, RemoverGrupoFiscalUseCaseUnit,
+  SalvarGrupoFiscalUseCaseUnit, ListarEmpresasUseCaseUnit, IDataSetReaderUnit;
 
 var
   FRegistry: TNextViewRegistry;
@@ -157,9 +159,16 @@ begin
 
   View := TfrmGruposFiscais.CreateParented(AParent);
   try
-    // A composicao resolve o apresentador do contexto atual. A tela o possui e
-    // permanece responsavel pelo leitor e pelo conjunto retornado.
-    Presenter := NextSetupInstance.Resolve<TGruposFiscaisPresenter>;
+    // O apresentador recebe a tela como view; as demais dependencias continuam
+    // vindo do container do Setup. A tela possui o apresentador e permanece
+    // responsavel pelo leitor e pelo conjunto retornado.
+    Presenter := TGruposFiscaisPresenter.Create(View,
+      NextSetupInstance.Resolve<IGruposFiscaisQuery>,
+      NextSetupInstance.Resolve<IAuthorizationService>,
+      NextSetupInstance.Resolve<IRemoverGrupoFiscalUseCase>,
+      NextSetupInstance.Resolve<ISalvarGrupoFiscalUseCase>,
+      NextSetupInstance.Resolve<ListarEmpresasUseCase>,
+      NextSetupInstance.SessionContext);
     try
       // Ordenacao no conjunto carregado, sem coluna de marcacao e sem filtro
       // rapido; a ordem inicial continua sendo a da consulta (SEQID).

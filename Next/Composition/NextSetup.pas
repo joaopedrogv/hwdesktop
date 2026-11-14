@@ -45,7 +45,7 @@ type
       const AUserLogin, ADatabaseName, ADatabaseUserName,
       ADatabasePassword: string);
     procedure Release;
-    function Resolve<T: class>: T;
+    function Resolve<T>: T;
     property Adapter: IDataBaseConnection read GetAdapter;
     property SessionContext: ISessionContext read FSessionContext;
     property DataSetSorter: IDataSetSorter read GetDataSetSorter;

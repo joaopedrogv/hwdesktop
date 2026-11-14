@@ -11,7 +11,7 @@ implementation
 
 uses
   EventosRtcQuery, EventosRtcPresenter, GruposFiscaisQuery,
-  GruposFiscaisPresenter, AuthorizationService, NextAuthorizationAdapter,
+  AuthorizationService, NextAuthorizationAdapter,
   IGruposFiscaisRepositoryUnit, GruposFiscaisRepositoryUnit,
   RemoverGrupoFiscalUseCaseUnit, SalvarGrupoFiscalUseCaseUnit,
   ListarEmpresasUseCaseUnit, IEmpresasRepositoryUnit, EmpresasRepositoryUnit;
@@ -40,8 +40,6 @@ begin
   AContainer.RegisterType<IEmpresasRepository, EmpresasRepository>.AsSingleton;
   AContainer.RegisterType<ListarEmpresasUseCase>.AsSingleton;
   AContainer.RegisterType<ISalvarGrupoFiscalUseCase, SalvarGrupoFiscalUseCase>.AsTransient;
-
-  AContainer.RegisterType<TGruposFiscaisPresenter>.AsTransient;
 end;
 
 end.

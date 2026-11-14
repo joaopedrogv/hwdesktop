@@ -164,6 +164,7 @@
         <DCCReference Include="..\..\Modern\Core\Domain\Types\Shared\StatusRegistroEnumUnit.pas"/>
         <DCCReference Include="..\Contracts\GridColumnDefinition.pas"/>
         <DCCReference Include="..\Contracts\ViewFeedback.pas"/>
+        <DCCReference Include="..\Contracts\GruposFiscaisView.pas"/>
         <DCCReference Include="..\Contracts\AuthorizationService.pas"/>
         <DCCReference Include="..\Contracts\GrupoFiscalCadastro.pas"/>
         <DCCReference Include="..\Infrastructure\Authorization\NextAuthorizationAdapter.pas"/>

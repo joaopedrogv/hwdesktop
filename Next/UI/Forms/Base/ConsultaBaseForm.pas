@@ -15,12 +15,6 @@ type
   TConsultaReaderFactory = reference to function(
     const ACriteria: TFilterCriteria): IDataSetReader;
 
-  // Desfecho de um comando do rodape da inclusao. A base so solicita o
-  // fechamento da aba em rciConcluido; rciEncerrado informa que a inclusao
-  // terminou durante a gravacao e nao existe mais aba a tratar.
-  TResultadoComandoInclusao = (rciConcluido, rciValidacao, rciNegado,
-    rciIndisponivel, rciFalha, rciEncerrado);
-
   // Intencao registrada no clique: somente a gravacao confirmada reconsulta a
   // grade depois de liberar a inclusao. ifaNenhuma e o valor inicial do form.
   TIntencaoFechamentoAbaInclusao = (ifaNenhuma, ifaSalvar, ifaCancelar);
@@ -116,7 +110,9 @@ type
     // Chamado depois de a base liberar a aba parcial: somente limpa estado
     // proprio, sem tocar em controle ja destruido.
     procedure AoFalharAberturaAbaInclusao; virtual;
-    function SalvarInclusao: TResultadoComandoInclusao; virtual;
+    // True quando a gravacao foi confirmada e a inclusao pode ser encerrada;
+    // a base registra o fechamento diferido e reconsulta depois do clique.
+    function SalvarInclusao: Boolean; virtual;
     // Aviso de gravacao confirmada cuja reconsulta falhou. O descendente
     // fornece a mensagem de negocio; a base chama depois de fechar a aba.
     procedure AvisarSalvamentoSemAtualizacao; virtual;
@@ -502,9 +498,9 @@ procedure TfrmConsultaBase.AoFalharAberturaAbaInclusao;
 begin
 end;
 
-function TfrmConsultaBase.SalvarInclusao: TResultadoComandoInclusao;
+function TfrmConsultaBase.SalvarInclusao: Boolean;
 begin
-  Result := rciIndisponivel;
+  Result := False;
 end;
 
 procedure TfrmConsultaBase.AvisarSalvamentoSemAtualizacao;
@@ -729,7 +725,7 @@ begin
 
   DefinirComandosHabilitados(False);
   try
-    if SalvarInclusao <> rciConcluido then
+    if not SalvarInclusao then
       Exit;
 
     // Gravacao confirmada: o fechamento e solicitado agora e concluido depois

@@ -24,16 +24,6 @@ type
 
   TGrupoFiscalFieldErrors = TArray<TGrupoFiscalFieldError>;
 
-  // Desfecho da gravacao. Os tres desfechos de interrupcao permanecem
-  // distintos para diagnostico, embora a tela os trate do mesmo modo.
-  TGrupoFiscalSaveOutcome = (gfsoSalvo, gfsoValidacao, gfsoNegado,
-    gfsoIndisponivel, gfsoFalha);
-
-  TGrupoFiscalSaveResult = record
-    Outcome: TGrupoFiscalSaveOutcome;
-    Erros: TGrupoFiscalFieldErrors;
-  end;
-
 const
   // Nomes de campo produzidos pelo validador de SalvarGrupoFiscalUseCase.
   GrupoFiscalCampoDescricao = 'Descricao';
