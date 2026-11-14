@@ -5,7 +5,9 @@ interface
 type
   // Acao tipada solicitada a autorizacao. O adaptador converte para o texto
   // usado pelo host; manter a acao tipada evita strings soltas no chamador.
-  TAuthorizationAction = (aaVisualizar, aaExcluir);
+  // Inclusao e gravacao tambem sao acoes tipadas: cada uma tem processo e
+  // tabela proprios na funcionalidade que a solicita.
+  TAuthorizationAction = (aaVisualizar, aaExcluir, aaInserir, aaSalvar);
 
   // Resultado da verificacao de autorizacao. aoDenied indica negativa ou
   // cancelamento apresentado pelo mecanismo legado; aoUnavailable cobre

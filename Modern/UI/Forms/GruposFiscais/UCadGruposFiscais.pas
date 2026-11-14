@@ -42,20 +42,20 @@ type
     procedure MapStateToForm();
     procedure MapFormToState();
   public
-    
+
   end;
 
 implementation
 
 uses
-  uDtmAtivo, UIUtilsUnit, hw_utils, hw_grid_utils, Math, DB,      
+  uDtmAtivo, UIUtilsUnit, hw_utils, hw_grid_utils, Math, DB,
   FieldsConfigUnit,
   TipoTributoFiscalEnumUnit, Contnrs, UIFormValidatorFactoryUnit,
   ContainerUnit, CreateEntityUseCaseOutputUnit,
   EValidacaoNegocioUnit, StatusRegistroEnumUnit, TipoComunsUnit;
 
 type
-  TGruposFiscaisOOP = class(TDataSet_OOP)   
+  TGruposFiscaisOOP = class(TDataSet_OOP)
   private
     procedure GetText(Sender: TField; var Text: string; DisplayText: Boolean);
   public
@@ -77,7 +77,7 @@ begin
       .Add('descricao', '', fvSempreVisivel)
       .Add('tipo_tributo', 'Tipo Tributo', GetText)
       .Add('gerido_sistema', 'Sistema', GetText)
-  );                                            
+  );
 
   montaSelect('SELECT * FROM GRUPOS_FISCAIS WHERE 1=0');
 end;
@@ -138,7 +138,7 @@ begin
 
     MapStateToForm();
     ShowAbaCadastro();
-    
+
   finally
     Screen.Cursor := crDefault;
   end;
@@ -148,36 +148,26 @@ procedure TfrmCadGruposFiscais.BitBtn4Click(Sender: TObject);
 var
   createResult: CreateEntityUseCaseOutPut;
 begin
-  MapFormToState();   
+  MapFormToState();
 
   if not FAuditor.Processo('MOD011').Salvar()
     .SetMensagem('%d - %s', [FState.SeqId, FState.Descricao] )
     .Permitido() then
     Exit;
 
-  try
+  try try
+    createResult := Container.GetInstance().ErpFeaturesFactory.CreateSalvarGruposFiscaisUseCase().Executar(FState);
 
-    try
-      with Container.GetInstance().ErpFeaturesFactory.CreateSalvarGruposFiscaisUseCase() do
-      try
-        createResult := Executar( FState );
-      finally
-        FreeSafe();
-      end;
-
-      if not createResult.Validation.IsValid then
-        FFormValidator.Validate(createResult.Validation)
-
-      else
-      begin
-        inherited;
-        FData.Refresh();
-      end;
-
-    finally
-      createResult.Free();
+    if not createResult.Validation.IsValid then
+      FFormValidator.Validate(createResult.Validation)
+    else
+    begin
+      inherited;
+      FData.Refresh();
     end;
-
+  finally
+    createResult.Free();
+  end;
   except on E: Exception do
     UIUtils.HandleError(E);
   end;
@@ -196,7 +186,7 @@ procedure TfrmCadGruposFiscais.FormClose(Sender: TObject;
 begin
   FData.Free();
   FState.Free();
-                     
+
   Action := caFree;
 
   inherited;
@@ -275,7 +265,7 @@ begin
   edTipoTributo.Enabled := FState.Id = '';
 
   if edDescricao.CanFocus then
-    edDescricao.SetFocus;  
+    edDescricao.SetFocus;
 end;
 
 procedure TfrmCadGruposFiscais.SpeedButton1Click(Sender: TObject);
@@ -330,15 +320,10 @@ begin
     Exit;
 
   try
-    with Container.GetInstance().ErpFeaturesFactory.CreateRemoverGruposFiscaisUseCase() do
-    try
-       Executar(FData.fstr('id'))
-    finally
-      FreeSafe();
-    end;
+    Container.GetInstance().ErpFeaturesFactory.CreateRemoverGruposFiscaisUseCase()
+      .Executar(FData.fstr('id'));
 
     FData.Refresh();
-
   except
     on E: Exception do
       UIUtils.HandleError(E);
@@ -346,4 +331,3 @@ begin
 end;
 
 end.
-

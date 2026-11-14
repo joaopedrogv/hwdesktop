@@ -85,8 +85,6 @@ type
   IListarTodasEmpresasUseCase = ListarEmpresasUseCase;
   IListarEmpresasPermitidasUseCase = ListarEmpresasUseCase;
   IObterGrupoFiscalPorIdUseCase = ObterGrupoFiscalPorIdUseCase;
-  ISalvarGrupoFiscalUseCase = SalvarGrupoFiscalUseCase;
-  IRemoverGrupoFiscalUseCase = RemoverGrupoFiscalUseCase;
   IObterOperacaoInternaPorIdUseCase = ObterOperacaoInternaPorIdUseCase;
   ISalvarOperacaoInternaUseCase = SalvarOperacaoInternaUseCase;
   IRemoverOperacaoInternaUseCase = RemoverOperacaoInternaUseCase;
@@ -549,6 +547,7 @@ end;
 function ErpFeaturesFactory.CreateCriarGruposFiscaisDeAnexosUseCase: ICriarGruposFiscaisDeAnexosUseCase;
 begin
   Result := CriarGruposFiscaisDeAnexosUseCase.Create(
+    FDatabaseConnection,
     ErpFeaturesRepoContainer.GetInstance().GruposFiscaisRepo,
     SharedRepoContainer.GetInstance().AnexosRepo,
     ErpFeaturesRepoContainer.GetInstance().EmpresasRepo
@@ -1147,6 +1146,7 @@ end;
 function ErpFeaturesFactory.CreateSalvarGruposFiscaisUseCase: ISalvarGrupoFiscalUseCase;
 begin
   Result := SalvarGrupoFiscalUseCase.Create(
+    FDatabaseConnection,
     ErpFeaturesRepoContainer.GetInstance().GruposFiscaisRepo
   );
 end;

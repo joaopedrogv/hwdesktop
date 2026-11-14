@@ -15,6 +15,7 @@ uses
   QueryFilterSqlBuilder in '..\Queries\Shared\Filters\QueryFilterSqlBuilder.pas',
   FilterFrame in '..\UI\Frames\Shared\Filters\FilterFrame.pas' {frmFilterFrame: TFrame},
   ColumnSelectionFrame in '..\UI\Frames\Shared\Columns\ColumnSelectionFrame.pas' {frmColumnSelectionFrame: TFrame},
+  GrupoFiscalCadastroFrame in '..\UI\Frames\Features\GruposFiscais\GrupoFiscalCadastroFrame.pas' {frmGrupoFiscalCadastroFrame: TFrame},
   QueryStandardForm in '..\UI\Forms\Base\QueryStandardForm.pas' {frmQueryStandard},
   QueryResultForm in '..\UI\Forms\Base\QueryResultForm.pas' {frmQueryResult},
   ColumnSelectionForm in '..\UI\Forms\Shared\Columns\ColumnSelectionForm.pas' {frmColumnSelection: TForm},
@@ -45,6 +46,7 @@ uses
   GridColumnDefinition in '..\Contracts\GridColumnDefinition.pas',
   ViewFeedback in '..\Contracts\ViewFeedback.pas',
   AuthorizationService in '..\Contracts\AuthorizationService.pas',
+  GrupoFiscalCadastro in '..\Contracts\GrupoFiscalCadastro.pas',
   ColumnLayoutPreferences in '..\..\Modern\Core\Domain\Ports\Shared\ColumnLayoutPreferences.pas',
   ColumnLayoutPreferencesRepository in '..\..\Modern\Adapters\Secondary\Preferences\ColumnLayoutPreferencesRepository.pas',
   QueryPreviewReader in '..\Composition\QueryPreviewReader.pas';

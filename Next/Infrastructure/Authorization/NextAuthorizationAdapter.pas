@@ -44,6 +44,10 @@ begin
       ActionText := 'VISUALIZAR';
     aaExcluir:
       ActionText := 'EXCLUIR';
+    aaInserir:
+      ActionText := 'INSERIR';
+    aaSalvar:
+      ActionText := 'SALVAR';
   else
     ActionText := '';
   end;
