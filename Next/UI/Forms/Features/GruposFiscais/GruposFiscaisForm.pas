@@ -4,54 +4,49 @@ interface
 
 uses
   Winapi.Windows, System.SysUtils, Data.DB, Vcl.Controls, Vcl.Forms,
-  Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, QueryResultForm, FilterCriterion,
-  IDataSetReaderUnit, GridColumnDefinition, GruposFiscaisPresenter,
-  QueryResultOperations, GrupoFiscalCadastro, GrupoFiscalEtdUnit,
-  TipoTributoFiscalEnumUnit, GrupoFiscalCadastroFrame;
+  Vcl.StdCtrls, ConsultaBaseForm, FilterCriterion, IDataSetReaderUnit,
+  GridColumnDefinition, GruposFiscaisPresenter, QueryResultOperations,
+  GrupoFiscalCadastro, GrupoFiscalEtdUnit, GrupoFiscalCadastroFrame;
 
 type
   // Tela de consulta e inclusao de Grupos Fiscais. Herda a apresentacao
   // generica e acrescenta a consulta, o envio da linha corrente para a lixeira
-  // e a inclusao em uma aba propria. O apresentador e o leitor sao injetados
-  // pela composicao; o rascunho da inclusao pertence a esta tela.
-  TfrmGruposFiscais = class(TfrmQueryResult)
-    pcAbas: TPageControl;
-    tsConsulta: TTabSheet;
-    tsCadastro: TTabSheet;
-    sbCadastro: TScrollBox;
-    fraCadastro: TfrmGrupoFiscalCadastroFrame;
-    pnAcoesCadastro: TPanel;
-    btnSalvar: TButton;
-    btnCancelar: TButton;
-    btnEnviarLixeira: TButton;
-    pnComandosConsulta: TPanel;
+  // e a inclusao em uma aba dinamica. O apresentador e o leitor sao injetados
+  // pela composicao; o rascunho pertence a esta tela e o editor pertence a aba
+  // criada pela base.
+  TfrmGruposFiscais = class(TfrmConsultaBase)
     btnNovo: TButton;
-    procedure btnEnviarLixeiraClick(Sender: TObject);
+    btnEnviarLixeira: TButton;
     procedure btnNovoClick(Sender: TObject);
-    procedure btnSalvarClick(Sender: TObject);
-    procedure btnCancelarClick(Sender: TObject);
+    procedure btnEnviarLixeiraClick(Sender: TObject);
   private
     FPresenter: TGruposFiscaisPresenter;
     // Rascunho da inclusao corrente. A existencia do objeto e a pendencia: na
     // inclusao nao existe estado aberto sem alteracao a gravar, porque as
     // empresas permitidas ja iniciam marcadas.
     FDraft: GrupoFiscalEtd;
-    FAbasPreparadas: Boolean;
+    // Referencia ao editor criado pela base para a aba aberta. A posse do
+    // controle e da area de rolagem da aba, que o libera junto com ela.
+    FEditor: TfrmGrupoFiscalCadastroFrame;
+    // Empresas lidas antes de abrir a aba, mantidas ate o preparo do editor.
+    FOpcoesEmpresas: TGrupoFiscalEmpresaOptions;
     function LerLinhaCorrente(out AId, ADescricao: string): Boolean;
     function PesquisarGrupos(
       const ACriteria: TFilterCriteria): IDataSetReader;
-    // Move os frames herdados para a aba de consulta e revela o page control.
-    // Executado uma unica vez, na primeira apresentacao da instancia.
-    procedure PrepararAbas;
-    procedure DescartarRascunho;
-    procedure AtualizarComandos;
   protected
     function CanPesquisar: Boolean; override;
-    procedure DoInitializeView; override;
+    // A base cria a aba, o rodape e a area de rolagem; a tela fornece o editor
+    // tipado usado pelos hooks de abertura, gravacao e foco.
+    function CriarEditorInclusao(AParent: TWinControl): TWinControl; override;
+    function TituloAbaInclusao: string; override;
+    procedure AoAbrirAbaInclusao; override;
+    procedure AoFecharAbaInclusao; override;
+    procedure AoFalharAberturaAbaInclusao; override;
+    function SalvarInclusao: TResultadoComandoInclusao; override;
+    procedure AvisarSalvamentoSemAtualizacao; override;
   public
     destructor Destroy; override;
     function HasPendingChanges: Boolean; override;
-    procedure ResetForSessionChange; override;
     procedure FocusView; override;
     procedure AttachPresenter(APresenter: TGruposFiscaisPresenter;
       const AColumns: TGridColumnDefinitions; const ATitle: string;
@@ -87,7 +82,8 @@ destructor TfrmGruposFiscais.Destroy;
 begin
   try
     // Nenhum controle e tocado na destruicao: apenas a posse dos objetos
-    // transientes desta tela e liberada.
+    // transientes desta tela e liberada. A base e os componentes do formulario
+    // liberam a aba, o editor e o resultado.
     FreeAndNil(FDraft);
     FreeAndNil(FPresenter);
   finally
@@ -124,43 +120,106 @@ begin
   Result := (FPresenter <> nil) and FPresenter.AutorizarPesquisa(Self);
 end;
 
-procedure TfrmGruposFiscais.PrepararAbas;
+function TfrmGruposFiscais.CriarEditorInclusao(
+  AParent: TWinControl): TWinControl;
 begin
-  if FAbasPreparadas then
-    Exit;
-
-  // Os frames herdados passam a viver na aba de consulta. Reparentar preserva
-  // as instancias, os eventos, o DataSource e o leiaute de colunas ja
-  // configurados; recriar os frames duplicaria filtros e grade.
-  pnFiltros.Parent := tsConsulta;
-  fraGrid.Parent := tsConsulta;
-  pnFiltros.Align := alTop;
-  fraGrid.Align := alClient;
-  pcAbas.Align := alClient;
-  pcAbas.Visible := True;
-
-  // A aba de cadastro so aparece depois de uma inclusao autorizada com as
-  // empresas carregadas; ate entao a tela apresenta apenas a consulta.
-  tsCadastro.TabVisible := False;
-  pcAbas.ActivePage := tsConsulta;
-
-  FAbasPreparadas := True;
+  // O editor nasce pertencendo a area de rolagem: quando a aba for liberada, a
+  // area leva o editor junto e nao existe uma segunda liberacao.
+  FEditor := TfrmGrupoFiscalCadastroFrame.Create(AParent);
+  Result := FEditor;
 end;
 
-procedure TfrmGruposFiscais.DoInitializeView;
+function TfrmGruposFiscais.TituloAbaInclusao: string;
 begin
-  // As abas sao preparadas antes da inicializacao da base: o posicionamento de
-  // btnEnviarLixeira e o calculo da largura minima usam a geometria final.
-  PrepararAbas;
-  inherited;
-  // O botao de envio para a lixeira fica a esquerda do Pesquisar, com a mesma
-  // ancora direita. ConfigureFilters (chamado pela composicao antes desta
-  // inicializacao) ja reposicionou btnPesquisar a 16 px da borda direita.
-  btnEnviarLixeira.Anchors := [akTop, akRight];
-  btnEnviarLixeira.Top := btnPesquisar.Top;
-  btnEnviarLixeira.Left := btnPesquisar.Left - btnEnviarLixeira.Width - 8;
-  Constraints.MinWidth := btnEnviarLixeira.Left +
-    btnEnviarLixeira.Width + 8 + btnPesquisar.Width + 16;
+  // A aba de inclusao usa o mesmo titulo da janela de inclusao da tela.
+  Result := InclusaoTitle;
+end;
+
+procedure TfrmGruposFiscais.AoAbrirAbaInclusao;
+begin
+  // A aba ja esta montada; o rascunho nasce aqui para que HasPendingChanges
+  // reflita exatamente o periodo de edicao.
+  FEditor.PrepararInclusao(FOpcoesEmpresas);
+  FDraft := GrupoFiscalEtd.Create;
+end;
+
+procedure TfrmGruposFiscais.AoFecharAbaInclusao;
+begin
+  // A base libera a aba em seguida: nenhuma referencia pode sobreviver ao
+  // editor, e o rascunho pertence ao mesmo escopo da aba.
+  FEditor := nil;
+  FreeAndNil(FDraft);
+  FOpcoesEmpresas := nil;
+end;
+
+procedure TfrmGruposFiscais.AoFalharAberturaAbaInclusao;
+begin
+  // A aba parcial ja foi liberada pela base; limpar apenas o estado proprio
+  // evita apontar para o editor destruido.
+  FEditor := nil;
+  FreeAndNil(FDraft);
+  FOpcoesEmpresas := nil;
+end;
+
+function TfrmGruposFiscais.SalvarInclusao: TResultadoComandoInclusao;
+var
+  Resultado: TGrupoFiscalSaveResult;
+begin
+  Result := rciFalha;
+  if (FDraft = nil) or (FEditor = nil) or (FPresenter = nil) then
+    Exit;
+
+  // Somente os tres campos da aba sao mapeados; os demais permanecem com os
+  // padroes de criacao do rascunho.
+  FDraft.Descricao := Trim(FEditor.Descricao);
+  FDraft.TipoTributo := FEditor.TipoTributo;
+  FDraft.EmpresasId := FEditor.EmpresasSelecionadas;
+  FEditor.LimparValidacao;
+
+  try
+    Resultado := FPresenter.Salvar(FDraft, Self);
+  except
+    // O apresentador traduz as falhas esperadas; este resguardo impede que uma
+    // excecao inesperada atravesse o manipulador de evento.
+    ShowError(SalvarFalhaMessage, SalvarTitle);
+    Exit;
+  end;
+
+  // Uma mensagem modal do apresentador pode despachar uma troca de sessao, que
+  // encerra a inclusao. Sem rascunho e sem editor nao existe aba para corrigir:
+  // encerrar aqui evita tocar em objetos ja liberados.
+  if (FDraft = nil) or (FEditor = nil) then
+  begin
+    Result := rciEncerrado;
+    Exit;
+  end;
+
+  case Resultado.Outcome of
+    gfsoSalvo:
+      // A base registra o pedido e so fecha a aba e reconsulta depois que o
+      // evento de clique retornar; a grade nao e atualizada aqui.
+      Result := rciConcluido;
+    gfsoValidacao:
+      begin
+        // O erro fica no proprio campo e a aba permanece com o digitado.
+        FEditor.ExibirValidacao(Resultado.Erros);
+        FEditor.FocarPrimeiroCampoInvalido;
+        Result := rciValidacao;
+      end;
+    gfsoNegado:
+      Result := rciNegado;
+    gfsoIndisponivel:
+      Result := rciIndisponivel;
+    gfsoFalha:
+      Result := rciFalha;
+  end;
+end;
+
+procedure TfrmGruposFiscais.AvisarSalvamentoSemAtualizacao;
+begin
+  // A base ja fechou a aba e descartou o rascunho; a mensagem confirma a
+  // gravacao e orienta a atualizar a consulta.
+  ShowWarning(GrupoSalvoAtualizacaoFalhouMessage, SalvarTitle);
 end;
 
 function TfrmGruposFiscais.HasPendingChanges: Boolean;
@@ -169,151 +228,54 @@ begin
   Result := FDraft <> nil;
 end;
 
-procedure TfrmGruposFiscais.ResetForSessionChange;
-begin
-  // O rascunho pertence ao usuario anterior: descartar antes da limpeza do
-  // resultado evita reabrir a inclusao com as empresas de outra sessao. O foco
-  // nao e definido aqui porque a janela pode estar oculta.
-  DescartarRascunho;
-  inherited;
-end;
-
 procedure TfrmGruposFiscais.FocusView;
 begin
-  // Com a aba de cadastro ativa, o foco pertence ao primeiro campo invalido (ou
+  // Com a aba de inclusao ativa, o foco pertence ao primeiro campo invalido (ou
   // a descricao). Nas demais situacoes a base decide.
-  if pcAbas.ActivePage = tsCadastro then
+  if AbaInclusaoAtiva and (FEditor <> nil) then
   begin
-    fraCadastro.FocarPrimeiroCampoInvalido;
+    FEditor.FocarPrimeiroCampoInvalido;
     Exit;
   end;
 
   inherited;
-end;
-
-procedure TfrmGruposFiscais.AtualizarComandos;
-var
-  EmInclusao: Boolean;
-begin
-  // Sem rascunho apenas o Novo esta disponivel; com rascunho, a tela oferece a
-  // gravacao e o cancelamento e impede substituir a inclusao corrente.
-  EmInclusao := FDraft <> nil;
-  btnNovo.Enabled := not EmInclusao;
-  btnSalvar.Enabled := EmInclusao;
-  btnCancelar.Enabled := EmInclusao;
-end;
-
-procedure TfrmGruposFiscais.DescartarRascunho;
-begin
-  FreeAndNil(FDraft);
-
-  // A consulta volta a ser a unica aba visivel. Os valores dos campos
-  // permanecem na aba oculta e sao reiniciados na proxima inclusao.
-  pcAbas.ActivePage := tsConsulta;
-  tsCadastro.TabVisible := False;
-  fraCadastro.LimparValidacao;
-  AtualizarComandos;
 end;
 
 procedure TfrmGruposFiscais.btnNovoClick(Sender: TObject);
 var
   Opcoes: TGrupoFiscalEmpresaOptions;
 begin
-  btnNovo.Enabled := False;
-  try
-    if FPresenter = nil then
-    begin
-      ShowError(MissingPresenterMessage, InclusaoTitle);
-      Exit;
-    end;
-
-    // A negativa ou o cancelamento da autorizacao de inclusao ja foi
-    // apresentado pelo legado: a tela permanece na consulta sem repetir a
-    // mensagem.
-    if not FPresenter.AutorizarInclusao(Self) then
-      Exit;
-
-    // Sem as empresas nao ha o que incluir; o apresentador ja informou a falha.
-    if not FPresenter.CarregarEmpresas(Self, Opcoes) then
-      Exit;
-
-    try
-      DescartarRascunho;
-      FDraft := GrupoFiscalEtd.Create;
-      fraCadastro.PrepararInclusao(Opcoes);
-
-      // A aba so aparece depois da autorizacao e das empresas carregadas; ao
-      // ativar depois de torna-la visivel nenhuma aba invisivel e ativada.
-      tsCadastro.TabVisible := True;
-      pcAbas.ActivePage := tsCadastro;
-      fraCadastro.FocarPrimeiroCampoInvalido;
-    except
-      // Uma falha inesperada nao pode deixar meia inclusao aberta: o descarte
-      // devolve a tela a consulta antes do aviso.
-      DescartarRascunho;
-      ShowError(NovaInclusaoFalhaMessage, InclusaoTitle);
-    end;
-  finally
-    AtualizarComandos;
+  // Reabrir devolve a aba existente sem repetir autorizacao nem recarregar as
+  // empresas: o rascunho ainda pertence a sessao atual.
+  if AbaInclusaoAberta then
+  begin
+    AtivarAbaInclusao;
+    Exit;
   end;
-end;
 
-procedure TfrmGruposFiscais.btnSalvarClick(Sender: TObject);
-var
-  Resultado: TGrupoFiscalSaveResult;
-begin
-  if FDraft = nil then
+  if FPresenter = nil then
+  begin
+    ShowError(MissingPresenterMessage, InclusaoTitle);
+    Exit;
+  end;
+
+  // A negativa ou o cancelamento da autorizacao de inclusao ja foi apresentado
+  // pelo legado: a tela permanece na consulta sem repetir a mensagem.
+  if not FPresenter.AutorizarInclusao(Self) then
     Exit;
 
-  // Somente os tres campos da aba sao mapeados; os demais permanecem com os
-  // padroes de criacao do rascunho.
-  FDraft.Descricao := Trim(fraCadastro.Descricao);
-  FDraft.TipoTributo := fraCadastro.TipoTributo;
-  FDraft.EmpresasId := fraCadastro.EmpresasSelecionadas;
+  // Sem as empresas nao ha o que incluir; o apresentador ja informou a falha.
+  if not FPresenter.CarregarEmpresas(Self, Opcoes) then
+    Exit;
 
-  fraCadastro.LimparValidacao;
-
-  btnSalvar.Enabled := False;
-  btnCancelar.Enabled := False;
+  FOpcoesEmpresas := Opcoes;
   try
-    try
-      Resultado := FPresenter.Salvar(FDraft, Self);
-    except
-      // O apresentador traduz as falhas esperadas; este resguardo impede que
-      // uma excecao inesperada atravesse o manipulador de evento.
-      ShowError(SalvarFalhaMessage, SalvarTitle);
-      Exit;
-    end;
-
-    case Resultado.Outcome of
-      gfsoValidacao:
-        begin
-          // A mensagem junto ao campo substitui o dialogo de validacao.
-          fraCadastro.ExibirValidacao(Resultado.Erros);
-          fraCadastro.FocarPrimeiroCampoInvalido;
-        end;
-      gfsoSalvo:
-        begin
-          // A grade atualizada e a confirmacao da gravacao; nao ha dialogo de
-          // sucesso. Uma falha apenas da reconsulta informa que o grupo foi
-          // salvo e orienta refazer a pesquisa.
-          DescartarRascunho;
-          if not RepetirPesquisa then
-            ShowWarning(GrupoSalvoAtualizacaoFalhouMessage, SalvarTitle);
-        end;
-      // gfsoNegado, gfsoIndisponivel e gfsoFalha mantem o rascunho e a aba: a
-      // mensagem, quando existe, ja foi apresentada pelo apresentador.
-    end;
-  finally
-    AtualizarComandos;
+    AbrirAbaInclusao;
+  except
+    // A base ja liberou a aba parcial e o hook de falha limpou FEditor/FDraft;
+    // aqui resta informar a falha ao usuario.
+    ShowError(NovaInclusaoFalhaMessage, InclusaoTitle);
   end;
-end;
-
-procedure TfrmGruposFiscais.btnCancelarClick(Sender: TObject);
-begin
-  // A inclusao e um registro novo nao gravado: descartar nao pede confirmacao,
-  // como no cadastro legado.
-  DescartarRascunho;
 end;
 
 function TfrmGruposFiscais.LerLinhaCorrente(out AId, ADescricao: string): Boolean;

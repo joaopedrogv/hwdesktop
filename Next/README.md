@@ -10,7 +10,7 @@ Com `HwNextHostUnit` no `uses` do chamador, passe o formulário hospedeiro,
 o identificador e as opções de abertura.
 
 ```pascal
-OpenNextView(Self, 'next.validation', NextQueryOptions());
+OpenNextView(Self, 'next.grupos.fiscais', NextQueryOptions());
 ```
 
 | Opções | Abertura | Fechamento individual |
@@ -35,7 +35,7 @@ OpenNextView(Self, 'next.validation', NextQueryOptions());
 O registro existente é um exemplo de tela com a construção padrão.
 
 ```pascal
-FRegistry.Register('next.validation', CreateValidationView);
+FRegistry.Register('next.grupos.fiscais', CreateGruposFiscaisView);
 ```
 
 A composição executa a função apenas para novas instâncias. Reapresentar uma

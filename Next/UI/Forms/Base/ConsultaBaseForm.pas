@@ -1,0 +1,805 @@
+unit ConsultaBaseForm;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Data.DB,
+  Vcl.Controls, Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Forms, Vcl.StdCtrls, NextBaseForm,
+  DataGridFrame, FilterDefinition, FilterCriterion, FilterFrame,
+  GridColumnDefinition, IDataSetReaderUnit, QueryResultOperations,
+  ColumnLayoutPreferences, LocalPreferences;
+
+type
+  // Fabrica de leitores para consultas que montam o SQL a partir dos criterios
+  // coletados. A forma de criar o leitor permanece na composicao.
+  TConsultaReaderFactory = reference to function(
+    const ACriteria: TFilterCriteria): IDataSetReader;
+
+  // Desfecho de um comando do rodape da inclusao. A base so solicita o
+  // fechamento da aba em rciConcluido; rciEncerrado informa que a inclusao
+  // terminou durante a gravacao e nao existe mais aba a tratar.
+  TResultadoComandoInclusao = (rciConcluido, rciValidacao, rciNegado,
+    rciIndisponivel, rciFalha, rciEncerrado);
+
+  // Intencao registrada no clique: somente a gravacao confirmada reconsulta a
+  // grade depois de liberar a inclusao. ifaNenhuma e o valor inicial do form.
+  TIntencaoFechamentoAbaInclusao = (ifaNenhuma, ifaSalvar, ifaCancelar);
+
+const
+  // Mensagem privada da base: o comando da aba e concluido depois que o evento
+  // de clique retorna, quando liberar a aba nao destroi mais o controle em uso.
+  WM_COMANDO_ABA_INCLUSAO = WM_APP + 311;
+
+type
+  // Base unica das consultas Next. Recebe o leitor (ou a fabrica), apresenta o
+  // resultado na grade e oferece a aba Consulta com filtros, Pesquisar e Sair.
+  // Cada inclusao autorizada pela funcionalidade abre uma aba propria, com
+  // rodape, area de rolagem e editor sob posse da base.
+  TfrmConsultaBase = class(TfrmNextBase)
+    pcAbas: TPageControl;
+    tsConsulta: TTabSheet;
+    pnFiltros: TPanel;
+    fraFiltros: TfrmFilterFrame;
+    btnPesquisar: TButton;
+    btnSair: TButton;
+    pnAcoesConsulta: TPanel;
+    fraGrid: TfrmDataGridFrame;
+    dsConsulta: TDataSource;
+    procedure btnSairClick(Sender: TObject);
+  private
+    FFiltersConfigured: Boolean;
+    FFilterDefinition: TFilterDefinition;
+    FReader: IDataSetReader;
+    FReaderFactory: TConsultaReaderFactory;
+    FColumns: TGridColumnDefinitions;
+    FOperations: IQueryResultOperations;
+    FTitle: string;
+    FQuickFilterEnabled: Boolean;
+    FPesquisando: Boolean;
+    // Aba de inclusao corrente e controles que nascem com ela. Todos ficam
+    // nulos assim que a aba e liberada, inclusive antes de qualquer uso tardio.
+    FAbaInclusao: TTabSheet;
+    FRodapeInclusao: TPanel;
+    FBtnSalvarInclusao: TButton;
+    FBtnCancelarInclusao: TButton;
+    // Pedido de fechamento: a intencao diz se ha reconsulta; o token identifica
+    // a aba sem guardar o endereco de um objeto cuja vida nao pode ser verificada.
+    FIntencaoFechamentoAba: TIntencaoFechamentoAbaInclusao;
+    FTokenPedidoAba: Integer;
+    FTokenAbaInclusao: Integer;
+    procedure ClearResult;
+    procedure DoPesquisar(Sender: TObject);
+    function Pesquisar(const AExibirFalha: Boolean): Boolean;
+    procedure GridTitleCtrlClick(Sender: TObject; const AFieldName: string);
+    procedure FrameFeedback(Sender: TObject;
+      const ATitulo, AMensagem: string);
+    procedure PosicionarBotoesPesquisa;
+    function GetAbaInclusaoAberta: Boolean;
+    function GetAbaInclusaoAtiva: Boolean;
+    function GetFechamentoAbaPendente: Boolean;
+    function AbaDoControle(AControle: TControl): TTabSheet;
+    function ComandoDaAbaInclusao(AOrigem: TObject): Boolean;
+    procedure DefinirComandosHabilitados(AHabilitado: Boolean);
+    procedure AtualizarComandosAbaInclusao;
+    procedure btnSalvarAbaInclusaoClick(Sender: TObject);
+    procedure btnCancelarAbaInclusaoClick(Sender: TObject);
+    procedure SolicitarFechamentoAbaInclusao(
+      AIntencao: TIntencaoFechamentoAbaInclusao);
+    procedure TratarPedidoFechamentoAbaInclusao;
+    procedure LimparPedidoFechamentoAbaInclusao;
+    procedure AtualizarAposSalvarInclusao;
+    procedure WMCmdAbaInclusao(var AMessage: TMessage);
+      message WM_COMANDO_ABA_INCLUSAO;
+    property FechamentoAbaPendente: Boolean read GetFechamentoAbaPendente;
+  protected
+    // Permite que a tela filha interrompa a pesquisa antes de limpar o
+    // resultado ou criar um novo leitor. A validacao dos filtros ocorre antes.
+    function CanPesquisar: Boolean; virtual;
+    function CollectFilters: TFilterCriteriaResult;
+    // Repete a pesquisa atual pela mesma sequencia de filtros, autorizacao e
+    // leitura, sem o dialogo generico da falha. Retorna True quando a grade
+    // reflete a consulta, incluindo resultado vazio. Destina-se as telas que
+    // alteram dados e precisam atualizar o resultado com mensagem propria.
+    function RepetirPesquisa: Boolean;
+    procedure DoInitializeView; override;
+    // Cria o editor com Owner = AParent e devolve o controle. A base define
+    // Parent e Align; a area de rolagem libera o editor e o descendente nao o
+    // libera.
+    function CriarEditorInclusao(AParent: TWinControl): TWinControl; virtual;
+    function TituloAbaInclusao: string; virtual;
+    // Chamado com aba, rodape e editor ja montados: e o ponto em que o
+    // rascunho da funcionalidade nasce.
+    procedure AoAbrirAbaInclusao; virtual;
+    // Chamado antes de a base liberar a aba: solta referencias e descarta o
+    // rascunho enquanto o editor ainda existe.
+    procedure AoFecharAbaInclusao; virtual;
+    // Chamado depois de a base liberar a aba parcial: somente limpa estado
+    // proprio, sem tocar em controle ja destruido.
+    procedure AoFalharAberturaAbaInclusao; virtual;
+    function SalvarInclusao: TResultadoComandoInclusao; virtual;
+    // Aviso de gravacao confirmada cuja reconsulta falhou. O descendente
+    // fornece a mensagem de negocio; a base chama depois de fechar a aba.
+    procedure AvisarSalvamentoSemAtualizacao; virtual;
+    // Uma aba de inclusao por janela: reabrir apenas devolve a aba existente,
+    // preservando o digitado e sem repetir autorizacao.
+    function AbrirAbaInclusao: Boolean;
+    procedure FecharAbaInclusao;
+    procedure AtivarAbaInclusao;
+    property AbaInclusaoAberta: Boolean read GetAbaInclusaoAberta;
+    property AbaInclusaoAtiva: Boolean read GetAbaInclusaoAtiva;
+  public
+    destructor Destroy; override;
+    procedure ResetForSessionChange; override;
+    procedure Attach(const AReader: IDataSetReader;
+      const AColumns: TGridColumnDefinitions; const ATitle: string;
+      AOperations: IQueryResultOperations = nil;
+      AQuickFilterEnabled: Boolean = False);
+    procedure AttachReaderFactory(const AFactory: TConsultaReaderFactory;
+      const AColumns: TGridColumnDefinitions; const ATitle: string;
+      AOperations: IQueryResultOperations = nil;
+      AQuickFilterEnabled: Boolean = False);
+    // A grade le e aplica o layout; a tela nao conhece banco nem sessao.
+    procedure AttachColumnLayout(const APreferences: IColumnLayoutPreferences);
+    // Recebe a definicao, as preferencias locais e a identidade estavel da tela.
+    // Configura a instancia inline de fraFiltros somente quando chamado; telas
+    // sem filtros mantem o frame oculto e pesquisam sem criterios.
+    procedure ConfigureFilters(const ADefinition: TFilterDefinition;
+      const APreferences: ILocalPreferences; const AIdentity: string);
+  end;
+
+implementation
+
+{$R *.dfm}
+
+const
+  FiltersAlreadyConfiguredMessage =
+    'Os filtros desta tela já foram configurados.';
+  MissingPreferencesMessage =
+    'As preferências locais dos filtros não foram informadas.';
+  MissingIdentityMessage = 'A identidade dos filtros não foi informada.';
+  FiltersNotConfiguredMessage =
+    'Os filtros desta tela ainda não foram configurados.';
+  MissingReaderMessage = 'O leitor de dados da consulta nao foi informado.';
+  MissingReaderFactoryMessage =
+    'A fabrica de leitores da consulta nao foi informada.';
+  MissingTitleMessage = 'O titulo da consulta nao foi informado.';
+  AlreadyAttachedMessage =
+    'O leitor de dados da consulta ja foi associado a esta tela.';
+  MissingDependencyMessage =
+    'A tela de consulta nao recebeu seu leitor de dados.';
+  MissingColumnLayoutPreferencesMessage =
+    'As preferencias de colunas nao foram informadas.';
+  EmptyResultMessage =
+    'Nenhum registro foi encontrado para a consulta de %s.';
+  FailureMessage = 'Nao foi possivel consultar os dados de %s.';
+  InvalidFilterTitle = 'Filtro invalido';
+  EmptyResultTitle = 'Consulta sem resultados';
+  QueryFailureTitle = 'Falha na consulta';
+  EditorNaoInformadoMessage =
+    'A aba de inclusão não recebeu seu editor.';
+  SalvamentoSemAtualizacaoMessage =
+    'O registro foi salvo. Repita a pesquisa para atualizar a consulta.';
+
+procedure TfrmConsultaBase.ConfigureFilters(
+  const ADefinition: TFilterDefinition;
+  const APreferences: ILocalPreferences; const AIdentity: string);
+begin
+  if FFiltersConfigured then
+    raise Exception.Create(FiltersAlreadyConfiguredMessage);
+
+  if APreferences = nil then
+    raise Exception.Create(MissingPreferencesMessage);
+
+  if Trim(AIdentity) = '' then
+    raise Exception.Create(MissingIdentityMessage);
+
+  // O frame ja faz parte do formulario (inline no DFM). A configuracao apenas
+  // injeta a definicao e as preferencias na instancia existente, sem criar ou
+  // liberar o frame: a tela e a proprietaria. Posicao dos botoes e largura
+  // minima pertencem a inicializacao, nao a esta chamada da composicao.
+  fraFiltros.Configure(ADefinition, APreferences, AIdentity, fpQuerySql);
+  FFilterDefinition := ADefinition;
+  FFiltersConfigured := True;
+
+  // Os filtros ficam disponiveis assim que configurados; a pesquisa so e
+  // habilitada quando a tela recebe leitor ou fabrica na inicializacao.
+  fraFiltros.Visible := True;
+end;
+
+function TfrmConsultaBase.CollectFilters: TFilterCriteriaResult;
+begin
+  if not FFiltersConfigured then
+    raise Exception.Create(FiltersNotConfiguredMessage);
+
+  Result := fraFiltros.CollectCriteria;
+end;
+
+procedure TfrmConsultaBase.GridTitleCtrlClick(Sender: TObject;
+  const AFieldName: string);
+begin
+  // O atalho apenas prepara o editor de pesquisa. Sem filtros configurados, o
+  // gesto nao altera a ordem nem o resultado ja carregado.
+  if FFiltersConfigured then
+    fraFiltros.TrySelectField(AFieldName);
+end;
+
+procedure TfrmConsultaBase.FrameFeedback(Sender: TObject;
+  const ATitulo, AMensagem: string);
+begin
+  // O host apresenta o feedback dos frames reutilizaveis, que nao criam
+  // dialogo proprio.
+  ShowWarning(AMensagem, ATitulo);
+end;
+
+procedure TfrmConsultaBase.ClearResult;
+begin
+  // Cada pesquisa comeca sem criterios rapidos e sem a ordenacao do resultado
+  // anterior; ambos pertencem ao conjunto que sera substituido.
+  fraGrid.ClearSorting();
+  fraGrid.ClearQuickFilters();
+
+  // Desvincular antes de limpar impede que a grade retenha um dataset liberado.
+  dsConsulta.DataSet := nil;
+  if FReader <> nil then
+  begin
+    FReader.Limpar;
+    if Assigned(FReaderFactory) then
+      FReader := nil;
+  end;
+end;
+
+function TfrmConsultaBase.Pesquisar(const AExibirFalha: Boolean): Boolean;
+var
+  Collected: TFilterCriteriaResult;
+  Criteria: TFilterCriteria;
+  NewReader: IDataSetReader;
+begin
+  // Segunda barreira contra composicao incompleta: sem leitor nem fabrica
+  // nenhuma instrucao SQL e executada e o resultado anterior nao e alterado.
+  if (FReader = nil) and (not Assigned(FReaderFactory)) then
+    raise Exception.Create(MissingDependencyMessage);
+
+  Result := False;
+  if FPesquisando then
+    Exit;
+  FPesquisando := True;
+  btnPesquisar.Enabled := False;
+  try
+    Criteria := nil;
+    if Assigned(FReaderFactory) and FFiltersConfigured then
+    begin
+      Collected := CollectFilters;
+      if Collected.Status = fcsInvalid then
+      begin
+        ShowWarning(Collected.ValidationMessage, InvalidFilterTitle);
+        Exit;
+      end;
+
+      if Collected.Status = fcsValidCriteria then
+        Criteria := Collected.Criteria;
+    end;
+
+    if not CanPesquisar then
+      Exit;
+
+    ClearResult;
+    try
+      if Assigned(FReaderFactory) then
+      begin
+        NewReader := FReaderFactory(Criteria);
+        if NewReader = nil then
+          raise Exception.Create(MissingReaderMessage);
+        FReader := NewReader;
+        NewReader := nil;
+      end;
+
+      FReader.Pesquisar;
+      dsConsulta.DataSet := FReader.DataSet;
+      // A sequencia terminou e a grade reflete a consulta; resultado vazio
+      // tambem conclui a pesquisa.
+      Result := True;
+      if FReader.DataSet.IsEmpty then
+      begin
+        ClearResult;
+        ShowInformation(Format(EmptyResultMessage, [FTitle]), EmptyResultTitle);
+      end;
+    except
+      Result := False;
+      ClearResult;
+      // A falha generica pertence ao botao; a repeticao programatica deixa a
+      // mensagem especifica para o chamador.
+      if AExibirFalha then
+        ShowError(Format(FailureMessage, [FTitle]), QueryFailureTitle);
+    end;
+  finally
+    FPesquisando := False;
+    btnPesquisar.Enabled := True;
+  end;
+end;
+
+procedure TfrmConsultaBase.DoPesquisar(Sender: TObject);
+begin
+  Pesquisar(True);
+end;
+
+function TfrmConsultaBase.RepetirPesquisa: Boolean;
+begin
+  Result := Pesquisar(False);
+end;
+
+procedure TfrmConsultaBase.Attach(const AReader: IDataSetReader;
+  const AColumns: TGridColumnDefinitions; const ATitle: string;
+  AOperations: IQueryResultOperations = nil;
+  AQuickFilterEnabled: Boolean = False);
+begin
+  if AReader = nil then
+    raise Exception.Create(MissingReaderMessage);
+  if Trim(ATitle) = '' then
+    raise Exception.Create(MissingTitleMessage);
+  if (FReader <> nil) or Assigned(FReaderFactory) then
+    raise Exception.Create(AlreadyAttachedMessage);
+
+  // A propriedade do leitor passa para a tela somente depois de todas as
+  // verificacoes; nenhuma falha ocorre a partir daqui.
+  FReader := AReader;
+  FColumns := AColumns;
+  FTitle := ATitle;
+  FOperations := AOperations;
+  FQuickFilterEnabled := AQuickFilterEnabled;
+
+  fraGrid.Configure(AOperations, FQuickFilterEnabled);
+end;
+
+procedure TfrmConsultaBase.AttachReaderFactory(
+  const AFactory: TConsultaReaderFactory;
+  const AColumns: TGridColumnDefinitions; const ATitle: string;
+  AOperations: IQueryResultOperations = nil;
+  AQuickFilterEnabled: Boolean = False);
+begin
+  if not Assigned(AFactory) then
+    raise Exception.Create(MissingReaderFactoryMessage);
+  if Trim(ATitle) = '' then
+    raise Exception.Create(MissingTitleMessage);
+  if (FReader <> nil) or Assigned(FReaderFactory) then
+    raise Exception.Create(AlreadyAttachedMessage);
+
+  // A consulta cria um novo leitor a cada pesquisa; nenhum leitor e recebido
+  // nesta associacao. Sem coluna de marcacao nas operacoes recebidas, os
+  // comandos de selecao ficam desabilitados. O filtro rapido tambem depende das
+  // operacoes; nesta fatia a opcao permanece desabilitada quando elas nao
+  // existem.
+  FReaderFactory := AFactory;
+  FColumns := AColumns;
+  FTitle := ATitle;
+  FOperations := AOperations;
+  FQuickFilterEnabled := AQuickFilterEnabled;
+
+  fraGrid.Configure(AOperations, FQuickFilterEnabled);
+end;
+
+procedure TfrmConsultaBase.AttachColumnLayout(
+  const APreferences: IColumnLayoutPreferences);
+begin
+  if APreferences = nil then
+    raise Exception.Create(MissingColumnLayoutPreferencesMessage);
+
+  fraGrid.AttachColumnLayout(APreferences);
+end;
+
+procedure TfrmConsultaBase.PosicionarBotoesPesquisa;
+begin
+  // Sair ocupa a borda direita e Pesquisar fica imediatamente a esquerda, com
+  // intervalo fixo. As ancoras preservam as duas distancias no redimensionamento
+  // posterior, quando o frame de filtros ja nao e tocado.
+  btnSair.Align := alNone;
+  btnSair.Anchors := [akTop, akRight];
+  btnSair.Left := pnFiltros.ClientWidth - btnSair.Width - 16;
+
+  btnPesquisar.Align := alNone;
+  btnPesquisar.Anchors := [akTop, akRight];
+  btnPesquisar.Left := btnSair.Left - btnPesquisar.Width - 8;
+
+  // A largura minima impede que os botoes invadam os filtros a esquerda.
+  Constraints.MinWidth := btnPesquisar.Left + btnPesquisar.Width + 8 +
+    btnSair.Width + 16;
+end;
+
+procedure TfrmConsultaBase.DoInitializeView;
+begin
+  Caption := Format('Consulta - Next %d', [InstanceNumber]);
+  fraGrid.DataSource := dsConsulta;
+  fraGrid.OnTitleCtrlClick := GridTitleCtrlClick;
+  fraGrid.OnFeedback := FrameFeedback;
+  fraFiltros.OnFeedback := FrameFeedback;
+
+  // Sem leitor nem fabrica nao existe consulta a apresentar: a falha de
+  // composicao aparece na abertura da view, antes de a tela parecer operavel.
+  if (FReader = nil) and (not Assigned(FReaderFactory)) then
+    raise Exception.Create(MissingDependencyMessage);
+
+  PosicionarBotoesPesquisa;
+  // A faixa so aparece quando a funcionalidade acrescentou comandos no DFM.
+  pnAcoesConsulta.Visible := pnAcoesConsulta.ControlCount > 0;
+  fraFiltros.Visible := FFiltersConfigured;
+  btnPesquisar.Enabled := True;
+  btnPesquisar.OnClick := DoPesquisar;
+  if FTitle <> '' then
+    Caption := FTitle;
+  fraGrid.ConfigureColumns(FColumns);
+end;
+
+function TfrmConsultaBase.CanPesquisar: Boolean;
+begin
+  Result := True;
+end;
+
+procedure TfrmConsultaBase.btnSairClick(Sender: TObject);
+begin
+  // O fechamento pertence ao host Delphi 2006: RequestClose passa pela
+  // confirmacao individual e pela politica de ocultar/destruir da instancia.
+  RequestClose;
+end;
+
+procedure TfrmConsultaBase.ResetForSessionChange;
+begin
+  // O rascunho e a aba pertencem a sessao encerrada. Fechar antes da limpeza
+  // garante que o descendente descarte o rascunho e nao reabra a inclusao com
+  // empresas do usuario anterior. Um comando pendente da aba tambem morre aqui.
+  FecharAbaInclusao;
+  ClearResult;
+
+  // O layout pertence ao login corrente: recarregar evita reapresentar, em uma
+  // janela oculta, a preferencia do usuario anterior.
+  fraGrid.ReloadColumnLayout;
+end;
+
+destructor TfrmConsultaBase.Destroy;
+begin
+  try
+    if dsConsulta <> nil then
+      dsConsulta.DataSet := nil;
+  finally
+    try
+      // A tela libera o leitor atual e a fabrica depois de desvincular o
+      // conjunto. Se o leitor for o wrapper do Next, ele libera o leitor interno
+      // antes de devolver a reserva do contexto.
+      FReader := nil;
+      FReaderFactory := nil;
+    finally
+      // A destruicao nao executa hooks nem libera a aba: pcAbas libera a aba
+      // remanescente e, com ela, rodape, area de rolagem e editor. Aqui apenas
+      // se descarta o pedido pendente e se zeram as referencias.
+      LimparPedidoFechamentoAbaInclusao;
+      FAbaInclusao := nil;
+      FRodapeInclusao := nil;
+      FBtnSalvarInclusao := nil;
+      FBtnCancelarInclusao := nil;
+      inherited;
+    end;
+  end;
+end;
+
+function TfrmConsultaBase.CriarEditorInclusao(
+  AParent: TWinControl): TWinControl;
+begin
+  Result := nil;
+end;
+
+function TfrmConsultaBase.TituloAbaInclusao: string;
+begin
+  Result := 'Inclusão';
+end;
+
+procedure TfrmConsultaBase.AoAbrirAbaInclusao;
+begin
+end;
+
+procedure TfrmConsultaBase.AoFecharAbaInclusao;
+begin
+end;
+
+procedure TfrmConsultaBase.AoFalharAberturaAbaInclusao;
+begin
+end;
+
+function TfrmConsultaBase.SalvarInclusao: TResultadoComandoInclusao;
+begin
+  Result := rciIndisponivel;
+end;
+
+procedure TfrmConsultaBase.AvisarSalvamentoSemAtualizacao;
+begin
+  // Padrao da base para telas que nao fornecem mensagem propria. A gravacao ja
+  // terminou; a mensagem apenas orienta a repetir a consulta.
+  ShowWarning(SalvamentoSemAtualizacaoMessage, FTitle);
+end;
+
+function TfrmConsultaBase.GetAbaInclusaoAberta: Boolean;
+begin
+  Result := FAbaInclusao <> nil;
+end;
+
+function TfrmConsultaBase.GetAbaInclusaoAtiva: Boolean;
+begin
+  Result := (FAbaInclusao <> nil) and (pcAbas.ActivePage = FAbaInclusao);
+end;
+
+function TfrmConsultaBase.GetFechamentoAbaPendente: Boolean;
+begin
+  // Enquanto ha intencao registrada o comando ja foi aceito e ainda nao foi
+  // concluido: um novo clique nao pode gravar nem fechar a mesma inclusao.
+  Result := FIntencaoFechamentoAba <> ifaNenhuma;
+end;
+
+function TfrmConsultaBase.AbrirAbaInclusao: Boolean;
+var
+  Aba: TTabSheet;
+  Area: TScrollBox;
+  Editor: TWinControl;
+begin
+  Result := AbaInclusaoAberta;
+  if Result then
+  begin
+    // Uma aba por janela: reabrir devolve o foco ao editor existente.
+    AtivarAbaInclusao;
+    Exit;
+  end;
+
+  Aba := TTabSheet.Create(pcAbas);
+  try
+    Aba.PageControl := pcAbas;
+    Aba.Caption := TituloAbaInclusao;
+
+    // O rodape nasce e morre com a aba: seus comandos so podem tratar o
+    // rascunho desta aba.
+    FRodapeInclusao := TPanel.Create(Aba);
+    FRodapeInclusao.Parent := Aba;
+    FRodapeInclusao.Align := alBottom;
+    FRodapeInclusao.Height := 44;
+    FRodapeInclusao.BevelOuter := bvNone;
+    FRodapeInclusao.Caption := '';
+
+    FBtnCancelarInclusao := TButton.Create(FRodapeInclusao);
+    FBtnCancelarInclusao.Parent := FRodapeInclusao;
+    FBtnCancelarInclusao.Caption := 'Cancelar';
+    FBtnCancelarInclusao.Width := 110;
+    FBtnCancelarInclusao.Height := 32;
+    FBtnCancelarInclusao.Top := 6;
+    FBtnCancelarInclusao.Anchors := [akTop, akRight];
+    FBtnCancelarInclusao.Left :=
+      Aba.ClientWidth - 16 - FBtnCancelarInclusao.Width;
+    FBtnCancelarInclusao.OnClick := btnCancelarAbaInclusaoClick;
+
+    FBtnSalvarInclusao := TButton.Create(FRodapeInclusao);
+    FBtnSalvarInclusao.Parent := FRodapeInclusao;
+    FBtnSalvarInclusao.Caption := 'Salvar';
+    FBtnSalvarInclusao.Width := 110;
+    FBtnSalvarInclusao.Height := 32;
+    FBtnSalvarInclusao.Top := 6;
+    FBtnSalvarInclusao.Anchors := [akTop, akRight];
+    FBtnSalvarInclusao.Left :=
+      FBtnCancelarInclusao.Left - FBtnSalvarInclusao.Width - 8;
+    FBtnSalvarInclusao.OnClick := btnSalvarAbaInclusaoClick;
+
+    // A area ocupa o restante da aba e e a dona do editor: libera-la encerra o
+    // editor junto.
+    Area := TScrollBox.Create(Aba);
+    Area.Parent := Aba;
+    Area.Align := alClient;
+    Area.BorderStyle := bsNone;
+    Area.AutoScroll := True;
+
+    // Cada montagem recebe identidade propria: um pedido registrado para a aba
+    // anterior nao pode alcancar esta.
+    Inc(FTokenAbaInclusao);
+    FAbaInclusao := Aba;
+    Editor := CriarEditorInclusao(Area);
+    if Editor = nil then
+      raise Exception.Create(EditorNaoInformadoMessage);
+    Editor.Parent := Area;
+    Editor.Align := alTop;
+
+    // O rascunho so nasce depois de aba, rodape e editor existirem.
+    AoAbrirAbaInclusao;
+    AtivarAbaInclusao;
+    Result := True;
+  except
+    // A aba parcial e liberada inteira. O hook de falha e chamado depois da
+    // liberacao: ele solta apenas referencias, sem tocar em controle destruido.
+    FAbaInclusao := nil;
+    FRodapeInclusao := nil;
+    FBtnSalvarInclusao := nil;
+    FBtnCancelarInclusao := nil;
+    Aba.Free;
+    AoFalharAberturaAbaInclusao;
+    raise;
+  end;
+end;
+
+procedure TfrmConsultaBase.FecharAbaInclusao;
+var
+  Aba: TTabSheet;
+begin
+  // Um comando pendente pertence a aba que esta sendo encerrada: uma troca de
+  // usuario que chegue por este caminho invalida o pedido, em vez de deixa-lo
+  // para ser tratado depois, sobre outra inclusao.
+  LimparPedidoFechamentoAbaInclusao;
+
+  if FAbaInclusao = nil then
+    Exit;
+
+  Aba := FAbaInclusao;
+  if pcAbas.ActivePage = Aba then
+    pcAbas.ActivePage := tsConsulta;
+
+  try
+    // O descendente solta as referencias e descarta o rascunho enquanto o
+    // editor ainda existe.
+    AoFecharAbaInclusao;
+  finally
+    // Uma unica liberacao encerra a aba e, com ela, rodape, area e editor.
+    Aba.Free;
+    FAbaInclusao := nil;
+    FRodapeInclusao := nil;
+    FBtnSalvarInclusao := nil;
+    FBtnCancelarInclusao := nil;
+    // Depois deste ponto nenhum pedido antigo identifica a proxima aba.
+    Inc(FTokenAbaInclusao);
+    AtualizarComandosAbaInclusao;
+  end;
+end;
+
+procedure TfrmConsultaBase.AtivarAbaInclusao;
+begin
+  if FAbaInclusao = nil then
+    Exit;
+
+  // Reapresentar a inclusao nao recria a aba nem o rascunho; o foco pertence ao
+  // descendente, que conhece o editor.
+  pcAbas.ActivePage := FAbaInclusao;
+end;
+
+function TfrmConsultaBase.AbaDoControle(AControle: TControl): TTabSheet;
+var
+  Atual: TControl;
+begin
+  Result := nil;
+  Atual := AControle;
+  while (Atual <> nil) and (not (Atual is TTabSheet)) do
+    Atual := Atual.Parent;
+  if Atual is TTabSheet then
+    Result := TTabSheet(Atual);
+end;
+
+function TfrmConsultaBase.ComandoDaAbaInclusao(AOrigem: TObject): Boolean;
+var
+  Aba: TTabSheet;
+begin
+  Result := False;
+  if (FAbaInclusao = nil) or (not (AOrigem is TControl)) then
+    Exit;
+
+  // O rodape e filho da aba, entao a origem do clique identifica o rascunho que
+  // o comando deve tratar.
+  Aba := AbaDoControle(TControl(AOrigem));
+  Result := Aba = FAbaInclusao;
+end;
+
+procedure TfrmConsultaBase.DefinirComandosHabilitados(AHabilitado: Boolean);
+begin
+  if FBtnSalvarInclusao <> nil then
+    FBtnSalvarInclusao.Enabled := AHabilitado;
+  if FBtnCancelarInclusao <> nil then
+    FBtnCancelarInclusao.Enabled := AHabilitado;
+end;
+
+procedure TfrmConsultaBase.AtualizarComandosAbaInclusao;
+begin
+  // So existe um conjunto de comandos, o da aba corrente; depois do fechamento
+  // ele ja nao existe e nada e reabilitado.
+  DefinirComandosHabilitados(FAbaInclusao <> nil);
+end;
+
+procedure TfrmConsultaBase.LimparPedidoFechamentoAbaInclusao;
+begin
+  FIntencaoFechamentoAba := ifaNenhuma;
+  FTokenPedidoAba := 0;
+end;
+
+procedure TfrmConsultaBase.SolicitarFechamentoAbaInclusao(
+  AIntencao: TIntencaoFechamentoAbaInclusao);
+begin
+  // O pedido guarda intencao e token, nunca o ponteiro da aba: quando a mensagem
+  // for tratada, a inclusao pode ja ter sido encerrada por uma troca de usuario.
+  FIntencaoFechamentoAba := AIntencao;
+  FTokenPedidoAba := FTokenAbaInclusao;
+
+  // Liberar a aba dentro do proprio OnClick destruiria o botao que ainda esta no
+  // caminho do evento. A mensagem privada so e tratada quando o laco de
+  // mensagens volta a despachar, depois de o clique terminar.
+  PostMessage(Handle, WM_COMANDO_ABA_INCLUSAO, 0, 0);
+end;
+
+procedure TfrmConsultaBase.btnSalvarAbaInclusaoClick(Sender: TObject);
+begin
+  // A origem identifica a aba; um comando de outra aba nao pode gravar este
+  // rascunho, e um pedido ja registrado aguarda o manipulador diferido.
+  if (not ComandoDaAbaInclusao(Sender)) or FechamentoAbaPendente then
+    Exit;
+
+  DefinirComandosHabilitados(False);
+  try
+    if SalvarInclusao <> rciConcluido then
+      Exit;
+
+    // Gravacao confirmada: o fechamento e solicitado agora e concluido depois
+    // que este evento retornar.
+    SolicitarFechamentoAbaInclusao(ifaSalvar);
+  finally
+    // Com fechamento pendente os botoes continuam desabilitados: a aba sera
+    // liberada e nao existe estado editavel para reabilitar.
+    if not FechamentoAbaPendente then
+      AtualizarComandosAbaInclusao;
+  end;
+end;
+
+procedure TfrmConsultaBase.btnCancelarAbaInclusaoClick(Sender: TObject);
+begin
+  if (not ComandoDaAbaInclusao(Sender)) or FechamentoAbaPendente then
+    Exit;
+
+  // Cancelar nao grava nem reconsulta: o pedido apenas encerra a aba, e o hook
+  // de fechamento descarta o rascunho.
+  DefinirComandosHabilitados(False);
+  SolicitarFechamentoAbaInclusao(ifaCancelar);
+end;
+
+procedure TfrmConsultaBase.TratarPedidoFechamentoAbaInclusao;
+var
+  Intencao: TIntencaoFechamentoAbaInclusao;
+  Token: Integer;
+begin
+  // O pedido e consumido uma unica vez, inclusive quando for descartado.
+  Intencao := FIntencaoFechamentoAba;
+  Token := FTokenPedidoAba;
+  LimparPedidoFechamentoAbaInclusao;
+
+  if Intencao = ifaNenhuma then
+    Exit;
+
+  // A aba e reconhecida pelo token, nunca pelo endereco. Sem aba, ou com token
+  // diferente, a inclusao terminou antes deste tratamento (troca de usuario ou
+  // fechamento do host): o pedido e descartado sem fechar, sem reconsultar e sem
+  // avisar, e a proxima aba nao herda o comando anterior.
+  if (FAbaInclusao = nil) or (FTokenAbaInclusao <> Token) then
+    Exit;
+
+  FecharAbaInclusao;
+
+  // Somente a gravacao confirmada atualiza a consulta; o cancelamento termina
+  // aqui. Neste ponto a aba ja foi liberada e o rascunho descartado pelo hook de
+  // fechamento.
+  if Intencao = ifaSalvar then
+    AtualizarAposSalvarInclusao;
+end;
+
+procedure TfrmConsultaBase.AtualizarAposSalvarInclusao;
+begin
+  // A reconsulta pode falhar com False ou com excecao antes do tratamento
+  // interno da pesquisa. Em ambos os casos a gravacao esta concluida: a aba
+  // permanece fechada e o usuario e orientado a repetir a pesquisa.
+  try
+    if not RepetirPesquisa then
+      AvisarSalvamentoSemAtualizacao;
+  except
+    AvisarSalvamentoSemAtualizacao;
+  end;
+end;
+
+procedure TfrmConsultaBase.WMCmdAbaInclusao(var AMessage: TMessage);
+begin
+  AMessage.Result := 0;
+  TratarPedidoFechamentoAbaInclusao;
+end;
+
+end.

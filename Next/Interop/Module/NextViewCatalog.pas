@@ -12,8 +12,8 @@ function NextViewCreate(const AIdentifier: string; AParent: HWND): TfrmNextBase;
 implementation
 
 uses
-  System.SysUtils, NextViewRegistry, HwNextValidationFormUnit,
-  HwNextValidationSecondFormUnit, QueryStandardForm, QueryResultForm,
+  System.SysUtils, NextViewRegistry,
+  HwNextValidationSecondFormUnit, ConsultaBaseForm,
   EventosRtcForm, EventosRtcDefinition, GruposFiscaisForm,
   GruposFiscaisDefinition, LocalPreferences,
   WindowsRegistryLocalPreferences, ColumnLayoutPreferences,
@@ -24,30 +24,14 @@ uses
 var
   FRegistry: TNextViewRegistry;
 
-function CreateValidationView(AParent: HWND): TfrmNextBase;
-var
-  View: TfrmHwNextValidation;
-begin
-  View := TfrmHwNextValidation.CreateParented(AParent);
-  try
-    // Composition point. next.validation currently has no injected dependency;
-    // when it gains one, compose it here and pass it to View before returning
-    // the base type.
-    Result := View;
-  except
-    View.Free;
-    raise;
-  end;
-end;
-
 function CreateStandardQueryView(AParent: HWND): TfrmNextBase;
 var
-  View: TfrmQueryResult;
+  View: TfrmConsultaBase;
   Preferences: ILocalPreferences;
   Reader: IDataSetReader;
   Operations: IQueryResultOperations;
 begin
-  View := TfrmQueryResult.CreateParented(AParent);
+  View := TfrmConsultaBase.CreateParented(AParent);
   try
     // A prévia recebe a definição de exemplo e o adaptador de preferências. A
     // identidade é dedicada a esta entrada e não é compartilhada com telas de
@@ -203,7 +187,6 @@ end;
 
 initialization
   FRegistry := TNextViewRegistry.Create;
-  FRegistry.Register('next.validation', CreateValidationView);
   FRegistry.Register('next.validation.second', CreateValidationSecondView);
   FRegistry.Register('next.query.standard', CreateStandardQueryView);
   FRegistry.Register('next.rtc.events', CreateEventosRtcView);

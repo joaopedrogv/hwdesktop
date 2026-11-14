@@ -3,7 +3,7 @@ unit EventosRtcForm;
 interface
 
 uses
-  System.SysUtils, Vcl.StdCtrls, QueryResultForm, FilterCriterion,
+  System.SysUtils, Vcl.StdCtrls, ConsultaBaseForm, FilterCriterion,
   IDataSetReaderUnit, GridColumnDefinition, EventosRtcPresenter,
   QueryResultOperations;
 
@@ -11,7 +11,7 @@ type
   // Tela de Eventos RTC. Herda a apresentacao generica e acrescenta apenas a
   // identidade da consulta e a opcao de restringir aos eventos autorizados; o
   // apresentador e o leitor correspondente sao injetados pela composicao.
-  TfrmEventosRtc = class(TfrmQueryResult)
+  TfrmEventosRtc = class(TfrmConsultaBase)
     chkSomenteAutorizada: TCheckBox;
   private
     FPresenter: TEventosRtcPresenter;

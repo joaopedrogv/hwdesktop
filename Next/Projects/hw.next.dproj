@@ -98,10 +98,6 @@
         <DCCReference Include="..\Interop\Contracts\HwNextViewApi.pas"/>
         <DCCReference Include="..\Interop\Module\NextBaseForm.pas"/>
         <DCCReference Include="..\Interop\Module\NextViewRegistry.pas"/>
-        <DCCReference Include="..\UI\Forms\Validation\HwNextValidationFormUnit.pas">
-            <Form>frmHwNextValidation</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <DCCReference Include="..\UI\Forms\Validation\HwNextValidationSecondFormUnit.pas">
             <Form>frmHwNextValidationSecond</Form>
             <FormType>dfm</FormType>
@@ -129,12 +125,8 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\UI\Forms\Base\QueryStandardForm.pas">
-            <Form>frmQueryStandard</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
-        <DCCReference Include="..\UI\Forms\Base\QueryResultForm.pas">
-            <Form>frmQueryResult</Form>
+        <DCCReference Include="..\UI\Forms\Base\ConsultaBaseForm.pas">
+            <Form>frmConsultaBase</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\UI\Forms\Shared\Columns\ColumnSelectionForm.pas">
