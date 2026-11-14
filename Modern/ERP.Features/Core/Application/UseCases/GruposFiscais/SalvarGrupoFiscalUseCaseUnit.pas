@@ -3,28 +3,24 @@ unit SalvarGrupoFiscalUseCaseUnit;
 interface
 
 uses
-  BaseUseCaseUnit,
   IGruposFiscaisRepositoryUnit,
+  IDataBaseConnectionUnit,
   GrupoFiscalEtdUnit,
   CreateEntityUseCaseOutputUnit;
 
-type       
-  {$IFDEF INTF_ON}
+type
+
   ISalvarGrupoFiscalUseCase = interface
     ['{A2E09023-1406-48D8-BC2E-6CBE8BD377E7}']
     function Executar(Input: GrupoFiscalEtd): CreateEntityUseCaseOutPut;
   end;
-  {$ENDIF}
-        
-  {$IFDEF INTF_ON}    
-  SalvarGrupoFiscalUseCase = class(BaseUseCase, ISalvarGrupoFiscalUseCase)
-  {$ELSE}          
-  SalvarGrupoFiscalUseCase = class(BaseUseCase)
-  {$ENDIF}
+
+  SalvarGrupoFiscalUseCase = class(TInterfacedObject, ISalvarGrupoFiscalUseCase)
   private
+    FConnection: IDataBaseConnection;
     FGruposFiscaisRepo: IGruposFiscaisRepository;
   public
-    constructor Create(const GruposFiscaisRepo: IGruposFiscaisRepository);
+    constructor Create(AConnection: IDataBaseConnection; AGruposFiscaisRepo: IGruposFiscaisRepository);
 
     function Executar(Input: GrupoFiscalEtd): CreateEntityUseCaseOutPut;
   end;
@@ -33,24 +29,20 @@ implementation
 
 uses
   Sysutils, EntityValidatorFactoryUnit, IEntityValidatorUnit,
-  TipoTributoFiscalEnumUnit, ArrayServiceUnit;
+  TipoTributoFiscalEnumUnit, ArrayServiceUnit, ITransactionUnit;
 
 { SalvarGrupoFiscalUseCase }
 
-constructor SalvarGrupoFiscalUseCase.Create(const GruposFiscaisRepo: IGruposFiscaisRepository);
+constructor SalvarGrupoFiscalUseCase.Create(AConnection: IDataBaseConnection; AGruposFiscaisRepo: IGruposFiscaisRepository);
 begin
-  FGruposFiscaisRepo := GruposFiscaisRepo;
-end;
-
-function Vai(Min, Max: Cardinal): Boolean;
-begin
-  Result :=  min = max ;
-
+  FConnection := AConnection;
+  FGruposFiscaisRepo := AGruposFiscaisRepo;
 end;
 
 function SalvarGrupoFiscalUseCase.Executar(Input: GrupoFiscalEtd): CreateEntityUseCaseOutPut;
 var
   validator: IEntityValidator;
+  transaction: ITransaction;
 begin
   validator := EntityValidatorFactory.Builder();
 
@@ -63,14 +55,30 @@ begin
   if not validator.IsValid() then
     Result := CreateEntityUseCaseOutPut.Create( validator.Result() )
 
-  else if Input.Id = '' then
-    Result := CreateEntityUseCaseOutPut.Create(
-      FGruposFiscaisRepo.Post( input )
-    )
   else
-    Result := CreateEntityUseCaseOutPut.Create(
-      FGruposFiscaisRepo.Put( input )
-    );
+  begin
+    transaction := FConnection.BeginTransaction();
+    try try
+      if Input.Id = '' then
+        Result := CreateEntityUseCaseOutPut.Create(
+          FGruposFiscaisRepo.Post( input )
+        )
+      else
+        Result := CreateEntityUseCaseOutPut.Create(
+          FGruposFiscaisRepo.Put( input )
+        );
+      transaction.Commit();
+    except
+      on E: Exception do
+        begin
+          transaction.Rollback();
+          raise;
+        end;
+    end;
+    finally
+      transaction.FreeTransaction();
+    end;
+  end;
 end;
 
 end.

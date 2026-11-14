@@ -13,7 +13,8 @@ uses
   EventosRtcQuery, EventosRtcPresenter, GruposFiscaisQuery,
   GruposFiscaisPresenter, AuthorizationService, NextAuthorizationAdapter,
   IGruposFiscaisRepositoryUnit, GruposFiscaisRepositoryUnit,
-  RemoverGrupoFiscalUseCaseUnit;
+  RemoverGrupoFiscalUseCaseUnit, SalvarGrupoFiscalUseCaseUnit,
+  ListarEmpresasUseCaseUnit, IEmpresasRepositoryUnit, EmpresasRepositoryUnit;
 
 procedure RegisterNextFeatures(const AContainer: TContainer);
 begin
@@ -30,7 +31,15 @@ begin
   // Repositorio e caso de uso sao sem estado: o container mantem a posse da
   // instancia unica e o apresentador apenas a utiliza.
   AContainer.RegisterType<IGruposFiscaisRepository, GruposFiscaisRepository>.AsSingleton;
-  AContainer.RegisterType<RemoverGrupoFiscalUseCase>.AsSingleton;
+  AContainer.RegisterType<IRemoverGrupoFiscalUseCase, RemoverGrupoFiscalUseCase>.AsTransient;
+
+  // Inclusao: as empresas sao lidas do mesmo repositorio compartilhado, que
+  // resolve pela conexao e pela sessao do Setup. Repositorio e casos de uso sao
+  // sem estado, portanto a instancia unica pode ser reutilizada por qualquer
+  // tela; o apresentador apenas os utiliza.
+  AContainer.RegisterType<IEmpresasRepository, EmpresasRepository>.AsSingleton;
+  AContainer.RegisterType<ListarEmpresasUseCase>.AsSingleton;
+  AContainer.RegisterType<ISalvarGrupoFiscalUseCase, SalvarGrupoFiscalUseCase>.AsTransient;
 
   AContainer.RegisterType<TGruposFiscaisPresenter>.AsTransient;
 end;

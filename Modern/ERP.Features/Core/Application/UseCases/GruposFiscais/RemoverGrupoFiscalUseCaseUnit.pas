@@ -3,14 +3,18 @@ unit RemoverGrupoFiscalUseCaseUnit;
 interface
 
 uses
-  BaseUseCaseUnit,
   IGruposFiscaisRepositoryUnit,
   IDataBaseConnectionUnit,
   GrupoFiscalEtdUnit,
   CreateEntityUseCaseOutputUnit;
 
 type
-  RemoverGrupoFiscalUseCase = class(BaseUseCase)
+  IRemoverGrupoFiscalUseCase = interface
+    ['{7089993C-54DB-4CF4-B2B6-F8E91C7093A6}']
+    procedure Executar(const Id: string);
+  end;
+
+  RemoverGrupoFiscalUseCase = class(TInterfacedObject, IRemoverGrupoFiscalUseCase)
   private
     FGruposFiscaisRepo: IGruposFiscaisRepository;
     FConnection: IDataBaseConnection;
