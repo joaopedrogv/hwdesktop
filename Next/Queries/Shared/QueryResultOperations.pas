@@ -29,6 +29,17 @@ type
 
   TQuerySortFields = TArray<TQuerySortField>;
 
+  TColumnSummary = record
+    Succeeded: Boolean;
+    FieldName: string;
+    IsNumeric: Boolean;
+    RecordCount: Integer;
+    Sum: Currency;
+    MarkingEnabled: Boolean;
+    MarkedCount: Integer;
+    MarkedSum: Currency;
+  end;
+
   IQueryResultOperations = interface
     ['{76045AA4-FE97-4A2E-87CA-85077589168B}']
     procedure MarkAll();
@@ -36,6 +47,7 @@ type
     procedure InverterAllMarks();
     procedure ToggleCurrentMark();
     function MarkingColumnName(): string;
+    function SummarizeColumn(const AField: TField): TColumnSummary;
     // Filtros rapidos sobre o mesmo conjunto ja carregado. Cada aceite e
     // combinado com os anteriores por AND e so substitui a lista apos o
     // conjunto aceitar o filtro.
@@ -100,6 +112,7 @@ type
     procedure InverterAllMarks();
     procedure ToggleCurrentMark();
     function MarkingColumnName(): string;
+    function SummarizeColumn(const AField: TField): TColumnSummary;
     function AddQuickFilter(const AField: TField; out AId: Integer;
       out AMessage: string): Boolean;
     function AddQuickFilterCriterion(
@@ -190,6 +203,13 @@ begin
   else
     Result := fftString;
   end;
+end;
+
+function ColumnSummaryIsNumeric(const AField: TField): Boolean;
+begin
+  Result := (AField <> nil) and (AField.DataType in [ftByte, ftShortint,
+    ftSmallint, ftInteger, ftWord, ftAutoInc, ftLargeint, ftCurrency, ftBCD,
+    ftFMTBcd, ftFloat, ftExtended, ftSingle]);
 end;
 
 function QuickFilterOperators(const AField: TField): TFilterOperatorSet;
@@ -1015,6 +1035,76 @@ end;
 function TQueryResultOperations.MarkingColumnName: string;
 begin
   Result := FMarkingColumn;
+end;
+
+function TQueryResultOperations.SummarizeColumn(
+  const AField: TField): TColumnSummary;
+var
+  dts: TDataSet;
+  DataField: TField;
+  MarkField: TField;
+  Bookmark: TBookmark;
+  ControlsDisabled: Boolean;
+begin
+  Result := Default(TColumnSummary);
+  if AField = nil then
+    Exit;
+
+  dts := AField.DataSet;
+  if (dts = nil) or (not dts.Active) or (dts.State <> dsBrowse) then
+    Exit;
+
+  DataField := dts.FindField(AField.FieldName);
+  if (DataField = nil) or (DataField <> AField) then
+    Exit;
+
+  Result.Succeeded := True;
+  Result.FieldName := DataField.FieldName;
+  Result.IsNumeric := ColumnSummaryIsNumeric(DataField);
+  MarkField := nil;
+  if FMarkingColumn <> '' then
+    MarkField := dts.FindField(FMarkingColumn);
+  Result.MarkingEnabled := MarkField <> nil;
+
+  Bookmark := nil;
+  ControlsDisabled := False;
+  try
+    dts.DisableControls;
+    ControlsDisabled := True;
+    if not dts.IsEmpty then
+      Bookmark := dts.Bookmark;
+
+    dts.First;
+    while not dts.Eof do
+    begin
+      Inc(Result.RecordCount);
+      if Result.IsNumeric and (not DataField.IsNull) then
+        Result.Sum := Result.Sum + DataField.AsCurrency;
+
+      if Result.MarkingEnabled and (not MarkField.IsNull) and
+        MarkField.AsBoolean then
+      begin
+        Inc(Result.MarkedCount);
+        if Result.IsNumeric and (not DataField.IsNull) then
+          Result.MarkedSum := Result.MarkedSum + DataField.AsCurrency;
+      end;
+
+      dts.Next;
+    end;
+  finally
+    try
+      if (Bookmark <> nil) and dts.BookmarkValid(Bookmark) then
+        dts.GotoBookmark(Bookmark);
+    finally
+      try
+        if Bookmark <> nil then
+          dts.FreeBookmark(Bookmark);
+      finally
+        if ControlsDisabled then
+          dts.EnableControls;
+      end;
+    end;
+  end;
 end;
 
 function TQueryResultOperations.CanSortField(const ADataSet: TDataSet;

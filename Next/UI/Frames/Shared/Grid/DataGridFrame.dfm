@@ -266,5 +266,13 @@ object frmDataGridFrame: TfrmDataGridFrame
       Enabled = False
       OnClick = miRestaurarColunasPadraoClick
     end
+    object N4: TMenuItem
+      Caption = '-'
+    end
+    object miSomaContagemColuna: TMenuItem
+      Caption = 'Soma e contagem da coluna'
+      Enabled = False
+      OnClick = miSomaContagemColunaClick
+    end
   end
 end

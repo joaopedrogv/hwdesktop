@@ -57,6 +57,7 @@ type
     miConfigurarColunas: TMenuItem;
     miSalvarConfigColunas: TMenuItem;
     miRestaurarColunasPadrao: TMenuItem;
+    miSomaContagemColuna: TMenuItem;
     procedure DrawCheckboxCell(const Rect: TRect;
       const State: TGridDrawState; AState: Boolean);
     procedure dbgDadosDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
@@ -76,6 +77,7 @@ type
     procedure miConfigurarColunasClick(Sender: TObject);
     procedure miSalvarConfigColunasClick(Sender: TObject);
     procedure miRestaurarColunasPadraoClick(Sender: TObject);
+    procedure miSomaContagemColunaClick(Sender: TObject);
     procedure dbgDadosExit(Sender: TObject);
     procedure dbgDadosTitleClick(Column: TColumn);
   private
@@ -83,6 +85,7 @@ type
     FOperations: IQueryResultOperations;
     FQuickFilterEnabled: Boolean;
     FQuickFilterColumnName: string;
+    FContextColumnName: string;
     FCriterionSlots: TList<TCriterionBandSlot>;
     FSortFields: TQuerySortFields;
     FSortedColumns: TArray<TSortedColumnState>;
@@ -133,6 +136,8 @@ type
     function CopiaDisponivel: Boolean;
     procedure CopiarCelulaAtual;
     procedure ReajustarLarguraColunas;
+    function ColumnSummaryAvailable: Boolean;
+    function ColumnSummaryLabel(const AField: TField): string;
     function IsMarkingColumn(const AFieldName: string): Boolean;
     function ColumnSelectionAvailable: Boolean;
     function BuildColumnSelectionEntries: TColumnSelectionEntries;
@@ -213,6 +218,9 @@ const
   ColumnsRestoreTitle = 'Restaurar padr'#227'o das colunas';
   ColumnsRestoreFailureMessage =
     'N'#227'o foi poss'#237'vel restaurar a configura'#231#227'o padr'#227'o das colunas.';
+  ColumnSummaryTitle = 'Soma e contagem da coluna';
+  ColumnSummaryFailureMessage =
+    'N'#227'o foi poss'#237'vel calcular o resumo da coluna.';
   MissingColumnLayoutPreferencesMessage =
     'As prefer'#234'ncias de colunas n'#227'o foram informadas.';
   ColumnLayoutAlreadyAttachedMessage =
@@ -345,6 +353,42 @@ function TfrmDataGridFrame.MarkingEnabled: Boolean;
 begin
   // Configuracao de marcacao independente de o conjunto estar carregado.
   Result := (FMarkingColumn <> '') and (FOperations <> nil);
+end;
+
+function TfrmDataGridFrame.ColumnSummaryAvailable: Boolean;
+var
+  dts: TDataSet;
+begin
+  Result := False;
+  if (FOperations = nil) or (FContextColumnName = '') or
+    IsMarkingColumn(FContextColumnName) or (dbgDados.DataSource = nil) then
+    Exit;
+
+  dts := dbgDados.DataSource.DataSet;
+  Result := (dts <> nil) and dts.Active and
+    (dts.FindField(FContextColumnName) <> nil);
+end;
+
+function TfrmDataGridFrame.ColumnSummaryLabel(const AField: TField): string;
+var
+  Column: TColumn;
+  I: Integer;
+begin
+  Result := '';
+  if AField = nil then
+    Exit;
+
+  for I := 0 to High(FSortedColumns) do
+    if SameText(FSortedColumns[I].FieldName, AField.FieldName) then
+      Exit(Trim(FSortedColumns[I].Caption));
+
+  Column := FindColumnByFieldName(AField.FieldName);
+  if Column <> nil then
+    Result := Trim(Column.Title.Caption);
+  if Result = '' then
+    Result := Trim(AField.DisplayLabel);
+  if Result = '' then
+    Result := AField.FieldName;
 end;
 
 function TfrmDataGridFrame.QuickFilterAvailable: Boolean;
@@ -553,6 +597,7 @@ begin
   if FOperations <> nil then
     FOperations.ClearQuickFilters();
   FQuickFilterColumnName := '';
+  FContextColumnName := '';
   ResetSortState();
   FObservedDataSet := nil;
   dbgDados.DataSource := Value;
@@ -874,6 +919,54 @@ end;
 procedure TfrmDataGridFrame.miRestaurarColunasPadraoClick(Sender: TObject);
 begin
   RestoreColumnLayoutDefaults;
+end;
+
+procedure TfrmDataGridFrame.miSomaContagemColunaClick(Sender: TObject);
+var
+  DataField: TField;
+  Summary: TColumnSummary;
+  ColumnLabel: string;
+  MessageText: string;
+  dts: TDataSet;
+begin
+  if not ColumnSummaryAvailable then
+    Exit;
+
+  dts := dbgDados.DataSource.DataSet;
+  DataField := dts.FindField(FContextColumnName);
+  if DataField = nil then
+    Exit;
+
+  try
+    Summary := FOperations.SummarizeColumn(DataField);
+  except
+    ReportarFeedback(ColumnSummaryTitle, ColumnSummaryFailureMessage);
+    Exit;
+  end;
+
+  if not Summary.Succeeded then
+  begin
+    ReportarFeedback(ColumnSummaryTitle, ColumnSummaryFailureMessage);
+    Exit;
+  end;
+
+  ColumnLabel := ColumnSummaryLabel(DataField);
+  MessageText := Format('Coluna: %s'#13'Quantidade de registros: %d',
+    [ColumnLabel, Summary.RecordCount]);
+  if Summary.IsNumeric then
+    MessageText := MessageText + #13'Soma: ' +
+      FormatCurr('#,##0.00##', Summary.Sum);
+
+  if Summary.MarkingEnabled then
+  begin
+    MessageText := MessageText + #13'Quantidade de registros marcados: ' +
+      IntToStr(Summary.MarkedCount);
+    if Summary.IsNumeric then
+      MessageText := MessageText + #13'Soma dos registros marcados: ' +
+        FormatCurr('#,##0.00##', Summary.MarkedSum);
+  end;
+
+  ReportarFeedback(ColumnSummaryTitle, MessageText);
 end;
 
 function TfrmDataGridFrame.FindColumnDefinitionIndex(
@@ -1211,6 +1304,7 @@ begin
   FOperations := AOperations;
   FQuickFilterEnabled := AQuickFilterEnabled;
   FQuickFilterColumnName := '';
+  FContextColumnName := '';
 
   if FOperations <> nil then
     FMarkingColumn := FOperations.MarkingColumnName()
@@ -1521,13 +1615,17 @@ begin
   miConfigurarColunas.Enabled := ColumnSelectionAvailable;
   miSalvarConfigColunas.Enabled := ColumnLayoutAvailable;
   miRestaurarColunasPadrao.Enabled := ColumnLayoutAvailable;
+  miSomaContagemColuna.Enabled := False;
   miFiltrarValor.Enabled := False;
   miFiltrarQuando.Enabled := False;
   FQuickFilterColumnName := '';
+  FContextColumnName := '';
   Column := TDBGridCellAccess(dbgDados).ColumnAt(X, Y);
   if (Column = nil) or (Column.Field = nil) then
     Exit;
 
+  FContextColumnName := Column.FieldName;
+  miSomaContagemColuna.Enabled := ColumnSummaryAvailable;
   FQuickFilterColumnName := Column.FieldName;
   DataField := QuickFilterField();
   // Filtrar por este valor exige um valor de celula; Filtrar quando abre o
