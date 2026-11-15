@@ -277,6 +277,7 @@ function FireDACDatabaseConnection.BeginTransaction: ITransaction;
 var
   Transaction: FireDACTransaction;
 begin
+  EnsureConnection();
   Transaction := FireDACTransaction.Create( FDatabase, Self );
   FTransactionStack.AddObject(Transaction.GetId(), Transaction.FDTransaction );
   Result := Transaction;
@@ -357,6 +358,8 @@ var
 begin
   Query := TFDQuery.Create(nil);
   try
+    EnsureConnection();
+
     Query.Connection := FDatabase;
     CurrentTrans := GetCurrentTransaction;
     if Assigned(CurrentTrans) then
