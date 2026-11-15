@@ -3,23 +3,23 @@ unit GrupoFiscalCadastroFrame;
 interface
 
 uses
-  System.SysUtils, System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls,
-  Vcl.CheckLst, TipoTributoFiscalEnumUnit, TipoComunsUnit, GrupoFiscalCadastro;
+  System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, Vcl.CheckLst,
+  TipoTributoFiscalEnumUnit, TipoComunsUnit, GrupoFiscalCadastro,
+  ValidationPanelFrame, ValidationEntityOutputUnit;
 
 type
   // Editor dos campos da inclusao de grupo fiscal. O frame apenas apresenta e
   // coleta descricao, tipo de tributo e empresas; a autorizacao, a gravacao e o
-  // descarte do rascunho pertencem ao formulario que o contem.
+  // descarte do rascunho pertencem ao formulario que o contem. Os erros do caso
+  // de uso sao apresentados pelo painel comum, que agrupa as mensagens por campo.
   TfrmGrupoFiscalCadastroFrame = class(TFrame)
     lblDescricao: TLabel;
     edDescricao: TEdit;
-    lblErroDescricao: TLabel;
     lblTipoTributo: TLabel;
     cbTipoTributo: TComboBox;
-    lblErroTipoTributo: TLabel;
     lblEmpresas: TLabel;
     clbEmpresas: TCheckListBox;
-    lblErroGeral: TLabel;
+    fraValidacao: TfrmValidationPanelFrame;
   private
     // Identificador de cada linha do checklist, na mesma ordem dos itens
     // exibidos. A tela le os ids marcados, nunca as posicoes.
@@ -27,11 +27,6 @@ type
     // Os itens do tipo de tributo sao fixos e independem da inclusao: monta-los
     // uma unica vez mantem a lista disponivel em todas as inclusoes.
     procedure CarregarOpcoesTributo;
-    procedure LimparErros;
-    function TextoErrosDoCampo(const AErros: TGrupoFiscalFieldErrors;
-      const ACampo: string): string;
-    function TextoErrosDesconhecidos(
-      const AErros: TGrupoFiscalFieldErrors): string;
     function GetDescricao: string;
     procedure SetDescricao(const AValue: string);
     function GetTipoTributo: TipoTributoFiscalEnum;
@@ -45,10 +40,10 @@ type
     // do rascunho limpa apenas as mensagens.
     procedure LimparCampos;
     procedure LimparValidacao;
-    // Associa cada erro ao campo correspondente; campos desconhecidos vao para
-    // o rotulo geral. Nenhum dialogo e aberto e a operacao e idempotente.
-    procedure ExibirValidacao(const AErros: TGrupoFiscalFieldErrors);
-    // Foca o primeiro campo com erro; sem erro, foca a descricao.
+    // Encaminha o resultado do caso de uso ao painel de validacao, que agrupa os
+    // campos e oferece o link para o editor correspondente.
+    procedure ExibirValidacao(const AValidacao: ValidationEntityOutput);
+    // Foca o primeiro campo com erro; sem erro vinculado, foca a descricao.
     function FocarPrimeiroCampoInvalido: Boolean;
     function EmpresasSelecionadas: TArrayInteger;
     property Descricao: string read GetDescricao write SetDescricao;
@@ -66,6 +61,12 @@ begin
   // O frame ja possui os proprios controles: a classe base carrega o DFM antes
   // deste trecho, portanto as opcoes podem ser montadas aqui.
   CarregarOpcoesTributo;
+
+  // O nome vinculado e o produzido pelo validador de SalvarGrupoFiscal; o painel
+  // usa o controle para navegar e o rotulo para identificar o campo.
+  fraValidacao.Bind(GrupoFiscalCampoDescricao, edDescricao, 'Descrição');
+  fraValidacao.Bind(GrupoFiscalCampoTipoTributo, cbTipoTributo,
+    'Tipo de tributo');
 end;
 
 procedure TfrmGrupoFiscalCadastroFrame.CarregarOpcoesTributo;
@@ -80,19 +81,9 @@ begin
   cbTipoTributo.ItemIndex := Ord(tfIndefinido);
 end;
 
-procedure TfrmGrupoFiscalCadastroFrame.LimparErros;
-begin
-  lblErroDescricao.Caption := '';
-  lblErroDescricao.Visible := False;
-  lblErroTipoTributo.Caption := '';
-  lblErroTipoTributo.Visible := False;
-  lblErroGeral.Caption := '';
-  lblErroGeral.Visible := False;
-end;
-
 procedure TfrmGrupoFiscalCadastroFrame.LimparValidacao;
 begin
-  LimparErros;
+  fraValidacao.Limpar;
 end;
 
 procedure TfrmGrupoFiscalCadastroFrame.LimparCampos;
@@ -128,96 +119,22 @@ begin
   end;
 end;
 
-function TfrmGrupoFiscalCadastroFrame.TextoErrosDoCampo(
-  const AErros: TGrupoFiscalFieldErrors; const ACampo: string): string;
-var
-  I: Integer;
-  Mensagem: string;
-begin
-  Result := '';
-  for I := 0 to High(AErros) do
-  begin
-    if not SameText(Trim(AErros[I].Campo), ACampo) then
-      Continue;
-
-    // Itens sem mensagem nao tem o que apresentar.
-    Mensagem := Trim(AErros[I].Mensagem);
-    if Mensagem = '' then
-      Continue;
-
-    if Result = '' then
-      Result := Mensagem
-    else
-      Result := Result + sLineBreak + Mensagem;
-  end;
-end;
-
-function TfrmGrupoFiscalCadastroFrame.TextoErrosDesconhecidos(
-  const AErros: TGrupoFiscalFieldErrors): string;
-var
-  I: Integer;
-  Campo: string;
-  Mensagem: string;
-begin
-  Result := '';
-  for I := 0 to High(AErros) do
-  begin
-    Campo := Trim(AErros[I].Campo);
-    if SameText(Campo, GrupoFiscalCampoDescricao) or
-      SameText(Campo, GrupoFiscalCampoTipoTributo) then
-      Continue;
-
-    Mensagem := Trim(AErros[I].Mensagem);
-    if Mensagem = '' then
-      Continue;
-
-    // O campo desconhecido e preservado no texto: uma validacao futura nao pode
-    // desaparecer sem que o usuario saiba a que campo ela se refere.
-    if Campo <> '' then
-      Mensagem := Campo + ': ' + Mensagem;
-
-    if Result = '' then
-      Result := Mensagem
-    else
-      Result := Result + sLineBreak + Mensagem;
-  end;
-end;
-
 procedure TfrmGrupoFiscalCadastroFrame.ExibirValidacao(
-  const AErros: TGrupoFiscalFieldErrors);
+  const AValidacao: ValidationEntityOutput);
 begin
-  LimparErros;
-
-  lblErroDescricao.Caption :=
-    TextoErrosDoCampo(AErros, GrupoFiscalCampoDescricao);
-  lblErroDescricao.Visible := lblErroDescricao.Caption <> '';
-
-  lblErroTipoTributo.Caption :=
-    TextoErrosDoCampo(AErros, GrupoFiscalCampoTipoTributo);
-  lblErroTipoTributo.Visible := lblErroTipoTributo.Caption <> '';
-
-  lblErroGeral.Caption := TextoErrosDesconhecidos(AErros);
-  lblErroGeral.Visible := lblErroGeral.Caption <> '';
+  fraValidacao.ExibirValidacao(AValidacao);
 end;
 
 function TfrmGrupoFiscalCadastroFrame.FocarPrimeiroCampoInvalido: Boolean;
-var
-  Alvo: TWinControl;
 begin
-  Result := False;
+  Result := fraValidacao.FocarPrimeiroErro;
+  if Result then
+    Exit;
 
-  if lblErroDescricao.Visible then
-    Alvo := edDescricao
-  else if lblErroTipoTributo.Visible then
-    Alvo := cbTipoTributo
-  else
-    Alvo := edDescricao;
-
-  // A janela pode estar oculta ou o controle desabilitado; nesse caso o foco
-  // nao e forcado e o chamador decide como prosseguir.
-  if Alvo.CanFocus then
+  // Sem erro vinculado, a descricao continua sendo o primeiro campo da inclusao.
+  if edDescricao.CanFocus then
   begin
-    Alvo.SetFocus;
+    edDescricao.SetFocus;
     Result := True;
   end;
 end;

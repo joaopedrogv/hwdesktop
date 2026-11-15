@@ -2,7 +2,7 @@ object frmGrupoFiscalCadastroFrame: TfrmGrupoFiscalCadastroFrame
   Left = 0
   Top = 0
   Width = 736
-  Height = 350
+  Height = 360
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -29,80 +29,47 @@ object frmGrupoFiscalCadastroFrame: TfrmGrupoFiscalCadastroFrame
     MaxLength = 128
     TabOrder = 0
   end
-  object lblErroDescricao: TLabel
-    Left = 16
-    Top = 57
-    Width = 600
-    Height = 32
-    AutoSize = False
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clRed
-    Font.Height = -13
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    ParentFont = False
-    Visible = False
-    WordWrap = True
-  end
   object lblTipoTributo: TLabel
     Left = 16
-    Top = 90
+    Top = 60
     Width = 89
     Height = 16
     Caption = 'Tipo de tributo'
   end
   object cbTipoTributo: TComboBox
     Left = 16
-    Top = 108
+    Top = 78
     Width = 260
     Height = 24
     Style = csDropDownList
     TabOrder = 1
   end
-  object lblErroTipoTributo: TLabel
-    Left = 16
-    Top = 135
-    Width = 600
-    Height = 32
-    AutoSize = False
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clRed
-    Font.Height = -13
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    ParentFont = False
-    Visible = False
-    WordWrap = True
-  end
   object lblEmpresas: TLabel
     Left = 16
-    Top = 168
+    Top = 108
     Width = 54
     Height = 16
     Caption = 'Empresas'
   end
   object clbEmpresas: TCheckListBox
     Left = 16
-    Top = 186
+    Top = 126
     Width = 600
-    Height = 120
+    Height = 110
     Anchors = [akLeft, akTop, akRight]
     IntegralHeight = False
     TabOrder = 2
   end
-  object lblErroGeral: TLabel
-    Left = 16
-    Top = 312
-    Width = 600
-    Height = 32
-    AutoSize = False
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clRed
-    Font.Height = -13
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    ParentFont = False
-    Visible = False
-    WordWrap = True
+  inline fraValidacao: TfrmValidationPanelFrame
+    Left = 0
+    Top = 240
+    Width = 736
+    Height = 120
+    Align = alBottom
+    TabOrder = 3
+    ExplicitLeft = 0
+    ExplicitTop = 240
+    ExplicitWidth = 736
+    ExplicitHeight = 120
   end
 end

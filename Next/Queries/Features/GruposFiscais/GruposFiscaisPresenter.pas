@@ -14,8 +14,9 @@ type
   // operacoes e executa a remocao logica e a gravacao. As mensagens e os erros
   // de campo sao apresentados pela view recebida no construtor; a negativa ou o
   // cancelamento ja apresentado pelo legado nao e repetido. Le o login da
-  // sessao a cada inclusao e traduz empresas e validacoes para o contrato da
-  // tela, sem entregar entidades ou listas do contexto Modern.
+  // sessao a cada inclusao, traduz as empresas para o contrato da tela e
+  // encaminha o resultado de validacao do caso de uso, sem entregar entidades
+  // ou listas do contexto Modern.
   TGruposFiscaisPresenter = class
   private
     // A view pertence a tela e as demais dependencias ao container de
@@ -46,8 +47,8 @@ type
 implementation
 
 uses
-  System.SysUtils, Contnrs, EValidacaoNegocioUnit, EmpresaEtdUnit,
-  CreateEntityUseCaseOutputUnit, ValidationEntityOutputUnit;
+  System.SysUtils, EValidacaoNegocioUnit, EmpresaEtdUnit,
+  CreateEntityUseCaseOutputUnit;
 
 const
   // Codigos do cadastro legado usados por esta funcionalidade. O host recebe o
@@ -73,22 +74,6 @@ const
   LixeiraTitle = 'Enviar para a lixeira';
   InclusaoTitle = 'Novo grupo fiscal';
   SalvarTitle = 'Salvar grupo fiscal';
-
-// Traduz a validacao do caso de uso para o contrato da tela preservando a ordem
-// produzida pelo validador. O texto ja vem pronto de GetMessage, que usa o
-// detalhe do item quando existe.
-function TraduzirValidacao(
-  const AValidation: ValidationEntityOutput): TGrupoFiscalFieldErrors;
-var
-  I: Integer;
-begin
-  SetLength(Result, Length(AValidation.Validations));
-  for I := 0 to High(AValidation.Validations) do
-  begin
-    Result[I].Campo := AValidation.Validations[I].FieldName;
-    Result[I].Mensagem := AValidation.Validations[I].GetMessage();
-  end;
-end;
 
 { TGruposFiscaisPresenter }
 
@@ -372,7 +357,7 @@ begin
       if Resultado.Validation.IsValid then
         Result := True
       else
-        FView.ExibirErrosDeCampo(TraduzirValidacao(Resultado.Validation));
+        FView.ExibirValidacao(Resultado.Validation);
     except
       on E: EValidacaoNegocio do
         FView.ShowError(E.Message, SalvarTitle);

@@ -7,7 +7,7 @@ uses
   Vcl.StdCtrls, ConsultaBaseForm, FilterCriterion, IDataSetReaderUnit,
   GridColumnDefinition, GruposFiscaisPresenter, GruposFiscaisView,
   QueryResultOperations, GrupoFiscalCadastro, GrupoFiscalEtdUnit,
-  GrupoFiscalCadastroFrame;
+  GrupoFiscalCadastroFrame, ValidationEntityOutputUnit;
 
 type
   // Tela de consulta e inclusao de Grupos Fiscais. Herda a apresentacao
@@ -49,9 +49,9 @@ type
     destructor Destroy; override;
     function HasPendingChanges: Boolean; override;
     procedure FocusView; override;
-    // Encaminha ao editor da inclusao os erros de campo produzidos pelo
-    // apresentador e posiciona o foco no primeiro campo invalido.
-    procedure ExibirErrosDeCampo(const AErros: TGrupoFiscalFieldErrors);
+    // Encaminha ao editor da inclusao o resultado de validacao produzido pelo
+    // apresentador; o painel do editor apresenta os campos e mensagens.
+    procedure ExibirValidacao(const AValidacao: ValidationEntityOutput);
     procedure AttachPresenter(APresenter: TGruposFiscaisPresenter;
       const AColumns: TGridColumnDefinitions; const ATitle: string;
       AOperations: IQueryResultOperations = nil);
@@ -173,16 +173,15 @@ begin
   Result := (FDraft <> nil) and (FEditor <> nil);
 end;
 
-procedure TfrmGruposFiscais.ExibirErrosDeCampo(
-  const AErros: TGrupoFiscalFieldErrors);
+procedure TfrmGruposFiscais.ExibirValidacao(
+  const AValidacao: ValidationEntityOutput);
 begin
   // A inclusao pode ter sido encerrada por uma troca de sessao antes desta
   // chamada: sem editor nao existe aba para exibir o erro.
   if FEditor = nil then
     Exit;
 
-  FEditor.ExibirValidacao(AErros);
-  FEditor.FocarPrimeiroCampoInvalido;
+  FEditor.ExibirValidacao(AValidacao);
 end;
 
 procedure TfrmGruposFiscais.AvisarSalvamentoSemAtualizacao;

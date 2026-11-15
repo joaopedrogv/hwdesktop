@@ -14,6 +14,7 @@ uses
   QueryFilterSqlBuilder in '..\Queries\Shared\Filters\QueryFilterSqlBuilder.pas',
   FilterFrame in '..\UI\Frames\Shared\Filters\FilterFrame.pas' {frmFilterFrame: TFrame},
   ColumnSelectionFrame in '..\UI\Frames\Shared\Columns\ColumnSelectionFrame.pas' {frmColumnSelectionFrame: TFrame},
+  ValidationPanelFrame in '..\UI\Frames\Shared\Validation\ValidationPanelFrame.pas' {frmValidationPanelFrame: TFrame},
   GrupoFiscalCadastroFrame in '..\UI\Frames\Features\GruposFiscais\GrupoFiscalCadastroFrame.pas' {frmGrupoFiscalCadastroFrame: TFrame},
   ConsultaBaseForm in '..\UI\Forms\Base\ConsultaBaseForm.pas' {frmConsultaBase},
   ColumnSelectionForm in '..\UI\Forms\Shared\Columns\ColumnSelectionForm.pas' {frmColumnSelection: TForm},

@@ -15,15 +15,6 @@ type
 
   TGrupoFiscalEmpresaOptions = TArray<TGrupoFiscalEmpresaOption>;
 
-  // Erro de validacao ja associado ao campo do formulario. Campo repete o nome
-  // usado pelo validador do caso de uso; Mensagem ja vem pronta para exibicao.
-  TGrupoFiscalFieldError = record
-    Campo: string;
-    Mensagem: string;
-  end;
-
-  TGrupoFiscalFieldErrors = TArray<TGrupoFiscalFieldError>;
-
 const
   // Nomes de campo produzidos pelo validador de SalvarGrupoFiscalUseCase.
   GrupoFiscalCampoDescricao = 'Descricao';
