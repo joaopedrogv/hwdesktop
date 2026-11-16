@@ -166,6 +166,7 @@ type
   strict private
     procedure SetupModern();
     procedure SetupModernShutdown();
+    procedure ShutDownApp();
   private
     { Private declarations }
     cxlQuery: TIBQuery;
@@ -621,7 +622,7 @@ begin
       end;
 
     closeallAuditoria;
-    SetupModernShutdown();
+    ShutDownApp();
   end;
 end;
 
@@ -736,12 +737,11 @@ begin
 
   if not dtmEnt.verificaEntrada then
   begin
+    ShutDownApp();
     Exit;
     Abort;
   end;
   vDadosIni.setSistemasRregistrados(sistemasRegistrados(vDadosIni.vEmp.vCNPJ));
-
-  SetupModern();
 
   if (not vDadosIni.vRegistro.vSisCaixaAuxiliar) then
   begin
@@ -1129,7 +1129,11 @@ begin
   TimerProcessamentos.Enabled  := False;
   try
     FechaJanelasMDI(0);
-    dtmEnt.verificaEntrada;
+    if not dtmEnt.verificaEntrada then
+    begin
+      ShutDownApp();
+      Application.Terminate();
+    end;
     obFecd.abreFecDia;
     obFecd.DiaAberto;
 
@@ -1272,6 +1276,12 @@ begin
   @ProcedureInitialize := GetProcAddress(vDadosIni.vModern.AHandle, 'ModernShutDown');
   if Assigned(ProcedureInitialize) then
     ProcedureInitialize();
+end;
+
+procedure TFrmPrincipalCxl.ShutDownApp;
+begin
+  ShutdownNextHost();
+  SetupModernShutdown();
 end;
 
 function TFrmPrincipalCxl.ShowFormMainForm(AFormName: string; AForm: string): Boolean;

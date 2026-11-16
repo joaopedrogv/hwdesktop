@@ -140,7 +140,7 @@ begin
     if vDadosIni.vSistema = 'Fiscal' then
     begin
       transacaoEmpDes.DefaultDatabase := dtmAtivo.bancoFiscal;
-      qrEmpDes.Database := dtmAtivo.bancoFiscal;                  
+      qrEmpDes.Database := dtmAtivo.bancoFiscal;
     end;
   except
   end;
@@ -208,15 +208,11 @@ begin
     if FrmEntrada.ModalResult <> mrOK then
     begin
       Result := false;
-      Application.Terminate;
-      Abort;
     end
     else if not vDadosIni.InstanciaValida then
     begin
       ShowErro('Já existe uma instancia para esse aplicativo em execução');
       Result := false;
-      Application.Terminate;
-      Abort;
     end;
   end
   else
@@ -227,15 +223,11 @@ begin
       Application.MessageBox(pchar('Usuário não tem acesso a empresa: ' + vDadosIni.codEmpresa),
         'Atenção', 0 + 64);
       Result := false;
-      Application.Terminate;
-      Abort;
     end
     else if not vDadosIni.InstanciaValida then
     begin
       ShowErro('Já existe uma instancia para esse aplicativo em execução');
       Result := false;
-      Application.Terminate;
-      Abort;
     end;
   end;
   vDadosIni.setDadosConfig(TSingleton(vDadosIni));
@@ -386,4 +378,3 @@ begin
 end;
 
 end.
-

@@ -857,6 +857,7 @@ type
     procedure UsarPlanilhaParaInserirAlterar(ParamsAdicionais: string);
     procedure SetupModern();
     procedure SetupModernShutdown();
+    procedure ShutDownApp();
   private
     { Private declarations }
 
@@ -4660,8 +4661,8 @@ begin
   if Assigned(vProcessamentos) then
     FreeAndNil(vProcessamentos);
 
-  ShutdownNextHost;
-  SetupModernShutdown();
+  ShutDownApp();
+
 
 //  LiberarDtmsAndUnloadPackage(hdConfig);
 //
@@ -4812,11 +4813,10 @@ begin
 
     if not dtmEnt.verificaEntrada then
     begin
+      ShutDownApp();
       Exit;
       Abort;
     end;
-
-    SetupModern();
 
     vDadosIni.abreStatusProcessamento('','Iniciando relatórios', True);
 
@@ -7199,7 +7199,12 @@ begin
 
     MenusReset;
 
-    dtmEnt.verificaEntrada;
+    if not dtmEnt.verificaEntrada then
+    begin
+      ShutDownApp();
+      Application.Terminate();
+      exit;
+    end;
     vDadosIni.abreStatusProcessamento('','Configurando menus');
     vDadosIni.setSistemasRregistrados(sistemasRegistrados(vDadosIni.vEmp.vCNPJ));
 
@@ -8891,6 +8896,12 @@ begin
   @ProcedureInitialize := GetProcAddress(vDadosIni.vModern.AHandle, 'ModernShutDown');
   if Assigned(ProcedureInitialize) then
     ProcedureInitialize();
+end;
+
+procedure TfrmPrincipalS.ShutDownApp();
+begin
+  ShutdownNextHost();
+  SetupModernShutdown();
 end;
 
 function TfrmPrincipalS.ShowFormMainForm(AFormName: string; AForm: string): Boolean;
