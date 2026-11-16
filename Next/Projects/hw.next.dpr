@@ -26,6 +26,7 @@ uses
   ISessionContextUnit in '..\..\Modern\Core\Domain\Ports\Shared\ISessionContextUnit.pas',
   SessionContextUnit in '..\..\Modern\Core\Application\Contexts\SessionContextUnit.pas',
   NextQueryDefinition in '..\Queries\Shared\NextQueryDefinition.pas',
+  QueryColumnDefinition in '..\Queries\Shared\QueryColumnDefinition.pas',
   PresenterConsultaBase in '..\Queries\Shared\PresenterConsultaBase.pas',
   EventosRtcQueryDefinition in '..\Queries\Features\EventosRtc\EventosRtcQueryDefinition.pas',
   OperacoesFiscaisIbsCbsQueryDefinition in '..\Queries\Features\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsQueryDefinition.pas',

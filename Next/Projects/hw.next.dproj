@@ -158,6 +158,7 @@
         <DCCReference Include="..\..\Modern\Core\Application\Contexts\SessionContextUnit.pas"/>
         <DCCReference Include="..\Queries\Shared\Empresas\EmpresaOptionsBuilder.pas"/>
         <DCCReference Include="..\Queries\Shared\NextQueryDefinition.pas"/>
+        <DCCReference Include="..\Queries\Shared\QueryColumnDefinition.pas"/>
         <DCCReference Include="..\Queries\Shared\PresenterConsultaBase.pas"/>
         <DCCReference Include="..\Queries\Features\EventosRtc\EventosRtcQueryDefinition.pas"/>
         <DCCReference Include="..\Queries\Features\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsQueryDefinition.pas"/>

@@ -3,7 +3,8 @@ unit OperacoesFiscaisIbsCbsQueryDefinition;
 interface
 
 uses
-  IDataSetReaderUnit, QueryResultOperations, FilterCriterion, NextQueryDefinition;
+  IDataSetReaderUnit, QueryResultOperations, FilterCriterion, NextQueryDefinition,
+  QueryColumnDefinition;
 
 type
   // Opcao da tela consultada a cada pesquisa: a marcacao do checkbox pertence a
@@ -16,6 +17,8 @@ type
   TOperacoesFiscaisIbsCbsQueryDefinition = class(TNextQueryDefinitionBase)
   private
     FLixeiraSearch: TLixeiraSearch;
+    // Declaracao unica das colunas; a grade e os filtros saem desta lista.
+    function BuildColumns: TQueryColumnDefinitions;
   protected
     // Colunas e filtros fixos da tela; nao le a opcao do checkbox.
     procedure Configure(); override;
@@ -29,6 +32,8 @@ type
 
 implementation
 
+// A declaracao usa os literais de tipo de valor e de visibilidade destas
+// unidades, alem dos metadados de coluna e filtro.
 uses
   System.SysUtils, ParameterValueUnit, QueryFilterSqlBuilder,
   GridColumnDefinition, FilterDefinition, StatusRegistroEnumUnit,
@@ -117,60 +122,49 @@ begin
   FLixeiraSearch := ALixeiraSearch;
 end;
 
-procedure TOperacoesFiscaisIbsCbsQueryDefinition.Configure();
+function TOperacoesFiscaisIbsCbsQueryDefinition.BuildColumns:
+  TQueryColumnDefinitions;
 begin
-  FColumnsDef := GridColumns([
-    GridColumn('O_DATA_INI_VIGENCIA', 'Inicio Vigencia', 110),
-    GridColumn('O_DATA_FIM_VIGENCIA', 'Fim Vigencia', 110),
-    GridColumn('OP_SEQID', 'Cod. Op Interna', 90),
-    GridColumn('OP_DESCRICAO', 'Operação Interna', 200, qcaDefault,
+  // Cada coluna e declarada uma vez, com o tipo usado pelo campo de filtro e o
+  // comportamento de visibilidade usado pela grade. As colunas sempre visiveis
+  // continuam filtraveis.
+  Result := QueryColumns([
+    QueryColumn('O_DATA_INI_VIGENCIA', 'Inicio Vigencia', fftDateTime, 110),
+    QueryColumn('O_DATA_FIM_VIGENCIA', 'Fim Vigencia', fftDateTime, 110),
+    QueryColumn('OP_SEQID', 'Cod. Op Interna', fftInteger, 90),
+    QueryColumn('OP_DESCRICAO', 'Operação Interna', fftString, 200,
+      qcaDefault, gcbAlwaysVisible),
+    QueryColumn('G_SEQID', 'Cod. Grupo Fiscal', fftInteger, 90),
+    QueryColumn('G_DESCRICAO', 'Grupo Fiscal', fftString, 180, qcaDefault,
       gcbAlwaysVisible),
-    GridColumn('G_SEQID', 'Cod. Grupo Fiscal', 90),
-    GridColumn('G_DESCRICAO', 'Grupo Fiscal', 180, qcaDefault, gcbAlwaysVisible),
-    GridColumn('G_TIPO_TRIBUTO', 'Tipo Tributo', 110),
-    GridColumn('R_DESCRICAO', 'Regra Fiscal', 180, qcaDefault, gcbAlwaysVisible),
-    GridColumn('R_CCLASSTRIB', 'CClass Trib', 90, qcaDefault, gcbAlwaysVisible),
-    GridColumn('R_PDIFCBS', 'Perc Diferimento CBS', 130, qcaDefault,
-      gcbConfigurableVisible, PercentDisplayFormat),
-    GridColumn('R_PDIFIBSUF', 'Perc Diferimento IBS UF', 140, qcaDefault,
-      gcbConfigurableVisible, PercentDisplayFormat),
-    GridColumn('R_PDIFIBSMUN', 'Perc Diferimento IBS Municipio', 150, qcaDefault,
-      gcbConfigurableVisible, PercentDisplayFormat),
-    GridColumn('R_DATA_INI_VIGENCIA', 'Inicio Vigencia Regra Fiscal', 140),
-    GridColumn('R_DATA_FIM_VIGENCIA', 'Fim Vigencia Regra Fiscal', 140)
+    QueryColumn('G_TIPO_TRIBUTO', 'Tipo Tributo', fftString, 110),
+    QueryColumn('R_DESCRICAO', 'Regra Fiscal', fftString, 180, qcaDefault,
+      gcbAlwaysVisible),
+    QueryColumn('R_CCLASSTRIB', 'CClass Trib', fftString, 90, qcaDefault,
+      gcbAlwaysVisible),
+    QueryColumn('R_PDIFCBS', 'Perc Diferimento CBS', fftCurrency, 130,
+      qcaDefault, gcbConfigurableVisible, PercentDisplayFormat),
+    QueryColumn('R_PDIFIBSUF', 'Perc Diferimento IBS UF', fftCurrency, 140,
+      qcaDefault, gcbConfigurableVisible, PercentDisplayFormat),
+    QueryColumn('R_PDIFIBSMUN', 'Perc Diferimento IBS Municipio', fftCurrency,
+      150, qcaDefault, gcbConfigurableVisible, PercentDisplayFormat),
+    QueryColumn('R_DATA_INI_VIGENCIA', 'Inicio Vigencia Regra Fiscal',
+      fftDateTime, 140),
+    QueryColumn('R_DATA_FIM_VIGENCIA', 'Fim Vigencia Regra Fiscal',
+      fftDateTime, 140)
   ]);
-  // Os filtros usam os aliases externos. O estado do registro nao esta aqui: o
-  // checkbox da tela escolhe entre ativos e lixeira em cada pesquisa.
-  FFiltersDef := FilterDefinitionOf([
-    FilterField('OP_DESCRICAO', 'Operação Interna', fftString,
-      FilterDefaultOperators(fftString)),
-    FilterField('G_DESCRICAO', 'Grupo Fiscal', fftString,
-      FilterDefaultOperators(fftString)),
-    FilterField('R_DESCRICAO', 'Regra Fiscal', fftString,
-      FilterDefaultOperators(fftString)),
-    FilterField('R_CCLASSTRIB', 'CClass Trib', fftString,
-      FilterDefaultOperators(fftString)),
-    FilterField('G_TIPO_TRIBUTO', 'Tipo Tributo', fftString,
-      FilterDefaultOperators(fftString)),
-    FilterField('OP_SEQID', 'Cod. Op Interna', fftInteger,
-      FilterDefaultOperators(fftInteger)),
-    FilterField('G_SEQID', 'Cod. Grupo Fiscal', fftInteger,
-      FilterDefaultOperators(fftInteger)),
-    FilterField('O_DATA_INI_VIGENCIA', 'Inicio Vigencia', fftDateTime,
-      FilterDefaultOperators(fftDateTime)),
-    FilterField('O_DATA_FIM_VIGENCIA', 'Fim Vigencia', fftDateTime,
-      FilterDefaultOperators(fftDateTime)),
-    FilterField('R_DATA_INI_VIGENCIA', 'Inicio Vigencia Regra Fiscal',
-      fftDateTime, FilterDefaultOperators(fftDateTime)),
-    FilterField('R_DATA_FIM_VIGENCIA', 'Fim Vigencia Regra Fiscal',
-      fftDateTime, FilterDefaultOperators(fftDateTime)),
-    FilterField('R_PDIFCBS', 'Perc Diferimento CBS', fftCurrency,
-      FilterDefaultOperators(fftCurrency)),
-    FilterField('R_PDIFIBSUF', 'Perc Diferimento IBS UF', fftCurrency,
-      FilterDefaultOperators(fftCurrency)),
-    FilterField('R_PDIFIBSMUN', 'Perc Diferimento IBS Municipio', fftCurrency,
-      FilterDefaultOperators(fftCurrency))
-  ], True);
+end;
+
+procedure TOperacoesFiscaisIbsCbsQueryDefinition.Configure();
+var
+  Columns: TQueryColumnDefinitions;
+begin
+  Columns := BuildColumns;
+  FColumnsDef := BuildGridColumns(Columns);
+  // Os filtros usam os aliases externos da mesma declaracao, na ordem das
+  // colunas. O estado do registro nao esta aqui: o checkbox da tela escolhe
+  // entre ativos e lixeira em cada pesquisa.
+  FFiltersDef := BuildFilterDefinition(Columns, True);
 end;
 
 function TOperacoesFiscaisIbsCbsQueryDefinition.CreateQueryDefinition(
