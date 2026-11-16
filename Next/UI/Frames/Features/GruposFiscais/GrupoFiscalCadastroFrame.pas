@@ -3,15 +3,17 @@ unit GrupoFiscalCadastroFrame;
 interface
 
 uses
-  System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, Vcl.CheckLst,
-  TipoTributoFiscalEnumUnit, TipoComunsUnit, GrupoFiscalCadastro,
-  ValidationPanelFrame, ValidationEntityOutputUnit;
+  System.SysUtils, System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls,
+  Vcl.CheckLst, TipoTributoFiscalEnumUnit, TipoComunsUnit,
+  GrupoFiscalCadastro, GrupoFiscalEtdUnit, ValidationPanelFrame,
+  ValidationEntityOutputUnit;
 
 type
-  // Editor dos campos do grupo fiscal. O frame apenas apresenta e coleta
-  // descricao, tipo de tributo e empresas; a autorizacao, a gravacao e o
-  // descarte do rascunho pertencem ao formulario que o contem. Os erros do caso
-  // de uso sao apresentados pelo painel comum, que agrupa as mensagens por campo.
+  // Editor dos campos do grupo fiscal. O frame apresenta e coleta descricao,
+  // tipo de tributo e empresas e e o dono do rascunho da aba: a autorizacao, a
+  // gravacao e a troca de sessao pertencem ao formulario que o contem. Os erros
+  // do caso de uso sao apresentados pelo painel comum, que agrupa as mensagens
+  // por campo.
   TfrmGrupoFiscalCadastroFrame = class(TFrame)
     lblDescricao: TLabel;
     edDescricao: TEdit;
@@ -21,6 +23,10 @@ type
     clbEmpresas: TCheckListBox;
     fraValidacao: TfrmValidationPanelFrame;
   private
+    // Rascunho da aba. A inclusao cria a entidade e a alteracao recebe uma copia
+    // independente do registro carregado; o frame libera o rascunho ao ser
+    // destruido, junto com a aba.
+    FRascunho: GrupoFiscalEtd;
     // Identificador de cada linha do checklist, na mesma ordem dos itens
     // exibidos. A tela le os ids marcados, nunca as posicoes.
     FIdsEmpresas: TArrayInteger;
@@ -37,17 +43,21 @@ type
     procedure SetTipoTributo(const AValue: TipoTributoFiscalEnum);
   public
     constructor Create(AOwner: TComponent); override;
-    // Reinicia o frame para uma inclusao: descricao vazia, tributo indefinido e
-    // lista de empresas reconstruida a partir das opcoes recebidas.
+    destructor Destroy; override;
+    // Reinicia o frame para uma inclusao: descarta o rascunho anterior, cria o
+    // novo e reconstroi a lista de empresas a partir das opcoes recebidas.
     procedure PrepararInclusao(const AOpcoes: TGrupoFiscalEmpresaOptions);
-    // Prepara a alteracao de um grupo existente: descricao e tipo recebidos, o
-    // tipo permanece bloqueado e as empresas vinculadas iniciam marcadas,
-    // inclusive as que o usuario nao pode habilitar.
-    procedure PrepararAlteracao(const ADescricao: string;
-      ATipoTributo: TipoTributoFiscalEnum;
+    // Prepara a alteracao de um grupo existente. A entidade recebida nao e
+    // assumida: o frame guarda um clone com empresas independentes. O tipo
+    // permanece bloqueado e as empresas vinculadas iniciam marcadas, inclusive
+    // as que o usuario nao pode habilitar.
+    procedure PrepararAlteracao(const AGrupo: GrupoFiscalEtd;
       const AOpcoes: TGrupoFiscalEmpresaOptions);
-    // Limpa campos e lista. A validacao tem limpeza propria, porque o descarte
-    // do rascunho limpa apenas as mensagens.
+    // Transfere os campos editados para o rascunho da aba. Nao grava: a
+    // gravacao pertence ao formulario. Retorna False quando nao ha rascunho.
+    function AplicarCamposAoRascunho: Boolean;
+    // Limpa os campos e a lista. Nao libera o rascunho, que pertence ao ciclo da
+    // aba.
     procedure LimparCampos;
     procedure LimparValidacao;
     // Encaminha o resultado do caso de uso ao painel de validacao, que agrupa os
@@ -56,6 +66,8 @@ type
     // Foca o primeiro campo com erro; sem erro vinculado, foca a descricao.
     function FocarPrimeiroCampoInvalido: Boolean;
     function EmpresasSelecionadas: TArrayInteger;
+    function TemRascunho: Boolean;
+    property Rascunho: GrupoFiscalEtd read FRascunho;
     property Descricao: string read GetDescricao write SetDescricao;
     property TipoTributo: TipoTributoFiscalEnum read GetTipoTributo
       write SetTipoTributo;
@@ -64,6 +76,10 @@ type
 implementation
 
 {$R *.dfm}
+
+const
+  RascunhoNaoInformadoMessage =
+    'O grupo fiscal da alteração não foi informado.';
 
 constructor TfrmGrupoFiscalCadastroFrame.Create(AOwner: TComponent);
 begin
@@ -77,6 +93,12 @@ begin
   fraValidacao.Bind(GrupoFiscalCampoDescricao, edDescricao, 'Descrição');
   fraValidacao.Bind(GrupoFiscalCampoTipoTributo, cbTipoTributo,
     'Tipo de tributo');
+end;
+
+destructor TfrmGrupoFiscalCadastroFrame.Destroy;
+begin
+  FreeAndNil(FRascunho);
+  inherited;
 end;
 
 procedure TfrmGrupoFiscalCadastroFrame.CarregarOpcoesTributo;
@@ -100,7 +122,7 @@ procedure TfrmGrupoFiscalCadastroFrame.LimparCampos;
 begin
   edDescricao.Clear;
   // A alteracao bloqueia o tipo de tributo; limpar devolve o editor ao estado
-  // neutro para a proxima inclusao.
+  // neutro para a proxima inclusao. O rascunho nao e liberado aqui.
   cbTipoTributo.Enabled := True;
   cbTipoTributo.ItemIndex := Ord(tfIndefinido);
   clbEmpresas.Items.Clear;
@@ -110,25 +132,63 @@ end;
 procedure TfrmGrupoFiscalCadastroFrame.PrepararInclusao(
   const AOpcoes: TGrupoFiscalEmpresaOptions);
 begin
+  FreeAndNil(FRascunho);
+  FRascunho := GrupoFiscalEtd.Create;
   LimparCampos;
   LimparValidacao;
   MontarListaEmpresas(AOpcoes);
 end;
 
 procedure TfrmGrupoFiscalCadastroFrame.PrepararAlteracao(
-  const ADescricao: string; ATipoTributo: TipoTributoFiscalEnum;
+  const AGrupo: GrupoFiscalEtd;
   const AOpcoes: TGrupoFiscalEmpresaOptions);
+var
+  Copia: GrupoFiscalEtd;
 begin
+  if AGrupo = nil then
+    raise Exception.Create(RascunhoNaoInformadoMessage);
+
+  // O clone preserva o identificador e os demais campos; as empresas recebem
+  // um array proprio para que a edicao nao altere a entidade de quem chamou.
+  Copia := GrupoFiscalEtd(AGrupo.Clone());
+  try
+    Copia.EmpresasId := Copy(AGrupo.EmpresasId, 0, Length(AGrupo.EmpresasId));
+  except
+    Copia.Free;
+    raise;
+  end;
+
+  FreeAndNil(FRascunho);
+  FRascunho := Copia;
+
   LimparCampos;
-  LimparValidacao;
-  Descricao := ADescricao;
-  TipoTributo := ATipoTributo;
+  Descricao := FRascunho.Descricao;
+  TipoTributo := FRascunho.TipoTributo;
 
   // O tipo de tributo nao e alteravel: o campo apenas apresenta o valor gravado.
   // A lista recebida marca as empresas vinculadas e desabilita as que o usuario
   // nao pode habilitar.
   cbTipoTributo.Enabled := False;
+  LimparValidacao;
   MontarListaEmpresas(AOpcoes);
+end;
+
+function TfrmGrupoFiscalCadastroFrame.AplicarCamposAoRascunho: Boolean;
+begin
+  Result := FRascunho <> nil;
+  if not Result then
+    Exit;
+
+  // Somente os tres campos da aba sao mapeados; os demais permanecem com os
+  // padroes de criacao ou da copia carregada.
+  FRascunho.Descricao := Trim(Descricao);
+  FRascunho.TipoTributo := TipoTributo;
+  FRascunho.EmpresasId := EmpresasSelecionadas;
+end;
+
+function TfrmGrupoFiscalCadastroFrame.TemRascunho: Boolean;
+begin
+  Result := FRascunho <> nil;
 end;
 
 procedure TfrmGrupoFiscalCadastroFrame.MontarListaEmpresas(

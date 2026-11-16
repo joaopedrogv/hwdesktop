@@ -3,30 +3,19 @@ unit GruposFiscaisForm;
 interface
 
 uses
-  Winapi.Windows, System.SysUtils, System.Generics.Collections, Data.DB,
+  Winapi.Windows, System.SysUtils, Data.DB,
   Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, ConsultaBaseForm, GruposFiscaisPresenter,
   GruposFiscaisView, NextQueryDefinition, GruposFiscaisQueryDefinition,
   GrupoFiscalCadastro, GrupoFiscalEtdUnit, GrupoFiscalCadastroFrame,
   ValidationEntityOutputUnit;
 
 type
-  // Contexto de uma aba de alteracao. O editor pertence a aba criada pela base,
-  // que o libera junto com ela; o rascunho pertence ao contexto e e descartado
-  // quando a aba e encerrada.
-  TContextoEdicao = class
-  public
-    Chave: string;
-    Editor: TfrmGrupoFiscalCadastroFrame;
-    Rascunho: GrupoFiscalEtd;
-    destructor Destroy; override;
-  end;
-
   // Tela de consulta, inclusao e alteracao de Grupos Fiscais. Herda a
   // apresentacao generica e acrescenta a consulta, a alteracao, o envio da linha
   // corrente para a lixeira e as abas de cadastro. A inclusao e cada registro
-  // alterado ocupam uma aba propria, com editor e rascunho da propria aba. O
-  // apresentador e o leitor sao injetados pela composicao; o editor pertence a
-  // aba criada pela base.
+  // alterado ocupam uma aba propria, cujo editor e dono do rascunho. O
+  // apresentador e o leitor sao injetados pela composicao; a base cria a aba e o
+  // editor a partir do contrato comum.
   TfrmGruposFiscais = class(TfrmConsultaBase, IGruposFiscaisView)
     btnNovo: TButton;
     btnAlterar: TButton;
@@ -36,23 +25,6 @@ type
     procedure btnEnviarLixeiraClick(Sender: TObject);
   private
     FPresenter: TGruposFiscaisPresenter;
-    // Rascunho da inclusao corrente. A existencia do objeto e a pendencia: na
-    // inclusao nao existe estado aberto sem alteracao a gravar, porque as
-    // empresas permitidas ja iniciam marcadas.
-    FDraft: GrupoFiscalEtd;
-    // Referencia ao editor criado pela base para a aba de inclusao. A posse do
-    // controle e da area de rolagem da aba, que o libera junto com ela.
-    FEditor: TfrmGrupoFiscalCadastroFrame;
-    // Empresas lidas antes de abrir a aba de inclusao, mantidas ate o preparo do
-    // editor.
-    FOpcoesEmpresas: TGrupoFiscalEmpresaOptions;
-    // Registro carregado e empresas lidas antes de a aba de alteracao existir.
-    // Os dois passam para o contexto da aba quando ela e montada.
-    FAlteracaoGrupo: GrupoFiscalEtd;
-    FAlteracaoOpcoes: TGrupoFiscalEmpresaOptions;
-    // Contextos das abas de alteracao abertas, um por chave de registro. A lista
-    // nasce no primeiro uso e e liberada na destruicao.
-    FContextosEdicao: TObjectList<TContextoEdicao>;
     // Contrato tipado da consulta: entrega o identificador da linha corrente
     // usado por Alterar e Lixeira.
     FDefinicaoSelecao: INextQueryDefinition<TGrupoSelecionado>;
@@ -60,49 +32,34 @@ type
     // Lixeira exigem uma linha corrente identificada na grade.
     procedure AtualizarComandos;
     procedure dsConsultaDataChange(Sender: TObject; Field: TField);
-    function ListaContextosEdicao: TObjectList<TContextoEdicao>;
-    function ContextoEdicao(const AChave: string): TContextoEdicao;
-    procedure RemoverContextoEdicao(const AChave: string);
     function TemRegistroCorrente: Boolean;
-    procedure DescartarAlteracaoPendente;
   protected
     function CanPesquisar: Boolean; override;
     procedure DoInitializeView; override;
-    // A base cria a aba, o rodape e a area de rolagem; a tela fornece o editor
-    // tipado usado pelos hooks de abertura, gravacao e foco.
-    function CriarEditorInclusao(AParent: TWinControl): TWinControl; override;
-    procedure AoAbrirAbaInclusao; override;
-    procedure AoFecharAbaInclusao; override;
-    procedure AoFalharAberturaAbaInclusao; override;
-    function SalvarInclusao: Boolean; override;
-    procedure AvisarSalvamentoSemAtualizacao; override;
-    // Hooks da aba de alteracao: o editor e o rascunho pertencem ao contexto
-    // identificado pela chave.
-    function CriarEditorEdicao(AParent: TWinControl;
-      const AChave: string): TWinControl; override;
-    procedure AoAbrirAbaEdicao(const AChave: string;
-      AEditor: TWinControl); override;
-    procedure AoFecharAbaEdicao(const AChave: string;
-      AEditor: TWinControl); override;
-    procedure AoFalharAberturaAbaEdicao(const AChave: string); override;
-    function SalvarEdicao(const AChave: string;
+    // A base cria a aba e a area de rolagem; a tela fornece o editor tipado que
+    // possui o rascunho da aba.
+    function CriarEditor(const AChave: string;
+      AParent: TWinControl): TWinControl; override;
+    // O frame da aba aplica os campos ao proprio rascunho e o apresentador
+    // executa a gravacao. Depois de Salvar o frame nao e mais acessado: uma
+    // troca de sessao pode te-lo liberado.
+    function SalvarAba(const AChave: string;
       AEditor: TWinControl): Boolean; override;
+    procedure AvisarSalvamentoSemAtualizacao; override;
   public
     destructor Destroy; override;
     function HasPendingChanges: Boolean; override;
     procedure FocusView; override;
-    // Encaminha ao editor da aba o resultado de validacao produzido pelo
-    // apresentador; o painel de validacao pertence a cada editor. A chave vazia
-    // identifica a inclusao e um identificador identifica a aba da alteracao.
-    procedure ExibirValidacao(const AChave: string;
-      const AValidacao: ValidationEntityOutput);
+    // Encaminha ao editor da aba que iniciou a gravacao o resultado de validacao
+    // produzido pelo apresentador; o painel pertence a cada editor.
+    procedure ExibirValidacao(const AValidacao: ValidationEntityOutput);
     // Reapresenta a aba de alteracao da chave ja aberta. Sem aba, nada e criado
     // e a alteracao segue para a autorizacao e a carga.
     function AtivarEdicao(const AChave: string): Boolean;
-    // Assume o rascunho carregado no ponto de transferencia e monta a aba da
-    // chave. A falha de montagem descarta a carga pendente e informa uma unica
-    // vez.
-    function AbrirEdicao(const AChave: string; var AGrupo: GrupoFiscalEtd;
+    // Abre a aba da chave e copia o grupo carregado para o rascunho do editor.
+    // A entidade continua pertencendo a quem chamou. A falha de montagem e
+    // informada uma unica vez.
+    function AbrirEdicao(const AChave: string; const AGrupo: GrupoFiscalEtd;
       const AOpcoes: TGrupoFiscalEmpresaOptions): Boolean;
     procedure AttachPresenter(APresenter: TGruposFiscaisPresenter;
       const ADefinition: INextQueryDefinitionBase; const ATitle: string);
@@ -116,23 +73,12 @@ const
   MissingPresenterMessage = 'O apresentador de Grupos Fiscais nao foi informado.';
   MissingDefinitionMessage = 'A definicao da consulta nao foi informada.';
 
-{ TContextoEdicao }
-
-destructor TContextoEdicao.Destroy;
-begin
-  FreeAndNil(Rascunho);
-  inherited;
-end;
-
 destructor TfrmGruposFiscais.Destroy;
 begin
   try
-    // Nenhum controle e tocado na destruicao: apenas a posse dos objetos
-    // transientes desta tela e liberada. A base e os componentes do formulario
-    // liberam as abas, os editores e o resultado.
-    FreeAndNil(FContextosEdicao);
-    DescartarAlteracaoPendente;
-    FreeAndNil(FDraft);
+    // Nenhum controle e tocado na destruicao: a base e os componentes do
+    // formulario liberam as abas, os editores e os rascunhos. Aqui se libera
+    // apenas o apresentador transiente desta tela.
     FreeAndNil(FPresenter);
   finally
     inherited;
@@ -203,58 +149,6 @@ begin
   Result := Trim(Selecionado.Id) <> '';
 end;
 
-function TfrmGruposFiscais.ListaContextosEdicao: TObjectList<TContextoEdicao>;
-begin
-  // A lista nasce no primeiro uso: telas que nunca abrem uma alteracao nao
-  // alocam estrutura alguma.
-  if FContextosEdicao = nil then
-    FContextosEdicao := TObjectList<TContextoEdicao>.Create;
-  Result := FContextosEdicao;
-end;
-
-function TfrmGruposFiscais.ContextoEdicao(
-  const AChave: string): TContextoEdicao;
-var
-  Chave: string;
-  I: Integer;
-begin
-  Result := nil;
-  if FContextosEdicao = nil then
-    Exit;
-
-  Chave := Trim(AChave);
-  for I := 0 to FContextosEdicao.Count - 1 do
-    if FContextosEdicao[I].Chave = Chave then
-    begin
-      Result := FContextosEdicao[I];
-      Break;
-    end;
-end;
-
-procedure TfrmGruposFiscais.RemoverContextoEdicao(const AChave: string);
-var
-  Chave: string;
-  I: Integer;
-begin
-  if FContextosEdicao = nil then
-    Exit;
-
-  // A lista libera o contexto e, com ele, o rascunho descartado da aba.
-  Chave := Trim(AChave);
-  for I := 0 to FContextosEdicao.Count - 1 do
-    if FContextosEdicao[I].Chave = Chave then
-    begin
-      FContextosEdicao.Delete(I);
-      Break;
-    end;
-end;
-
-procedure TfrmGruposFiscais.DescartarAlteracaoPendente;
-begin
-  SetLength(FAlteracaoOpcoes, 0);
-  FreeAndNil(FAlteracaoGrupo);
-end;
-
 procedure TfrmGruposFiscais.dsConsultaDataChange(Sender: TObject; Field: TField);
 begin
   AtualizarComandos;
@@ -278,214 +172,85 @@ begin
   Result := (FPresenter <> nil) and FPresenter.AutorizarPesquisa;
 end;
 
-function TfrmGruposFiscais.CriarEditorInclusao(
+function TfrmGruposFiscais.CriarEditor(const AChave: string;
   AParent: TWinControl): TWinControl;
 begin
-  // O editor nasce pertencendo a area de rolagem: quando a aba for liberada, a
-  // area leva o editor junto e nao existe uma segunda liberacao.
-  FEditor := TfrmGrupoFiscalCadastroFrame.Create(AParent);
-  Result := FEditor;
+  // Cada aba recebe o proprio frame, dono do rascunho correspondente. A base
+  // define Parent e Align e libera o editor junto com a aba.
+  Result := TfrmGrupoFiscalCadastroFrame.Create(AParent);
 end;
 
-function TfrmGruposFiscais.CriarEditorEdicao(AParent: TWinControl;
-  const AChave: string): TWinControl;
-var
-  Contexto: TContextoEdicao;
-begin
-  // Cada aba recebe o proprio editor e o proprio contexto: os dois nascem juntos
-  // e o contexto e descartado quando a aba e encerrada.
-  Contexto := TContextoEdicao.Create;
-  try
-    Contexto.Chave := Trim(AChave);
-    Contexto.Editor := TfrmGrupoFiscalCadastroFrame.Create(AParent);
-    ListaContextosEdicao.Add(Contexto);
-    Result := Contexto.Editor;
-  except
-    // Sem o editor nao existe aba para este contexto.
-    Contexto.Free;
-    raise;
-  end;
-end;
-
-procedure TfrmGruposFiscais.AoAbrirAbaInclusao;
-begin
-  // A aba ja esta montada; o rascunho nasce aqui para que HasPendingChanges
-  // reflita exatamente o periodo de edicao.
-  FEditor.PrepararInclusao(FOpcoesEmpresas);
-  FDraft := GrupoFiscalEtd.Create;
-end;
-
-procedure TfrmGruposFiscais.AoFecharAbaInclusao;
-begin
-  // A base libera a aba em seguida: nenhuma referencia pode sobreviver ao
-  // editor, e o rascunho pertence ao mesmo escopo da aba.
-  FEditor := nil;
-  FreeAndNil(FDraft);
-  FOpcoesEmpresas := nil;
-end;
-
-procedure TfrmGruposFiscais.AoFalharAberturaAbaInclusao;
-begin
-  // A aba parcial ja foi liberada pela base; limpar apenas o estado proprio
-  // evita apontar para o editor destruido.
-  FEditor := nil;
-  FreeAndNil(FDraft);
-  FOpcoesEmpresas := nil;
-end;
-
-procedure TfrmGruposFiscais.AoAbrirAbaEdicao(const AChave: string;
-  AEditor: TWinControl);
-var
-  Contexto: TContextoEdicao;
-begin
-  Contexto := ContextoEdicao(AChave);
-  if Contexto = nil then
-    Exit;
-
-  // A carga feita antes de abrir a aba passa a pertencer a esta aba: o rascunho
-  // e as empresas deixam de ser pendencia da tela.
-  Contexto.Rascunho := FAlteracaoGrupo;
-  FAlteracaoGrupo := nil;
-  if Contexto.Rascunho = nil then
-  begin
-    SetLength(FAlteracaoOpcoes, 0);
-    Exit;
-  end;
-
-  // O tipo de tributo e apresentado bloqueado e as empresas vinculadas chegam
-  // marcadas; a tela nao decide nenhum desses valores.
-  Contexto.Editor.PrepararAlteracao(Contexto.Rascunho.Descricao,
-    Contexto.Rascunho.TipoTributo, FAlteracaoOpcoes);
-  SetLength(FAlteracaoOpcoes, 0);
-end;
-
-procedure TfrmGruposFiscais.AoFecharAbaEdicao(const AChave: string;
-  AEditor: TWinControl);
-begin
-  // A base libera a aba em seguida: o contexto e o rascunho sao descartados
-  // antes disso, com o editor ainda existente.
-  RemoverContextoEdicao(AChave);
-end;
-
-procedure TfrmGruposFiscais.AoFalharAberturaAbaEdicao(const AChave: string);
-begin
-  // A aba parcial ja foi liberada pela base: resta descartar o contexto criado
-  // com o editor, sem tocar em controle destruido.
-  RemoverContextoEdicao(AChave);
-end;
-
-function TfrmGruposFiscais.SalvarInclusao: Boolean;
-begin
-  Result := False;
-  if (FDraft = nil) or (FEditor = nil) or (FPresenter = nil) then
-    Exit;
-
-  // Somente os tres campos da aba sao mapeados; os demais permanecem com os
-  // padroes de criacao do rascunho.
-  FDraft.Descricao := Trim(FEditor.Descricao);
-  FDraft.TipoTributo := FEditor.TipoTributo;
-  FDraft.EmpresasId := FEditor.EmpresasSelecionadas;
-  FEditor.LimparValidacao;
-
-  if not FPresenter.Salvar(FDraft) then
-    Exit;
-
-  // Uma mensagem modal do apresentador pode despachar uma troca de sessao, que
-  // encerra a inclusao. Sem rascunho e sem editor nao existe aba a encerrar: a
-  // base nao deve receber o pedido de fechamento.
-  Result := (FDraft <> nil) and (FEditor <> nil);
-end;
-
-function TfrmGruposFiscais.SalvarEdicao(const AChave: string;
+function TfrmGruposFiscais.SalvarAba(const AChave: string;
   AEditor: TWinControl): Boolean;
 var
-  Contexto: TContextoEdicao;
+  Frame: TfrmGrupoFiscalCadastroFrame;
 begin
   Result := False;
-  Contexto := ContextoEdicao(AChave);
-  if (Contexto = nil) or (Contexto.Rascunho = nil) or (FPresenter = nil) then
+  if (FPresenter = nil) or
+    (not (AEditor is TfrmGrupoFiscalCadastroFrame)) then
     Exit;
 
-  // O rascunho e a entidade carregada: o identificador permanece e o caso de uso
-  // grava por Put. Somente os campos editaveis sao remapeados.
-  Contexto.Rascunho.Descricao := Trim(Contexto.Editor.Descricao);
-  Contexto.Rascunho.TipoTributo := Contexto.Editor.TipoTributo;
-  Contexto.Rascunho.EmpresasId := Contexto.Editor.EmpresasSelecionadas;
-  Contexto.Editor.LimparValidacao;
-
-  if not FPresenter.Salvar(Contexto.Rascunho) then
+  Frame := TfrmGrupoFiscalCadastroFrame(AEditor);
+  if not Frame.TemRascunho then
     Exit;
 
-  // Uma mensagem modal do apresentador pode despachar uma troca de sessao, que
-  // encerra esta aba. O contexto ja pode ter sido liberado: a base so recebe o
-  // pedido de fechamento se a aba ainda existir.
-  Result := ContextoEdicao(AChave) <> nil;
+  Frame.LimparValidacao;
+  if not Frame.AplicarCamposAoRascunho then
+    Exit;
+
+  // A entidade pertence ao frame e continua valida durante a chamada. Depois de
+  // Salvar o frame nao e mais acessado: uma troca de sessao pode te-lo liberado.
+  Result := FPresenter.Salvar(Frame.Rascunho);
 end;
 
-procedure TfrmGruposFiscais.ExibirValidacao(const AChave: string;
+procedure TfrmGruposFiscais.ExibirValidacao(
   const AValidacao: ValidationEntityOutput);
 var
-  Contexto: TContextoEdicao;
+  Editor: TWinControl;
 begin
-  // A inclusao nao tem identificador: o painel pertence ao editor dela. A aba
+  // O formulario encaminha o resultado para a aba que iniciou a gravacao. A aba
   // pode ter sido encerrada por uma troca de sessao antes desta chamada.
-  if Trim(AChave) = '' then
-  begin
-    if FEditor <> nil then
-      FEditor.ExibirValidacao(AValidacao);
-    Exit;
-  end;
-
-  Contexto := ContextoEdicao(AChave);
-  if (Contexto = nil) or (Contexto.Editor = nil) then
-    Exit;
-
-  Contexto.Editor.ExibirValidacao(AValidacao);
+  Editor := EditorDaAba(ChaveAbaEmGravacao);
+  if Editor is TfrmGrupoFiscalCadastroFrame then
+    TfrmGrupoFiscalCadastroFrame(Editor).ExibirValidacao(AValidacao);
 end;
 
 function TfrmGruposFiscais.AtivarEdicao(const AChave: string): Boolean;
 begin
   // Reabrir devolve a aba existente sem repetir autorizacao nem recarregar o
   // registro: o rascunho ainda pertence a sessao atual.
-  Result := AbaEdicaoAberta[AChave];
+  Result := AbaAberta(AChave);
   if Result then
-    AtivarAbaEdicao(AChave);
+    AtivarAba(AChave);
 end;
 
 function TfrmGruposFiscais.AbrirEdicao(const AChave: string;
-  var AGrupo: GrupoFiscalEtd;
+  const AGrupo: GrupoFiscalEtd;
   const AOpcoes: TGrupoFiscalEmpresaOptions): Boolean;
 var
   Titulo: string;
+  Grupo: GrupoFiscalEtd;
+  Opcoes: TGrupoFiscalEmpresaOptions;
 begin
   Result := False;
   if AGrupo = nil then
     Exit;
 
-  // O titulo usa a descricao antes de a posse do rascunho passar para a aba.
+  // O titulo usa a descricao antes de o frame clonar a entidade recebida.
   Titulo := 'Alterar - ' + AGrupo.Descricao;
 
-  // A transferencia de posse acontece antes de a base criar a aba: o hook de
-  // abertura encontra o rascunho pendente e o leva para o contexto, que o
-  // libera junto com a aba.
-  FAlteracaoGrupo := AGrupo;
-  AGrupo := nil;
-  FAlteracaoOpcoes := AOpcoes;
-  try
-    Result := AbrirAbaEdicao(AChave, Titulo);
-  except
-    // A base ja liberou a aba parcial e o hook de falha descartou o contexto;
-    // aqui se descarta o rascunho que nao chegou a uma aba. A falha e informada
-    // uma unica vez.
-    DescartarAlteracaoPendente;
-    ShowError('Não foi possível iniciar a alteração do grupo fiscal.');
-    Exit;
-  end;
+  // O frame copia o grupo e as opcoes durante a abertura; o apresentador libera
+  // a entidade original no finally.
+  Grupo := AGrupo;
+  Opcoes := AOpcoes;
+  Result := AbrirAba(AChave, Titulo,
+    procedure(AEditor: TWinControl)
+    begin
+      TfrmGrupoFiscalCadastroFrame(AEditor).PrepararAlteracao(Grupo, Opcoes);
+    end);
 
-  // Uma aba que ja existia nao consome a carga pendente: o rascunho nao
-  // pertence a nenhuma aba.
-  if FAlteracaoGrupo <> nil then
-    DescartarAlteracaoPendente;
+  if not Result then
+    ShowError('Não foi possível iniciar a alteração do grupo fiscal.');
 end;
 
 procedure TfrmGruposFiscais.AvisarSalvamentoSemAtualizacao;
@@ -498,42 +263,33 @@ end;
 function TfrmGruposFiscais.HasPendingChanges: Boolean;
 var
   I: Integer;
+  Editor: TWinControl;
 begin
-  // Qualquer rascunho aberto e pendencia: a inclusao ja contem dados a gravar e
-  // cada aba de alteracao com rascunho tambem.
-  Result := FDraft <> nil;
-  if Result or (FContextosEdicao = nil) then
-    Exit;
-
-  for I := 0 to FContextosEdicao.Count - 1 do
-    if FContextosEdicao[I].Rascunho <> nil then
+  // Qualquer aba de cadastro com rascunho e pendencia: a inclusao ja contem
+  // dados a gravar e cada alteracao possui a copia carregada.
+  for I := 0 to TotalAbasCadastro - 1 do
+  begin
+    Editor := EditorAbaCadastro(I);
+    if (Editor is TfrmGrupoFiscalCadastroFrame) and
+      TfrmGrupoFiscalCadastroFrame(Editor).TemRascunho then
     begin
       Result := True;
-      Break;
+      Exit;
     end;
+  end;
+  Result := False;
 end;
 
 procedure TfrmGruposFiscais.FocusView;
 var
-  Contexto: TContextoEdicao;
+  Editor: TWinControl;
 begin
-  // Com a aba de inclusao ativa, o foco pertence ao primeiro campo invalido (ou
-  // a descricao).
-  if AbaInclusaoAtiva and (FEditor <> nil) then
+  // Com uma aba de cadastro ativa, o foco pertence ao editor daquela aba.
+  Editor := EditorAbaAtiva;
+  if Editor is TfrmGrupoFiscalCadastroFrame then
   begin
-    FEditor.FocarPrimeiroCampoInvalido;
+    TfrmGrupoFiscalCadastroFrame(Editor).FocarPrimeiroCampoInvalido;
     Exit;
-  end;
-
-  // Com uma aba de alteracao ativa, o foco pertence ao editor daquela aba.
-  if HaAbaEdicaoAtiva then
-  begin
-    Contexto := ContextoEdicao(ChaveAbaEdicaoAtiva);
-    if (Contexto <> nil) and (Contexto.Editor <> nil) then
-    begin
-      Contexto.Editor.FocarPrimeiroCampoInvalido;
-      Exit;
-    end;
   end;
 
   inherited;
@@ -546,9 +302,9 @@ begin
   // Reabrir devolve a aba existente sem repetir autorizacao nem recarregar as
   // empresas: o rascunho ainda pertence a sessao atual. As abas de alteracao
   // abertas nao interferem na inclusao.
-  if AbaInclusaoAberta then
+  if AbaAberta(ChaveAbaInclusao) then
   begin
-    AtivarAbaInclusao;
+    AtivarAba(ChaveAbaInclusao);
     Exit;
   end;
 
@@ -567,14 +323,12 @@ begin
   if not FPresenter.CarregarEmpresas(Opcoes) then
     Exit;
 
-  FOpcoesEmpresas := Opcoes;
-  try
-    AbrirAbaInclusao;
-  except
-    // A base ja liberou a aba parcial e o hook de falha limpou FEditor/FDraft;
-    // aqui resta informar a falha ao usuario.
+  if not AbrirAba(ChaveAbaInclusao, 'Inclusão',
+    procedure(AEditor: TWinControl)
+    begin
+      TfrmGrupoFiscalCadastroFrame(AEditor).PrepararInclusao(Opcoes);
+    end) then
     ShowError('Não foi possível iniciar a inclusão do grupo fiscal.');
-  end;
 end;
 
 procedure TfrmGruposFiscais.btnAlterarClick(Sender: TObject);

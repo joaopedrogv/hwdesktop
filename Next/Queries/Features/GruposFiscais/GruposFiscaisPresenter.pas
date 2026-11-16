@@ -14,7 +14,8 @@ type
   // Encaminha a leitura para a consulta injetada, verifica a autorizacao antes
   // das operacoes e executa a remocao logica, o carregamento e a gravacao. A
   // alteracao e uma unica chamada: identifica a linha corrente, reapresenta a
-  // aba existente ou autoriza, carrega o registro e entrega o rascunho a tela.
+  // aba existente ou autoriza, carrega o registro e entrega o grupo a tela, que
+  // monta o rascunho da aba.
   // As mensagens e os erros de campo sao apresentados pela view recebida no
   // construtor; a negativa ou o cancelamento ja apresentado pelo legado e a
   // indisponibilidade comunicada pelo proprio servico de autorizacao nao sao
@@ -56,8 +57,8 @@ type
     function EnviarParaLixeira(): Boolean;
     function AutorizarInclusao: Boolean;
     // Reapresenta a aba da linha corrente quando ela ja existe; caso contrario
-    // autoriza a alteracao, carrega o registro e as empresas e entrega o
-    // rascunho para a nova aba. Sem linha valida a view informa que a selecao e
+    // autoriza a alteracao, carrega o registro e as empresas e entrega o grupo
+    // para a nova aba. Sem linha valida a view informa que a selecao e
     // obrigatoria e a operacao nao prossegue.
     function CarregarParaEdicao(): Boolean;
     function CarregarEmpresas(out AOpcoes: TGrupoFiscalEmpresaOptions): Boolean;
@@ -232,8 +233,8 @@ begin
       if not CarregarEmpresasAlteracao(Carregado.EmpresasId, Opcoes) then
         Exit;
 
-      // A view assume o rascunho no ponto de transferencia e o libera com a
-      // aba; sem transferencia o registro lido e liberado aqui.
+      // A view copia o grupo para o rascunho da aba; a entidade continua
+      // pertencendo a este metodo e e liberada no finally.
       Result := FView.AbrirEdicao(Id, Carregado, Opcoes);
     except
       on E: EValidacaoNegocio do
@@ -382,9 +383,8 @@ begin
       if Resultado.Validation.IsValid then
         Result := True
       else
-        // A chave identifica a aba: vazia na inclusao e o Id do registro na
-        // alteracao.
-        FView.ExibirValidacao(ARascunho.Id, Resultado.Validation);
+        // A validacao volta para a aba que iniciou a gravacao.
+        FView.ExibirValidacao(Resultado.Validation);
     except
       on E: EValidacaoNegocio do
         FView.ShowError(E.Message);
