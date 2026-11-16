@@ -10,7 +10,6 @@ procedure RegisterNextFeatures(const AContainer: TContainer);
 implementation
 
 uses
-  EventosRtcQuery, EventosRtcPresenter,
   AuthorizationService, NextAuthorizationAdapter,
   IGruposFiscaisRepositoryUnit, GruposFiscaisRepositoryUnit,
   RemoverGrupoFiscalUseCaseUnit, SalvarGrupoFiscalUseCaseUnit,
@@ -20,9 +19,6 @@ uses
 
 procedure RegisterNextFeatures(const AContainer: TContainer);
 begin
-  AContainer.RegisterType<IEventosRtcQuery, TEventosRtcQuery>.AsSingleton;
-  AContainer.RegisterType<TEventosRtcPresenter>.AsTransient;
-
   // Autorizacao compartilhada pelas telas Next sobre o callback do host.
   AContainer.RegisterType<IAuthorizationComunicator, TNextAuthorizationComunicator>.AsTransient;
   AContainer.RegisterType<IAuthorizationService, TNextAuthorizationAdapter>.AsSingleton;

@@ -155,9 +155,7 @@
         <DCCReference Include="..\Queries\Shared\Empresas\EmpresaOptionsBuilder.pas"/>
         <DCCReference Include="..\Queries\Shared\NextQueryDefinition.pas"/>
         <DCCReference Include="..\Queries\Shared\PresenterConsultaBase.pas"/>
-        <DCCReference Include="..\Queries\Features\EventosRtc\EventosRtcDefinition.pas"/>
-        <DCCReference Include="..\Queries\Features\EventosRtc\EventosRtcQuery.pas"/>
-        <DCCReference Include="..\Queries\Features\EventosRtc\EventosRtcPresenter.pas"/>
+        <DCCReference Include="..\Queries\Features\EventosRtc\EventosRtcQueryDefinition.pas"/>
         <DCCReference Include="..\Queries\Features\GruposFiscais\GruposFiscaisPresenter.pas"/>
         <DCCReference Include="..\Queries\Shared\Filters\StandardQueryFilterDefinition.pas"/>
         <DCCReference Include="..\Interop\Module\NextViewCatalog.pas"/>

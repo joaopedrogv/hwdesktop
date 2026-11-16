@@ -13,12 +13,12 @@ implementation
 
 uses
   System.SysUtils, NextViewRegistry,
-  EventosRtcForm, EventosRtcDefinition, GruposFiscaisForm,
+  EventosRtcForm, EventosRtcQueryDefinition, GruposFiscaisForm,
   LocalPreferences,
   WindowsRegistryLocalPreferences, ColumnLayoutPreferences,
   ColumnLayoutPreferencesRepository, StandardQueryFilterDefinition,
-  QueryResultOperations, GridColumnDefinition,
-  NextSetup, EventosRtcPresenter, GruposFiscaisPresenter,
+  QueryResultOperations, IDataSetReaderUnit,
+  NextSetup, GruposFiscaisPresenter,
   AuthorizationService, RemoverGrupoFiscalUseCaseUnit,
   SalvarGrupoFiscalUseCaseUnit, ListarEmpresasUseCaseUnit,
   ObterGruposFiscaisUseCaseUnit,
@@ -32,29 +32,21 @@ var
   View: TfrmEventosRtc;
   Preferences: ILocalPreferences;
   LayoutPreferences: IColumnLayoutPreferences;
-  Presenter: TEventosRtcPresenter;
-  Operations: IQueryResultOperations;
+  Definition: INextQueryDefinitionBase;
 begin
   Preferences := TWindowsRegistryLocalPreferences.Create;
 
   View := TfrmEventosRtc.CreateParented(AParent);
   try
-    // A composicao resolve o apresentador do contexto atual. A tela o possui,
-    // consulta a empresa e a opcao de autorizacao a cada pesquisa e permanece
-    // responsavel pelo leitor e pelo conjunto retornado.
-    Presenter := NextSetupInstance.Resolve<TEventosRtcPresenter>;
-    try
-      // A ordenacao usa as mesmas operacoes da consulta, sem coluna de
-      // marcacao: o conjunto e criado a cada pesquisa e o container fornece o
-      // ordenador que aplica a ordem nativa.
-      Operations := NextSetupInstance.Resolve<IQueryResultOperations>();
-      View.AttachPresenter(Presenter, CreateEventosRtcColumns, 'Eventos RTC', Operations);
-    except
-      // Se a associacao nao foi aceita, a tela nao assumiu a posse; liberar
-      // evita deixar uma instancia orfa do apresentador.
-      Presenter.Free;
-      raise;
-    end;
+    // A definicao pertence a esta tela: recebe a fabrica e as operacoes da
+    // composicao, a sessao vigente e o metodo que le a opcao do checkbox. A
+    // empresa e a opcao sao consultadas a cada pesquisa, nao na abertura.
+    Definition := TEventosRtcQueryDefinition.Create(
+      NextSetupInstance.Resolve<ISqlDataSetReaderFactory>,
+      NextSetupInstance.Resolve<IQueryResultOperations>,
+      NextSetupInstance.SessionContext,
+      View.IsOnlyAuthorizedNFe);
+    View.Attach(Definition, 'Eventos RTC');
 
     // O repositório é transiente: a composição cede conexão/sessão do Setup e a
     // grade o mantém enquanto a tela existir.
@@ -63,7 +55,7 @@ begin
       'next.rtc.events');
     View.AttachColumnLayout(LayoutPreferences);
 
-    View.ConfigureFilters(CreateEventosRtcFilters(), Preferences,
+    View.ConfigureFilters(Definition.FiltersDef, Preferences,
       'next.rtc.events');
 
     Result := View;
