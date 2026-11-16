@@ -29,7 +29,8 @@ implementation
 
 uses
   Sysutils, EntityValidatorFactoryUnit, IEntityValidatorUnit,
-  TipoTributoFiscalEnumUnit, ArrayServiceUnit, ITransactionUnit;
+  TipoTributoFiscalEnumUnit, ArrayServiceUnit, ITransactionUnit,
+  GrupoFiscalMetadataUnit;
 
 { SalvarGrupoFiscalUseCase }
 
@@ -44,7 +45,7 @@ var
   validator: IEntityValidator;
   transaction: ITransaction;
 begin
-  validator := EntityValidatorFactory.Builder();
+  validator := EntityValidatorFactory.Builder(TGrupoFiscalMetadata.GetMetadata());
 
   validator.Field('Descricao', Input.Descricao)
     .IsRequired().HasSize( 2, 128);

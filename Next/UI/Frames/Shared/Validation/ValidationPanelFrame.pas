@@ -48,6 +48,8 @@ type
     FAjustando: Boolean;
     procedure LimparLinhas;
     function IndiceVinculo(const ANomeCampo: string): Integer;
+    // Deriva o nome do campo do validador a partir do nome do editor.
+    function NomeCampoDoControle(AControle: TWinControl): string;
     function JaAgrupado(const ACampos: TArray<string>;
       const ANomeCampo: string): Boolean;
     function MensagensDoCampo(const AValidacao: ValidationEntityOutput;
@@ -69,7 +71,10 @@ type
     // Registra o editor responsavel por um campo do validador. O vinculo
     // repetido substitui o anterior, porque um campo possui um unico editor.
     procedure Bind(const ANomeCampo: string; AControle: TWinControl;
-      const ANomeExibicao: string);
+      const ANomeExibicao: string); overload;
+    // Registra o editor pelo sufixo do proprio nome e deixa o rotulo para o
+    // texto do metadata devolvido na validacao.
+    procedure Bind(AControle: TWinControl); overload;
     // Substitui as linhas anteriores pelas mensagens do resultado recebido.
     procedure ExibirValidacao(const AValidacao: ValidationEntityOutput);
     procedure Limpar;
@@ -163,6 +168,16 @@ begin
   end;
 end;
 
+procedure TfrmValidationPanelFrame.Bind(AControle: TWinControl);
+begin
+  // Sem controle nao ha campo para vincular.
+  if AControle = nil then
+    Exit;
+
+  // O rotulo fica vazio: a exibicao usa o texto do metadata, quando existir.
+  Bind(NomeCampoDoControle(AControle), AControle, '');
+end;
+
 procedure TfrmValidationPanelFrame.ExibirValidacao(
   const AValidacao: ValidationEntityOutput);
 var
@@ -192,9 +207,11 @@ begin
     if Indice >= 0 then
     begin
       Controle := FVinculos[Indice].Controle;
+      // O rotulo informado pela tela tem prioridade; sem ele, o metadata do
+      // validador nomeia o campo, e o proprio nome e a ultima alternativa.
       NomeExibicao := FVinculos[Indice].NomeExibicao;
-      // O display do item de validacao nao e preenchido neste fluxo; o rotulo
-      // do vinculo e a referencia do campo, com o proprio nome como alternativa.
+      if NomeExibicao = '' then
+        NomeExibicao := AValidacao.Validations[I].Display;
       if NomeExibicao = '' then
         NomeExibicao := NomeCampo;
     end
@@ -266,6 +283,30 @@ begin
   for I := 0 to High(FVinculos) do
     if SameText(FVinculos[I].NomeCampo, ANomeCampo) then
       Exit(I);
+end;
+
+function TfrmValidationPanelFrame.NomeCampoDoControle(
+  AControle: TWinControl): string;
+const
+  Prefixos: array[0..5] of string = ('ed_', 'cb_', 'ck_', 'ed', 'cb', 'ck');
+var
+  I: Integer;
+  Prefixo: string;
+begin
+  Result := AControle.Name;
+
+  // Os prefixos com sublinhado vem antes dos curtos porque ed_ tambem comeca
+  // com ed; sem prefixo conhecido o proprio nome do controle e a chave.
+  for I := Low(Prefixos) to High(Prefixos) do
+  begin
+    Prefixo := Prefixos[I];
+    if (Length(Result) > Length(Prefixo)) and
+      SameText(Copy(Result, 1, Length(Prefixo)), Prefixo) then
+    begin
+      Result := Copy(Result, Length(Prefixo) + 1, Length(Result));
+      Exit;
+    end;
+  end;
 end;
 
 function TfrmValidationPanelFrame.JaAgrupado(const ACampos: TArray<string>;

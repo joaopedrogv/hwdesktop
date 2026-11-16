@@ -451,6 +451,7 @@
         <DCCReference Include="..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeImpostoSeletivoEtdUnit.pas"/>
         <DCCReference Include="..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeMonofasiaIbsCbsEtdUnit.pas"/>
         <DCCReference Include="..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeTransfCredIbsCbsEtdUnit.pas"/>
+        <DCCReference Include="..\ERP.Features\Core\Domain\Metadata\GrupoFiscalMetadataUnit.pas"/>
         <DCCReference Include="..\ERP.Features\Core\Domain\Metadata\DFeAlertaMetadataUnit.pas"/>
         <DCCReference Include="..\ERP.Features\Core\Domain\Metadata\NFSeMetadataUnit.pas"/>
         <DCCReference Include="..\ERP.Features\Core\Domain\Metadata\NFSeOSMetadataUnit.pas"/>

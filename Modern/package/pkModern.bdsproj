@@ -390,6 +390,7 @@
     ..\Core\Infrastructure\Exceptions\EValidacaoNegocioUnit.pas;
     ..\ERP.Features\Core\Domain\Entities\OperacaoInternaEtdUnit.pas;
     ..\ERP.Features\Core\Domain\Metadata\OperacaoInternaMetadataUnit.pas;
+    ..\ERP.Features\Core\Domain\Metadata\GrupoFiscalMetadataUnit.pas;
     ..\ERP.Features\Core\Domain\Ports\IOperacoesInternasRepositoryUnit.pas;
     ..\ERP.Features\Adapters\Secondary\Repositories\OperacoesInternasRepositoryUnit.pas;
     ..\ERP.Features\Core\Application\UseCases\OperacoesInternas\ObterOperacaoInternaPorIdUseCaseUnit.pas;

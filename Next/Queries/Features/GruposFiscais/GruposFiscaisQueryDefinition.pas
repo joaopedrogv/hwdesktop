@@ -28,7 +28,8 @@ implementation
 
 uses
   System.SysUtils, QueryResultUnit, ParameterValueUnit, QueryFilterSqlBuilder,
-  StatusRegistroEnumUnit, TipoTributoFiscalEnumUnit, TipoComunsUnit;
+  StatusRegistroEnumUnit, TipoTributoFiscalEnumUnit, TipoComunsUnit,
+  EntityMetadataUnit, GrupoFiscalMetadataUnit;
 
 const
   FilterMarker = '/*FILTROS*/';
@@ -64,16 +65,22 @@ end;
 { TGruposFiscaisQueryDefinition }
 
 procedure TGruposFiscaisQueryDefinition.Configure();
+var
+  Metadata: EntityMetadata;
 begin
+  // Os rotulos da grade e do filtro vem do metadata do grupo fiscal, o mesmo
+  // usado pelo validador na nomeacao dos campos.
+  Metadata := TGrupoFiscalMetadata.GetMetadata();
+
   FColumnsDef := GridColumns([
-    GridColumn('DESCRICAO', 'Descrição', 300),
-    GridColumn('TIPO_TRIBUTO_DESCRICAO', 'Tipo Tributo', 180),
+    GridColumn('DESCRICAO', Metadata.GetDisplayAttribute('Descricao'), 300),
+    GridColumn('TIPO_TRIBUTO_DESCRICAO', Metadata.GetDisplayAttribute('TipoTributo'), 180),
     GridColumn('GERIDO_SISTEMA_DESCRICAO', 'Sistema', 90)
   ]);
   // Somente igualdade de descricao: o montador SQL traduz apenas igualdade e
   // faixa, portanto outros operadores seriam oferecidos sem funcionar.
   FFiltersDef := FilterDefinitionOf([
-    FilterField('DESCRICAO', 'Descrição', fftString, [foEquals])
+    FilterField('DESCRICAO', Metadata.GetDisplayAttribute('Descricao'), fftString, [foEquals])
   ], True);
 end;
 

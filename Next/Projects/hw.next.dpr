@@ -46,7 +46,6 @@ uses
   ViewFeedback in '..\Contracts\ViewFeedback.pas',
   GruposFiscaisView in '..\Contracts\GruposFiscaisView.pas',
   AuthorizationService in '..\Contracts\AuthorizationService.pas',
-  GrupoFiscalCadastro in '..\Contracts\GrupoFiscalCadastro.pas',
   ColumnLayoutPreferences in '..\..\Modern\Core\Domain\Ports\Shared\ColumnLayoutPreferences.pas',
   ColumnLayoutPreferencesRepository in '..\..\Modern\Adapters\Secondary\Preferences\ColumnLayoutPreferencesRepository.pas',
   GruposFiscaisQueryDefinition in '..\Queries\Features\GruposFiscais\GruposFiscaisQueryDefinition.pas';

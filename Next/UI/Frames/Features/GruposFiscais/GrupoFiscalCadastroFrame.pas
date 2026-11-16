@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls,
-  TipoTributoFiscalEnumUnit, GrupoFiscalCadastro, GrupoFiscalEtdUnit,
+  TipoTributoFiscalEnumUnit, GrupoFiscalEtdUnit,
   ValidationPanelFrame, ValidationEntityOutputUnit, EmpresaOption,
   EmpresaChecklistFrame;
 
@@ -80,11 +80,10 @@ begin
   // deste trecho, portanto as opcoes podem ser montadas aqui.
   CarregarOpcoesTributo;
 
-  // O nome vinculado e o produzido pelo validador de SalvarGrupoFiscal; o painel
-  // usa o controle para navegar e o rotulo para identificar o campo.
-  fraValidacao.Bind(GrupoFiscalCampoDescricao, edDescricao, 'Descrição');
-  fraValidacao.Bind(GrupoFiscalCampoTipoTributo, cbTipoTributo,
-    'Tipo de tributo');
+  // O painel deriva o campo do nome do controle; o rotulo exibido vem do
+  // metadata do grupo fiscal usado pelo validador.
+  fraValidacao.Bind(edDescricao);
+  fraValidacao.Bind(cbTipoTributo);
 end;
 
 destructor TfrmGrupoFiscalCadastroFrame.Destroy;

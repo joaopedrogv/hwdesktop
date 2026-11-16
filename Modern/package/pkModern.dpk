@@ -252,6 +252,7 @@ contains
   EValidacaoNegocioUnit in '..\Core\Infrastructure\Exceptions\EValidacaoNegocioUnit.pas',
   OperacaoInternaEtdUnit in '..\ERP.Features\Core\Domain\Entities\OperacaoInternaEtdUnit.pas',
   OperacaoInternaMetadataUnit in '..\ERP.Features\Core\Domain\Metadata\OperacaoInternaMetadataUnit.pas',
+  GrupoFiscalMetadataUnit in '..\ERP.Features\Core\Domain\Metadata\GrupoFiscalMetadataUnit.pas',
   IOperacoesInternasRepositoryUnit in '..\ERP.Features\Core\Domain\Ports\IOperacoesInternasRepositoryUnit.pas',
   OperacoesInternasRepositoryUnit in '..\ERP.Features\Adapters\Secondary\Repositories\OperacoesInternasRepositoryUnit.pas',
   ObterOperacaoInternaPorIdUseCaseUnit in '..\ERP.Features\Core\Application\UseCases\OperacoesInternas\ObterOperacaoInternaPorIdUseCaseUnit.pas',

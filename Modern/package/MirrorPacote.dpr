@@ -360,6 +360,7 @@ uses
   TributoDFeImpostoSeletivoEtdUnit in '..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeImpostoSeletivoEtdUnit.pas',
   TributoDFeMonofasiaIbsCbsEtdUnit in '..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeMonofasiaIbsCbsEtdUnit.pas',
   TributoDFeTransfCredIbsCbsEtdUnit in '..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeTransfCredIbsCbsEtdUnit.pas',
+  GrupoFiscalMetadataUnit in '..\ERP.Features\Core\Domain\Metadata\GrupoFiscalMetadataUnit.pas',
   DFeAlertaMetadataUnit in '..\ERP.Features\Core\Domain\Metadata\DFeAlertaMetadataUnit.pas',
   NFSeMetadataUnit in '..\ERP.Features\Core\Domain\Metadata\NFSeMetadataUnit.pas',
   NFSeOSMetadataUnit in '..\ERP.Features\Core\Domain\Metadata\NFSeOSMetadataUnit.pas',
