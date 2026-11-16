@@ -8,7 +8,7 @@ uses
   Vcl.DBGrids, Vcl.Menus, System.Classes, System.SysUtils, System.Types,
   System.UITypes, System.Generics.Collections, Data.DB, FilterDefinition,
   FilterCriterion, FilterFrame, QueryResultOperations, GridColumnDefinition,
-  ColumnSelectionFrame, ColumnLayoutPreferences;
+  ColumnSelectionFrame, ColumnLayoutPreferences, IDataSetSorterUnit;
 
 type
   // Controles de um criterio na faixa. Os slots sao reaproveitados na ordem
@@ -87,7 +87,7 @@ type
     FQuickFilterColumnName: string;
     FContextColumnName: string;
     FCriterionSlots: TList<TCriterionBandSlot>;
-    FSortFields: TQuerySortFields;
+    FSortFields: TDataSetSortFields;
     FSortedColumns: TArray<TSortedColumnState>;
     FObservedDataSet: TDataSet;
     FDataLink: TDataLink;
@@ -131,7 +131,7 @@ type
     procedure ResetSortState();
     procedure RestoreSortedTitles();
     procedure ApplySortedTitles();
-    function TryApplySort(const ASorts: TQuerySortFields): Boolean;
+    function TryApplySort(const ASorts: TDataSetSortFields): Boolean;
     procedure ObserveDataSetChange();
     function CopiaDisponivel: Boolean;
     procedure CopiarCelulaAtual;
@@ -1488,7 +1488,7 @@ begin
 end;
 
 function TfrmDataGridFrame.TryApplySort(
-  const ASorts: TQuerySortFields): Boolean;
+  const ASorts: TDataSetSortFields): Boolean;
 var
   dts: TDataSet;
 begin
@@ -1544,7 +1544,7 @@ end;
 
 procedure TfrmDataGridFrame.dbgDadosTitleClick(Column: TColumn);
 var
-  NewSorts: TQuerySortFields;
+  NewSorts: TDataSetSortFields;
   Index: Integer;
 begin
   // Ctrl+clique prepara o filtro da coluna antes de qualquer ordenacao. O

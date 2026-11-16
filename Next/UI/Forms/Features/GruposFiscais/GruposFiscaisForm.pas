@@ -4,9 +4,8 @@ interface
 
 uses
   Winapi.Windows, System.SysUtils, Data.DB, Vcl.Controls, Vcl.Forms,
-  Vcl.StdCtrls, ConsultaBaseForm, FilterCriterion, IDataSetReaderUnit,
-  GridColumnDefinition, GruposFiscaisPresenter, GruposFiscaisView,
-  QueryResultOperations, GrupoFiscalCadastro, GrupoFiscalEtdUnit,
+  Vcl.StdCtrls, ConsultaBaseForm, GruposFiscaisPresenter, GruposFiscaisView,
+  NextQueryDefinition, GrupoFiscalCadastro, GrupoFiscalEtdUnit,
   GrupoFiscalCadastroFrame, ValidationEntityOutputUnit;
 
 type
@@ -31,11 +30,13 @@ type
     FEditor: TfrmGrupoFiscalCadastroFrame;
     // Empresas lidas antes de abrir a aba, mantidas ate o preparo do editor.
     FOpcoesEmpresas: TGrupoFiscalEmpresaOptions;
-    function LerLinhaCorrente(out AId, ADescricao: string): Boolean;
-    function PesquisarGrupos(
-      const ACriteria: TFilterCriteria): IDataSetReader;
+    // Estado dos comandos da consulta: Novo depende do apresentador e Lixeira
+    // exige uma linha corrente valida na grade.
+    procedure AtualizarComandos;
+    procedure dsConsultaDataChange(Sender: TObject; Field: TField);
   protected
     function CanPesquisar: Boolean; override;
+    procedure DoInitializeView; override;
     // A base cria a aba, o rodape e a area de rolagem; a tela fornece o editor
     // tipado usado pelos hooks de abertura, gravacao e foco.
     function CriarEditorInclusao(AParent: TWinControl): TWinControl; override;
@@ -52,8 +53,7 @@ type
     // apresentador; o painel do editor apresenta os campos e mensagens.
     procedure ExibirValidacao(const AValidacao: ValidationEntityOutput);
     procedure AttachPresenter(APresenter: TGruposFiscaisPresenter;
-      const AColumns: TGridColumnDefinitions; const ATitle: string;
-      AOperations: IQueryResultOperations = nil);
+      const ADefinition: INextQueryDefinitionBase; const ATitle: string);
   end;
 
 implementation
@@ -62,6 +62,7 @@ implementation
 
 const
   MissingPresenterMessage = 'O apresentador de Grupos Fiscais nao foi informado.';
+  MissingDefinitionMessage = 'A definicao da consulta nao foi informada.';
 
 destructor TfrmGruposFiscais.Destroy;
 begin
@@ -77,25 +78,51 @@ begin
 end;
 
 procedure TfrmGruposFiscais.AttachPresenter(APresenter: TGruposFiscaisPresenter;
-  const AColumns: TGridColumnDefinitions; const ATitle: string;
-  AOperations: IQueryResultOperations = nil);
+  const ADefinition: INextQueryDefinitionBase; const ATitle: string);
 begin
   if APresenter = nil then
     raise Exception.Create(MissingPresenterMessage);
+  if ADefinition = nil then
+    raise Exception.Create(MissingDefinitionMessage);
 
-  // A base recebe apenas o metodo de pesquisa; a tela assume o apresentador
-  // transiente so depois da associacao aceita, para nao deixar posse parcial.
-  AttachReaderFactory(PesquisarGrupos, AColumns, ATitle, AOperations, False);
+  // A definicao entrega colunas, filtros, operacoes e o ciclo da pesquisa; a
+  // tela assume o apresentador transiente so depois da associacao aceita, para
+  // nao deixar posse parcial.
+  Attach(ADefinition, ATitle, False);
   FPresenter := APresenter;
+  AtualizarComandos;
 end;
 
-function TfrmGruposFiscais.PesquisarGrupos(
-  const ACriteria: TFilterCriteria): IDataSetReader;
+procedure TfrmGruposFiscais.AtualizarComandos;
+var
+  DataSet: TDataSet;
 begin
-  if FPresenter = nil then
-    raise Exception.Create(MissingPresenterMessage);
+  // Novo depende apenas do apresentador; a consulta pode estar vazia antes da
+  // primeira pesquisa. Lixeira exige uma linha corrente identificavel.
+  if btnNovo <> nil then
+    btnNovo.Enabled := FPresenter <> nil;
 
-  Result := FPresenter.CriarLeitor(ACriteria);
+  if btnEnviarLixeira = nil then
+    Exit;
+
+  DataSet := dsConsulta.DataSet;
+  pnAcoesConsulta := (DataSet <> nil) and (DataSet.Active) and (not DataSet.IsEmpty);
+  btnEnviarLixeira.Enabled := (DataSet <> nil) and (DataSet.Active) and (not DataSet.IsEmpty);
+end;
+
+procedure TfrmGruposFiscais.dsConsultaDataChange(Sender: TObject; Field: TField);
+begin
+  AtualizarComandos;
+end;
+
+procedure TfrmGruposFiscais.DoInitializeView;
+begin
+  inherited;
+
+  // A troca de dataset (pesquisa, limpeza, reconsulta) atualiza os comandos
+  // junto com a grade.
+  dsConsulta.OnDataChange := dsConsultaDataChange;
+  AtualizarComandos;
 end;
 
 function TfrmGruposFiscais.CanPesquisar: Boolean;
@@ -237,67 +264,26 @@ begin
   end;
 end;
 
-function TfrmGruposFiscais.LerLinhaCorrente(out AId, ADescricao: string): Boolean;
-var
-  DataSet: TDataSet;
-  CampoId, CampoDescricao: TField;
-begin
-  AId := '';
-  ADescricao := '';
-  Result := False;
-
-  if dsConsulta = nil then
-    Exit;
-
-  DataSet := dsConsulta.DataSet;
-  if (DataSet = nil) or (not DataSet.Active) or DataSet.IsEmpty then
-    Exit;
-
-  // A linha corrente e lida uma unica vez: a identidade identifica o registro a
-  // alterar e a descricao identifica a linha na confirmacao e nas mensagens.
-  CampoId := DataSet.FindField('ID');
-  CampoDescricao := DataSet.FindField('DESCRICAO');
-  if (CampoId = nil) or (CampoDescricao = nil) then
-    Exit;
-
-  AId := Trim(CampoId.AsString);
-  ADescricao := Trim(CampoDescricao.AsString);
-  Result := AId <> '';
-end;
-
 procedure TfrmGruposFiscais.btnEnviarLixeiraClick(Sender: TObject);
-var
-  Id, Descricao: string;
 begin
-  // if not LerLinhaCorrente(Id, Descricao) then
-  // begin
-  //   ShowInformation('Selecione um grupo fiscal na grade.');
-  //   Exit;
-  // end;
-
-  // O envio para a lixeira retira o grupo da consulta: somente a afirmacao
-  // explicita prossegue, e o padrao do dialogo e "Nao".
-  // if ShowConfirm(Format('Deseja enviar o grupo fiscal "%s" para a lixeira?',
-  //     [Descricao]), MB_YESNO or MB_ICONWARNING or MB_DEFBUTTON2) <> IDYES then
-  //   Exit;
-
-  btnEnviarLixeira.Enabled := False;
   try
-    // if FPresenter = nil then
-    //   ShowError(MissingPresenterMessage, LixeiraTitle)
-    // else
+    if FPresenter = nil then
     begin
-      // O apresentador interpreta a autorizacao e apresenta a mensagem
-      // correspondente; False interrompe sem repetir o que o legado mostrou.
-      if not FPresenter.EnviarParaLixeira() then
-        Exit;
-
-      // A grade atualizada e a confirmacao do envio; nao ha dialogo de sucesso.
-      if not RepetirPesquisa then
-        ShowWarning('O grupo fiscal já foi enviado para a lixeira. Refaça a pesquisa para atualizar a consulta.');
+      ShowError(MissingPresenterMessage);
+      Exit;
     end;
+
+    // O apresentador identifica a linha corrente, confirma (padrao "Nao") e
+    // autoriza antes de executar; False interrompe sem repetir o que o legado
+    // mostrou.
+    if not FPresenter.EnviarParaLixeira() then
+      Exit;
+
+    // A grade atualizada e a confirmacao do envio; nao ha dialogo de sucesso.
+    if not RepetirPesquisa then
+      ShowWarning('O grupo fiscal já foi enviado para a lixeira. Refaça a pesquisa para atualizar a consulta.');
   finally
-    btnEnviarLixeira.Enabled := True;
+    AtualizarComandos;
   end;
 end;
 

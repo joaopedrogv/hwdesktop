@@ -20,15 +20,6 @@ type
 
   TMarkOperation = (moMarkAll, moUnmarkAll, moInvertAll, moToggle);
 
-  // Especificacao neutra de ordenacao. A prioridade segue a ordem do array; o
-  // adaptador do conjunto carregado traduz cada item para a ordenacao nativa.
-  TQuerySortField = record
-    FieldName: string;
-    Ascending: Boolean;
-  end;
-
-  TQuerySortFields = TArray<TQuerySortField>;
-
   TColumnSummary = record
     Succeeded: Boolean;
     FieldName: string;
@@ -74,13 +65,7 @@ type
     function CanSortField(const ADataSet: TDataSet;
       const AFieldName: string): Boolean;
     function ApplySort(const ADataSet: TDataSet;
-      const ASorts: TQuerySortFields): Boolean;
-  end;
-
-  IQueryResultConfiguration = interface
-    ['{3256577F-2B15-436E-A42B-ECCBD6E8E633}']
-    procedure SetReader(const AReader: IDataSetReader);
-    procedure SetMarkingColumn(const AMarkingColumn: string);
+      const ASorts: TDataSetSortFields): Boolean;
   end;
 
   TQueryResultOperations = class(TInterfacedObject, IQueryResultOperations)
@@ -139,7 +124,7 @@ type
     function CanSortField(const ADataSet: TDataSet;
       const AFieldName: string): Boolean;
     function ApplySort(const ADataSet: TDataSet;
-      const ASorts: TQuerySortFields): Boolean;
+      const ASorts: TDataSetSortFields): Boolean;
   end;
 
 // Mapeia o tipo fisico do campo para o tipo tipado usado pelo catalogo de
@@ -1136,9 +1121,8 @@ begin
 end;
 
 function TQueryResultOperations.ApplySort(const ADataSet: TDataSet;
-  const ASorts: TQuerySortFields): Boolean;
+  const ASorts: TDataSetSortFields): Boolean;
 var
-  DataSetSorts: TDataSetSortFields;
   I: Integer;
 begin
   for I := 0 to High(ASorts) do
@@ -1149,16 +1133,9 @@ begin
   if FDataSetSorter = nil then
     Exit(False);
 
-  // A especificacao permanece neutra: a traducao para o formato do contrato de
-  // ordenacao e a aplicacao nativa ficam atras de IDataSetSorter.
-  SetLength(DataSetSorts, Length(ASorts));
-  for I := 0 to High(ASorts) do
-  begin
-    DataSetSorts[I].FieldName := ASorts[I].FieldName;
-    DataSetSorts[I].Ascending := ASorts[I].Ascending;
-  end;
-
-  Result := FDataSetSorter.ApplySort(ADataSet, DataSetSorts);
+  // O contrato recebido ja e a especificacao neutra que IDataSetSorter aplica
+  // ao conjunto carregado.
+  Result := FDataSetSorter.ApplySort(ADataSet, ASorts);
 end;
 
 procedure TQueryResultOperations.ToggleCurrentMark;

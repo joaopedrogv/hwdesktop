@@ -39,6 +39,14 @@ separate responsibilities and invert dependencies at infrastructure boundaries.
   read contract. The adapter executes the read. Composition selects the adapter
   and owns the connection lifecycle. Keep Setup and driver details behind that
   boundary. Business operations use their Modern contracts.
+- Use the project's existing read abstractions when implementing or refactoring
+  a query. Use `QueryResult` to map known result fields into records or objects.
+  Use its typed accessors and choose a nullable accessor when the distinction
+  between `NULL` and an empty or default value matters. When wrapping a dataset
+  supplied by an `IDataSetReader`, pass `OwnsDataSet = False` and free the
+  wrapper after copying the values. Use `TDataSet` and `TField` directly for
+  VCL binding and generic grid operations that need field metadata or native
+  dataset behavior.
 - Use Spring4D only in composition and supply dependencies to consumers. Do not
   resolve dependencies from a global container in forms, presenters or Use Cases.
 - Choose Spring4D lifetimes based on the intended ownership and sharing. Prefer

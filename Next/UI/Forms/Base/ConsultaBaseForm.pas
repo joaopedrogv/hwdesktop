@@ -4,10 +4,11 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Data.DB,
-  Vcl.Controls, Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Forms, Vcl.StdCtrls, NextBaseForm,
+  Vcl.Controls, Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Forms, Vcl.StdCtrls, Vcl.Buttons,
+  NextBaseForm,
   DataGridFrame, FilterDefinition, FilterCriterion, FilterFrame,
   GridColumnDefinition, IDataSetReaderUnit, QueryResultOperations,
-  ColumnLayoutPreferences, LocalPreferences;
+  NextQueryDefinition, ColumnLayoutPreferences, LocalPreferences;
 
 type
   // Fabrica de leitores para consultas que montam o SQL a partir dos criterios
@@ -34,8 +35,8 @@ type
     tsConsulta: TTabSheet;
     pnFiltros: TPanel;
     fraFiltros: TfrmFilterFrame;
-    btnPesquisar: TButton;
-    btnSair: TButton;
+    btnPesquisar: TBitBtn;
+    btnSair: TBitBtn;
     pnAcoesConsulta: TPanel;
     fraGrid: TfrmDataGridFrame;
     dsConsulta: TDataSource;
@@ -45,6 +46,7 @@ type
     FFilterDefinition: TFilterDefinition;
     FReader: IDataSetReader;
     FReaderFactory: TConsultaReaderFactory;
+    FDefinition: INextQueryDefinitionBase;
     FColumns: TGridColumnDefinitions;
     FOperations: IQueryResultOperations;
     FTitle: string;
@@ -129,7 +131,11 @@ type
     procedure Attach(const AReader: IDataSetReader;
       const AColumns: TGridColumnDefinitions; const ATitle: string;
       AOperations: IQueryResultOperations = nil;
-      AQuickFilterEnabled: Boolean = False);
+      AQuickFilterEnabled: Boolean = False); overload;
+    // Recebe a definicao completa da consulta: colunas e operacoes vem dela e o
+    // ciclo do leitor pertence a propria definicao.
+    procedure Attach(const ADefinition: INextQueryDefinitionBase;
+      const ATitle: string; AQuickFilterEnabled: Boolean = False); overload;
     procedure AttachReaderFactory(const AFactory: TConsultaReaderFactory;
       const AColumns: TGridColumnDefinitions; const ATitle: string;
       AOperations: IQueryResultOperations = nil;
@@ -156,6 +162,8 @@ const
   FiltersNotConfiguredMessage =
     'Os filtros desta tela ainda não foram configurados.';
   MissingReaderMessage = 'O leitor de dados da consulta nao foi informado.';
+  MissingDefinitionMessage =
+    'A definicao da consulta nao foi informada.';
   MissingReaderFactoryMessage =
     'A fabrica de leitores da consulta nao foi informada.';
   MissingTitleMessage = 'O titulo da consulta nao foi informado.';
@@ -236,12 +244,18 @@ begin
 
   // Desvincular antes de limpar impede que a grade retenha um dataset liberado.
   dsConsulta.DataSet := nil;
-  if FReader <> nil then
+  if FDefinition <> nil then
+    FDefinition.Limpar
+  else if FReader <> nil then
   begin
     FReader.Limpar;
     if Assigned(FReaderFactory) then
       FReader := nil;
   end;
+
+  // Nenhuma operacao pode alcancar a linha anterior depois da limpeza.
+  if FOperations <> nil then
+    FOperations.SetReader(nil);
 end;
 
 function TfrmConsultaBase.Pesquisar(const AExibirFalha: Boolean): Boolean;
@@ -249,10 +263,13 @@ var
   Collected: TFilterCriteriaResult;
   Criteria: TFilterCriteria;
   NewReader: IDataSetReader;
+  DataSet: TDataSet;
 begin
-  // Segunda barreira contra composicao incompleta: sem leitor nem fabrica
-  // nenhuma instrucao SQL e executada e o resultado anterior nao e alterado.
-  if (FReader = nil) and (not Assigned(FReaderFactory)) then
+  // Segunda barreira contra composicao incompleta: sem leitor, fabrica ou
+  // definicao nenhuma instrucao SQL e executada e o resultado anterior nao e
+  // alterado.
+  if (FReader = nil) and (not Assigned(FReaderFactory)) and
+    (FDefinition = nil) then
     raise Exception.Create(MissingDependencyMessage);
 
   Result := False;
@@ -262,7 +279,7 @@ begin
   btnPesquisar.Enabled := False;
   try
     Criteria := nil;
-    if Assigned(FReaderFactory) and FFiltersConfigured then
+    if FFiltersConfigured then
     begin
       Collected := CollectFilters;
       if Collected.Status = fcsInvalid then
@@ -289,12 +306,24 @@ begin
         NewReader := nil;
       end;
 
-      FReader.Pesquisar;
-      dsConsulta.DataSet := FReader.DataSet;
+      if FDefinition <> nil then
+        FDefinition.Pesquisar(Criteria)
+      else
+        FReader.Pesquisar;
+
+      if FDefinition <> nil then
+        DataSet := FDefinition.GetDataSet
+      else
+        DataSet := FReader.DataSet;
+
+      if DataSet = nil then
+        raise Exception.Create(MissingReaderMessage);
+      dsConsulta.DataSet := DataSet;
+
       // A sequencia terminou e a grade reflete a consulta; resultado vazio
       // tambem conclui a pesquisa.
       Result := True;
-      if FReader.DataSet.IsEmpty then
+      if DataSet.IsEmpty then
       begin
         ClearResult;
         ShowInformation(Format(EmptyResultMessage, [FTitle]));
@@ -332,7 +361,7 @@ begin
     raise Exception.Create(MissingReaderMessage);
   if Trim(ATitle) = '' then
     raise Exception.Create(MissingTitleMessage);
-  if (FReader <> nil) or Assigned(FReaderFactory) then
+  if (FReader <> nil) or Assigned(FReaderFactory) or (FDefinition <> nil) then
     raise Exception.Create(AlreadyAttachedMessage);
 
   // A propriedade do leitor passa para a tela somente depois de todas as
@@ -346,6 +375,28 @@ begin
   fraGrid.Configure(AOperations, FQuickFilterEnabled);
 end;
 
+procedure TfrmConsultaBase.Attach(const ADefinition: INextQueryDefinitionBase;
+  const ATitle: string; AQuickFilterEnabled: Boolean = False);
+begin
+  if ADefinition = nil then
+    raise Exception.Create(MissingDefinitionMessage);
+  if Trim(ATitle) = '' then
+    raise Exception.Create(MissingTitleMessage);
+  if (FReader <> nil) or Assigned(FReaderFactory) or (FDefinition <> nil) then
+    raise Exception.Create(AlreadyAttachedMessage);
+
+  // Colunas e operacoes pertencem a definicao; a base apenas as apresenta. O
+  // ciclo do leitor permanece na definicao e a grade recebe a instancia das
+  // operacoes para ordenacao, marcacao e filtros rapidos.
+  FDefinition := ADefinition;
+  FColumns := ADefinition.ColumnsDef;
+  FTitle := ATitle;
+  FOperations := ADefinition.GetResultOperation();
+  FQuickFilterEnabled := AQuickFilterEnabled;
+
+  fraGrid.Configure(FOperations, FQuickFilterEnabled);
+end;
+
 procedure TfrmConsultaBase.AttachReaderFactory(
   const AFactory: TConsultaReaderFactory;
   const AColumns: TGridColumnDefinitions; const ATitle: string;
@@ -356,7 +407,7 @@ begin
     raise Exception.Create(MissingReaderFactoryMessage);
   if Trim(ATitle) = '' then
     raise Exception.Create(MissingTitleMessage);
-  if (FReader <> nil) or Assigned(FReaderFactory) then
+  if (FReader <> nil) or Assigned(FReaderFactory) or (FDefinition <> nil) then
     raise Exception.Create(AlreadyAttachedMessage);
 
   // A consulta cria um novo leitor a cada pesquisa; nenhum leitor e recebido
@@ -387,13 +438,16 @@ begin
   // Sair ocupa a borda direita e Pesquisar fica imediatamente a esquerda, com
   // intervalo fixo. As ancoras preservam as duas distancias no redimensionamento
   // posterior, quando o frame de filtros ja nao e tocado.
+
+  btnPesquisar.Align := alNone;
+  btnPesquisar.Anchors := [akTop, akLeft];
+  // Vou mudar para acompanha o fraFiltros, Pesquisar, sair
+  // btnPesquisar.Left := fraFiltros.Left - btnPesquisar.Width - 8;
+  btnPesquisar.Left := btnSair.Left - btnPesquisar.Width - 8;
+
   btnSair.Align := alNone;
   btnSair.Anchors := [akTop, akRight];
   btnSair.Left := pnFiltros.ClientWidth - btnSair.Width - 16;
-
-  btnPesquisar.Align := alNone;
-  btnPesquisar.Anchors := [akTop, akRight];
-  btnPesquisar.Left := btnSair.Left - btnPesquisar.Width - 8;
 
   // A largura minima impede que os botoes invadam os filtros a esquerda.
   Constraints.MinWidth := btnPesquisar.Left + btnPesquisar.Width + 8 +
@@ -408,9 +462,11 @@ begin
   fraGrid.OnFeedback := FrameFeedback;
   fraFiltros.OnFeedback := FrameFeedback;
 
-  // Sem leitor nem fabrica nao existe consulta a apresentar: a falha de
-  // composicao aparece na abertura da view, antes de a tela parecer operavel.
-  if (FReader = nil) and (not Assigned(FReaderFactory)) then
+  // Sem leitor, fabrica ou definicao nao existe consulta a apresentar: a falha
+  // de composicao aparece na abertura da view, antes de a tela parecer
+  // operavel.
+  if (FReader = nil) and (not Assigned(FReaderFactory)) and
+    (FDefinition = nil) then
     raise Exception.Create(MissingDependencyMessage);
 
   PosicionarBotoesPesquisa;
@@ -459,6 +515,7 @@ begin
       // A tela libera o leitor atual e a fabrica depois de desvincular o
       // conjunto. Se o leitor for o wrapper do Next, ele libera o leitor interno
       // antes de devolver a reserva do contexto.
+      FDefinition := nil;
       FReader := nil;
       FReaderFactory := nil;
     finally

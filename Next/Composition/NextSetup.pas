@@ -12,15 +12,14 @@ const
 
 type
   // Possui o contexto ERP recebido, a conexao/adaptador FireDAC do Next, a
-  // fabrica de leitores, o ordenador de conjuntos e o container Spring4D usado
-  // somente na composicao.
+  // fabrica de leitores e o container Spring4D usado somente na composicao.
   // Nunca abre a conexao em SetContext; o adaptador a abre na primeira busca.
   // A identidade da empresa/usuario fica em SessionContext. As credenciais
   // tecnicas ficam somente na string de conexao mantida pelo adaptador.
   // O adaptador, a fabrica e o container sao montados no primeiro contexto e
   // reutilizados enquanto o banco, identificado por um resumo da conexao,
-  // permanecer o mesmo. O ordenador e criado com o Setup e nao depende da
-  // conexao, pois apenas traduz a ordenacao para o conjunto carregado.
+  // permanecer o mesmo. A ordenacao e registrada no container e fornecida as
+  // consultas que a utilizam.
   // Nenhum logger e associado, portanto falhas do adaptador nao sao registradas
   // e sao substituidas por mensagens constantes.
   TNextSetup = class
@@ -28,12 +27,10 @@ type
     FSessionContext: ISessionContext;
     FAdapter: FireDACDatabaseConnection;
     FReaderFactory: ISqlDataSetReaderFactory;
-    FDataSetSorter: IDataSetSorter;
     FContainer: TContainer;
     FContextSet: Boolean;
     FDatabaseFingerprint: string;
     function GetAdapter: IDataBaseConnection;
-    function GetDataSetSorter: IDataSetSorter;
     function BuildConnectionString(const ADatabaseName, ADatabaseUserName,
       ADatabasePassword: string): string;
     function BuildDatabaseFingerprint(const AConnectionString: string): string;
@@ -48,7 +45,6 @@ type
     function Resolve<T>: T;
     property Adapter: IDataBaseConnection read GetAdapter;
     property SessionContext: ISessionContext read FSessionContext;
-    property DataSetSorter: IDataSetSorter read GetDataSetSorter;
     property HasContext: Boolean read FContextSet;
   end;
 
@@ -75,17 +71,11 @@ constructor TNextSetup.Create;
 begin
   inherited Create;
   FSessionContext := SessionContextUnit.SessionContext.Create;
-  FDataSetSorter := TFireDACDataSetSorter.Create;
 end;
 
 function TNextSetup.GetAdapter: IDataBaseConnection;
 begin
   Result := FAdapter;
-end;
-
-function TNextSetup.GetDataSetSorter: IDataSetSorter;
-begin
-  Result := FDataSetSorter;
 end;
 
 procedure TNextSetup.ValidateValue(const AValue: string);

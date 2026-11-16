@@ -13,7 +13,6 @@ implementation
 
 uses
   System.SysUtils, NextViewRegistry,
-  HwNextValidationSecondFormUnit, ConsultaBaseForm,
   EventosRtcForm, EventosRtcDefinition, GruposFiscaisForm,
   LocalPreferences,
   WindowsRegistryLocalPreferences, ColumnLayoutPreferences,
@@ -21,7 +20,7 @@ uses
   QueryResultOperations, GridColumnDefinition,
   NextSetup, EventosRtcPresenter, GruposFiscaisPresenter,
   AuthorizationService, RemoverGrupoFiscalUseCaseUnit,
-  SalvarGrupoFiscalUseCaseUnit, ListarEmpresasUseCaseUnit, IDataSetReaderUnit,
+  SalvarGrupoFiscalUseCaseUnit, ListarEmpresasUseCaseUnit,
   GruposFiscaisQueryDefinition, NextQueryDefinition;
 
 var
@@ -44,9 +43,9 @@ begin
     // responsavel pelo leitor e pelo conjunto retornado.
     Presenter := NextSetupInstance.Resolve<TEventosRtcPresenter>;
     try
-      // A ordenacao usa as mesmas operacoes da previa, sem coluna de marcacao:
-      // o conjunto e criado a cada pesquisa e o Setup fornece o ordenador que
-      // aplica a ordem nativa.
+      // A ordenacao usa as mesmas operacoes da consulta, sem coluna de
+      // marcacao: o conjunto e criado a cada pesquisa e o container fornece o
+      // ordenador que aplica a ordem nativa.
       Operations := NextSetupInstance.Resolve<IQueryResultOperations>();
       View.AttachPresenter(Presenter, CreateEventosRtcColumns, 'Eventos RTC', Operations);
     except
@@ -84,7 +83,6 @@ var
   View: TfrmGruposFiscais;
   Preferences: ILocalPreferences;
   Presenter: TGruposFiscaisPresenter;
-  Operations: IQueryResultOperations;
   Definitions: INextQueryDefinition<TGrupoSelecionado>;
 begin
   Preferences := TWindowsRegistryLocalPreferences.Create;
@@ -93,8 +91,8 @@ begin
   try
     Definitions := NextSetupInstance.Resolve<INextQueryDefinition<TGrupoSelecionado>>;
     // O apresentador recebe a tela como view; as demais dependencias continuam
-    // vindo do container do Setup. A tela possui o apresentador e permanece
-    // responsavel pelo leitor e pelo conjunto retornado.
+    // vindo do container do Setup. A mesma definicao e entregue a tela, que
+    // permanece responsavel pelo resultado apresentado.
     Presenter := TGruposFiscaisPresenter.Create(View, Definitions,
       NextSetupInstance.Resolve<IAuthorizationService>,
       NextSetupInstance.Resolve<IRemoverGrupoFiscalUseCase>,
@@ -102,7 +100,7 @@ begin
       NextSetupInstance.Resolve<ListarEmpresasUseCase>,
       NextSetupInstance.SessionContext);
     try
-      View.AttachPresenter(Presenter, Definitions.ColumnsDef, 'Grupos Fiscais', Definitions.GetResultOperation());
+      View.AttachPresenter(Presenter, Definitions, 'Grupos Fiscais');
     except
       // Associacao recusada: a tela nao assumiu a posse.
       Presenter.Free;

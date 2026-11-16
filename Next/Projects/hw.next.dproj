@@ -98,10 +98,6 @@
         <DCCReference Include="..\Interop\Contracts\HwNextViewApi.pas"/>
         <DCCReference Include="..\Interop\Module\NextBaseForm.pas"/>
         <DCCReference Include="..\Interop\Module\NextViewRegistry.pas"/>
-        <DCCReference Include="..\UI\Forms\Validation\HwNextValidationSecondFormUnit.pas">
-            <Form>frmHwNextValidationSecond</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <DCCReference Include="..\UI\Frames\Shared\Grid\DataGridFrame.pas">
             <Form>frmDataGridFrame</Form>
             <FormType>dfm</FormType>
@@ -155,8 +151,6 @@
         <DCCReference Include="..\Queries\Features\EventosRtc\EventosRtcDefinition.pas"/>
         <DCCReference Include="..\Queries\Features\EventosRtc\EventosRtcQuery.pas"/>
         <DCCReference Include="..\Queries\Features\EventosRtc\EventosRtcPresenter.pas"/>
-        <DCCReference Include="..\Queries\Features\GruposFiscais\GruposFiscaisDefinition.pas"/>
-        <DCCReference Include="..\Queries\Features\GruposFiscais\GruposFiscaisQuery.pas"/>
         <DCCReference Include="..\Queries\Features\GruposFiscais\GruposFiscaisPresenter.pas"/>
         <DCCReference Include="..\Queries\Shared\Filters\StandardQueryFilterDefinition.pas"/>
         <DCCReference Include="..\Interop\Module\NextViewCatalog.pas"/>
@@ -176,7 +170,6 @@
         <DCCReference Include="..\Contracts\GrupoFiscalCadastro.pas"/>
         <DCCReference Include="..\..\Modern\Core\Domain\Ports\Shared\ColumnLayoutPreferences.pas"/>
         <DCCReference Include="..\..\Modern\Adapters\Secondary\Preferences\ColumnLayoutPreferencesRepository.pas"/>
-        <DCCReference Include="..\Composition\QueryPreviewReader.pas"/>
         <DCCReference Include="..\Queries\Features\GruposFiscais\GruposFiscaisQueryDefinition.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

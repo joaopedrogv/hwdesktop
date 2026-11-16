@@ -3,17 +3,12 @@ unit GruposFiscaisPresenter;
 interface
 
 uses
-  FilterCriterion, IDataSetReaderUnit, AuthorizationService,
-  RemoverGrupoFiscalUseCaseUnit, GruposFiscaisView, SalvarGrupoFiscalUseCaseUnit,
-  ListarEmpresasUseCaseUnit, ISessionContextUnit, GrupoFiscalEtdUnit,
-  GrupoFiscalCadastro, NextQueryDefinition, GruposFiscaisQueryDefinition;
+  AuthorizationService, RemoverGrupoFiscalUseCaseUnit, GruposFiscaisView,
+  SalvarGrupoFiscalUseCaseUnit, ListarEmpresasUseCaseUnit, ISessionContextUnit,
+  GrupoFiscalEtdUnit, GrupoFiscalCadastro, NextQueryDefinition,
+  GruposFiscaisQueryDefinition;
 
 type
-  IConsultaPadraoPresenter = interface
-    ['{295B42C6-497F-44D0-A3AD-E311EB814F9E}']
-    function CriarLeitor(const ACriteria: TFilterCriteria): IDataSetReader;
-  end;
-
   // Apresentador da consulta e da inclusao de Grupos Fiscais. Encaminha a
   // leitura para a consulta injetada, verifica a autorizacao antes das
   // operacoes e executa a remocao logica e a gravacao. As mensagens e os erros
@@ -42,7 +37,6 @@ type
       AListarEmpresas: ListarEmpresasUseCase;
       ASession: ISessionContext);
     function AutorizarPesquisa: Boolean;
-    function CriarLeitor(const ACriteria: TFilterCriteria): IDataSetReader;
     function EnviarParaLixeira(): Boolean;
     function AutorizarInclusao: Boolean;
     function CarregarEmpresas(out AOpcoes: TGrupoFiscalEmpresaOptions): Boolean;
@@ -145,37 +139,24 @@ begin
   end;
 end;
 
-function TGruposFiscaisPresenter.CriarLeitor(
-  const ACriteria: TFilterCriteria): IDataSetReader;
-begin
-  // O catalogo e global: nenhuma empresa ou sessao participa da leitura.
-  Result := FQueryDefinition.CreateReader(ACriteria);
-end;
-
 function TGruposFiscaisPresenter.EnviarParaLixeira(): Boolean;
 var
   Autorizacao: TAuthorizationResult;
-  selected: TGrupoSelecionado;
-  Id: string;
+  Selected: TGrupoSelecionado;
 begin
   Result := False;
 
-  selected := FQueryDefinition.GetSelected();
-  try
-    if selected = nil then
-    begin
-      FView.ShowError('O grupo fiscal a enviar para a lixeira não foi identificado.');
-      Exit;
-    end;
-
-    if not FView.ShowDangerQuestion(Format('Deseja enviar o grupo fiscal "%s" para a lixeira?',
-        [selected.Descricao])) then
-      Exit;
-
-    Id := selected.Id;
-  finally
-    selected.Free();
+  // A linha corrente e lida uma unica vez; o mesmo registro identificado na
+  // confirmacao e enviado para a lixeira.
+  if not FQueryDefinition.TryGetSelected(Selected) then
+  begin
+    FView.ShowError('O grupo fiscal a enviar para a lixeira não foi identificado.');
+    Exit;
   end;
+
+  if not FView.ShowDangerQuestion(Format('Deseja enviar o grupo fiscal "%s" para a lixeira?',
+      [Selected.Descricao])) then
+    Exit;
 
   if FAuthorization = nil then
   begin
@@ -203,7 +184,7 @@ begin
   end;
 
   try
-    FRemoverGrupoFiscal.Executar(Id);
+    FRemoverGrupoFiscal.Executar(Selected.Id);
     Result := True;
   except
     on E: EValidacaoNegocio do

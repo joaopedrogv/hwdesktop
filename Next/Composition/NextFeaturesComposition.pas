@@ -10,7 +10,7 @@ procedure RegisterNextFeatures(const AContainer: TContainer);
 implementation
 
 uses
-  EventosRtcQuery, EventosRtcPresenter, GruposFiscaisQuery,
+  EventosRtcQuery, EventosRtcPresenter,
   AuthorizationService, NextAuthorizationAdapter,
   IGruposFiscaisRepositoryUnit, GruposFiscaisRepositoryUnit,
   RemoverGrupoFiscalUseCaseUnit, SalvarGrupoFiscalUseCaseUnit,
@@ -24,9 +24,6 @@ begin
 
   // Autorizacao compartilhada pelas telas Next sobre o callback do host.
   AContainer.RegisterType<IAuthorizationService, TNextAuthorizationAdapter>.AsSingleton;
-
-  // Catalogo global: a consulta nao depende de empresa nem de sessao.
-  AContainer.RegisterType<IGruposFiscaisQuery, TGruposFiscaisQuery>.AsSingleton;
 
   // A remocao logica reutiliza a conexao compartilhada registrada pelo Setup.
   // Repositorio e caso de uso sao sem estado: o container mantem a posse da
@@ -42,8 +39,6 @@ begin
   AContainer.RegisterType<ListarEmpresasUseCase>.AsSingleton;
   AContainer.RegisterType<ISalvarGrupoFiscalUseCase, SalvarGrupoFiscalUseCase>.AsTransient;
   AContainer.RegisterType<INextQueryDefinition<TGrupoSelecionado>, TGruposFiscaisQueryDefinition>().AsTransient;
-//  AContainer.RegisterType<TGruposFiscaisQueryDefinition>().AsTransient;
-//  INextQueryDefinition<TGrupoSelecionado>
 end;
 
 end.

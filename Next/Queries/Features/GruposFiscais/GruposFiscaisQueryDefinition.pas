@@ -3,32 +3,32 @@ unit GruposFiscaisQueryDefinition;
 interface
 
 uses
-  IDataSetReaderUnit, FilterCriterion, NextQueryDefinition, GridColumnDefinition, FilterDefinition, QueryResultOperations;
+  Data.DB, FilterCriterion, NextQueryDefinition, GridColumnDefinition,
+  FilterDefinition;
 
 type
-  TGrupoSelecionado = class
-  private
-    FId: string;
-    FDescricao: string;
-  public
-    property Id: string read FId;
-    property Descricao: string read FDescricao;
+  // Identificacao do grupo fiscal escolhido na grade. O record e copiado por
+  // valor; nenhum objeto precisa ser liberado pela tela ou pelo apresentador.
+  TGrupoSelecionado = record
+    Id: string;
+    Descricao: string;
   end;
 
-  TGruposFiscaisQueryDefinition = class(TNextQueryDefinitionBase, INextQueryDefinition<TGrupoSelecionado>)
-  private
-    function CreateGruposFiscaisDefinition(const ACriteria: TFilterCriteria): TNextQueryDefinition;
+  TGruposFiscaisQueryDefinition = class(TNextQueryDefinitionBase,
+    INextQueryDefinition<TGrupoSelecionado>)
+  protected
+    function CreateQueryDefinition(
+      const ACriteria: TFilterCriteria): TNextQueryDefinition; override;
     procedure Configure(); override;
   public
-    function CreateReader(const ACriteria: TFilterCriteria): IDataSetReader;
-    function GetSelected(): TGrupoSelecionado;
+    function TryGetSelected(out ASelected: TGrupoSelecionado): Boolean;
   end;
 
 implementation
 
 uses
-  System.SysUtils, ParameterValueUnit, QueryFilterSqlBuilder, StatusRegistroEnumUnit,
-  TipoTributoFiscalEnumUnit, TipoComunsUnit, QueryResultUnit;
+  System.SysUtils, QueryResultUnit, ParameterValueUnit, QueryFilterSqlBuilder,
+  StatusRegistroEnumUnit, TipoTributoFiscalEnumUnit, TipoComunsUnit;
 
 const
   FilterMarker = '/*FILTROS*/';
@@ -77,7 +77,7 @@ begin
   ], True);
 end;
 
-function TGruposFiscaisQueryDefinition.CreateGruposFiscaisDefinition(
+function TGruposFiscaisQueryDefinition.CreateQueryDefinition(
   const ACriteria: TFilterCriteria): TNextQueryDefinition;
 var
   Builder: IParametersBuilder;
@@ -94,41 +94,36 @@ begin
     'where ATIVO = :' + ActiveParameterName + sLineBreak +
     FilterMarker;
 
-  Result := TQueryFilterSqlBuilder.Build(BaseSql, FilterMarker, Builder.Build, FFiltersDef, ACriteria);
+  Result := TQueryFilterSqlBuilder.Build(BaseSql, FilterMarker, Builder.Build,
+    FFiltersDef, ACriteria);
   Result.Sql := Result.Sql + sLineBreak + 'order by SEQID';
 end;
 
-function TGruposFiscaisQueryDefinition.CreateReader(const ACriteria: TFilterCriteria): IDataSetReader;
+function TGruposFiscaisQueryDefinition.TryGetSelected(
+  out ASelected: TGrupoSelecionado): Boolean;
 var
-  Definition: TNextQueryDefinition;
+  DataSet: TDataSet;
+  Consulta: QueryResult;
 begin
-  // A definicao monta SQL e parametros; a fabrica apenas cria o leitor.
-  Definition := CreateGruposFiscaisDefinition(ACriteria);
-  FReader := FReaderFactory.CreateReader(Definition.Sql, Definition.Parameters);
+  ASelected := Default(TGrupoSelecionado);
+  Result := False;
 
-  Result := FReader;
-end;
+  // Sem pesquisa concluida, sem resultado ou com a linha corrente invalida nao
+  // existe grupo a enviar para a lixeira.
+  DataSet := GetDataSet;
+  if (DataSet = nil) or (not DataSet.Active) or DataSet.IsEmpty then
+    Exit;
 
-function TGruposFiscaisQueryDefinition.GetSelected: TGrupoSelecionado;
-begin
-  with QueryResult.Create(FReader.DataSet, '', False) do
+  // A grade fornece o dataset: o wrapper apenas le a linha corrente e nao
+  // participa da posse do dataset.
+  // O campo Id é a PK da tabela consultada, se vazio ainda e um valor valido.
+  Consulta := QueryResult.Create(DataSet, '', False);
   try
-    if IsEmpty then
-    begin
-      Result := nil;
-      exit;
-    end;
-
-    Result := TGrupoSelecionado.Create();
-    try
-      Result.FId := FieldAsString('ID');
-      Result.FDescricao := FieldAsString('DESCRICAO');
-    except
-      Result.Free();
-      raise;
-    end;
+    ASelected.Id := Consulta.FieldAsString('ID');
+    ASelected.Descricao := Consulta.FieldAsString('DESCRICAO');
+    Result := True;
   finally
-    FreeQueryResult();
+    Consulta.Free;
   end;
 end;
 

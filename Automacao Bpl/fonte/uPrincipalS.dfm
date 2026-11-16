@@ -4320,12 +4320,6 @@ object frmPrincipalS: TfrmPrincipalS
           ShortCut = 24645
           OnClick = EventosDFe1Click
         end
-        object PreviewNext1: TMenuItem
-          Tag = 1
-          Caption = 'Preview Next'
-          ShortCut = 24663
-          OnClick = PreviewNext1Click
-        end
         object N13: TMenuItem
           Caption = '-'
         end

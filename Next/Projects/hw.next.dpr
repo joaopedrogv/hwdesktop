@@ -7,7 +7,6 @@ uses
   HwNextViewApi in '..\Interop\Contracts\HwNextViewApi.pas',
   NextBaseForm in '..\Interop\Module\NextBaseForm.pas',
   NextViewRegistry in '..\Interop\Module\NextViewRegistry.pas',
-  HwNextValidationSecondFormUnit in '..\UI\Forms\Validation\HwNextValidationSecondFormUnit.pas' {frmHwNextValidationSecond},
   DataGridFrame in '..\UI\Frames\Shared\Grid\DataGridFrame.pas' {frmDataGridFrame: TFrame},
   FilterDefinition in '..\Queries\Shared\Filters\FilterDefinition.pas',
   FilterCriterion in '..\Queries\Shared\Filters\FilterCriterion.pas',
@@ -28,8 +27,6 @@ uses
   EventosRtcDefinition in '..\Queries\Features\EventosRtc\EventosRtcDefinition.pas',
   EventosRtcQuery in '..\Queries\Features\EventosRtc\EventosRtcQuery.pas',
   EventosRtcPresenter in '..\Queries\Features\EventosRtc\EventosRtcPresenter.pas',
-  GruposFiscaisDefinition in '..\Queries\Features\GruposFiscais\GruposFiscaisDefinition.pas',
-  GruposFiscaisQuery in '..\Queries\Features\GruposFiscais\GruposFiscaisQuery.pas',
   GruposFiscaisPresenter in '..\Queries\Features\GruposFiscais\GruposFiscaisPresenter.pas',
   StandardQueryFilterDefinition in '..\Queries\Shared\Filters\StandardQueryFilterDefinition.pas',
   NextViewCatalog in '..\Interop\Module\NextViewCatalog.pas',
@@ -49,7 +46,6 @@ uses
   GrupoFiscalCadastro in '..\Contracts\GrupoFiscalCadastro.pas',
   ColumnLayoutPreferences in '..\..\Modern\Core\Domain\Ports\Shared\ColumnLayoutPreferences.pas',
   ColumnLayoutPreferencesRepository in '..\..\Modern\Adapters\Secondary\Preferences\ColumnLayoutPreferencesRepository.pas',
-  QueryPreviewReader in '..\Composition\QueryPreviewReader.pas',
   GruposFiscaisQueryDefinition in '..\Queries\Features\GruposFiscais\GruposFiscaisQueryDefinition.pas';
 
 {$R *.res}
