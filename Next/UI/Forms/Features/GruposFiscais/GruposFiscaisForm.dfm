@@ -13,13 +13,22 @@ inherited frmGruposFiscais: TfrmGruposFiscais
           TabOrder = 0
           OnClick = btnNovoClick
         end
-        object btnEnviarLixeira: TButton
+        object btnAlterar: TButton
           Left = 124
+          Top = 6
+          Width = 100
+          Height = 32
+          Caption = 'Alterar'
+          TabOrder = 1
+          OnClick = btnAlterarClick
+        end
+        object btnEnviarLixeira: TButton
+          Left = 232
           Top = 6
           Width = 150
           Height = 32
           Caption = 'Enviar para a lixeira'
-          TabOrder = 1
+          TabOrder = 2
           OnClick = btnEnviarLixeiraClick
         end
       end

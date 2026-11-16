@@ -66,14 +66,14 @@ end;
 procedure TGruposFiscaisQueryDefinition.Configure();
 begin
   FColumnsDef := GridColumns([
-    GridColumn('DESCRICAO', 'Descri'#231#227'o', 300),
+    GridColumn('DESCRICAO', 'Descrição', 300),
     GridColumn('TIPO_TRIBUTO_DESCRICAO', 'Tipo Tributo', 180),
     GridColumn('GERIDO_SISTEMA_DESCRICAO', 'Sistema', 90)
   ]);
   // Somente igualdade de descricao: o montador SQL traduz apenas igualdade e
   // faixa, portanto outros operadores seriam oferecidos sem funcionar.
   FFiltersDef := FilterDefinitionOf([
-    FilterField('DESCRICAO', 'Descri'#231#227'o', fftString, [foEquals])
+    FilterField('DESCRICAO', 'Descrição', fftString, [foEquals])
   ], True);
 end;
 

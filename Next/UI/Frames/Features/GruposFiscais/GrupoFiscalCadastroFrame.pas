@@ -8,8 +8,8 @@ uses
   ValidationPanelFrame, ValidationEntityOutputUnit;
 
 type
-  // Editor dos campos da inclusao de grupo fiscal. O frame apenas apresenta e
-  // coleta descricao, tipo de tributo e empresas; a autorizacao, a gravacao e o
+  // Editor dos campos do grupo fiscal. O frame apenas apresenta e coleta
+  // descricao, tipo de tributo e empresas; a autorizacao, a gravacao e o
   // descarte do rascunho pertencem ao formulario que o contem. Os erros do caso
   // de uso sao apresentados pelo painel comum, que agrupa as mensagens por campo.
   TfrmGrupoFiscalCadastroFrame = class(TFrame)
@@ -27,6 +27,10 @@ type
     // Os itens do tipo de tributo sao fixos e independem da inclusao: monta-los
     // uma unica vez mantem a lista disponivel em todas as inclusoes.
     procedure CarregarOpcoesTributo;
+    // Reconstroi a lista de empresas na ordem recebida, mantendo o id de cada
+    // item. Inclusao e alteracao compartilham a montagem; o que muda sao as
+    // opcoes recebidas.
+    procedure MontarListaEmpresas(const AOpcoes: TGrupoFiscalEmpresaOptions);
     function GetDescricao: string;
     procedure SetDescricao(const AValue: string);
     function GetTipoTributo: TipoTributoFiscalEnum;
@@ -36,6 +40,12 @@ type
     // Reinicia o frame para uma inclusao: descricao vazia, tributo indefinido e
     // lista de empresas reconstruida a partir das opcoes recebidas.
     procedure PrepararInclusao(const AOpcoes: TGrupoFiscalEmpresaOptions);
+    // Prepara a alteracao de um grupo existente: descricao e tipo recebidos, o
+    // tipo permanece bloqueado e as empresas vinculadas iniciam marcadas,
+    // inclusive as que o usuario nao pode habilitar.
+    procedure PrepararAlteracao(const ADescricao: string;
+      ATipoTributo: TipoTributoFiscalEnum;
+      const AOpcoes: TGrupoFiscalEmpresaOptions);
     // Limpa campos e lista. A validacao tem limpeza propria, porque o descarte
     // do rascunho limpa apenas as mensagens.
     procedure LimparCampos;
@@ -89,6 +99,9 @@ end;
 procedure TfrmGrupoFiscalCadastroFrame.LimparCampos;
 begin
   edDescricao.Clear;
+  // A alteracao bloqueia o tipo de tributo; limpar devolve o editor ao estado
+  // neutro para a proxima inclusao.
+  cbTipoTributo.Enabled := True;
   cbTipoTributo.ItemIndex := Ord(tfIndefinido);
   clbEmpresas.Items.Clear;
   SetLength(FIdsEmpresas, 0);
@@ -96,12 +109,33 @@ end;
 
 procedure TfrmGrupoFiscalCadastroFrame.PrepararInclusao(
   const AOpcoes: TGrupoFiscalEmpresaOptions);
-var
-  I: Integer;
 begin
   LimparCampos;
   LimparValidacao;
+  MontarListaEmpresas(AOpcoes);
+end;
 
+procedure TfrmGrupoFiscalCadastroFrame.PrepararAlteracao(
+  const ADescricao: string; ATipoTributo: TipoTributoFiscalEnum;
+  const AOpcoes: TGrupoFiscalEmpresaOptions);
+begin
+  LimparCampos;
+  LimparValidacao;
+  Descricao := ADescricao;
+  TipoTributo := ATipoTributo;
+
+  // O tipo de tributo nao e alteravel: o campo apenas apresenta o valor gravado.
+  // A lista recebida marca as empresas vinculadas e desabilita as que o usuario
+  // nao pode habilitar.
+  cbTipoTributo.Enabled := False;
+  MontarListaEmpresas(AOpcoes);
+end;
+
+procedure TfrmGrupoFiscalCadastroFrame.MontarListaEmpresas(
+  const AOpcoes: TGrupoFiscalEmpresaOptions);
+var
+  I: Integer;
+begin
   // A lista e reconstruida na ordem recebida e os ids acompanham os itens para
   // que a leitura da selecao devolva identificadores e nao posicoes.
   SetLength(FIdsEmpresas, Length(AOpcoes));

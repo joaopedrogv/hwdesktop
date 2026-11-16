@@ -21,6 +21,7 @@ uses
   NextSetup, EventosRtcPresenter, GruposFiscaisPresenter,
   AuthorizationService, RemoverGrupoFiscalUseCaseUnit,
   SalvarGrupoFiscalUseCaseUnit, ListarEmpresasUseCaseUnit,
+  ObterGruposFiscaisUseCaseUnit,
   GruposFiscaisQueryDefinition, NextQueryDefinition;
 
 var
@@ -98,6 +99,7 @@ begin
       NextSetupInstance.Resolve<IRemoverGrupoFiscalUseCase>,
       NextSetupInstance.Resolve<ISalvarGrupoFiscalUseCase>,
       NextSetupInstance.Resolve<ListarEmpresasUseCase>,
+      NextSetupInstance.Resolve<ObterGrupoFiscalPorIdUseCase>,
       NextSetupInstance.SessionContext);
     try
       View.AttachPresenter(Presenter, Definitions, 'Grupos Fiscais');
