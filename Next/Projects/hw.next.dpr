@@ -25,6 +25,7 @@ uses
   ISessionContextUnit in '..\..\Modern\Core\Domain\Ports\Shared\ISessionContextUnit.pas',
   SessionContextUnit in '..\..\Modern\Core\Application\Contexts\SessionContextUnit.pas',
   NextQueryDefinition in '..\Queries\Shared\NextQueryDefinition.pas',
+  PresenterConsultaBase in '..\Queries\Shared\PresenterConsultaBase.pas',
   EventosRtcDefinition in '..\Queries\Features\EventosRtc\EventosRtcDefinition.pas',
   EventosRtcQuery in '..\Queries\Features\EventosRtc\EventosRtcQuery.pas',
   EventosRtcPresenter in '..\Queries\Features\EventosRtc\EventosRtcPresenter.pas',

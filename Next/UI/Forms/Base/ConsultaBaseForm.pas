@@ -7,7 +7,7 @@ uses
   Vcl.ExtCtrls, Vcl.Forms, Vcl.StdCtrls, Vcl.Buttons, Vcl.ImgList, System.Generics.Collections,
   Data.DB,  NextBaseForm, DataGridFrame, FilterDefinition, FilterCriterion, FilterFrame,
   GridColumnDefinition, IDataSetReaderUnit, QueryResultOperations, NextQueryDefinition,
-  ColumnLayoutPreferences, LocalPreferences;
+  ColumnLayoutPreferences, LocalPreferences, PresenterConsultaBase;
 
 type
   // Fabrica de leitores para consultas que montam o SQL a partir dos criterios
@@ -45,6 +45,13 @@ type
     Editor: TWinControl;
     Token: Integer;
     Intencao: TIntencaoFechamentoAba;
+  end;
+
+  // Comando da consulta cujo Enabled acompanha a associacao do apresentador e a
+  // linha corrente. O controle pertence ao formulario; a base apenas o atualiza.
+  TComandoConsulta = record
+    Controle: TControl;
+    ExigeSelecao: Boolean;
   end;
 
   // Base unica das consultas Next. Recebe a definicao ou a fabrica de leitores,
@@ -88,8 +95,17 @@ type
     // Chave da aba cuja gravacao esta em andamento; a validacao do apresentador
     // volta para o editor dessa aba.
     FChaveAbaEmGravacao: string;
+    // Apresentador da funcionalidade. A base responde pela liberacao a partir da
+    // associacao aceita e nunca o libera com o evento da grade ainda ligado.
+    FPresenterConsulta: TPresenterConsultaBase;
+    // Comandos registrados pela funcionalidade: cada um e habilitado conforme a
+    // associacao do apresentador e, quando exigido, a linha corrente.
+    FComandosConsulta: TArray<TComandoConsulta>;
     procedure ClearResult;
     procedure DoPesquisar(Sender: TObject);
+    // A troca, a limpeza e a leitura de linha atualizam os comandos junto com a
+    // grade.
+    procedure dsConsultaDataChange(Sender: TObject; Field: TField);
     function Pesquisar(const AExibirFalha: Boolean): Boolean;
     procedure GridTitleCtrlClick(Sender: TObject; const AFieldName: string);
     procedure FrameFeedback(Sender: TObject;
@@ -112,7 +128,29 @@ type
   protected
     // Permite que a tela filha interrompa a pesquisa antes de limpar o
     // resultado ou criar um novo leitor. A validacao dos filtros ocorre antes.
+    // A base pede a autorizacao ao apresentador associado; telas sem
+    // apresentador, como a que usa a fabrica de leitores, pesquisam sem ela.
     function CanPesquisar: Boolean; virtual;
+    // Associa a definicao e o apresentador da funcionalidade. Attach e o gancho
+    // da tela acontecem antes da posse: ate a atribuicao, a composicao continua
+    // dona do apresentador e o libera se a associacao for recusada.
+    procedure AssociarPresenter(APresenter: TPresenterConsultaBase;
+      const ADefinition: INextQueryDefinitionBase; const ATitle: string;
+      AQuickFilterEnabled: Boolean = False);
+    // Gancho executado depois de Attach e antes da posse do apresentador: a tela
+    // registra os comandos e os contratos que dependem da definicao.
+    procedure ApresentadorAssociado(
+      const ADefinition: INextQueryDefinitionBase); virtual;
+    // Registra um controle da funcionalidade cujo Enabled acompanha a consulta.
+    // Com AExigeSelecao, o controle so e habilitado com uma linha corrente.
+    procedure RegistrarComando(AControl: TControl;
+      AExigeSelecao: Boolean = False);
+    // Recalcula o Enabled dos controles registrados. Os botoes da propria
+    // consulta, como Pesquisar e Sair, nao passam por aqui.
+    procedure AtualizarComandos; virtual;
+    // True quando a grade reflete uma linha corrente identificada. A base apenas
+    // verifica o conjunto; a funcionalidade decide o que identifica o registro.
+    function TemRegistroCorrente: Boolean; virtual;
     function CollectFilters: TFilterCriteriaResult;
     // Repete a pesquisa atual pela mesma sequencia de filtros, autorizacao e
     // leitura, sem o dialogo generico da falha. Retorna True quando a grade
@@ -153,6 +191,9 @@ type
     // Chave da aba cuja gravacao esta em andamento. A validacao produzida pelo
     // apresentador e encaminhada ao editor dessa aba.
     property ChaveAbaEmGravacao: string read FChaveAbaEmGravacao;
+    // Apresentador associado, sem o tipo da funcionalidade: a tela usa o proprio
+    // apelido tipado para as chamadas especificas.
+    property PresenterConsulta: TPresenterConsultaBase read FPresenterConsulta;
   public
     destructor Destroy; override;
     procedure ResetForSessionChange; override;
@@ -188,6 +229,10 @@ const
   MissingReaderMessage = 'O leitor de dados da consulta nao foi informado.';
   MissingDefinitionMessage =
     'A definicao da consulta nao foi informada.';
+  MissingPresenterMessage =
+    'O apresentador da consulta nao foi informado.';
+  MissingCommandControlMessage =
+    'O controle do comando da consulta nao foi informado.';
   MissingReaderFactoryMessage =
     'A fabrica de leitores da consulta nao foi informada.';
   MissingTitleMessage = 'O titulo da consulta nao foi informado.';
@@ -284,6 +329,10 @@ begin
   // Nenhuma operacao pode alcancar a linha anterior depois da limpeza.
   if FOperations <> nil then
     FOperations.SetReader(nil);
+
+  // A grade ficou sem conjunto: os comandos que dependem da linha corrente
+  // acompanham a limpeza, assim como o evento do conjunto desvinculado.
+  AtualizarComandos;
 end;
 
 function TfrmConsultaBase.Pesquisar(const AExibirFalha: Boolean): Boolean;
@@ -361,6 +410,9 @@ begin
   finally
     FPesquisando := False;
     btnPesquisar.Enabled := True;
+    // Resultado vazio, falha, negativa de autorizacao e reaquisicao terminam
+    // aqui: os comandos refletem o conjunto efetivamente apresentado.
+    AtualizarComandos;
   end;
 end;
 
@@ -455,6 +507,8 @@ end;
 
 procedure TfrmConsultaBase.DoInitializeView;
 begin
+  inherited;
+
   Caption := Format('Consulta - Next %d', [InstanceNumber]);
   fraGrid.DataSource := dsConsulta;
   fraGrid.OnTitleCtrlClick := GridTitleCtrlClick;
@@ -475,11 +529,122 @@ begin
   if FTitle <> '' then
     Caption := FTitle;
   fraGrid.ConfigureColumns(FColumns);
+
+  // A troca de conjunto, a limpeza e a leitura de linha atualizam os comandos
+  // da funcionalidade junto com a grade.
+  dsConsulta.OnDataChange := dsConsultaDataChange;
+  AtualizarComandos;
 end;
 
 function TfrmConsultaBase.CanPesquisar: Boolean;
 begin
-  Result := True;
+  // Telas que montam o leitor pela fabrica nao tem apresentador e pesquisam sem
+  // autorizacao propria; com apresentador, a decisao e o feedback sao dele.
+  Result := (FPresenterConsulta = nil) or FPresenterConsulta.AutorizarPesquisa;
+end;
+
+procedure TfrmConsultaBase.AssociarPresenter(
+  APresenter: TPresenterConsultaBase;
+  const ADefinition: INextQueryDefinitionBase; const ATitle: string;
+  AQuickFilterEnabled: Boolean = False);
+begin
+  if APresenter = nil then
+    raise Exception.Create(MissingPresenterMessage);
+  if ADefinition = nil then
+    raise Exception.Create(MissingDefinitionMessage);
+
+  // Attach e o gancho da tela podem recusar a associacao e nao assumem posse
+  // alguma. A atribuicao abaixo e o ponto de transferencia: a partir dela a tela
+  // libera o apresentador, inclusive na destruicao.
+  Attach(ADefinition, ATitle, AQuickFilterEnabled);
+  ApresentadorAssociado(ADefinition);
+
+  FPresenterConsulta := APresenter;
+  try
+    AtualizarComandos;
+  except
+    // Uma falha ao publicar os comandos devolve a posse: a composicao libera o
+    // apresentador ao tratar a excecao.
+    FPresenterConsulta := nil;
+    raise;
+  end;
+end;
+
+procedure TfrmConsultaBase.ApresentadorAssociado(
+  const ADefinition: INextQueryDefinitionBase);
+begin
+  // Padrao sem comandos: apenas a tela que possui comandos proprios usa a
+  // definicao recebida aqui, quando a associacao ja foi aceita mas a posse ainda
+  // nao foi transferida.
+end;
+
+procedure TfrmConsultaBase.RegistrarComando(AControl: TControl;
+  AExigeSelecao: Boolean);
+var
+  Indice: Integer;
+  Comando: TComandoConsulta;
+begin
+  if AControl = nil then
+    raise Exception.Create(MissingCommandControlMessage);
+
+  // Cada controle tem um unico papel: registrar de novo substitui a exigencia
+  // anterior em vez de manter dois estados para o mesmo botao.
+  for Indice := 0 to High(FComandosConsulta) do
+    if FComandosConsulta[Indice].Controle = AControl then
+    begin
+      FComandosConsulta[Indice].ExigeSelecao := AExigeSelecao;
+      AtualizarComandos;
+      Exit;
+    end;
+
+  Comando.Controle := AControl;
+  Comando.ExigeSelecao := AExigeSelecao;
+  FComandosConsulta := FComandosConsulta + [Comando];
+  AtualizarComandos;
+end;
+
+procedure TfrmConsultaBase.AtualizarComandos;
+var
+  Indice: Integer;
+  ExigeSelecao: Boolean;
+  SelecaoValida: Boolean;
+begin
+  // A linha corrente e verificada uma unica vez por atualizacao, e somente
+  // quando algum comando registrado depende dela.
+  ExigeSelecao := False;
+  for Indice := 0 to High(FComandosConsulta) do
+    if FComandosConsulta[Indice].ExigeSelecao then
+    begin
+      ExigeSelecao := True;
+      Break;
+    end;
+
+  SelecaoValida := False;
+  if ExigeSelecao then
+    SelecaoValida := TemRegistroCorrente;
+
+  // Comandos sem selecao dependem apenas da associacao do apresentador; os
+  // demais tambem exigem a linha corrente. Os botoes da consulta nao sao
+  // registrados e nao sao tocados.
+  for Indice := 0 to High(FComandosConsulta) do
+    if FComandosConsulta[Indice].Controle <> nil then
+      FComandosConsulta[Indice].Controle.Enabled :=
+        (FPresenterConsulta <> nil) and
+        ((not FComandosConsulta[Indice].ExigeSelecao) or SelecaoValida);
+end;
+
+function TfrmConsultaBase.TemRegistroCorrente: Boolean;
+var
+  DataSet: TDataSet;
+begin
+  DataSet := dsConsulta.DataSet;
+  Result := (DataSet <> nil) and DataSet.Active and (not DataSet.IsEmpty);
+end;
+
+procedure TfrmConsultaBase.dsConsultaDataChange(Sender: TObject;
+  Field: TField);
+begin
+  AtualizarComandos;
 end;
 
 procedure TfrmConsultaBase.btnSairClick(Sender: TObject);
@@ -505,8 +670,14 @@ end;
 destructor TfrmConsultaBase.Destroy;
 begin
   try
+    // Desligar o evento antes de liberar o apresentador impede que a atualizacao
+    // dos comandos alcance uma instancia ja liberada ou um formulario em
+    // destruicao.
     if dsConsulta <> nil then
+    begin
+      dsConsulta.OnDataChange := nil;
       dsConsulta.DataSet := nil;
+    end;
   finally
     try
       // A tela libera o leitor atual e a fabrica depois de desvincular o
@@ -516,6 +687,10 @@ begin
       FReader := nil;
       FReaderFactory := nil;
     finally
+      // O apresentador pertence a tela a partir da associacao aceita e sai com o
+      // evento da grade ja desligado.
+      FreeAndNil(FPresenterConsulta);
+
       // A destruicao nao executa pedidos pendentes: pcAbas libera as abas
       // remanescentes e, com elas, rodapes, areas e editores. Aqui se descarta
       // apenas a lista de descritores e a chave de gravacao.

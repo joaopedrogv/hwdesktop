@@ -3,7 +3,7 @@ unit GruposFiscaisForm;
 interface
 
 uses
-  Winapi.Windows, System.SysUtils, Data.DB,
+  Winapi.Windows, System.SysUtils,
   Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, ConsultaBaseForm, GruposFiscaisPresenter,
   GruposFiscaisView, NextQueryDefinition, GruposFiscaisQueryDefinition,
   GrupoFiscalEtdUnit, GrupoFiscalCadastroFrame, EmpresaOption,
@@ -24,18 +24,20 @@ type
     procedure btnAlterarClick(Sender: TObject);
     procedure btnEnviarLixeiraClick(Sender: TObject);
   private
+    // Apelido tipado do apresentador que a base possui e libera: esta tela nao
+    // responde pela liberacao nem assume posse dele.
     FPresenter: TGruposFiscaisPresenter;
     // Contrato tipado da consulta: entrega o identificador da linha corrente
     // usado por Alterar e Lixeira.
     FDefinicaoSelecao: INextQueryDefinition<TGrupoSelecionado>;
-    // Estado dos comandos da consulta: Novo depende do apresentador e Alterar e
-    // Lixeira exigem uma linha corrente identificada na grade.
-    procedure AtualizarComandos;
-    procedure dsConsultaDataChange(Sender: TObject; Field: TField);
-    function TemRegistroCorrente: Boolean;
   protected
-    function CanPesquisar: Boolean; override;
-    procedure DoInitializeView; override;
+    // Registra os comandos da consulta depois que a base aceitou a definicao e
+    // antes de assumir a posse do apresentador.
+    procedure ApresentadorAssociado(
+      const ADefinition: INextQueryDefinitionBase); override;
+    // Novo depende do apresentador; Alterar e Lixeira exigem tambem uma linha
+    // corrente identificada na grade.
+    function TemRegistroCorrente: Boolean; override;
     // A base cria a aba e a area de rolagem; a tela fornece o editor tipado que
     // possui o rascunho da aba.
     function CriarEditor(const AChave: string;
@@ -47,7 +49,6 @@ type
       AEditor: TWinControl): Boolean; override;
     procedure AvisarSalvamentoSemAtualizacao; override;
   public
-    destructor Destroy; override;
     function HasPendingChanges: Boolean; override;
     procedure FocusView; override;
     // Encaminha ao editor da aba que iniciou a gravacao o resultado de validacao
@@ -79,18 +80,6 @@ const
   MissingPresenterMessage = 'O apresentador de Grupos Fiscais nao foi informado.';
   MissingDefinitionMessage = 'A definicao da consulta nao foi informada.';
 
-destructor TfrmGruposFiscais.Destroy;
-begin
-  try
-    // Nenhum controle e tocado na destruicao: a base e os componentes do
-    // formulario liberam as abas, os editores e os rascunhos. Aqui se libera
-    // apenas o apresentador transiente desta tela.
-    FreeAndNil(FPresenter);
-  finally
-    inherited;
-  end;
-end;
-
 procedure TfrmGruposFiscais.AttachPresenter(APresenter: TGruposFiscaisPresenter;
   const ADefinition: INextQueryDefinitionBase; const ATitle: string);
 begin
@@ -99,12 +88,16 @@ begin
   if ADefinition = nil then
     raise Exception.Create(MissingDefinitionMessage);
 
-  // A definicao entrega colunas, filtros, operacoes e o ciclo da pesquisa; a
-  // tela assume o apresentador transiente so depois da associacao aceita, para
-  // nao deixar posse parcial.
-  Attach(ADefinition, ATitle, False);
+  // A base recebe a definicao, registra os comandos desta tela e passa a possuir
+  // o apresentador; aqui fica apenas o apelido tipado das chamadas da
+  // funcionalidade.
+  AssociarPresenter(APresenter, ADefinition, ATitle);
   FPresenter := APresenter;
+end;
 
+procedure TfrmGruposFiscais.ApresentadorAssociado(
+  const ADefinition: INextQueryDefinitionBase);
+begin
   // O identificador da linha corrente vem do mesmo contrato que a alteracao
   // consome. Sem esse contrato a tela abre, mas Alterar e Lixeira permanecem
   // desabilitados.
@@ -112,70 +105,26 @@ begin
     FDefinicaoSelecao) then
     FDefinicaoSelecao := nil;
 
-  AtualizarComandos;
-end;
-
-procedure TfrmGruposFiscais.AtualizarComandos;
-var
-  DataSet: TDataSet;
-  ComRegistro: Boolean;
-begin
-  // Novo depende apenas do apresentador; a consulta pode estar vazia antes da
-  // primeira pesquisa.
-  if btnNovo <> nil then
-    btnNovo.Enabled := FPresenter <> nil;
-
-  // Alterar e Lixeira exigem a consulta lida e uma linha corrente com
-  // identificador, porque as duas operacoes partem do registro selecionado.
-  ComRegistro := False;
-  DataSet := dsConsulta.DataSet;
-  if (FPresenter <> nil) and (DataSet <> nil) then
-    ComRegistro := DataSet.Active and (not DataSet.IsEmpty) and
-      TemRegistroCorrente;
-
-  if btnAlterar <> nil then
-    btnAlterar.Enabled := ComRegistro;
-  if btnEnviarLixeira <> nil then
-    btnEnviarLixeira.Enabled := ComRegistro;
+  // Novo depende apenas do apresentador; Alterar e Lixeira partem do registro
+  // selecionado na grade.
+  RegistrarComando(btnNovo, False);
+  RegistrarComando(btnAlterar, True);
+  RegistrarComando(btnEnviarLixeira, True);
 end;
 
 function TfrmGruposFiscais.TemRegistroCorrente: Boolean;
 var
   Selecionado: TGrupoSelecionado;
 begin
-  Result := False;
-  if FDefinicaoSelecao = nil then
+  Result := inherited TemRegistroCorrente;
+  if not Result then
     Exit;
 
   // A definicao le a linha corrente sem criar objetos de apresentacao. A chave
-  // vazia nao identifica registro e nao habilita nenhuma das operacoes.
-  if not FDefinicaoSelecao.TryGetSelected(Selecionado) then
-    Exit;
-
-  Result := Trim(Selecionado.Id) <> '';
-end;
-
-procedure TfrmGruposFiscais.dsConsultaDataChange(Sender: TObject; Field: TField);
-begin
-  AtualizarComandos;
-end;
-
-procedure TfrmGruposFiscais.DoInitializeView;
-begin
-  inherited;
-
-  // A troca de dataset (pesquisa, limpeza, reconsulta) atualiza os comandos
-  // junto com a grade.
-  dsConsulta.OnDataChange := dsConsultaDataChange;
-  AtualizarComandos;
-end;
-
-function TfrmGruposFiscais.CanPesquisar: Boolean;
-begin
-  // A decisao e as mensagens de indisponibilidade pertencem ao apresentador,
-  // que apresenta o feedback na propria tela. Sem apresentador a pesquisa nao
-  // prossegue.
-  Result := (FPresenter <> nil) and FPresenter.AutorizarPesquisa;
+  // vazia nao identifica registro e nao habilita as operacoes.
+  Result := (FDefinicaoSelecao <> nil) and
+    FDefinicaoSelecao.TryGetSelected(Selecionado) and
+    (Trim(Selecionado.Id) <> '');
 end;
 
 function TfrmGruposFiscais.CriarEditor(const AChave: string;
@@ -338,39 +287,31 @@ end;
 
 procedure TfrmGruposFiscais.btnAlterarClick(Sender: TObject);
 begin
-  try
-    // A alteracao e uma unica chamada: o apresentador identifica a linha
-    // corrente, reapresenta a aba existente ou autoriza, carrega e entrega o
-    // rascunho para a nova aba. As mensagens pertencem a tela ou ao servico de
-    // autorizacao.
-    if FPresenter <> nil then
-      FPresenter.CarregarParaEdicao;
-  finally
-    AtualizarComandos;
-  end;
+  // A alteracao e uma unica chamada: o apresentador identifica a linha
+  // corrente, reapresenta a aba existente ou autoriza, carrega e entrega o
+  // rascunho para a nova aba. As mensagens pertencem a tela ou ao servico de
+  // autorizacao. A base atualiza os comandos quando a consulta muda.
+  if FPresenter <> nil then
+    FPresenter.CarregarParaEdicao;
 end;
 
 procedure TfrmGruposFiscais.btnEnviarLixeiraClick(Sender: TObject);
 begin
-  try
-    if FPresenter = nil then
-    begin
-      ShowError(MissingPresenterMessage);
-      Exit;
-    end;
-
-    // O apresentador identifica a linha corrente, confirma (padrao "Nao") e
-    // autoriza antes de executar; False interrompe sem repetir o que o legado
-    // mostrou.
-    if not FPresenter.EnviarParaLixeira() then
-      Exit;
-
-    // A grade atualizada e a confirmacao do envio; nao ha dialogo de sucesso.
-    if not RepetirPesquisa then
-      ShowWarning('O grupo fiscal já foi enviado para a lixeira. Refaça a pesquisa para atualizar a consulta.');
-  finally
-    AtualizarComandos;
+  if FPresenter = nil then
+  begin
+    ShowError(MissingPresenterMessage);
+    Exit;
   end;
+
+  // O apresentador identifica a linha corrente, confirma (padrao "Nao") e
+  // autoriza antes de executar; False interrompe sem repetir o que o legado
+  // mostrou.
+  if not FPresenter.EnviarParaLixeira() then
+    Exit;
+
+  // A grade atualizada e a confirmacao do envio; nao ha dialogo de sucesso.
+  if not RepetirPesquisa then
+    ShowWarning('O grupo fiscal já foi enviado para a lixeira. Refaça a pesquisa para atualizar a consulta.');
 end;
 
 end.

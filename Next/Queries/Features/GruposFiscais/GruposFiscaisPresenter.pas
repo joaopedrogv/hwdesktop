@@ -7,7 +7,7 @@ uses
   SalvarGrupoFiscalUseCaseUnit, ObterGruposFiscaisUseCaseUnit,
   ListarEmpresasUseCaseUnit, ISessionContextUnit,
   GrupoFiscalEtdUnit, EmpresaOption, EmpresaOptionsBuilder, TipoComunsUnit,
-  NextQueryDefinition, GruposFiscaisQueryDefinition;
+  NextQueryDefinition, GruposFiscaisQueryDefinition, PresenterConsultaBase;
 
 type
   // Apresentador da consulta, da inclusao e da alteracao de Grupos Fiscais.
@@ -23,21 +23,17 @@ type
   // indisponibilidade comunicada pelo proprio servico de autorizacao nao sao
   // repetidos. Delega a leitura das empresas a preparacao compartilhada, que le
   // o login a cada operacao, e encaminha o resultado de validacao do caso de uso.
-  TGruposFiscaisPresenter = class
+  TGruposFiscaisPresenter = class(TPresenterConsultaBase)
   private
     // A view pertence a tela e as demais dependencias ao container de
     // composicao: o apresentador apenas as utiliza e nunca as libera.
     FView: IGruposFiscaisView;
     FQueryDefinition: INextQueryDefinition<TGrupoSelecionado>;
-    FAuthorization: IAuthorizationService;
     FRemoverGrupoFiscal: IRemoverGrupoFiscalUseCase;
     FSalvarGrupoFiscal: ISalvarGrupoFiscalUseCase;
     FListarEmpresas: ListarEmpresasUseCase;
     FObterGrupoFiscal: ObterGrupoFiscalPorIdUseCase;
     FSession: ISessionContext;
-    // Verifica a permissao de inclusao; a negativa ou o cancelamento ja foi
-    // apresentado pelo legado.
-    function AutorizarInclusao: Boolean;
     // Le as empresas da inclusao com o login atual e avisa a falha na propria
     // tela, porque a inclusao nao tem outra mensagem para essa leitura.
     function CarregarEmpresas(out AOpcoes: TEmpresaOptions): Boolean;
@@ -55,7 +51,6 @@ type
       AListarEmpresas: ListarEmpresasUseCase;
       AObterGrupoFiscal: ObterGrupoFiscalPorIdUseCase;
       ASession: ISessionContext);
-    function AutorizarPesquisa: Boolean;
     function EnviarParaLixeira(): Boolean;
     // Reapresenta a aba de inclusao quando ela ja existe; caso contrario
     // autoriza a inclusao, carrega as empresas e entrega as opcoes para a nova
@@ -104,13 +99,14 @@ constructor TGruposFiscaisPresenter.Create(AView: IGruposFiscaisView;
   AObterGrupoFiscal: ObterGrupoFiscalPorIdUseCase;
   ASession: ISessionContext);
 begin
-  inherited Create;
+  // O processo de pesquisa e a tabela padrao ficam na base, que tambem responde
+  // pela permissao da consulta. As demais operacoes informam o proprio processo
+  // e usam essa tabela padrao.
+  inherited Create(AAuthorization, ProcessoConsulta, TabelaGruposFiscais);
   if AView = nil then
     raise Exception.Create('A view de Grupos Fiscais não foi informada.');
   if AQueryDefinition = nil then
     raise Exception.Create('A consulta de Grupos Fiscais não foi informada.');
-  if AAuthorization = nil then
-    raise Exception.Create('O serviço de autorização de Grupos Fiscais não foi informado.');
   if ARemoverGrupoFiscal = nil then
     raise Exception.Create('O caso de uso de remoção de Grupos Fiscais não foi informado.');
   if ASalvarGrupoFiscal = nil then
@@ -124,21 +120,11 @@ begin
 
   FView := AView;
   FQueryDefinition := AQueryDefinition;
-  // A indisponibilidade da autorizacao e comunicada pelo proprio servico; o
-  // apresentador apenas interrompe a operacao.
-  FAuthorization := AAuthorization;
   FRemoverGrupoFiscal := ARemoverGrupoFiscal;
   FSalvarGrupoFiscal := ASalvarGrupoFiscal;
   FListarEmpresas := AListarEmpresas;
   FObterGrupoFiscal := AObterGrupoFiscal;
   FSession := ASession;
-end;
-
-function TGruposFiscaisPresenter.AutorizarPesquisa: Boolean;
-var
-  Autorizacao: TAuthorizationResult;
-begin
-  Result := FAuthorization.Authorize(ProcessoConsulta, aaVisualizar, TabelaGruposFiscais).Outcome = aoAllowed;
 end;
 
 function TGruposFiscaisPresenter.EnviarParaLixeira(): Boolean;
@@ -159,7 +145,7 @@ begin
       [Selected.Descricao])) then
     Exit;
 
-  if FAuthorization.Authorize(ProcessoExclusao, aaExcluir, TabelaGruposFiscais).Outcome <> aoAllowed then
+  if not Autorizar(ProcessoExclusao, aaExcluir) then
     Exit;
 
   try
@@ -172,11 +158,6 @@ begin
       // O texto tecnico do banco nao deve chegar a interface.
       FView.ShowError('Não foi possível enviar o grupo fiscal para a lixeira.');
   end;
-end;
-
-function TGruposFiscaisPresenter.AutorizarInclusao: Boolean;
-begin
-  Result := FAuthorization.Authorize(ProcessoInclusao, aaInserir, TabelaGruposFiscais).Outcome = aoAllowed;
 end;
 
 function TGruposFiscaisPresenter.CarregarParaInclusao: Boolean;
@@ -194,7 +175,7 @@ begin
   end;
 
   // A negativa ou o cancelamento ja foi apresentado pelo legado.
-  if not AutorizarInclusao then
+  if not Autorizar(ProcessoInclusao, aaInserir) then
     Exit;
 
   // Sem as empresas nao ha o que incluir; o aviso ja foi apresentado.
@@ -238,8 +219,7 @@ begin
 
   // A permissao de alteracao e verificada antes de qualquer leitura; a negativa
   // ou o cancelamento ja foi apresentado pelo legado.
-  if FAuthorization.Authorize(ProcessoAlteracao, aaAlterar,
-    TabelaGruposFiscais).Outcome <> aoAllowed then
+  if not Autorizar(ProcessoAlteracao, aaAlterar) then
     Exit;
 
   Carregado := nil;
@@ -314,7 +294,7 @@ begin
     Exit;
   end;
 
-  if FAuthorization.Authorize(ProcessoGravacao, aaSalvar, TabelaGruposFiscais).Outcome <> aoAllowed then
+  if not Autorizar(ProcessoGravacao, aaSalvar) then
     Exit;
 
   Resultado := nil;
