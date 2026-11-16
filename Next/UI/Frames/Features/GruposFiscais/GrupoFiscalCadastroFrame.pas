@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls,
-  TipoTributoFiscalEnumUnit, GrupoFiscalEtdUnit,
+  EditorCadastro, TipoTributoFiscalEnumUnit, GrupoFiscalEtdUnit,
   ValidationPanelFrame, ValidationEntityOutputUnit, EmpresaOption,
   EmpresaChecklistFrame;
 
@@ -14,7 +14,7 @@ type
   // gravacao e a troca de sessao pertencem ao formulario que o contem. Os erros
   // do caso de uso sao apresentados pelo painel comum, que agrupa as mensagens
   // por campo.
-  TfrmGrupoFiscalCadastroFrame = class(TFrame)
+  TfrmGrupoFiscalCadastroFrame = class(TFrame, IEditorCadastro)
     lblDescricao: TLabel;
     edDescricao: TEdit;
     lblTipoTributo: TLabel;
@@ -59,6 +59,11 @@ type
     // Foca o primeiro campo com erro; sem erro vinculado, foca a descricao.
     function FocarPrimeiroCampoInvalido: Boolean;
     function TemRascunho: Boolean;
+    // Contrato comum da aba de cadastro: a base consulta pendencias, encaminha o
+    // foco e entrega a validacao sem conhecer este frame.
+    function HasPendingChanges: Boolean;
+    function TryFocus: Boolean;
+    procedure ShowValidation(const AValidacao: ValidationEntityOutput);
     property Rascunho: GrupoFiscalEtd read FRascunho;
     property Descricao: string read GetDescricao write SetDescricao;
     property TipoTributo: TipoTributoFiscalEnum read GetTipoTributo
@@ -179,6 +184,24 @@ end;
 function TfrmGrupoFiscalCadastroFrame.TemRascunho: Boolean;
 begin
   Result := FRascunho <> nil;
+end;
+
+function TfrmGrupoFiscalCadastroFrame.HasPendingChanges: Boolean;
+begin
+  // Um rascunho aberto ja e pendencia: a inclusao nasce com dados a gravar e a
+  // alteracao com a copia carregada do registro.
+  Result := TemRascunho;
+end;
+
+function TfrmGrupoFiscalCadastroFrame.TryFocus: Boolean;
+begin
+  Result := FocarPrimeiroCampoInvalido;
+end;
+
+procedure TfrmGrupoFiscalCadastroFrame.ShowValidation(
+  const AValidacao: ValidationEntityOutput);
+begin
+  ExibirValidacao(AValidacao);
 end;
 
 procedure TfrmGrupoFiscalCadastroFrame.ExibirValidacao(

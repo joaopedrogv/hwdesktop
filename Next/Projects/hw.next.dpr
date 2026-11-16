@@ -44,6 +44,7 @@ uses
   EmpresaOption in '..\Contracts\EmpresaOption.pas',
   ViewFeedback in '..\Contracts\ViewFeedback.pas',
   GruposFiscaisView in '..\Contracts\GruposFiscaisView.pas',
+  EditorCadastro in '..\Contracts\EditorCadastro.pas',
   AuthorizationService in '..\Contracts\AuthorizationService.pas',
   ColumnLayoutPreferences in '..\..\Modern\Core\Domain\Ports\Shared\ColumnLayoutPreferences.pas',
   ColumnLayoutPreferencesRepository in '..\..\Modern\Adapters\Secondary\Preferences\ColumnLayoutPreferencesRepository.pas',

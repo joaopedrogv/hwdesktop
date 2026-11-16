@@ -24,12 +24,12 @@ type
     procedure btnAlterarClick(Sender: TObject);
     procedure btnEnviarLixeiraClick(Sender: TObject);
   private
-    // Apelido tipado do apresentador que a base possui e libera: esta tela nao
-    // responde pela liberacao nem assume posse dele.
-    FPresenter: TGruposFiscaisPresenter;
     // Contrato tipado da consulta: entrega o identificador da linha corrente
     // usado por Alterar e Lixeira.
     FDefinicaoSelecao: INextQueryDefinition<TGrupoSelecionado>;
+    // Acesso tipado ao apresentador que a base possui e libera: esta tela nao
+    // responde pela liberacao nem assume posse dele.
+    function Presenter: TGruposFiscaisPresenter;
   protected
     // Registra os comandos da consulta depois que a base aceitou a definicao e
     // antes de assumir a posse do apresentador.
@@ -49,10 +49,8 @@ type
       AEditor: TWinControl): Boolean; override;
     procedure AvisarSalvamentoSemAtualizacao; override;
   public
-    function HasPendingChanges: Boolean; override;
-    procedure FocusView; override;
-    // Encaminha ao editor da aba que iniciou a gravacao o resultado de validacao
-    // produzido pelo apresentador; o painel pertence a cada editor.
+    // Implementa IGruposFiscaisView: a base encaminha a validacao ao editor da
+    // aba que iniciou a gravacao, que apresenta as mensagens por campo.
     procedure ExibirValidacao(const AValidacao: ValidationEntityOutput);
     // Reapresenta a aba de alteracao da chave ja aberta. Sem aba, nada e criado
     // e a alteracao segue para a autorizacao e a carga.
@@ -89,10 +87,15 @@ begin
     raise Exception.Create(MissingDefinitionMessage);
 
   // A base recebe a definicao, registra os comandos desta tela e passa a possuir
-  // o apresentador; aqui fica apenas o apelido tipado das chamadas da
-  // funcionalidade.
+  // o apresentador; esta tela o acessa pelo getter tipado.
   AssociarPresenter(APresenter, ADefinition, ATitle);
-  FPresenter := APresenter;
+end;
+
+function TfrmGruposFiscais.Presenter: TGruposFiscaisPresenter;
+begin
+  // A instancia pertence a base; o valor e sempre o apresentador associado por
+  // AttachPresenter a esta tela.
+  Result := TGruposFiscaisPresenter(PresenterConsulta);
 end;
 
 procedure TfrmGruposFiscais.ApresentadorAssociado(
@@ -141,7 +144,7 @@ var
   Frame: TfrmGrupoFiscalCadastroFrame;
 begin
   Result := False;
-  if (FPresenter = nil) or
+  if (Presenter = nil) or
     (not (AEditor is TfrmGrupoFiscalCadastroFrame)) then
     Exit;
 
@@ -155,28 +158,22 @@ begin
 
   // A entidade pertence ao frame e continua valida durante a chamada. Depois de
   // Salvar o frame nao e mais acessado: uma troca de sessao pode te-lo liberado.
-  Result := FPresenter.Salvar(Frame.Rascunho);
+  Result := Presenter.Salvar(Frame.Rascunho);
 end;
 
 procedure TfrmGruposFiscais.ExibirValidacao(
   const AValidacao: ValidationEntityOutput);
-var
-  Editor: TWinControl;
 begin
-  // O formulario encaminha o resultado para a aba que iniciou a gravacao. A aba
-  // pode ter sido encerrada por uma troca de sessao antes desta chamada.
-  Editor := EditorDaAba(ChaveAbaEmGravacao);
-  if Editor is TfrmGrupoFiscalCadastroFrame then
-    TfrmGrupoFiscalCadastroFrame(Editor).ExibirValidacao(AValidacao);
+  // O encaminhamento e da base: a validacao vai para o editor da aba que
+  // iniciou a gravacao.
+  inherited ShowValidation(AValidacao);
 end;
 
 function TfrmGruposFiscais.AtivarEdicao(const AChave: string): Boolean;
 begin
   // Reabrir devolve a aba existente sem repetir autorizacao nem recarregar o
   // registro: o rascunho ainda pertence a sessao atual.
-  Result := AbaAberta(AChave);
-  if Result then
-    AtivarAba(AChave);
+  Result := TryAtivarAba(AChave);
 end;
 
 function TfrmGruposFiscais.AbrirEdicao(const AChave: string;
@@ -212,9 +209,7 @@ function TfrmGruposFiscais.AtivarInclusao: Boolean;
 begin
   // Reabrir devolve a aba de inclusao existente sem repetir autorizacao nem
   // recarregar as empresas: o rascunho ainda pertence a sessao atual.
-  Result := AbaAberta(ChaveAbaInclusao);
-  if Result then
-    AtivarAba(ChaveAbaInclusao);
+  Result := TryAtivarAba(ChaveAbaInclusao);
 end;
 
 function TfrmGruposFiscais.AbrirInclusao(
@@ -241,48 +236,13 @@ begin
   ShowWarning('O grupo fiscal foi salvo. Refaça a pesquisa para atualizar a consulta.');
 end;
 
-function TfrmGruposFiscais.HasPendingChanges: Boolean;
-var
-  I: Integer;
-  Editor: TWinControl;
-begin
-  // Qualquer aba de cadastro com rascunho e pendencia: a inclusao ja contem
-  // dados a gravar e cada alteracao possui a copia carregada.
-  for I := 0 to TotalAbasCadastro - 1 do
-  begin
-    Editor := EditorAbaCadastro(I);
-    if (Editor is TfrmGrupoFiscalCadastroFrame) and
-      TfrmGrupoFiscalCadastroFrame(Editor).TemRascunho then
-    begin
-      Result := True;
-      Exit;
-    end;
-  end;
-  Result := False;
-end;
-
-procedure TfrmGruposFiscais.FocusView;
-var
-  Editor: TWinControl;
-begin
-  // Com uma aba de cadastro ativa, o foco pertence ao editor daquela aba.
-  Editor := EditorAbaAtiva;
-  if Editor is TfrmGrupoFiscalCadastroFrame then
-  begin
-    TfrmGrupoFiscalCadastroFrame(Editor).FocarPrimeiroCampoInvalido;
-    Exit;
-  end;
-
-  inherited;
-end;
-
 procedure TfrmGruposFiscais.btnNovoClick(Sender: TObject);
 begin
   // A inclusao e uma unica chamada: o apresentador reapresenta a aba existente
   // ou autoriza, carrega as empresas e entrega as opcoes para a nova aba, que
   // cria o proprio rascunho.
-  if FPresenter <> nil then
-    FPresenter.CarregarParaInclusao;
+  if Presenter <> nil then
+    Presenter.CarregarParaInclusao;
 end;
 
 procedure TfrmGruposFiscais.btnAlterarClick(Sender: TObject);
@@ -291,13 +251,13 @@ begin
   // corrente, reapresenta a aba existente ou autoriza, carrega e entrega o
   // rascunho para a nova aba. As mensagens pertencem a tela ou ao servico de
   // autorizacao. A base atualiza os comandos quando a consulta muda.
-  if FPresenter <> nil then
-    FPresenter.CarregarParaEdicao;
+  if Presenter <> nil then
+    Presenter.CarregarParaEdicao;
 end;
 
 procedure TfrmGruposFiscais.btnEnviarLixeiraClick(Sender: TObject);
 begin
-  if FPresenter = nil then
+  if Presenter = nil then
   begin
     ShowError(MissingPresenterMessage);
     Exit;
@@ -306,7 +266,7 @@ begin
   // O apresentador identifica a linha corrente, confirma (padrao "Nao") e
   // autoriza antes de executar; False interrompe sem repetir o que o legado
   // mostrou.
-  if not FPresenter.EnviarParaLixeira() then
+  if not Presenter.EnviarParaLixeira() then
     Exit;
 
   // A grade atualizada e a confirmacao do envio; nao ha dialogo de sucesso.

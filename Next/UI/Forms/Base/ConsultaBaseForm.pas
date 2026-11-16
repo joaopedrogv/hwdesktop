@@ -7,7 +7,8 @@ uses
   Vcl.ExtCtrls, Vcl.Forms, Vcl.StdCtrls, Vcl.Buttons, Vcl.ImgList, System.Generics.Collections,
   Data.DB,  NextBaseForm, DataGridFrame, FilterDefinition, FilterCriterion, FilterFrame,
   GridColumnDefinition, QueryResultOperations, NextQueryDefinition,
-  ColumnLayoutPreferences, LocalPreferences, PresenterConsultaBase;
+  ColumnLayoutPreferences, LocalPreferences, PresenterConsultaBase,
+  EditorCadastro, ValidationEntityOutputUnit;
 
 type
   // Configura o editor recem-criado antes de a aba ser ativada: e o ponto em que
@@ -158,6 +159,9 @@ type
     function AbrirAba(const AChave, ATitulo: string;
       AConfigurar: TConfigurarAbaCadastro): Boolean; overload;
     function AbrirAba(const AChave, ATitulo: string): Boolean; overload;
+    // Ativa a aba de cadastro ja existente e informa se ela foi encontrada. Nao
+    // cria nem reconfigura a aba: o editor e o rascunho continuam intactos.
+    function TryAtivarAba(const AChave: string): Boolean;
     procedure AtivarAba(const AChave: string);
     procedure FecharAba(const AChave: string);
     procedure FecharAbas;
@@ -178,6 +182,9 @@ type
     // registra o fechamento diferido e reconsulta depois do clique.
     function SalvarAba(const AChave: string;
       AEditor: TWinControl): Boolean; virtual;
+    // Encaminha o resultado de validacao da gravacao ao editor da aba que a
+    // iniciou. Sem esse editor nada e apresentado.
+    procedure ShowValidation(const AValidacao: ValidationEntityOutput);
     // Aviso de gravacao confirmada cuja reconsulta falhou. O descendente
     // fornece a mensagem de negocio; a base chama depois de fechar a aba.
     procedure AvisarSalvamentoSemAtualizacao; virtual;
@@ -185,11 +192,17 @@ type
     // apresentador e encaminhada ao editor dessa aba.
     property ChaveAbaEmGravacao: string read FChaveAbaEmGravacao;
     // Apresentador associado, sem o tipo da funcionalidade: a tela usa o proprio
-    // apelido tipado para as chamadas especificas.
+    // getter tipado para as chamadas especificas.
     property PresenterConsulta: TPresenterConsultaBase read FPresenterConsulta;
   public
     destructor Destroy; override;
     procedure ResetForSessionChange; override;
+    // Qualquer aba de cadastro com rascunho pendente impede o fechamento; cada
+    // editor responde pela propria pendencia.
+    function HasPendingChanges: Boolean; override;
+    // A aba de cadastro ativa recebe o foco quando o editor consegue; caso
+    // contrario o foco continua com o host.
+    procedure FocusView; override;
     // Recebe a definicao completa da consulta: colunas e operacoes vem dela e o
     // ciclo do leitor pertence a propria definicao.
     procedure Attach(const ADefinition: INextQueryDefinitionBase;
@@ -646,6 +659,47 @@ begin
   fraGrid.ReloadColumnLayout;
 end;
 
+function TfrmConsultaBase.HasPendingChanges: Boolean;
+var
+  I: Integer;
+  Editor: TWinControl;
+  Cadastro: IEditorCadastro;
+begin
+  // A base nao conhece o tipo do editor: cada aba informa se o proprio rascunho
+  // ainda conta como pendencia. Sem abas de cadastro nao ha o que gravar.
+  Result := False;
+  for I := 0 to TotalAbasCadastro - 1 do
+  begin
+    Editor := EditorAbaCadastro(I);
+    if Editor = nil then
+      Continue;
+    if not Supports(Editor, IEditorCadastro, Cadastro) then
+      Continue;
+
+    if Cadastro.HasPendingChanges then
+    begin
+      Result := True;
+      Exit;
+    end;
+  end;
+end;
+
+procedure TfrmConsultaBase.FocusView;
+var
+  Editor: TWinControl;
+  Cadastro: IEditorCadastro;
+begin
+  // Com uma aba de cadastro ativa, o foco pertence ao editor daquela aba. Sem
+  // editor que o receba, o foco permanece com o host.
+  Editor := EditorAbaAtiva;
+  if Editor <> nil then
+    if Supports(Editor, IEditorCadastro, Cadastro) then
+      if Cadastro.TryFocus then
+        Exit;
+
+  inherited;
+end;
+
 destructor TfrmConsultaBase.Destroy;
 begin
   try
@@ -694,6 +748,22 @@ begin
   // Padrao da base para telas que nao fornecem mensagem propria. A gravacao ja
   // terminou; a mensagem apenas orienta a repetir a consulta.
   ShowWarning(SalvamentoSemAtualizacaoMessage);
+end;
+
+procedure TfrmConsultaBase.ShowValidation(
+  const AValidacao: ValidationEntityOutput);
+var
+  Editor: TWinControl;
+  Cadastro: IEditorCadastro;
+begin
+  // A validacao pertence a aba que iniciou a gravacao; uma troca de sessao pode
+  // te-la encerrado antes desta chamada.
+  Editor := EditorDaAba(ChaveAbaEmGravacao);
+  if Editor = nil then
+    Exit;
+
+  if Supports(Editor, IEditorCadastro, Cadastro) then
+    Cadastro.ShowValidation(AValidacao);
 end;
 
 function TfrmConsultaBase.ListaAbasCadastro: TObjectList<TAbaCadastro>;
@@ -968,17 +1038,25 @@ begin
   Result := AbrirAba(AChave, ATitulo, nil);
 end;
 
-procedure TfrmConsultaBase.AtivarAba(const AChave: string);
+function TfrmConsultaBase.TryAtivarAba(const AChave: string): Boolean;
 var
   Indice: Integer;
 begin
   Indice := IndiceAbaCadastro(AChave);
-  if Indice < 0 then
+  Result := Indice >= 0;
+  if not Result then
     Exit;
 
   // Reapresentar a aba nao recria o editor nem recarrega o registro; o foco
   // pertence ao descendente, que conhece o editor.
   pcAbas.ActivePage := FAbasCadastro[Indice].Aba;
+end;
+
+procedure TfrmConsultaBase.AtivarAba(const AChave: string);
+begin
+  // A abertura da aba continua usando a assinatura sem retorno; sem aba
+  // existente a ativacao nao faz nada.
+  TryAtivarAba(AChave);
 end;
 
 procedure TfrmConsultaBase.FecharAba(const AChave: string);
