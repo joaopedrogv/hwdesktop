@@ -23,6 +23,9 @@ type
     function GetFiltersDef(): TFilterDefinition;
     function GetDataSet: TDataSet;
     procedure Pesquisar(const ACriteria: TFilterCriteria);
+    // Atualiza o resultado da pesquisa corrente sem recriar o leitor nem
+    // reaplicar os criterios da tela.
+    procedure Atualizar;
     procedure Limpar;
 
     property FiltersDef: TFilterDefinition read GetFiltersDef;
@@ -52,6 +55,7 @@ type
     constructor Create(AReaderFactory: ISqlDataSetReaderFactory;
       AOperation: IQueryResultOperations);
     procedure Pesquisar(const ACriteria: TFilterCriteria);
+    procedure Atualizar;
     procedure Limpar;
     function GetResultOperation(): IQueryResultOperations;
     function GetColumnsDef: TGridColumnDefinitions;
@@ -115,6 +119,16 @@ begin
     Limpar;
     raise;
   end;
+end;
+
+procedure TNextQueryDefinitionBase.Atualizar;
+begin
+  // Sem leitor nao existe resultado aberto a reler; a base nao cria um novo
+  // leitor nesta chamada.
+  if FReader = nil then
+    raise Exception.Create(MissingReaderMessage);
+
+  FReader.Atualizar;
 end;
 
 procedure TNextQueryDefinitionBase.Limpar;

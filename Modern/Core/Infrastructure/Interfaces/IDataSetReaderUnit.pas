@@ -11,6 +11,9 @@ type
   IDataSetReader = interface
     ['{B7A4C1D2-3E5F-4A6B-8C9D-0E1F2A3B4C5D}']
     procedure Pesquisar;
+    // Rele o resultado aberto mantendo o SQL e os parametros da pesquisa
+    // corrente; nao substitui o conjunto nem recria o leitor.
+    procedure Atualizar;
     procedure Limpar;
     function DataSet: TDataSet;
   end;

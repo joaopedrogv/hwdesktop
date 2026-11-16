@@ -78,6 +78,8 @@ const
     'A conexao da leitura nao foi configurada.';
   ReaderConnectionFailedMessage =
     'Nao foi possivel conectar ao banco de dados da empresa.';
+  ReaderNotActiveMessage =
+    'A leitura da consulta nao esta aberta para atualizacao.';
 
 type
   TReaderEnsureConnection = procedure of object;
@@ -98,6 +100,7 @@ type
       const ABindParameters: TReaderBindParameters);
     destructor Destroy; override;
     procedure Pesquisar;
+    procedure Atualizar;
     procedure Limpar;
     function DataSet: TDataSet;
   end;
@@ -167,6 +170,16 @@ begin
     Limpar;
     raise;
   end;
+end;
+
+procedure TFireDACDatabaseReader.Atualizar;
+begin
+  // Refresh reposiciona o resultado com o SQL e os parametros ja aplicados pela
+  // pesquisa corrente; sem conjunto aberto nao ha leitura a atualizar.
+  if (FQuery = nil) or (not FQuery.Active) then
+    raise Exception.Create(ReaderNotActiveMessage);
+
+  FQuery.Refresh;
 end;
 
 procedure TFireDACDatabaseReader.Limpar;

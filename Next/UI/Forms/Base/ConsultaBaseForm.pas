@@ -107,6 +107,9 @@ type
     // grade.
     procedure dsConsultaDataChange(Sender: TObject; Field: TField);
     function Pesquisar(const AExibirFalha: Boolean): Boolean;
+    // True somente quando a grade esta vinculada ao leitor ativo da pesquisa
+    // corrente, pela definicao ou pela fabrica.
+    function TemLeitorAtivo: Boolean;
     procedure GridTitleCtrlClick(Sender: TObject; const AFieldName: string);
     procedure FrameFeedback(Sender: TObject;
       const AMensagem: string);
@@ -152,11 +155,12 @@ type
     // verifica o conjunto; a funcionalidade decide o que identifica o registro.
     function TemRegistroCorrente: Boolean; virtual;
     function CollectFilters: TFilterCriteriaResult;
-    // Repete a pesquisa atual pela mesma sequencia de filtros, autorizacao e
-    // leitura, sem o dialogo generico da falha. Retorna True quando a grade
-    // reflete a consulta, incluindo resultado vazio. Destina-se as telas que
-    // alteram dados e precisam atualizar o resultado com mensagem propria.
-    function RepetirPesquisa: Boolean;
+    // Atualiza o resultado ja apresentado com o SQL e os parametros da ultima
+    // pesquisa, mantendo a grade vinculada; sem leitor ativo, executa a pesquisa.
+    // Retorna True quando a consulta foi relida, incluindo resultado vazio. A
+    // negativa de autorizacao e a falha devolvem False sem limpar a grade.
+    // Destina-se as telas que alteram dados e precisam de mensagem propria.
+    function AtualizarResultado: Boolean;
     procedure DoInitializeView; override;
     // Abre a aba de cadastro da chave. Se ela ja existe, apenas a ativa e
     // preserva o rascunho; caso contrario cria aba, rodape, area de rolagem e
@@ -421,9 +425,52 @@ begin
   Pesquisar(True);
 end;
 
-function TfrmConsultaBase.RepetirPesquisa: Boolean;
+function TfrmConsultaBase.TemLeitorAtivo: Boolean;
+var
+  DataSet: TDataSet;
 begin
-  Result := Pesquisar(False);
+  DataSet := dsConsulta.DataSet;
+  Result := (DataSet <> nil) and DataSet.Active;
+  if not Result then
+    Exit;
+
+  if FDefinition <> nil then
+    Result := FDefinition.GetDataSet <> nil
+  else
+    Result := FReader <> nil;
+end;
+
+function TfrmConsultaBase.AtualizarResultado: Boolean;
+begin
+  Result := False;
+  try
+    if TemLeitorAtivo then
+    begin
+      // A atualizacao reusa a autorizacao da consulta; a negativa preserva o
+      // conjunto ja apresentado.
+      if not CanPesquisar then
+        Exit;
+
+      try
+        if FDefinition <> nil then
+          FDefinition.Atualizar
+        else
+          FReader.Atualizar;
+
+        // Um resultado vazio tambem conclui a atualizacao: a grade continua
+        // vinculada e apresenta o conjunto relido.
+        Result := True;
+      except
+        Result := False;
+      end;
+    end
+    else
+      // Sem leitor ativo, a atualizacao equivale a primeira pesquisa e aplica
+      // os criterios da tela.
+      Result := Pesquisar(False);
+  finally
+    AtualizarComandos;
+  end;
 end;
 
 procedure TfrmConsultaBase.Attach(const ADefinition: INextQueryDefinitionBase;
@@ -1143,11 +1190,11 @@ end;
 
 procedure TfrmConsultaBase.AtualizarAposSalvar;
 begin
-  // A reconsulta pode falhar com False ou com excecao antes do tratamento
-  // interno da pesquisa. Em ambos os casos a gravacao esta concluida: a aba
+  // A atualizacao do resultado pode falhar com False ou com excecao antes do
+  // tratamento interno. Em ambos os casos a gravacao esta concluida: a aba
   // permanece fechada e o usuario e orientado a repetir a pesquisa.
   try
-    if not RepetirPesquisa then
+    if not AtualizarResultado then
       AvisarSalvamentoSemAtualizacao;
   except
     AvisarSalvamentoSemAtualizacao;
