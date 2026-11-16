@@ -18,13 +18,15 @@ type
 
   // Metadados de apresentacao de uma coluna. Width igual a zero preserva a
   // largura padrao da grade. Behavior define a visibilidade inicial e se o
-  // usuario pode altera-la na tela.
+  // usuario pode altera-la na tela. DisplayFormat vazio preserva a formatacao
+  // do proprio campo.
   TGridColumnDefinition = record
     FieldName: string;
     Title: string;
     Width: Integer;
     Alignment: TGridColumnDefinitionAlignment;
     Behavior: TGridColumnBehavior;
+    DisplayFormat: string;
   end;
 
   TGridColumnDefinitions = TArray<TGridColumnDefinition>;
@@ -32,7 +34,8 @@ type
 function GridColumn(const AFieldName, ATitle: string;
   AWidth: Integer = 0;
   AAlignment: TGridColumnDefinitionAlignment = qcaDefault;
-  ABehavior: TGridColumnBehavior = gcbConfigurableVisible): TGridColumnDefinition;
+  ABehavior: TGridColumnBehavior = gcbConfigurableVisible;
+  const ADisplayFormat: string = ''): TGridColumnDefinition;
 function GridColumns(const AItems: array of TGridColumnDefinition): TGridColumnDefinitions;
 
 // Visibilidade inicial derivada apenas do comportamento.
@@ -45,13 +48,15 @@ implementation
 
 function GridColumn(const AFieldName, ATitle: string;
   AWidth: Integer; AAlignment: TGridColumnDefinitionAlignment;
-  ABehavior: TGridColumnBehavior): TGridColumnDefinition;
+  ABehavior: TGridColumnBehavior;
+  const ADisplayFormat: string): TGridColumnDefinition;
 begin
   Result.FieldName := AFieldName;
   Result.Title := ATitle;
   Result.Width := AWidth;
   Result.Alignment := AAlignment;
   Result.Behavior := ABehavior;
+  Result.DisplayFormat := ADisplayFormat;
 end;
 
 function GridColumnVisibleByDefault(

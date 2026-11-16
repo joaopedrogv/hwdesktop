@@ -8825,11 +8825,11 @@ end;
 
 procedure TfrmPrincipalS.RTC_OperacoesFiscaisdoIBSeCBS1Click(Sender: TObject);
 var
-  ShowModelExecute: TShowForm;
+  Options: THwNextOpenOptions;
 begin
-  @ShowModelExecute := GetProcAddress(vDadosIni.vModern.AHandle, 'ShowOperacoesFiscaisIbsCbs');
-  if Assigned(ShowModelExecute) then
-    ShowModelExecute( False );
+  Options := NextQueryOptions();
+  Options.DisplayTitle := 'Operações Fiscais IBS/CBS';
+  OpenNextView(Self, 'next.operacoes.fiscais.ibscbs', Options);
 end;
 
 procedure TfrmPrincipalS.RTC_RegrasFiscaisdoIBSeCBS1Click(Sender: TObject);

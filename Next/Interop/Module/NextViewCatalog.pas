@@ -14,6 +14,7 @@ implementation
 uses
   System.SysUtils, NextViewRegistry,
   EventosRtcForm, EventosRtcQueryDefinition, GruposFiscaisForm,
+  OperacoesFiscaisIbsCbsForm, OperacoesFiscaisIbsCbsQueryDefinition,
   LocalPreferences,
   WindowsRegistryLocalPreferences, ColumnLayoutPreferences,
   ColumnLayoutPreferencesRepository, StandardQueryFilterDefinition,
@@ -22,7 +23,7 @@ uses
   AuthorizationService, RemoverGrupoFiscalUseCaseUnit,
   SalvarGrupoFiscalUseCaseUnit, ListarEmpresasUseCaseUnit,
   ObterGruposFiscaisUseCaseUnit,
-  GruposFiscaisQueryDefinition, NextQueryDefinition;
+  GruposFiscaisQueryDefinition, NextQueryDefinition, PresenterConsultaBase;
 
 var
   FRegistry: TNextViewRegistry;
@@ -57,6 +58,57 @@ begin
 
     View.ConfigureFilters(Definition.FiltersDef, Preferences,
       'next.rtc.events');
+
+    Result := View;
+  except
+    View.Free;
+    raise;
+  end;
+end;
+
+function CreateOperacoesFiscaisIbsCbsView(AParent: HWND): TfrmNextBase;
+var
+  View: TfrmOperacoesFiscaisIbsCbs;
+  Preferences: ILocalPreferences;
+  LayoutPreferences: IColumnLayoutPreferences;
+  Definition: INextQueryDefinitionBase;
+  Presenter: TPresenterConsultaBase;
+begin
+  Preferences := TWindowsRegistryLocalPreferences.Create;
+
+  View := TfrmOperacoesFiscaisIbsCbs.CreateParented(AParent);
+  try
+    // A definicao pertence a esta tela e recebe o metodo que le a opcao do
+    // checkbox: o estado e consultado a cada pesquisa, nao na abertura.
+    Definition := TOperacoesFiscaisIbsCbsQueryDefinition.Create(
+      NextSetupInstance.Resolve<ISqlDataSetReaderFactory>,
+      NextSetupInstance.Resolve<IQueryResultOperations>,
+      View.IsLixeiraSearch);
+
+    // A tela e somente leitura: a pesquisa e autorizada pela consulta padrao,
+    // sem acoes de cadastro associadas.
+    Presenter := TPresenterConsultaBase.Create(
+      NextSetupInstance.Resolve<IAuthorizationService>, 'MOD020',
+      'OP_FISCAIS_IBSCBS');
+    try
+      View.AttachPresenter(Presenter, Definition,
+        'Operações Fiscais IBS/CBS');
+    except
+      // Associacao recusada: a tela nao assumiu a posse.
+      Presenter.Free;
+      raise;
+    end;
+
+    // O repositorio e transiente: a composicao cede conexao/sessao do Setup e a
+    // grade o mantem enquanto a tela existir. Layout e filtros usam a mesma
+    // identidade estavel da tela.
+    LayoutPreferences := TColumnLayoutPreferencesRepository.Create(
+      NextSetupInstance.Adapter, NextSetupInstance.SessionContext,
+      'next.operacoes.fiscais.ibscbs');
+    View.AttachColumnLayout(LayoutPreferences);
+
+    View.ConfigureFilters(Definition.FiltersDef, Preferences,
+      'next.operacoes.fiscais.ibscbs');
 
     Result := View;
   except
@@ -113,6 +165,8 @@ end;
 initialization
   FRegistry := TNextViewRegistry.Create;
   FRegistry.Register('next.rtc.events', CreateEventosRtcView);
+  FRegistry.Register('next.operacoes.fiscais.ibscbs',
+    CreateOperacoesFiscaisIbsCbsView);
   FRegistry.Register('next.grupos.fiscais', CreateGruposFiscaisView);
 
 finalization

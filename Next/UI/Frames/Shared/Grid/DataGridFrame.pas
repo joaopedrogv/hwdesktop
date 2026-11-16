@@ -132,6 +132,7 @@ type
     procedure RestoreSortedTitles();
     procedure ApplySortedTitles();
     function TryApplySort(const ASorts: TDataSetSortFields): Boolean;
+    procedure ApplyColumnDisplayFormats(ADataSet: TDataSet);
     procedure ObserveDataSetChange();
     function CopiaDisponivel: Boolean;
     procedure CopiarCelulaAtual;
@@ -1319,6 +1320,32 @@ begin
   UpdateCommandBandLayout();
 end;
 
+procedure TfrmDataGridFrame.ApplyColumnDisplayFormats(ADataSet: TDataSet);
+var
+  I: Integer;
+  Definition: TGridColumnDefinition;
+  DataField: TField;
+begin
+  // A definicao e a autoridade sobre a apresentacao: apenas as colunas que
+  // declaram formato alteram o campo do conjunto corrente. O campo pertence ao
+  // conjunto, entao a formatacao vale para a grade e para o resumo da coluna.
+  if ADataSet = nil then
+    Exit;
+
+  for I := 0 to High(FColumnDefinitions) do
+  begin
+    Definition := FColumnDefinitions[I];
+    if Definition.DisplayFormat = '' then
+      Continue;
+
+    DataField := ADataSet.FindField(Definition.FieldName);
+    // DisplayFormat pertence aos campos numericos do conjunto; os demais tipos
+    // conservam a formatacao do proprio campo.
+    if DataField is TNumericField then
+      TNumericField(DataField).DisplayFormat := Definition.DisplayFormat;
+  end;
+end;
+
 procedure TfrmDataGridFrame.ConfigureColumns(
   const AColumns: TGridColumnDefinitions);
 var
@@ -1363,6 +1390,12 @@ begin
   end;
 
   ReloadColumnLayout;
+
+  // Configurar as colunas antes de a pesquisa chegar deixa a definicao pronta
+  // para o conjunto ja associado; os resultados seguintes vem pela troca
+  // observada em ObserveDataSetChange.
+  if (dbgDados.DataSource <> nil) and (dbgDados.DataSource.DataSet <> nil) then
+    ApplyColumnDisplayFormats(dbgDados.DataSource.DataSet);
 end;
 
 procedure TfrmDataGridFrame.ClearQuickFilters;
@@ -1522,6 +1555,10 @@ begin
   // ou negrito do resultado anterior.
   FObservedDataSet := Current;
   ResetSortState();
+
+  // Os formatos declarados na definicao sao aplicados ao resultado recem
+  // associado, depois de as colunas poderem ter sido criadas.
+  ApplyColumnDisplayFormats(Current);
 end;
 
 procedure TfrmDataGridFrame.ClearSorting;
