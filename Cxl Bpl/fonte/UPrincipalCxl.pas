@@ -13,7 +13,7 @@ const
 
 type
   Treestrutura_verificar_hwauto = procedure(VersaoBPL: PChar);
-  Treestrutura_verificar_fiscal = procedure(VersaoBPL: PChar);         
+  Treestrutura_verificar_fiscal = procedure(VersaoBPL: PChar);
   TSimpleProcedure = procedure();
 
   TOKEN_ELEVATION = record
@@ -384,7 +384,7 @@ begin
         vform.Enabled := False;
         vform.DisableAlign;
         vform.DisableAutoRange;
-        
+
         if AForm = 'TfrmCadPadraoM' then
         begin
         	if TfrmCadPadraoM(vform).PageControl1.ActivePage <> TfrmCadPadraoM(vform).TabSheet2 then
@@ -418,7 +418,7 @@ begin
     	if not (TForm(Application.Components[X]) = Application.MainForm) then
         if TForm(Application.Components[X]).Name = AFormName then
         begin
-        
+
         	if Assigned(ADBGrid) then
             if ADBGrid.DataSource <> nil then
               if ADBGrid.DataSource.DataSet.State in [dsInsert, dsEdit] then
@@ -544,7 +544,7 @@ begin
       try
         cQuery.Open;
 
-        if (cQuery.FieldByName('cod_faturamento').AsInteger <> 13) and         // Diferente de 13 não está barrado 
+        if (cQuery.FieldByName('cod_faturamento').AsInteger <> 13) and         // Diferente de 13 não está barrado
           (DateOf(cQuery.FieldByName('dataconsulta').AsDateTime) = DateOf(cQuery.FieldByName('datafaturamento').AsDateTime)) and     // data da consulta igual a data do faturamento(servidorHw)
           (DateOf(cQuery.FieldByName('dataconsulta').AsDateTime) = DateOf(cQuery.FieldByName('datahora').AsDateTime)) then  // data da consulta igual a data do cliente
           vDadosIni._GravaConfiguracoesString('DataRegistroAviso', DateToStr(Date))
@@ -742,6 +742,8 @@ begin
     Abort;
   end;
   vDadosIni.setSistemasRregistrados(sistemasRegistrados(vDadosIni.vEmp.vCNPJ));
+
+  SetupModern();
 
   if (not vDadosIni.vRegistro.vSisCaixaAuxiliar) then
   begin
@@ -1338,7 +1340,7 @@ begin
 
       	if verificaConfiguracoesJanela = 'S' then
         	if TForm(Component).WindowState <> wsMaximized then
-          
+
         	TForm(Component).WindowState := wsMaximized;
 
         TForm(Component).Show;
@@ -1636,7 +1638,7 @@ begin
   if fTimeNotification <= Now then
   begin
     try
-      
+
     finally
       fTimeNotification := Now + EncodeTime(00, 01, 00, 00);
     end;
@@ -2120,4 +2122,3 @@ finalization
   UnRegisterClass(TFrmPrincipalCxl);
 
 end.
-

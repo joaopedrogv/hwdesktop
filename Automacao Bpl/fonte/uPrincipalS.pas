@@ -4818,6 +4818,8 @@ begin
       Abort;
     end;
 
+    SetupModern();
+
     vDadosIni.abreStatusProcessamento('','Iniciando relatórios', True);
 
     criarMenusRelatorios;

@@ -50,6 +50,11 @@ type
     ExigeSelecao: Boolean;
   end;
 
+  // Acao padrao da consulta associada a um metodo do apresentador. O retorno
+  // indica se a operacao foi concluida; a base usa essa resposta para atualizar
+  // a grade depois da exclusao.
+  TAcaoConsulta = function: Boolean of object;
+
   // Base unica das consultas Next. Recebe a definicao da consulta, apresenta o
   // resultado na grade e oferece a aba Consulta com filtros, Pesquisar e Sair.
   // Cada inclusao autorizada pela funcionalidade abre uma aba propria e cada
@@ -91,6 +96,16 @@ type
     // Comandos registrados pela funcionalidade: cada um e habilitado conforme a
     // associacao do apresentador e, quando exigido, a linha corrente.
     FComandosConsulta: TArray<TComandoConsulta>;
+    // Botoes das acoes padrao da consulta. Nascem na primeira associacao e
+    // pertencem ao painel, que os libera com o formulario.
+    FBtnNovo: TButton;
+    FBtnAlterar: TButton;
+    FBtnExcluir: TButton;
+    // Metodos do apresentador acionados por cada botao: sem o metodo a acao
+    // permanece oculta e a faixa e reorganizada.
+    FAcaoNovo: TAcaoConsulta;
+    FAcaoAlterar: TAcaoConsulta;
+    FAcaoExcluir: TAcaoConsulta;
     procedure ClearResult;
     procedure DoPesquisar(Sender: TObject);
     // A troca, a limpeza e a leitura de linha atualizam os comandos junto com a
@@ -118,6 +133,18 @@ type
     procedure WMCmdAba(var AMessage: TMessage);
       message WM_COMANDO_ABA;
     procedure AtualizarAposSalvar;
+    // Cria o botao da acao na primeira associacao e devolve a mesma instancia
+    // nas seguintes.
+    function CriarBotaoAcao(var ABotao: TButton; ALargura: Integer;
+      AOnClick: TNotifyEvent): TButton;
+    // Organiza os botoes visiveis da esquerda para a direita e oculta a faixa
+    // quando nenhuma acao foi associada.
+    procedure AjustarAcoesConsulta;
+    // Handlers das acoes padrao; a exclusao reconsulta a grade somente depois
+    // da execucao confirmada pelo apresentador.
+    procedure btnNovoClick(Sender: TObject);
+    procedure btnAlterarClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);
   protected
     // Permite que a tela filha interrompa a pesquisa antes de limpar o
     // resultado ou criar um novo leitor. A validacao dos filtros ocorre antes.
@@ -131,13 +158,25 @@ type
       const ADefinition: INextQueryDefinitionBase; const ATitle: string;
       AQuickFilterEnabled: Boolean = False);
     // Gancho executado depois de Attach e antes da posse do apresentador: a tela
-    // registra os comandos e os contratos que dependem da definicao.
-    procedure ApresentadorAssociado(
+    // registra os comandos, os contratos e as acoes que dependem da definicao e
+    // do proprio apresentador, que ainda pertence a composicao.
+    procedure ApresentadorAssociado(APresenter: TPresenterConsultaBase;
       const ADefinition: INextQueryDefinitionBase); virtual;
     // Registra um controle da funcionalidade cujo Enabled acompanha a consulta.
     // Com AExigeSelecao, o controle so e habilitado com uma linha corrente.
     procedure RegistrarComando(AControl: TControl;
       AExigeSelecao: Boolean = False);
+    // Associa a inclusao ao metodo do apresentador. O botao nasce na primeira
+    // associacao; sem metodo ele permanece oculto.
+    procedure AssociarAcaoInclusao(const AMetodo: TAcaoConsulta;
+      const ACaption: string = 'Novo');
+    // Associa a alteracao da linha corrente ao metodo do apresentador.
+    procedure AssociarAcaoAlteracao(const AMetodo: TAcaoConsulta;
+      const ACaption: string = 'Alterar');
+    // Associa a exclusao da linha corrente ao metodo do apresentador. A base
+    // reconsulta a grade depois da execucao confirmada.
+    procedure AssociarAcaoExclusao(const AMetodo: TAcaoConsulta;
+      const ACaption: string = 'Excluir');
     // Recalcula o Enabled dos controles registrados. Os botoes da propria
     // consulta, como Pesquisar e Sair, nao passam por aqui.
     procedure AtualizarComandos; virtual;
@@ -188,6 +227,9 @@ type
     // Aviso de gravacao confirmada cuja reconsulta falhou. O descendente
     // fornece a mensagem de negocio; a base chama depois de fechar a aba.
     procedure AvisarSalvamentoSemAtualizacao; virtual;
+    // Aviso de exclusao confirmada cuja reconsulta falhou. O descendente fornece
+    // a mensagem de negocio da funcionalidade.
+    procedure AvisarExclusaoSemAtualizacao; virtual;
     // Chave da aba cuja gravacao esta em andamento. A validacao produzida pelo
     // apresentador e encaminhada ao editor dessa aba.
     property ChaveAbaEmGravacao: string read FChaveAbaEmGravacao;
@@ -250,6 +292,8 @@ const
     'A aba de cadastro não recebeu seu editor.';
   SalvamentoSemAtualizacaoMessage =
     'O registro foi salvo. Repita a pesquisa para atualizar a consulta.';
+  ExclusaoSemAtualizacaoMessage =
+    'O registro foi excluído. Refaça a pesquisa para atualizar a consulta.';
   ChaveAbaNaoInformadaMessage =
     'A chave da aba de cadastro não foi informada.';
 
@@ -513,8 +557,9 @@ begin
     raise Exception.Create(MissingDefinitionMessage);
 
   PosicionarBotoesPesquisa;
-  // A faixa so aparece quando a funcionalidade acrescentou comandos no DFM.
-  pnAcoesConsulta.Visible := pnAcoesConsulta.ControlCount > 0;
+  // A faixa so aparece quando a funcionalidade associou alguma acao; os botoes
+  // visiveis ficam organizados da esquerda para a direita.
+  AjustarAcoesConsulta;
   fraFiltros.Visible := FFiltersConfigured;
   btnPesquisar.Enabled := True;
   btnPesquisar.OnClick := DoPesquisar;
@@ -549,7 +594,7 @@ begin
   // alguma. A atribuicao abaixo e o ponto de transferencia: a partir dela a tela
   // libera o apresentador, inclusive na destruicao.
   Attach(ADefinition, ATitle, AQuickFilterEnabled);
-  ApresentadorAssociado(ADefinition);
+  ApresentadorAssociado(APresenter, ADefinition);
 
   FPresenterConsulta := APresenter;
   try
@@ -563,11 +608,12 @@ begin
 end;
 
 procedure TfrmConsultaBase.ApresentadorAssociado(
+  APresenter: TPresenterConsultaBase;
   const ADefinition: INextQueryDefinitionBase);
 begin
-  // Padrao sem comandos: apenas a tela que possui comandos proprios usa a
-  // definicao recebida aqui, quando a associacao ja foi aceita mas a posse ainda
-  // nao foi transferida.
+  // Padrao sem comandos: apenas a tela que possui acoes proprias usa a definicao
+  // e o apresentador recebidos aqui, quando a associacao ja foi aceita mas a
+  // posse ainda nao foi transferida.
 end;
 
 procedure TfrmConsultaBase.RegistrarComando(AControl: TControl;
@@ -593,6 +639,111 @@ begin
   Comando.ExigeSelecao := AExigeSelecao;
   FComandosConsulta := FComandosConsulta + [Comando];
   AtualizarComandos;
+end;
+
+function TfrmConsultaBase.CriarBotaoAcao(var ABotao: TButton;
+  ALargura: Integer; AOnClick: TNotifyEvent): TButton;
+begin
+  // O botao nasce no painel de acoes e e liberado por ele com o formulario. A
+  // mesma instancia e reaproveitada nas associacoes seguintes.
+  if ABotao = nil then
+  begin
+    ABotao := TButton.Create(pnAcoesConsulta);
+    ABotao.Parent := pnAcoesConsulta;
+    ABotao.Width := ALargura;
+    ABotao.Height := 32;
+    ABotao.Top := 6;
+    ABotao.OnClick := AOnClick;
+  end;
+
+  Result := ABotao;
+end;
+
+procedure TfrmConsultaBase.AjustarAcoesConsulta;
+var
+  Botoes: array[0..2] of TButton;
+  Indice: Integer;
+  Esquerda: Integer;
+  HaVisivel: Boolean;
+begin
+  Botoes[0] := FBtnNovo;
+  Botoes[1] := FBtnAlterar;
+  Botoes[2] := FBtnExcluir;
+
+  // As acoes associadas ocupam a faixa a partir da margem esquerda, sem lacunas
+  // entre as que a funcionalidade oferece.
+  Esquerda := 16;
+  HaVisivel := False;
+  for Indice := Low(Botoes) to High(Botoes) do
+  begin
+    if (Botoes[Indice] = nil) or (not Botoes[Indice].Visible) then
+      Continue;
+
+    Botoes[Indice].Left := Esquerda;
+    Esquerda := Esquerda + Botoes[Indice].Width + 8;
+    HaVisivel := True;
+  end;
+
+  // Sem acoes a faixa nao ocupa espaco na aba.
+  pnAcoesConsulta.Visible := HaVisivel;
+end;
+
+procedure TfrmConsultaBase.AssociarAcaoInclusao(const AMetodo: TAcaoConsulta;
+  const ACaption: string);
+begin
+  FAcaoNovo := AMetodo;
+
+  if Assigned(AMetodo) then
+  begin
+    FBtnNovo := CriarBotaoAcao(FBtnNovo, 100, btnNovoClick);
+    FBtnNovo.Caption := ACaption;
+    // A inclusao nao parte da linha corrente: depende do apresentador associado.
+    RegistrarComando(FBtnNovo, False);
+  end;
+
+  if FBtnNovo <> nil then
+    FBtnNovo.Visible := Assigned(AMetodo);
+
+  AjustarAcoesConsulta;
+end;
+
+procedure TfrmConsultaBase.AssociarAcaoAlteracao(const AMetodo: TAcaoConsulta;
+  const ACaption: string);
+begin
+  FAcaoAlterar := AMetodo;
+
+  if Assigned(AMetodo) then
+  begin
+    FBtnAlterar := CriarBotaoAcao(FBtnAlterar, 100, btnAlterarClick);
+    FBtnAlterar.Caption := ACaption;
+    // A alteracao parte do registro selecionado na grade.
+    RegistrarComando(FBtnAlterar, True);
+  end;
+
+  if FBtnAlterar <> nil then
+    FBtnAlterar.Visible := Assigned(AMetodo);
+
+  AjustarAcoesConsulta;
+end;
+
+procedure TfrmConsultaBase.AssociarAcaoExclusao(const AMetodo: TAcaoConsulta;
+  const ACaption: string);
+begin
+  FAcaoExcluir := AMetodo;
+
+  if Assigned(AMetodo) then
+  begin
+    // A exclusao recebe mais largura para as legendas de negocio.
+    FBtnExcluir := CriarBotaoAcao(FBtnExcluir, 150, btnExcluirClick);
+    FBtnExcluir.Caption := ACaption;
+    // A exclusao parte do registro selecionado na grade.
+    RegistrarComando(FBtnExcluir, True);
+  end;
+
+  if FBtnExcluir <> nil then
+    FBtnExcluir.Visible := Assigned(AMetodo);
+
+  AjustarAcoesConsulta;
 end;
 
 procedure TfrmConsultaBase.AtualizarComandos;
@@ -644,6 +795,39 @@ begin
   // O fechamento pertence ao host Delphi 2006: RequestClose passa pela
   // confirmacao individual e pela politica de ocultar/destruir da instancia.
   RequestClose;
+end;
+
+procedure TfrmConsultaBase.btnNovoClick(Sender: TObject);
+begin
+  // Sem metodo associado nao ha inclusao a executar.
+  if Assigned(FAcaoNovo) then
+    FAcaoNovo;
+end;
+
+procedure TfrmConsultaBase.btnAlterarClick(Sender: TObject);
+begin
+  // Sem metodo associado nao ha alteracao a executar.
+  if Assigned(FAcaoAlterar) then
+    FAcaoAlterar;
+end;
+
+procedure TfrmConsultaBase.btnExcluirClick(Sender: TObject);
+begin
+  // O apresentador identifica a linha corrente, confirma, autoriza e executa; a
+  // negativa ou o cancelamento interrompe sem reconsultar a grade.
+  if not Assigned(FAcaoExcluir) then
+    Exit;
+  if not FAcaoExcluir then
+    Exit;
+
+  // A grade atualizada e a confirmacao da exclusao; a falha de atualizacao
+  // mantem a mensagem de negocio da funcionalidade.
+  try
+    if not RefreshResult then
+      AvisarExclusaoSemAtualizacao;
+  except
+    AvisarExclusaoSemAtualizacao;
+  end;
 end;
 
 procedure TfrmConsultaBase.ResetForSessionChange;
@@ -748,6 +932,13 @@ begin
   // Padrao da base para telas que nao fornecem mensagem propria. A gravacao ja
   // terminou; a mensagem apenas orienta a repetir a consulta.
   ShowWarning(SalvamentoSemAtualizacaoMessage);
+end;
+
+procedure TfrmConsultaBase.AvisarExclusaoSemAtualizacao;
+begin
+  // Padrao da base para telas que nao fornecem mensagem propria. A exclusao ja
+  // terminou; a mensagem apenas orienta a repetir a consulta.
+  ShowWarning(ExclusaoSemAtualizacaoMessage);
 end;
 
 procedure TfrmConsultaBase.ShowValidation(

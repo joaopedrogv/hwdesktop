@@ -4,8 +4,9 @@ interface
 
 uses
   Winapi.Windows, System.SysUtils,
-  Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, ConsultaBaseForm, GruposFiscaisPresenter,
-  GruposFiscaisView, NextQueryDefinition, GruposFiscaisQueryDefinition,
+  Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, ConsultaBaseForm, PresenterConsultaBase,
+  GruposFiscaisPresenter, GruposFiscaisView, NextQueryDefinition,
+  GruposFiscaisQueryDefinition,
   GrupoFiscalEtdUnit, GrupoFiscalCadastroFrame, EmpresaOption,
   ValidationEntityOutputUnit;
 
@@ -17,12 +18,6 @@ type
   // apresentador e o leitor sao injetados pela composicao; a base cria a aba e o
   // editor a partir do contrato comum.
   TfrmGruposFiscais = class(TfrmConsultaBase, IGruposFiscaisView)
-    btnNovo: TButton;
-    btnAlterar: TButton;
-    btnEnviarLixeira: TButton;
-    procedure btnNovoClick(Sender: TObject);
-    procedure btnAlterarClick(Sender: TObject);
-    procedure btnEnviarLixeiraClick(Sender: TObject);
   private
     // Contrato tipado da consulta: entrega o identificador da linha corrente
     // usado por Alterar e Lixeira.
@@ -31,12 +26,12 @@ type
     // responde pela liberacao nem assume posse dele.
     function Presenter: TGruposFiscaisPresenter;
   protected
-    // Registra os comandos da consulta depois que a base aceitou a definicao e
-    // antes de assumir a posse do apresentador.
-    procedure ApresentadorAssociado(
+    // Liga as acoes padrao da consulta aos metodos do apresentador depois que a
+    // base aceitou a definicao e antes de assumir a posse.
+    procedure ApresentadorAssociado(APresenter: TPresenterConsultaBase;
       const ADefinition: INextQueryDefinitionBase); override;
-    // Novo depende do apresentador; Alterar e Lixeira exigem tambem uma linha
-    // corrente identificada na grade.
+    // Inclusao depende do apresentador; Alterar e Excluir exigem tambem uma
+    // linha corrente identificada na grade.
     function TemRegistroCorrente: Boolean; override;
     // A base cria a aba e a area de rolagem; a tela fornece o editor tipado que
     // possui o rascunho da aba.
@@ -48,6 +43,9 @@ type
     function SalvarAba(const AChave: string;
       AEditor: TWinControl): Boolean; override;
     procedure AvisarSalvamentoSemAtualizacao; override;
+    // O envio para a lixeira ja terminou; a mensagem usa o vocabulario desta
+    // funcionalidade.
+    procedure AvisarExclusaoSemAtualizacao; override;
   public
     // Implementa IGruposFiscaisView: a base encaminha a validacao ao editor da
     // aba que iniciou a gravacao, que apresenta as mensagens por campo.
@@ -99,20 +97,25 @@ begin
 end;
 
 procedure TfrmGruposFiscais.ApresentadorAssociado(
+  APresenter: TPresenterConsultaBase;
   const ADefinition: INextQueryDefinitionBase);
+var
+  GrupoPresenter: TGruposFiscaisPresenter;
 begin
   // O identificador da linha corrente vem do mesmo contrato que a alteracao
-  // consome. Sem esse contrato a tela abre, mas Alterar e Lixeira permanecem
+  // consome. Sem esse contrato a tela abre, mas Alterar e Excluir permanecem
   // desabilitados.
   if not Supports(ADefinition, INextQueryDefinition<TGrupoSelecionado>,
     FDefinicaoSelecao) then
     FDefinicaoSelecao := nil;
 
-  // Novo depende apenas do apresentador; Alterar e Lixeira partem do registro
-  // selecionado na grade.
-  RegistrarComando(btnNovo, False);
-  RegistrarComando(btnAlterar, True);
-  RegistrarComando(btnEnviarLixeira, True);
+  // O gancho roda antes da posse do apresentador: as acoes usam a instancia
+  // recebida, que ainda pertence a composicao.
+  GrupoPresenter := TGruposFiscaisPresenter(APresenter);
+  AssociarAcaoInclusao(GrupoPresenter.CarregarParaInclusao);
+  AssociarAcaoAlteracao(GrupoPresenter.CarregarParaEdicao);
+  AssociarAcaoExclusao(GrupoPresenter.EnviarParaLixeira,
+    'Enviar para a lixeira');
 end;
 
 function TfrmGruposFiscais.TemRegistroCorrente: Boolean;
@@ -236,42 +239,10 @@ begin
   ShowWarning('O grupo fiscal foi salvo. Refaça a pesquisa para atualizar a consulta.');
 end;
 
-procedure TfrmGruposFiscais.btnNovoClick(Sender: TObject);
+procedure TfrmGruposFiscais.AvisarExclusaoSemAtualizacao;
 begin
-  // A inclusao e uma unica chamada: o apresentador reapresenta a aba existente
-  // ou autoriza, carrega as empresas e entrega as opcoes para a nova aba, que
-  // cria o proprio rascunho.
-  if Presenter <> nil then
-    Presenter.CarregarParaInclusao;
-end;
-
-procedure TfrmGruposFiscais.btnAlterarClick(Sender: TObject);
-begin
-  // A alteracao e uma unica chamada: o apresentador identifica a linha
-  // corrente, reapresenta a aba existente ou autoriza, carrega e entrega o
-  // rascunho para a nova aba. As mensagens pertencem a tela ou ao servico de
-  // autorizacao. A base atualiza os comandos quando a consulta muda.
-  if Presenter <> nil then
-    Presenter.CarregarParaEdicao;
-end;
-
-procedure TfrmGruposFiscais.btnEnviarLixeiraClick(Sender: TObject);
-begin
-  if Presenter = nil then
-  begin
-    ShowError(MissingPresenterMessage);
-    Exit;
-  end;
-
-  // O apresentador identifica a linha corrente, confirma (padrao "Nao") e
-  // autoriza antes de executar; False interrompe sem repetir o que o legado
-  // mostrou.
-  if not Presenter.EnviarParaLixeira() then
-    Exit;
-
-  // A grade atualizada e a confirmacao do envio; nao ha dialogo de sucesso.
-  if not RefreshResult then
-    ShowWarning('O grupo fiscal já foi enviado para a lixeira. Refaça a pesquisa para atualizar a consulta.');
+  // A exclusao desta funcionalidade envia o registro para a lixeira.
+  ShowWarning('O grupo fiscal já foi enviado para a lixeira. Refaça a pesquisa para atualizar a consulta.');
 end;
 
 end.
