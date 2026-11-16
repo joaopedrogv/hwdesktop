@@ -6,7 +6,7 @@ uses
   Winapi.Windows, System.SysUtils, Data.DB,
   Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, ConsultaBaseForm, GruposFiscaisPresenter,
   GruposFiscaisView, NextQueryDefinition, GruposFiscaisQueryDefinition,
-  GrupoFiscalCadastro, GrupoFiscalEtdUnit, GrupoFiscalCadastroFrame,
+  GrupoFiscalEtdUnit, GrupoFiscalCadastroFrame, EmpresaOption,
   ValidationEntityOutputUnit;
 
 type
@@ -60,7 +60,13 @@ type
     // A entidade continua pertencendo a quem chamou. A falha de montagem e
     // informada uma unica vez.
     function AbrirEdicao(const AChave: string; const AGrupo: GrupoFiscalEtd;
-      const AOpcoes: TGrupoFiscalEmpresaOptions): Boolean;
+      const AOpcoes: TEmpresaOptions): Boolean;
+    // Reapresenta a aba de inclusao ja aberta. Sem aba, nada e criado e a
+    // inclusao segue para a autorizacao e a carga das empresas.
+    function AtivarInclusao: Boolean;
+    // Abre uma nova aba de inclusao e copia as opcoes para o editor, que cria o
+    // proprio rascunho. A falha de montagem e informada uma unica vez.
+    function AbrirInclusao(const AOpcoes: TEmpresaOptions): Boolean;
     procedure AttachPresenter(APresenter: TGruposFiscaisPresenter;
       const ADefinition: INextQueryDefinitionBase; const ATitle: string);
   end;
@@ -226,11 +232,11 @@ end;
 
 function TfrmGruposFiscais.AbrirEdicao(const AChave: string;
   const AGrupo: GrupoFiscalEtd;
-  const AOpcoes: TGrupoFiscalEmpresaOptions): Boolean;
+  const AOpcoes: TEmpresaOptions): Boolean;
 var
   Titulo: string;
   Grupo: GrupoFiscalEtd;
-  Opcoes: TGrupoFiscalEmpresaOptions;
+  Opcoes: TEmpresaOptions;
 begin
   Result := False;
   if AGrupo = nil then
@@ -251,6 +257,32 @@ begin
 
   if not Result then
     ShowError('Não foi possível iniciar a alteração do grupo fiscal.');
+end;
+
+function TfrmGruposFiscais.AtivarInclusao: Boolean;
+begin
+  // Reabrir devolve a aba de inclusao existente sem repetir autorizacao nem
+  // recarregar as empresas: o rascunho ainda pertence a sessao atual.
+  Result := AbaAberta(ChaveAbaInclusao);
+  if Result then
+    AtivarAba(ChaveAbaInclusao);
+end;
+
+function TfrmGruposFiscais.AbrirInclusao(
+  const AOpcoes: TEmpresaOptions): Boolean;
+var
+  Opcoes: TEmpresaOptions;
+begin
+  // O editor copia as opcoes durante a abertura e cria o proprio rascunho.
+  Opcoes := AOpcoes;
+  Result := AbrirAba(ChaveAbaInclusao, 'Inclusão',
+    procedure(AEditor: TWinControl)
+    begin
+      TfrmGrupoFiscalCadastroFrame(AEditor).PrepararInclusao(Opcoes);
+    end);
+
+  if not Result then
+    ShowError('Não foi possível iniciar a inclusão do grupo fiscal.');
 end;
 
 procedure TfrmGruposFiscais.AvisarSalvamentoSemAtualizacao;
@@ -296,39 +328,12 @@ begin
 end;
 
 procedure TfrmGruposFiscais.btnNovoClick(Sender: TObject);
-var
-  Opcoes: TGrupoFiscalEmpresaOptions;
 begin
-  // Reabrir devolve a aba existente sem repetir autorizacao nem recarregar as
-  // empresas: o rascunho ainda pertence a sessao atual. As abas de alteracao
-  // abertas nao interferem na inclusao.
-  if AbaAberta(ChaveAbaInclusao) then
-  begin
-    AtivarAba(ChaveAbaInclusao);
-    Exit;
-  end;
-
-  if FPresenter = nil then
-  begin
-    ShowError(MissingPresenterMessage);
-    Exit;
-  end;
-
-  // A negativa ou o cancelamento da autorizacao de inclusao ja foi apresentado
-  // pelo legado: a tela permanece na consulta sem repetir a mensagem.
-  if not FPresenter.AutorizarInclusao then
-    Exit;
-
-  // Sem as empresas nao ha o que incluir; o apresentador ja informou a falha.
-  if not FPresenter.CarregarEmpresas(Opcoes) then
-    Exit;
-
-  if not AbrirAba(ChaveAbaInclusao, 'Inclusão',
-    procedure(AEditor: TWinControl)
-    begin
-      TfrmGrupoFiscalCadastroFrame(AEditor).PrepararInclusao(Opcoes);
-    end) then
-    ShowError('Não foi possível iniciar a inclusão do grupo fiscal.');
+  // A inclusao e uma unica chamada: o apresentador reapresenta a aba existente
+  // ou autoriza, carrega as empresas e entrega as opcoes para a nova aba, que
+  // cria o proprio rascunho.
+  if FPresenter <> nil then
+    FPresenter.CarregarParaInclusao;
 end;
 
 procedure TfrmGruposFiscais.btnAlterarClick(Sender: TObject);

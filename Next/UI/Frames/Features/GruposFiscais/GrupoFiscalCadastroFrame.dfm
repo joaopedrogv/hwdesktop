@@ -51,14 +51,17 @@ object frmGrupoFiscalCadastroFrame: TfrmGrupoFiscalCadastroFrame
     Height = 16
     Caption = 'Empresas'
   end
-  object clbEmpresas: TCheckListBox
+  inline fraEmpresas: TfrmEmpresaChecklistFrame
     Left = 16
     Top = 126
     Width = 600
     Height = 110
     Anchors = [akLeft, akTop, akRight]
-    IntegralHeight = False
     TabOrder = 2
+    ExplicitLeft = 16
+    ExplicitTop = 126
+    ExplicitWidth = 600
+    ExplicitHeight = 110
   end
   inline fraValidacao: TfrmValidationPanelFrame
     Left = 0

@@ -6,21 +6,23 @@ uses
   AuthorizationService, RemoverGrupoFiscalUseCaseUnit, GruposFiscaisView,
   SalvarGrupoFiscalUseCaseUnit, ObterGruposFiscaisUseCaseUnit,
   ListarEmpresasUseCaseUnit, ISessionContextUnit,
-  GrupoFiscalEtdUnit, GrupoFiscalCadastro, TipoComunsUnit, NextQueryDefinition,
-  GruposFiscaisQueryDefinition;
+  GrupoFiscalEtdUnit, EmpresaOption, EmpresaOptionsBuilder, TipoComunsUnit,
+  NextQueryDefinition, GruposFiscaisQueryDefinition;
 
 type
   // Apresentador da consulta, da inclusao e da alteracao de Grupos Fiscais.
   // Encaminha a leitura para a consulta injetada, verifica a autorizacao antes
   // das operacoes e executa a remocao logica, o carregamento e a gravacao. A
-  // alteracao e uma unica chamada: identifica a linha corrente, reapresenta a
-  // aba existente ou autoriza, carrega o registro e entrega o grupo a tela, que
-  // monta o rascunho da aba.
+  // inclusao e uma unica chamada: reapresenta a aba existente ou autoriza,
+  // carrega as empresas e entrega as opcoes a tela, que cria o rascunho da aba.
+  // A alteracao tambem e uma unica chamada: identifica a linha corrente,
+  // reapresenta a aba existente ou autoriza, carrega o registro e entrega o
+  // grupo a tela, que monta o rascunho da aba.
   // As mensagens e os erros de campo sao apresentados pela view recebida no
   // construtor; a negativa ou o cancelamento ja apresentado pelo legado e a
   // indisponibilidade comunicada pelo proprio servico de autorizacao nao sao
-  // repetidos. Le o login da sessao a cada operacao, traduz as empresas para o
-  // contrato da tela e encaminha o resultado de validacao do caso de uso.
+  // repetidos. Delega a leitura das empresas a preparacao compartilhada, que le
+  // o login a cada operacao, e encaminha o resultado de validacao do caso de uso.
   TGruposFiscaisPresenter = class
   private
     // A view pertence a tela e as demais dependencias ao container de
@@ -33,17 +35,17 @@ type
     FListarEmpresas: ListarEmpresasUseCase;
     FObterGrupoFiscal: ObterGrupoFiscalPorIdUseCase;
     FSession: ISessionContext;
-    // Leitura comum a inclusao e a alteracao: todas as empresas na ordem do
-    // cadastro, habilitadas apenas as permitidas ao login corrente, e a falha
-    // informada por quem chamou.
-    function MontarOpcoesEmpresas(
-      out AOpcoes: TGrupoFiscalEmpresaOptions): Boolean;
-    procedure MarcarEmpresasVinculadas(
-      var AOpcoes: TGrupoFiscalEmpresaOptions;
-      const AEmpresasVinculadas: TArrayInteger);
+    // Verifica a permissao de inclusao; a negativa ou o cancelamento ja foi
+    // apresentado pelo legado.
+    function AutorizarInclusao: Boolean;
+    // Le as empresas da inclusao com o login atual e avisa a falha na propria
+    // tela, porque a inclusao nao tem outra mensagem para essa leitura.
+    function CarregarEmpresas(out AOpcoes: TEmpresaOptions): Boolean;
+    // Acrescenta as marcas dos vinculos gravados as opcoes recebidas e deixa a
+    // falha de leitura para quem chamou.
     function CarregarEmpresasAlteracao(
       const AEmpresasVinculadas: TArrayInteger;
-      out AOpcoes: TGrupoFiscalEmpresaOptions): Boolean;
+      out AOpcoes: TEmpresaOptions): Boolean;
   public
     constructor Create(AView: IGruposFiscaisView;
       AQueryDefinition: INextQueryDefinition<TGrupoSelecionado>;
@@ -55,21 +57,24 @@ type
       ASession: ISessionContext);
     function AutorizarPesquisa: Boolean;
     function EnviarParaLixeira(): Boolean;
-    function AutorizarInclusao: Boolean;
+    // Reapresenta a aba de inclusao quando ela ja existe; caso contrario
+    // autoriza a inclusao, carrega as empresas e entrega as opcoes para a nova
+    // aba, que cria o proprio rascunho. A negativa da autorizacao ou a falha na
+    // leitura das empresas ja foi apresentada e interrompe a operacao.
+    function CarregarParaInclusao(): Boolean;
     // Reapresenta a aba da linha corrente quando ela ja existe; caso contrario
     // autoriza a alteracao, carrega o registro e as empresas e entrega o grupo
     // para a nova aba. Sem linha valida a view informa que a selecao e
     // obrigatoria e a operacao nao prossegue.
     function CarregarParaEdicao(): Boolean;
-    function CarregarEmpresas(out AOpcoes: TGrupoFiscalEmpresaOptions): Boolean;
     function Salvar(const ARascunho: GrupoFiscalEtd): Boolean;
   end;
 
 implementation
 
 uses
-  System.SysUtils, EValidacaoNegocioUnit, EmpresaEtdUnit,
-  StatusRegistroEnumUnit, CreateEntityUseCaseOutputUnit;
+  System.SysUtils, EValidacaoNegocioUnit, StatusRegistroEnumUnit,
+  CreateEntityUseCaseOutputUnit;
 
 const
   // Codigos do cadastro legado usados por esta funcionalidade. O host recebe o
@@ -174,12 +179,37 @@ begin
   Result := FAuthorization.Authorize(ProcessoInclusao, aaInserir, TabelaGruposFiscais).Outcome = aoAllowed;
 end;
 
+function TGruposFiscaisPresenter.CarregarParaInclusao: Boolean;
+var
+  Opcoes: TEmpresaOptions;
+begin
+  Result := False;
+
+  // Aba ja aberta: reapresenta o rascunho existente, sem nova autorizacao e
+  // sem recarregar as empresas.
+  if FView.AtivarInclusao then
+  begin
+    Result := True;
+    Exit;
+  end;
+
+  // A negativa ou o cancelamento ja foi apresentado pelo legado.
+  if not AutorizarInclusao then
+    Exit;
+
+  // Sem as empresas nao ha o que incluir; o aviso ja foi apresentado.
+  if not CarregarEmpresas(Opcoes) then
+    Exit;
+
+  Result := FView.AbrirInclusao(Opcoes);
+end;
+
 function TGruposFiscaisPresenter.CarregarParaEdicao: Boolean;
 var
   Selected: TGrupoSelecionado;
   Id: string;
   Carregado: GrupoFiscalEtd;
-  Opcoes: TGrupoFiscalEmpresaOptions;
+  Opcoes: TEmpresaOptions;
 begin
   Result := False;
 
@@ -249,19 +279,19 @@ begin
 end;
 
 function TGruposFiscaisPresenter.CarregarEmpresas(
-  out AOpcoes: TGrupoFiscalEmpresaOptions): Boolean;
+  out AOpcoes: TEmpresaOptions): Boolean;
 begin
   // Na inclusao a mensagem e unica para qualquer falha de leitura.
-  Result := MontarOpcoesEmpresas(AOpcoes);
+  Result := MontarOpcoesEmpresas(FListarEmpresas, FSession, AOpcoes);
   if not Result then
     FView.ShowWarning(EmpresasFalhaMessage);
 end;
 
 function TGruposFiscaisPresenter.CarregarEmpresasAlteracao(
   const AEmpresasVinculadas: TArrayInteger;
-  out AOpcoes: TGrupoFiscalEmpresaOptions): Boolean;
+  out AOpcoes: TEmpresaOptions): Boolean;
 begin
-  Result := MontarOpcoesEmpresas(AOpcoes);
+  Result := MontarOpcoesEmpresas(FListarEmpresas, FSession, AOpcoes);
   if not Result then
   begin
     FView.ShowWarning(EmpresasAlteracaoFalhaMessage);
@@ -269,94 +299,6 @@ begin
   end;
 
   MarcarEmpresasVinculadas(AOpcoes, AEmpresasVinculadas);
-end;
-
-function TGruposFiscaisPresenter.MontarOpcoesEmpresas(
-  out AOpcoes: TGrupoFiscalEmpresaOptions): Boolean;
-var
-  TodasEmpresas: EmpresasEtd;
-  EmpresasPermitidas: EmpresasEtd;
-  Login: string;
-  I: Integer;
-  J: Integer;
-  Empresa: EmpresaEtd;
-  Opcao: TGrupoFiscalEmpresaOption;
-begin
-  Result := False;
-  SetLength(AOpcoes, 0);
-
-  // O login e lido a cada operacao: o host pode trocar o usuario mantendo esta
-  // janela viva.
-  Login := Trim(FSession.UsuarioLogin);
-  if Login = '' then
-    Exit;
-
-  TodasEmpresas := nil;
-  EmpresasPermitidas := nil;
-  try
-    try
-      TodasEmpresas := FListarEmpresas.Executar();
-      EmpresasPermitidas := FListarEmpresas.Executar(Login);
-
-      if (TodasEmpresas = nil) or (EmpresasPermitidas = nil) then
-        Exit;
-
-      // A ordem e a da lista total (COD_EMPRESA). Empresas permitidas que nao
-      // constam dela sao ignoradas, como no legado. As listas pertencem ao
-      // apresentador e nenhuma entidade chega a tela.
-      SetLength(AOpcoes, TodasEmpresas.Count);
-      for I := 0 to TodasEmpresas.Count - 1 do
-      begin
-        Empresa := EmpresaEtd(TodasEmpresas.Items[I]);
-        Opcao.Id := Empresa.Id;
-        Opcao.Texto := Format('%d - %s',
-          [Empresa.Id, Empresa.Identificacao]);
-        Opcao.Habilitada := False;
-        for J := 0 to EmpresasPermitidas.Count - 1 do
-          if EmpresaEtd(EmpresasPermitidas.Items[J]).Id = Empresa.Id then
-          begin
-            Opcao.Habilitada := True;
-            Break;
-          end;
-
-        // A inclusao marca toda empresa permitida; a alteracao substitui a
-        // marca pelo vinculo gravado.
-        Opcao.Marcada := Opcao.Habilitada;
-        AOpcoes[I] := Opcao;
-      end;
-
-      Result := True;
-    except
-      // Falha de leitura ou de montagem interrompe a operacao; nenhuma opcao
-      // parcial e devolvida.
-      SetLength(AOpcoes, 0);
-    end;
-  finally
-    EmpresasPermitidas.Free;
-    TodasEmpresas.Free;
-  end;
-end;
-
-procedure TGruposFiscaisPresenter.MarcarEmpresasVinculadas(
-  var AOpcoes: TGrupoFiscalEmpresaOptions;
-  const AEmpresasVinculadas: TArrayInteger);
-var
-  I: Integer;
-  J: Integer;
-begin
-  // A marca pertence ao vinculo gravado e a permissao apenas habilita a troca:
-  // vinculos sem permissao continuam marcados e bloqueados, como no cadastro
-  // legado.
-  for I := 0 to High(AOpcoes) do
-  begin
-    AOpcoes[I].Marcada := False;
-    for J := 0 to High(AEmpresasVinculadas) do
-      if AOpcoes[I].Id = AEmpresasVinculadas[J] then
-      begin
-        AOpcoes[I].Marcada := True;
-        Break;
-      end;
-  end;
 end;
 
 function TGruposFiscaisPresenter.Salvar(

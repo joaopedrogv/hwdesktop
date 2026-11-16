@@ -4,7 +4,7 @@ interface
 
 uses
   ViewFeedback, ValidationEntityOutputUnit, GrupoFiscalEtdUnit,
-  GrupoFiscalCadastro;
+  EmpresaOption;
 
 type
   // Contrato visual de Grupos Fiscais. Alem do feedback comum das telas Next,
@@ -23,7 +23,12 @@ type
     // Abre a aba da chave e copia o grupo carregado para o rascunho da aba.
     // A entidade recebida continua pertencendo a quem chamou.
     function AbrirEdicao(const AChave: string; const AGrupo: GrupoFiscalEtd;
-      const AOpcoes: TGrupoFiscalEmpresaOptions): Boolean;
+      const AOpcoes: TEmpresaOptions): Boolean;
+    // True quando a aba de inclusao ja existe e foi ativada: a inclusao nao
+    // repete a autorizacao nem recarrega as empresas.
+    function AtivarInclusao: Boolean;
+    // Abre uma nova aba de inclusao e deixa o editor criar o proprio rascunho.
+    function AbrirInclusao(const AOpcoes: TEmpresaOptions): Boolean;
   end;
 
 implementation
