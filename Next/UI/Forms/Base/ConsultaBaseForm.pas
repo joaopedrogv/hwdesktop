@@ -3,13 +3,11 @@ unit ConsultaBaseForm;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes,
-  System.Generics.Collections, Data.DB,
-  Vcl.Controls, Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Forms, Vcl.StdCtrls, Vcl.Buttons,
-  NextBaseForm,
-  DataGridFrame, FilterDefinition, FilterCriterion, FilterFrame,
-  GridColumnDefinition, IDataSetReaderUnit, QueryResultOperations,
-  NextQueryDefinition, ColumnLayoutPreferences, LocalPreferences;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Controls, Vcl.ComCtrls,
+  Vcl.ExtCtrls, Vcl.Forms, Vcl.StdCtrls, Vcl.Buttons, Vcl.ImgList, System.Generics.Collections,
+  Data.DB,  NextBaseForm, DataGridFrame, FilterDefinition, FilterCriterion, FilterFrame,
+  GridColumnDefinition, IDataSetReaderUnit, QueryResultOperations, NextQueryDefinition,
+  ColumnLayoutPreferences, LocalPreferences;
 
 type
   // Fabrica de leitores para consultas que montam o SQL a partir dos criterios
@@ -65,6 +63,7 @@ type
     pnAcoesConsulta: TPanel;
     fraGrid: TfrmDataGridFrame;
     dsConsulta: TDataSource;
+    imgListConsulta: TImageList;
     procedure btnSairClick(Sender: TObject);
   private
     FFiltersConfigured: Boolean;
