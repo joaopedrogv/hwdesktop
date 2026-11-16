@@ -109,7 +109,7 @@ type
     function Pesquisar(const AExibirFalha: Boolean): Boolean;
     // True somente quando a grade esta vinculada ao leitor ativo da pesquisa
     // corrente, pela definicao ou pela fabrica.
-    function TemLeitorAtivo: Boolean;
+    function HasActiveReader: Boolean;
     procedure GridTitleCtrlClick(Sender: TObject; const AFieldName: string);
     procedure FrameFeedback(Sender: TObject;
       const AMensagem: string);
@@ -160,7 +160,7 @@ type
     // Retorna True quando a consulta foi relida, incluindo resultado vazio. A
     // negativa de autorizacao e a falha devolvem False sem limpar a grade.
     // Destina-se as telas que alteram dados e precisam de mensagem propria.
-    function AtualizarResultado: Boolean;
+    function RefreshResult: Boolean;
     procedure DoInitializeView; override;
     // Abre a aba de cadastro da chave. Se ela ja existe, apenas a ativa e
     // preserva o rascunho; caso contrario cria aba, rodape, area de rolagem e
@@ -323,10 +323,10 @@ begin
   // O leitor da definicao pertence a ela e segue o ciclo dela. O leitor da
   // fabrica pertence a pesquisa corrente e nao sobrevive a limpeza do resultado.
   if FDefinition <> nil then
-    FDefinition.Limpar
+    FDefinition.Clear
   else if FReader <> nil then
   begin
-    FReader.Limpar;
+    FReader.Clear;
     FReader := nil;
   end;
 
@@ -379,7 +379,7 @@ begin
       // proprio leitor e a fabrica entrega um novo leitor para esta pesquisa.
       if FDefinition <> nil then
       begin
-        FDefinition.Pesquisar(Criteria);
+        FDefinition.Search(Criteria);
         DataSet := FDefinition.GetDataSet;
       end
       else
@@ -387,8 +387,8 @@ begin
         FReader := FReaderFactory(Criteria);
         if FReader = nil then
           raise Exception.Create(MissingReaderMessage);
-        FReader.Pesquisar;
-        DataSet := FReader.DataSet;
+        FReader.Search;
+        DataSet := FReader.GetDataSet;
       end;
 
       if DataSet = nil then
@@ -425,7 +425,7 @@ begin
   Pesquisar(True);
 end;
 
-function TfrmConsultaBase.TemLeitorAtivo: Boolean;
+function TfrmConsultaBase.HasActiveReader: Boolean;
 var
   DataSet: TDataSet;
 begin
@@ -440,11 +440,11 @@ begin
     Result := FReader <> nil;
 end;
 
-function TfrmConsultaBase.AtualizarResultado: Boolean;
+function TfrmConsultaBase.RefreshResult: Boolean;
 begin
   Result := False;
   try
-    if TemLeitorAtivo then
+    if HasActiveReader then
     begin
       // A atualizacao reusa a autorizacao da consulta; a negativa preserva o
       // conjunto ja apresentado.
@@ -453,9 +453,9 @@ begin
 
       try
         if FDefinition <> nil then
-          FDefinition.Atualizar
+          FDefinition.Refresh
         else
-          FReader.Atualizar;
+          FReader.Refresh;
 
         // Um resultado vazio tambem conclui a atualizacao: a grade continua
         // vinculada e apresenta o conjunto relido.
@@ -1194,7 +1194,7 @@ begin
   // tratamento interno. Em ambos os casos a gravacao esta concluida: a aba
   // permanece fechada e o usuario e orientado a repetir a pesquisa.
   try
-    if not AtualizarResultado then
+    if not RefreshResult then
       AvisarSalvamentoSemAtualizacao;
   except
     AvisarSalvamentoSemAtualizacao;

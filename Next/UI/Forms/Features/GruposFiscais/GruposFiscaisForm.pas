@@ -310,7 +310,7 @@ begin
     Exit;
 
   // A grade atualizada e a confirmacao do envio; nao ha dialogo de sucesso.
-  if not AtualizarResultado then
+  if not RefreshResult then
     ShowWarning('O grupo fiscal já foi enviado para a lixeira. Refaça a pesquisa para atualizar a consulta.');
 end;
 

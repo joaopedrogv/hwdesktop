@@ -398,7 +398,7 @@ var
   dts: TDataSet;
   reNo: Integer;
 begin
-  dts := FReader.DataSet;
+  dts := FReader.GetDataSet;
   fdMark := dts.FieldByName(FMarkingColumn);
 
   case AOperation of
@@ -489,7 +489,7 @@ begin
   if FReader = nil then
     dts := nil
   else
-    dts := FReader.DataSet;
+    dts := FReader.GetDataSet;
 
   // Os criterios pertencem ao conjunto em que foram aceitos. Um conjunto
   // diferente comeca sem criterios locais e sem reaproveitar identificadores.
@@ -535,8 +535,8 @@ begin
   AValueType := fftString;
   AMessage := '';
 
-  if (FReader = nil) or (FReader.DataSet = nil) or
-    (not FReader.DataSet.Active) then
+  if (FReader = nil) or (FReader.GetDataSet = nil) or
+    (not FReader.GetDataSet.Active) then
   begin
     AMessage := QuickFilterNoDataSetMessage;
     Exit;
@@ -548,7 +548,7 @@ begin
     Exit;
   end;
 
-  AField := FReader.DataSet.FindField(ACriterion.FieldId);
+  AField := FReader.GetDataSet.FindField(ACriterion.FieldId);
   if AField = nil then
   begin
     AMessage := Format(QuickFilterUnknownFieldMessage,
@@ -719,7 +719,7 @@ begin
     Exit;
   end;
 
-  dts := FReader.DataSet;
+  dts := FReader.GetDataSet;
   if (dts = nil) or (not dts.Active) then
   begin
     AMessage := QuickFilterNoDataSetMessage;
@@ -830,7 +830,7 @@ begin
     Exit;
   end;
 
-  dts := FReader.DataSet;
+  dts := FReader.GetDataSet;
   if (dts = nil) or (not dts.Active) then
   begin
     AMessage := QuickFilterNoDataSetMessage;
@@ -922,7 +922,7 @@ begin
   if FReader = nil then
     Exit;
 
-  dts := FReader.DataSet;
+  dts := FReader.GetDataSet;
   if (dts = nil) or (not dts.Active) then
     Exit;
 
@@ -960,7 +960,7 @@ begin
   if FReader = nil then
     dts := nil
   else
-    dts := FReader.DataSet;
+    dts := FReader.GetDataSet;
 
   if dts <> nil then
   begin

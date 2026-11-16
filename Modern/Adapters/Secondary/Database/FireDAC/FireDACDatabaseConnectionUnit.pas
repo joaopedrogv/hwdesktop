@@ -99,10 +99,10 @@ type
       const AEnsureConnection: TReaderEnsureConnection;
       const ABindParameters: TReaderBindParameters);
     destructor Destroy; override;
-    procedure Pesquisar;
-    procedure Atualizar;
-    procedure Limpar;
-    function DataSet: TDataSet;
+    procedure Search;
+    procedure Refresh;
+    procedure Clear;
+    function GetDataSet: TDataSet;
   end;
 
 var
@@ -157,9 +157,9 @@ begin
   end;
 end;
 
-procedure TFireDACDatabaseReader.Pesquisar;
+procedure TFireDACDatabaseReader.Search;
 begin
-  Limpar;
+  Clear;
   try
     FEnsureConnection();
     FBindParameters(FQuery, FParams);
@@ -167,12 +167,12 @@ begin
       FTransaction.StartTransaction;
     FQuery.Open;
   except
-    Limpar;
+    Clear;
     raise;
   end;
 end;
 
-procedure TFireDACDatabaseReader.Atualizar;
+procedure TFireDACDatabaseReader.Refresh;
 begin
   // Refresh reposiciona o resultado com o SQL e os parametros ja aplicados pela
   // pesquisa corrente; sem conjunto aberto nao ha leitura a atualizar.
@@ -182,7 +182,7 @@ begin
   FQuery.Refresh;
 end;
 
-procedure TFireDACDatabaseReader.Limpar;
+procedure TFireDACDatabaseReader.Clear;
 begin
   try
     if (FQuery <> nil) and FQuery.Active then
@@ -196,7 +196,7 @@ begin
   end;
 end;
 
-function TFireDACDatabaseReader.DataSet: TDataSet;
+function TFireDACDatabaseReader.GetDataSet: TDataSet;
 begin
   Result := FQuery;
 end;
@@ -204,7 +204,7 @@ end;
 destructor TFireDACDatabaseReader.Destroy;
 begin
   try
-    Limpar;
+    Clear;
     FTransaction := nil;
     try
       FreeAndNil(FQuery);

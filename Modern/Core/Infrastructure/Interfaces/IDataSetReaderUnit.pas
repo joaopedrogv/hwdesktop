@@ -10,12 +10,12 @@ type
   // parametros, driver, conexao ou Setup.
   IDataSetReader = interface
     ['{B7A4C1D2-3E5F-4A6B-8C9D-0E1F2A3B4C5D}']
-    procedure Pesquisar;
+    procedure Search;
     // Rele o resultado aberto mantendo o SQL e os parametros da pesquisa
     // corrente; nao substitui o conjunto nem recria o leitor.
-    procedure Atualizar;
-    procedure Limpar;
-    function DataSet: TDataSet;
+    procedure Refresh;
+    procedure Clear;
+    function GetDataSet: TDataSet;
   end;
 
   // Fabrica de leitores sob demanda. Recebe o SQL e os parametros ja montados

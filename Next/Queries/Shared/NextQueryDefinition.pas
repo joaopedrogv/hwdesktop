@@ -22,11 +22,11 @@ type
     function GetColumnsDef: TGridColumnDefinitions;
     function GetFiltersDef(): TFilterDefinition;
     function GetDataSet: TDataSet;
-    procedure Pesquisar(const ACriteria: TFilterCriteria);
+    procedure Search(const ACriteria: TFilterCriteria);
     // Atualiza o resultado da pesquisa corrente sem recriar o leitor nem
     // reaplicar os criterios da tela.
-    procedure Atualizar;
-    procedure Limpar;
+    procedure Refresh;
+    procedure Clear;
 
     property FiltersDef: TFilterDefinition read GetFiltersDef;
     property ColumnsDef: TGridColumnDefinitions read GetColumnsDef;
@@ -54,9 +54,9 @@ type
   public
     constructor Create(AReaderFactory: ISqlDataSetReaderFactory;
       AOperation: IQueryResultOperations);
-    procedure Pesquisar(const ACriteria: TFilterCriteria);
-    procedure Atualizar;
-    procedure Limpar;
+    procedure Search(const ACriteria: TFilterCriteria);
+    procedure Refresh;
+    procedure Clear;
     function GetResultOperation(): IQueryResultOperations;
     function GetColumnsDef: TGridColumnDefinitions;
     function GetFiltersDef(): TFilterDefinition;
@@ -99,46 +99,46 @@ begin
   raise Exception.Create(ConfigureNotImplementedMessage);
 end;
 
-procedure TNextQueryDefinitionBase.Pesquisar(
+procedure TNextQueryDefinitionBase.Search(
   const ACriteria: TFilterCriteria);
 var
   QueryDefinition: TNextQueryDefinition;
 begin
   // Uma pesquisa substitui a anterior: nenhum leitor antigo permanece ativo
   // nem associado as operacoes.
-  Limpar;
+  Clear;
   QueryDefinition := CreateQueryDefinition(ACriteria);
   FReader := FReaderFactory.CreateReader(QueryDefinition.Sql,
     QueryDefinition.Parameters);
   try
     if FReader = nil then
       raise Exception.Create(MissingReaderMessage);
-    FReader.Pesquisar;
+    FReader.Search;
     FOperation.SetReader(FReader);
   except
-    Limpar;
+    Clear;
     raise;
   end;
 end;
 
-procedure TNextQueryDefinitionBase.Atualizar;
+procedure TNextQueryDefinitionBase.Refresh;
 begin
   // Sem leitor nao existe resultado aberto a reler; a base nao cria um novo
   // leitor nesta chamada.
   if FReader = nil then
     raise Exception.Create(MissingReaderMessage);
 
-  FReader.Atualizar;
+  FReader.Refresh;
 end;
 
-procedure TNextQueryDefinitionBase.Limpar;
+procedure TNextQueryDefinitionBase.Clear;
 begin
   // Desassociar antes de fechar impede que as operacoes alcancem um leitor
   // liberado ou uma linha do resultado anterior.
   FOperation.SetReader(nil);
   if FReader <> nil then
   begin
-    FReader.Limpar;
+    FReader.Clear;
     FReader := nil;
   end;
 end;
@@ -163,7 +163,7 @@ begin
   if FReader = nil then
     Result := nil
   else
-    Result := FReader.DataSet;
+    Result := FReader.GetDataSet;
 end;
 
 end.
