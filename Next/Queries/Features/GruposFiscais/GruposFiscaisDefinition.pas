@@ -58,7 +58,7 @@ var
 begin
   // O catalogo e global: o unico predicado fixo restringe aos registros ativos.
   Builder := ParametersBuilder.Create(1);
-  Builder.ByName(ActiveParameterName, Ord(saAtivo));
+  Builder.ByName(ActiveParameterName, Ord(StatusRegistroEnum.saAtivo));
 
   BaseSql := 'select ID, DESCRICAO, ' + TipoTributoDisplaySql +
     ' as TIPO_TRIBUTO_DESCRICAO, ' + SistemaDisplaySql +

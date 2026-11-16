@@ -63,7 +63,7 @@ uses
   // por TFDQuery e TFDTransaction. System.Hash gera a identificacao da
   // configuracao do banco sem reter usuario ou senha.
   System.Hash, FireDAC.DApt, FireDAC.Phys.FB, NextFeaturesComposition,
-  FireDACDataSetSorterUnit;
+  FireDACDataSetSorterUnit, QueryResultOperations;
 
 const
   InvalidContextMessage = 'O contexto da empresa nao foi aceito.';
@@ -193,6 +193,10 @@ begin
     FContainer.RegisterInstance<ISessionContext>(FSessionContext);
     FContainer.RegisterInstance<IDataBaseConnection>(FAdapter);
     FContainer.RegisterInstance<ISqlDataSetReaderFactory>(FReaderFactory);
+
+    FContainer.RegisterType<IDataSetSorter, TFireDACDataSetSorter>().AsSingleton;
+    FContainer.RegisterType<IQueryResultOperations, TQueryResultOperations>().AsTransient;
+
     RegisterNextFeatures(FContainer);
     FContainer.Build;
   except

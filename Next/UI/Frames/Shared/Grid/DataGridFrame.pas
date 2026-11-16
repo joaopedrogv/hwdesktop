@@ -154,9 +154,9 @@ type
     procedure ApplyColumnLayoutDefaults;
     procedure RestoreInitialColumnWidth(Column: TColumn;
       const ADefinitionIndex: Integer);
-    procedure ReportarFeedback(const ATitulo, AMensagem: string);
+    procedure ReportarFeedback(const AMensagem: string);
     procedure ModalFeedback(Sender: TObject;
-      const ATitulo, AMensagem: string);
+      const AMensagem: string);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -206,7 +206,6 @@ const
     'O filtro selecionado n'#227'o est'#225' mais ativo.';
   QuickFilterInvalidMessage =
     'O filtro informado n'#227'o '#233' v'#225'lido.';
-  CopyTitle = 'Copiar';
   CopyFailureMessage =
     'N'#227'o foi poss'#237'vel copiar o valor da c'#233'lula.';
   ColumnsTitle = 'Configurar colunas';
@@ -683,7 +682,7 @@ begin
     Clipboard.AsText := Texto;
   except
     // Cobre falha de conversao e de abertura/escrita do clipboard.
-    ReportarFeedback(CopyTitle, CopyFailureMessage);
+    ReportarFeedback(CopyFailureMessage);
   end;
 end;
 
@@ -772,18 +771,18 @@ begin
   end;
 end;
 
-procedure TfrmDataGridFrame.ReportarFeedback(const ATitulo, AMensagem: string);
+procedure TfrmDataGridFrame.ReportarFeedback(const AMensagem: string);
 begin
   // O frame nao abre dialogo proprio; o host apresenta a mensagem.
   if Assigned(FOnFeedback) then
-    FOnFeedback(Self, ATitulo, AMensagem);
+    FOnFeedback(Self, AMensagem);
 end;
 
 procedure TfrmDataGridFrame.ModalFeedback(Sender: TObject;
-  const ATitulo, AMensagem: string);
+  const AMensagem: string);
 begin
   // O modal de filtro usa o mesmo destino de feedback da grade.
-  ReportarFeedback(ATitulo, AMensagem);
+  ReportarFeedback(AMensagem);
 end;
 
 procedure TfrmDataGridFrame.miCopiarClick(Sender: TObject);
@@ -904,7 +903,7 @@ begin
       if Dialog.ShowModal = mrOk then
         ApplyColumnSelection(Dialog.CollectSelection);
     except
-      ReportarFeedback(ColumnsTitle, ColumnsFailureMessage);
+      ReportarFeedback(ColumnsFailureMessage);
     end;
   finally
     Dialog.Free;
@@ -940,13 +939,13 @@ begin
   try
     Summary := FOperations.SummarizeColumn(DataField);
   except
-    ReportarFeedback(ColumnSummaryTitle, ColumnSummaryFailureMessage);
+    ReportarFeedback(ColumnSummaryFailureMessage);
     Exit;
   end;
 
   if not Summary.Succeeded then
   begin
-    ReportarFeedback(ColumnSummaryTitle, ColumnSummaryFailureMessage);
+    ReportarFeedback(ColumnSummaryFailureMessage);
     Exit;
   end;
 
@@ -966,7 +965,7 @@ begin
         FormatCurr('#,##0.00##', Summary.MarkedSum);
   end;
 
-  ReportarFeedback(ColumnSummaryTitle, MessageText);
+  ReportarFeedback(MessageText);
 end;
 
 function TfrmDataGridFrame.FindColumnDefinitionIndex(
@@ -1262,7 +1261,7 @@ begin
     FColumnLayoutPreferences.Save(Entries);
   except
     // A grade permanece como esta; o host apresenta a falha.
-    ReportarFeedback(ColumnsSaveTitle, ColumnsSaveFailureMessage);
+    ReportarFeedback(ColumnsSaveFailureMessage);
   end;
 end;
 
@@ -1275,7 +1274,7 @@ begin
     FColumnLayoutPreferences.Reset;
   except
     // Sem a restauracao no banco a grade nao pode divergir do que esta gravado.
-    ReportarFeedback(ColumnsRestoreTitle, ColumnsRestoreFailureMessage);
+    ReportarFeedback(ColumnsRestoreFailureMessage);
     Exit;
   end;
 
@@ -1656,7 +1655,7 @@ begin
   begin
     if Trim(Msg) = '' then
       Msg := QuickFilterFailureMessage;
-    ReportarFeedback(QuickFilterTitle, Msg);
+    ReportarFeedback(Msg);
   end;
 end;
 
@@ -1711,7 +1710,7 @@ end;
 procedure TfrmDataGridFrame.ShowQuickFilterMessage(const AMessage: string);
 begin
   // O frame nao abre dialogo proprio; a mensagem segue para o host.
-  ReportarFeedback(QuickFilterTitle, AMessage);
+  ReportarFeedback(AMessage);
 end;
 
 function TfrmDataGridFrame.ShowQuickFilterModal(const ACaption: string;
@@ -1827,7 +1826,7 @@ begin
   begin
     if Trim(Msg) = '' then
       Msg := QuickFilterAddFailureMessage;
-    ReportarFeedback(QuickFilterTitle, Msg);
+    ReportarFeedback(Msg);
     Exit;
   end;
 
@@ -1852,7 +1851,7 @@ begin
 
   if not FOperations.GetQuickFilterCriterion(AId, CurrentCriterion) then
   begin
-    ReportarFeedback(QuickFilterTitle, QuickFilterMissingMessage);
+    ReportarFeedback(QuickFilterMissingMessage);
     UpdateCommandBandLayout();
     Exit;
   end;
@@ -1866,7 +1865,7 @@ begin
   begin
     if Trim(Msg) = '' then
       Msg := QuickFilterUpdateFailureMessage;
-    ReportarFeedback(QuickFilterTitle, Msg);
+    ReportarFeedback(Msg);
     Exit;
   end;
 

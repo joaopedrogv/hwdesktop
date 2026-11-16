@@ -15,84 +15,17 @@ uses
   System.SysUtils, NextViewRegistry,
   HwNextValidationSecondFormUnit, ConsultaBaseForm,
   EventosRtcForm, EventosRtcDefinition, GruposFiscaisForm,
-  GruposFiscaisDefinition, LocalPreferences,
+  LocalPreferences,
   WindowsRegistryLocalPreferences, ColumnLayoutPreferences,
   ColumnLayoutPreferencesRepository, StandardQueryFilterDefinition,
-  QueryPreviewReader, QueryResultOperations, GridColumnDefinition,
-  NextSetup, EventosRtcPresenter, GruposFiscaisPresenter, GruposFiscaisQuery,
+  QueryResultOperations, GridColumnDefinition,
+  NextSetup, EventosRtcPresenter, GruposFiscaisPresenter,
   AuthorizationService, RemoverGrupoFiscalUseCaseUnit,
-  SalvarGrupoFiscalUseCaseUnit, ListarEmpresasUseCaseUnit, IDataSetReaderUnit;
+  SalvarGrupoFiscalUseCaseUnit, ListarEmpresasUseCaseUnit, IDataSetReaderUnit,
+  GruposFiscaisQueryDefinition, NextQueryDefinition;
 
 var
   FRegistry: TNextViewRegistry;
-
-function CreateStandardQueryView(AParent: HWND): TfrmNextBase;
-var
-  View: TfrmConsultaBase;
-  Preferences: ILocalPreferences;
-  Reader: IDataSetReader;
-  Operations: IQueryResultOperations;
-begin
-  View := TfrmConsultaBase.CreateParented(AParent);
-  try
-    // A prévia recebe a definição de exemplo e o adaptador de preferências. A
-    // identidade é dedicada a esta entrada e não é compartilhada com telas de
-    // produto. A interface é contada por referência e o frame a mantém viva.
-    Preferences := TWindowsRegistryLocalPreferences.Create;
-
-    // A entrada apresenta o conjunto de prévia e habilita o filtro rápido sobre
-    // o resultado carregado. Não há coluna de marcação nesta tela: o campo
-    // 'sel' do leitor de exemplo permanece fora das colunas da grade.
-    Reader := TQueryPreviewReader.Create('');
-    Operations := TQueryResultOperations.Create(Reader, '',
-      NextSetupInstance.DataSetSorter);
-    View.Attach(Reader, GridColumns([
-      GridColumn('documento', 'Documento', 120),
-      GridColumn('descricao', 'Descri'#231#227'o', 220),
-      GridColumn('codigo', 'C'#243'digo', 90, qcaRight),
-      GridColumn('valor', 'Valor', 110, qcaRight),
-      GridColumn('data', 'Data', 110, qcaCenter)
-    ]), 'Consulta Next', Operations, True);
-    View.ConfigureFilters(CreateStandardQueryFilterDefinition, Preferences,
-      'next.query.standard.filter');
-    Result := View;
-  except
-    View.Free;
-    raise;
-  end;
-end;
-
-function CreateValidationSecondView(AParent: HWND): TfrmNextBase;
-var
-  View: TfrmHwNextValidationSecond;
-  Reader: IDataSetReader;
-  Operations: IQueryResultOperations;
-begin
-  View := TfrmHwNextValidationSecond.CreateParented(AParent);
-  try
-    // A segunda previa usa o leitor de exemplo e as operacoes de marcacao para
-    // validar o filtro rapido sobre o mesmo conjunto ja carregado. As colunas
-    // seguem os campos criados pelo leitor de previa e o Setup fornece o
-    // ordenador usado pela grade.
-    Reader := TQueryPreviewReader.Create('sel');
-    Operations := TQueryResultOperations.Create(Reader, 'sel',
-      NextSetupInstance.DataSetSorter);
-    // A previa declara os quatro comportamentos para validar a configuracao de
-    // colunas. A coluna 'sel' continua sendo a marcacao, visivel e fora da lista.
-    View.Attach(Reader, GridColumns([
-      GridColumn('sel', 'Sel', 50, qcaCenter),
-      GridColumn('documento', 'Documento', 120, qcaDefault, gcbAlwaysVisible),
-      GridColumn('descricao', 'Descri'#231#227'o', 220),
-      GridColumn('codigo', 'C'#243'digo', 90, qcaRight),
-      GridColumn('valor', 'Valor', 110, qcaRight, gcbConfigurableHidden),
-      GridColumn('data', 'Data', 110, qcaCenter, gcbAlwaysHidden)
-    ]), 'Valida'#231#227'o Next 2', Operations, True);
-    Result := View;
-  except
-    View.Free;
-    raise;
-  end;
-end;
 
 function CreateEventosRtcView(AParent: HWND): TfrmNextBase;
 var
@@ -114,10 +47,8 @@ begin
       // A ordenacao usa as mesmas operacoes da previa, sem coluna de marcacao:
       // o conjunto e criado a cada pesquisa e o Setup fornece o ordenador que
       // aplica a ordem nativa.
-      Operations := TQueryResultOperations.Create(nil, '',
-        NextSetupInstance.DataSetSorter);
-      View.AttachPresenter(Presenter, CreateEventosRtcColumns, 'Eventos RTC',
-        Operations);
+      Operations := NextSetupInstance.Resolve<IQueryResultOperations>();
+      View.AttachPresenter(Presenter, CreateEventosRtcColumns, 'Eventos RTC', Operations);
     except
       // Se a associacao nao foi aceita, a tela nao assumiu a posse; liberar
       // evita deixar uma instancia orfa do apresentador.
@@ -154,38 +85,31 @@ var
   Preferences: ILocalPreferences;
   Presenter: TGruposFiscaisPresenter;
   Operations: IQueryResultOperations;
+  Definitions: INextQueryDefinition<TGrupoSelecionado>;
 begin
   Preferences := TWindowsRegistryLocalPreferences.Create;
 
   View := TfrmGruposFiscais.CreateParented(AParent);
   try
+    Definitions := NextSetupInstance.Resolve<INextQueryDefinition<TGrupoSelecionado>>;
     // O apresentador recebe a tela como view; as demais dependencias continuam
     // vindo do container do Setup. A tela possui o apresentador e permanece
     // responsavel pelo leitor e pelo conjunto retornado.
-    Presenter := TGruposFiscaisPresenter.Create(View,
-      NextSetupInstance.Resolve<IGruposFiscaisQuery>,
+    Presenter := TGruposFiscaisPresenter.Create(View, Definitions,
       NextSetupInstance.Resolve<IAuthorizationService>,
       NextSetupInstance.Resolve<IRemoverGrupoFiscalUseCase>,
       NextSetupInstance.Resolve<ISalvarGrupoFiscalUseCase>,
       NextSetupInstance.Resolve<ListarEmpresasUseCase>,
       NextSetupInstance.SessionContext);
     try
-      // Ordenacao no conjunto carregado, sem coluna de marcacao e sem filtro
-      // rapido; a ordem inicial continua sendo a da consulta (SEQID).
-      Operations := TQueryResultOperations.Create(nil, '',
-        NextSetupInstance.DataSetSorter);
-      View.AttachPresenter(Presenter, CreateGruposFiscaisColumns,
-        'Grupos Fiscais', Operations);
+      View.AttachPresenter(Presenter, Definitions.ColumnsDef, 'Grupos Fiscais', Definitions.GetResultOperation());
     except
       // Associacao recusada: a tela nao assumiu a posse.
       Presenter.Free;
       raise;
     end;
 
-    // A identidade da tela e tambem a identidade das preferencias de filtro,
-    // seguindo o padrao do EventosRtc.
-    View.ConfigureFilters(CreateGruposFiscaisFilters(), Preferences,
-      'next.grupos.fiscais');
+    View.ConfigureFilters(Definitions.FiltersDef, Preferences, 'next.grupos.fiscais');
 
     Result := View;
   except
@@ -196,8 +120,6 @@ end;
 
 initialization
   FRegistry := TNextViewRegistry.Create;
-  FRegistry.Register('next.validation.second', CreateValidationSecondView);
-  FRegistry.Register('next.query.standard', CreateStandardQueryView);
   FRegistry.Register('next.rtc.events', CreateEventosRtcView);
   FRegistry.Register('next.grupos.fiscais', CreateGruposFiscaisView);
 

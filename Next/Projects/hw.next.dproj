@@ -137,6 +137,7 @@
         <DCCReference Include="..\UI\Forms\Shared\Columns\ColumnSelectionForm.pas">
             <Form>frmColumnSelection</Form>
             <FormType>dfm</FormType>
+            <DesignClass>TForm</DesignClass>
         </DCCReference>
         <DCCReference Include="..\UI\Forms\Features\EventosRtc\EventosRtcForm.pas">
             <Form>frmEventosRtc</Form>
@@ -146,9 +147,6 @@
             <Form>frmGruposFiscais</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="..\Queries\Features\GruposFiscais\GruposFiscaisDefinition.pas"/>
-        <DCCReference Include="..\Queries\Features\GruposFiscais\GruposFiscaisQuery.pas"/>
-        <DCCReference Include="..\Queries\Features\GruposFiscais\GruposFiscaisPresenter.pas"/>
         <DCCReference Include="..\Composition\NextSetup.pas"/>
         <DCCReference Include="..\Composition\NextFeaturesComposition.pas"/>
         <DCCReference Include="..\..\Modern\Core\Domain\Ports\Shared\ISessionContextUnit.pas"/>
@@ -157,10 +155,14 @@
         <DCCReference Include="..\Queries\Features\EventosRtc\EventosRtcDefinition.pas"/>
         <DCCReference Include="..\Queries\Features\EventosRtc\EventosRtcQuery.pas"/>
         <DCCReference Include="..\Queries\Features\EventosRtc\EventosRtcPresenter.pas"/>
+        <DCCReference Include="..\Queries\Features\GruposFiscais\GruposFiscaisDefinition.pas"/>
+        <DCCReference Include="..\Queries\Features\GruposFiscais\GruposFiscaisQuery.pas"/>
+        <DCCReference Include="..\Queries\Features\GruposFiscais\GruposFiscaisPresenter.pas"/>
         <DCCReference Include="..\Queries\Shared\Filters\StandardQueryFilterDefinition.pas"/>
         <DCCReference Include="..\Interop\Module\NextViewCatalog.pas"/>
         <DCCReference Include="..\Interop\Module\NextViewExports.pas"/>
         <DCCReference Include="..\Interop\Module\NextAuthorizationBridge.pas"/>
+        <DCCReference Include="..\Infrastructure\Authorization\NextAuthorizationAdapter.pas"/>
         <DCCReference Include="..\Queries\Shared\QueryResultOperations.pas"/>
         <DCCReference Include="..\..\Modern\Core\Infrastructure\Interfaces\IDataSetSorterUnit.pas"/>
         <DCCReference Include="..\..\Modern\Adapters\Secondary\Database\FireDAC\FireDACDataSetSorterUnit.pas"/>
@@ -172,10 +174,10 @@
         <DCCReference Include="..\Contracts\GruposFiscaisView.pas"/>
         <DCCReference Include="..\Contracts\AuthorizationService.pas"/>
         <DCCReference Include="..\Contracts\GrupoFiscalCadastro.pas"/>
-        <DCCReference Include="..\Infrastructure\Authorization\NextAuthorizationAdapter.pas"/>
         <DCCReference Include="..\..\Modern\Core\Domain\Ports\Shared\ColumnLayoutPreferences.pas"/>
         <DCCReference Include="..\..\Modern\Adapters\Secondary\Preferences\ColumnLayoutPreferencesRepository.pas"/>
         <DCCReference Include="..\Composition\QueryPreviewReader.pas"/>
+        <DCCReference Include="..\Queries\Features\GruposFiscais\GruposFiscaisQueryDefinition.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

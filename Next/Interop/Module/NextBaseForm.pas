@@ -28,9 +28,11 @@ type
     procedure FocusView; virtual;
     // Feedback visual comum das telas Next. O titulo e a mensagem vem do
     // chamador; os botoes seguem o idioma do Windows.
-    procedure ShowInformation(const AMessage, ATitle: string);
-    procedure ShowWarning(const AMessage, ATitle: string);
-    procedure ShowError(const AMessage, ATitle: string);
+    procedure ShowInformation(const AMessage: string);
+    procedure ShowWarning(const AMessage: string);
+    procedure ShowError(const AMessage: string);
+    function ShowDangerQuestion(const AMessage: string): Boolean;
+    function ShowQuestion(const AMessage: string): Boolean;
     property ViewIdentifier: string read FViewIdentifier;
     property InstanceNumber: Integer read FInstanceNumber;
   end;
@@ -41,22 +43,34 @@ procedure TfrmNextBase.DoInitializeView;
 begin
 end;
 
-procedure TfrmNextBase.ShowInformation(const AMessage, ATitle: string);
+procedure TfrmNextBase.ShowInformation(const AMessage: string);
 begin
-  Application.MessageBox(PChar(AMessage), PChar(ATitle),
+  Application.MessageBox(PChar(AMessage), 'Informação',
     MB_OK or MB_ICONINFORMATION);
 end;
 
-procedure TfrmNextBase.ShowWarning(const AMessage, ATitle: string);
+procedure TfrmNextBase.ShowWarning(const AMessage: string);
 begin
-  Application.MessageBox(PChar(AMessage), PChar(ATitle),
+  Application.MessageBox(PChar(AMessage), 'Atenção',
     MB_OK or MB_ICONWARNING);
 end;
 
-procedure TfrmNextBase.ShowError(const AMessage, ATitle: string);
+procedure TfrmNextBase.ShowError(const AMessage: string);
 begin
-  Application.MessageBox(PChar(AMessage), PChar(ATitle),
+  Application.MessageBox(PChar(AMessage), 'Erro',
     MB_OK or MB_ICONERROR);
+end;
+
+function TfrmNextBase.ShowDangerQuestion(const AMessage: string): boolean;
+begin
+  Result := Application.MessageBox(PChar(AMessage), 'Confirmação',
+    MB_YESNO or MB_ICONWARNING or MB_DEFBUTTON2) = ID_YES;
+end;
+
+function TfrmNextBase.ShowQuestion(const AMessage: string): boolean;
+begin
+  Result := Application.MessageBox(PChar(AMessage), 'Confirmação',
+    MB_YESNO or MB_ICONQUESTION) = ID_YES;
 end;
 
 function TfrmNextBase.HasPendingChanges: Boolean;

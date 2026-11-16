@@ -12,7 +12,7 @@ type
   // Contrato minimo frame -> host para o host apresentar a mensagem. O frame
   // reutilizavel nao cria dialogo proprio.
   TFrameFeedbackEvent = procedure(Sender: TObject;
-    const ATitulo, AMensagem: string) of object;
+    const AMensagem: string) of object;
 
   TfrmFilterFrame = class(TFrame)
     pnCampo: TPanel;
@@ -124,7 +124,6 @@ uses
 const
   // Espacos nunca representam conteudo digitado em um valor mascarado.
   MaskWhitespaceChars: TSysCharSet = [' ', #9, #10, #13];
-  FilterFeedbackTitle = 'Filtro';
 
 function FrameFieldCaption(const AField: TFilterFieldDefinition): string;
 begin
@@ -1033,7 +1032,7 @@ procedure TfrmFilterFrame.ReportarFeedback(const AMensagem: string);
 begin
   // O frame reutilizavel nao abre dialogo proprio; o host apresenta.
   if Assigned(FOnFeedback) then
-    FOnFeedback(Self, FilterFeedbackTitle, AMensagem);
+    FOnFeedback(Self, AMensagem);
 end;
 
 function TfrmFilterFrame.TrySelectField(const AFieldId: string): Boolean;

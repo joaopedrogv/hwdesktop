@@ -39,7 +39,6 @@ type
     // A base cria a aba, o rodape e a area de rolagem; a tela fornece o editor
     // tipado usado pelos hooks de abertura, gravacao e foco.
     function CriarEditorInclusao(AParent: TWinControl): TWinControl; override;
-    function TituloAbaInclusao: string; override;
     procedure AoAbrirAbaInclusao; override;
     procedure AoFecharAbaInclusao; override;
     procedure AoFalharAberturaAbaInclusao; override;
@@ -62,10 +61,7 @@ implementation
 {$R *.dfm}
 
 const
-  MissingPresenterMessage =
-    'O apresentador de Grupos Fiscais nao foi informado.';
-  LixeiraTitle = 'Enviar para a lixeira';
-  InclusaoTitle = 'Novo grupo fiscal';
+  MissingPresenterMessage = 'O apresentador de Grupos Fiscais nao foi informado.';
 
 destructor TfrmGruposFiscais.Destroy;
 begin
@@ -117,12 +113,6 @@ begin
   // area leva o editor junto e nao existe uma segunda liberacao.
   FEditor := TfrmGrupoFiscalCadastroFrame.Create(AParent);
   Result := FEditor;
-end;
-
-function TfrmGruposFiscais.TituloAbaInclusao: string;
-begin
-  // A aba de inclusao usa o mesmo titulo da janela de inclusao da tela.
-  Result := InclusaoTitle;
 end;
 
 procedure TfrmGruposFiscais.AoAbrirAbaInclusao;
@@ -188,8 +178,7 @@ procedure TfrmGruposFiscais.AvisarSalvamentoSemAtualizacao;
 begin
   // A base ja fechou a aba e descartou o rascunho; a mensagem confirma a
   // gravacao e orienta a atualizar a consulta.
-  ShowWarning('O grupo fiscal foi salvo. Refaça a pesquisa para atualizar a consulta.',
-    'Salvar grupo fiscal');
+  ShowWarning('O grupo fiscal foi salvo. Refaça a pesquisa para atualizar a consulta.');
 end;
 
 function TfrmGruposFiscais.HasPendingChanges: Boolean;
@@ -225,7 +214,7 @@ begin
 
   if FPresenter = nil then
   begin
-    ShowError(MissingPresenterMessage, InclusaoTitle);
+    ShowError(MissingPresenterMessage);
     Exit;
   end;
 
@@ -244,8 +233,7 @@ begin
   except
     // A base ja liberou a aba parcial e o hook de falha limpou FEditor/FDraft;
     // aqui resta informar a falha ao usuario.
-    ShowError('Não foi possível iniciar a inclusão do grupo fiscal.',
-      InclusaoTitle);
+    ShowError('Não foi possível iniciar a inclusão do grupo fiscal.');
   end;
 end;
 
@@ -281,35 +269,32 @@ procedure TfrmGruposFiscais.btnEnviarLixeiraClick(Sender: TObject);
 var
   Id, Descricao: string;
 begin
-  if not LerLinhaCorrente(Id, Descricao) then
-  begin
-    ShowInformation('Selecione um grupo fiscal na grade.', LixeiraTitle);
-    Exit;
-  end;
+  // if not LerLinhaCorrente(Id, Descricao) then
+  // begin
+  //   ShowInformation('Selecione um grupo fiscal na grade.');
+  //   Exit;
+  // end;
 
   // O envio para a lixeira retira o grupo da consulta: somente a afirmacao
   // explicita prossegue, e o padrao do dialogo e "Nao".
-  if Application.MessageBox(
-    PChar(Format('Deseja enviar o grupo fiscal "%s" para a lixeira?',
-      [Descricao])), PChar(LixeiraTitle),
-    MB_YESNO or MB_ICONWARNING or MB_DEFBUTTON2) <> IDYES then
-    Exit;
+  // if ShowConfirm(Format('Deseja enviar o grupo fiscal "%s" para a lixeira?',
+  //     [Descricao]), MB_YESNO or MB_ICONWARNING or MB_DEFBUTTON2) <> IDYES then
+  //   Exit;
 
   btnEnviarLixeira.Enabled := False;
   try
-    if FPresenter = nil then
-      ShowError(MissingPresenterMessage, LixeiraTitle)
-    else
+    // if FPresenter = nil then
+    //   ShowError(MissingPresenterMessage, LixeiraTitle)
+    // else
     begin
       // O apresentador interpreta a autorizacao e apresenta a mensagem
       // correspondente; False interrompe sem repetir o que o legado mostrou.
-      if not FPresenter.EnviarParaLixeira(Id) then
+      if not FPresenter.EnviarParaLixeira() then
         Exit;
 
       // A grade atualizada e a confirmacao do envio; nao ha dialogo de sucesso.
       if not RepetirPesquisa then
-        ShowWarning('O grupo fiscal já foi enviado para a lixeira. Refaça a pesquisa para atualizar a consulta.',
-          LixeiraTitle);
+        ShowWarning('O grupo fiscal já foi enviado para a lixeira. Refaça a pesquisa para atualizar a consulta.');
     end;
   finally
     btnEnviarLixeira.Enabled := True;

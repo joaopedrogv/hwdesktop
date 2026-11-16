@@ -66,7 +66,7 @@ type
     function Pesquisar(const AExibirFalha: Boolean): Boolean;
     procedure GridTitleCtrlClick(Sender: TObject; const AFieldName: string);
     procedure FrameFeedback(Sender: TObject;
-      const ATitulo, AMensagem: string);
+      const AMensagem: string);
     procedure PosicionarBotoesPesquisa;
     function GetAbaInclusaoAberta: Boolean;
     function GetAbaInclusaoAtiva: Boolean;
@@ -220,11 +220,11 @@ begin
 end;
 
 procedure TfrmConsultaBase.FrameFeedback(Sender: TObject;
-  const ATitulo, AMensagem: string);
+  const AMensagem: string);
 begin
   // O host apresenta o feedback dos frames reutilizaveis, que nao criam
   // dialogo proprio.
-  ShowWarning(AMensagem, ATitulo);
+  ShowWarning(AMensagem);
 end;
 
 procedure TfrmConsultaBase.ClearResult;
@@ -267,7 +267,7 @@ begin
       Collected := CollectFilters;
       if Collected.Status = fcsInvalid then
       begin
-        ShowWarning(Collected.ValidationMessage, InvalidFilterTitle);
+        ShowWarning(Collected.ValidationMessage);
         Exit;
       end;
 
@@ -297,7 +297,7 @@ begin
       if FReader.DataSet.IsEmpty then
       begin
         ClearResult;
-        ShowInformation(Format(EmptyResultMessage, [FTitle]), EmptyResultTitle);
+        ShowInformation(Format(EmptyResultMessage, [FTitle]));
       end;
     except
       Result := False;
@@ -305,7 +305,7 @@ begin
       // A falha generica pertence ao botao; a repeticao programatica deixa a
       // mensagem especifica para o chamador.
       if AExibirFalha then
-        ShowError(Format(FailureMessage, [FTitle]), QueryFailureTitle);
+        ShowError(Format(FailureMessage, [FTitle]));
     end;
   finally
     FPesquisando := False;
@@ -507,7 +507,7 @@ procedure TfrmConsultaBase.AvisarSalvamentoSemAtualizacao;
 begin
   // Padrao da base para telas que nao fornecem mensagem propria. A gravacao ja
   // terminou; a mensagem apenas orienta a repetir a consulta.
-  ShowWarning(SalvamentoSemAtualizacaoMessage, FTitle);
+  ShowWarning(SalvamentoSemAtualizacaoMessage);
 end;
 
 function TfrmConsultaBase.GetAbaInclusaoAberta: Boolean;

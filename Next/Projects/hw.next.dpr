@@ -49,7 +49,8 @@ uses
   GrupoFiscalCadastro in '..\Contracts\GrupoFiscalCadastro.pas',
   ColumnLayoutPreferences in '..\..\Modern\Core\Domain\Ports\Shared\ColumnLayoutPreferences.pas',
   ColumnLayoutPreferencesRepository in '..\..\Modern\Adapters\Secondary\Preferences\ColumnLayoutPreferencesRepository.pas',
-  QueryPreviewReader in '..\Composition\QueryPreviewReader.pas';
+  QueryPreviewReader in '..\Composition\QueryPreviewReader.pas',
+  GruposFiscaisQueryDefinition in '..\Queries\Features\GruposFiscais\GruposFiscaisQueryDefinition.pas';
 
 {$R *.res}
 

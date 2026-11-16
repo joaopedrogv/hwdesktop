@@ -42,6 +42,8 @@ type
 
   IQueryResultOperations = interface
     ['{76045AA4-FE97-4A2E-87CA-85077589168B}']
+    procedure SetReader(const AReader: IDataSetReader);
+    procedure SetMarkingColumn(const AMarkingColumn: string);
     procedure MarkAll();
     procedure UnmarkAll();
     procedure InverterAllMarks();
@@ -75,6 +77,12 @@ type
       const ASorts: TQuerySortFields): Boolean;
   end;
 
+  IQueryResultConfiguration = interface
+    ['{3256577F-2B15-436E-A42B-ECCBD6E8E633}']
+    procedure SetReader(const AReader: IDataSetReader);
+    procedure SetMarkingColumn(const AMarkingColumn: string);
+  end;
+
   TQueryResultOperations = class(TInterfacedObject, IQueryResultOperations)
   private
     FReader: IDataSetReader;
@@ -103,9 +111,10 @@ type
     function GetQuickFilter(const AId: Integer;
       out ACriterion: TQuickFilterCriterion): Boolean;
     procedure ResetQuickFilterState();
+    procedure SetReader(const AReader: IDataSetReader);
+    procedure SetMarkingColumn(const AMarkingColumn: string);
   public
-    constructor Create(AReader: IDataSetReader; const AMarkingColumn: string;
-      const ADataSetSorter: IDataSetSorter = nil);
+    constructor Create(const ADataSetSorter: IDataSetSorter);
     destructor Destroy; override;
     procedure MarkAll();
     procedure UnmarkAll();
@@ -385,11 +394,8 @@ end;
 
 { TQueryResultOperations }
 
-constructor TQueryResultOperations.Create(AReader: IDataSetReader;
-  const AMarkingColumn: string; const ADataSetSorter: IDataSetSorter);
+constructor TQueryResultOperations.Create(const ADataSetSorter: IDataSetSorter);
 begin
-  FReader := AReader;
-  FMarkingColumn := AMarkingColumn;
   FDataSetSorter := ADataSetSorter;
   FQuickFilters := TList<TQuickFilterCriterion>.Create;
   FNextQuickFilterId := 1;
@@ -1020,6 +1026,16 @@ begin
   FQuickFilters.Clear;
   FNextQuickFilterId := 1;
   FQuickFilterDataSet := nil;
+end;
+
+procedure TQueryResultOperations.SetReader(const AReader: IDataSetReader);
+begin
+  FReader := AReader;
+end;
+
+procedure TQueryResultOperations.SetMarkingColumn(const AMarkingColumn: string);
+begin
+  FMarkingColumn := AMarkingColumn;
 end;
 
 procedure TQueryResultOperations.InverterAllMarks;

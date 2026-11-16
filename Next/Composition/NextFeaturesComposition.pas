@@ -14,7 +14,8 @@ uses
   AuthorizationService, NextAuthorizationAdapter,
   IGruposFiscaisRepositoryUnit, GruposFiscaisRepositoryUnit,
   RemoverGrupoFiscalUseCaseUnit, SalvarGrupoFiscalUseCaseUnit,
-  ListarEmpresasUseCaseUnit, IEmpresasRepositoryUnit, EmpresasRepositoryUnit;
+  ListarEmpresasUseCaseUnit, IEmpresasRepositoryUnit, EmpresasRepositoryUnit,
+  NextQueryDefinition, GruposFiscaisQueryDefinition;
 
 procedure RegisterNextFeatures(const AContainer: TContainer);
 begin
@@ -40,6 +41,9 @@ begin
   AContainer.RegisterType<IEmpresasRepository, EmpresasRepository>.AsSingleton;
   AContainer.RegisterType<ListarEmpresasUseCase>.AsSingleton;
   AContainer.RegisterType<ISalvarGrupoFiscalUseCase, SalvarGrupoFiscalUseCase>.AsTransient;
+  AContainer.RegisterType<INextQueryDefinition<TGrupoSelecionado>, TGruposFiscaisQueryDefinition>().AsTransient;
+//  AContainer.RegisterType<TGruposFiscaisQueryDefinition>().AsTransient;
+//  INextQueryDefinition<TGrupoSelecionado>
 end;
 
 end.
