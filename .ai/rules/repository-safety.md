@@ -38,54 +38,6 @@ always_apply: true
   correction changes approved behavior, contracts or scope, or leaves a material
   ambiguity. Do not silently change business behavior or expand the demand.
 
-## Local Implementation Quality
-
-- Prefer existing mechanisms and the simplest correct representation within the
-  assigned scope. Before adding persistent fields, check which values can be
-  derived from existing data or held locally for the current operation.
-- Before adding a helper, wrapper or alias, inspect existing contracts and actual
-  callers. Add a separate member for behavior or a responsibility needed by
-  current code. A different name, language or hypothetical future variation is
-  insufficient. Implement a required interface method directly when a local
-  alias would only forward the same result.
-- Use an operation's existing precondition check and failure result when they
-  already satisfy its caller's needs. Review new methods together with their
-  callers to remove repeated checks and unnecessary forwarding. Preserve checks
-  that enforce distinct semantics or are needed before other side effects.
-- Retain cross-call state only when its lifetime is needed. For new caches or
-  recalculation flags, establish their identity, invalidation and update points,
-  including failure and retry behavior. Use a cohesive representation for fields
-  that describe one concept when it improves clarity. Review state necessity as
-  well as field count, preserving compiler compatibility and existing contracts.
-- Write new or substantively revised source comments in Brazilian Portuguese.
-  Preserve the established spelling of technical identifiers, compiler
-  directives and tool-recognized markers.
-- Prefer self-explanatory names and structures. Ordinary declarations and
-  straightforward code usually need no comments. Explain a non-obvious reason,
-  business rule, ownership, compatibility constraint, workaround or guarantee
-  when the code does not convey it.
-- Keep comments concise and place each explanation at the owning contract or
-  decision. An implementation comment should add local information. Avoid
-  repeating the same explanation above declarations, inside methods and at
-  callers.
-- During implementation and review, remove redundant or repeated comments
-  added within the assignment. Comments that only announce a step or narrate
-  names, calls, conditions and assignments should be omitted.
-- Prefer writing a user-facing message directly in the method that uses it.
-  Use a named constant when the same message is reused.
-- Keep source explanations understandable without the current Workflow run.
-  Store run-local decision IDs, increment IDs, approval narratives and review
-  history in run artifacts. Stable domain codes and specification references
-  can remain when they explain the source contract.
-- When a user must locate a record, use its recognizable business labels. Compose
-  enough identifying data to distinguish the records involved. Keep internal
-  identifiers in diagnostic evidence when needed for traceability.
-- State a finding's practical consequence and appropriate action in the user's
-  vocabulary. Describe the data actually checked, including current edits versus
-  saved data, company and date when relevant. Match severity and success claims to
-  the evidence. Respect valid precedence and intentional broad conditions when
-  describing overlaps or observations.
-
 ## Source Encoding Verification
 
 - Establish the expected encoding and line endings before editing or creating a

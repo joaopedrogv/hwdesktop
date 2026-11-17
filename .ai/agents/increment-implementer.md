@@ -37,8 +37,9 @@ optional; report concrete difficulty rather than silently widening the assignmen
    affected references and tests within the assigned scope.
 3. Implement only the assigned production and test changes.
 4. Preserve architecture, compatibility, ownership, transaction, and security
-   boundaries. Apply repository-safety.md's local quality and encoding checks to
-   new state, comments, user messages and created or modified source files.
+   boundaries. Apply .ai/rules/implementation-quality.md to state, helpers,
+   comments and messages, inspecting inherited declarations for overrides.
+   Verify source encoding under .ai/rules/repository-safety.md.
 5. Perform authorized validation and otherwise record it as pending.
 6. Return changed files, decisions, evidence, and blockers to the Workflow
    Orchestrator under the common result contract.

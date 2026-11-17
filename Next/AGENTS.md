@@ -1,210 +1,49 @@
 # Next — AI working instructions
 
-These instructions supplement ../AGENTS.md for Next work, including sources
-identified with a Next header. See [Next screens](README.md) for the host API,
-screen registration and build pairing.
+These instructions supplement ../AGENTS.md for Next work, including Modern
+sources identified with a Next compatibility header.
 
-## Scope and delivery
+## Scope and required guidance
+
+Next owns presentation, runtime composition and host integration; reusable
+business code remains in its owning Modern contexts. Read ../Modern/AGENTS.md
+when those sources are involved. A header does not replace the owning area's rules.
+
+Read ../.ai/rules/next-architecture.md for Next work. For forms, frames,
+Presenters, View contracts or host window/session integration, also read
+../.ai/rules/next-ui.md. Shared implementation quality is loaded by the root entry;
+Next Delphi sources also use ../.ai/rules/delphi-coding-standards.md.
 
 Implement only the agreed short, executable delivery. Combine UI, integration
-and infrastructure when needed so the developer can open the application and
-validate the result. Do not finish entire layers before providing usable behavior.
-Grow documentation from implemented, verified contracts; do not anticipate Skills
-or copy Modern's instruction system.
+and infrastructure when needed to provide behavior the developer can validate.
+Grow guidance from implemented contracts; do not anticipate Skills or copy
+Modern's instruction system.
+
+## Compatibility
+
+Within Next/, Delphi Rio 10.3.3/Win32 is the default. Do not add a redundant Next
+header. Use // Delphi 2006 on the first line for sources that must preserve that
+compatibility, including shared ABI contracts and their dependencies.
+
+For Modern-owned sources, follow ../Modern/.ai/rules/delphi-compatibility.md.
+Preserve its Next markers and explicit dual-target exception. Source headers and
+compiler defaults do not authorize encoding conversion or bulk annotation.
 
 ## Build validation
 
 When an authorized implementation affects hw.next.dll, compile it in the working
-clone before handing off the affected changes. From the clone root, run
-`pwsh -NoProfile -File ./_automation/build/build-next.ps1`. Fix compiler errors
-caused by the assigned changes and rerun. Report the outcome or the concrete
-blocker. The [Next build instructions](../_automation/build/README.md#compilar-e-publicar-next)
-list the output paths for the DLL and DCUs. See the standing Next DLL build
-grant in ../.ai/rules/repository-safety.md.
+clone before handoff. From the clone root, run
 
-## Responsibilities
+    pwsh -NoProfile -File ./_automation/build/build-next.ps1
 
-Next follows Hexagonal Architecture (Ports and Adapters) and applies SOLID to
-separate responsibilities and invert dependencies at infrastructure boundaries.
+Fix compiler errors caused by the assignment and rerun. Report the outcome or the
+concrete blocker. See ../.ai/rules/repository-safety.md for the standing build
+grant and ../_automation/build/README.md#compilar-e-publicar-next for output paths.
+The DLL goes to bpl/hw.next.dll; DCUs go to Next/Projects/output/dcu-rio/.
 
-- Keep business domains, Use Cases, validations, Ports and reusable adapters in
-  their owning Modern contexts, with one source of maintenance. Read
-  ../Modern/AGENTS.md for that scope; Rio-only sources may also live in Modern.
-- Next owns its presentation, internal service contracts, runtime composition
-  and host integration. Build independent visual/read components; do not inherit
-  uCadPadraoModal, uDataSet_OOP or legacy-backed Modern bases, or import the
-  legacy global singleton as Next's context.
-- The chosen stack is Delphi Rio 10.3.3/Win32, native VCL/TDBGrid and FireDAC.
-- In screen reads, the form requests the search and presents the complete
-  filtered result as a native `TDataSet`. Feature queries use a driver-independent
-  read contract. The adapter executes the read. Composition selects the adapter
-  and owns the connection lifecycle. Keep Setup and driver details behind that
-  boundary. Business operations use their Modern contracts.
-- Use the project's existing read abstractions when implementing or refactoring
-  a query. Use `QueryResult` to map known result fields into records or objects.
-  Use its typed accessors and choose a nullable accessor when the distinction
-  between `NULL` and an empty or default value matters. When wrapping a dataset
-  supplied by an `IDataSetReader`, pass `OwnsDataSet = False` and free the
-  wrapper after copying the values. Use `TDataSet` and `TField` directly for
-  VCL binding and generic grid operations that need field metadata or native
-  dataset behavior.
-- Use Spring4D only in composition and supply dependencies to consumers. Do not
-  resolve dependencies from a global container in forms, presenters or Use Cases.
-- Composition can configure a concrete editor's public child frames directly
-  through their configuration methods. Prefer this over editor methods that
-  only forward the same arguments. Use an editor-level method when it adds
-  coordination, validation or a distinct contract. Supply loading callbacks
-  during composition; execute them during the editor's preparation.
-- Choose Spring4D lifetimes based on the intended ownership and sharing. Prefer
-  `AsTransient` for Presenters and for lightweight queries and Use Cases that
-  follow a Presenter instance. With reference-counted dependencies, inject and
-  retain the interface so the object is released when its last reference ends.
-  For class references, define who frees a transient instance. A form can own
-  its Presenter. Use `AsSingleton` when a shared instance should live with the
-  container, such as a shared connection. Statelessness makes sharing possible.
-  Explain non-obvious ownership or sharing decisions at the registration.
-- The ERP host supplies session and connection data. Keep resource ownership
-  explicit. The host side targets Delphi 2006; the module side targets Rio.
-  Cross that boundary through an explicit ABI, not Delphi objects, datasets or
-  containers. Sharing source does not share objects between the two runtimes.
+## References
 
-## Source organization
-
-Use this layout for new assignments and planned relocations. Preserve the
-locations agreed for work already in progress. Create folders when they have
-source files and keep related units together.
-
-```text
-Next/
-  Contracts/
-    Features/
-      <Feature>.pas
-    <NoFeature>.pas
-  Composition/
-    Features/
-      <Feature>.pas
-    Shared/
-      Seletores/
-    <NoFeature>.pas
-  Infrastructure/
-    Database/
-    Authorization/
-    Auditing/
-    Preferences/
-  Queries/
-    Shared/
-      Filters/
-    Features/
-      <Feature>/
-  UI/
-    Presenters/
-      Shared/
-      Features/
-        <Feature>/
-    Forms/
-      Base/
-      Validation/
-      Features/
-        <Feature>/
-    Frames/
-      Shared/
-        Empresas/
-        Filters/
-        Grid/
-        Seletores/
-      Features/
-        <Feature>/
-    Components/
-  Interop/
-    Contracts/
-    Host/
-    Module/
-  Projects/
-  Tests/
-```
-
-Use the same feature folder name under queries, presenters, forms and frames.
-Keep query definitions, shared filter definitions, SQL filter builders and
-result operations in `Queries/`. Presenter bases belong in
-`UI/Presenters/Shared/`; concrete Presenters belong in
-`UI/Presenters/Features/<Feature>/`.
-
-Factories that create shared selector-loading callbacks from injected Use
-Cases belong in `Composition/Shared/Seletores/`. Their option and callback
-contracts belong in `Contracts/`. Feature view factories belong in
-`Composition/Features/`; `NextViewCatalog` registers them.
-
-Use `Queries/Shared/Filters/` for shared filter definitions and criteria,
-`UI/Frames/Shared/Filters/` for search frames and `UI/Frames/Shared/Grid/` for
-grid and quick-filter frames. The host-integrated form base belongs in
-`Interop/Module/`.
-
-## Naming
-
-- Start new unit and file names with the subject or responsibility to support
-  prefix searches. Use the module name only when it clarifies scope or resolves
-  ambiguity.
-- Use `T` for classes and custom records and `I` for interfaces. For a unit with
-  a clear primary type, default to its name without the leading `T` or `I`.
-- For new visual units, use `Form` or `Frame` as the final suffix and match the
-  base name of the `.pas` and `.dfm` to the unit name. Use `Tfrm` for the class,
-  as in `QueryStandardForm.pas` with `TfrmQueryStandard` and `DataGridFrame.pas`
-  with `TfrmDataGridFrame`.
-- Use the `Unit` suffix only when the owning area's convention requires it or
-  it resolves a concrete identifier conflict. When a variable collides with a
-  unit name, prefer a descriptive variable name. Apply this guidance to new
-  names and preserve existing names during unrelated changes.
-
-## User feedback
-
-- Use `TfrmNextBase` to present information, warnings and errors in Rio forms.
-  Write dialog titles and messages in Brazilian Portuguese. Use
-  `Application.MessageBox` for standard buttons in the Windows UI language.
-  Avoid `MessageDlg` with VCL-supplied button captions.
-- Reusable frames report validation or feedback to their host form, which
-  presents the message.
-- Preserve default buttons, focus and cancellation semantics. A confirmation
-  accepts only an explicit affirmative action. Make the negative answer the
-  default when confirming the discard of pending edits.
-- Keep VCL dialog creation in the UI. Presenters can request feedback through
-  their view or a presentation contract when needed. Business code returns
-  results and validation failures. Keep the Modern `UIUtilsUnit` and its
-  setup and validation dependencies outside Next's dialog implementation.
-
-## Window lifecycle
-
-- Open forms through the shared bridge API and a stable textual identifier.
-  Register a creation function in the DLL catalog. It composes dependencies
-  when a new instance is needed.
-- Editable forms report pending edits through HasPendingChanges. The base
-  confirms individual closes and the host applies the instance's close policy.
-  User changes and ERP shutdown use collective closure.
-- Keep MDI/modal presentation, single/multiple instances and hide/destroy-on-close
-  policies distinct. Queries default to a reusable single instance with hiding.
-  Modal openings use their own instance, normally destroyed when closed, without
-  converting an existing MDI instance into a modal.
-- Common window management coordinates the Delphi 2006 host wrapper and Rio
-  content. It finds reusable instances before construction; the Next base form
-  supplies common integration so descendants do not repeat lifecycle machinery.
-- The ERP changes users, not companies. User changes invalidate all retained
-  windows, including hidden ones. Collective shutdown releases those instances
-  regardless of their individual close policy; do not reuse an old user's view.
-- Hidden instances still own resources. Do not unload the DLL merely because no
-  windows are visible. Preserve module ownership and safe callback/message lifetimes.
-
-## Compatibility and continuity
-
-Within Next/, Delphi Rio 10.3.3 is the default. Do not add a redundant Next header.
-Use `// Delphi 2006` on the first line for sources that must preserve Delphi 2006
-compatibility. This is a compatibility requirement, not a prohibition on Rio use:
-shared ABI contracts must support both actual consumers and their dependencies.
-
-For sources owned by Modern/, follow ../Modern/.ai/rules/delphi-compatibility.md,
-including its Next marker and explicit dual-target exception. A marker does not
-relocate a source or replace its owner's rules. Preserve encoding and line endings;
-do not annotate or convert existing sources in bulk. Follow the execution
-authority in ../.ai/rules/repository-safety.md.
-
-Use the approved plan for the current delivery. Context and reasons are in
+README.md describes the host API and screen registration. Use the approved plan
+for the current delivery. Context and reasons are in
 D:/Hw/ai-docs/hwdesktop/temas/modernizacao-delphi/README.md; consult only the
-relevant record when needed. Record actual capabilities as work advances.
+relevant record when needed.
