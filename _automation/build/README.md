@@ -47,7 +47,10 @@ Exemplos a partir da raiz do repositório:
 
 ## Compilar e publicar Next
 
-Execute o comando abaixo na raiz do clone. Ele compila somente `Next/Projects/hw.next.dproj` em Debug/Win32 e gera `bpl/hw.next.dll`.
+Execute o comando abaixo na raiz do clone. Ele compila somente `Next/Projects/hw.next.dproj` em Debug/Win32. As saídas ficam nestes caminhos, relativos à raiz do clone.
+
+- DLL `bpl/hw.next.dll`
+- Unidades compiladas (`.dcu`) em `Next/Projects/output/dcu-rio/`
 
 ```powershell
 .\_automation\build\build-next.ps1

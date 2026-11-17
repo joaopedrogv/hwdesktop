@@ -18,8 +18,9 @@ When an authorized implementation affects hw.next.dll, compile it in the working
 clone before handing off the affected changes. From the clone root, run
 `pwsh -NoProfile -File ./_automation/build/build-next.ps1`. Fix compiler errors
 caused by the assigned changes and rerun. Report the outcome or the concrete
-blocker. See the standing Next DLL build grant in
-../.ai/rules/repository-safety.md.
+blocker. The [Next build instructions](../_automation/build/README.md#compilar-e-publicar-next)
+list the output paths for the DLL and DCUs. See the standing Next DLL build
+grant in ../.ai/rules/repository-safety.md.
 
 ## Responsibilities
 
