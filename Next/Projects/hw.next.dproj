@@ -195,6 +195,7 @@
         <DCCReference Include="..\Contracts\QueryColumnLayout.pas"/>
         <DCCReference Include="..\Contracts\EmpresaOption.pas"/>
         <DCCReference Include="..\Contracts\ViewFeedback.pas"/>
+        <DCCReference Include="..\Contracts\ConsultaBaseView.pas"/>
         <DCCReference Include="..\Contracts\GruposFiscaisView.pas"/>
         <DCCReference Include="..\Contracts\EditorCadastro.pas"/>
         <DCCReference Include="..\Contracts\SelecaoEntidadeOption.pas"/>

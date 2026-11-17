@@ -52,6 +52,7 @@ uses
   QueryColumnLayout in '..\Contracts\QueryColumnLayout.pas',
   EmpresaOption in '..\Contracts\EmpresaOption.pas',
   ViewFeedback in '..\Contracts\ViewFeedback.pas',
+  ConsultaBaseView in '..\Contracts\ConsultaBaseView.pas',
   GruposFiscaisView in '..\Contracts\GruposFiscaisView.pas',
   EditorCadastro in '..\Contracts\EditorCadastro.pas',
   SelecaoEntidadeOption in '..\Contracts\SelecaoEntidadeOption.pas',

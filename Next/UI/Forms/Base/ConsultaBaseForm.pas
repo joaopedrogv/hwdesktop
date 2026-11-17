@@ -8,7 +8,7 @@ uses
   Data.DB,  NextBaseForm, DataGridFrame, FilterDefinition, FilterCriterion, FilterFrame,
   QueryResultOperations, NextQueryDefinition,
   LocalPreferences, PresenterConsultaBase,
-  EditorCadastro, ValidationEntityOutputUnit;
+  EditorCadastro, ValidationEntityOutputUnit, ConsultaBaseView;
 
 type
   // Configura o editor recem-criado antes de a aba ser ativada: e o ponto em que
@@ -60,7 +60,7 @@ type
   // Cada inclusao autorizada pela funcionalidade abre uma aba propria e cada
   // registro escolhido para alteracao abre outra, com rodape, area de rolagem e
   // editor sob posse da base.
-  TfrmConsultaBase = class(TfrmNextBase)
+  TfrmConsultaBase = class(TfrmNextBase, IConsultaBaseView)
     pcAbas: TPageControl;
     tsConsulta: TTabSheet;
     pnFiltros: TPanel;
@@ -233,9 +233,6 @@ type
     // registra o fechamento diferido e reconsulta depois do clique.
     function SalvarAba(const AChave: string;
       AEditor: TWinControl): Boolean; virtual;
-    // Encaminha o resultado de validacao da gravacao ao editor da aba que a
-    // iniciou. Sem esse editor nada e apresentado.
-    procedure ShowValidation(const AValidacao: ValidationEntityOutput);
     // Aviso de gravacao confirmada cuja reconsulta falhou. O descendente
     // fornece a mensagem de negocio; a base chama depois de fechar a aba.
     procedure AvisarSalvamentoSemAtualizacao; virtual;
@@ -251,6 +248,9 @@ type
   public
     destructor Destroy; override;
     procedure ResetForSessionChange; override;
+    procedure ExibirValidacao(const AValidacao: ValidationEntityOutput);
+    function AtivarEdicao(const AChave: string): Boolean;
+    function AtivarInclusao: Boolean;
     // Qualquer aba de cadastro com rascunho pendente impede o fechamento; cada
     // editor responde pela propria pendencia.
     function HasPendingChanges: Boolean; override;
@@ -927,7 +927,7 @@ begin
   ShowWarning(ExclusaoSemAtualizacaoMessage);
 end;
 
-procedure TfrmConsultaBase.ShowValidation(
+procedure TfrmConsultaBase.ExibirValidacao(
   const AValidacao: ValidationEntityOutput);
 var
   Editor: TWinControl;
@@ -941,6 +941,16 @@ begin
 
   if Supports(Editor, IEditorCadastro, Cadastro) then
     Cadastro.ShowValidation(AValidacao);
+end;
+
+function TfrmConsultaBase.AtivarEdicao(const AChave: string): Boolean;
+begin
+  Result := TryAtivarAba(AChave);
+end;
+
+function TfrmConsultaBase.AtivarInclusao: Boolean;
+begin
+  Result := TryAtivarAba(ChaveAbaInclusao);
 end;
 
 function TfrmConsultaBase.ListaAbasCadastro: TObjectList<TAbaCadastro>;

@@ -7,7 +7,7 @@ uses
   PresenterConsultaBase, NextQueryDefinition, LocalPreferences,
   OperacoesFiscaisIbsCbsView, OperacoesFiscaisIbsCbsPresenter,
   OperacoesFiscaisIbsCbsQueryDefinition, OperacaoFiscalIbsCbsEtdUnit,
-  OperacaoFiscalIbsCbsCadastroFrame, EditorCadastro, ValidationEntityOutputUnit;
+  OperacaoFiscalIbsCbsCadastroFrame, EditorCadastro;
 
 type
   // Tela de consulta, inclusao e alteracao de Operacoes Fiscais IBS/CBS. Herda a
@@ -56,20 +56,11 @@ type
       AEditor: TWinControl): Boolean; override;
     procedure AvisarSalvamentoSemAtualizacao; override;
   public
-    // Implementa IOperacoesFiscaisIbsCbsView: a base encaminha a validacao ao
-    // editor da aba que iniciou a gravacao, que apresenta as mensagens por campo.
-    procedure ExibirValidacao(const AValidacao: ValidationEntityOutput);
-    // Reapresenta a aba de alteracao da chave ja aberta. Sem aba, nada e criado
-    // e a alteracao segue para a autorizacao e a carga do registro.
-    function AtivarEdicao(const AChave: string): Boolean;
     // Abre a aba da chave e copia a operacao carregada para o rascunho do editor.
     // A entidade continua pertencendo a quem chamou. A falha de preparacao e
     // informada uma unica vez.
     function AbrirEdicao(const AChave: string;
       const AOperacao: OperacaoFiscalIbsCbsEtd): Boolean;
-    // Reapresenta a aba de inclusao ja aberta. Sem aba, nada e criado e a
-    // inclusao segue para a autorizacao e a preparacao da aba.
-    function AtivarInclusao: Boolean;
     // Abre uma nova aba de inclusao; o editor cria o proprio rascunho e carrega
     // os seletores na preparacao. A falha e informada uma unica vez.
     function AbrirInclusao: Boolean;
@@ -200,21 +191,6 @@ begin
   Result := Presenter.Salvar(Frame.Rascunho);
 end;
 
-procedure TfrmOperacoesFiscaisIbsCbs.ExibirValidacao(
-  const AValidacao: ValidationEntityOutput);
-begin
-  // O encaminhamento e da base: a validacao vai para o editor da aba que
-  // iniciou a gravacao.
-  inherited ShowValidation(AValidacao);
-end;
-
-function TfrmOperacoesFiscaisIbsCbs.AtivarEdicao(const AChave: string): Boolean;
-begin
-  // Reabrir devolve a aba existente sem repetir autorizacao nem recarregar o
-  // registro: o rascunho ainda pertence a sessao atual.
-  Result := TryAtivarAba(AChave);
-end;
-
 function TfrmOperacoesFiscaisIbsCbs.TituloAlteracao(const AChave: string;
   const AOperacao: OperacaoFiscalIbsCbsEtd): string;
 var
@@ -292,13 +268,6 @@ begin
   end
   else
     ShowError('Não foi possível iniciar a alteração da operação fiscal.');
-end;
-
-function TfrmOperacoesFiscaisIbsCbs.AtivarInclusao: Boolean;
-begin
-  // Reabrir devolve a aba de inclusao existente sem repetir autorizacao nem
-  // recarregar os seletores: o rascunho ainda pertence a sessao atual.
-  Result := TryAtivarAba(ChaveAbaInclusao);
 end;
 
 function TfrmOperacoesFiscaisIbsCbs.AbrirInclusao: Boolean;
