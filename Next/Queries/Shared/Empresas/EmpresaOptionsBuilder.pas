@@ -5,24 +5,22 @@ interface
 uses
   EmpresaOption, ListarEmpresasUseCaseUnit, ISessionContextUnit, TipoComunsUnit;
 
-// Le todas as empresas do cadastro e as permitidas ao login corrente e devolve
-// uma opcao por empresa, na ordem da lista total. O login e lido a cada chamada
-// porque o host pode trocar o usuario mantendo a janela viva. A falha de leitura
-// ou de montagem devolve False e nenhuma opcao parcial.
-function MontarOpcoesEmpresas(AListarEmpresas: ListarEmpresasUseCase;
-  ASession: ISessionContext; out AOpcoes: TEmpresaOptions): Boolean;
-
-// Zera as marcas recebidas e marca somente os vinculos gravados. A permissao
-// apenas habilita a troca: um vinculo sem permissao continua marcado e
-// bloqueado. Sem vinculos, todas as empresas ficam desmarcadas.
-procedure MarcarEmpresasVinculadas(var AOpcoes: TEmpresaOptions;
-  const AEmpresasVinculadas: TArrayInteger);
+// Cria o carregador de opcoes do seletor de empresas da tela. As dependencias
+// sao capturadas uma unica vez; o login continua sendo lido a cada carga. A
+// inclusao preserva a marca das permitidas; a alteracao usa os vinculos
+// gravados, inclusive os de itens bloqueados.
+function CriarCarregadorEmpresas(AListarEmpresas: ListarEmpresasUseCase;
+  ASession: ISessionContext): TCarregarOpcoesEmpresas;
 
 implementation
 
 uses
   System.SysUtils, System.Classes, System.Contnrs, EmpresaEtdUnit;
 
+// Le todas as empresas do cadastro e as permitidas ao login corrente e devolve
+// uma opcao por empresa, na ordem da lista total. O login e lido a cada chamada
+// porque o host pode trocar o usuario mantendo a janela viva. A falha de leitura
+// ou de montagem devolve False e nenhuma opcao parcial.
 function MontarOpcoesEmpresas(AListarEmpresas: ListarEmpresasUseCase;
   ASession: ISessionContext; out AOpcoes: TEmpresaOptions): Boolean;
 var
@@ -91,6 +89,9 @@ begin
   end;
 end;
 
+// Zera as marcas recebidas e marca somente os vinculos gravados. A permissao
+// apenas habilita a troca: um vinculo sem permissao continua marcado e
+// bloqueado. Sem vinculos, todas as empresas ficam desmarcadas.
 procedure MarcarEmpresasVinculadas(var AOpcoes: TEmpresaOptions;
   const AEmpresasVinculadas: TArrayInteger);
 var
@@ -107,6 +108,22 @@ begin
         Break;
       end;
   end;
+end;
+
+function CriarCarregadorEmpresas(AListarEmpresas: ListarEmpresasUseCase;
+  ASession: ISessionContext): TCarregarOpcoesEmpresas;
+begin
+  Result :=
+    function(APreparacao: TPreparacaoEmpresas;
+      const AEmpresasVinculadas: TArrayInteger;
+      out AOpcoes: TEmpresaOptions): Boolean
+    begin
+      Result := MontarOpcoesEmpresas(AListarEmpresas, ASession, AOpcoes);
+      if not Result then
+        Exit;
+      if APreparacao = peAlteracao then
+        MarcarEmpresasVinculadas(AOpcoes, AEmpresasVinculadas);
+    end;
 end;
 
 end.

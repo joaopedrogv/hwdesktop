@@ -5,24 +5,23 @@ interface
 uses
   AuthorizationService, RemoverGrupoFiscalUseCaseUnit, GruposFiscaisView,
   SalvarGrupoFiscalUseCaseUnit, ObterGruposFiscaisUseCaseUnit,
-  ListarEmpresasUseCaseUnit, ISessionContextUnit,
-  GrupoFiscalEtdUnit, EmpresaOption, EmpresaOptionsBuilder, TipoComunsUnit,
+  GrupoFiscalEtdUnit,
   NextQueryDefinition, GruposFiscaisQueryDefinition, PresenterConsultaBase;
 
 type
   // Apresentador da consulta, da inclusao e da alteracao de Grupos Fiscais.
   // Encaminha a leitura para a consulta injetada, verifica a autorizacao antes
-  // das operacoes e executa a remocao logica, o carregamento e a gravacao. A
-  // inclusao e uma unica chamada: reapresenta a aba existente ou autoriza,
-  // carrega as empresas e entrega as opcoes a tela, que cria o rascunho da aba.
-  // A alteracao tambem e uma unica chamada: identifica a linha corrente,
-  // reapresenta a aba existente ou autoriza, carrega o registro e entrega o
-  // grupo a tela, que monta o rascunho da aba.
+  // das operacoes e executa a remocao logica, o carregamento e a gravacao.
+  // A inclusao reapresenta a aba existente ou autoriza e entrega a abertura a
+  // tela, que prepara o rascunho e carrega as empresas na propria aba. A
+  // alteracao identifica a linha corrente, reapresenta a aba existente ou
+  // autoriza, carrega o registro e delega a tela a preparacao da aba e das
+  // empresas.
   // As mensagens e os erros de campo sao apresentados pela view recebida no
   // construtor; a negativa ou o cancelamento ja apresentado pelo legado e a
   // indisponibilidade comunicada pelo proprio servico de autorizacao nao sao
-  // repetidos. Delega a leitura das empresas a preparacao compartilhada, que le
-  // o login a cada operacao, e encaminha o resultado de validacao do caso de uso.
+  // repetidos. O resultado de validacao do caso de uso volta para a aba que
+  // iniciou a gravacao.
   TGruposFiscaisPresenter = class(TPresenterConsultaBase)
   private
     // A view pertence a tela e as demais dependencias ao container de
@@ -31,36 +30,24 @@ type
     FQueryDefinition: INextQueryDefinition<TGrupoSelecionado>;
     FRemoverGrupoFiscal: IRemoverGrupoFiscalUseCase;
     FSalvarGrupoFiscal: ISalvarGrupoFiscalUseCase;
-    FListarEmpresas: ListarEmpresasUseCase;
     FObterGrupoFiscal: ObterGrupoFiscalPorIdUseCase;
-    FSession: ISessionContext;
-    // Le as empresas da inclusao com o login atual e avisa a falha na propria
-    // tela, porque a inclusao nao tem outra mensagem para essa leitura.
-    function CarregarEmpresas(out AOpcoes: TEmpresaOptions): Boolean;
-    // Acrescenta as marcas dos vinculos gravados as opcoes recebidas e deixa a
-    // falha de leitura para quem chamou.
-    function CarregarEmpresasAlteracao(
-      const AEmpresasVinculadas: TArrayInteger;
-      out AOpcoes: TEmpresaOptions): Boolean;
   public
     constructor Create(AView: IGruposFiscaisView;
       AQueryDefinition: INextQueryDefinition<TGrupoSelecionado>;
       AAuthorization: IAuthorizationService;
       ARemoverGrupoFiscal: IRemoverGrupoFiscalUseCase;
       ASalvarGrupoFiscal: ISalvarGrupoFiscalUseCase;
-      AListarEmpresas: ListarEmpresasUseCase;
-      AObterGrupoFiscal: ObterGrupoFiscalPorIdUseCase;
-      ASession: ISessionContext);
+      AObterGrupoFiscal: ObterGrupoFiscalPorIdUseCase);
     function EnviarParaLixeira(): Boolean;
-    // Reapresenta a aba de inclusao quando ela ja existe; caso contrario
-    // autoriza a inclusao, carrega as empresas e entrega as opcoes para a nova
-    // aba, que cria o proprio rascunho. A negativa da autorizacao ou a falha na
-    // leitura das empresas ja foi apresentada e interrompe a operacao.
+    // Reapresenta a aba de inclusao quando ela ja existe; caso contrario autoriza
+    // a inclusao e entrega a abertura para a nova aba, que cria o proprio
+    // rascunho e carrega as empresas. A negativa da autorizacao ja foi
+    // apresentada e interrompe a operacao.
     function CarregarParaInclusao(): Boolean;
     // Reapresenta a aba da linha corrente quando ela ja existe; caso contrario
-    // autoriza a alteracao, carrega o registro e as empresas e entrega o grupo
-    // para a nova aba. Sem linha valida a view informa que a selecao e
-    // obrigatoria e a operacao nao prossegue.
+    // autoriza a alteracao, carrega o registro e entrega o grupo para a nova
+    // aba, que prepara o rascunho e os vinculos das empresas. Sem linha valida a
+    // view informa que a selecao e obrigatoria e a operacao nao prossegue.
     function CarregarParaEdicao(): Boolean;
     function Salvar(const ARascunho: GrupoFiscalEtd): Boolean;
   end;
@@ -81,11 +68,6 @@ const
   ProcessoExclusao    = 'MOD012';
   TabelaGruposFiscais = 'GRUPOS_FISCAIS';
 
-  // Mensagens repetidas na mesma operacao.
-  EmpresasFalhaMessage =
-    'Não foi possível carregar as empresas para a inclusão.';
-  EmpresasAlteracaoFalhaMessage =
-    'Não foi possível carregar as empresas para a alteração.';
   SelecaoObrigatoriaMessage = 'Selecione um grupo fiscal na grade.';
 
 { TGruposFiscaisPresenter }
@@ -95,9 +77,7 @@ constructor TGruposFiscaisPresenter.Create(AView: IGruposFiscaisView;
   AAuthorization: IAuthorizationService;
   ARemoverGrupoFiscal: IRemoverGrupoFiscalUseCase;
   ASalvarGrupoFiscal: ISalvarGrupoFiscalUseCase;
-  AListarEmpresas: ListarEmpresasUseCase;
-  AObterGrupoFiscal: ObterGrupoFiscalPorIdUseCase;
-  ASession: ISessionContext);
+  AObterGrupoFiscal: ObterGrupoFiscalPorIdUseCase);
 begin
   // O processo de pesquisa e a tabela padrao ficam na base, que tambem responde
   // pela permissao da consulta. As demais operacoes informam o proprio processo
@@ -111,20 +91,14 @@ begin
     raise Exception.Create('O caso de uso de remoção de Grupos Fiscais não foi informado.');
   if ASalvarGrupoFiscal = nil then
     raise Exception.Create('O caso de uso de gravação de Grupos Fiscais não foi informado.');
-  if AListarEmpresas = nil then
-    raise Exception.Create('A consulta de empresas não foi informada.');
   if AObterGrupoFiscal = nil then
     raise Exception.Create('O caso de uso de carregamento de Grupos Fiscais não foi informado.');
-  if ASession = nil then
-    raise Exception.Create('A sessão de Grupos Fiscais não foi informada.');
 
   FView := AView;
   FQueryDefinition := AQueryDefinition;
   FRemoverGrupoFiscal := ARemoverGrupoFiscal;
   FSalvarGrupoFiscal := ASalvarGrupoFiscal;
-  FListarEmpresas := AListarEmpresas;
   FObterGrupoFiscal := AObterGrupoFiscal;
-  FSession := ASession;
 end;
 
 function TGruposFiscaisPresenter.EnviarParaLixeira(): Boolean;
@@ -161,13 +135,11 @@ begin
 end;
 
 function TGruposFiscaisPresenter.CarregarParaInclusao: Boolean;
-var
-  Opcoes: TEmpresaOptions;
 begin
   Result := False;
 
-  // Aba ja aberta: reapresenta o rascunho existente, sem nova autorizacao e
-  // sem recarregar as empresas.
+  // Aba ja aberta: reapresenta o rascunho existente, sem nova autorizacao e sem
+  // nova carga de empresas.
   if FView.AtivarInclusao then
   begin
     Result := True;
@@ -178,11 +150,9 @@ begin
   if not Autorizar(ProcessoInclusao, aaInserir) then
     Exit;
 
-  // Sem as empresas nao ha o que incluir; o aviso ja foi apresentado.
-  if not CarregarEmpresas(Opcoes) then
-    Exit;
-
-  Result := FView.AbrirInclusao(Opcoes);
+  // A aba carrega as empresas ao ser preparada; a falha descarta a aba parcial
+  // e e informada uma unica vez pela propria tela.
+  Result := FView.AbrirInclusao;
 end;
 
 function TGruposFiscaisPresenter.CarregarParaEdicao: Boolean;
@@ -190,7 +160,6 @@ var
   Selected: TGrupoSelecionado;
   Id: string;
   Carregado: GrupoFiscalEtd;
-  Opcoes: TEmpresaOptions;
 begin
   Result := False;
 
@@ -240,12 +209,9 @@ begin
         Exit;
       end;
 
-      if not CarregarEmpresasAlteracao(Carregado.EmpresasId, Opcoes) then
-        Exit;
-
       // A view copia o grupo para o rascunho da aba; a entidade continua
       // pertencendo a este metodo e e liberada no finally.
-      Result := FView.AbrirEdicao(Id, Carregado, Opcoes);
+      Result := FView.AbrirEdicao(Id, Carregado);
     except
       on E: EValidacaoNegocio do
         FView.ShowError(E.Message);
@@ -256,29 +222,6 @@ begin
   finally
     Carregado.Free;
   end;
-end;
-
-function TGruposFiscaisPresenter.CarregarEmpresas(
-  out AOpcoes: TEmpresaOptions): Boolean;
-begin
-  // Na inclusao a mensagem e unica para qualquer falha de leitura.
-  Result := MontarOpcoesEmpresas(FListarEmpresas, FSession, AOpcoes);
-  if not Result then
-    FView.ShowWarning(EmpresasFalhaMessage);
-end;
-
-function TGruposFiscaisPresenter.CarregarEmpresasAlteracao(
-  const AEmpresasVinculadas: TArrayInteger;
-  out AOpcoes: TEmpresaOptions): Boolean;
-begin
-  Result := MontarOpcoesEmpresas(FListarEmpresas, FSession, AOpcoes);
-  if not Result then
-  begin
-    FView.ShowWarning(EmpresasAlteracaoFalhaMessage);
-    Exit;
-  end;
-
-  MarcarEmpresasVinculadas(AOpcoes, AEmpresasVinculadas);
 end;
 
 function TGruposFiscaisPresenter.Salvar(

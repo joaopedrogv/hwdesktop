@@ -10,10 +10,10 @@ uses
 
 type
   // Editor dos campos do grupo fiscal. O frame apresenta e coleta descricao,
-  // tipo de tributo e empresas e e o dono do rascunho da aba: a autorizacao, a
-  // gravacao e a troca de sessao pertencem ao formulario que o contem. Os erros
-  // do caso de uso sao apresentados pelo painel comum, que agrupa as mensagens
-  // por campo.
+  // tipo de tributo e empresas, carrega as empresas na preparacao da aba e e o
+  // dono do rascunho: a autorizacao, a gravacao e a troca de sessao pertencem
+  // ao formulario que o contem. Os erros do caso de uso sao apresentados pelo
+  // painel comum, que agrupa as mensagens por campo.
   TfrmGrupoFiscalCadastroFrame = class(TFrame, IEditorCadastro)
     lblDescricao: TLabel;
     edDescricao: TEdit;
@@ -37,15 +37,19 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    // Reinicia o frame para uma inclusao: descarta o rascunho anterior, cria o
-    // novo e entrega as opcoes ao seletor de empresas.
-    procedure PrepararInclusao(const AOpcoes: TEmpresaOptions);
+    // Recebe o carregamento das empresas. A composicao chama logo apos criar o
+    // frame; o seletor le o login vigente a cada carga.
+    procedure ConfigurarCarregamentoEmpresas(
+      const ACarregar: TCarregarOpcoesEmpresas);
+    // Reinicia o frame para uma inclusao: descarta o rascunho anterior, limpa os
+    // campos e carrega as empresas permitidas no seletor. Devolve False quando a
+    // carga falha; o frame nao apresenta mensagem e nao deixa rascunho.
+    function PrepararInclusao: Boolean;
     // Prepara a alteracao de um grupo existente. A entidade recebida nao e
     // assumida: o frame guarda um clone com empresas independentes. O tipo
     // permanece bloqueado e as empresas vinculadas iniciam marcadas, inclusive
-    // as que o usuario nao pode habilitar.
-    procedure PrepararAlteracao(const AGrupo: GrupoFiscalEtd;
-      const AOpcoes: TEmpresaOptions);
+    // as que o usuario nao pode habilitar. Devolve False quando a carga falha.
+    function PrepararAlteracao(const AGrupo: GrupoFiscalEtd): Boolean;
     // Transfere os campos editados para o rascunho da aba. Nao grava: a
     // gravacao pertence ao formulario. Retorna False quando nao ha rascunho.
     function AplicarCamposAoRascunho: Boolean;
@@ -124,22 +128,39 @@ begin
   fraEmpresas.Limpar;
 end;
 
-procedure TfrmGrupoFiscalCadastroFrame.PrepararInclusao(
-  const AOpcoes: TEmpresaOptions);
+procedure TfrmGrupoFiscalCadastroFrame.ConfigurarCarregamentoEmpresas(
+  const ACarregar: TCarregarOpcoesEmpresas);
 begin
-  FreeAndNil(FRascunho);
-  FRascunho := GrupoFiscalEtd.Create;
-  LimparCampos;
-  LimparValidacao;
-  fraEmpresas.Configurar(AOpcoes);
+  // O seletor e um filho do DFM: o frame repassa a configuracao para nao expor
+  // o controle nem exigir evento no formulario.
+  fraEmpresas.ConfigurarCarregamento(ACarregar);
 end;
 
-procedure TfrmGrupoFiscalCadastroFrame.PrepararAlteracao(
-  const AGrupo: GrupoFiscalEtd;
-  const AOpcoes: TEmpresaOptions);
+function TfrmGrupoFiscalCadastroFrame.PrepararInclusao: Boolean;
+begin
+  Result := False;
+
+  FreeAndNil(FRascunho);
+  // Limpar os campos tambem limpa o seletor; a carga vem depois para nao ser
+  // apagada por esse reinicio.
+  LimparCampos;
+  LimparValidacao;
+
+  // Sem empresas nao ha inclusao: o formulario descarta a aba e apresenta o
+  // aviso. O rascunho so nasce com a lista carregada.
+  if not fraEmpresas.CarregarInclusao then
+    Exit;
+
+  FRascunho := GrupoFiscalEtd.Create;
+  Result := True;
+end;
+
+function TfrmGrupoFiscalCadastroFrame.PrepararAlteracao(
+  const AGrupo: GrupoFiscalEtd): Boolean;
 var
   Copia: GrupoFiscalEtd;
 begin
+  Result := False;
   if AGrupo = nil then
     raise Exception.Create(RascunhoNaoInformadoMessage);
 
@@ -157,15 +178,24 @@ begin
   FRascunho := Copia;
 
   LimparCampos;
+  LimparValidacao;
+
+  // Os vinculos gravados vem do rascunho: a lista marca inclusive os itens
+  // bloqueados e, sem vinculos, comeca toda desmarcada.
+  if not fraEmpresas.CarregarAlteracao(FRascunho.EmpresasId) then
+  begin
+    // Nenhum estado parcial sobrevive: o formulario descarta a aba.
+    FreeAndNil(FRascunho);
+    LimparCampos;
+    Exit;
+  end;
+
   Descricao := FRascunho.Descricao;
   TipoTributo := FRascunho.TipoTributo;
 
   // O tipo de tributo nao e alteravel: o campo apenas apresenta o valor gravado.
-  // A lista recebida marca as empresas vinculadas e desabilita as que o usuario
-  // nao pode habilitar.
   cbTipoTributo.Enabled := False;
-  LimparValidacao;
-  fraEmpresas.Configurar(AOpcoes);
+  Result := True;
 end;
 
 function TfrmGrupoFiscalCadastroFrame.AplicarCamposAoRascunho: Boolean;

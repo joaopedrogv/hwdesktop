@@ -12,17 +12,18 @@ function NextViewCreate(const AIdentifier: string; AParent: HWND): TfrmNextBase;
 implementation
 
 uses
-  System.SysUtils, NextViewRegistry,
+  Vcl.Controls, System.SysUtils, NextViewRegistry,
   EventosRtcForm, EventosRtcQueryDefinition, GruposFiscaisForm,
   OperacoesFiscaisIbsCbsForm, OperacoesFiscaisIbsCbsQueryDefinition,
   LocalPreferences,
   WindowsRegistryLocalPreferences, ColumnLayoutPreferences,
   ColumnLayoutPreferencesRepository, StandardQueryFilterDefinition,
   QueryResultOperations, IDataSetReaderUnit,
-  NextSetup, GruposFiscaisPresenter,
+  NextSetup, GruposFiscaisPresenter, EditorCadastro,
   AuthorizationService, RemoverGrupoFiscalUseCaseUnit,
   SalvarGrupoFiscalUseCaseUnit, ListarEmpresasUseCaseUnit,
-  ObterGruposFiscaisUseCaseUnit,
+  ObterGruposFiscaisUseCaseUnit, EmpresaOption, EmpresaOptionsBuilder,
+  ISessionContextUnit, GrupoFiscalCadastroFrame,
   GruposFiscaisQueryDefinition, NextQueryDefinition, PresenterConsultaBase;
 
 var
@@ -129,22 +130,43 @@ var
   Preferences: ILocalPreferences;
   Presenter: TGruposFiscaisPresenter;
   Definitions: INextQueryDefinition<TGrupoSelecionado>;
+  ListarEmpresas: ListarEmpresasUseCase;
+  Sessao: ISessionContext;
+  CarregarOpcoes: TCarregarOpcoesEmpresas;
+  CriarEditor: TCriarEditorCadastro;
 begin
   Preferences := TWindowsRegistryLocalPreferences.Create;
 
   View := TfrmGruposFiscais.CreateParented(AParent);
   try
     Definitions := NextSetupInstance.Resolve<INextQueryDefinition<TGrupoSelecionado>>;
-    // O apresentador recebe a tela como view; as demais dependencias continuam
-    // vindo do container do Setup. A mesma definicao e entregue a tela, que
-    // permanece responsavel pelo resultado apresentado.
+
+    // A leitura das empresas e da sessao pertence a composicao: as duas
+    // dependencias sao resolvidas uma unica vez e o login e lido a cada carga.
+    ListarEmpresas := NextSetupInstance.Resolve<ListarEmpresasUseCase>;
+    Sessao := NextSetupInstance.SessionContext;
+
+    CarregarOpcoes := CriarCarregadorEmpresas(ListarEmpresas, Sessao);
+
+    // Cada aba recebe um editor novo, dono do proprio rascunho e da propria
+    // lista. A funcao nao guarda a aba nem o frame.
+    CriarEditor :=
+      function(const AChave: string; AControlePai: TWinControl): TWinControl
+      begin
+        Result := TfrmGrupoFiscalCadastroFrame.Create(AControlePai);
+        TfrmGrupoFiscalCadastroFrame(Result).ConfigurarCarregamentoEmpresas(
+          CarregarOpcoes);
+      end;
+
+    // A tela precisa do editor antes do apresentador: a primeira abertura de aba
+    // usa a funcao ja configurada.
+    View.ConfigurarCriacaoEditor(CriarEditor);
+
     Presenter := TGruposFiscaisPresenter.Create(View, Definitions,
       NextSetupInstance.Resolve<IAuthorizationService>,
       NextSetupInstance.Resolve<IRemoverGrupoFiscalUseCase>,
       NextSetupInstance.Resolve<ISalvarGrupoFiscalUseCase>,
-      NextSetupInstance.Resolve<ListarEmpresasUseCase>,
-      NextSetupInstance.Resolve<ObterGrupoFiscalPorIdUseCase>,
-      NextSetupInstance.SessionContext);
+      NextSetupInstance.Resolve<ObterGrupoFiscalPorIdUseCase>);
     try
       View.AttachPresenter(Presenter, Definitions, 'Grupos Fiscais');
     except

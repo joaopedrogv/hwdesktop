@@ -3,7 +3,7 @@ unit EditorCadastro;
 interface
 
 uses
-  ValidationEntityOutputUnit;
+  Vcl.Controls, ValidationEntityOutputUnit;
 
 type
   // Contrato comum do editor de uma aba de cadastro da ConsultaBase. A base
@@ -21,6 +21,12 @@ type
     // da propria aba.
     procedure ShowValidation(const AValidacao: ValidationEntityOutput);
   end;
+
+  // Cria o editor de uma aba de cadastro e o entrega pronto para a preparacao.
+  // AParent e a area de rolagem que passa a possuir o controle; devolver nil
+  // recusa a aba. A funcao nao retem a aba nem o editor.
+  TCriarEditorCadastro = reference to function(const AChave: string;
+    AParent: TWinControl): TWinControl;
 
 implementation
 

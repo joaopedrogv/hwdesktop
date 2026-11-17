@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, ConsultaBaseForm, PresenterConsultaBase,
   GruposFiscaisPresenter, GruposFiscaisView, NextQueryDefinition,
   GruposFiscaisQueryDefinition,
-  GrupoFiscalEtdUnit, GrupoFiscalCadastroFrame, EmpresaOption,
+  GrupoFiscalEtdUnit, GrupoFiscalCadastroFrame, EditorCadastro,
   ValidationEntityOutputUnit;
 
 type
@@ -22,6 +22,10 @@ type
     // Contrato tipado da consulta: entrega o identificador da linha corrente
     // usado por Alterar e Lixeira.
     FDefinicaoSelecao: INextQueryDefinition<TGrupoSelecionado>;
+    // Funcao de composicao que cria e configura o editor de cada aba. A tela
+    // nao conhece as dependencias do editor e nao guarda aba, frame nem
+    // rascunho.
+    FCriarEditorAba: TCriarEditorCadastro;
     // Acesso tipado ao apresentador que a base possui e libera: esta tela nao
     // responde pela liberacao nem assume posse dele.
     function Presenter: TGruposFiscaisPresenter;
@@ -54,16 +58,19 @@ type
     // e a alteracao segue para a autorizacao e a carga.
     function AtivarEdicao(const AChave: string): Boolean;
     // Abre a aba da chave e copia o grupo carregado para o rascunho do editor.
-    // A entidade continua pertencendo a quem chamou. A falha de montagem e
+    // A entidade continua pertencendo a quem chamou. A falha de preparacao e
     // informada uma unica vez.
-    function AbrirEdicao(const AChave: string; const AGrupo: GrupoFiscalEtd;
-      const AOpcoes: TEmpresaOptions): Boolean;
+    function AbrirEdicao(const AChave: string;
+      const AGrupo: GrupoFiscalEtd): Boolean;
     // Reapresenta a aba de inclusao ja aberta. Sem aba, nada e criado e a
-    // inclusao segue para a autorizacao e a carga das empresas.
+    // inclusao segue para a autorizacao e a preparacao da aba.
     function AtivarInclusao: Boolean;
-    // Abre uma nova aba de inclusao e copia as opcoes para o editor, que cria o
-    // proprio rascunho. A falha de montagem e informada uma unica vez.
-    function AbrirInclusao(const AOpcoes: TEmpresaOptions): Boolean;
+    // Abre uma nova aba de inclusao; o editor cria o proprio rascunho e carrega
+    // as empresas na preparacao. A falha e informada uma unica vez.
+    function AbrirInclusao: Boolean;
+    // Recebe a funcao de composicao que cria e configura o editor de cada aba.
+    // Chamada pela composicao antes de AttachPresenter.
+    procedure ConfigurarCriacaoEditor(const ACriarEditor: TCriarEditorCadastro);
     procedure AttachPresenter(APresenter: TGruposFiscaisPresenter;
       const ADefinition: INextQueryDefinitionBase; const ATitle: string);
   end;
@@ -75,6 +82,8 @@ implementation
 const
   MissingPresenterMessage = 'O apresentador de Grupos Fiscais nao foi informado.';
   MissingDefinitionMessage = 'A definicao da consulta nao foi informada.';
+  MissingEditorFactoryMessage =
+    'A criacao do editor de Grupos Fiscais nao foi informada.';
 
 procedure TfrmGruposFiscais.AttachPresenter(APresenter: TGruposFiscaisPresenter;
   const ADefinition: INextQueryDefinitionBase; const ATitle: string);
@@ -133,12 +142,22 @@ begin
     (Trim(Selecionado.Id) <> '');
 end;
 
+procedure TfrmGruposFiscais.ConfigurarCriacaoEditor(
+  const ACriarEditor: TCriarEditorCadastro);
+begin
+  if not Assigned(ACriarEditor) then
+    raise Exception.Create(MissingEditorFactoryMessage);
+  FCriarEditorAba := ACriarEditor;
+end;
+
 function TfrmGruposFiscais.CriarEditor(const AChave: string;
   AParent: TWinControl): TWinControl;
 begin
-  // Cada aba recebe o proprio frame, dono do rascunho correspondente. A base
-  // define Parent e Align e libera o editor junto com a aba.
-  Result := TfrmGrupoFiscalCadastroFrame.Create(AParent);
+  // Cada aba recebe o proprio frame, dono do rascunho e da propria lista de
+  // empresas. A base define Parent e Align e libera o editor junto com a aba.
+  if not Assigned(FCriarEditorAba) then
+    raise Exception.Create(MissingEditorFactoryMessage);
+  Result := FCriarEditorAba(AChave, AParent);
 end;
 
 function TfrmGruposFiscais.SalvarAba(const AChave: string;
@@ -180,12 +199,11 @@ begin
 end;
 
 function TfrmGruposFiscais.AbrirEdicao(const AChave: string;
-  const AGrupo: GrupoFiscalEtd;
-  const AOpcoes: TEmpresaOptions): Boolean;
+  const AGrupo: GrupoFiscalEtd): Boolean;
 var
   Titulo: string;
   Grupo: GrupoFiscalEtd;
-  Opcoes: TEmpresaOptions;
+  CargaFalhou: Boolean;
 begin
   Result := False;
   if AGrupo = nil then
@@ -194,17 +212,25 @@ begin
   // O titulo usa a descricao antes de o frame clonar a entidade recebida.
   Titulo := 'Alterar - ' + AGrupo.Descricao;
 
-  // O frame copia o grupo e as opcoes durante a abertura; o apresentador libera
-  // a entidade original no finally.
+  // O frame copia o grupo durante a abertura; o apresentador libera a entidade
+  // original no finally.
   Grupo := AGrupo;
-  Opcoes := AOpcoes;
+  CargaFalhou := False;
   Result := AbrirAba(AChave, Titulo,
     procedure(AEditor: TWinControl)
     begin
-      TfrmGrupoFiscalCadastroFrame(AEditor).PrepararAlteracao(Grupo, Opcoes);
+      if TfrmGrupoFiscalCadastroFrame(AEditor).PrepararAlteracao(Grupo) then
+        Exit;
+      CargaFalhou := True;
+      Abort;
     end);
 
-  if not Result then
+  if Result then
+    Exit;
+
+  if CargaFalhou then
+    ShowWarning('Não foi possível carregar as empresas para a alteração.')
+  else
     ShowError('Não foi possível iniciar a alteração do grupo fiscal.');
 end;
 
@@ -215,20 +241,30 @@ begin
   Result := TryAtivarAba(ChaveAbaInclusao);
 end;
 
-function TfrmGruposFiscais.AbrirInclusao(
-  const AOpcoes: TEmpresaOptions): Boolean;
+function TfrmGruposFiscais.AbrirInclusao: Boolean;
 var
-  Opcoes: TEmpresaOptions;
+  CargaFalhou: Boolean;
 begin
-  // O editor copia as opcoes durante a abertura e cria o proprio rascunho.
-  Opcoes := AOpcoes;
+  // A carga das empresas pertence ao editor e roda na preparacao da aba. A
+  // falha e registrada aqui para que o aviso especifico apareca uma unica vez.
+  CargaFalhou := False;
   Result := AbrirAba(ChaveAbaInclusao, 'Inclusão',
     procedure(AEditor: TWinControl)
     begin
-      TfrmGrupoFiscalCadastroFrame(AEditor).PrepararInclusao(Opcoes);
+      // Abort interrompe a montagem; a base descarta a aba parcial e devolve
+      // False sem apresentar mensagem.
+      if TfrmGrupoFiscalCadastroFrame(AEditor).PrepararInclusao then
+        Exit;
+      CargaFalhou := True;
+      Abort;
     end);
 
-  if not Result then
+  if Result then
+    Exit;
+
+  if CargaFalhou then
+    ShowWarning('Não foi possível carregar as empresas para a inclusão.')
+  else
     ShowError('Não foi possível iniciar a inclusão do grupo fiscal.');
 end;
 
