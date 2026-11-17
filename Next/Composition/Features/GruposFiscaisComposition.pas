@@ -49,25 +49,20 @@ begin
           CarregarOpcoes);
       end;
 
-    // A tela precisa do editor antes do apresentador: a primeira abertura de aba
-    // usa a funcao ja configurada.
-    View.ConfigurarCriacaoEditor(CriarEditor);
-
     Presenter := TGruposFiscaisPresenter.Create(View, Definitions,
       NextSetupInstance.Resolve<IAuthorizationService>,
       NextSetupInstance.Resolve<IRemoverGrupoFiscalUseCase>,
       NextSetupInstance.Resolve<ISalvarGrupoFiscalUseCase>,
       NextSetupInstance.Resolve<ObterGrupoFiscalPorIdUseCase>);
     try
-      View.AttachPresenter(Presenter, Definitions, 'Grupos Fiscais');
+      // A tela configura a criacao do editor, associa a definicao, configura os
+      // filtros e so entao assume a posse do apresentador; uma falha antes disso
+      // mantem a posse aqui.
+      View.ConfigurarTela(Definitions, Presenter, Preferences, CriarEditor);
     except
-      // Associacao recusada: a tela nao assumiu a posse.
       Presenter.Free;
       raise;
     end;
-
-    View.ConfigureFilters(Definitions.FiltersDef, Preferences,
-      Definitions.QueryId);
 
     Result := View;
   except

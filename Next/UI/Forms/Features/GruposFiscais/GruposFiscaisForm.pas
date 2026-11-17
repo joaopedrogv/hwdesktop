@@ -6,6 +6,7 @@ uses
   Winapi.Windows, System.SysUtils,
   Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, ConsultaBaseForm, PresenterConsultaBase,
   GruposFiscaisPresenter, GruposFiscaisView, NextQueryDefinition,
+  LocalPreferences,
   GruposFiscaisQueryDefinition,
   GrupoFiscalEtdUnit, GrupoFiscalCadastroFrame, EditorCadastro,
   ValidationEntityOutputUnit;
@@ -29,6 +30,10 @@ type
     // Acesso tipado ao apresentador que a base possui e libera: esta tela nao
     // responde pela liberacao nem assume posse dele.
     function Presenter: TGruposFiscaisPresenter;
+    // Recebe a funcao de composicao que cria e configura o editor de cada aba.
+    // Executada por ConfigurarTela antes da primeira abertura e da posse do
+    // apresentador.
+    procedure ConfigurarCriacaoEditor(const ACriarEditor: TCriarEditorCadastro);
   protected
     // Liga as acoes padrao da consulta aos metodos do apresentador depois que a
     // base aceitou a definicao e antes de assumir a posse.
@@ -68,11 +73,13 @@ type
     // Abre uma nova aba de inclusao; o editor cria o proprio rascunho e carrega
     // as empresas na preparacao. A falha e informada uma unica vez.
     function AbrirInclusao: Boolean;
-    // Recebe a funcao de composicao que cria e configura o editor de cada aba.
-    // Chamada pela composicao antes de AttachPresenter.
-    procedure ConfigurarCriacaoEditor(const ACriarEditor: TCriarEditorCadastro);
-    procedure AttachPresenter(APresenter: TGruposFiscaisPresenter;
-      const ADefinition: INextQueryDefinitionBase; const ATitle: string);
+    // Unica entrada da configuracao inicial: associa a definicao, configura a
+    // criacao do editor e os filtros e entrega o apresentador a base por ultimo.
+    procedure ConfigurarTela(
+      const ADefinition: INextQueryDefinition<TGrupoSelecionado>;
+      const APresenter: TGruposFiscaisPresenter;
+      const APreferences: ILocalPreferences;
+      const ACriarEditor: TCriarEditorCadastro);
   end;
 
 implementation
@@ -85,23 +92,32 @@ const
   MissingEditorFactoryMessage =
     'A criacao do editor de Grupos Fiscais nao foi informada.';
 
-procedure TfrmGruposFiscais.AttachPresenter(APresenter: TGruposFiscaisPresenter;
-  const ADefinition: INextQueryDefinitionBase; const ATitle: string);
+procedure TfrmGruposFiscais.ConfigurarTela(
+  const ADefinition: INextQueryDefinition<TGrupoSelecionado>;
+  const APresenter: TGruposFiscaisPresenter;
+  const APreferences: ILocalPreferences;
+  const ACriarEditor: TCriarEditorCadastro);
+const
+  QueryTitle = 'Grupos Fiscais';
 begin
   if APresenter = nil then
     raise Exception.Create(MissingPresenterMessage);
   if ADefinition = nil then
     raise Exception.Create(MissingDefinitionMessage);
 
-  // A base recebe a definicao, registra os comandos desta tela e passa a possuir
-  // o apresentador; esta tela o acessa pelo getter tipado.
-  AssociarPresenter(APresenter, ADefinition, ATitle);
+  // A definicao, a fabrica do editor e os filtros precisam existir antes da
+  // posse: a primeira abertura de aba ja usa a fabrica configurada e o
+  // apresentador so passa a pertencer a tela em AssociarPresenter.
+  Attach(ADefinition, QueryTitle);
+  ConfigurarCriacaoEditor(ACriarEditor);
+  ConfigureFilters(ADefinition.FiltersDef, APreferences, ADefinition.QueryId);
+  AssociarPresenter(APresenter);
 end;
 
 function TfrmGruposFiscais.Presenter: TGruposFiscaisPresenter;
 begin
-  // A instancia pertence a base; o valor e sempre o apresentador associado por
-  // AttachPresenter a esta tela.
+  // A instancia pertence a base; o valor e sempre o apresentador recebido por
+  // ConfigurarTela.
   Result := TGruposFiscaisPresenter(PresenterConsulta);
 end;
 

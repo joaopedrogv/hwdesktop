@@ -34,9 +34,7 @@ begin
       NextSetupInstance.Resolve<IColumnLayoutPreferences>,
       NextSetupInstance.SessionContext,
       View.IsOnlyAuthorizedNFe);
-    View.Attach(Definition, 'Eventos RTC');
-
-    View.ConfigureFilters(Definition.FiltersDef, Preferences, Definition.QueryId);
+    View.ConfigurarTela(Definition, Preferences);
 
     Result := View;
   except

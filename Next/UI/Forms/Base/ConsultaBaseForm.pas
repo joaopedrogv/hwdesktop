@@ -145,17 +145,30 @@ type
     procedure btnAlterarClick(Sender: TObject);
     procedure btnExcluirClick(Sender: TObject);
   protected
+    // Operacoes da configuracao inicial, expostas pela ConfigurarTela da tela
+    // concreta. A definicao e associada primeiro; os filtros e o editor de
+    // cadastro vem em seguida; a posse do apresentador e sempre a ultima etapa.
+    //
+    // Primeira etapa: recebe a definicao completa da consulta. Colunas e
+    // operacoes vem dela e o ciclo do leitor pertence a propria definicao.
+    procedure Attach(const ADefinition: INextQueryDefinitionBase;
+      const ATitle: string; AQuickFilterEnabled: Boolean = False); overload;
+    // Segunda etapa: recebe a definicao de filtros, as preferencias locais e a
+    // identidade estavel da tela. Configura a instancia inline de fraFiltros
+    // somente quando chamado; telas sem filtros mantem o frame oculto e
+    // pesquisam sem criterios.
+    procedure ConfigureFilters(const ADefinition: TFilterDefinition;
+      const APreferences: ILocalPreferences; const AIdentity: string);
+    // Etapa final: associa o apresentador da funcionalidade. Exige a definicao
+    // ja associada; o gancho da tela roda antes da posse. Ate a atribuicao a
+    // composicao continua dona do apresentador e o libera se a associacao for
+    // recusada.
+    procedure AssociarPresenter(APresenter: TPresenterConsultaBase);
     // Permite que a tela filha interrompa a pesquisa antes de limpar o
     // resultado ou criar um novo leitor. A validacao dos filtros ocorre antes.
     // A base pede a autorizacao ao apresentador associado; telas sem
     // apresentador pesquisam sem ela.
     function CanPesquisar: Boolean; virtual;
-    // Associa a definicao e o apresentador da funcionalidade. Attach e o gancho
-    // da tela acontecem antes da posse: ate a atribuicao, a composicao continua
-    // dona do apresentador e o libera se a associacao for recusada.
-    procedure AssociarPresenter(APresenter: TPresenterConsultaBase;
-      const ADefinition: INextQueryDefinitionBase; const ATitle: string;
-      AQuickFilterEnabled: Boolean = False);
     // Gancho executado depois de Attach e antes da posse do apresentador: a tela
     // registra os comandos, os contratos e as acoes que dependem da definicao e
     // do proprio apresentador, que ainda pertence a composicao.
@@ -244,15 +257,6 @@ type
     // A aba de cadastro ativa recebe o foco quando o editor consegue; caso
     // contrario o foco continua com o host.
     procedure FocusView; override;
-    // Recebe a definicao completa da consulta: colunas e operacoes vem dela e o
-    // ciclo do leitor pertence a propria definicao.
-    procedure Attach(const ADefinition: INextQueryDefinitionBase;
-      const ATitle: string; AQuickFilterEnabled: Boolean = False); overload;
-    // Recebe a definicao, as preferencias locais e a identidade estavel da tela.
-    // Configura a instancia inline de fraFiltros somente quando chamado; telas
-    // sem filtros mantem o frame oculto e pesquisam sem criterios.
-    procedure ConfigureFilters(const ADefinition: TFilterDefinition;
-      const APreferences: ILocalPreferences; const AIdentity: string);
   end;
 
 implementation
@@ -566,21 +570,17 @@ begin
   Result := (FPresenterConsulta = nil) or FPresenterConsulta.AutorizarPesquisa;
 end;
 
-procedure TfrmConsultaBase.AssociarPresenter(
-  APresenter: TPresenterConsultaBase;
-  const ADefinition: INextQueryDefinitionBase; const ATitle: string;
-  AQuickFilterEnabled: Boolean = False);
+procedure TfrmConsultaBase.AssociarPresenter(APresenter: TPresenterConsultaBase);
 begin
   if APresenter = nil then
     raise Exception.Create(MissingPresenterMessage);
-  if ADefinition = nil then
+  if FDefinition = nil then
     raise Exception.Create(MissingDefinitionMessage);
 
-  // Attach e o gancho da tela podem recusar a associacao e nao assumem posse
-  // alguma. A atribuicao abaixo e o ponto de transferencia: a partir dela a tela
-  // libera o apresentador, inclusive na destruicao.
-  Attach(ADefinition, ATitle, AQuickFilterEnabled);
-  ApresentadorAssociado(APresenter, ADefinition);
+  // O gancho da tela pode recusar a associacao e nao assume posse alguma. A
+  // atribuicao abaixo e o ponto de transferencia: a partir dela a tela libera o
+  // apresentador, inclusive na destruicao.
+  ApresentadorAssociado(APresenter, FDefinition);
 
   FPresenterConsulta := APresenter;
   try

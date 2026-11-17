@@ -41,15 +41,14 @@ begin
       NextSetupInstance.Resolve<IAuthorizationService>, 'MOD020',
       'OP_FISCAIS_IBSCBS');
     try
-      View.AttachPresenter(Presenter, Definition,
-        'Operações Fiscais IBS/CBS');
+      // A tela configura a definicao, os filtros e, por ultimo, assume a posse
+      // do apresentador; uma falha antes disso mantem a posse aqui.
+      View.ConfigurarTela(Definition, Presenter, Preferences);
     except
       // Associacao recusada: a tela nao assumiu a posse.
       Presenter.Free;
       raise;
     end;
-
-    View.ConfigureFilters(Definition.FiltersDef, Preferences, Definition.QueryId);
 
     Result := View;
   except
