@@ -12,7 +12,7 @@ function NextViewCreate(const AIdentifier: string; AParent: HWND): TfrmNextBase;
 implementation
 
 uses
-  Vcl.Controls, System.SysUtils, NextViewRegistry,
+  Vcl.Controls, System.SysUtils, NextViewRegistry, GruposFiscaisComposition,
   EventosRtcForm, EventosRtcQueryDefinition, GruposFiscaisForm,
   OperacoesFiscaisIbsCbsForm, OperacoesFiscaisIbsCbsQueryDefinition,
   LocalPreferences,
@@ -54,11 +54,11 @@ begin
     // grade o mantém enquanto a tela existir.
     LayoutPreferences := TColumnLayoutPreferencesRepository.Create(
       NextSetupInstance.Adapter, NextSetupInstance.SessionContext,
-      'next.rtc.events');
+      'rtc.events');
     View.AttachColumnLayout(LayoutPreferences);
 
     View.ConfigureFilters(Definition.FiltersDef, Preferences,
-      'next.rtc.events');
+      'rtc.events');
 
     Result := View;
   except
@@ -105,11 +105,11 @@ begin
     // identidade estavel da tela.
     LayoutPreferences := TColumnLayoutPreferencesRepository.Create(
       NextSetupInstance.Adapter, NextSetupInstance.SessionContext,
-      'next.operacoes.fiscais.ibscbs');
+      'operacoes.fiscais.ibscbs');
     View.AttachColumnLayout(LayoutPreferences);
 
     View.ConfigureFilters(Definition.FiltersDef, Preferences,
-      'next.operacoes.fiscais.ibscbs');
+      'operacoes.fiscais.ibscbs');
 
     Result := View;
   except
@@ -124,72 +124,11 @@ begin
   Result := FRegistry.CreateView(AIdentifier, AParent);
 end;
 
-function CreateGruposFiscaisView(AParent: HWND): TfrmNextBase;
-var
-  View: TfrmGruposFiscais;
-  Preferences: ILocalPreferences;
-  Presenter: TGruposFiscaisPresenter;
-  Definitions: INextQueryDefinition<TGrupoSelecionado>;
-  ListarEmpresas: ListarEmpresasUseCase;
-  Sessao: ISessionContext;
-  CarregarOpcoes: TCarregarOpcoesEmpresas;
-  CriarEditor: TCriarEditorCadastro;
-begin
-  Preferences := TWindowsRegistryLocalPreferences.Create;
-
-  View := TfrmGruposFiscais.CreateParented(AParent);
-  try
-    Definitions := NextSetupInstance.Resolve<INextQueryDefinition<TGrupoSelecionado>>;
-
-    // A leitura das empresas e da sessao pertence a composicao: as duas
-    // dependencias sao resolvidas uma unica vez e o login e lido a cada carga.
-    ListarEmpresas := NextSetupInstance.Resolve<ListarEmpresasUseCase>;
-    Sessao := NextSetupInstance.SessionContext;
-
-    CarregarOpcoes := CriarCarregadorEmpresas(ListarEmpresas, Sessao);
-
-    // Cada aba recebe um editor novo, dono do proprio rascunho e da propria
-    // lista. A funcao nao guarda a aba nem o frame.
-    CriarEditor :=
-      function(const AChave: string; AControlePai: TWinControl): TWinControl
-      begin
-        Result := TfrmGrupoFiscalCadastroFrame.Create(AControlePai);
-        TfrmGrupoFiscalCadastroFrame(Result).ConfigurarCarregamentoEmpresas(
-          CarregarOpcoes);
-      end;
-
-    // A tela precisa do editor antes do apresentador: a primeira abertura de aba
-    // usa a funcao ja configurada.
-    View.ConfigurarCriacaoEditor(CriarEditor);
-
-    Presenter := TGruposFiscaisPresenter.Create(View, Definitions,
-      NextSetupInstance.Resolve<IAuthorizationService>,
-      NextSetupInstance.Resolve<IRemoverGrupoFiscalUseCase>,
-      NextSetupInstance.Resolve<ISalvarGrupoFiscalUseCase>,
-      NextSetupInstance.Resolve<ObterGrupoFiscalPorIdUseCase>);
-    try
-      View.AttachPresenter(Presenter, Definitions, 'Grupos Fiscais');
-    except
-      // Associacao recusada: a tela nao assumiu a posse.
-      Presenter.Free;
-      raise;
-    end;
-
-    View.ConfigureFilters(Definitions.FiltersDef, Preferences, 'next.grupos.fiscais');
-
-    Result := View;
-  except
-    View.Free;
-    raise;
-  end;
-end;
-
 initialization
   FRegistry := TNextViewRegistry.Create;
-  FRegistry.Register('next.rtc.events', CreateEventosRtcView);
-  FRegistry.Register('next.operacoes.fiscais.ibscbs',
-    CreateOperacoesFiscaisIbsCbsView);
-  FRegistry.Register('next.grupos.fiscais', CreateGruposFiscaisView);
+  FRegistry.Register('rtc.events', CreateEventosRtcView);
+  FRegistry.Register('operacoes.fiscais.ibscbs', CreateOperacoesFiscaisIbsCbsView);
+  FRegistry.Register('grupos.fiscais', CreateGruposFiscaisView);
 
 finalization
   FRegistry.Free;

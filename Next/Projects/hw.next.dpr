@@ -51,7 +51,8 @@ uses
   AuthorizationService in '..\Contracts\AuthorizationService.pas',
   ColumnLayoutPreferences in '..\..\Modern\Core\Domain\Ports\Shared\ColumnLayoutPreferences.pas',
   ColumnLayoutPreferencesRepository in '..\..\Modern\Adapters\Secondary\Preferences\ColumnLayoutPreferencesRepository.pas',
-  GruposFiscaisQueryDefinition in '..\Queries\Features\GruposFiscais\GruposFiscaisQueryDefinition.pas';
+  GruposFiscaisQueryDefinition in '..\Queries\Features\GruposFiscais\GruposFiscaisQueryDefinition.pas',
+  GruposFiscaisComposition in '..\Composition\Features\GruposFiscaisComposition.pas';
 
 {$R *.res}
 

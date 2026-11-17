@@ -156,7 +156,6 @@
         <DCCReference Include="..\Composition\NextFeaturesComposition.pas"/>
         <DCCReference Include="..\..\Modern\Core\Domain\Ports\Shared\ISessionContextUnit.pas"/>
         <DCCReference Include="..\..\Modern\Core\Application\Contexts\SessionContextUnit.pas"/>
-        <DCCReference Include="..\Queries\Shared\Empresas\EmpresaOptionsBuilder.pas"/>
         <DCCReference Include="..\Queries\Shared\NextQueryDefinition.pas"/>
         <DCCReference Include="..\Queries\Shared\QueryColumnDefinition.pas"/>
         <DCCReference Include="..\Queries\Shared\PresenterConsultaBase.pas"/>
@@ -169,20 +168,22 @@
         <DCCReference Include="..\Interop\Module\NextAuthorizationBridge.pas"/>
         <DCCReference Include="..\Infrastructure\Authorization\NextAuthorizationAdapter.pas"/>
         <DCCReference Include="..\Queries\Shared\QueryResultOperations.pas"/>
+        <DCCReference Include="..\Queries\Shared\Empresas\EmpresaOptionsBuilder.pas"/>
         <DCCReference Include="..\..\Modern\Core\Infrastructure\Interfaces\IDataSetSorterUnit.pas"/>
         <DCCReference Include="..\..\Modern\Adapters\Secondary\Database\FireDAC\FireDACDataSetSorterUnit.pas"/>
         <DCCReference Include="..\..\Modern\Core\Domain\Types\Shared\TipoTributoFiscalEnumUnit.pas"/>
         <DCCReference Include="..\..\Modern\Core\Domain\Types\Shared\TipoComunsUnit.pas"/>
         <DCCReference Include="..\..\Modern\Core\Domain\Types\Shared\StatusRegistroEnumUnit.pas"/>
         <DCCReference Include="..\Contracts\GridColumnDefinition.pas"/>
+        <DCCReference Include="..\Contracts\EmpresaOption.pas"/>
         <DCCReference Include="..\Contracts\ViewFeedback.pas"/>
         <DCCReference Include="..\Contracts\GruposFiscaisView.pas"/>
         <DCCReference Include="..\Contracts\EditorCadastro.pas"/>
         <DCCReference Include="..\Contracts\AuthorizationService.pas"/>
-        <DCCReference Include="..\Contracts\EmpresaOption.pas"/>
         <DCCReference Include="..\..\Modern\Core\Domain\Ports\Shared\ColumnLayoutPreferences.pas"/>
         <DCCReference Include="..\..\Modern\Adapters\Secondary\Preferences\ColumnLayoutPreferencesRepository.pas"/>
         <DCCReference Include="..\Queries\Features\GruposFiscais\GruposFiscaisQueryDefinition.pas"/>
+        <DCCReference Include="..\Composition\Features\GruposFiscaisComposition.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

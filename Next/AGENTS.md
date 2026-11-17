@@ -71,7 +71,13 @@ source files and keep related units together.
 ```text
 Next/
   Contracts/
+    Features/
+      <Feature>.pas
+    <NoFeature>.pas
   Composition/
+    Features/
+      <Feature>.pas
+    <NoFeature>.pas
   Infrastructure/
     Database/
     Authorization/

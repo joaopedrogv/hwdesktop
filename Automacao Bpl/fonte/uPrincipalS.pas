@@ -4008,7 +4008,7 @@ var
 begin
   Options := NextMultipleOptions(True);
   Options.DisplayTitle := 'Eventos RTC';
-  OpenNextView(Self, 'next.rtc.events', Options);
+  OpenNextView(Self, 'rtc.events', Options);
 end;
 
 procedure TfrmPrincipalS.ExibirMensagemChavePeriodica;
@@ -8811,7 +8811,7 @@ var
 begin
   Options := NextQueryOptions();
   Options.DisplayTitle := 'Grupos Fiscais';
-  OpenNextView(Self, 'next.grupos.fiscais', Options);
+  OpenNextView(Self, 'grupos.fiscais', Options);
 end;
 
 procedure TfrmPrincipalS.RTC_OperaccoesInternas1Click(Sender: TObject);
@@ -8829,7 +8829,7 @@ var
 begin
   Options := NextQueryOptions();
   Options.DisplayTitle := 'Operações Fiscais IBS/CBS';
-  OpenNextView(Self, 'next.operacoes.fiscais.ibscbs', Options);
+  OpenNextView(Self, 'operacoes.fiscais.ibscbs', Options);
 end;
 
 procedure TfrmPrincipalS.RTC_RegrasFiscaisdoIBSeCBS1Click(Sender: TObject);
