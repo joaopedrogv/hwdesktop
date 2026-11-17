@@ -205,7 +205,7 @@ implementation
 
 uses funcoes, UpendBalcao, UpendPrestacao, UPendOficina,UpendVeiculos,UpendRec,uLancCxl,
   uDtmFormPag,uFecDia, uDtmAtivo, uDtmEntrada, URelCrystal, uDadosIni,Registry,
-  uNewHw, uCCJ, TlHelp32, StrUtils, DateUtils, ShellAPI, hw_utils, hw_win_utils,
+  uNewHw, uCCJ, TlHelp32, StrUtils, DateUtils, ShellAPI, hw_utils, hw_win_utils, HwNextHostUnit,
   hw_grid_utils, DB, uCadPadraoModal, uCadPadrao, uPadrao, LegacyDFeDLLAdapterUnit, DFeHwLibUnit;
 
 function validaChaveEmpresa(tipo, vBanco, vcodEmpresa: string): boolean; stdcall; external 'cons40.dll';

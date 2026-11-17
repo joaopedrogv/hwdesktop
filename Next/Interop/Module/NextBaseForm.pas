@@ -83,21 +83,14 @@ begin
 end;
 
 function TfrmNextBase.ConfirmClose: Boolean;
-const
-  DiscardMessage =
-    'H'#225' altera'#231#245'es pendentes. Fechar esta tela descartar'#225' a ' +
-    'edi'#231#227'o. Deseja fechar?';
-  RetainMessage =
-    'H'#225' altera'#231#245'es pendentes. A tela ser'#225' ocultada e a ' +
-    'edi'#231#227'o ser'#225' mantida para retomada. Deseja continuar?';
 begin
   Result := True;
   if not HasPendingChanges then
     Exit;
   if FCloseDiscardsEdits then
-    Result := MessageDlg(DiscardMessage, mtWarning, [mbYes, mbNo], 0, mbNo) = mrYes
+    Result := ShowDangerQuestion('Há alteações pendentes. Fechar esta tela descartará a edição. Deseja fechar?')
   else
-    Result := MessageDlg(RetainMessage, mtConfirmation, [mbYes, mbNo], 0, mbNo) = mrYes;
+    Result := ShowQuestion('Há alteações pendentes. Deseja continuar?');
 end;
 
 procedure TfrmNextBase.InitializeNextView(const AIdentifier: string;
