@@ -11,7 +11,7 @@ implementation
 
 uses
   Vcl.Controls, GruposFiscaisForm, LocalPreferences, GruposFiscaisPresenter, NextQueryDefinition,
-  ListarEmpresasUseCaseUnit, GruposFiscaisQueryDefinition, ISessionContextUnit, EmpresaOption, EditorCadastro, WindowsRegistryLocalPreferences,
+  ListarEmpresasUseCaseUnit, GruposFiscaisQueryDefinition, ISessionContextUnit, EmpresaOption, EditorCadastro,
   NextSetup, EmpresaOptionsBuilder, GrupoFiscalCadastroFrame, AuthorizationService, RemoverGrupoFiscalUseCaseUnit,
   SalvarGrupoFiscalUseCaseUnit, ObterGruposFiscaisUseCaseUnit;
 
@@ -26,7 +26,7 @@ var
   CarregarOpcoes: TCarregarOpcoesEmpresas;
   CriarEditor: TCriarEditorCadastro;
 begin
-  Preferences := TWindowsRegistryLocalPreferences.Create;
+  Preferences := NextSetupInstance.Resolve<ILocalPreferences>;
 
   View := TfrmGruposFiscais.CreateParented(AParent);
   try
@@ -66,7 +66,8 @@ begin
       raise;
     end;
 
-    View.ConfigureFilters(Definitions.FiltersDef, Preferences, 'grupos.fiscais');
+    View.ConfigureFilters(Definitions.FiltersDef, Preferences,
+      Definitions.QueryId);
 
     Result := View;
   except

@@ -53,6 +53,8 @@ uses
   ColumnLayoutPreferences in '..\..\Modern\Core\Domain\Ports\Shared\ColumnLayoutPreferences.pas',
   ColumnLayoutPreferencesRepository in '..\..\Modern\Adapters\Secondary\Preferences\ColumnLayoutPreferencesRepository.pas',
   GruposFiscaisQueryDefinition in '..\Queries\Features\GruposFiscais\GruposFiscaisQueryDefinition.pas',
+  EventosRtcComposition in '..\Composition\Features\EventosRtcComposition.pas',
+  OperacoesFiscaisIbsCbsComposition in '..\Composition\Features\OperacoesFiscaisIbsCbsComposition.pas',
   GruposFiscaisComposition in '..\Composition\Features\GruposFiscaisComposition.pas';
 
 {$R *.res}

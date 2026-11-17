@@ -184,6 +184,8 @@
         <DCCReference Include="..\..\Modern\Core\Domain\Ports\Shared\ColumnLayoutPreferences.pas"/>
         <DCCReference Include="..\..\Modern\Adapters\Secondary\Preferences\ColumnLayoutPreferencesRepository.pas"/>
         <DCCReference Include="..\Queries\Features\GruposFiscais\GruposFiscaisQueryDefinition.pas"/>
+        <DCCReference Include="..\Composition\Features\EventosRtcComposition.pas"/>
+        <DCCReference Include="..\Composition\Features\OperacoesFiscaisIbsCbsComposition.pas"/>
         <DCCReference Include="..\Composition\Features\GruposFiscaisComposition.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

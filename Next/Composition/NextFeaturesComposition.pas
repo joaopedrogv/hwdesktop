@@ -16,7 +16,8 @@ uses
   ObterGruposFiscaisUseCaseUnit,
   ListarEmpresasUseCaseUnit, IEmpresasRepositoryUnit, EmpresasRepositoryUnit,
   NextQueryDefinition, GruposFiscaisQueryDefinition,
-  ColumnLayoutPreferences, ColumnLayoutPreferencesRepository;
+  ColumnLayoutPreferences, ColumnLayoutPreferencesRepository,
+  LocalPreferences, WindowsRegistryLocalPreferences;
 
 procedure RegisterNextFeatures(const AContainer: TContainer);
 begin
@@ -30,6 +31,11 @@ begin
   // repositorios sem estado do container.
   AContainer.RegisterType<IColumnLayoutPreferences,
     TColumnLayoutPreferencesRepository>.AsSingleton;
+
+  // Preferencias locais: o adaptador de registro do Windows nao guarda a tela
+  // nem a sessao; a secao e a chave sao recebidas a cada operacao. Por isso a
+  // instancia unica atende todas as telas.
+  AContainer.RegisterType<ILocalPreferences, TWindowsRegistryLocalPreferences>.AsSingleton;
 
 
   // A remocao logica reutiliza a conexao compartilhada registrada pelo Setup.
