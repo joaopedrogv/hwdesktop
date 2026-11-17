@@ -111,7 +111,7 @@ var
     if not QLocal.FieldIsNull('COD_EMPRESA') then
     begin
       if count >= Length(EmpresasId) then
-        SetLength(EmpresasId, Length(EmpresasId) * 2);
+        SetLength(EmpresasId, Max(0, Length(EmpresasId)) + 2);
 
       EmpresasId[count] := QLocal.FieldAsInteger('COD_EMPRESA');
       Inc(count);
@@ -179,7 +179,7 @@ var
     if not Q.FieldIsNull('COD_EMPRESA') then
     begin
       if count >= Length(EmpresasId) then
-        SetLength(EmpresasId, Length(EmpresasId) * 2);
+        SetLength(EmpresasId, Max(0, Length(EmpresasId)) + 2);
 
       EmpresasId[count] := Q.FieldAsInteger('COD_EMPRESA');
       Inc(count);

@@ -43,6 +43,15 @@ always_apply: true
 - Prefer existing mechanisms and the simplest correct representation within the
   assigned scope. Before adding persistent fields, check which values can be
   derived from existing data or held locally for the current operation.
+- Before adding a helper, wrapper or alias, inspect existing contracts and actual
+  callers. Add a separate member for behavior or a responsibility needed by
+  current code. A different name, language or hypothetical future variation is
+  insufficient. Implement a required interface method directly when a local
+  alias would only forward the same result.
+- Use an operation's existing precondition check and failure result when they
+  already satisfy its caller's needs. Review new methods together with their
+  callers to remove repeated checks and unnecessary forwarding. Preserve checks
+  that enforce distinct semantics or are needed before other side effects.
 - Retain cross-call state only when its lifetime is needed. For new caches or
   recalculation flags, establish their identity, invalidation and update points,
   including failure and retry behavior. Use a cohesive representation for fields
@@ -51,16 +60,23 @@ always_apply: true
 - Write new or substantively revised source comments in Brazilian Portuguese.
   Preserve the established spelling of technical identifiers, compiler
   directives and tool-recognized markers.
-- Make names and structures self-explanatory. Write comments that add motives,
-  restrictions or contract guarantees the code does not make evident; do not
-  restate method names, conditions or assignments.
+- Prefer self-explanatory names and structures. Ordinary declarations and
+  straightforward code usually need no comments. Explain a non-obvious reason,
+  business rule, ownership, compatibility constraint, workaround or guarantee
+  when the code does not convey it.
+- Keep comments concise and place each explanation at the owning contract or
+  decision. An implementation comment should add local information. Avoid
+  repeating the same explanation above declarations, inside methods and at
+  callers.
+- During implementation and review, remove redundant or repeated comments
+  added within the assignment. Comments that only announce a step or narrate
+  names, calls, conditions and assignments should be omitted.
 - Prefer writing a user-facing message directly in the method that uses it.
   Use a named constant when the same message is reused.
-- Write source comments that remain understandable without the current Workflow
-  run. Explain a business rule, ownership, compatibility constraint or a
-  non-obvious reason. Keep run-local decision IDs, increment IDs, approval
-  narratives and review history in run artifacts. Stable domain codes and
-  specification references can remain when they explain the source contract.
+- Keep source explanations understandable without the current Workflow run.
+  Store run-local decision IDs, increment IDs, approval narratives and review
+  history in run artifacts. Stable domain codes and specification references
+  can remain when they explain the source contract.
 - When a user must locate a record, use its recognizable business labels. Compose
   enough identifying data to distinguish the records involved. Keep internal
   identifiers in diagnostic evidence when needed for traceability.

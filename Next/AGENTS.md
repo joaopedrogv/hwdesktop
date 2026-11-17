@@ -50,6 +50,11 @@ separate responsibilities and invert dependencies at infrastructure boundaries.
   dataset behavior.
 - Use Spring4D only in composition and supply dependencies to consumers. Do not
   resolve dependencies from a global container in forms, presenters or Use Cases.
+- Composition can configure a concrete editor's public child frames directly
+  through their configuration methods. Prefer this over editor methods that
+  only forward the same arguments. Use an editor-level method when it adds
+  coordination, validation or a distinct contract. Supply loading callbacks
+  during composition; execute them during the editor's preparation.
 - Choose Spring4D lifetimes based on the intended ownership and sharing. Prefer
   `AsTransient` for Presenters and for lightweight queries and Use Cases that
   follow a Presenter instance. With reference-counted dependencies, inject and
@@ -78,6 +83,8 @@ Next/
   Composition/
     Features/
       <Feature>.pas
+    Shared/
+      Seletores/
     <NoFeature>.pas
   Infrastructure/
     Database/
@@ -90,6 +97,10 @@ Next/
     Features/
       <Feature>/
   UI/
+    Presenters/
+      Shared/
+      Features/
+        <Feature>/
     Forms/
       Base/
       Validation/
@@ -97,8 +108,10 @@ Next/
         <Feature>/
     Frames/
       Shared/
+        Empresas/
         Filters/
         Grid/
+        Seletores/
       Features/
         <Feature>/
     Components/
@@ -110,11 +123,21 @@ Next/
   Tests/
 ```
 
-Group a feature's queries together and use the same feature folder name under
-queries, forms, and frames. Keep shared filter definitions and criteria under
-`Queries/Shared/Filters/`. Use `UI/Frames/Shared/Filters/` for search frames and
-`UI/Frames/Shared/Grid/` for grid and quick-filter frames. The host-integrated
-form base belongs in `Interop/Module/`.
+Use the same feature folder name under queries, presenters, forms and frames.
+Keep query definitions, shared filter definitions, SQL filter builders and
+result operations in `Queries/`. Presenter bases belong in
+`UI/Presenters/Shared/`; concrete Presenters belong in
+`UI/Presenters/Features/<Feature>/`.
+
+Factories that create shared selector-loading callbacks from injected Use
+Cases belong in `Composition/Shared/Seletores/`. Their option and callback
+contracts belong in `Contracts/`. Feature view factories belong in
+`Composition/Features/`; `NextViewCatalog` registers them.
+
+Use `Queries/Shared/Filters/` for shared filter definitions and criteria,
+`UI/Frames/Shared/Filters/` for search frames and `UI/Frames/Shared/Grid/` for
+grid and quick-filter frames. The host-integrated form base belongs in
+`Interop/Module/`.
 
 ## Naming
 
