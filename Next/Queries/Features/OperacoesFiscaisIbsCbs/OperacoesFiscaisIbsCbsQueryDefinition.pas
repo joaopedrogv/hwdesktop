@@ -4,7 +4,7 @@ interface
 
 uses
   IDataSetReaderUnit, QueryResultOperations, FilterCriterion, NextQueryDefinition,
-  QueryColumnDefinition;
+  QueryColumnDefinition, ColumnLayoutPreferences;
 
 type
   // Opcao da tela consultada a cada pesquisa: a marcacao do checkbox pertence a
@@ -27,6 +27,7 @@ type
   public
     constructor Create(AReaderFactory: ISqlDataSetReaderFactory;
       AOperation: IQueryResultOperations;
+      ALayoutPreferences: IColumnLayoutPreferences;
       const ALixeiraSearch: TLixeiraSearch);
   end;
 
@@ -40,6 +41,7 @@ uses
   TipoTributoFiscalEnumUnit;
 
 const
+  LayoutQueryId = 'operacoes.fiscais.ibscbs';
   FilterMarker = '/*FILTROS*/';
   ActiveParameterName = 'ATIVO';
   // Percentuais do diferimento com quatro casas, como no cadastro Modern. Sem a
@@ -110,11 +112,12 @@ end;
 
 constructor TOperacoesFiscaisIbsCbsQueryDefinition.Create(
   AReaderFactory: ISqlDataSetReaderFactory; AOperation: IQueryResultOperations;
+  ALayoutPreferences: IColumnLayoutPreferences;
   const ALixeiraSearch: TLixeiraSearch);
 begin
-  // A base valida a fabrica e as operacoes e monta colunas e filtros fixos.
-  // Somente a pesquisa consulta a opcao do checkbox.
-  inherited Create(AReaderFactory, AOperation);
+  // A base valida a fabrica, as operacoes e as preferencias e monta colunas e
+  // filtros fixos. Somente a pesquisa consulta a opcao do checkbox.
+  inherited Create(AReaderFactory, AOperation, ALayoutPreferences);
 
   if not Assigned(ALixeiraSearch) then
     raise Exception.Create(MissingOptionMessage);
@@ -159,6 +162,8 @@ procedure TOperacoesFiscaisIbsCbsQueryDefinition.Configure();
 var
   Columns: TQueryColumnDefinitions;
 begin
+  FQueryId := LayoutQueryId;
+
   Columns := BuildColumns;
   FColumnsDef := BuildGridColumns(Columns);
   // Os filtros usam os aliases externos da mesma declaracao, na ordem das

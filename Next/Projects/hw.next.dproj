@@ -175,6 +175,7 @@
         <DCCReference Include="..\..\Modern\Core\Domain\Types\Shared\TipoComunsUnit.pas"/>
         <DCCReference Include="..\..\Modern\Core\Domain\Types\Shared\StatusRegistroEnumUnit.pas"/>
         <DCCReference Include="..\Contracts\GridColumnDefinition.pas"/>
+        <DCCReference Include="..\Contracts\QueryColumnLayout.pas"/>
         <DCCReference Include="..\Contracts\EmpresaOption.pas"/>
         <DCCReference Include="..\Contracts\ViewFeedback.pas"/>
         <DCCReference Include="..\Contracts\GruposFiscaisView.pas"/>

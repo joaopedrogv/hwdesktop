@@ -4,7 +4,8 @@ interface
 
 uses
   Data.DB, FilterCriterion, NextQueryDefinition, GridColumnDefinition,
-  FilterDefinition;
+  FilterDefinition, IDataSetReaderUnit, QueryResultOperations,
+  ColumnLayoutPreferences;
 
 type
   // Identificacao do grupo fiscal escolhido na grade. O record e copiado por
@@ -16,12 +17,15 @@ type
 
   TGruposFiscaisQueryDefinition = class(TNextQueryDefinitionBase,
     INextQueryDefinition<TGrupoSelecionado>)
+  public
+    constructor Create(AReaderFactory: ISqlDataSetReaderFactory;
+      AOperation: IQueryResultOperations;
+      ALayoutPreferences: IColumnLayoutPreferences);
+    function TryGetSelected(out ASelected: TGrupoSelecionado): Boolean;
   protected
     function CreateQueryDefinition(
       const ACriteria: TFilterCriteria): TNextQueryDefinition; override;
     procedure Configure(); override;
-  public
-    function TryGetSelected(out ASelected: TGrupoSelecionado): Boolean;
   end;
 
 implementation
@@ -32,6 +36,7 @@ uses
   EntityMetadataUnit, GrupoFiscalMetadataUnit;
 
 const
+  LayoutQueryId = 'grupos.fiscais';
   FilterMarker = '/*FILTROS*/';
   ActiveParameterName = 'ATIVO';
 
@@ -64,10 +69,18 @@ end;
 
 { TGruposFiscaisQueryDefinition }
 
+constructor TGruposFiscaisQueryDefinition.Create(
+  AReaderFactory: ISqlDataSetReaderFactory; AOperation: IQueryResultOperations;
+  ALayoutPreferences: IColumnLayoutPreferences);
+begin
+  inherited Create(AReaderFactory, AOperation, ALayoutPreferences);
+end;
+
 procedure TGruposFiscaisQueryDefinition.Configure();
 var
   Metadata: EntityMetadata;
 begin
+  FQueryId := LayoutQueryId;
   // Os rotulos da grade e do filtro vem do metadata do grupo fiscal, o mesmo
   // usado pelo validador na nomeacao dos campos.
   Metadata := TGrupoFiscalMetadata.GetMetadata();

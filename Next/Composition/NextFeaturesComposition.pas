@@ -15,13 +15,21 @@ uses
   RemoverGrupoFiscalUseCaseUnit, SalvarGrupoFiscalUseCaseUnit,
   ObterGruposFiscaisUseCaseUnit,
   ListarEmpresasUseCaseUnit, IEmpresasRepositoryUnit, EmpresasRepositoryUnit,
-  NextQueryDefinition, GruposFiscaisQueryDefinition;
+  NextQueryDefinition, GruposFiscaisQueryDefinition,
+  ColumnLayoutPreferences, ColumnLayoutPreferencesRepository;
 
 procedure RegisterNextFeatures(const AContainer: TContainer);
 begin
   // Autorizacao compartilhada pelas telas Next sobre o callback do host.
   AContainer.RegisterType<IAuthorizationComunicator, TNextAuthorizationComunicator>.AsTransient;
   AContainer.RegisterType<IAuthorizationService, TNextAuthorizationAdapter>.AsSingleton;
+
+  // Preferencias de colunas: a instancia nao guarda a consulta nem o login; o
+  // QueryId e o usuario sao lidos a cada operacao. Por isso a instancia unica
+  // atende todas as telas e a troca de usuario sem recriacao, como os demais
+  // repositorios sem estado do container.
+  AContainer.RegisterType<IColumnLayoutPreferences,
+    TColumnLayoutPreferencesRepository>.AsSingleton;
 
 
   // A remocao logica reutiliza a conexao compartilhada registrada pelo Setup.

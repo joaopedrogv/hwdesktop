@@ -6,8 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Controls, Vcl.ComCtrls,
   Vcl.ExtCtrls, Vcl.Forms, Vcl.StdCtrls, Vcl.Buttons, Vcl.ImgList, System.Generics.Collections,
   Data.DB,  NextBaseForm, DataGridFrame, FilterDefinition, FilterCriterion, FilterFrame,
-  GridColumnDefinition, QueryResultOperations, NextQueryDefinition,
-  ColumnLayoutPreferences, LocalPreferences, PresenterConsultaBase,
+  QueryResultOperations, NextQueryDefinition,
+  LocalPreferences, PresenterConsultaBase,
   EditorCadastro, ValidationEntityOutputUnit;
 
 type
@@ -76,7 +76,6 @@ type
     FFiltersConfigured: Boolean;
     FFilterDefinition: TFilterDefinition;
     FDefinition: INextQueryDefinitionBase;
-    FColumns: TGridColumnDefinitions;
     FOperations: IQueryResultOperations;
     FTitle: string;
     FQuickFilterEnabled: Boolean;
@@ -249,8 +248,6 @@ type
     // ciclo do leitor pertence a propria definicao.
     procedure Attach(const ADefinition: INextQueryDefinitionBase;
       const ATitle: string; AQuickFilterEnabled: Boolean = False); overload;
-    // A grade le e aplica o layout; a tela nao conhece banco nem sessao.
-    procedure AttachColumnLayout(const APreferences: IColumnLayoutPreferences);
     // Recebe a definicao, as preferencias locais e a identidade estavel da tela.
     // Configura a instancia inline de fraFiltros somente quando chamado; telas
     // sem filtros mantem o frame oculto e pesquisam sem criterios.
@@ -280,8 +277,6 @@ const
   MissingTitleMessage = 'O titulo da consulta nao foi informado.';
   AlreadyAttachedMessage =
     'A definicao da consulta ja foi associada a esta tela.';
-  MissingColumnLayoutPreferencesMessage =
-    'As preferencias de colunas nao foram informadas.';
   EmptyResultMessage =
     'Nenhum registro foi encontrado para a consulta de %s.';
   FailureMessage = 'Nao foi possivel consultar os dados de %s.';
@@ -499,25 +494,16 @@ begin
   if FDefinition <> nil then
     raise Exception.Create(AlreadyAttachedMessage);
 
-  // Colunas e operacoes pertencem a definicao; a base apenas as apresenta. O
-  // ciclo do leitor permanece na definicao e a grade recebe a instancia das
-  // operacoes para ordenacao, marcacao e filtros rapidos.
+  // Colunas e operacoes pertencem a definicao; a base apenas as apresenta. A
+  // grade recebe a mesma definicao como origem das colunas padrao e do layout
+  // persistido (leitura, gravacao e restauracao).
   FDefinition := ADefinition;
-  FColumns := ADefinition.ColumnsDef;
   FTitle := ATitle;
   FOperations := ADefinition.GetResultOperation();
   FQuickFilterEnabled := AQuickFilterEnabled;
 
   fraGrid.Configure(FOperations, FQuickFilterEnabled);
-end;
-
-procedure TfrmConsultaBase.AttachColumnLayout(
-  const APreferences: IColumnLayoutPreferences);
-begin
-  if APreferences = nil then
-    raise Exception.Create(MissingColumnLayoutPreferencesMessage);
-
-  fraGrid.AttachColumnLayout(APreferences);
+  fraGrid.AttachColumnLayoutSource(ADefinition);
 end;
 
 procedure TfrmConsultaBase.PosicionarBotoesPesquisa;
@@ -565,7 +551,7 @@ begin
   btnPesquisar.OnClick := DoPesquisar;
   if FTitle <> '' then
     Caption := FTitle;
-  fraGrid.ConfigureColumns(FColumns);
+  fraGrid.ConfigureColumns;
 
   // A troca de conjunto, a limpeza e a leitura de linha atualizam os comandos
   // da funcionalidade junto com a grade.

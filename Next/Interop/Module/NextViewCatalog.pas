@@ -17,7 +17,7 @@ uses
   OperacoesFiscaisIbsCbsForm, OperacoesFiscaisIbsCbsQueryDefinition,
   LocalPreferences,
   WindowsRegistryLocalPreferences, ColumnLayoutPreferences,
-  ColumnLayoutPreferencesRepository, StandardQueryFilterDefinition,
+  StandardQueryFilterDefinition,
   QueryResultOperations, IDataSetReaderUnit,
   NextSetup, GruposFiscaisPresenter, EditorCadastro,
   AuthorizationService, RemoverGrupoFiscalUseCaseUnit,
@@ -33,29 +33,23 @@ function CreateEventosRtcView(AParent: HWND): TfrmNextBase;
 var
   View: TfrmEventosRtc;
   Preferences: ILocalPreferences;
-  LayoutPreferences: IColumnLayoutPreferences;
   Definition: INextQueryDefinitionBase;
 begin
   Preferences := TWindowsRegistryLocalPreferences.Create;
 
   View := TfrmEventosRtc.CreateParented(AParent);
   try
-    // A definicao pertence a esta tela: recebe a fabrica e as operacoes da
-    // composicao, a sessao vigente e o metodo que le a opcao do checkbox. A
-    // empresa e a opcao sao consultadas a cada pesquisa, nao na abertura.
+    // A definicao pertence a esta tela: recebe a fabrica, as operacoes e as
+    // preferencias de colunas da composicao, a sessao vigente e o metodo que le
+    // a opcao do checkbox. A empresa e a opcao sao consultadas a cada pesquisa,
+    // nao na abertura.
     Definition := TEventosRtcQueryDefinition.Create(
       NextSetupInstance.Resolve<ISqlDataSetReaderFactory>,
       NextSetupInstance.Resolve<IQueryResultOperations>,
+      NextSetupInstance.Resolve<IColumnLayoutPreferences>,
       NextSetupInstance.SessionContext,
       View.IsOnlyAuthorizedNFe);
     View.Attach(Definition, 'Eventos RTC');
-
-    // O repositório é transiente: a composição cede conexão/sessão do Setup e a
-    // grade o mantém enquanto a tela existir.
-    LayoutPreferences := TColumnLayoutPreferencesRepository.Create(
-      NextSetupInstance.Adapter, NextSetupInstance.SessionContext,
-      'rtc.events');
-    View.AttachColumnLayout(LayoutPreferences);
 
     View.ConfigureFilters(Definition.FiltersDef, Preferences,
       'rtc.events');
@@ -71,7 +65,6 @@ function CreateOperacoesFiscaisIbsCbsView(AParent: HWND): TfrmNextBase;
 var
   View: TfrmOperacoesFiscaisIbsCbs;
   Preferences: ILocalPreferences;
-  LayoutPreferences: IColumnLayoutPreferences;
   Definition: INextQueryDefinitionBase;
   Presenter: TPresenterConsultaBase;
 begin
@@ -79,11 +72,13 @@ begin
 
   View := TfrmOperacoesFiscaisIbsCbs.CreateParented(AParent);
   try
-    // A definicao pertence a esta tela e recebe o metodo que le a opcao do
-    // checkbox: o estado e consultado a cada pesquisa, nao na abertura.
+    // A definicao pertence a esta tela e recebe as preferencias de colunas e o
+    // metodo que le a opcao do checkbox: o estado e consultado a cada pesquisa,
+    // nao na abertura.
     Definition := TOperacoesFiscaisIbsCbsQueryDefinition.Create(
       NextSetupInstance.Resolve<ISqlDataSetReaderFactory>,
       NextSetupInstance.Resolve<IQueryResultOperations>,
+      NextSetupInstance.Resolve<IColumnLayoutPreferences>,
       View.IsLixeiraSearch);
 
     // A tela e somente leitura: a pesquisa e autorizada pela consulta padrao,
@@ -99,14 +94,6 @@ begin
       Presenter.Free;
       raise;
     end;
-
-    // O repositorio e transiente: a composicao cede conexao/sessao do Setup e a
-    // grade o mantem enquanto a tela existir. Layout e filtros usam a mesma
-    // identidade estavel da tela.
-    LayoutPreferences := TColumnLayoutPreferencesRepository.Create(
-      NextSetupInstance.Adapter, NextSetupInstance.SessionContext,
-      'operacoes.fiscais.ibscbs');
-    View.AttachColumnLayout(LayoutPreferences);
 
     View.ConfigureFilters(Definition.FiltersDef, Preferences,
       'operacoes.fiscais.ibscbs');

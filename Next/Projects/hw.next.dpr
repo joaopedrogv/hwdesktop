@@ -44,6 +44,7 @@ uses
   TipoComunsUnit in '..\..\Modern\Core\Domain\Types\Shared\TipoComunsUnit.pas',
   StatusRegistroEnumUnit in '..\..\Modern\Core\Domain\Types\Shared\StatusRegistroEnumUnit.pas',
   GridColumnDefinition in '..\Contracts\GridColumnDefinition.pas',
+  QueryColumnLayout in '..\Contracts\QueryColumnLayout.pas',
   EmpresaOption in '..\Contracts\EmpresaOption.pas',
   ViewFeedback in '..\Contracts\ViewFeedback.pas',
   GruposFiscaisView in '..\Contracts\GruposFiscaisView.pas',

@@ -9,22 +9,24 @@ uses
 type
   // Adaptador de CONFIG_COLUNAS para preferencias visuais de colunas. Nao
   // possui a conexao nem a sessao: a composicao cede ambas e continua
-  // responsavel pelo ciclo de vida delas. O login e lido da sessao a cada
-  // operacao, portanto a troca de usuario vale sem recriar o repositorio.
+  // responsavel pelo ciclo de vida delas. O QueryId e validado a cada operacao;
+  // o login continua sendo lido da sessao a cada operacao, portanto a troca de
+  // usuario vale sem recriar o repositorio.
   TColumnLayoutPreferencesRepository = class(TInterfacedObject,
     IColumnLayoutPreferences)
   private
     FConnection: IDataBaseConnection;
     FSession: ISessionContext;
-    FComponent: string;
+    function RequireComponent(const AQueryId: string): string;
     function RequireLogin: string;
     procedure ValidateEntry(const AEntry: TColumnLayoutEntry);
   public
     constructor Create(const AConnection: IDataBaseConnection;
-      const ASession: ISessionContext; const AComponent: string);
-    function Load: TColumnLayoutEntries;
-    procedure Save(const AEntries: TColumnLayoutEntries);
-    procedure Reset;
+      const ASession: ISessionContext);
+    function Load(const AQueryId: string): TColumnLayoutEntries;
+    procedure Save(const AQueryId: string;
+      const AEntries: TColumnLayoutEntries);
+    procedure Reset(const AQueryId: string);
   end;
 
 implementation
@@ -77,10 +79,7 @@ const
 { TColumnLayoutPreferencesRepository }
 
 constructor TColumnLayoutPreferencesRepository.Create(
-  const AConnection: IDataBaseConnection; const ASession: ISessionContext;
-  const AComponent: string);
-var
-  Component: string;
+  const AConnection: IDataBaseConnection; const ASession: ISessionContext);
 begin
   inherited Create;
 
@@ -91,22 +90,25 @@ begin
     raise Exception.Create(
       'A sessao das preferencias de colunas nao foi informada.');
 
-  // O componente identifica a consulta e nao pode ocupar o espaco de nomes dos
-  // modelos de exportacao, que usam '@' para separar a consulta do codigo.
-  Component := Trim(AComponent);
-  if Component = '' then
-    raise EValidacaoNegocio.Create(
-      'O componente das preferencias de colunas nao foi informado.');
-  if Length(Component) > MaxComponentLength then
-    raise EValidacaoNegocio.Create(
-      'O componente das preferencias de colunas excede 64 caracteres.');
-  if Pos('@', Component) > 0 then
-    raise Exception.Create(
-      'O componente das preferencias de colunas nao pode conter @.');
-
   FConnection := AConnection;
   FSession := ASession;
-  FComponent := Component;
+end;
+
+function TColumnLayoutPreferencesRepository.RequireComponent(
+  const AQueryId: string): string;
+begin
+  // O QueryId identifica a consulta e nao pode ocupar o espaco de nomes dos
+  // modelos de exportacao, que usam '@' para separar a consulta do codigo.
+  Result := Trim(AQueryId);
+  if Result = '' then
+    raise EValidacaoNegocio.Create(
+      'O componente das preferencias de colunas nao foi informado.');
+  if Length(Result) > MaxComponentLength then
+    raise EValidacaoNegocio.Create(
+      'O componente das preferencias de colunas excede 64 caracteres.');
+  if Pos('@', Result) > 0 then
+    raise Exception.Create(
+      'O componente das preferencias de colunas nao pode conter @.');
 end;
 
 function TColumnLayoutPreferencesRepository.RequireLogin: string;
@@ -134,8 +136,10 @@ begin
     raise EValidacaoNegocio.Create('A ordem da preferencia de colunas nao pode ser negativa.');
 end;
 
-function TColumnLayoutPreferencesRepository.Load: TColumnLayoutEntries;
+function TColumnLayoutPreferencesRepository.Load(
+  const AQueryId: string): TColumnLayoutEntries;
 var
+  Component: string;
   Login: string;
   Query: QueryResult;
   Entry: TColumnLayoutEntry;
@@ -146,13 +150,15 @@ var
 begin
   SetLength(Result, 0);
 
+  Component := RequireComponent(AQueryId);
+
   // Leitura nao abre transacao propria: CreateQuery usa a transacao corrente da
   // conexao e a libera junto com a consulta.
   Login := RequireLogin;
   Query := FConnection.CreateQuery(LoadSql,
     ParametersBuilder.Create(2)
       .ByName('USUARIO', Login)
-      .ByName('COMPONENTE', FComponent)
+      .ByName('COMPONENTE', Component)
       .Build());
   try
     Count := 0;
@@ -203,14 +209,19 @@ begin
     end;
 end;
 
-procedure TColumnLayoutPreferencesRepository.Save(
+procedure TColumnLayoutPreferencesRepository.Save(const AQueryId: string;
   const AEntries: TColumnLayoutEntries);
 var
+  Component: string;
   Login: string;
   Transaction: ITransaction;
   Params: ParametersValues;
   I: Integer;
 begin
+  // A consulta e validada antes da saida da lista vazia: um QueryId invalido
+  // nao pode passar como operacao bem-sucedida.
+  Component := RequireComponent(AQueryId);
+
   if Length(AEntries) = 0 then
     Exit;
 
@@ -235,7 +246,7 @@ begin
         begin
           Params := ParametersBuilder.Create(6)
             .ByName('USUARIO', Login)
-            .ByName('COMPONENTE', FComponent)
+            .ByName('COMPONENTE', Component)
             .ByName('CAMPOS', Trim(AEntries[I].FieldName))
             .ByName('VISIVEL', Ord(AEntries[I].Visible))
             .ByName('ORDEM', AEntries[I].Order)
@@ -247,7 +258,7 @@ begin
         begin
           Params := ParametersBuilder.Create(5)
             .ByName('USUARIO', Login)
-            .ByName('COMPONENTE', FComponent)
+            .ByName('COMPONENTE', Component)
             .ByName('CAMPOS', Trim(AEntries[I].FieldName))
             .ByName('VISIVEL', Ord(AEntries[I].Visible))
             .ByName('ORDEM', AEntries[I].Order)
@@ -266,16 +277,19 @@ begin
   end;
 end;
 
-procedure TColumnLayoutPreferencesRepository.Reset;
+procedure TColumnLayoutPreferencesRepository.Reset(
+  const AQueryId: string);
 var
+  Component: string;
   Login: string;
   Transaction: ITransaction;
   Params: ParametersValues;
 begin
+  Component := RequireComponent(AQueryId);
   Login := RequireLogin;
   Params := ParametersBuilder.Create(2)
     .ByName('USUARIO', Login)
-    .ByName('COMPONENTE', FComponent)
+    .ByName('COMPONENTE', Component)
     .Build();
 
   Transaction := FConnection.BeginTransaction;

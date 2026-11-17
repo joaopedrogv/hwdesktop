@@ -4,7 +4,7 @@ interface
 
 uses
   IDataSetReaderUnit, QueryResultOperations, ISessionContextUnit, FilterCriterion,
-  NextQueryDefinition;
+  NextQueryDefinition, ColumnLayoutPreferences;
 
 type
   // Opcao da tela consultada a cada pesquisa: o checkbox pertence a view e pode
@@ -25,7 +25,8 @@ type
       const ACriteria: TFilterCriteria): TNextQueryDefinition; override;
   public
     constructor Create(AReaderFactory: ISqlDataSetReaderFactory;
-      AOperation: IQueryResultOperations; ASession: ISessionContext;
+      AOperation: IQueryResultOperations;
+      ALayoutPreferences: IColumnLayoutPreferences; ASession: ISessionContext;
       const AOnlyAuthorizedNFe: TEventosRtcOnlyAuthorizedNFe);
   end;
 
@@ -36,6 +37,7 @@ uses
   GridColumnDefinition, FilterDefinition;
 
 const
+  LayoutQueryId = 'rtc.events';
   AuthorizationMarker = '/*AUTORIZACAO*/';
   FilterMarker = '/*FILTROS*/';
   EventosRtcBaseSql =
@@ -62,12 +64,12 @@ const
 
 constructor TEventosRtcQueryDefinition.Create(
   AReaderFactory: ISqlDataSetReaderFactory; AOperation: IQueryResultOperations;
-  ASession: ISessionContext;
+  ALayoutPreferences: IColumnLayoutPreferences; ASession: ISessionContext;
   const AOnlyAuthorizedNFe: TEventosRtcOnlyAuthorizedNFe);
 begin
-  // A base valida a fabrica e as operacoes e monta colunas e filtros fixos.
-  // Somente a pesquisa consulta a sessao e a opcao da tela.
-  inherited Create(AReaderFactory, AOperation);
+  // A base valida a fabrica, as operacoes e as preferencias e monta colunas e
+  // filtros fixos. Somente a pesquisa consulta a sessao e a opcao da tela.
+  inherited Create(AReaderFactory, AOperation, ALayoutPreferences);
 
   if ASession = nil then
     raise Exception.Create(MissingSessionMessage);
@@ -80,6 +82,7 @@ end;
 
 procedure TEventosRtcQueryDefinition.Configure();
 begin
+  FQueryId := LayoutQueryId;
   FColumnsDef := GridColumns([
     GridColumn('CHNFE', 'Chave da NF-e', 310),
     GridColumn('TPEVENTO', 'Tipo de evento', 120),

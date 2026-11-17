@@ -4,7 +4,8 @@ interface
 
 uses
   Data.DB, IDataSetReaderUnit, FilterCriterion, QueryResultOperations,
-  GridColumnDefinition, FilterDefinition, ParameterValueUnit;
+  GridColumnDefinition, FilterDefinition, ParameterValueUnit,
+  ColumnLayoutPreferences, QueryColumnLayout;
 
 type
   // Definicao de leitura independente de driver. Contem apenas SQL, parametros
@@ -21,15 +22,22 @@ type
     function GetResultOperation(): IQueryResultOperations;
     function GetColumnsDef: TGridColumnDefinitions;
     function GetFiltersDef(): TFilterDefinition;
+    function GetQueryId: string;
     function GetDataSet: TDataSet;
     procedure Search(const ACriteria: TFilterCriteria);
     // Atualiza o resultado da pesquisa corrente sem recriar o leitor nem
     // reaplicar os criterios da tela.
     procedure Refresh;
     procedure Clear;
+    // Layout de colunas: a definicao e a unica origem das colunas padrao e das
+    // preferencias persistidas para o QueryId corrente.
+    function LoadColumnLayout: TQueryColumnLayout;
+    procedure SaveColumnLayout(const AEntries: TColumnLayoutEntries);
+    procedure ResetColumnLayout;
 
     property FiltersDef: TFilterDefinition read GetFiltersDef;
     property ColumnsDef: TGridColumnDefinitions read GetColumnsDef;
+    property QueryId: string read GetQueryId;
   end;
 
   INextQueryDefinition<T> = interface(INextQueryDefinitionBase)
@@ -44,6 +52,11 @@ type
     FOperation: IQueryResultOperations;
     FReader: IDataSetReader;
     FReaderFactory: ISqlDataSetReaderFactory;
+    FLayoutPreferences: IColumnLayoutPreferences;
+    // Identidade do layout em CONFIG_COLUNAS. Cada definicao atribui na primeira
+    // linha de Configure, que roda na construcao da base e nao pode depender de
+    // campos da classe derivada.
+    FQueryId: string;
     FFiltersDef: TFilterDefinition;
     FColumnsDef: TGridColumnDefinitions;
     // Preenche colunas e filtros da funcionalidade.
@@ -53,14 +66,19 @@ type
       const ACriteria: TFilterCriteria): TNextQueryDefinition; virtual; abstract;
   public
     constructor Create(AReaderFactory: ISqlDataSetReaderFactory;
-      AOperation: IQueryResultOperations);
+      AOperation: IQueryResultOperations;
+      ALayoutPreferences: IColumnLayoutPreferences);
     procedure Search(const ACriteria: TFilterCriteria);
     procedure Refresh;
     procedure Clear;
     function GetResultOperation(): IQueryResultOperations;
     function GetColumnsDef: TGridColumnDefinitions;
     function GetFiltersDef(): TFilterDefinition;
+    function GetQueryId(): string;
     function GetDataSet: TDataSet;
+    function LoadColumnLayout: TQueryColumnLayout;
+    procedure SaveColumnLayout(const AEntries: TColumnLayoutEntries);
+    procedure ResetColumnLayout;
   end;
 
 implementation
@@ -74,6 +92,10 @@ const
   MissingOperationMessage =
     'As operacoes do resultado da consulta nao foram informadas.';
   MissingReaderMessage = 'O leitor de dados da consulta nao foi informado.';
+  MissingLayoutPreferencesMessage =
+    'As preferencias de colunas nao foram informadas.';
+  MissingQueryIdMessage =
+    'A identidade do layout de colunas da consulta nao foi informada.';
   ConfigureNotImplementedMessage =
     'Configuração da consulta não implementada';
 
@@ -81,17 +103,68 @@ const
 
 constructor TNextQueryDefinitionBase.Create(
   AReaderFactory: ISqlDataSetReaderFactory;
-  AOperation: IQueryResultOperations);
+  AOperation: IQueryResultOperations;
+  ALayoutPreferences: IColumnLayoutPreferences);
 begin
   inherited Create;
   if AReaderFactory = nil then
     raise Exception.Create(MissingReaderFactoryMessage);
   if AOperation = nil then
     raise Exception.Create(MissingOperationMessage);
+  if ALayoutPreferences = nil then
+    raise Exception.Create(MissingLayoutPreferencesMessage);
 
   FReaderFactory := AReaderFactory;
   FOperation := AOperation;
+  FLayoutPreferences := ALayoutPreferences;
   Configure();
+
+  // Sem identidade nenhuma preferencia pode ser lida ou gravada; a falha de
+  // composicao aparece na abertura, nao como layout padrao silencioso.
+  if Trim(FQueryId) = '' then
+    raise Exception.Create(MissingQueryIdMessage);
+end;
+
+function TNextQueryDefinitionBase.GetQueryId(): string;
+begin
+  Result := FQueryId;
+end;
+
+function TNextQueryDefinitionBase.LoadColumnLayout: TQueryColumnLayout;
+var
+  Entries: TColumnLayoutEntries;
+  MarkingFieldName: string;
+begin
+  MarkingFieldName := FOperation.MarkingColumnName();
+
+  // Sem coluna configuravel nao existe preferencia a aplicar e a leitura do
+  // banco e dispensavel.
+  if not QueryColumnLayoutAvailable(FColumnsDef, MarkingFieldName) then
+    Exit(ResolveQueryColumnLayout(FColumnsDef, nil, MarkingFieldName));
+
+  try
+    Entries := FLayoutPreferences.Load(FQueryId);
+  except
+    // Abrir a consulta nunca depende da preferencia gravada: uma falha de
+    // leitura mantem as colunas padrao da definicao. A falha real continua
+    // visivel em Save/Reset, que reportam ao host.
+    Entries := nil;
+  end;
+
+  Result := ResolveQueryColumnLayout(FColumnsDef, Entries, MarkingFieldName);
+end;
+
+procedure TNextQueryDefinitionBase.SaveColumnLayout(
+  const AEntries: TColumnLayoutEntries);
+begin
+  // A falha de validacao ou de banco pertence ao chamador, que decide a
+  // apresentacao.
+  FLayoutPreferences.Save(FQueryId, AEntries);
+end;
+
+procedure TNextQueryDefinitionBase.ResetColumnLayout;
+begin
+  FLayoutPreferences.Reset(FQueryId);
 end;
 
 procedure TNextQueryDefinitionBase.Configure();
