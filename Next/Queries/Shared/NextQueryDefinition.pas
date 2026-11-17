@@ -137,7 +137,7 @@ var
 begin
   MarkingFieldName := FOperation.MarkingColumnName();
 
-  // Sem coluna configuravel nao existe preferencia a aplicar e a leitura do
+  // Sem coluna participante nao existe preferencia a aplicar e a leitura do
   // banco e dispensavel.
   if not QueryColumnLayoutAvailable(FColumnsDef, MarkingFieldName) then
     Exit(ResolveQueryColumnLayout(FColumnsDef, nil, MarkingFieldName));

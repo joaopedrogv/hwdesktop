@@ -980,7 +980,7 @@ end;
 
 function TfrmDataGridFrame.ColumnLayoutAvailable: Boolean;
 begin
-  // A marcacao e as colunas de visibilidade fixa nao geram persistencia.
+  // A marcacao e as colunas sempre ocultas nao geram persistencia.
   Result := (FColumnLayout <> nil) and
     QueryColumnLayoutAvailable(FColumnDefinitions, FMarkingColumn);
 end;
@@ -1010,8 +1010,8 @@ begin
     SetLength(Result, Count + 1);
     Result[Count].FieldName := Column.FieldName;
     Result[Count].Visible := Column.Visible;
-    // A ordem e a posicao entre as colunas persistidas: colunas fixas e a
-    // marcacao intercaladas nao deslocam o valor gravado.
+    // A ordem e a posicao entre as colunas participantes: a marcacao e as
+    // colunas sempre ocultas intercaladas nao deslocam o valor gravado.
     Result[Count].Order := Count;
     Result[Count].Width := Column.Width;
     Inc(Count);

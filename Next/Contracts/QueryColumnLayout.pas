@@ -17,19 +17,24 @@ type
   // reordenar depois.
   TQueryColumnLayout = TArray<TQueryColumnLayoutItem>;
 
-// Verdadeiro para a coluna que o usuario pode alterar e que pode ser gravada.
-// A coluna de marcacao e as colunas de visibilidade fixa nao participam.
+// Verdadeiro para a coluna cuja ordem e largura participam da preferencia
+// gravada: as configuraveis e as sempre visiveis. A marcacao e as colunas
+// sempre ocultas nao participam; a sempre visivel participa da ordem e da
+// largura, mas mantem a visibilidade forcada.
 function QueryColumnPersistable(const AColumn: TGridColumnDefinition;
   const AMarkingFieldName: string): Boolean;
 
-// Verdadeiro quando a definicao oferece ao menos uma coluna persistivel.
+// Verdadeiro quando a definicao oferece ao menos uma coluna participante da
+// ordem e da largura gravadas.
 function QueryColumnLayoutAvailable(const ADefinitions: TGridColumnDefinitions;
   const AMarkingFieldName: string): Boolean;
 
 // Cruza as preferencias salvas com as colunas padrao. Entradas desconhecidas,
-// duplicadas ou de colunas nao persistiveis sao ignoradas; colunas ausentes do
-// layout entram ao final na ordem da definicao; colunas nao persistiveis mantem
-// posicao, visibilidade e largura da definicao.
+// duplicadas ou de colunas que nao participam da ordem e da largura sao
+// ignoradas. Colunas configuraveis ausentes do layout entram ao final na ordem
+// da definicao; a sempre visivel ausente mantem a posicao da definicao, o que
+// preserva os layouts gravados antes de ela participar. Colunas fora da
+// participacao mantem posicao, visibilidade e largura da definicao.
 function ResolveQueryColumnLayout(const ADefinitions: TGridColumnDefinitions;
   const AEntries: TColumnLayoutEntries;
   const AMarkingFieldName: string): TQueryColumnLayout;
@@ -89,12 +94,25 @@ begin
   end;
 end;
 
+// Coluna cuja posicao segue a ordem gravada. Sem entrada salva, apenas a
+// configuravel entra na sequencia; a sempre visivel sem entrada permanece no
+// slot da definicao.
+function ColumnFollowsSavedOrder(const AColumn: TGridColumnDefinition;
+  const AMarkingFieldName: string; const AHasSavedEntry: Boolean): Boolean;
+begin
+  Result := QueryColumnPersistable(AColumn, AMarkingFieldName) and
+    (AHasSavedEntry or GridColumnConfigurable(AColumn.Behavior));
+end;
+
 function QueryColumnPersistable(const AColumn: TGridColumnDefinition;
   const AMarkingFieldName: string): Boolean;
 begin
-  Result := GridColumnConfigurable(AColumn.Behavior) and
-    ((AMarkingFieldName = '') or
-     (not SameText(AColumn.FieldName, AMarkingFieldName)));
+  if (AMarkingFieldName <> '') and
+    SameText(AColumn.FieldName, AMarkingFieldName) then
+    Exit(False);
+
+  Result := GridColumnConfigurable(AColumn.Behavior) or
+    (AColumn.Behavior = gcbAlwaysVisible);
 end;
 
 function QueryColumnLayoutAvailable(const ADefinitions: TGridColumnDefinitions;
@@ -136,8 +154,8 @@ function ResolveQueryColumnLayout(const ADefinitions: TGridColumnDefinitions;
   const AMarkingFieldName: string): TQueryColumnLayout;
 var
   Sorted: TColumnLayoutEntries;
-  Used: TArray<Boolean>;
-  PersistableOrder: TArray<Integer>;
+  HasEntry: TArray<Boolean>;
+  OrderSequence: TArray<Integer>;
   FinalOrder: TArray<Integer>;
   EntryIndex: Integer;
   DefinitionIndex: Integer;
@@ -146,13 +164,14 @@ var
   Item: TQueryColumnLayoutItem;
 begin
   Sorted := SortColumnLayoutEntries(AEntries);
-  SetLength(Used, Length(ADefinitions));
-  SetLength(PersistableOrder, 0);
+  SetLength(HasEntry, Length(ADefinitions));
+  SetLength(OrderSequence, 0);
   Count := 0;
 
-  // 1. Ordem salva: somente colunas ainda oferecidas e persistiveis. Entradas
-  // desconhecidas, de visibilidade fixa, de marcacao ou duplicadas sao ignoradas
-  // sem apagar a preferencia gravada.
+  // 1. Ordem salva: vale para toda coluna ainda oferecida que participa da
+  // ordem e da largura, inclusive a sempre visivel. Entradas desconhecidas, de
+  // colunas fora da participacao ou duplicadas sao ignoradas sem apagar a
+  // preferencia gravada.
   for I := 0 to High(Sorted) do
   begin
     DefinitionIndex := FindDefinitionIndex(ADefinitions, Sorted[I].FieldName);
@@ -161,43 +180,48 @@ begin
     if not QueryColumnPersistable(ADefinitions[DefinitionIndex],
       AMarkingFieldName) then
       Continue;
-    if Used[DefinitionIndex] then
+    if HasEntry[DefinitionIndex] then
       Continue;
 
-    Used[DefinitionIndex] := True;
-    SetLength(PersistableOrder, Count + 1);
-    PersistableOrder[Count] := DefinitionIndex;
+    HasEntry[DefinitionIndex] := True;
+    SetLength(OrderSequence, Count + 1);
+    OrderSequence[Count] := DefinitionIndex;
     Inc(Count);
   end;
 
-  // 2. Colunas persistiveis ausentes do layout completam a sequencia na ordem
-  // da definicao.
+  // 2. Colunas configuraveis ausentes do layout completam a sequencia na ordem
+  // da definicao. A sempre visivel ausente nao entra: ela mantem o slot da
+  // definicao para nao deslocar um layout gravado antes de ela participar.
   for I := 0 to High(ADefinitions) do
   begin
-    if Used[I] then
+    if HasEntry[I] then
       Continue;
-    if not QueryColumnPersistable(ADefinitions[I], AMarkingFieldName) then
+    if not ColumnFollowsSavedOrder(ADefinitions[I], AMarkingFieldName, False) then
       Continue;
 
-    SetLength(PersistableOrder, Count + 1);
-    PersistableOrder[Count] := I;
+    SetLength(OrderSequence, Count + 1);
+    OrderSequence[Count] := I;
     Inc(Count);
   end;
 
-  // 3. Somente os slots persistiveis recebem a sequencia; as colunas fixas e a
-  // marcacao mantem a posicao da definicao.
+  // 3. Cada slot recebe a sequencia somente quando a coluna da definicao consome
+  // a ordem gravada: configuravel ou sempre visivel com entrada salva. A sempre
+  // visivel sem entrada, a sempre oculta e a marcacao mantem o indice da
+  // definicao.
   SetLength(FinalOrder, Length(ADefinitions));
   Count := 0;
   for I := 0 to High(ADefinitions) do
-    if QueryColumnPersistable(ADefinitions[I], AMarkingFieldName) then
+    if ColumnFollowsSavedOrder(ADefinitions[I], AMarkingFieldName,
+      HasEntry[I]) then
     begin
-      FinalOrder[I] := PersistableOrder[Count];
+      FinalOrder[I] := OrderSequence[Count];
       Inc(Count);
     end
     else
       FinalOrder[I] := I;
 
-  // 4. Plano resolvido na ordem final.
+  // 4. Plano resolvido na ordem final. A visibilidade continua derivada do
+  // comportamento e a largura gravada vale para toda coluna participante.
   SetLength(Result, Length(ADefinitions));
   for I := 0 to High(FinalOrder) do
   begin
