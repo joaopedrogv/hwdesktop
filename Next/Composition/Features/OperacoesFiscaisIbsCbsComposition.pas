@@ -20,7 +20,8 @@ uses
   ListarOperacoesInternasUseCaseUnit, ListarGruposFiscaisUseCaseUnit,
   ListarRegrasFiscaisUseCaseUnit, ListarEmpresasUseCaseUnit,
   ISessionContextUnit, SalvarOperacaoFiscalIbsCbsUseCaseUnit,
-  ObterOperacaoFiscalIbsCbsPorIdUseCaseUnit;
+  ObterOperacaoFiscalIbsCbsPorIdUseCaseUnit,
+  RemoverOperacaoFiscalIbsCbsUseCaseUnit;
 
 function CreateOperacoesFiscaisIbsCbsView(AParent: HWND): TfrmNextBase;
 var
@@ -35,6 +36,7 @@ var
   Sessao: ISessionContext;
   Salvar: SalvarOperacaoFiscalIbsCbsUseCase;
   Obter: ObterOperacaoFiscalIbsCbsPorIdUseCase;
+  Remover: RemoverOperacaoFiscalIbsCbsUseCase;
   CarregarOperacaoInterna: TCarregarSelecaoEntidade;
   CarregarGrupoFiscal: TCarregarSelecaoEntidade;
   CarregarRegraFiscal: TCarregarRegraFiscalSelecao;
@@ -63,6 +65,7 @@ begin
     Sessao := NextSetupInstance.SessionContext;
     Salvar := NextSetupInstance.Resolve<SalvarOperacaoFiscalIbsCbsUseCase>;
     Obter := NextSetupInstance.Resolve<ObterOperacaoFiscalIbsCbsPorIdUseCase>;
+    Remover := NextSetupInstance.Resolve<RemoverOperacaoFiscalIbsCbsUseCase>;
 
     CarregarOperacaoInterna := CriarCarregadorOperacoesInternas(ListarOperacoesInternas);
     CarregarGrupoFiscal := CriarCarregadorGruposFiscais(ListarGruposFiscais);
@@ -87,7 +90,7 @@ begin
       end;
 
     Presenter := TOperacoesFiscaisIbsCbsPresenter.Create(View, Definition,
-      NextSetupInstance.Resolve<IAuthorizationService>, Salvar, Obter);
+      NextSetupInstance.Resolve<IAuthorizationService>, Remover, Salvar, Obter);
     try
       // A tela configura a criacao do editor, associa a definicao, configura os
       // filtros e so entao assume a posse do apresentador; uma falha antes disso

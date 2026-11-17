@@ -20,6 +20,7 @@ uses
   IRegrasFiscaisIbsCbsRepositoryUnit, RegrasFiscaisIbsCbsRepositoryUnit,
   ObterOperacaoFiscalIbsCbsPorIdUseCaseUnit,
   SalvarOperacaoFiscalIbsCbsUseCaseUnit,
+  RemoverOperacaoFiscalIbsCbsUseCaseUnit,
   ListarOperacoesInternasUseCaseUnit, ListarRegrasFiscaisUseCaseUnit,
   NextQueryDefinition, GruposFiscaisQueryDefinition,
   ColumnLayoutPreferences, ColumnLayoutPreferencesRepository,
@@ -85,6 +86,7 @@ begin
   // ObterOperacaoFiscalIbsCbsPorIdUseCase, o container mantem a instancia unica
   // e o apresentador apenas a utiliza, sem libera-la.
   AContainer.RegisterType<SalvarOperacaoFiscalIbsCbsUseCase>.AsSingleton;
+  AContainer.RegisterType<RemoverOperacaoFiscalIbsCbsUseCase>.AsSingleton;
 end;
 
 end.

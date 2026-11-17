@@ -4,7 +4,7 @@ interface
 
 uses
   AuthorizationService, OperacoesFiscaisIbsCbsView,
-  SalvarOperacaoFiscalIbsCbsUseCaseUnit,
+  RemoverOperacaoFiscalIbsCbsUseCaseUnit, SalvarOperacaoFiscalIbsCbsUseCaseUnit,
   ObterOperacaoFiscalIbsCbsPorIdUseCaseUnit, OperacaoFiscalIbsCbsEtdUnit,
   NextQueryDefinition, OperacoesFiscaisIbsCbsQueryDefinition,
   PresenterConsultaBase;
@@ -28,14 +28,17 @@ type
     // composicao: o apresentador apenas as utiliza e nunca as libera.
     FView: IOperacoesFiscaisIbsCbsView;
     FQueryDefinition: INextQueryDefinition<TOperacaoFiscalSelecionada>;
+    FRemover: RemoverOperacaoFiscalIbsCbsUseCase;
     FSalvar: SalvarOperacaoFiscalIbsCbsUseCase;
     FObter: ObterOperacaoFiscalIbsCbsPorIdUseCase;
   public
     constructor Create(const AView: IOperacoesFiscaisIbsCbsView;
       const AQueryDefinition: INextQueryDefinition<TOperacaoFiscalSelecionada>;
       const AAuthorization: IAuthorizationService;
+      ARemover: RemoverOperacaoFiscalIbsCbsUseCase;
       ASalvar: SalvarOperacaoFiscalIbsCbsUseCase;
       AObter: ObterOperacaoFiscalIbsCbsPorIdUseCase);
+    function EnviarParaLixeira: Boolean;
     // Reapresenta a aba de inclusao quando ela ja existe; caso contrario autoriza
     // a inclusao e entrega a abertura para a nova aba, que cria o proprio
     // rascunho e carrega os seletores. A negativa da autorizacao ja foi
@@ -62,6 +65,8 @@ const
   ProcessoInclusao = 'MOD021';
   ProcessoAlteracao = 'MOD022';
   ProcessoGravacao = 'MOD023';
+  ProcessoExclusao = 'MOD024';
+  ProcessoRestauracao = 'MOD025';
   TabelaOperacoesFiscais = 'OP_FISCAIS_IBSCBS';
 
   SelecaoObrigatoriaMessage = 'Selecione uma operação fiscal na grade.';
@@ -72,6 +77,7 @@ constructor TOperacoesFiscaisIbsCbsPresenter.Create(
   const AView: IOperacoesFiscaisIbsCbsView;
   const AQueryDefinition: INextQueryDefinition<TOperacaoFiscalSelecionada>;
   const AAuthorization: IAuthorizationService;
+  ARemover: RemoverOperacaoFiscalIbsCbsUseCase;
   ASalvar: SalvarOperacaoFiscalIbsCbsUseCase;
   AObter: ObterOperacaoFiscalIbsCbsPorIdUseCase);
 begin
@@ -85,6 +91,9 @@ begin
   if AQueryDefinition = nil then
     raise Exception.Create(
       'A consulta de Operações Fiscais IBS/CBS não foi informada.');
+  if ARemover = nil then
+    raise Exception.Create(
+      'O caso de uso de remoção de Operações Fiscais IBS/CBS não foi informado.');
   if ASalvar = nil then
     raise Exception.Create(
       'O caso de uso de gravação de Operações Fiscais IBS/CBS não foi informado.');
@@ -94,8 +103,44 @@ begin
 
   FView := AView;
   FQueryDefinition := AQueryDefinition;
+  FRemover := ARemover;
   FSalvar := ASalvar;
   FObter := AObter;
+end;
+
+function TOperacoesFiscaisIbsCbsPresenter.EnviarParaLixeira: Boolean;
+var
+  Selected: TOperacaoFiscalSelecionada;
+  Descricao: string;
+begin
+  Result := False;
+
+  if not FQueryDefinition.TryGetSelected(Selected) then
+    Exit;
+
+  Descricao := Trim(Selected.OperacaoInternaDescricao);
+  if Trim(Selected.RegraFiscalDescricao) <> '' then
+    Descricao := Descricao + ' / ' + Trim(Selected.RegraFiscalDescricao);
+  if Trim(Selected.GrupoFiscalDescricao) <> '' then
+    Descricao := Descricao + ' / ' + Trim(Selected.GrupoFiscalDescricao);
+
+  if not FView.ShowDangerQuestion(Format(
+    'Deseja enviar a operação fiscal "%s" para a lixeira?', [Descricao])) then
+    Exit;
+
+  if not Autorizar(ProcessoExclusao, aaExcluir) then
+    Exit;
+
+  try
+    FRemover.Executar(Selected.Id);
+    Result := True;
+  except
+    on E: EValidacaoNegocio do
+      FView.ShowError(E.Message);
+    on E: Exception do
+      FView.ShowError(
+        'Não foi possível enviar a operação fiscal para a lixeira.');
+  end;
 end;
 
 function TOperacoesFiscaisIbsCbsPresenter.CarregarParaInclusao: Boolean;
@@ -121,6 +166,7 @@ function TOperacoesFiscaisIbsCbsPresenter.CarregarParaEdicao: Boolean;
 var
   Selected: TOperacaoFiscalSelecionada;
   Id: string;
+  Descricao: string;
   Carregada: OperacaoFiscalIbsCbsEtd;
 begin
   Result := False;
@@ -158,14 +204,23 @@ begin
         Exit;
       end;
 
-      // Restaurar um registro da lixeira pertence a uma entrega futura: esta
-      // alteracao apenas recusa, para nao regravar o registro fora do estado em
-      // que a consulta o apresenta.
       if Carregada.Ativo <> saAtivo then
       begin
-        FView.ShowError(
-          'A operação fiscal selecionada está na lixeira e não pode ser alterada.');
-        Exit;
+        Descricao := Trim(Carregada.OperacaoInternaDescricao);
+        if Trim(Carregada.RegraFiscalDescricao) <> '' then
+          Descricao := Descricao + ' / ' + Trim(Carregada.RegraFiscalDescricao);
+        if Trim(Carregada.GrupoFiscalDescricao) <> '' then
+          Descricao := Descricao + ' / ' + Trim(Carregada.GrupoFiscalDescricao);
+
+        if not FView.ShowQuestion(Format(
+          'A operação fiscal "%s" está na lixeira. Deseja restaurar o registro?',
+          [Descricao])) then
+          Exit;
+
+        if not Autorizar(ProcessoRestauracao, aaAlterar) then
+          Exit;
+
+        Carregada.Ativo := saAtivo;
       end;
 
       // A view copia a operacao para o rascunho da aba; a entidade continua

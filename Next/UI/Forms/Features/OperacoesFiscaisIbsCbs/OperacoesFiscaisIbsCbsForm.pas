@@ -38,8 +38,7 @@ type
       const AOperacao: OperacaoFiscalIbsCbsEtd): string;
   protected
     // Liga as acoes padrao da consulta aos metodos do apresentador depois que a
-    // base aceitou a definicao e antes de assumir a posse. Esta tela nao possui
-    // acao de exclusao.
+    // base aceitou a definicao e antes de assumir a posse.
     procedure ApresentadorAssociado(APresenter: TPresenterConsultaBase;
       const ADefinition: INextQueryDefinitionBase); override;
     // Inclusao depende do apresentador; Alterar exige tambem uma linha corrente
@@ -55,6 +54,7 @@ type
     function SalvarAba(const AChave: string;
       AEditor: TWinControl): Boolean; override;
     procedure AvisarSalvamentoSemAtualizacao; override;
+    procedure AvisarExclusaoSemAtualizacao; override;
   public
     // Abre a aba da chave e copia a operacao carregada para o rascunho do editor.
     // A entidade continua pertencendo a quem chamou. A falha de preparacao e
@@ -136,6 +136,8 @@ begin
   OperacoesPresenter := TOperacoesFiscaisIbsCbsPresenter(APresenter);
   AssociarAcaoInclusao(OperacoesPresenter.CarregarParaInclusao);
   AssociarAcaoAlteracao(OperacoesPresenter.CarregarParaEdicao);
+  AssociarAcaoExclusao(OperacoesPresenter.EnviarParaLixeira,
+    'Enviar para a lixeira');
 end;
 
 function TfrmOperacoesFiscaisIbsCbs.TemRegistroCorrente: Boolean;
@@ -323,6 +325,12 @@ begin
   // gravacao e orienta a atualizar a consulta.
   ShowWarning(
     'A operação fiscal foi salva. Refaça a pesquisa para atualizar a consulta.');
+end;
+
+procedure TfrmOperacoesFiscaisIbsCbs.AvisarExclusaoSemAtualizacao;
+begin
+  ShowWarning(
+    'A operação fiscal já foi enviada para a lixeira. Refaça a pesquisa para atualizar a consulta.');
 end;
 
 end.
