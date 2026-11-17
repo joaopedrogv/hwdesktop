@@ -35,7 +35,6 @@ begin
   Result := False;
   SetLength(AOpcoes, 0);
 
-  // Sem as dependencias nao existe leitura a fazer.
   if (AListarEmpresas = nil) or (ASession = nil) then
     Exit;
 
@@ -79,8 +78,6 @@ begin
 
       Result := True;
     except
-      // Falha de leitura ou de montagem interrompe a operacao; nenhuma opcao
-      // parcial e devolvida.
       SetLength(AOpcoes, 0);
     end;
   finally

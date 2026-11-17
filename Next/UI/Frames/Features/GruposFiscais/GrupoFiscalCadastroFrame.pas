@@ -37,10 +37,6 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    // Recebe o carregamento das empresas. A composicao chama logo apos criar o
-    // frame; o seletor le o login vigente a cada carga.
-    procedure ConfigurarCarregamentoEmpresas(
-      const ACarregar: TCarregarOpcoesEmpresas);
     // Reinicia o frame para uma inclusao: descarta o rascunho anterior, limpa os
     // campos e carrega as empresas permitidas no seletor. Devolve False quando a
     // carga falha; o frame nao apresenta mensagem e nao deixa rascunho.
@@ -62,7 +58,6 @@ type
     procedure ExibirValidacao(const AValidacao: ValidationEntityOutput);
     // Foca o primeiro campo com erro; sem erro vinculado, foca a descricao.
     function FocarPrimeiroCampoInvalido: Boolean;
-    function TemRascunho: Boolean;
     // Contrato comum da aba de cadastro: a base consulta pendencias, encaminha o
     // foco e entrega a validacao sem conhecer este frame.
     function HasPendingChanges: Boolean;
@@ -126,14 +121,6 @@ begin
   cbTipoTributo.Enabled := True;
   cbTipoTributo.ItemIndex := Ord(tfIndefinido);
   fraEmpresas.Limpar;
-end;
-
-procedure TfrmGrupoFiscalCadastroFrame.ConfigurarCarregamentoEmpresas(
-  const ACarregar: TCarregarOpcoesEmpresas);
-begin
-  // O seletor e um filho do DFM: o frame repassa a configuracao para nao expor
-  // o controle nem exigir evento no formulario.
-  fraEmpresas.ConfigurarCarregamento(ACarregar);
 end;
 
 function TfrmGrupoFiscalCadastroFrame.PrepararInclusao: Boolean;
@@ -211,16 +198,11 @@ begin
   FRascunho.EmpresasId := fraEmpresas.EmpresasSelecionadas;
 end;
 
-function TfrmGrupoFiscalCadastroFrame.TemRascunho: Boolean;
-begin
-  Result := FRascunho <> nil;
-end;
-
 function TfrmGrupoFiscalCadastroFrame.HasPendingChanges: Boolean;
 begin
   // Um rascunho aberto ja e pendencia: a inclusao nasce com dados a gravar e a
   // alteracao com a copia carregada do registro.
-  Result := TemRascunho;
+  Result := FRascunho <> nil;
 end;
 
 function TfrmGrupoFiscalCadastroFrame.TryFocus: Boolean;

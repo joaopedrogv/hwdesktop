@@ -33,6 +33,11 @@ type
     Texto: TLabel;
   end;
 
+  // Aviso ao anfitriao, antes da rolagem e do foco, para que ele torne a area do
+  // controle visivel: um campo de outra sub-aba nao aceita foco nem e alcancado
+  // pela rolagem enquanto a pagina que o contem estiver oculta.
+  TPrepararAtivacaoCampo = procedure(AControle: TWinControl) of object;
+
   // Painel reutilizavel de erros de validacao. Recebe o resultado produzido pelo
   // caso de uso e agrupa as mensagens por campo. A navegacao depende apenas dos
   // vinculos registrados pela tela, portanto o painel nao conhece a
@@ -46,6 +51,8 @@ type
     FVinculos: TArray<TVinculoCampoValidacao>;
     FLinhas: TArray<TLinhaValidacao>;
     FAjustando: Boolean;
+    // Gancho opcional do anfitriao para preparar a area do campo antes do foco.
+    FOnPrepararAtivacao: TPrepararAtivacaoCampo;
     procedure LimparLinhas;
     function IndiceVinculo(const ANomeCampo: string): Integer;
     // Deriva o nome do campo do validador a partir do nome do editor.
@@ -81,6 +88,12 @@ type
     // Navega ate o primeiro campo vinculado com erro; campos sem vinculo nao
     // recebem foco.
     function FocarPrimeiroErro: Boolean;
+    // Permite que o anfitriao torne o campo alcancavel (por exemplo, ativando a
+    // sub-aba que o contem) antes da rolagem e do foco. Clique, Enter e o foco do
+    // primeiro erro passam pelo mesmo caminho; sem assinante, o comportamento
+    // anterior permanece.
+    property OnPrepararAtivacao: TPrepararAtivacaoCampo
+      read FOnPrepararAtivacao write FOnPrepararAtivacao;
   end;
 
 implementation
@@ -517,6 +530,11 @@ begin
   Controle := FVinculos[Indice].Controle;
   if Controle = nil then
     Exit;
+
+  // O anfitriao prepara a area do controle antes da rolagem e do foco: a
+  // sub-aba oculta precisa ser ativada para que o campo seja alcancado.
+  if Assigned(FOnPrepararAtivacao) then
+    FOnPrepararAtivacao(Controle);
 
   RolarControleEmVista(Controle);
 

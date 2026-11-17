@@ -10,17 +10,36 @@ function CreateOperacoesFiscaisIbsCbsView(AParent: HWND): TfrmNextBase;
 implementation
 
 uses
-  OperacoesFiscaisIbsCbsForm, LocalPreferences,
+  Vcl.Controls, OperacoesFiscaisIbsCbsForm, LocalPreferences,
   OperacoesFiscaisIbsCbsQueryDefinition, NextQueryDefinition,
+  OperacoesFiscaisIbsCbsPresenter, OperacoesFiscaisSelecoesBuilder,
+  OperacaoFiscalIbsCbsCadastroFrame, EditorCadastro, SelecaoEntidadeOption,
+  RegraFiscalSelecaoOption, EmpresaOption,
   IDataSetReaderUnit, QueryResultOperations, ColumnLayoutPreferences,
-  PresenterConsultaBase, AuthorizationService, NextSetup;
+  AuthorizationService, NextSetup, EmpresaOptionsBuilder,
+  ListarOperacoesInternasUseCaseUnit, ListarGruposFiscaisUseCaseUnit,
+  ListarRegrasFiscaisUseCaseUnit, ListarEmpresasUseCaseUnit,
+  ISessionContextUnit, SalvarOperacaoFiscalIbsCbsUseCaseUnit,
+  ObterOperacaoFiscalIbsCbsPorIdUseCaseUnit;
 
 function CreateOperacoesFiscaisIbsCbsView(AParent: HWND): TfrmNextBase;
 var
   View: TfrmOperacoesFiscaisIbsCbs;
   Preferences: ILocalPreferences;
-  Definition: INextQueryDefinitionBase;
-  Presenter: TPresenterConsultaBase;
+  Definition: INextQueryDefinition<TOperacaoFiscalSelecionada>;
+  Presenter: TOperacoesFiscaisIbsCbsPresenter;
+  ListarOperacoesInternas: ListarOperacoesInternasUseCase;
+  ListarGruposFiscais: IListarAtualeTodosGruposFiscaisUseCase;
+  ListarRegrasFiscais: ListarRegrasFiscaisUseCase;
+  ListarEmpresas: ListarEmpresasUseCase;
+  Sessao: ISessionContext;
+  Salvar: SalvarOperacaoFiscalIbsCbsUseCase;
+  Obter: ObterOperacaoFiscalIbsCbsPorIdUseCase;
+  CarregarOperacaoInterna: TCarregarSelecaoEntidade;
+  CarregarGrupoFiscal: TCarregarSelecaoEntidade;
+  CarregarRegraFiscal: TCarregarRegraFiscalSelecao;
+  CarregarEmpresas: TCarregarOpcoesEmpresas;
+  CriarEditor: TCriarEditorCadastro;
 begin
   Preferences := NextSetupInstance.Resolve<ILocalPreferences>;
 
@@ -35,17 +54,46 @@ begin
       NextSetupInstance.Resolve<IColumnLayoutPreferences>,
       View.IsLixeiraSearch);
 
-    // A tela e somente leitura: a pesquisa e autorizada pela consulta padrao,
-    // sem acoes de cadastro associadas.
-    Presenter := TPresenterConsultaBase.Create(
-      NextSetupInstance.Resolve<IAuthorizationService>, 'MOD020',
-      'OP_FISCAIS_IBSCBS');
+    // Os casos de uso e a sessao sao resolvidos uma unica vez: cada carga
+    // consulta o registro atual e o login continua sendo lido a cada chamada.
+    ListarOperacoesInternas := NextSetupInstance.Resolve<ListarOperacoesInternasUseCase>;
+    ListarGruposFiscais := NextSetupInstance.Resolve<IListarAtualeTodosGruposFiscaisUseCase>;
+    ListarRegrasFiscais := NextSetupInstance.Resolve<ListarRegrasFiscaisUseCase>;
+    ListarEmpresas := NextSetupInstance.Resolve<ListarEmpresasUseCase>;
+    Sessao := NextSetupInstance.SessionContext;
+    Salvar := NextSetupInstance.Resolve<SalvarOperacaoFiscalIbsCbsUseCase>;
+    Obter := NextSetupInstance.Resolve<ObterOperacaoFiscalIbsCbsPorIdUseCase>;
+
+    CarregarOperacaoInterna := CriarCarregadorOperacoesInternas(ListarOperacoesInternas);
+    CarregarGrupoFiscal := CriarCarregadorGruposFiscais(ListarGruposFiscais);
+    CarregarRegraFiscal := CriarCarregadorRegrasFiscais(ListarRegrasFiscais);
+    CarregarEmpresas := CriarCarregadorEmpresas(ListarEmpresas, Sessao);
+
+    // Cada aba recebe um editor novo, dono do proprio rascunho e dos proprios
+    // seletores. A funcao nao guarda a aba nem o frame.
+    CriarEditor :=
+      function(const AChave: string; AControlePai: TWinControl): TWinControl
+      var
+        Frame: TfrmOperacaoFiscalIbsCbsCadastroFrame;
+      begin
+        Frame := TfrmOperacaoFiscalIbsCbsCadastroFrame.Create(AControlePai);
+        // Somente o Grupo Fiscal aceita a opcao vazia, que representa o vinculo
+        // nulo no rascunho.
+        Frame.fraOperacaoInterna.ConfigurarCarregamento(CarregarOperacaoInterna, False);
+        Frame.fraGrupoFiscal.ConfigurarCarregamento(CarregarGrupoFiscal, True);
+        Frame.fraRegraFiscal.ConfigurarCarregamento(CarregarRegraFiscal);
+        Frame.fraEmpresas.ConfigurarCarregamento(CarregarEmpresas);
+        Result := Frame;
+      end;
+
+    Presenter := TOperacoesFiscaisIbsCbsPresenter.Create(View, Definition,
+      NextSetupInstance.Resolve<IAuthorizationService>, Salvar, Obter);
     try
-      // A tela configura a definicao, os filtros e, por ultimo, assume a posse
-      // do apresentador; uma falha antes disso mantem a posse aqui.
-      View.ConfigurarTela(Definition, Presenter, Preferences);
+      // A tela configura a criacao do editor, associa a definicao, configura os
+      // filtros e so entao assume a posse do apresentador; uma falha antes disso
+      // mantem a posse aqui.
+      View.ConfigurarTela(Definition, Presenter, Preferences, CriarEditor);
     except
-      // Associacao recusada: a tela nao assumiu a posse.
       Presenter.Free;
       raise;
     end;

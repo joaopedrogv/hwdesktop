@@ -138,8 +138,6 @@ function TGruposFiscaisPresenter.CarregarParaInclusao: Boolean;
 begin
   Result := False;
 
-  // Aba ja aberta: reapresenta o rascunho existente, sem nova autorizacao e sem
-  // nova carga de empresas.
   if FView.AtivarInclusao then
   begin
     Result := True;
@@ -163,8 +161,6 @@ var
 begin
   Result := False;
 
-  // A linha corrente e lida uma unica vez: o mesmo registro identificado aqui e
-  // o que a tela reapresenta ou carrega.
   if not FQueryDefinition.TryGetSelected(Selected) then
   begin
     FView.ShowError(SelecaoObrigatoriaMessage);
@@ -178,16 +174,13 @@ begin
     Exit;
   end;
 
-  // Aba ja aberta: reapresenta o rascunho existente, sem nova autorizacao e sem
-  // recarregar o registro.
   if FView.AtivarEdicao(Id) then
   begin
     Result := True;
     Exit;
   end;
 
-  // A permissao de alteracao e verificada antes de qualquer leitura; a negativa
-  // ou o cancelamento ja foi apresentado pelo legado.
+  // A permissao de alteracao e verificada antes de qualquer leitura.
   if not Autorizar(ProcessoAlteracao, aaAlterar) then
     Exit;
 

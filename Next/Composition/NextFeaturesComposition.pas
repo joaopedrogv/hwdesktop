@@ -13,8 +13,14 @@ uses
   AuthorizationService, NextAuthorizationAdapter,
   IGruposFiscaisRepositoryUnit, GruposFiscaisRepositoryUnit,
   RemoverGrupoFiscalUseCaseUnit, SalvarGrupoFiscalUseCaseUnit,
-  ObterGruposFiscaisUseCaseUnit,
+  ObterGruposFiscaisUseCaseUnit, ListarGruposFiscaisUseCaseUnit,
   ListarEmpresasUseCaseUnit, IEmpresasRepositoryUnit, EmpresasRepositoryUnit,
+  IOperacoesFiscaisIbsCbsRepositoryUnit, OperacoesFiscaisIbsCbsRepositoryUnit,
+  IOperacoesInternasRepositoryUnit, OperacoesInternasRepositoryUnit,
+  IRegrasFiscaisIbsCbsRepositoryUnit, RegrasFiscaisIbsCbsRepositoryUnit,
+  ObterOperacaoFiscalIbsCbsPorIdUseCaseUnit,
+  SalvarOperacaoFiscalIbsCbsUseCaseUnit,
+  ListarOperacoesInternasUseCaseUnit, ListarRegrasFiscaisUseCaseUnit,
   NextQueryDefinition, GruposFiscaisQueryDefinition,
   ColumnLayoutPreferences, ColumnLayoutPreferencesRepository,
   LocalPreferences, WindowsRegistryLocalPreferences;
@@ -58,6 +64,27 @@ begin
   // container, como ListarEmpresasUseCase, e o apresentador apenas a utiliza.
   AContainer.RegisterType<ObterGrupoFiscalPorIdUseCase>.AsSingleton;
   AContainer.RegisterType<INextQueryDefinition<TGrupoSelecionado>, TGruposFiscaisQueryDefinition>().AsTransient;
+
+  // Operacoes Fiscais IBS/CBS: os repositorios leem a mesma conexao
+  // compartilhada do Setup e nao guardam estado entre chamadas, portanto a
+  // instancia unica pode ser reutilizada por qualquer tela. Os casos de uso de
+  // leitura seguem o mesmo criterio e o apresentador apenas os utiliza.
+  AContainer.RegisterType<IOperacoesFiscaisIbsCbsRepository,
+    OperacoesFiscaisIbsCbsRepository>.AsSingleton;
+  AContainer.RegisterType<IOperacoesInternasRepository,
+    OperacoesInternasRepository>.AsSingleton;
+  AContainer.RegisterType<IRegrasFiscaisIbsCbsRepository,
+    RegrasFiscaisIbsCbsRepository>.AsSingleton;
+  AContainer.RegisterType<ObterOperacaoFiscalIbsCbsPorIdUseCase>.AsSingleton;
+  AContainer.RegisterType<ListarOperacoesInternasUseCase>.AsSingleton;
+  AContainer.RegisterType<IListarAtualeTodosGruposFiscaisUseCase>.AsSingleton;
+  AContainer.RegisterType<ListarRegrasFiscaisUseCase>.AsSingleton;
+
+  // A gravacao recebe a conexao e o repositorio compartilhados e nao guarda
+  // estado mutavel por tela: cada execucao usa apenas variaveis locais. Como
+  // ObterOperacaoFiscalIbsCbsPorIdUseCase, o container mantem a instancia unica
+  // e o apresentador apenas a utiliza, sem libera-la.
+  AContainer.RegisterType<SalvarOperacaoFiscalIbsCbsUseCase>.AsSingleton;
 end;
 
 end.

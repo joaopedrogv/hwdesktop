@@ -187,9 +187,6 @@ begin
     Exit;
 
   Frame := TfrmGrupoFiscalCadastroFrame(AEditor);
-  if not Frame.TemRascunho then
-    Exit;
-
   Frame.LimparValidacao;
   if not Frame.AplicarCamposAoRascunho then
     Exit;

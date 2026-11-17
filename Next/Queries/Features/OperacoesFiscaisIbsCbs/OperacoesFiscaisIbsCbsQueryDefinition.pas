@@ -11,10 +11,22 @@ type
   // view e pode mudar enquanto a janela permanece aberta.
   TLixeiraSearch = function: Boolean of object;
 
+  // Identificacao da operacao fiscal escolhida na grade. As descricoes ja
+  // apresentadas na consulta acompanham a selecao e identificam a aba aberta; o
+  // record e copiado por valor e nenhum objeto precisa ser liberado pela tela ou
+  // pelo apresentador.
+  TOperacaoFiscalSelecionada = record
+    Id: string;
+    OperacaoInternaDescricao: string;
+    GrupoFiscalDescricao: string;
+    RegraFiscalDescricao: string;
+  end;
+
   // Definicao de leitura das Operacoes Fiscais IBS/CBS. A tabela nao possui
   // empresa: o unico predicado fixo e o estado do registro, informado pela tela
   // em cada pesquisa.
-  TOperacoesFiscaisIbsCbsQueryDefinition = class(TNextQueryDefinitionBase)
+  TOperacoesFiscaisIbsCbsQueryDefinition = class(TNextQueryDefinitionBase,
+    INextQueryDefinition<TOperacaoFiscalSelecionada>)
   private
     FLixeiraSearch: TLixeiraSearch;
     // Declaracao unica das colunas; a grade e os filtros saem desta lista.
@@ -29,6 +41,9 @@ type
       AOperation: IQueryResultOperations;
       ALayoutPreferences: IColumnLayoutPreferences;
       const ALixeiraSearch: TLixeiraSearch);
+    // Le a linha corrente da grade para a alteracao. Sem resultado aberto ou com
+    // a linha corrente invalida nao existe operacao fiscal identificada.
+    function TryGetSelected(out ASelected: TOperacaoFiscalSelecionada): Boolean;
   end;
 
 implementation
@@ -36,9 +51,9 @@ implementation
 // A declaracao usa os literais de tipo de valor e de visibilidade destas
 // unidades, alem dos metadados de coluna e filtro.
 uses
-  System.SysUtils, ParameterValueUnit, QueryFilterSqlBuilder,
-  GridColumnDefinition, FilterDefinition, StatusRegistroEnumUnit,
-  TipoTributoFiscalEnumUnit;
+  System.SysUtils, Data.DB, QueryResultUnit, ParameterValueUnit,
+  QueryFilterSqlBuilder, GridColumnDefinition, FilterDefinition,
+  StatusRegistroEnumUnit, TipoTributoFiscalEnumUnit;
 
 const
   LayoutQueryId = 'operacoes.fiscais.ibscbs';
@@ -194,6 +209,39 @@ begin
   Result := TQueryFilterSqlBuilder.Build(OperacoesFiscaisSql, FilterMarker,
     Builder.Build, FFiltersDef, ACriteria);
   Result.Sql := Result.Sql + OrderSql;
+end;
+
+function TOperacoesFiscaisIbsCbsQueryDefinition.TryGetSelected(
+  out ASelected: TOperacaoFiscalSelecionada): Boolean;
+var
+  DataSet: TDataSet;
+  Consulta: QueryResult;
+begin
+  ASelected := Default(TOperacaoFiscalSelecionada);
+  Result := False;
+
+  // Sem pesquisa concluida, sem resultado ou com a linha corrente invalida nao
+  // existe operacao fiscal a alterar.
+  DataSet := GetDataSet;
+  if (DataSet = nil) or (not DataSet.Active) or DataSet.IsEmpty then
+    Exit;
+
+  // A grade fornece o dataset: o wrapper apenas le a linha corrente e nao
+  // participa da posse do dataset. O grupo fiscal vem do left join e o valor
+  // nulo e apresentado como texto vazio; as demais descricoes sao obrigatorias
+  // na consulta. O campo Id e a PK da tabela consultada, se vazio ainda e um
+  // valor valido.
+  Consulta := QueryResult.Create(DataSet, '', False);
+  try
+    ASelected.Id := Consulta.FieldAsString('ID');
+    ASelected.OperacaoInternaDescricao := Consulta.FieldAsString('OP_DESCRICAO');
+    ASelected.GrupoFiscalDescricao :=
+      Consulta.FieldAsStringNullable('G_DESCRICAO').ToText('');
+    ASelected.RegraFiscalDescricao := Consulta.FieldAsString('R_DESCRICAO');
+    Result := True;
+  finally
+    Consulta.Free;
+  end;
 end;
 
 end.

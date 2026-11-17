@@ -1046,6 +1046,7 @@ end;
 function ErpFeaturesFactory.CreateRemoverOperacaoFiscalIbsCbsUseCase: IRemoverOperacaoFiscalIbsCbsUseCase;
 begin
   Result := RemoverOperacaoFiscalIbsCbsUseCase.Create(
+    FDatabaseConnection,
     ErpFeaturesRepoContainer.GetInstance().OperacoesFiscaisIbsCbsRepo
   );
 end;
@@ -1154,6 +1155,7 @@ end;
 function ErpFeaturesFactory.CreateSalvarOperacaoFiscalIbsCbsUseCase: ISalvarOperacaoFiscalIbsCbsUseCase;
 begin
   Result := SalvarOperacaoFiscalIbsCbsUseCase.Create(
+    FDatabaseConnection,
     ErpFeaturesRepoContainer.GetInstance().OperacoesFiscaisIbsCbsRepo
   );
 end;

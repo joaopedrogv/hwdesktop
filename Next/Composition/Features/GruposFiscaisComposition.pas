@@ -43,10 +43,12 @@ begin
     // lista. A funcao nao guarda a aba nem o frame.
     CriarEditor :=
       function(const AChave: string; AControlePai: TWinControl): TWinControl
+      var
+        Frame: TfrmGrupoFiscalCadastroFrame;
       begin
-        Result := TfrmGrupoFiscalCadastroFrame.Create(AControlePai);
-        TfrmGrupoFiscalCadastroFrame(Result).ConfigurarCarregamentoEmpresas(
-          CarregarOpcoes);
+        Frame := TfrmGrupoFiscalCadastroFrame.Create(AControlePai);
+        Frame.fraEmpresas.ConfigurarCarregamento(CarregarOpcoes);
+        Result := Frame;
       end;
 
     Presenter := TGruposFiscaisPresenter.Create(View, Definitions,
