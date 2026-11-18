@@ -137,6 +137,7 @@ teste:
   (8 linhas no `.pas`, 9 no `.dfm`).
 - Sem resíduos para `hw_LerXMLNFeSaida`, `verificarRecibolote`, `EnviarEmailNFSe`,
   `nfce_anexos_csharp`, `NFSeCallCriarAnexosCSharp` e `nfe_anexos_csharp` no ERP.
-- **Comentários legados pré-existentes** com `VerificaSCAN` (nome que nunca foi export) permanecem em
-  blocos `{ ... }` de `uClassesNotasFiscais.pas`, `UClassesVeiculosCCIA.pas` e `UClassesPend.pas`;
-  não são referências às remoções desta série — avaliar remoção numa limpeza de comentários.
+- **Comentários legados com `VerificaSCAN` removidos (2026-11-18):** blocos comentados dos métodos
+  `tentarSCAN` em `uClassesNotasFiscais.pas` (25 linhas), `UClassesVeiculosCCIA.pas` (22) e
+  `UClassesPend.pas` (22). Os métodos permanecem como stubs (`Result := False; Exit;`); não há mais
+  `VerificaSCAN`/`VerificarSCAN` no código da aplicação.
