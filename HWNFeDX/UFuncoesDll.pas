@@ -76,21 +76,21 @@ type
     WebService: TNFeWebServiceLegado;
   end;
 
-
+ function GeraChaveNFe(codigo_uf: integer;cnf: integer;modelo: integer;
+   serie: integer;nnf: integer;tpemi: integer;vdata: WideString;cnpj: WideString): WideString;
  function getCampoPipe(plinha: string; pOrdem: integer; pDelimitador: string = '|'): string;
  function strIn(pSubString: string; const pArgs: array of string): Boolean;
  function LerConfiguracao(const AConfigLegado: TNFeConfiguracaoLegado): WideString;
+ function VerificarSVC(pUF: string): Integer;
+ function Cpf(Num: string): boolean;
+ function cgc(Num: string): boolean;
+ function Split(const Str: string; Delimiter: Char = '|'): TStringList;
+
  function verificarStatusWeb(verresultado: WideString): WideString; stdcall;
  function GeraNFe(hide, hemit, hDest, temVeic, veiculo, htotal: array of shortstring; tProd: ArrayBi; tipoOP: WideString; vNLote: Integer; tipoI_F: Integer;var resposta: WideString;sisint: WideString;NFTP: WideString;codempresa: WideString;Ddup: ArrayBi;DTransp:array of shortstring;vinfadic: WideString;hretirada,hentrega: array of shortstring;DdadosCupom:ArrayBi; pItemDI: array of Record_Item_DI; hexporta: array of shortstring; hrefNFe: array of shortstring): WideString; stdcall;
  function TerminaNFE: LongBool;stdcall;
  function ExecutarDLL(ttipo: WideString; Aux: WideString; Just: WideString;var resposta:WideString;sisint: WideString;NFTP: WideString;codempresa: WideString;vtipocons: WideString;statusNFE: WideString;nregdpec: WideString; pUFWS: WideString): WideString; stdcall;export;
  function ConsultaCadastro(vuf,cnpjcpf,mostrarretorno: WideString): WideString;stdcall;export;
- function GeraChaveNFe(codigo_uf: integer;cnf: integer;modelo: integer;
- serie: integer;nnf: integer;tpemi: integer;vdata: WideString;cnpj: WideString): WideString; stdcall;
- function VerificarSVC(pUF: string): Integer;
- function Cpf(Num: string): boolean;
- function cgc(Num: string): boolean;
- function Split(const Str: string; Delimiter: Char = '|'): TStringList;
 
 
  var
@@ -119,7 +119,7 @@ uses ACBrNFeConfiguracoes, ACBrMDFe, pcnConversaoNFe,
   ACBrMDFe.Conversao, ACBrDFe, ACBrDFeSSL, {pcnEnvEventoNFe, }ACBrNFeNotasFiscais,
   Math, ACBrDFeUtil, ACBrDFeDANFeReport, hw_win_utils;
 
-procedure closeallAuditoria ;stdcall; external 'auditoria.dll';
+procedure closeallAuditoria; stdcall; external 'auditoria.dll';
 
 Class procedure Tevent.GerarLog(const Mensagem: String; var Tratado: Boolean);
 var
@@ -865,7 +865,7 @@ end;
 
 
 function GeraChaveNFe(codigo_uf: integer;cnf: integer;modelo: integer;
-serie: integer;nnf: integer;tpemi: integer;vdata: WideString;cnpj: WideString): WideString; stdcall;
+serie: integer;nnf: integer;tpemi: integer;vdata: WideString;cnpj: WideString): WideString;
 var
  vchave: AnsiString;
  function OnlyNumber(Atext: string): string;
@@ -2498,20 +2498,6 @@ begin
 //   resposta:='TESTE';
 end;
 
-function BuscaTroca(Text, Busca, Troca: string): string;
-var n: integer;
-begin
-   for n := 1 to length(Text) do
-   begin
-      if Copy(Text, n, 1) = Busca then
-      begin
-         Delete(Text, n, 1);
-         Insert(Troca, Text, n);
-      end;
-   end;
-   Result := Text;
-end;
-
 function ConsultaCadastro(vuf,cnpjcpf,mostrarretorno: WideString): WideString;stdcall;export;
 var
  vataviso: boolean;
@@ -2940,7 +2926,6 @@ exports
  verificarStatusWeb,
  TerminaNFE,
  ConsultaCadastro,
- GeraChaveNFe,
  EnviarMDFE,
  ConsultarMDFE,
  EnviaEventoMDFE,
