@@ -160,10 +160,6 @@
             <FormType>dfm</FormType>
             <DesignClass>TForm</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\UI\Forms\Features\EventosRtc\EventosRtcForm.pas">
-            <Form>frmEventosRtc</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <DCCReference Include="..\UI\Forms\Features\GruposFiscais\GruposFiscaisForm.pas">
             <Form>frmGruposFiscais</Form>
             <FormType>dfm</FormType>
@@ -180,7 +176,6 @@
         <DCCReference Include="..\Queries\Shared\QueryColumnDefinition.pas"/>
         <DCCReference Include="..\UI\Presenters\Shared\PresenterConsultaBase.pas"/>
         <DCCReference Include="..\UI\Presenters\Shared\PresenterCadastroBase.pas"/>
-        <DCCReference Include="..\Queries\Features\EventosRtc\EventosRtcQueryDefinition.pas"/>
         <DCCReference Include="..\Queries\Features\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsQueryDefinition.pas"/>
         <DCCReference Include="..\UI\Presenters\Features\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsPresenter.pas"/>
         <DCCReference Include="..\Composition\Shared\Seletores\OperacoesFiscaisSelecoesBuilder.pas"/>
@@ -211,7 +206,6 @@
         <DCCReference Include="..\..\Modern\Core\Domain\Ports\Shared\ColumnLayoutPreferences.pas"/>
         <DCCReference Include="..\..\Modern\Adapters\Secondary\Preferences\ColumnLayoutPreferencesRepository.pas"/>
         <DCCReference Include="..\Queries\Features\GruposFiscais\GruposFiscaisQueryDefinition.pas"/>
-        <DCCReference Include="..\Composition\Features\EventosRtcComposition.pas"/>
         <DCCReference Include="..\Composition\Features\OperacoesFiscaisIbsCbsComposition.pas"/>
         <DCCReference Include="..\Composition\Features\GruposFiscaisComposition.pas"/>
         <BuildConfiguration Include="Release">

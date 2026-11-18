@@ -23,7 +23,6 @@ uses
   OperacaoFiscalIbsCbsCadastroFrame in '..\UI\Frames\Features\OperacoesFiscaisIbsCbs\OperacaoFiscalIbsCbsCadastroFrame.pas' {frmOperacaoFiscalIbsCbsCadastroFrame: TFrame},
   ConsultaBaseForm in '..\UI\Forms\Base\ConsultaBaseForm.pas' {frmConsultaBase},
   ColumnSelectionForm in '..\UI\Forms\Shared\Columns\ColumnSelectionForm.pas' {frmColumnSelection: TForm},
-  EventosRtcForm in '..\UI\Forms\Features\EventosRtc\EventosRtcForm.pas' {frmEventosRtc},
   GruposFiscaisForm in '..\UI\Forms\Features\GruposFiscais\GruposFiscaisForm.pas' {frmGruposFiscais},
   OperacoesFiscaisIbsCbsForm in '..\UI\Forms\Features\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsForm.pas' {frmOperacoesFiscaisIbsCbs},
   AnaliseCondicoesForm in '..\UI\Forms\Features\OperacoesFiscaisIbsCbs\AnaliseCondicoesForm.pas' {frmAnaliseCondicoes: TForm},
@@ -36,7 +35,6 @@ uses
   PresenterConsultaBase in '..\UI\Presenters\Shared\PresenterConsultaBase.pas',
   PresenterCadastroBase in '..\UI\Presenters\Shared\PresenterCadastroBase.pas',
   PresenterAutorizacao in '..\UI\Presenters\Shared\PresenterAutorizacao.pas',
-  EventosRtcQueryDefinition in '..\Queries\Features\EventosRtc\EventosRtcQueryDefinition.pas',
   OperacoesFiscaisIbsCbsQueryDefinition in '..\Queries\Features\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsQueryDefinition.pas',
   OperacoesFiscaisIbsCbsPresenter in '..\UI\Presenters\Features\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsPresenter.pas',
   OperacoesFiscaisIbsCbsCadastroPresenter in '..\UI\Presenters\Features\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsCadastroPresenter.pas',
@@ -75,7 +73,6 @@ uses
   IResolverRegraFiscalIbsCbsServiceUnit in '..\..\Modern\ERP.Features\Core\Domain\Services\RegrasFiscais\IResolverRegraFiscalIbsCbsServiceUnit.pas',
   ResolverRegraFiscalIbsCbsServiceUnit in '..\..\Modern\ERP.Features\Core\Domain\Services\RegrasFiscais\ResolverRegraFiscalIbsCbsServiceUnit.pas',
   GruposFiscaisQueryDefinition in '..\Queries\Features\GruposFiscais\GruposFiscaisQueryDefinition.pas',
-  EventosRtcComposition in '..\Composition\Features\EventosRtcComposition.pas',
   OperacoesFiscaisIbsCbsComposition in '..\Composition\Features\OperacoesFiscaisIbsCbsComposition.pas',
   GruposFiscaisComposition in '..\Composition\Features\GruposFiscaisComposition.pas';
 

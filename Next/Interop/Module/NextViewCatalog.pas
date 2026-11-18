@@ -10,8 +10,7 @@ function NextViewCreate(const AIdentifier: string; AParent: HWND): TfrmNextBase;
 implementation
 
 uses
-  NextViewRegistry, EventosRtcComposition, OperacoesFiscaisIbsCbsComposition,
-  GruposFiscaisComposition;
+  NextViewRegistry, OperacoesFiscaisIbsCbsComposition, GruposFiscaisComposition;
 
 var
   FRegistry: TNextViewRegistry;
@@ -23,7 +22,6 @@ end;
 
 initialization
   FRegistry := TNextViewRegistry.Create;
-  FRegistry.Register('rtc.events', CreateEventosRtcView);
   FRegistry.Register('operacoes.fiscais.ibscbs', TOperacoesFiscaisIbsCbsComposition.CriarConsulta);
   FRegistry.Register('grupos.fiscais', TGruposFiscaisComposition.CriarConsulta);
 
