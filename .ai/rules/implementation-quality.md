@@ -53,7 +53,7 @@ are evidence to evaluate, including their comments.
 
 ## Messages and review findings
 
-- Write a user-facing message at its point of use. Use a named constant when the
+- Write a user-facing message at its point of use. Use a named constant only when the
   same message is reused.
 - Identify records using recognizable business labels, with enough data to
   distinguish them. Keep internal identifiers in diagnostic evidence when needed.

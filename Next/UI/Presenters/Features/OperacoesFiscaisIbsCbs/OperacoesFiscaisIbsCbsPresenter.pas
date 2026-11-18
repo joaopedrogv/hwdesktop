@@ -73,10 +73,6 @@ const
   ProcessoExclusao = 'MOD024';
   ProcessoRestauracao = 'MOD025';
   TabelaOperacoesFiscais = 'OP_FISCAIS_IBSCBS';
-
-  AnaliseFalhaMessage =
-    'Não foi possível analisar as condições da operação fiscal.';
-
   SelecaoObrigatoriaMessage = 'Selecione uma operação fiscal na grade.';
 
 function DescricaoConfiguracao(
@@ -443,7 +439,7 @@ begin
       on E: EValidacaoNegocio do
         FView.ShowError(E.Message);
       on E: Exception do
-        FView.ShowError(AnaliseFalhaMessage);
+        FView.ShowError('Não foi possível analisar as condições da operação fiscal.');
     end;
   finally
     Analise.Free;

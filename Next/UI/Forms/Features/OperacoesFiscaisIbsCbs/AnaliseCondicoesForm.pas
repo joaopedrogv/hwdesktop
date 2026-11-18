@@ -29,9 +29,6 @@ implementation
 uses
   Vcl.Clipbrd;
 
-const
-  CopyFailureMessage = 'Não foi possível copiar o relatório.';
-
 procedure TfrmAnaliseCondicoes.Configure(const AResumo, ARelatorio: string);
 begin
   lblResumo.Caption := AResumo;
@@ -43,7 +40,7 @@ begin
   try
     Clipboard.AsText := MemoRelatorio.Text;
   except
-    ShowError(CopyFailureMessage);
+    ShowError('Não foi possível copiar o relatório.');
   end;
 end;
 
