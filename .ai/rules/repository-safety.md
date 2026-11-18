@@ -11,6 +11,9 @@ always_apply: true
 - Preserve the developer's task scope, approved behavior and existing contracts.
 - Preserve unrelated changes, personal configuration, ignored dependencies, file
   encoding and line endings. Do not perform incidental cleanup or normalization.
+- Apply coding, comment and encoding standards within the assigned change.
+  Do not use them as a standing assignment to clean up existing code.
+  Report broader cleanup or refactoring as a separate demand.
 - Planning, implementation, test creation, build/test execution, SQL execution,
   setup changes and publication have distinct authorization boundaries. The
   standing validation grants below cover isolated ERP.UnitTests and the local
@@ -29,10 +32,9 @@ always_apply: true
   reusable mechanisms. Do not propagate unjustified duplication, swallowed errors
   or other demonstrated defects merely to resemble existing code. Distinguish
   such risks from personal style preferences.
-- Write clear, maintainable code within the assigned change. Local improvements
-  that preserve approved behavior and contracts do not require a separate gate.
-  Preserve the area's architecture; do not introduce Modern infrastructure or
-  perform unrelated cleanup or broad refactoring under this rule.
+- Write clear, maintainable code within the assigned change. Preserve the area's
+  architecture; do not introduce Modern infrastructure or perform unrelated
+  cleanup or broad refactoring under this rule.
 - Report relevant existing defects and bounded alternatives in the existing
   assignment/result artifacts when needed. Ask for a decision only when a needed
   correction changes approved behavior, contracts or scope, or leaves a material
@@ -45,8 +47,9 @@ always_apply: true
   neighboring files. Apply the area's compatibility Rules where present.
 - Configure the writer explicitly. Use strict encoding that reports characters
   which cannot be represented. Preserve unrelated bytes and existing file format.
-- In Delphi 2006 and Rio `.pas` files, write accented messages and labels as
-  readable string literals, such as `'Autorização'`, using the file's encoding.
+- For new or revised literals in Delphi 2006 and Rio `.pas` files, write
+  accented messages and labels as readable string literals, such as
+  `'Autorização'`, using the file's encoding.
   Reserve numeric escapes such as `#231` for technical needs. In textual `.dfm`
   files, preserve the Delphi designer's serialized form, including numeric
   escapes. Check the readability of changed literals alongside the byte-level

@@ -28,9 +28,10 @@ approved behavior and existing common contracts.
   Write dialog titles and messages in Brazilian Portuguese. Use
   Application.MessageBox for standard buttons in the Windows UI language;
   avoid MessageDlg with VCL-supplied button captions.
-- Reusable frames report feedback to their host form. Keep VCL dialog creation
-  in the UI, outside business code. Keep Modern UIUtilsUnit and its setup and
-  validation dependencies outside Next's dialog implementation.
+- Smaller reusable frames report feedback to their host form. Cadastro editors
+  present feedback through their View and the shared base frame. Keep VCL dialog
+  creation in the UI, outside business code. Keep Modern UIUtilsUnit and its
+  setup and validation dependencies outside Next's dialog implementation.
 - Preserve default buttons, focus and cancellation semantics. Confirmations
   require an explicit affirmative action; make the negative answer the default
   when discarding pending edits.
