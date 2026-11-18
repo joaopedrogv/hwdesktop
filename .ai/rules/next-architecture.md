@@ -64,7 +64,12 @@ source files. Use the same feature name under queries, Presenters, forms and fra
 
 | Location under Next/ | Responsibility |
 | --- | --- |
-| Contracts/ and Contracts/Features/ | Internal contracts and shared option/callback types |
+| Contracts/Shared/Views/ | Common consultation/editor View contracts and feedback |
+| Contracts/Shared/Cadastro/ | Editor/host coordination and editor creation contracts |
+| Contracts/Shared/Seletores/ | Reusable selector options and loading callbacks |
+| Contracts/Shared/Grid/ | Shared grid presentation contracts and column metadata |
+| Contracts/Shared/Authorization/ | Internal authorization service contracts |
+| Contracts/Features/<Feature>/ | Feature-specific consultation/editor Views and exchange contracts |
 | Composition/Features/ | Feature view factories registered by NextViewCatalog |
 | Composition/Shared/Seletores/ | Factories creating selector loaders from injected Use Cases |
 | Infrastructure/ | Database, authorization, auditing and preferences integration |
@@ -75,6 +80,18 @@ source files. Use the same feature name under queries, Presenters, forms and fra
 | UI/Components/ | UI components |
 | Interop/Contracts/, Interop/Host/ and Interop/Module/ | ABI, Delphi 2006 host and Rio module integration |
 | Projects/ and Tests/ | Projects and test support |
+
+Contracts may contain interfaces, records, enums, callbacks and small helpers
+for constructing their values. Group shared contracts by responsibility; keep
+feature-specific contracts under the matching feature name. Selector contracts
+remain shared when the component is reusable, including EmpresaOption,
+SelecaoEntidadeOption and RegraFiscalSelecaoOption.
+
+Keep implementation algorithms in the area that owns their behavior.
+QueryColumnLayout belongs under Queries/Shared/: it resolves the grid layout
+from default columns and persisted preferences. Its relocation does not require
+splitting its types and functions into additional units. Host ABI contracts stay
+under Interop/Contracts/; Modern business Ports stay in their owning contexts.
 
 Within shared queries, place filter definitions and criteria in Filters/.
 Within shared frames, group filters, grids, selectors and companies by their

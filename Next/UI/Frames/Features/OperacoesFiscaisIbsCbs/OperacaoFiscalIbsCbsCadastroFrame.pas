@@ -10,7 +10,7 @@ uses
   DateTimeServiceUnit, StringNullableUnit, DateAndTimeNullableUnit,
   OperacaoFiscalIbsCbsEtdUnit, OperacaoFiscalIbsCbsCondicaoEtdUnit,
   SeletorEntidadeFrame, RegraFiscalSelecaoFrame, EmpresaChecklistFrame,
-  ValidationPanelFrame, ValidationEntityOutputUnit;
+  ValidationPanelFrame;
 
 type
   // Editor da aba de Operacoes Fiscais IBS/CBS; dono do rascunho e do
@@ -104,12 +104,6 @@ type
     // O rotulo de escopo das condicoes acompanha o Grupo Fiscal selecionado.
     procedure AtualizarEscopo;
     procedure GrupoFiscalAlterado(Sender: TObject);
-    // Gancho do painel de validacao: ativa a sub-aba que contem o campo antes da
-    // rolagem e do foco, porque uma pagina oculta nao aceita foco.
-    procedure AtivarSecaoDoControle(AControle: TWinControl);
-    // A primeira mensagem do resultado define a sub-aba apresentada.
-    procedure AtivarSecaoDaValidacao(
-      const AValidacao: ValidationEntityOutput);
 
     property Presenter: TOperacoesFiscaisIbsCbsCadastroPresenter read GetPresenter;
   public
@@ -136,8 +130,6 @@ type
     // foco e entrega a validacao sem conhecer este frame.
     function HasPendingChanges: Boolean; override;
     function TryFocus: Boolean; override;
-    procedure ShowValidation(const AValidacao: ValidationEntityOutput);
-      override;
     procedure ExibirAnaliseCondicoes(const AResumo, ARelatorio: string);
   protected
     function Salvar: Boolean; override;
@@ -186,7 +178,7 @@ begin
   // O erro das condicoes e agrupado pelo dominio: o vinculo leva o foco ao
   // primeiro checklist, que esta na sub-aba Condicoes.
   fraValidacao.Bind('Condicoes', clbTipoEmissao, '');
-  fraValidacao.OnPrepararAtivacao := AtivarSecaoDoControle;
+  AssociarPainelValidacao(fraValidacao);
 
   pcSecoes.ActivePage := tsCadastro;
 end;
@@ -489,44 +481,6 @@ begin
   AtualizarEscopo;
 end;
 
-procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.AtivarSecaoDoControle(
-  AControle: TWinControl);
-var
-  Atual: TControl;
-begin
-  // A sub-aba e identificada pela cadeia de pais: o painel de validacao entrega
-  // o controle interno do seletor ou o checklist, nao a pagina.
-  Atual := AControle;
-  while Atual <> nil do
-  begin
-    if Atual = tsCondicoes then
-    begin
-      pcSecoes.ActivePage := tsCondicoes;
-      Exit;
-    end;
-
-    if Atual = tsCadastro then
-    begin
-      pcSecoes.ActivePage := tsCadastro;
-      Exit;
-    end;
-
-    Atual := Atual.Parent;
-  end;
-end;
-
-procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.AtivarSecaoDaValidacao(
-  const AValidacao: ValidationEntityOutput);
-begin
-  // As condicoes ficam na sub-aba Condicoes; qualquer outro campo do validador
-  // pertence ao Cadastro.
-  if (Length(AValidacao.Validations) > 0) and
-    SameText(Trim(AValidacao.Validations[0].FieldName), 'Condicoes') then
-    pcSecoes.ActivePage := tsCondicoes
-  else
-    pcSecoes.ActivePage := tsCadastro;
-end;
-
 procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.ckFimVigenciaClick(
   Sender: TObject);
 begin
@@ -723,7 +677,6 @@ end;
 
 function TfrmOperacaoFiscalIbsCbsCadastroFrame.TryFocus: Boolean;
 begin
-  // O foco do primeiro erro passa pelo mesmo gancho de ativacao da sub-aba.
   Result := fraValidacao.FocarPrimeiroErro;
   if Result then
     Exit;
@@ -736,15 +689,6 @@ begin
     fraOperacaoInterna.ControleEdicao.SetFocus;
     Result := True;
   end;
-end;
-
-procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.ShowValidation(
-  const AValidacao: ValidationEntityOutput);
-begin
-  // A sub-aba do primeiro erro e apresentada antes das mensagens, para que o
-  // usuario veja a secao a que o painel se refere.
-  AtivarSecaoDaValidacao(AValidacao);
-  fraValidacao.ExibirValidacao(AValidacao);
 end;
 
 procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.ExibirAnaliseCondicoes(

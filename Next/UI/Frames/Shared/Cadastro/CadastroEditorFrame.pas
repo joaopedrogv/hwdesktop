@@ -4,12 +4,12 @@ interface
 
 uses
   System.SysUtils, System.Classes, Vcl.Controls, Vcl.ExtCtrls, Vcl.StdCtrls,
-  Vcl.Forms, EditorCadastro, ViewFeedback, ValidationEntityOutputUnit, PresenterCadastroBase;
+  Vcl.Forms, EditorCadastro, CadastroEditorView, ValidationPanelFrame,
+  ValidationEntityOutputUnit, PresenterCadastroBase;
 
 type
   // Base dos editores de cadastro: rodape proprio e contratos comuns da aba.
-  TfrmCadastroEditor = class(TFrame, IViewFeedback, IEditorCadastro,
-    IEditorCadastroComandos)
+  TfrmCadastroEditor = class(TFrame, ICadastroEditorView, IEditorCadastro)
   private
     FHost: IEditorCadastroHost;
     FRodape: TPanel;
@@ -17,6 +17,8 @@ type
     FBtnCancelar: TButton;
     // Apresentador da funcionalidade. A base responde pela liberacao a partir da  associacao aceita.
     FPresenterCadastro: TPresenterCadastroBase;
+    // Painel de validacao da funcionalidade; o componente continua sendo do frame concreto.
+    FPainelValidacao: TfrmValidationPanelFrame;
     procedure CriarRodape;
     procedure btnSalvarClick(Sender: TObject);
     procedure btnCancelarClick(Sender: TObject);
@@ -24,6 +26,8 @@ type
     // Associa o apresentador da funcionalidade. Ate a atribuicao a composicao continua dona do apresentador e o
     // libera se a associacao for recusada.
     procedure AssociarPresenter(APresenter: TPresenterCadastroBase);
+    // Registra o painel que o frame concreto ja exibe e que continua sendo dele.
+    procedure AssociarPainelValidacao(APainel: TfrmValidationPanelFrame);
     // Executa a gravacao da funcionalidade; False mantem o editor e os dados.
     function Salvar: Boolean; virtual;
     property PresenterCadastro: TPresenterCadastroBase read FPresenterCadastro;
@@ -132,6 +136,15 @@ begin
   FPresenterCadastro := APresenter;
 end;
 
+procedure TfrmCadastroEditor.AssociarPainelValidacao(
+  APainel: TfrmValidationPanelFrame);
+begin
+  if APainel = nil then
+    raise Exception.Create('O painel de validação do editor de cadastro não foi informado.');
+
+  FPainelValidacao := APainel;
+end;
+
 function TfrmCadastroEditor.Salvar: Boolean;
 begin
   Result := False;
@@ -150,6 +163,8 @@ end;
 procedure TfrmCadastroEditor.ShowValidation(
   const AValidacao: ValidationEntityOutput);
 begin
+  if FPainelValidacao <> nil then
+    FPainelValidacao.ExibirValidacao(AValidacao);
 end;
 
 procedure TfrmCadastroEditor.ShowInformation(const AMessage: string);

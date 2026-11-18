@@ -3,7 +3,7 @@ unit EditorCadastro;
 interface
 
 uses
-  Vcl.Controls, ValidationEntityOutputUnit;
+  Vcl.Controls;
 
 type
   // A aba e dona do editor; o editor, do rascunho.
@@ -14,21 +14,6 @@ type
     // Foca o primeiro campo que deve receber a atencao do usuario; False quando o
     // editor nao consegue receber o foco.
     function TryFocus: Boolean;
-    // Apresenta o resultado de validacao produzido pelo caso de uso na gravacao
-    // da propria aba.
-    procedure ShowValidation(const AValidacao: ValidationEntityOutput);
-  end;
-
-  // Cria o editor de uma aba de cadastro e o entrega pronto para a preparacao.
-  // AParent e a area de rolagem que passa a possuir o controle; devolver nil
-  // recusa a aba. A funcao nao retem a aba nem o editor.
-  TCriarEditorCadastro = reference to function(const AChave: string;
-    AParent: TWinControl): TWinControl;
-
-  // Editor que traz os proprios comandos Salvar/Cancelar; a ConsultaBase nao
-  // cria o rodape dessa aba.
-  IEditorCadastroComandos = interface
-    ['{9C4A7E52-1B3D-4F68-8E27-5A6B1D9C3F02}']
   end;
 
   // Destino dos comandos concluidos no editor; o hospedeiro decide quando

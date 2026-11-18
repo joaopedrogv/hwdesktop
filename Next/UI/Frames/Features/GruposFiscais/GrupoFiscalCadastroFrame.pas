@@ -3,18 +3,17 @@ unit GrupoFiscalCadastroFrame;
 interface
 
 uses
-  System.SysUtils, System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls,
-  EditorCadastro, TipoTributoFiscalEnumUnit, GrupoFiscalEtdUnit,
-  ValidationPanelFrame, ValidationEntityOutputUnit, EmpresaOption,
-  EmpresaChecklistFrame;
+  System.SysUtils, System.Classes, Vcl.Forms,
+  Vcl.StdCtrls, CadastroEditorFrame, EditorCadastro, GruposFiscaisCadastroView,
+  GruposFiscaisCadastroPresenter, TipoTributoFiscalEnumUnit, GrupoFiscalEtdUnit,
+  ValidationPanelFrame, EmpresaChecklistFrame;
 
 type
-  // Editor dos campos do grupo fiscal. O frame apresenta e coleta descricao,
-  // tipo de tributo e empresas, carrega as empresas na preparacao da aba e e o
-  // dono do rascunho: a autorizacao, a gravacao e a troca de sessao pertencem
-  // ao formulario que o contem. Os erros do caso de uso sao apresentados pelo
-  // painel comum, que agrupa as mensagens por campo.
-  TfrmGrupoFiscalCadastroFrame = class(TFrame, IEditorCadastro)
+  // Editor dos campos do grupo fiscal; dono do rascunho e do apresentador do
+  // cadastro.
+  TfrmGrupoFiscalCadastroFrame = class(TfrmCadastroEditor,
+    IGruposFiscaisCadastroView)
+    sbCampos: TScrollBox;
     lblDescricao: TLabel;
     edDescricao: TEdit;
     lblTipoTributo: TLabel;
@@ -34,9 +33,21 @@ type
     procedure SetDescricao(const AValue: string);
     function GetTipoTributo: TipoTributoFiscalEnum;
     procedure SetTipoTributo(const AValue: TipoTributoFiscalEnum);
+    // Acesso tipado ao apresentador que a base possui e libera.
+    function GetPresenter: TGruposFiscaisCadastroPresenter;
+    function AplicarCamposAoRascunho: Boolean;
+    procedure LimparCampos;
+    procedure LimparValidacao;
+    property Presenter: TGruposFiscaisCadastroPresenter read GetPresenter;
+    property Descricao: string read GetDescricao write SetDescricao;
+    property TipoTributo: TipoTributoFiscalEnum read GetTipoTributo
+      write SetTipoTributo;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent;
+      const AHost: IEditorCadastroHost); override;
     destructor Destroy; override;
+    // A composicao entrega o apresentador ao frame, que passa a libera-lo.
+    procedure ConfigurarPresenter(APresenter: TGruposFiscaisCadastroPresenter);
     // Reinicia o frame para uma inclusao: descarta o rascunho anterior, limpa os
     // campos e carrega as empresas permitidas no seletor. Devolve False quando a
     // carga falha; o frame nao apresenta mensagem e nao deixa rascunho.
@@ -44,42 +55,25 @@ type
     // Prepara a alteracao de um grupo existente. A entidade recebida nao e
     // assumida: o frame guarda um clone com empresas independentes. O tipo
     // permanece bloqueado e as empresas vinculadas iniciam marcadas, inclusive
-    // as que o usuario nao pode habilitar. Devolve False quando a carga falha.
+    // as que o usuario nao pode habilitar.
     function PrepararAlteracao(const AGrupo: GrupoFiscalEtd): Boolean;
-    // Transfere os campos editados para o rascunho da aba. Nao grava: a
-    // gravacao pertence ao formulario. Retorna False quando nao ha rascunho.
-    function AplicarCamposAoRascunho: Boolean;
-    // Limpa os campos e a lista. Nao libera o rascunho, que pertence ao ciclo da
-    // aba.
-    procedure LimparCampos;
-    procedure LimparValidacao;
-    // Encaminha o resultado do caso de uso ao painel de validacao, que agrupa os
-    // campos e oferece o link para o editor correspondente.
-    procedure ExibirValidacao(const AValidacao: ValidationEntityOutput);
-    // Foca o primeiro campo com erro; sem erro vinculado, foca a descricao.
-    function FocarPrimeiroCampoInvalido: Boolean;
-    // Contrato comum da aba de cadastro: a base consulta pendencias, encaminha o
-    // foco e entrega a validacao sem conhecer este frame.
-    function HasPendingChanges: Boolean;
-    function TryFocus: Boolean;
-    procedure ShowValidation(const AValidacao: ValidationEntityOutput);
-    property Rascunho: GrupoFiscalEtd read FRascunho;
-    property Descricao: string read GetDescricao write SetDescricao;
-    property TipoTributo: TipoTributoFiscalEnum read GetTipoTributo
-      write SetTipoTributo;
+    function HasPendingChanges: Boolean; override;
+    function TryFocus: Boolean; override;
+  protected
+    function Salvar: Boolean; override;
   end;
 
 implementation
 
 {$R *.dfm}
 
-const
-  RascunhoNaoInformadoMessage =
-    'O grupo fiscal da alteração não foi informado.';
+{ TfrmGrupoFiscalCadastroFrame }
 
-constructor TfrmGrupoFiscalCadastroFrame.Create(AOwner: TComponent);
+constructor TfrmGrupoFiscalCadastroFrame.Create(AOwner: TComponent;
+  const AHost: IEditorCadastroHost);
 begin
-  inherited Create(AOwner);
+  inherited Create(AOwner, AHost);
+
   // O frame ja possui os proprios controles: a classe base carrega o DFM antes
   // deste trecho, portanto as opcoes podem ser montadas aqui.
   CarregarOpcoesTributo;
@@ -88,12 +82,23 @@ begin
   // metadata do grupo fiscal usado pelo validador.
   fraValidacao.Bind(edDescricao);
   fraValidacao.Bind(cbTipoTributo);
+  AssociarPainelValidacao(fraValidacao);
 end;
 
 destructor TfrmGrupoFiscalCadastroFrame.Destroy;
 begin
   FreeAndNil(FRascunho);
   inherited;
+end;
+
+procedure TfrmGrupoFiscalCadastroFrame.ConfigurarPresenter(
+  APresenter: TGruposFiscaisCadastroPresenter);
+begin
+  if APresenter = nil then
+    raise Exception.Create(
+      'O apresentador do cadastro de Grupos Fiscais não foi informado.');
+
+  AssociarPresenter(APresenter);
 end;
 
 procedure TfrmGrupoFiscalCadastroFrame.CarregarOpcoesTributo;
@@ -133,8 +138,8 @@ begin
   LimparCampos;
   LimparValidacao;
 
-  // Sem empresas nao ha inclusao: o formulario descarta a aba e apresenta o
-  // aviso. O rascunho so nasce com a lista carregada.
+  // Sem empresas nao ha inclusao: o apresentador apresenta o aviso e o
+  // formulario descarta a aba. O rascunho so nasce com a lista carregada.
   if not fraEmpresas.CarregarInclusao then
     Exit;
 
@@ -149,7 +154,7 @@ var
 begin
   Result := False;
   if AGrupo = nil then
-    raise Exception.Create(RascunhoNaoInformadoMessage);
+    raise Exception.Create('O grupo fiscal da alteração não foi informado.');
 
   // O clone preserva o identificador e os demais campos; as empresas recebem
   // um array proprio para que a edicao nao altere a entidade de quem chamou.
@@ -185,6 +190,22 @@ begin
   Result := True;
 end;
 
+function TfrmGrupoFiscalCadastroFrame.Salvar: Boolean;
+begin
+  Result := False;
+
+  LimparValidacao;
+  if not AplicarCamposAoRascunho then
+    Exit;
+
+  Result := Presenter.Salvar(FRascunho);
+end;
+
+function TfrmGrupoFiscalCadastroFrame.GetPresenter: TGruposFiscaisCadastroPresenter;
+begin
+  Result := TGruposFiscaisCadastroPresenter(PresenterCadastro);
+end;
+
 function TfrmGrupoFiscalCadastroFrame.AplicarCamposAoRascunho: Boolean;
 begin
   Result := FRascunho <> nil;
@@ -206,23 +227,6 @@ begin
 end;
 
 function TfrmGrupoFiscalCadastroFrame.TryFocus: Boolean;
-begin
-  Result := FocarPrimeiroCampoInvalido;
-end;
-
-procedure TfrmGrupoFiscalCadastroFrame.ShowValidation(
-  const AValidacao: ValidationEntityOutput);
-begin
-  ExibirValidacao(AValidacao);
-end;
-
-procedure TfrmGrupoFiscalCadastroFrame.ExibirValidacao(
-  const AValidacao: ValidationEntityOutput);
-begin
-  fraValidacao.ExibirValidacao(AValidacao);
-end;
-
-function TfrmGrupoFiscalCadastroFrame.FocarPrimeiroCampoInvalido: Boolean;
 begin
   Result := fraValidacao.FocarPrimeiroErro;
   if Result then

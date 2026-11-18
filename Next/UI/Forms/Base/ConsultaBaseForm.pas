@@ -8,7 +8,7 @@ uses
   Data.DB,  NextBaseForm, DataGridFrame, FilterDefinition, FilterCriterion, FilterFrame,
   QueryResultOperations, NextQueryDefinition,
   LocalPreferences, PresenterConsultaBase,
-  EditorCadastro, ValidationEntityOutputUnit, ConsultaBaseView;
+  EditorCadastro, ConsultaBaseView;
 
 type
   // Configura o editor recem-criado antes de a aba ser ativada: e o ponto em que
@@ -35,9 +35,6 @@ type
   public
     Chave: string;
     Aba: TTabSheet;
-    Rodape: TPanel;
-    BtnSalvar: TButton;
-    BtnCancelar: TButton;
     Editor: TWinControl;
     Token: Integer;
     Intencao: TIntencaoFechamentoAba;
@@ -59,7 +56,7 @@ type
   // resultado na grade e oferece a aba Consulta com filtros, Pesquisar e Sair.
   // Cada inclusao autorizada pela funcionalidade abre uma aba propria e cada
   // registro escolhido para alteracao abre outra, com area de rolagem e editor
-  // sob posse da base. O rodape da aba pertence a base ou ao proprio editor.
+  // sob posse da base. O rodape da aba pertence ao proprio editor.
   TfrmConsultaBase = class(TfrmNextBase, IConsultaBaseView,
     IEditorCadastroHost)
     pcAbas: TPageControl;
@@ -87,9 +84,6 @@ type
     // Identidade monotonica de cada montagem: um pedido de fechamento registrado
     // para uma aba anterior nao pode alcancar a proxima.
     FTokenAbaCadastro: Integer;
-    // Chave da aba cuja gravacao esta em andamento; a validacao do apresentador
-    // volta para o editor dessa aba.
-    FChaveAbaEmGravacao: string;
     // Apresentador da funcionalidade. A base responde pela liberacao a partir da
     // associacao aceita e nunca o libera com o evento da grade ainda ligado.
     FPresenterConsulta: TPresenterConsultaBase;
@@ -124,9 +118,7 @@ type
     function AbaCadastroPorToken(AToken: Integer): TAbaCadastro;
     function AbaDoControle(AControle: TControl): TTabSheet;
     function AbaCadastroDoControle(AOrigem: TObject): TAbaCadastro;
-    procedure DefinirComandosAba(AAba: TAbaCadastro; AHabilitado: Boolean);
-    procedure btnSalvarAbaClick(Sender: TObject);
-    procedure btnCancelarAbaClick(Sender: TObject);
+
     procedure EditorSalvo(const AEditor: TWinControl);
     procedure EditorCancelado(const AEditor: TWinControl);
     procedure FinalizarEditor(const AEditor: TWinControl;
@@ -213,8 +205,7 @@ type
     // chama AConfigurar antes de ativar e devolve True. Uma falha de montagem
     // libera a aba parcial e devolve False.
     function AbrirAba(const AChave, ATitulo: string;
-      AConfigurar: TConfigurarAbaCadastro): Boolean; overload;
-    function AbrirAba(const AChave, ATitulo: string): Boolean; overload;
+      AConfigurar: TConfigurarAbaCadastro): Boolean;
     // Ativa a aba de cadastro ja existente e informa se ela foi encontrada. Nao
     // cria nem reconfigura a aba: o editor e o rascunho continuam intactos.
     function TryAtivarAba(const AChave: string): Boolean;
@@ -225,7 +216,6 @@ type
     function AbaAtiva(const AChave: string): Boolean;
     function HaAbaAtiva: Boolean;
     function ChaveAbaAtiva: string;
-    function EditorDaAba(const AChave: string): TWinControl;
     function EditorAbaAtiva: TWinControl;
     function TotalAbasCadastro: Integer;
     function EditorAbaCadastro(AIndice: Integer): TWinControl;
@@ -234,26 +224,20 @@ type
     // libera.
     function CriarEditor(const AChave: string;
       AParent: TWinControl): TWinControl; virtual;
-    // True quando a gravacao foi confirmada e a aba pode ser encerrada; a base
-    // registra o fechamento diferido e reconsulta depois do clique.
-    function SalvarAba(const AChave: string;
-      AEditor: TWinControl): Boolean; virtual;
+
     // Aviso de gravacao confirmada cuja reconsulta falhou. O descendente
     // fornece a mensagem de negocio; a base chama depois de fechar a aba.
     procedure AvisarSalvamentoSemAtualizacao; virtual;
     // Aviso de exclusao confirmada cuja reconsulta falhou. O descendente fornece
     // a mensagem de negocio da funcionalidade.
     procedure AvisarExclusaoSemAtualizacao; virtual;
-    // Chave da aba cuja gravacao esta em andamento. A validacao produzida pelo
-    // apresentador e encaminhada ao editor dessa aba.
-    property ChaveAbaEmGravacao: string read FChaveAbaEmGravacao;
+
     // Apresentador associado, sem o tipo da funcionalidade: a tela usa o proprio
     // getter tipado para as chamadas especificas.
     property PresenterConsulta: TPresenterConsultaBase read FPresenterConsulta;
   public
     destructor Destroy; override;
     procedure ResetForSessionChange; override;
-    procedure ExibirValidacao(const AValidacao: ValidationEntityOutput);
     function AtivarEdicao(const AChave: string): Boolean;
     function AtivarInclusao: Boolean;
     // Qualquer aba de cadastro com rascunho pendente impede o fechamento; cada
@@ -898,8 +882,7 @@ begin
 
       // A destruicao nao executa pedidos pendentes: pcAbas libera as abas
       // remanescentes e, com elas, rodapes, areas e editores. Aqui se descarta
-      // apenas a lista de descritores e a chave de gravacao.
-      FChaveAbaEmGravacao := '';
+      // apenas a lista de descritores.
       FreeAndNil(FAbasCadastro);
       inherited;
     end;
@@ -910,12 +893,6 @@ function TfrmConsultaBase.CriarEditor(const AChave: string;
   AParent: TWinControl): TWinControl;
 begin
   raise Exception.Create(EditorNaoInformadoMessage);
-end;
-
-function TfrmConsultaBase.SalvarAba(const AChave: string;
-  AEditor: TWinControl): Boolean;
-begin
-  Result := False;
 end;
 
 procedure TfrmConsultaBase.AvisarSalvamentoSemAtualizacao;
@@ -930,22 +907,6 @@ begin
   // Padrao da base para telas que nao fornecem mensagem propria. A exclusao ja
   // terminou; a mensagem apenas orienta a repetir a consulta.
   ShowWarning(ExclusaoSemAtualizacaoMessage);
-end;
-
-procedure TfrmConsultaBase.ExibirValidacao(
-  const AValidacao: ValidationEntityOutput);
-var
-  Editor: TWinControl;
-  Cadastro: IEditorCadastro;
-begin
-  // A validacao pertence a aba que iniciou a gravacao; uma troca de sessao pode
-  // te-la encerrado antes desta chamada.
-  Editor := EditorDaAba(ChaveAbaEmGravacao);
-  if Editor = nil then
-    Exit;
-
-  if Supports(Editor, IEditorCadastro, Cadastro) then
-    Cadastro.ShowValidation(AValidacao);
 end;
 
 function TfrmConsultaBase.AtivarEdicao(const AChave: string): Boolean;
@@ -1074,18 +1035,6 @@ begin
     end;
 end;
 
-function TfrmConsultaBase.EditorDaAba(const AChave: string): TWinControl;
-var
-  Indice: Integer;
-begin
-  Result := nil;
-  Indice := IndiceAbaCadastro(AChave);
-  if Indice < 0 then
-    Exit;
-
-  Result := FAbasCadastro[Indice].Editor;
-end;
-
 function TfrmConsultaBase.EditorAbaAtiva: TWinControl;
 var
   I: Integer;
@@ -1159,7 +1108,6 @@ begin
     Area.Parent := Tela;
     Area.Align := alClient;
     Area.BorderStyle := bsNone;
-    Area.AutoScroll := True;
 
     Editor := CriarEditor(Chave, Area);
     if Editor = nil then
@@ -1167,47 +1115,8 @@ begin
     Editor.Parent := Area;
     Descritor.Editor := Editor;
 
-    if Supports(Editor, IEditorCadastroComandos) then
-    begin
-      // O editor traz o proprio rodape; a area externa nao rola.
-      Area.AutoScroll := False;
-      Editor.Align := alClient;
-    end
-    else
-    begin
-      // O rodape nasce e morre com a aba: seus comandos so podem tratar o
-      // rascunho desta aba.
-      Descritor.Rodape := TPanel.Create(Tela);
-      Descritor.Rodape.Parent := Tela;
-      Descritor.Rodape.Align := alBottom;
-      Descritor.Rodape.Height := 44;
-      Descritor.Rodape.BevelOuter := bvNone;
-      Descritor.Rodape.Caption := '';
-
-      Descritor.BtnCancelar := TButton.Create(Descritor.Rodape);
-      Descritor.BtnCancelar.Parent := Descritor.Rodape;
-      Descritor.BtnCancelar.Caption := 'Cancelar';
-      Descritor.BtnCancelar.Width := 110;
-      Descritor.BtnCancelar.Height := 32;
-      Descritor.BtnCancelar.Top := 6;
-      Descritor.BtnCancelar.Anchors := [akTop, akRight];
-      Descritor.BtnCancelar.Left :=
-        Tela.ClientWidth - 16 - Descritor.BtnCancelar.Width;
-      Descritor.BtnCancelar.OnClick := btnCancelarAbaClick;
-
-      Descritor.BtnSalvar := TButton.Create(Descritor.Rodape);
-      Descritor.BtnSalvar.Parent := Descritor.Rodape;
-      Descritor.BtnSalvar.Caption := 'Salvar';
-      Descritor.BtnSalvar.Width := 110;
-      Descritor.BtnSalvar.Height := 32;
-      Descritor.BtnSalvar.Top := 6;
-      Descritor.BtnSalvar.Anchors := [akTop, akRight];
-      Descritor.BtnSalvar.Left :=
-        Descritor.BtnCancelar.Left - Descritor.BtnSalvar.Width - 8;
-      Descritor.BtnSalvar.OnClick := btnSalvarAbaClick;
-
-      Editor.Align := alTop;
-    end;
+    // O editor traz o proprio rodape e rola os proprios campos.
+    Editor.Align := alClient;
 
     // O rascunho nasce com o editor, antes de a aba ser ativada.
     if Assigned(AConfigurar) then
@@ -1230,12 +1139,6 @@ begin
     Tela.Free;
     Result := False;
   end;
-end;
-
-function TfrmConsultaBase.AbrirAba(const AChave,
-  ATitulo: string): Boolean;
-begin
-  Result := AbrirAba(AChave, ATitulo, nil);
 end;
 
 function TfrmConsultaBase.TryAtivarAba(const AChave: string): Boolean;
@@ -1295,18 +1198,6 @@ begin
   end;
 end;
 
-procedure TfrmConsultaBase.DefinirComandosAba(AAba: TAbaCadastro;
-  AHabilitado: Boolean);
-begin
-  if AAba = nil then
-    Exit;
-
-  if AAba.BtnSalvar <> nil then
-    AAba.BtnSalvar.Enabled := AHabilitado;
-  if AAba.BtnCancelar <> nil then
-    AAba.BtnCancelar.Enabled := AHabilitado;
-end;
-
 procedure TfrmConsultaBase.SolicitarFechamentoAba(AAba: TAbaCadastro;
   AIntencao: TIntencaoFechamentoAba);
 begin
@@ -1340,55 +1231,7 @@ begin
 
   // O pedido apenas registra a intencao: a aba e liberada depois que o evento de
   // clique retorna.
-  DefinirComandosAba(Aba, False);
   SolicitarFechamentoAba(Aba, AIntencao);
-end;
-
-procedure TfrmConsultaBase.btnSalvarAbaClick(Sender: TObject);
-var
-  Aba: TAbaCadastro;
-  Token: Integer;
-begin
-  // A origem identifica a aba; um comando de outra aba nao pode gravar este
-  // rascunho, e um pedido ja registrado aguarda o manipulador diferido.
-  Aba := AbaCadastroDoControle(Sender);
-  if (Aba = nil) or (Aba.Intencao <> ifaNenhuma) then
-    Exit;
-
-  Token := Aba.Token;
-  DefinirComandosAba(Aba, False);
-  FChaveAbaEmGravacao := Aba.Chave;
-  try
-    if not SalvarAba(Aba.Chave, Aba.Editor) then
-      Exit;
-
-    // A gravacao pode ter despachado uma troca de sessao: a aba so recebe o
-    // pedido de fechamento se ainda estiver registrada.
-    Aba := AbaCadastroPorToken(Token);
-    if Aba <> nil then
-      SolicitarFechamentoAba(Aba, ifaSalvar);
-  finally
-    FChaveAbaEmGravacao := '';
-    // Com fechamento pendente os botoes continuam desabilitados; sem aba, nada
-    // e reabilitado.
-    Aba := AbaCadastroPorToken(Token);
-    if (Aba <> nil) and (Aba.Intencao = ifaNenhuma) then
-      DefinirComandosAba(Aba, True);
-  end;
-end;
-
-procedure TfrmConsultaBase.btnCancelarAbaClick(Sender: TObject);
-var
-  Aba: TAbaCadastro;
-begin
-  Aba := AbaCadastroDoControle(Sender);
-  if (Aba = nil) or (Aba.Intencao <> ifaNenhuma) then
-    Exit;
-
-  // Cancelar nao grava nem reconsulta: o pedido apenas encerra esta aba e a
-  // liberacao descarta o rascunho.
-  DefinirComandosAba(Aba, False);
-  SolicitarFechamentoAba(Aba, ifaCancelar);
 end;
 
 procedure TfrmConsultaBase.TratarPedidoFechamentoAba(AToken: Integer);

@@ -29,7 +29,8 @@ initialization
   FRegistry.Register('rtc.events', CreateEventosRtcView);
   FRegistry.Register('operacoes.fiscais.ibscbs',
     TOperacoesFiscaisIbsCbsComposition.CriarConsulta);
-  FRegistry.Register('grupos.fiscais', CreateGruposFiscaisView);
+  FRegistry.Register('grupos.fiscais',
+    TGruposFiscaisComposition.CriarConsulta);
 
 finalization
   FRegistry.Free;

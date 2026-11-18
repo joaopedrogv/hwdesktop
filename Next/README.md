@@ -35,7 +35,7 @@ OpenNextView(Self, 'grupos.fiscais', NextQueryOptions());
 O registro existente é um exemplo de tela com a construção padrão.
 
 ```pascal
-FRegistry.Register('grupos.fiscais', CreateGruposFiscaisView);
+FRegistry.Register('grupos.fiscais', TGruposFiscaisComposition.CriarConsulta);
 ```
 
 A composição executa a função apenas para novas instâncias. Reapresentar uma

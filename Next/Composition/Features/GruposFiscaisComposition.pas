@@ -3,64 +3,50 @@ unit GruposFiscaisComposition;
 interface
 
 uses
-  Winapi.Windows, NextBaseForm;
+  Winapi.Windows, Vcl.Controls, NextBaseForm, EditorCadastro;
 
-function CreateGruposFiscaisView(AParent: HWND): TfrmNextBase;
+type
+  // Composicao da tela e do editor de Grupos Fiscais.
+  TGruposFiscaisComposition = class
+  public
+    class function CriarConsulta(AParent: HWND): TfrmNextBase; static;
+    class function CriarEditor(const AChave: string; AParent: TWinControl;
+      const AHost: IEditorCadastroHost): TWinControl; static;
+  end;
 
 implementation
 
 uses
-  Vcl.Controls, GruposFiscaisForm, LocalPreferences, GruposFiscaisPresenter, NextQueryDefinition,
-  ListarEmpresasUseCaseUnit, GruposFiscaisQueryDefinition, ISessionContextUnit, EmpresaOption, EditorCadastro,
-  NextSetup, EmpresaOptionsBuilder, GrupoFiscalCadastroFrame, AuthorizationService, RemoverGrupoFiscalUseCaseUnit,
-  SalvarGrupoFiscalUseCaseUnit, ObterGruposFiscaisUseCaseUnit;
+  GruposFiscaisForm, LocalPreferences, GruposFiscaisQueryDefinition,
+  NextQueryDefinition, GruposFiscaisPresenter, GruposFiscaisCadastroPresenter,
+  GrupoFiscalCadastroFrame, EmpresaOption, NextSetup, EmpresaOptionsBuilder,
+  AuthorizationService, RemoverGrupoFiscalUseCaseUnit,
+  SalvarGrupoFiscalUseCaseUnit, ObterGruposFiscaisUseCaseUnit,
+  ListarEmpresasUseCaseUnit;
 
-function CreateGruposFiscaisView(AParent: HWND): TfrmNextBase;
+class function TGruposFiscaisComposition.CriarConsulta(
+  AParent: HWND): TfrmNextBase;
 var
   View: TfrmGruposFiscais;
   Preferences: ILocalPreferences;
+  Definition: INextQueryDefinition<TGrupoSelecionado>;
   Presenter: TGruposFiscaisPresenter;
-  Definitions: INextQueryDefinition<TGrupoSelecionado>;
-  ListarEmpresas: ListarEmpresasUseCase;
-  Sessao: ISessionContext;
-  CarregarOpcoes: TCarregarOpcoesEmpresas;
-  CriarEditor: TCriarEditorCadastro;
 begin
   Preferences := NextSetupInstance.Resolve<ILocalPreferences>;
 
   View := TfrmGruposFiscais.CreateParented(AParent);
   try
-    Definitions := NextSetupInstance.Resolve<INextQueryDefinition<TGrupoSelecionado>>;
+    Definition := NextSetupInstance.Resolve<INextQueryDefinition<TGrupoSelecionado>>;
 
-    // A leitura das empresas e da sessao pertence a composicao: as duas
-    // dependencias sao resolvidas uma unica vez e o login e lido a cada carga.
-    ListarEmpresas := NextSetupInstance.Resolve<ListarEmpresasUseCase>;
-    Sessao := NextSetupInstance.SessionContext;
-
-    CarregarOpcoes := CriarCarregadorEmpresas(ListarEmpresas, Sessao);
-
-    // Cada aba recebe um editor novo, dono do proprio rascunho e da propria
-    // lista. A funcao nao guarda a aba nem o frame.
-    CriarEditor :=
-      function(const AChave: string; AControlePai: TWinControl): TWinControl
-      var
-        Frame: TfrmGrupoFiscalCadastroFrame;
-      begin
-        Frame := TfrmGrupoFiscalCadastroFrame.Create(AControlePai);
-        Frame.fraEmpresas.ConfigurarCarregamento(CarregarOpcoes);
-        Result := Frame;
-      end;
-
-    Presenter := TGruposFiscaisPresenter.Create(View, Definitions,
+    Presenter := TGruposFiscaisPresenter.Create(View, Definition,
       NextSetupInstance.Resolve<IAuthorizationService>,
-      NextSetupInstance.Resolve<IRemoverGrupoFiscalUseCase>,
-      NextSetupInstance.Resolve<ISalvarGrupoFiscalUseCase>,
-      NextSetupInstance.Resolve<ObterGrupoFiscalPorIdUseCase>);
+      NextSetupInstance.Resolve<IRemoverGrupoFiscalUseCase>);
     try
       // A tela configura a criacao do editor, associa a definicao, configura os
       // filtros e so entao assume a posse do apresentador; uma falha antes disso
       // mantem a posse aqui.
-      View.ConfigurarTela(Definitions, Presenter, Preferences, CriarEditor);
+      View.ConfigurarTela(Definition, Presenter, Preferences,
+        TGruposFiscaisComposition.CriarEditor);
     except
       Presenter.Free;
       raise;
@@ -69,6 +55,35 @@ begin
     Result := View;
   except
     View.Free;
+    raise;
+  end;
+end;
+
+class function TGruposFiscaisComposition.CriarEditor(const AChave: string;
+  AParent: TWinControl; const AHost: IEditorCadastroHost): TWinControl;
+var
+  Frame: TfrmGrupoFiscalCadastroFrame;
+  Presenter: TGruposFiscaisCadastroPresenter;
+  CarregarEmpresas: TCarregarOpcoesEmpresas;
+begin
+  // A leitura das empresas e da sessao pertence a composicao; o login e lido a
+  // cada carga.
+  CarregarEmpresas := CriarCarregadorEmpresas(
+    NextSetupInstance.Resolve<ListarEmpresasUseCase>,
+    NextSetupInstance.SessionContext);
+
+  Frame := TfrmGrupoFiscalCadastroFrame.Create(AParent, AHost);
+  try
+    Frame.fraEmpresas.ConfigurarCarregamento(CarregarEmpresas);
+
+    Presenter := TGruposFiscaisCadastroPresenter.Create(Frame,
+      NextSetupInstance.Resolve<IAuthorizationService>,
+      NextSetupInstance.Resolve<ObterGrupoFiscalPorIdUseCase>,
+      NextSetupInstance.Resolve<ISalvarGrupoFiscalUseCase>);
+    Frame.ConfigurarPresenter(Presenter);
+    Result := Frame;
+  except
+    Frame.Free;
     raise;
   end;
 end;

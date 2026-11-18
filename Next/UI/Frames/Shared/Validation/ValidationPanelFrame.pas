@@ -33,11 +33,6 @@ type
     Texto: TLabel;
   end;
 
-  // Aviso ao anfitriao, antes da rolagem e do foco, para que ele torne a area do
-  // controle visivel: um campo de outra sub-aba nao aceita foco nem e alcancado
-  // pela rolagem enquanto a pagina que o contem estiver oculta.
-  TPrepararAtivacaoCampo = procedure(AControle: TWinControl) of object;
-
   // Painel reutilizavel de erros de validacao. Recebe o resultado produzido pelo
   // caso de uso e agrupa as mensagens por campo. A navegacao depende apenas dos
   // vinculos registrados pela tela, portanto o painel nao conhece a
@@ -51,8 +46,6 @@ type
     FVinculos: TArray<TVinculoCampoValidacao>;
     FLinhas: TArray<TLinhaValidacao>;
     FAjustando: Boolean;
-    // Gancho opcional do anfitriao para preparar a area do campo antes do foco.
-    FOnPrepararAtivacao: TPrepararAtivacaoCampo;
     procedure LimparLinhas;
     function IndiceVinculo(const ANomeCampo: string): Integer;
     // Deriva o nome do campo do validador a partir do nome do editor.
@@ -65,9 +58,10 @@ type
       AControle: TWinControl; const ANomeExibicao: string);
     function LarguraDisponivel: Integer;
     procedure ReorganizarLinhas;
-    function RolagemAncestral(AControle: TControl): TScrollBox;
+    procedure PrepararControle(AControle: TControl);
     procedure RolarControleEmVista(AControle: TControl);
     procedure RolarPainelEmVista;
+    procedure ApresentarSecaoDoPrimeiroCampo;
     function AtivarCampo(const ANomeCampo: string): Boolean;
     procedure LinkClick(Sender: TObject; const ALink: string;
       ALinkType: TSysLinkType);
@@ -88,12 +82,6 @@ type
     // Navega ate o primeiro campo vinculado com erro; campos sem vinculo nao
     // recebem foco.
     function FocarPrimeiroErro: Boolean;
-    // Permite que o anfitriao torne o campo alcancavel (por exemplo, ativando a
-    // sub-aba que o contem) antes da rolagem e do foco. Clique, Enter e o foco do
-    // primeiro erro passam pelo mesmo caminho; sem assinante, o comportamento
-    // anterior permanece.
-    property OnPrepararAtivacao: TPrepararAtivacaoCampo
-      read FOnPrepararAtivacao write FOnPrepararAtivacao;
   end;
 
 implementation
@@ -101,7 +89,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Vcl.Graphics;
+  Vcl.ComCtrls, Vcl.Graphics;
 
 const
   // Medidas internas do painel: margem das linhas, intervalo entre o link e o
@@ -242,6 +230,7 @@ begin
   // A primeira exibicao acontece com o painel recem-visivel: a largura real e a
   // altura das mensagens quebradas so podem ser calculadas depois disso.
   ReorganizarLinhas;
+  ApresentarSecaoDoPrimeiroCampo;
   RolarPainelEmVista;
 end;
 
@@ -466,48 +455,51 @@ begin
   ReorganizarLinhas;
 end;
 
-function TfrmValidationPanelFrame.RolagemAncestral(
-  AControle: TControl): TScrollBox;
+procedure TfrmValidationPanelFrame.PrepararControle(AControle: TControl);
 var
-  Atual: TControl;
+  Ancestral: TControl;
 begin
-  Result := nil;
-  if AControle = nil then
-    Exit;
-
-  Atual := AControle.Parent;
-  while Atual <> nil do
+  Ancestral := AControle.Parent;
+  while Ancestral <> nil do
   begin
-    if Atual is TScrollBox then
-      Exit(TScrollBox(Atual));
-    Atual := Atual.Parent;
+    // A cadeia ShowControl do VCL apresenta a pagina ancestral do campo; as
+    // restricoes de visibilidade e habilitacao do controle continuam da tela.
+    if Ancestral is TTabSheet then
+      Ancestral.Show;
+    Ancestral := Ancestral.Parent;
   end;
 end;
 
 procedure TfrmValidationPanelFrame.RolarControleEmVista(AControle: TControl);
 var
-  Rolagem: TScrollBox;
-  Origem: TPoint;
-  Topo: Integer;
-  Base: Integer;
+  Ancestral: TControl;
 begin
-  Rolagem := RolagemAncestral(AControle);
-  if Rolagem = nil then
-    Exit;
+  Ancestral := AControle.Parent;
+  while Ancestral <> nil do
+  begin
+    if Ancestral is TScrollingWinControl then
+      TScrollingWinControl(Ancestral).ScrollInView(AControle);
+    Ancestral := Ancestral.Parent;
+  end;
+end;
 
-  // ClientToParent devolve a posicao no conteudo da area de rolagem, inclusive
-  // para controles aninhados no frame do editor.
-  Origem.X := 0;
-  Origem.Y := 0;
-  Origem := AControle.ClientToParent(Origem, Rolagem);
+procedure TfrmValidationPanelFrame.ApresentarSecaoDoPrimeiroCampo;
+var
+  I: Integer;
+  Indice: Integer;
+begin
+  for I := 0 to High(FLinhas) do
+  begin
+    if FLinhas[I].Link = nil then
+      Continue;
 
-  Topo := Origem.Y;
-  Base := Topo + AControle.Height;
-
-  if Topo < Rolagem.VertScrollBar.Position then
-    Rolagem.VertScrollBar.Position := Topo
-  else if Base > Rolagem.VertScrollBar.Position + Rolagem.ClientHeight then
-    Rolagem.VertScrollBar.Position := Base - Rolagem.ClientHeight;
+    Indice := IndiceVinculo(FLinhas[I].Link.NomeCampo);
+    if Indice >= 0 then
+    begin
+      PrepararControle(FVinculos[Indice].Controle);
+      Exit;
+    end;
+  end;
 end;
 
 procedure TfrmValidationPanelFrame.RolarPainelEmVista;
@@ -531,11 +523,7 @@ begin
   if Controle = nil then
     Exit;
 
-  // O anfitriao prepara a area do controle antes da rolagem e do foco: a
-  // sub-aba oculta precisa ser ativada para que o campo seja alcancado.
-  if Assigned(FOnPrepararAtivacao) then
-    FOnPrepararAtivacao(Controle);
-
+  PrepararControle(Controle);
   RolarControleEmVista(Controle);
 
   if Controle.CanFocus then

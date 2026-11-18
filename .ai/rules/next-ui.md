@@ -4,8 +4,9 @@ description: Next consultation, editor, feedback and host window/session lifecyc
 applies_to:
   - "Next/UI/**/*"
   - "Next/Interop/**/*"
-  - "Next/Contracts/*View.pas"
-  - "Next/Contracts/EditorCadastro.pas"
+  - "Next/Contracts/**/*View.pas"
+  - "Next/Contracts/**/ViewFeedback.pas"
+  - "Next/Contracts/**/EditorCadastro.pas"
 ---
 
 # Next UI
