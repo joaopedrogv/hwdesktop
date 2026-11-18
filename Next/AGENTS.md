@@ -19,6 +19,10 @@ and infrastructure when needed to provide behavior the developer can validate.
 Grow guidance from implemented contracts; do not anticipate Skills or copy
 Modern's instruction system.
 
+For creating or refactoring a consultation screen or cadastro editor, use
+../.ai/skills/next-consulta-cadastro/SKILL.md and select the steps relevant to the
+assigned delivery.
+
 ## Compatibility
 
 Within Next/, Delphi Rio 10.3.3/Win32 is the default. Do not add a redundant Next
