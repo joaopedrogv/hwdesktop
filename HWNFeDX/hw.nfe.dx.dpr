@@ -35,7 +35,6 @@ uses
   ufrmStatus in 'ufrmStatus.pas' {frmStatus},
   uDataSet_OOP_DX in 'ArqsHw\uDataSet_OOP_DX.pas',
   UFuncoesDll in 'UFuncoesDll.pas',
-  UInutilizarNFE in 'ArqsHw\UInutilizarNFE.pas' {FrmInutilizarNFes},
   UPesPros in 'ArqsHw\UPesPros.pas' {FrmPesqPros},
   UConfcontingencia in 'ArqsHw\UConfcontingencia.pas' {FrmConfContingencia},
   UFormconsCad in 'ArqsHw\UFormconsCad.pas' {FrmConsCad},

@@ -2432,17 +2432,6 @@ object FrmAdmNfe: TFrmAdmNfe
         TabOrder = 1
         OnClick = btnConsultarClick
       end
-      object btnInutilizar: TButton
-        Left = 285
-        Top = 44
-        Width = 132
-        Height = 28
-        Caption = '(F5) Inutilizar NFe'
-        Enabled = False
-        TabOrder = 2
-        Visible = False
-        OnClick = btnInutilizarClick
-      end
       object btnCancNF: TButton
         Left = 423
         Top = 44

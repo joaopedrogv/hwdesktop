@@ -34,7 +34,6 @@ type
     BitBtn2: TBitBtn;
     btnStatusServ: TButton;
     btnConsultar: TButton;
-    btnInutilizar: TButton;
     btnCancNF: TButton;
     btnConsCad: TButton;
     btnImprimir: TButton;
@@ -74,7 +73,6 @@ type
     procedure btnEnviarEmailClick(Sender: TObject);
     procedure btnGerarPDFClick(Sender: TObject);
     procedure btnValidarXMLClick(Sender: TObject);
-    procedure btnInutilizarClick(Sender: TObject);
     procedure btnCancNFClick(Sender: TObject);
     procedure btnImprimirClick(Sender: TObject);
     procedure btnConsultarClick(Sender: TObject);
@@ -130,7 +128,7 @@ var
 
 implementation
 
-uses UDtmHwNFE, DBClient, UFuncoesDll, UInutilizarNFE,
+uses UDtmHwNFE, DBClient, UFuncoesDll,
   uDataSet_OOP_DX, ShellAPI, UFormconsCad, UConfcontingencia,
   {pcnEnvEventoNFe,}ufrmStatus, pcnRetDistDFeInt, ACBrNFeConfiguracoes,
   pcnConversaoNFe, ACBrNFe, pcnAuxiliar, ACBrNFeNotasFiscais,
@@ -325,24 +323,6 @@ procedure TFrmAdmNfe.btnImprimirClick(Sender: TObject);
 begin
   if CadNfeVenda.PesqPros(true,'HW516',CadNfeVenda.dataSet.FieldByName('CHAVE_NFE').AsString) then
    imprimirNFe;
-end;
-
-procedure TFrmAdmNfe.btnInutilizarClick(Sender: TObject);
-begin
-  if CadNfeVenda.PesqPros(true,'HW514','') then
-  begin
-    leconfigNFE(CadNfeVenda);
-    Application.CreateForm(TFrmInutilizarNFes,FrmInutilizarNFes);
-    FrmInutilizarNFes.MskCNPJ.Text:=LbCNPJ_CPF.Caption;
-    FrmInutilizarNFes.MaskEdit2.text:=CadNfeVenda.cadempresa.VSUB_SERIE;
-    FrmInutilizarNFes.Showmodal;
-    if FrmInutilizarNFes.vresposta = 'OK' then
-    begin
-    CadNfeVenda.inutilizaNFe(StrToInt(FrmInutilizarNFes.MaskEdit4.text),
-    strtoint(FrmInutilizarNFes.MaskEdit5.Text),CadNfeVenda.cadempresa.codempresa,FrmInutilizarNFes.MaskEdit2.text);
-    end;
-    FrmInutilizarNFes.Free;
-  end;
 end;
 
 procedure TFrmAdmNfe.btnStatusServClick(Sender: TObject);

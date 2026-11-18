@@ -29,7 +29,10 @@
 | 8 | `leCertificadoNFe` | **aplicado (completo)** | DLL + wrapper ERP + app de teste |
 | 9 | `ConsultaCadastro` | **preservar** (decisão do desenvolvedor) | feature do viewer mantida |
 | 10 | `LerConfiguracao` (refactor com record) | **aplicado — DLL compilada; pkAtivos/PrTesteDll e teste pendentes** | `LIMPEZA-LERCONFIGURACAO.md` |
-| 11 | `InutilizarNFe`, `GeraChaveNFe` | backlog | features/forms do viewer |
+| 11 | `InutilizarNFe` | **aplicado — DLL compilada; teste pendente** | função + export + botão + form apagados |
+| 12 | `BuscaTroca` (helper sem chamadores) | **proposto — próximo** | `UFuncoesDll.pas`; confirmar histórico |
+| 13 | `GeraChaveNFe` | backlog | feature/forms + chamadas em `UAdmNFe` |
+| 14 | cargas mortas do wrapper (`ExecutarDLL`, `GeraNFe`, `verificarStatusWeb`, `TerminaNFE`) | backlog | exports permanecem; limpar tipo/var/GetProcAddress |
 | — | `LerConfiguracao` + `IniciaNFE` | preservar por enquanto | usadas por `leconfigNFE`, que atende o viewer |
 | — | `nfce_serv_*` | preservar | usados pelos EXEs de serviço |
 | — | variantes `*CSharpBuffer` e exports ativos | preservar | usados por C#/ERP |
@@ -160,6 +163,47 @@ interface de `UFuncoesDll.pas`; campos `string`; não reproduzir campos sem uso;
   (`pkAtivos`/`PrTesteDll` não compilados — autorização era só da DLL).
 - **Pendente:** compilar `pkAtivos`/`PrTesteDll` quando autorizado e executar o roteiro runtime do
   viewer (certificado, emissão, DANFE, eventos, e-mail, download, log, `WEBSERV_VISUALIZAR`).
+
+## Demanda 11 — `InutilizarNFe` (aplicada)
+
+**Contexto:** era o último export de viewer cuja feature já estava **oculta e desabilitada** na tela —
+`btnInutilizar` com `Visible=False` e `Enabled=False`, sem código que a habilitasse.
+
+**Removido**
+
+- `UFuncoesDll.pas`: `function InutilizarNFe(...)` (implementação-only) e a entrada do `exports`.
+- `UAdmNFe.pas`: campo `btnInutilizar`, declaração/implementação de `btnInutilizarClick` e
+  `UInutilizarNFE` do `uses`.
+- `UAdmNFe.dfm`: objeto `btnInutilizar`.
+- `hw.nfe.dx.dpr` e `hw.nfe.dx.dproj`: referências a `UInutilizarNFE`.
+- Arquivos `UInutilizarNFE.pas` e `UInutilizarNFE.dfm` apagados.
+- `UformTeste.pas`: comentário legado de `InutilizarNFe`.
+
+**Verificação**
+
+- Nenhuma ocorrência de `InutilizarNFe`/`UInutilizarNFE`/`FrmInutilizarNFes`/`btnInutilizar` no código
+  rastreado; `TClassNfe.inutilizaNFe` (método distinto) permanece.
+- Encoding: CP1252/ASCII, sem BOM, CRLF; `.dproj` mantém o BOM UTF-8. Bytes: `UFuncoesDll.pas`
+  128.075 (430 altos), `UAdmNFe.pas` 99.541 (134), `UAdmNFe.dfm` 162.934 (ASCII),
+  `hw.nfe.dx.dpr` 71.476 (25), `.dproj` 98.737 (BOM), `UformTeste.pas` 51.266 (84).
+
+**Build (DLL, autorizado)**
+
+- `msbuild HWNFeDX\hw.nfe.dx.dproj /t:Build /p:Config=Debug /p:Platform=Win32 /p:DCC_ForceExecute=true`
+  — exit 0, sem erros.
+- `bpl\hw.nfe.dx.dll` = 68.963.447 bytes (18/11/2026 12:01:49); `tdump` confirma `InutilizarNFe` fora
+  da tabela de exports e `GeraNFe`/`ConsultaCadastro` presentes.
+
+**Revisão independente:** sem achados bloqueantes/graves. Menores tratados: `LIMPEZA.md` atualizado;
+DCU órfão `Win32\Debug\UInutilizarNFE.dcu` removido. Aceito: gap de `TabOrder` (2) no `TabSheet1` —
+cosmético; o IDE pode renumerar ao salvar. Observação: remoção de export muda a tabela pública
+(inclusive ordinais) — registrar em release notes.
+
+**Pendente:** compilar `pkAtivos`/`PrTesteDll` quando autorizado e smoke do viewer (abrir
+`FrmAdmNfe`, emissão/impressão).
+
+**Próximos candidatos:** `BuscaTroca` em `UFuncoesDll.pas` (ficou sem chamadores) e as cargas mortas
+do wrapper para `ExecutarDLL`, `GeraNFe`, `verificarStatusWeb` e `TerminaNFE`.
 
 ## Limpeza de referências residuais (2026-11-18)
 

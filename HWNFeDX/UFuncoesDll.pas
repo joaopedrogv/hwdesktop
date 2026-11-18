@@ -2512,36 +2512,6 @@ begin
    Result := Text;
 end;
 
-function InutilizarNFe(justificativa, cnpjemit, modelo, serie, ano, numeroinicial, numerofinal: WideString): WideString; stdcall;
-begin
-  try
-   if (StrToInt(serie) >= 900) and (StrToInt(serie) <= 999) then
-   begin
-     if application.messagebox('Foi informado Série do SCAN. Tem certeza que deseja Inutilizar este(s) Numero? ', 'Confirmação', mb_yesno + MB_DEFBUTTON2) = IDYES then
-      ACBrNFe1.Configuracoes.Geral.FormaEmissao:=teSCAN
-     else
-     begin
-      InutilizarNFe:='ERRO';
-      exit;
-     end;
-   end
-   else
-    ACBrNFe1.Configuracoes.Geral.FormaEmissao:=teNormal;
-
-   ACBrNFe1.WebServices.Inutiliza(trim(cnpjemit),trim(justificativa), StrToInt(ano), StrToInt(modelo), StrToInt(serie), StrToInt(numeroinicial), StrToInt(numerofinal));
-   InutilizarNFe:='OK';
-  except
-   on e: exception do
-   begin
-    Application.MessageBox(PWideChar('2125 ' + E.Message),PWideChar('Error'), MB_OK);
-    InutilizarNFe:='ERRO';
-   end;
-  end;
-//     ACBrNFe1.WebServices.Inutiliza(edtEmitCNPJ.Text, Justificativa, StrToInt(Ano), StrToInt(Modelo), StrToInt(Serie), StrToInt(NumeroInicial), StrToInt(NumeroFinal));
-//   Result:=WideString(UTF8Encode(ACBrNFe1.WebServices.Inutilizacao.RetWS));
-// MemoResp.Lines.Text := UTF8Encode(ACBrNFe1.WebServices.Inutilizacao.RetWS);
-end;
-
 function ConsultaCadastro(vuf,cnpjcpf,mostrarretorno: WideString): WideString;stdcall;export;
 var
  vataviso: boolean;
@@ -2967,7 +2937,6 @@ end;
 exports
  ExecutarDLL,
  GeraNFe,
- InutilizarNFe,
  verificarStatusWeb,
  TerminaNFE,
  ConsultaCadastro,

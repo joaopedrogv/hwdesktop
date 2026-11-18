@@ -115,9 +115,6 @@
         </DCCReference>
         <DCCReference Include="ArqsHw\uDataSet_OOP_DX.pas"/>
         <DCCReference Include="UFuncoesDll.pas"/>
-        <DCCReference Include="ArqsHw\UInutilizarNFE.pas">
-            <Form>FrmInutilizarNFes</Form>
-        </DCCReference>
         <DCCReference Include="ArqsHw\UPesPros.pas">
             <Form>FrmPesqPros</Form>
         </DCCReference>

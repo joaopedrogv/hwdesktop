@@ -229,7 +229,6 @@ type
 //
 //  function ExecutarDLL(ttipo: pchar; Aux: Pchar; Just: Pchar;var resposta:Pchar;sisint: Pchar;NFTP: Pchar;codempresa: Pchar;vtipocons: Pchar;statusNFE: Pchar): Pchar; stdcall; external 'HWNFe.dll';
 //
-//  function InutilizarNFe(justificativa, cnpjemit, modelo, serie, ano, numeroinicial, numerofinal: pchar): Pchar; stdcall; external 'HWNFe.dll';
 //
 //  function VisualizaNFe(comveic,vendBanco: PChar;codempresa: integer;vversao: Pchar): longbool; stdcall; external 'HWNFe.dll';
 //
