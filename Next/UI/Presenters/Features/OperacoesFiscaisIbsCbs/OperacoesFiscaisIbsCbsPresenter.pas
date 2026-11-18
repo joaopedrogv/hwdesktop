@@ -7,7 +7,7 @@ uses
   RemoverOperacaoFiscalIbsCbsUseCaseUnit, SalvarOperacaoFiscalIbsCbsUseCaseUnit,
   ObterOperacaoFiscalIbsCbsPorIdUseCaseUnit, OperacaoFiscalIbsCbsEtdUnit,
   NextQueryDefinition, OperacoesFiscaisIbsCbsQueryDefinition,
-  PresenterConsultaBase;
+  ResolverRegraFiscalIbsCbsUseCaseUnit, PresenterConsultaBase;
 
 type
   // Apresentador da consulta, da inclusao e da alteracao de Operacoes Fiscais
@@ -31,13 +31,15 @@ type
     FRemover: RemoverOperacaoFiscalIbsCbsUseCase;
     FSalvar: SalvarOperacaoFiscalIbsCbsUseCase;
     FObter: ObterOperacaoFiscalIbsCbsPorIdUseCase;
+    FResolver: ResolverRegraFiscalIbsCbsUseCase;
   public
     constructor Create(const AView: IOperacoesFiscaisIbsCbsView;
       const AQueryDefinition: INextQueryDefinition<TOperacaoFiscalSelecionada>;
       const AAuthorization: IAuthorizationService;
       ARemover: RemoverOperacaoFiscalIbsCbsUseCase;
       ASalvar: SalvarOperacaoFiscalIbsCbsUseCase;
-      AObter: ObterOperacaoFiscalIbsCbsPorIdUseCase);
+      AObter: ObterOperacaoFiscalIbsCbsPorIdUseCase;
+      AResolver: ResolverRegraFiscalIbsCbsUseCase);
     function EnviarParaLixeira: Boolean;
     // Reapresenta a aba de inclusao quando ela ja existe; caso contrario autoriza
     // a inclusao e entrega a abertura para a nova aba, que cria o proprio
@@ -50,13 +52,16 @@ type
     // que a selecao e obrigatoria e a operacao nao prossegue.
     function CarregarParaEdicao: Boolean;
     function Salvar(const ARascunho: OperacaoFiscalIbsCbsEtd): Boolean;
+    // Executa a análise do rascunho recebido e apresenta a conferência.
+    function AnalisarCondicoes(
+      const ARascunho: OperacaoFiscalIbsCbsEtd): Boolean;
   end;
 
 implementation
 
 uses
   System.SysUtils, EValidacaoNegocioUnit, StatusRegistroEnumUnit,
-  CreateEntityUseCaseOutputUnit;
+  ResolverRegraFiscalIbsCbsTypesUnit, CreateEntityUseCaseOutputUnit;
 
 const
   // Codigos do cadastro legado usados por esta funcionalidade. O host recebe o
@@ -69,7 +74,84 @@ const
   ProcessoRestauracao = 'MOD025';
   TabelaOperacoesFiscais = 'OP_FISCAIS_IBSCBS';
 
+  AnaliseFalhaMessage =
+    'Não foi possível analisar as condições da operação fiscal.';
+
   SelecaoObrigatoriaMessage = 'Selecione uma operação fiscal na grade.';
+
+function DescricaoConfiguracao(
+  const ARascunho: OperacaoFiscalIbsCbsEtd): string;
+var
+  OperacaoInterna: string;
+  GrupoFiscal: string;
+  RegraFiscal: string;
+begin
+  OperacaoInterna := Trim(ARascunho.OperacaoInternaDescricao);
+  if OperacaoInterna = '' then
+    OperacaoInterna := 'não identificada';
+
+  GrupoFiscal := Trim(ARascunho.GrupoFiscalDescricao);
+  if GrupoFiscal = '' then
+    GrupoFiscal := 'Nenhum';
+
+  RegraFiscal := Trim(ARascunho.RegraFiscalDescricao);
+  if RegraFiscal = '' then
+    RegraFiscal := 'não identificada';
+
+  Result := Format('Op Interna [%s] / Grupo Fiscal [%s] / Regra fiscal [%s]',
+    [OperacaoInterna, GrupoFiscal, RegraFiscal]);
+end;
+
+function SecaoApontamentos(const ATitulo: string;
+  const AApontamentos: ResolverRegraFiscalIbsCbsApontamentoArray;
+  ATipo: ResolverRegraFiscalIbsCbsApontamentoTipo): string;
+var
+  I: Integer;
+  Quantidade: Integer;
+  TituloSecao: string;
+begin
+  Result := '';
+  Quantidade := 0;
+  for I := 0 to High(AApontamentos) do
+    if AApontamentos[I].Tipo = ATipo then
+      Inc(Quantidade);
+
+  if Quantidade = 0 then
+    Exit;
+
+  if ATipo = ratObservacaoOpcoes then
+  begin
+    if Quantidade = 1 then
+      TituloSecao := 'Uma observação sobre as opções selecionadas'
+    else
+      TituloSecao := Format('%d observações sobre as opções selecionadas',
+        [Quantidade]);
+  end
+  else
+    TituloSecao := ATitulo;
+
+  Result := TituloSecao;
+  for I := 0 to High(AApontamentos) do
+    if AApontamentos[I].Tipo = ATipo then
+      Result := Result + sLineBreak + #149 + ' ' + AApontamentos[I].Texto;
+
+  if ATipo = ratObservacaoOpcoes then
+    Result := Result + sLineBreak +
+      'Esses campos aceitam todas as opções disponíveis. Por isso, a aplicação ' +
+      'desta configuração depende dos demais critérios. Se essa abrangência é a ' +
+      'desejada, mantenha as opções. Para limitar a configuração, marque somente ' +
+      'as opções que ela deve aceitar.';
+end;
+
+procedure AdicionarBloco(var ATexto: string; const ABloco: string);
+begin
+  if ABloco = '' then
+    Exit;
+
+  if ATexto <> '' then
+    ATexto := ATexto + sLineBreak + sLineBreak;
+  ATexto := ATexto + ABloco;
+end;
 
 { TOperacoesFiscaisIbsCbsPresenter }
 
@@ -79,7 +161,8 @@ constructor TOperacoesFiscaisIbsCbsPresenter.Create(
   const AAuthorization: IAuthorizationService;
   ARemover: RemoverOperacaoFiscalIbsCbsUseCase;
   ASalvar: SalvarOperacaoFiscalIbsCbsUseCase;
-  AObter: ObterOperacaoFiscalIbsCbsPorIdUseCase);
+  AObter: ObterOperacaoFiscalIbsCbsPorIdUseCase;
+  AResolver: ResolverRegraFiscalIbsCbsUseCase);
 begin
   // O processo de pesquisa e a tabela padrao ficam na base, que tambem responde
   // pela permissao da consulta. As demais operacoes informam o proprio processo
@@ -101,11 +184,16 @@ begin
     raise Exception.Create(
       'O caso de uso de carregamento de Operações Fiscais IBS/CBS não foi informado.');
 
+  if AResolver = nil then
+    raise Exception.Create(
+      'O caso de uso de análise das condições de Operações Fiscais IBS/CBS não foi informado.');
+
   FView := AView;
   FQueryDefinition := AQueryDefinition;
   FRemover := ARemover;
   FSalvar := ASalvar;
   FObter := AObter;
+  FResolver := AResolver;
 end;
 
 function TOperacoesFiscaisIbsCbsPresenter.EnviarParaLixeira: Boolean;
@@ -276,6 +364,89 @@ begin
     // O resultado do caso de uso libera a entidade persistida; o apresentador
     // nunca a devolve nem a retem.
     Resultado.Free;
+  end;
+end;
+
+function TOperacoesFiscaisIbsCbsPresenter.AnalisarCondicoes(
+  const ARascunho: OperacaoFiscalIbsCbsEtd): Boolean;
+var
+  Analise: ResolverRegraFiscalIbsCbsAnalise;
+  EmpresaId: Integer;
+  EmpresaTexto: string;
+  DataTexto: string;
+  Relatorio: string;
+  Corpo: string;
+  Resumo: string;
+begin
+  Result := False;
+  Analise := nil;
+
+  try
+    try
+      EmpresaId := 0;
+      if Length(ARascunho.EmpresasId) > 0 then
+        EmpresaId := ARascunho.EmpresasId[0];
+
+      Analise := FResolver.Analisar(
+        ResolverRegraFiscalIbsCbsInput.CreateParaAnalise(
+          ARascunho.OperacaoInternaId, ARascunho.GrupoFiscalId.Value,
+          EmpresaId, ARascunho.InicioVigencia, ARascunho));
+
+      if EmpresaId > 0 then
+        EmpresaTexto := Format('Código [%d]', [EmpresaId])
+      else
+        EmpresaTexto := 'Empresa não selecionada';
+
+      if ARascunho.InicioVigencia > 0 then
+        DataTexto := FormatDateTime('dd/mm/yyyy', ARascunho.InicioVigencia)
+      else
+        DataTexto := 'data não informada';
+
+      Relatorio := 'Conferência da configuração' + sLineBreak + sLineBreak +
+        'Configuração analisada' + sLineBreak +
+        DescricaoConfiguracao(ARascunho) + sLineBreak + sLineBreak +
+        'Empresa analisada: ' + EmpresaTexto + sLineBreak + sLineBreak +
+        'Data considerada' + sLineBreak + DataTexto;
+
+      Corpo := '';
+      AdicionarBloco(Corpo, SecaoApontamentos(
+        'Uma observação sobre as opções selecionadas', Analise.Apontamentos,
+        ratObservacaoOpcoes));
+      AdicionarBloco(Corpo, SecaoApontamentos(
+        'Possível duplicidade', Analise.Apontamentos, ratDuplicidade));
+      AdicionarBloco(Corpo, SecaoApontamentos(
+        'Possível conflito', Analise.Apontamentos, ratConflito));
+      AdicionarBloco(Corpo, SecaoApontamentos(
+        'Regra fiscal não encontrada', Analise.Apontamentos, ratRegraAusente));
+      AdicionarBloco(Corpo, SecaoApontamentos(
+        'Valor inválido', Analise.Apontamentos, ratValorInvalido));
+
+      if Corpo = '' then
+        Corpo := 'Nenhuma inconsistência ou possível duplicidade foi encontrada ' +
+          'nas configurações consideradas para esta empresa e esta data.';
+
+      Relatorio := Relatorio + sLineBreak + sLineBreak + Corpo + sLineBreak +
+        sLineBreak +
+        'A conferência considera as alterações deste cadastro e os demais ' +
+        'cadastros já salvos para a empresa e a data indicadas. As outras ' +
+        'empresas selecionadas precisam de uma conferência própria.';
+
+      if Length(Analise.Apontamentos) = 0 then
+        Resumo := 'Nenhum problema encontrado'
+      else
+        Resumo := Format('%d ponto(s) para revisar',
+          [Length(Analise.Apontamentos)]);
+
+      FView.ExibirAnaliseCondicoes(Resumo, Relatorio);
+      Result := True;
+    except
+      on E: EValidacaoNegocio do
+        FView.ShowError(E.Message);
+      on E: Exception do
+        FView.ShowError(AnaliseFalhaMessage);
+    end;
+  finally
+    Analise.Free;
   end;
 end;
 

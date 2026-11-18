@@ -3,11 +3,11 @@ unit OperacoesFiscaisIbsCbsForm;
 interface
 
 uses
-  System.SysUtils, Vcl.Controls, Vcl.StdCtrls, ConsultaBaseForm,
+  System.SysUtils, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, ConsultaBaseForm,
   PresenterConsultaBase, NextQueryDefinition, LocalPreferences,
   OperacoesFiscaisIbsCbsView, OperacoesFiscaisIbsCbsPresenter,
   OperacoesFiscaisIbsCbsQueryDefinition, OperacaoFiscalIbsCbsEtdUnit,
-  OperacaoFiscalIbsCbsCadastroFrame, EditorCadastro;
+  OperacaoFiscalIbsCbsCadastroFrame, EditorCadastro, AnaliseCondicoesForm;
 
 type
   // Tela de consulta, inclusao e alteracao de Operacoes Fiscais IBS/CBS. Herda a
@@ -36,6 +36,8 @@ type
     // consulta; sem nenhuma descricao o identificador mantem a aba rastreavel.
     function TituloAlteracao(const AChave: string;
       const AOperacao: OperacaoFiscalIbsCbsEtd): string;
+    procedure VerificarCondicoesAba(
+      const ARascunho: OperacaoFiscalIbsCbsEtd);
   protected
     // Liga as acoes padrao da consulta aos metodos do apresentador depois que a
     // base aceitou a definicao e antes de assumir a posse.
@@ -67,6 +69,7 @@ type
     // Opcao lida pela definicao em cada pesquisa: vale para a proxima busca e
     // nao altera o resultado ja apresentado.
     function IsLixeiraSearch: Boolean;
+    procedure ExibirAnaliseCondicoes(const AResumo, ARelatorio: string);
     // Unica entrada da configuracao inicial: associa a definicao, configura a
     // criacao do editor e os filtros e entrega o apresentador a base por ultimo.
     procedure ConfigurarTela(
@@ -165,12 +168,26 @@ end;
 
 function TfrmOperacoesFiscaisIbsCbs.CriarEditor(const AChave: string;
   AParent: TWinControl): TWinControl;
+var
+  Frame: TfrmOperacaoFiscalIbsCbsCadastroFrame;
 begin
   // Cada aba recebe o proprio frame, dono do rascunho e dos proprios seletores.
   // A base define Parent e Align e libera o editor junto com a aba.
   if not Assigned(FCriarEditorAba) then
     raise Exception.Create(MissingEditorFactoryMessage);
   Result := FCriarEditorAba(AChave, AParent);
+  if not (Result is TfrmOperacaoFiscalIbsCbsCadastroFrame) then
+    Exit;
+  Frame := TfrmOperacaoFiscalIbsCbsCadastroFrame(Result);
+  Frame.OnVerificarCondicoes := VerificarCondicoesAba;
+end;
+
+procedure TfrmOperacoesFiscaisIbsCbs.VerificarCondicoesAba(
+  const ARascunho: OperacaoFiscalIbsCbsEtd);
+begin
+  if Presenter = nil then
+    Exit;
+  Presenter.AnalisarCondicoes(ARascunho);
 end;
 
 function TfrmOperacoesFiscaisIbsCbs.SalvarAba(const AChave: string;
@@ -191,6 +208,20 @@ begin
   // A entidade pertence ao frame e continua valida durante a chamada. Depois de
   // Salvar o frame nao e mais acessado: uma troca de sessao pode te-lo liberado.
   Result := Presenter.Salvar(Frame.Rascunho);
+end;
+
+procedure TfrmOperacoesFiscaisIbsCbs.ExibirAnaliseCondicoes(
+  const AResumo, ARelatorio: string);
+var
+  Dialogo: TfrmAnaliseCondicoes;
+begin
+  Dialogo := TfrmAnaliseCondicoes.Create(nil);
+  try
+    Dialogo.Configure(AResumo, ARelatorio);
+    Dialogo.ShowModal;
+  finally
+    Dialogo.Free;
+  end;
 end;
 
 function TfrmOperacoesFiscaisIbsCbs.TituloAlteracao(const AChave: string;

@@ -21,6 +21,8 @@ type
     // Abre uma nova aba de inclusao; o editor cria o proprio rascunho e carrega
     // os seletores na preparacao.
     function AbrirInclusao: Boolean;
+    // Apresenta a conferência das condições do rascunho da aba.
+    procedure ExibirAnaliseCondicoes(const AResumo, ARelatorio: string);
   end;
 
 implementation

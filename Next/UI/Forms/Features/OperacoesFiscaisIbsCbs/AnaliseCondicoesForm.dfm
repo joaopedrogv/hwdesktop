@@ -1,0 +1,100 @@
+object frmAnaliseCondicoes: TfrmAnaliseCondicoes
+  Left = 0
+  Top = 0
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsDialog
+  Caption = 'Verifica'#231#227'o das condi'#231#245'es'
+  ClientHeight = 440
+  ClientWidth = 640
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poMainFormCenter
+  Scaled = False
+  PixelsPerInch = 96
+  TextHeight = 13
+  object pnResumo: TPanel
+    Left = 0
+    Top = 0
+    Width = 640
+    Height = 40
+    Align = alTop
+    BevelOuter = bvNone
+    BorderWidth = 8
+    Caption = ''
+    TabOrder = 0
+    object lblResumo: TLabel
+      Left = 8
+      Top = 8
+      Width = 624
+      Height = 24
+      Align = alClient
+      AutoSize = False
+      Caption = 'lblResumo'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+      WordWrap = True
+    end
+  end
+  object pnRodape: TPanel
+    Left = 0
+    Top = 392
+    Width = 640
+    Height = 48
+    Align = alBottom
+    BevelOuter = bvNone
+    BorderWidth = 6
+    Caption = ''
+    TabOrder = 1
+    object btnFechar: TButton
+      Left = 544
+      Top = 4
+      Width = 90
+      Height = 28
+      Cancel = True
+      Caption = 'Fechar'
+      Default = True
+      ModalResult = 1
+      TabOrder = 0
+    end
+    object btnCopiar: TButton
+      Left = 448
+      Top = 4
+      Width = 90
+      Height = 28
+      Caption = 'Copiar'
+      TabOrder = 1
+      OnClick = btnCopiarClick
+    end
+  end
+  object pnRelatorio: TPanel
+    Left = 0
+    Top = 40
+    Width = 640
+    Height = 352
+    Align = alClient
+    BevelOuter = bvNone
+    BorderWidth = 6
+    Caption = ''
+    TabOrder = 2
+    object MemoRelatorio: TMemo
+      Left = 6
+      Top = 6
+      Width = 628
+      Height = 340
+      Align = alClient
+      ReadOnly = True
+      ScrollBars = ssVertical
+      TabOrder = 0
+      WordWrap = True
+    end
+  end
+end

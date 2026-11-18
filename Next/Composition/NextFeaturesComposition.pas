@@ -21,6 +21,8 @@ uses
   ObterOperacaoFiscalIbsCbsPorIdUseCaseUnit,
   SalvarOperacaoFiscalIbsCbsUseCaseUnit,
   RemoverOperacaoFiscalIbsCbsUseCaseUnit,
+  ResolverRegraFiscalIbsCbsUseCaseUnit, IResolverRegraFiscalIbsCbsServiceUnit,
+  ResolverRegraFiscalIbsCbsServiceUnit,
   ListarOperacoesInternasUseCaseUnit, ListarRegrasFiscaisUseCaseUnit,
   NextQueryDefinition, GruposFiscaisQueryDefinition,
   ColumnLayoutPreferences, ColumnLayoutPreferencesRepository,
@@ -87,6 +89,12 @@ begin
   // e o apresentador apenas a utiliza, sem libera-la.
   AContainer.RegisterType<SalvarOperacaoFiscalIbsCbsUseCase>.AsSingleton;
   AContainer.RegisterType<RemoverOperacaoFiscalIbsCbsUseCase>.AsSingleton;
+
+  // A análise consulta os dois repositórios já registrados. Serviço e caso de
+  // uso não guardam estado, por isso o caso de uso é uma instância única.
+  AContainer.RegisterType<IResolverRegraFiscalIbsCbsService,
+    ResolverRegraFiscalIbsCbsService>.AsTransient;
+  AContainer.RegisterType<ResolverRegraFiscalIbsCbsUseCase>.AsSingleton;
 end;
 
 end.

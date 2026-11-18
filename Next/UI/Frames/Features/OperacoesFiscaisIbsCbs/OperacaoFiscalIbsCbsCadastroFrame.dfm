@@ -208,6 +208,14 @@ object frmOperacaoFiscalIbsCbsCadastroFrame: TfrmOperacaoFiscalIbsCbsCadastroFra
           TabOrder = 0
         end
       end
+      object btnVerificarCondicoes: TSpeedButton
+        Left = 16
+        Top = 340
+        Width = 140
+        Height = 25
+        Caption = 'Verificar condi'#231#245'es'
+        OnClick = btnVerificarCondicoesClick
+      end
     end
   end
   inline fraValidacao: TfrmValidationPanelFrame

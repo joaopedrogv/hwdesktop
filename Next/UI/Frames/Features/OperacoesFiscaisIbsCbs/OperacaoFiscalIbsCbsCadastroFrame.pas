@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls,
-  Vcl.Mask, Vcl.ComCtrls, Vcl.CheckLst,
+  Vcl.Mask, Vcl.ComCtrls, Vcl.CheckLst, Vcl.Buttons,
   EditorCadastro, TipoComunsUnit, DateTimeServiceUnit, StringNullableUnit,
   DateAndTimeNullableUnit, OperacaoFiscalIbsCbsEtdUnit,
   OperacaoFiscalIbsCbsCondicaoEtdUnit, SeletorEntidadeFrame,
@@ -12,6 +12,9 @@ uses
   ValidationEntityOutputUnit;
 
 type
+  TVerificarCondicoesEvent = procedure(
+    const ARascunho: OperacaoFiscalIbsCbsEtd) of object;
+
   // Editor da aba de Operacoes Fiscais IBS/CBS. O frame apresenta as sub-abas
   // Cadastro e Condicoes, carrega os seletores e as empresas na preparacao e e o
   // dono do rascunho: a autorizacao, a gravacao e a troca de sessao pertencem ao
@@ -42,7 +45,9 @@ type
     gbTipoOrgaoPublico: TGroupBox;
     clbTipoOrgaoPublico: TCheckListBox;
     fraValidacao: TfrmValidationPanelFrame;
+    btnVerificarCondicoes: TSpeedButton;
     procedure ckFimVigenciaClick(Sender: TObject);
+    procedure btnVerificarCondicoesClick(Sender: TObject);
   private
     // Rascunho da aba. A inclusao cria a entidade e a alteracao recebe uma copia
     // independente do registro carregado; o frame libera o rascunho ao ser
@@ -56,6 +61,7 @@ type
     FCodigosTipoEmissao: TArrayInteger;
     FCodigosNatureza: TArrayInteger;
     FCodigosTipoOrgaoPublico: TArrayInteger;
+    FOnVerificarCondicoes: TVerificarCondicoesEvent;
     // As opcoes das condicoes sao fixas e independem da preparacao: monta-las
     // uma unica vez mantem as listas disponiveis em todas as abas.
     procedure CarregarOpcoesCondicoes;
@@ -130,6 +136,8 @@ type
     function HasPendingChanges: Boolean;
     function TryFocus: Boolean;
     procedure ShowValidation(const AValidacao: ValidationEntityOutput);
+    property OnVerificarCondicoes: TVerificarCondicoesEvent
+      read FOnVerificarCondicoes write FOnVerificarCondicoes;
     property Rascunho: OperacaoFiscalIbsCbsEtd read FRascunho;
   end;
 
@@ -509,6 +517,15 @@ begin
   // Desmarcado significa fim de vigencia nulo: a mascara nao aceita edicao
   // enquanto a data nao for informada.
   edFimVigencia.Enabled := ckFimVigencia.Checked;
+end;
+
+procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.btnVerificarCondicoesClick(
+  Sender: TObject);
+begin
+  if not AplicarCamposAoRascunho then
+    Exit;
+  if Assigned(FOnVerificarCondicoes) then
+    FOnVerificarCondicoes(FRascunho);
 end;
 
 function TfrmOperacaoFiscalIbsCbsCadastroFrame.PrepararInclusao: Boolean;
