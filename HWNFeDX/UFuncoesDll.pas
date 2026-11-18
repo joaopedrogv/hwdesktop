@@ -42,10 +42,44 @@ type
       class procedure FrStatusShowMDFe(Sender: TObject); virtual;
    end;
 
+  TNFeCertificadoLegado = record
+    CaminhoPFX: string;
+    Senha: string;
+    NumeroSerie: string;
+  end;
+
+  TNFeGeralLegado = record
+    TipoDANFE: string;
+    FormaEmissao: string;
+    Logomarca: string;
+    SalvarArquivos: string;
+    PathSalvar: string;
+    EnderecoPDF: string;
+    CaminhoBanco: string;
+    AguardarConsultaRet: string;
+    GravarLog: string;
+    Sistema: string;
+    MostrarValorLiquido: string;
+    CasasDecimais: string;
+    LarguraCodProd: string;
+  end;
+
+  TNFeWebServiceLegado = record
+    UF: string;
+    Ambiente: string;
+    Visualizar: string;
+  end;
+
+  TNFeConfiguracaoLegado = record
+    Certificado: TNFeCertificadoLegado;
+    Geral: TNFeGeralLegado;
+    WebService: TNFeWebServiceLegado;
+  end;
+
 
  function getCampoPipe(plinha: string; pOrdem: integer; pDelimitador: string = '|'): string;
  function strIn(pSubString: string; const pArgs: array of string): Boolean;
- function LerConfiguracao(certif, geral, webservice: array of shortstring;vescolhacert: WideString): WideString; stdcall;
+ function LerConfiguracao(const AConfigLegado: TNFeConfiguracaoLegado): WideString;
  function verificarStatusWeb(verresultado: WideString): WideString; stdcall;
  function GeraNFe(hide, hemit, hDest, temVeic, veiculo, htotal: array of shortstring; tProd: ArrayBi; tipoOP: WideString; vNLote: Integer; tipoI_F: Integer;var resposta: WideString;sisint: WideString;NFTP: WideString;codempresa: WideString;Ddup: ArrayBi;DTransp:array of shortstring;vinfadic: WideString;hretirada,hentrega: array of shortstring;DdadosCupom:ArrayBi; pItemDI: array of Record_Item_DI; hexporta: array of shortstring; hrefNFe: array of shortstring): WideString; stdcall;
  function TerminaNFE: LongBool;stdcall;
@@ -282,18 +316,17 @@ begin
     Result := teSVCRS;
 end;
 
-function  IniciaNFE(certif, geral, webservice: array of shortstring): LongBool;
+procedure IniciaNFE(const AConfigLegado: TNFeConfiguracaoLegado);
 var
-  ATipo: string;
   ALargProd: Integer;
 begin
-  if Pos('rave', LowerCase(geral[0])) > 0 then
+  if Pos('rave', LowerCase(AConfigLegado.Geral.TipoDANFE)) > 0 then
   begin
     if ACBrNFeDANFERave1 = nil then
       ACBrNFeDANFERave1:= TACBrNFeDANFeRL.create(nil);
 //      ACBrNFeDANFERave1:= TACBrNFeDANFERaveCB.create(nil);
     ACBrNFeDANFERave1.ExibeInforAdicProduto := infSeparadamente;
-    ALargProd := StrToIntDef(geral[15], 0);
+    ALargProd := StrToIntDef(AConfigLegado.Geral.LarguraCodProd, 0);
     ALargProd := IfThen(ALargProd <= 0, TACBrNFeDANFeRL(ACBrNFeDANFERave1).LarguraCodProd, ALargProd);
     TACBrNFeDANFeRL(ACBrNFeDANFERave1).LarguraCodProd := ALargProd;
   end
@@ -302,7 +335,7 @@ begin
     if not Assigned(ACBrNFeDANFeRL1) then
       ACBrNFeDANFeRL1 := TACBrNFeDANFeRL.Create(Application);
     ACBrNFeDANFeRL1.ExibeInforAdicProduto := infNenhum;
-    ALargProd := StrToIntDef(geral[15], 0);
+    ALargProd := StrToIntDef(AConfigLegado.Geral.LarguraCodProd, 0);
     ALargProd := IfThen(ALargProd <= 0, TACBrNFeDANFeRL(ACBrNFeDANFeRL1).LarguraCodProd, ALargProd);
     TACBrNFeDANFeRL(ACBrNFeDANFeRL1).LarguraCodProd := ALargProd;
     TACBrNFeDANFeRL(ACBrNFeDANFeRL1).PosCanhoto := prCabecalho;
@@ -310,22 +343,22 @@ begin
   if ACBrNFe1 = nil then
   begin
     ACBrNFe1 := TACBrNFe.Create(nil);
-    if geral[11] = 'S' then
+    if AConfigLegado.Geral.GravarLog = 'S' then
       ACBrNFe1.OnGerarLog:=TEvent.GerarLog;
 
-    if Pos('rave', LowerCase(geral[0])) > 0 then
+    if Pos('rave', LowerCase(AConfigLegado.Geral.TipoDANFE)) > 0 then
       ACBrNFe1.DANFE := ACBrNFeDANFERave1
     else
       ACBrNFe1.DANFE := ACBrNFeDANFeRL1;
 
-    if geral[13] = 'S' then
+    if AConfigLegado.Geral.MostrarValorLiquido = 'S' then
       ACBrNFe1.DANFE.ExibeInforAdicProduto := infSeparadamente
     else
       ACBrNFe1.DANFE.ExibeInforAdicProduto := infNenhum;
 
     ACBrNFe1.Configuracoes.Geral.SSLLib := libCapicom;//DelphiSoap;
   end;
-  if Pos('rave', LowerCase(geral[0])) > 0 then
+  if Pos('rave', LowerCase(AConfigLegado.Geral.TipoDANFE)) > 0 then
     ACBrNFe1.DANFE := ACBrNFeDANFERave1
   else
     ACBrNFe1.DANFE := ACBrNFeDANFeRL1;
@@ -338,16 +371,15 @@ begin
 
 //   if ACBrNFe1.DANFE <> nil then
 //   begin
-      if Pos('Retrato', geral[0]) > 0 then
+      if Pos('Retrato', AConfigLegado.Geral.TipoDANFE) > 0 then
        ACBrNFe1.DANFE.TipoDANFE := tiretrato
       else
        ACBrNFe1.DANFE.TipoDANFE := tipaisagem;
-//      ACBrNFe1.DANFE.RavFile:=geral[5];
-      ACBrNFe1.DANFE.PathPDF:=geral[6];
-      ACBrNFe1.DANFE.Logo:= geral[2];
-      ACBrNFe1.DANFE.Sistema:=geral[12];
-      ACBrNFe1.DANFE.CasasDecimais.vUnCom:=strtoint(geral[14]);
-      ACBrNFe1.DANFE.CasasDecimais.qCom:=strtoint(geral[14]);
+      ACBrNFe1.DANFE.PathPDF:=AConfigLegado.Geral.EnderecoPDF;
+      ACBrNFe1.DANFE.Logo:= AConfigLegado.Geral.Logomarca;
+      ACBrNFe1.DANFE.Sistema:=AConfigLegado.Geral.Sistema;
+      ACBrNFe1.DANFE.CasasDecimais.vUnCom:=strtoint(AConfigLegado.Geral.CasasDecimais);
+      ACBrNFe1.DANFE.CasasDecimais.qCom:=strtoint(AConfigLegado.Geral.CasasDecimais);
       ACBrNFe1.DANFE.CasasDecimais.MaskqCom := '';
       ACBrNFe1.DANFE.CasasDecimais.MaskvUnCom := '';
 //      ACBrNFe1.DANFE.rav
@@ -355,51 +387,46 @@ begin
 //     ACBrNFe1.DANFE:=ACBrNFeDANFERave1;
 //   end;
 
-   if geral[1] = 'NORMAL' then
+   if AConfigLegado.Geral.FormaEmissao = 'NORMAL' then
     ACBrNFe1.Configuracoes.Geral.FormaEmissao := tenormal
    else
-    if geral[1] = 'SCAN' then
+    if AConfigLegado.Geral.FormaEmissao = 'SCAN' then
      ACBrNFe1.Configuracoes.Geral.FormaEmissao := teSCAN
-   else if geral[1] = 'SVC' then
-     ACBrNFe1.Configuracoes.Geral.FormaEmissao := TpEmisUFToStr(webservice[0])
+   else if AConfigLegado.Geral.FormaEmissao = 'SVC' then
+     ACBrNFe1.Configuracoes.Geral.FormaEmissao := TpEmisUFToStr(AConfigLegado.WebService.UF)
    else
-    if geral[1] = 'DPEC' then
+    if AConfigLegado.Geral.FormaEmissao = 'DPEC' then
      ACBrNFe1.Configuracoes.Geral.FormaEmissao := teDPEC
    else
-    if geral[1] = 'CONTINGENCIA' then
+    if AConfigLegado.Geral.FormaEmissao = 'CONTINGENCIA' then
      ACBrNFe1.Configuracoes.Geral.FormaEmissao := teContingencia
    else
-    if geral[1] = 'FSDA' then
+    if AConfigLegado.Geral.FormaEmissao = 'FSDA' then
      ACBrNFe1.Configuracoes.Geral.FormaEmissao := teFSDA;
 
-   if geral[3] = '1' then ACBrNFe1.Configuracoes.Geral.Salvar := True;
-   if geral[3] = '2' then ACBrNFe1.Configuracoes.Geral.Salvar := False;
-   if geral[10] <> '' then
-     ACBrNFe1.Configuracoes.WebServices.AguardarConsultaRet:=StrToInt(geral[10]);
-   ACBrNFe1.Configuracoes.Arquivos.PathSalvar := geral[4];
+   if AConfigLegado.Geral.SalvarArquivos = '1' then ACBrNFe1.Configuracoes.Geral.Salvar := True;
+   if AConfigLegado.Geral.SalvarArquivos = '2' then ACBrNFe1.Configuracoes.Geral.Salvar := False;
+   if AConfigLegado.Geral.AguardarConsultaRet <> '' then
+     ACBrNFe1.Configuracoes.WebServices.AguardarConsultaRet:=StrToInt(AConfigLegado.Geral.AguardarConsultaRet);
+   ACBrNFe1.Configuracoes.Arquivos.PathSalvar := AConfigLegado.Geral.PathSalvar;
    vcaminho := ACBrNFe1.Configuracoes.Arquivos.PathSalvar;
-   ACBrNFe1.Configuracoes.WebServices.UF := webservice[0];
+   ACBrNFe1.Configuracoes.WebServices.UF := AConfigLegado.WebService.UF;
 
-   if webservice[1] = 'Homologação' then ACBrNFe1.Configuracoes.WebServices.Ambiente := tahomologacao;
-   if webservice[1] = 'Produção' then ACBrNFe1.Configuracoes.WebServices.Ambiente := taproducao;
-   if UpperCase(webservice[2]) = 'TRUE' then ACBrNFe1.Configuracoes.WebServices.Visualizar := TRUE;
-   if UpperCase(webservice[2]) = 'FALSE' then ACBrNFe1.Configuracoes.WebServices.Visualizar := FALSE;
+   if AConfigLegado.WebService.Ambiente = 'Homologação' then ACBrNFe1.Configuracoes.WebServices.Ambiente := tahomologacao;
+   if AConfigLegado.WebService.Ambiente = 'Produção' then ACBrNFe1.Configuracoes.WebServices.Ambiente := taproducao;
+   if UpperCase(AConfigLegado.WebService.Visualizar) = 'TRUE' then ACBrNFe1.Configuracoes.WebServices.Visualizar := TRUE;
+   if UpperCase(AConfigLegado.WebService.Visualizar) = 'FALSE' then ACBrNFe1.Configuracoes.WebServices.Visualizar := FALSE;
 
 
-//{$IFNDEF ACBrNFeCAPICOM}
-//  ACBrNFe1.Configuracoes.WebServices.ProxyHost := webservice[3];
-//  ACBrNFe1.Configuracoes.WebServices.ProxyPort := webservice[4];
-//  ACBrNFe1.Configuracoes.WebServices.ProxyUser := webservice[5];
-//  ACBrNFe1.Configuracoes.WebServices.ProxyPass := webservice[6];
    AcBrNFe1.OnStatusChange := TEvent.FrStatusShow;
 
 end;
 
 
-function LerConfiguracao(certif, geral, webservice: array of shortstring;vescolhacert: WideString): WideString; stdcall;
+function LerConfiguracao(const AConfigLegado: TNFeConfiguracaoLegado): WideString;
 begin
- IniciaNFE(certif, geral, webservice);
- vendbanco:=geral[7];
+ IniciaNFE(AConfigLegado);
+ vendbanco:=AConfigLegado.Geral.CaminhoBanco;
 
  ACBrNFe1.Configuracoes.Geral.SSLLib := TSSLLib(IfThen(IniConf.ReadInt('Sistema', 'libNFe', 0) = 0, Integer(libCapicom)) +
                                                  IfThen(IniConf.ReadInt('Sistema', 'libNFe', 0) = 1, Integer(libOpenSSL)) +
@@ -407,39 +434,11 @@ begin
 
  ACBrNFe1.Configuracoes.Geral.Salvar := True;
  ACBrNFe1.Configuracoes.Geral.VersaoDF := ve400;
-//{$IFNDEF ACBrNFeCAPICOM}
-   ACBrNFe1.Configuracoes.Certificados.ArquivoPFX:= certif[0];
-   ACBrNFe1.Configuracoes.Certificados.Senha := certif[1];
+   ACBrNFe1.Configuracoes.Certificados.ArquivoPFX:= AConfigLegado.Certificado.CaminhoPFX;
+   ACBrNFe1.Configuracoes.Certificados.Senha := AConfigLegado.Certificado.Senha;
 
    if ACBrNFe1.Configuracoes.Geral.SSLLib <> libOpenSSL then
-     ACBrNFe1.Configuracoes.Certificados.NumeroSerie:= certif[2];
-//{$ELSE}
-{
-   if vescolhacert = 'S' then
-   begin
-    ACBrNFe1.Configuracoes.Certificados.NumeroSerie := ACBrNFe1.SSL.SelecionarCertificado;
-    Result:=WideString(ACBrNFe1.Configuracoes.Certificados.NumeroSerie);
-   end
-   else
-   begin
-     if certif[2] = '' then
-     begin
-        Application.MessageBox('Informe o número de série do certificado', 'Atenção', MB_ICONWARNING + MB_OK);
-        ACBrNFe1.Configuracoes.Certificados.NumeroSerie := ACBrNFe1.SSL.SelecionarCertificado;
-        Result:=WideString(ACBrNFe1.Configuracoes.Certificados.NumeroSerie);
-     end
-     else
-      ACBrNFe1.Configuracoes.Certificados.NumeroSerie := certif[2];
-   end;
-   if ACBrNFe1.Configuracoes.Certificados.NumeroSerie <> '' then
-   //certif[2] = '' then
-   begin
-     if (ACBrNFe1.SSL.CertDataVenc-date) <= strtoint(certif[3]) then
-      Application.MessageBox(WideString('Certificado selecionado vence em: '+
-      datetostr(ACBrNFe1.SSL.CertDataVenc)), 'Atenção', MB_ICONWARNING + MB_OK);
-   end;
-   }
-//{$ENDIF}
+     ACBrNFe1.Configuracoes.Certificados.NumeroSerie:= AConfigLegado.Certificado.NumeroSerie;
 end;
 
 procedure ShowfrStatus;
@@ -2966,8 +2965,6 @@ end;
 
 
 exports
- LerConfiguracao,
- IniciaNFE,
  ExecutarDLL,
  GeraNFe,
  InutilizarNFe,

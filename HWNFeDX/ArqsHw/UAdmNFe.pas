@@ -120,7 +120,7 @@ type
 var
   FrmAdmNfe: TFrmAdmNfe;
    tIde, temit, tdest, temVeic, veiculo, ttotal, ttipo,tretirada,tentrega, tExporta: array of shortstring;
-   DDadTransp,certif, geral, webservice: array of shortstring;
+   DDadTransp: array of shortstring;
    tProd,DDadosdup,DdadosCupom: ArrayBi;
    x, i,vNLote: Integer;
    vTipoOP, vChaveNF: string;
@@ -2052,61 +2052,45 @@ end;
 
 
 procedure TFrmAdmNfe.leconfigNFE(vClass: TClassNfe);
+var
+  AConfigLegado: TNFeConfiguracaoLegado;
 begin
 //================ CONFIGURAÇÃO =============================
-   SetLength(certif, 4); //certificacao
-   SetLength(geral, 16); //geral
-   SetLength(webservice, 7); //Webservice
 
-   certif[0] := vClass.CadEmpresa.dataset.fieldbyname('NFE_CAMINHO_CERT').AsString; //<caminho>
-   certif[1] := vClass.CadEmpresa.dataset.fieldbyname('NFE_SENHA__CERT').AsString;
-   certif[2] := vClass.CadEmpresa.dataset.fieldbyname('NFE_NUMSERIE_CERT').AsString;//<num serial>
-   if vClass.CadEmpresa.dataset.fieldbyname('DIAS_AVISO').asinteger <> 0 then
-    certif[3] := vClass.CadEmpresa.dataset.fieldbyname('DIAS_AVISO').AsString//<dias de aviso do certificado>
-   else
-    certif[3] := '0';
+   AConfigLegado.Certificado.CaminhoPFX := vClass.CadEmpresa.dataset.fieldbyname('NFE_CAMINHO_CERT').AsString; //<caminho>
+   AConfigLegado.Certificado.Senha := vClass.CadEmpresa.dataset.fieldbyname('NFE_SENHA__CERT').AsString;
+   AConfigLegado.Certificado.NumeroSerie := vClass.CadEmpresa.dataset.fieldbyname('NFE_NUMSERIE_CERT').AsString;//<num serial>
 
-   geral[0] := vClass.cadempresa.dataSet.FieldByName('NFE_DANFE_TIPO').AsString;//<danfe>
-   geral[1] := vClass.cadempresa.dataSet.FieldByName('NFE_DANFE_FOREMISS').AsString;// cbFormaEmissao.Text; //<Forma emissao>
-   geral[2] :=StringReplace(vClass.cadempresa.dataSet.FieldByName('NFE_LOGOMARCA').AsString,'.BMP','.JPG',[rfIgnoreCase,rfReplaceAll]);//<logo marca>
-   geral[3] := '1'; //<Salvar Arquivos de Envio e Resposta>
-   geral[4] := vClass.cadempresa.dataSet.FieldByName('NFE_LOGPATH').AsString; //<PathSalvar>
-   geral[5] := vClass.cadempresa.dataSet.FieldByName('NFE_ENDRELRAVE').AsString; //Endereco do arquivo de relatorio Rave
-   geral[6] := vClass.cadempresa.dataSet.FieldByName('NFE_ENDERECOPDF').AsString;// Endereço de geração do arquivo PDF
-   geral[7] := vClass.vcaminhobanco;// Endereço do banco de dados.Caso for em branco o sistema não considerará
+   AConfigLegado.Geral.TipoDANFE := vClass.cadempresa.dataSet.FieldByName('NFE_DANFE_TIPO').AsString;//<danfe>
+   AConfigLegado.Geral.FormaEmissao := vClass.cadempresa.dataSet.FieldByName('NFE_DANFE_FOREMISS').AsString;// cbFormaEmissao.Text; //<Forma emissao>
+   AConfigLegado.Geral.Logomarca :=StringReplace(vClass.cadempresa.dataSet.FieldByName('NFE_LOGOMARCA').AsString,'.BMP','.JPG',[rfIgnoreCase,rfReplaceAll]);//<logo marca>
+   AConfigLegado.Geral.SalvarArquivos := '1'; //<Salvar Arquivos de Envio e Resposta>
+   AConfigLegado.Geral.PathSalvar := vClass.cadempresa.dataSet.FieldByName('NFE_LOGPATH').AsString; //<PathSalvar>
+   AConfigLegado.Geral.EnderecoPDF := vClass.cadempresa.dataSet.FieldByName('NFE_ENDERECOPDF').AsString;// Endereço de geração do arquivo PDF
+   AConfigLegado.Geral.CaminhoBanco := vClass.vcaminhobanco;// Endereço do banco de dados.Caso for em branco o sistema não considerará
                                                           // Nosso banco de dados...
-   geral[8] :=IntToStr(vClass.cadempresa.codempresa);// Código da empres
-   geral[9] :='4.0'; // Código da empresa
-   geral[10] :=vClass.cadempresa.dataSet.FieldByName('NFE_TMPRETORNOMIL').AsString; // sleep para retorno do webservice.
-   geral[11] :=vClass.cadempresa.dataSet.FieldByName('NFE_GRAVALOG').AsString; // sleep para retorno do webservice.
-   geral[12] :=vClass.cadempresa.vSISTEMA; // Dados do desenvolvedor
-   geral[13] :=vClass.cadempresa.dataSet.FieldByName('MS_VAL_LIQ_NFE').AsString; // Mostrar valor líquido dos itens na NFe
-   geral[14] :=vClass.cadempresa.dataSet.FieldByName('CASAS_DECIMAIS').AsString; // Mostrar valor líquido dos itens na NFe
-   geral[15] :=vClass.cadempresa.SqlOpen('select VALUE1_F from CONFIG_SISTEMA' +
+   AConfigLegado.Geral.AguardarConsultaRet :=vClass.cadempresa.dataSet.FieldByName('NFE_TMPRETORNOMIL').AsString; // sleep para retorno do webservice.
+   AConfigLegado.Geral.GravarLog :=vClass.cadempresa.dataSet.FieldByName('NFE_GRAVALOG').AsString; // sleep para retorno do webservice.
+   AConfigLegado.Geral.Sistema :=vClass.cadempresa.vSISTEMA; // Dados do desenvolvedor
+   AConfigLegado.Geral.MostrarValorLiquido :=vClass.cadempresa.dataSet.FieldByName('MS_VAL_LIQ_NFE').AsString; // Mostrar valor líquido dos itens na NFe
+   AConfigLegado.Geral.CasasDecimais :=vClass.cadempresa.dataSet.FieldByName('CASAS_DECIMAIS').AsString; // Mostrar valor líquido dos itens na NFe
+   AConfigLegado.Geral.LarguraCodProd :=vClass.cadempresa.SqlOpen('select VALUE1_F from CONFIG_SISTEMA' +
                               ' where CHAVE = ' + QuotedStr('nfe_cfg_ad_danfe_largura_codprod') +
                               ' and COD_EMPRESA = ' + IntToStr(vClass.cadempresa.codempresa)).FieldByName('VALUE1_F').AsString;
 
-//   dataSet.FieldByName('NFE_GRAVALOG').AsString; // sleep para retorno do webservice.
 
-//   geral[10] :=parei...
-//   '4.0'; // Código da empresa
-   webservice[0] := vClass.cadempresa.dataSet.FieldByName('WEBSERV_UF').AsString;//<uf>
-   webservice[1] := vClass.cadempresa.dataSet.FieldByName('WEBSERV_AMBIENTE').AsString;//cbAmbiente.text; //<Selecione o Ambiente de Destino:>
+   AConfigLegado.WebService.UF := vClass.cadempresa.dataSet.FieldByName('WEBSERV_UF').AsString;//<uf>
+   AConfigLegado.WebService.Ambiente := vClass.cadempresa.dataSet.FieldByName('WEBSERV_AMBIENTE').AsString;//cbAmbiente.text; //<Selecione o Ambiente de Destino:>
 
    if vClass.cadempresa.dataSet.FieldByName('WEBSERV_VISUALIZAR').AsString = 'SIM' then
-    webservice[2] :='True'
+    AConfigLegado.WebService.Visualizar :='True'
    else
-    webservice[2] := 'False'; //<visualizar Mensagem>
+    AConfigLegado.WebService.Visualizar := 'False'; //<visualizar Mensagem>
 
-   webservice[3] := ''; //<host>
-   webservice[4] := ''; //<porta>
-   webservice[5] := ''; //<user>
-   webservice[6] := ''; //<pass>
-
-   if  certif[2] = '' then
-    certif[2]:=LerConfiguracao(certif, geral, webservice,'N')
+   if  AConfigLegado.Certificado.NumeroSerie = '' then
+    AConfigLegado.Certificado.NumeroSerie := LerConfiguracao(AConfigLegado)
    else
-    LerConfiguracao(certif, geral, webservice,'N');
+    LerConfiguracao(AConfigLegado);
 //==========================================================
    ACBrNFe1.NotasFiscais.Clear;
 end;

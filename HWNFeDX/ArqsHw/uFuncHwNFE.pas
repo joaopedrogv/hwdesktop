@@ -8,8 +8,6 @@ type
     longbool; stdcall;
   TEnviarNFeHW = function(comveic: WideString; vendBanco: WideString; codempresa: integer; vversao: WideString;
     vnumnf: integer; tipoNF: WideString; tpop: WideString; vsubserie: WideString;vusuario: WideString): longbool; stdcall;
-  TLerConfiguracao = function(certif, geral, webservice: array of shortstring; vescolhacert: WideString):
-    WideString; stdcall;
   TverificarStatusWeb = function(verresultado: WideString): WideString; stdcall;
   TGeraNFe = function(hide, hemit, hDest, temVeic, veiculo, htotal: array of shortstring; tProd:
     ArrayBi; tipoOP: WideString; vNLote: Integer; tipoI_F: Integer; var resposta: WideString; sisint: WideString;
@@ -30,7 +28,6 @@ var
   hdNFE: thandle;
   VisualizaNFe: TVisualizaNFe;
   EnviarNFeHW: TEnviarNFeHW;
-  LerConfiguracao: TLerConfiguracao;
   verificarStatusWeb: TverificarStatusWeb;
   GeraNFe: TGeraNFe;
   TerminaNFE: TTerminaNFE;
@@ -55,7 +52,6 @@ begin
   begin
     @VisualizaNFe := GetProcAddress(hdNFE, WideString('VisualizaNFe'));
     @EnviarNFeHW := GetProcAddress(hdNFE, WideString('EnviarNFeHW'));
-    @LerConfiguracao := GetProcAddress(hdNFE, WideString('LerConfiguracao'));
     @verificarStatusWeb := GetProcAddress(hdNFE, WideString('verificarStatusWeb'));
     @GeraNFe := GetProcAddress(hdNFE, WideString('GeraNFe'));
     @TerminaNFE := GetProcAddress(hdNFE, WideString('TerminaNFE'));

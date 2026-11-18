@@ -28,7 +28,7 @@
 | 7 | `nfe_anexos_csharp` | **aplicado (completo)** | variante sem buffer NFe; buffer preservada |
 | 8 | `leCertificadoNFe` | **aplicado (completo)** | DLL + wrapper ERP + app de teste |
 | 9 | `ConsultaCadastro` | **preservar** (decisão do desenvolvedor) | feature do viewer mantida |
-| 10 | `LerConfiguracao` (carga morta no ERP) | **proposto — próximo** | export permanece; remover tipo/var/GetProcAddress do wrapper |
+| 10 | `LerConfiguracao` (refactor com record) | **aplicado — DLL compilada; pkAtivos/PrTesteDll e teste pendentes** | `LIMPEZA-LERCONFIGURACAO.md` |
 | 11 | `InutilizarNFe`, `GeraChaveNFe` | backlog | features/forms do viewer |
 | — | `LerConfiguracao` + `IniciaNFE` | preservar por enquanto | usadas por `leconfigNFE`, que atende o viewer |
 | — | `nfce_serv_*` | preservar | usados pelos EXEs de serviço |
@@ -114,30 +114,52 @@
 Decisão do desenvolvedor (2026-11-18): a feature continua no viewer; não será removida. O export, o
 formulário e o botão permanecem.
 
-## Demanda 10 — `LerConfiguracao` (carga morta no ERP) — proposta
+## Demanda 10 — `LerConfiguracao` (em planejamento — refactor com records)
 
-**Contexto:** o export `LerConfiguracao` **permanece** na DLL (é usado internamente por `leconfigNFE` no
-viewer), mas o wrapper do ERP carrega o ponteiro e nunca o chama. Esta demanda limpa só o lado da
-aplicação — sem tocar na DLL.
+**Contexto real (corrigindo a unidade):** a implementação de `LerConfiguracao` está em
+`HWNFeDX\UFuncoesDll.pas` (declaração `:48`, implementação `:399-443`, export `:2969`), não em
+`uFuncHwNFE.pas` — este apenas carrega o ponteiro. O único chamador é `TFrmAdmNfe.leconfigNFE`
+(`UAdmNFe.pas:2054-2112`). `LerConfiguracao` chama `IniciaNFE(certif, geral, webservice)`
+(`UFuncoesDll.pas:285-396`, export `:2970`).
 
-**Evidências**
+**Mapeamento atual (cada posição → campo do record)**
 
-- `Ativos\fonte\DLLNFe\DFeHwLibUnit.pas`: `TLerConfiguracao` (43; cópia comentada em 66),
-  `LerConfiguracao` (99) e `GetProcAddress` (148).
-- `HWNFeDX\ArqsHw\uFuncHwNFE.pas`: `TLerConfiguracao` (11), `LerConfiguracao` (33) e
-  `GetProcAddress` (58).
-- Nenhuma chamada a `LerConfiguracao(...)` no ERP; a função só é chamada dentro da DLL
-  (`UAdmNFe.pas:2120,2122`).
+`certif: array[0..3] of shortstring`
+0 CaminhoPFX, 1 Senha, 2 NumeroSerie, 3 DiasAviso.
 
-**Ajustes**
+`geral: array[0..15]`
+0 TipoDANFE, 1 FormaEmissao, 2 Logomarca, 3 SalvarArquivos, 4 PathSalvar, 5 EnderecoRave,
+6 EnderecoPDF, 7 CaminhoBanco, 8 CodigoEmpresa, 9 VersaoDF, 10 AguardarConsultaRet,
+11 GravarLog, 12 Sistema, 13 MostrarValorLiquido, 14 CasasDecimais, 15 LarguraCodProd.
 
-1. Remover o tipo, a variável e o `GetProcAddress` de `DFeHwLibUnit.pas` (e a cópia comentada).
-2. Remover os equivalentes em `uFuncHwNFE.pas`.
-3. Não alterar a DLL.
-4. Compilar o `pkAtivos`/ERP; comportamento inalterado.
+`webservice: array[0..6]`
+0 UF, 1 Ambiente, 2 Visualizar, 3 Host, 4 Porta, 5 Usuario, 6 Senha.
 
-**Próximas cargas mortas do mesmo padrão:** `ExecutarDLL`, `GeraNFe`, `verificarStatusWeb` e
-`TerminaNFE` (o app carrega, não chama; as funções são usadas internamente pelo viewer).
+`vescolhacert: WideString` → `EscolhaCertificado` ('N'/'S'; no código vivo atual não é usado — só no
+bloco comentado).
+
+**Decisões aprovadas (2026-11-18):** refactor em `UFuncoesDll.pas`; `uFuncHwNFE.pas` só perde o
+loader; remover os exports de `LerConfiguracao` e `IniciaNFE`; `IniciaNFE` recebe o record; records no
+interface de `UFuncoesDll.pas`; campos `string`; não reproduzir campos sem uso; assinatura
+`const AConfigLegado: TNFeConfiguracaoLegado`. P1/P2/P4/P5/P6 aplicados; P3 adiado. Desenho completo:
+`HWNFeDX/LIMPEZA-LERCONFIGURACAO.md`.
+
+**Resultado (2026-11-18):**
+
+- `UFuncoesDll.pas`: records `TNFeCertificadoLegado`/`TNFeGeralLegado`/`TNFeWebServiceLegado`/
+  `TNFeConfiguracaoLegado` no interface; `LerConfiguracao(const AConfigLegado): WideString`;
+  `procedure IniciaNFE(const AConfigLegado)`; mapeamento de todos os índices; remoção do bloco
+  comentado de `vescolhacert`/`certif` e do proxy; `exports` sem `LerConfiguracao`/`IniciaNFE`.
+- `UAdmNFe.pas`: `leconfigNFE` com record local, sem `SetLength` e sem as posições sem uso; globais
+  `certif/geral/webservice` removidas (mantido `DDadTransp`).
+- `DFeHwLibUnit.pas` e `uFuncHwNFE.pas`: loaders removidos; `UformTeste.pas` sem o comentário de
+  `LerConfiguracao`.
+- **Build da DLL:** `msbuild HWNFeDX\hw.nfe.dx.dproj /t:Build /p:Config=Debug /p:Platform=Win32
+  /p:DCC_ForceExecute=true` — exit 0; `bpl\hw.nfe.dx.dll` com 69.043.794 bytes (18/11/2026 11:18).
+- **Revisão independente:** sem achados bloqueantes/graves; um menor de cobertura de build
+  (`pkAtivos`/`PrTesteDll` não compilados — autorização era só da DLL).
+- **Pendente:** compilar `pkAtivos`/`PrTesteDll` quando autorizado e executar o roteiro runtime do
+  viewer (certificado, emissão, DANFE, eventos, e-mail, download, log, `WEBSERV_VISUALIZAR`).
 
 ## Limpeza de referências residuais (2026-11-18)
 
