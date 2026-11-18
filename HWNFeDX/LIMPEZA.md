@@ -30,9 +30,10 @@
 | 9 | `ConsultaCadastro` | **preservar** (decisão do desenvolvedor) | feature do viewer mantida |
 | 10 | `LerConfiguracao` (refactor com record) | **aplicado — DLL compilada; pkAtivos/PrTesteDll e teste pendentes** | `LIMPEZA-LERCONFIGURACAO.md` |
 | 11 | `InutilizarNFe` | **aplicado — DLL compilada; teste pendente** | função + export + botão + form apagados |
-| 12 | `BuscaTroca` (helper sem chamadores) | **proposto — próximo** | `UFuncoesDll.pas`; confirmar histórico |
-| 13 | `GeraChaveNFe` | backlog | feature/forms + chamadas em `UAdmNFe` |
-| 14 | cargas mortas do wrapper (`ExecutarDLL`, `GeraNFe`, `verificarStatusWeb`, `TerminaNFE`) | backlog | exports permanecem; limpar tipo/var/GetProcAddress |
+| 12 | `BuscaTroca` | **aplicado pelo desenvolvedor** | helper removido |
+| 13 | `GeraChaveNFe` | **export removido pelo desenvolvedor** | função/implementação permanece (uso interno) |
+| 14 | `ShowfrStatus` (helper sem chamadores) | **proposto — próximo** | implementação-only em `UFuncoesDll.pas` |
+| 15 | cargas mortas do wrapper (`ExecutarDLL`, `GeraNFe`, `verificarStatusWeb`, `TerminaNFE`) | backlog | exports permanecem; limpar tipo/var/GetProcAddress |
 | — | `LerConfiguracao` + `IniciaNFE` | preservar por enquanto | usadas por `leconfigNFE`, que atende o viewer |
 | — | `nfce_serv_*` | preservar | usados pelos EXEs de serviço |
 | — | variantes `*CSharpBuffer` e exports ativos | preservar | usados por C#/ERP |
@@ -204,6 +205,31 @@ cosmético; o IDE pode renumerar ao salvar. Observação: remoção de export mu
 
 **Próximos candidatos:** `BuscaTroca` em `UFuncoesDll.pas` (ficou sem chamadores) e as cargas mortas
 do wrapper para `ExecutarDLL`, `GeraNFe`, `verificarStatusWeb` e `TerminaNFE`.
+
+## Demanda 12 — `ShowfrStatus` (proposta)
+
+**Por que é o próximo:** é o único helper de `UFuncoesDll.pas` que ficou sem qualquer chamador — mesma
+situação do `BuscaTroca` que você removeu.
+
+**Evidências**
+
+- Implementação-only: `UFuncoesDll.pas:444-510`; não há declaração no `interface` nem export.
+- Nenhuma chamada a `ShowfrStatus` no projeto da DLL, no ERP ou nos C#.
+- O global `frmStatus` continua usado por `UAdmNFe` (`:780,2118-2122,2167-2187,2203-2207,2266-2289`)
+  e `UClasseNFe` (`:10835-10842`) — **não remover** esse global; a criação do form nesses fluxos é
+  feita localmente.
+
+**Ajustes**
+
+1. Remover o bloco `procedure ShowfrStatus; ... end;` (444-510) e a linha em branco adjacente.
+2. Nenhuma outra alteração; `frmStatus`/`TfrmStatus` permanecem.
+3. Compilar a DLL (quando autorizado).
+
+**Risco:** nenhum funcional; era código morto.
+
+**Depois:** candidatos a export com carga morta no wrapper (`ExecutarDLL`, `GeraNFe`,
+`verificarStatusWeb`, `TerminaNFE`) — remover a entrada do `exports` e o tipo/variável/`GetProcAddress`
+em `DFeHwLibUnit.pas`/`uFuncHwNFE.pas`, mantendo as funções internas do viewer.
 
 ## Limpeza de referências residuais (2026-11-18)
 
