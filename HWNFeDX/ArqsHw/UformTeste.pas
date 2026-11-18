@@ -222,7 +222,6 @@ type
 
 //  function LerConfiguracao(certif, geral, webservice: array of shortstring;vescolhacert: Pchar): Pchar; stdcall; external 'HWNFe.dll';
 //
-//  function leCertificadoNFe: Pchar; stdcall; external 'HWNFe.dll';
 //
 //  function GeraNFe(hide, hemit, hDest, temVeic, veiculo, htotal: array of shortstring; detProd: ArrayBi; tipoOP: pchar; vnLote: Integer; tipoI_F: Integer;var resposta: Pchar;Ddup: ArrayBi;DTransp:array of shortstring): Pchar; stdcall; external 'HWNFe.dll';
 //

@@ -42,7 +42,6 @@ type
     vnumnf: integer; tipoNF: WideString; tpop: WideString; vsubserie: WideString;vusuario: WideString): longbool; stdcall;
   TLerConfiguracao = function(certif, geral, webservice: array of shortstring; vescolhacert: WideString):
     WideString; stdcall;
-  TleCertificadoNFe = function: WideString; stdcall;
   TverificarStatusWeb = function(verresultado: WideString): WideString; stdcall;
   TGeraNFe = function(hide, hemit, hDest, temVeic, veiculo, htotal: array of shortstring; tProd:
     ArrayBi; tipoOP: WideString; vNLote: Integer; tipoI_F: Integer; var resposta: WideString; sisint: WideString;
@@ -66,7 +65,6 @@ type
     vnumnf: integer; tipoNF: PChar; tpop: PChar; vsubserie: PChar;vusuario: PChar): longbool; stdcall;
   TLerConfiguracao = function(certif, geral, webservice: array of shortstring; vescolhacert: PChar):
     PChar; stdcall;
-  TleCertificadoNFe = function: PChar; stdcall;
   TverificarStatusWeb = function(verresultado: PChar): PChar; stdcall;
   TGeraNFe = function(hide, hemit, hDest, temVeic, veiculo, htotal: array of shortstring; tProd:
     ArrayBi; tipoOP: PChar; vNLote: Integer; tipoI_F: Integer; var resposta: PChar; sisint: PChar;
@@ -99,7 +97,6 @@ var
   VisualizaNFe: TVisualizaNFe;
   EnviarNFeHW: TEnviarNFeHW;
   LerConfiguracao: TLerConfiguracao;
-  leCertificadoNFe: TleCertificadoNFe;
   verificarStatusWeb: TverificarStatusWeb;
   GeraNFe: TGeraNFe;
   TerminaNFE: TTerminaNFE;
@@ -149,7 +146,6 @@ begin
     @VisualizaNFe := GetProcAddress(hdNFE, PAnsiChar('VisualizaNFe'));
     @EnviarNFeHW := GetProcAddress(hdNFE, PAnsiChar('EnviarNFeHW'));
     @LerConfiguracao := GetProcAddress(hdNFE, PAnsiChar('LerConfiguracao'));
-    @leCertificadoNFe := GetProcAddress(hdNFE, PAnsiChar('leCertificadoNFe'));
     @verificarStatusWeb := GetProcAddress(hdNFE, PAnsiChar('verificarStatusWeb'));
     @GeraNFe := GetProcAddress(hdNFE, PAnsiChar('GeraNFe'));
     @TerminaNFE := GetProcAddress(hdNFE, PAnsiChar('TerminaNFE'));

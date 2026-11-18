@@ -26,9 +26,11 @@
 | 5 | `EnviarEmailNFSe` | **aplicado (completo)** | função no `.dpr` + export + declaração/handler/botão do app de teste |
 | 6 | `nfce_anexos_csharp`, `NFSeCallCriarAnexosCSharp` | **aplicado (completo)** | variantes sem buffer; buffers preservadas |
 | 7 | `nfe_anexos_csharp` | **aplicado (completo)** | variante sem buffer NFe; buffer preservada |
-| 8 | `leCertificadoNFe` | **proposto — próximo** | sem nenhuma chamada no repo; app só carrega |
-| 9 | `LerConfiguracao` + `IniciaNFE` | preservar por enquanto | usadas por `leconfigNFE`, que atende o viewer |
-| 10 | `InutilizarNFe`, `ConsultaCadastro`, `GeraChaveNFe` | backlog | dependem de features/forms do viewer |
+| 8 | `leCertificadoNFe` | **aplicado (completo)** | DLL + wrapper ERP + app de teste |
+| 9 | `ConsultaCadastro` | **preservar** (decisão do desenvolvedor) | feature do viewer mantida |
+| 10 | `LerConfiguracao` (carga morta no ERP) | **proposto — próximo** | export permanece; remover tipo/var/GetProcAddress do wrapper |
+| 11 | `InutilizarNFe`, `GeraChaveNFe` | backlog | features/forms do viewer |
+| — | `LerConfiguracao` + `IniciaNFE` | preservar por enquanto | usadas por `leconfigNFE`, que atende o viewer |
 | — | `nfce_serv_*` | preservar | usados pelos EXEs de serviço |
 | — | variantes `*CSharpBuffer` e exports ativos | preservar | usados por C#/ERP |
 
@@ -95,33 +97,47 @@
 - Bytes: 11.763 → 11.394; 1 byte alto, CP1252/CRLF.
 - Sem mudança de comportamento para a variante buffer nem para os C# fornecidos.
 
-## Demanda 8 — `leCertificadoNFe` (proposta)
+## Demanda 8 — `leCertificadoNFe` (aplicada)
 
-**Por que é o próximo:** é o único export restante sem **nenhuma** chamada no repositório. A aplicação
-apenas carrega o ponteiro em `DFeHwLibUnit` (nunca chama), e o projeto da DLL não usa a função.
+- Removidos declaração (49), implementação (515-518) e export (2980) de `UFuncoesDll.pas` (7 linhas).
+- Removidas as referências no wrapper do ERP (`DFeHwLibUnit.pas`): `TleCertificadoNFe` (tipo live e
+  cópia comentada), variável e `GetProcAddress` — 4 linhas.
+- Removidas as referências no app de teste/DLL (`uFuncHwNFE.pas`): tipo, variável e `GetProcAddress` —
+  3 linhas.
+- Removido o comentário remanescente em `UformTeste.pas` (`// function leCertificadoNFe...`).
+- Não havia chamadas no ERP, nos C# ou no app de teste.
+- Bytes: `UFuncoesDll.pas` 129.600 → 129.405; `DFeHwLibUnit.pas` 12.692 → 12.469;
+  `uFuncHwNFE.pas` 3.786 → 3.611. Encoding preservado (CP1252/CRLF).
+
+## Demanda 9 — `ConsultaCadastro` (preservada)
+
+Decisão do desenvolvedor (2026-11-18): a feature continua no viewer; não será removida. O export, o
+formulário e o botão permanecem.
+
+## Demanda 10 — `LerConfiguracao` (carga morta no ERP) — proposta
+
+**Contexto:** o export `LerConfiguracao` **permanece** na DLL (é usado internamente por `leconfigNFE` no
+viewer), mas o wrapper do ERP carrega o ponteiro e nunca o chama. Esta demanda limpa só o lado da
+aplicação — sem tocar na DLL.
 
 **Evidências**
 
-- Declaração: `HWNFeDX\UFuncoesDll.pas:49`.
-- Implementação: `UFuncoesDll.pas:515-518`.
-- Export: `UFuncoesDll.pas:2980`.
-- Carga sem uso no ERP: `Ativos\fonte\DLLNFe\DFeHwLibUnit.pas:106,158`; nenhuma chamada.
-- No app de teste/DLL: apenas declaração/carga (`uFuncHwNFE.pas:13,37,65`), sem chamada.
-- Nenhum dos projetos C# usa.
+- `Ativos\fonte\DLLNFe\DFeHwLibUnit.pas`: `TLerConfiguracao` (43; cópia comentada em 66),
+  `LerConfiguracao` (99) e `GetProcAddress` (148).
+- `HWNFeDX\ArqsHw\uFuncHwNFE.pas`: `TLerConfiguracao` (11), `LerConfiguracao` (33) e
+  `GetProcAddress` (58).
+- Nenhuma chamada a `LerConfiguracao(...)` no ERP; a função só é chamada dentro da DLL
+  (`UAdmNFe.pas:2120,2122`).
 
-**Ajustes necessários**
+**Ajustes**
 
-1. Remover a declaração `function leCertificadoNFe: WideString; stdcall;` (linha 49).
-2. Remover o bloco de implementação (515-518).
-3. Remover `leCertificadoNFe,` do `exports` (2980).
-4. Remover a referência no wrapper do ERP: `TleCertificadoNFe` (45), `leCertificadoNFe` (106) e o
-   `GetProcAddress` (158) em `Ativos\fonte\DLLNFe\DFeHwLibUnit.pas`.
-5. Remover as referências equivalentes no app de teste/DLL: `TleCertificadoNFe` (13),
-   `leCertificadoNFe` (37) e o `GetProcAddress` (65) em `HWNFeDX\ArqsHw\uFuncHwNFE.pas`.
-6. Compilar a DLL; o ERP não é afetado (não há chamada).
+1. Remover o tipo, a variável e o `GetProcAddress` de `DFeHwLibUnit.pas` (e a cópia comentada).
+2. Remover os equivalentes em `uFuncHwNFE.pas`.
+3. Não alterar a DLL.
+4. Compilar o `pkAtivos`/ERP; comportamento inalterado.
 
-**Risco residual:** consumidor externo desconhecido; não há evidência no ERP, nos C# ou no app de
-teste. O wrapper do ERP manterá uma carga morta até a limpeza do app.
+**Próximas cargas mortas do mesmo padrão:** `ExecutarDLL`, `GeraNFe`, `verificarStatusWeb` e
+`TerminaNFE` (o app carrega, não chama; as funções são usadas internamente pelo viewer).
 
 ## Limpeza de referências residuais (2026-11-18)
 

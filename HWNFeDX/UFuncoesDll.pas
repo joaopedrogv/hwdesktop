@@ -46,7 +46,6 @@ type
  function getCampoPipe(plinha: string; pOrdem: integer; pDelimitador: string = '|'): string;
  function strIn(pSubString: string; const pArgs: array of string): Boolean;
  function LerConfiguracao(certif, geral, webservice: array of shortstring;vescolhacert: WideString): WideString; stdcall;
- function leCertificadoNFe: WideString; stdcall;
  function verificarStatusWeb(verresultado: WideString): WideString; stdcall;
  function GeraNFe(hide, hemit, hDest, temVeic, veiculo, htotal: array of shortstring; tProd: ArrayBi; tipoOP: WideString; vNLote: Integer; tipoI_F: Integer;var resposta: WideString;sisint: WideString;NFTP: WideString;codempresa: WideString;Ddup: ArrayBi;DTransp:array of shortstring;vinfadic: WideString;hretirada,hentrega: array of shortstring;DdadosCupom:ArrayBi; pItemDI: array of Record_Item_DI; hexporta: array of shortstring; hrefNFe: array of shortstring): WideString; stdcall;
  function TerminaNFE: LongBool;stdcall;
@@ -511,11 +510,6 @@ begin
 
 end;
 
-
-function leCertificadoNFe: WideString; stdcall;
-begin
-  result := WideString(ACBrNFe1.SSL.SelecionarCertificado);
-end;
 
 class procedure TEvent.btExecutarClick(Sender: TObject);
 begin
@@ -2977,7 +2971,6 @@ exports
  ExecutarDLL,
  GeraNFe,
  InutilizarNFe,
- leCertificadoNFe,
  verificarStatusWeb,
  TerminaNFE,
  ConsultaCadastro,
