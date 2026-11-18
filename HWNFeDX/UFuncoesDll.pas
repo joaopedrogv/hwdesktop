@@ -52,10 +52,8 @@ type
  function TerminaNFE: LongBool;stdcall;
  function ExecutarDLL(ttipo: WideString; Aux: WideString; Just: WideString;var resposta:WideString;sisint: WideString;NFTP: WideString;codempresa: WideString;vtipocons: WideString;statusNFE: WideString;nregdpec: WideString; pUFWS: WideString): WideString; stdcall;export;
  function ConsultaCadastro(vuf,cnpjcpf,mostrarretorno: WideString): WideString;stdcall;export;
- function verificarRecibolote(vnumrecibo: WideString): WideString; stdcall;
  function GeraChaveNFe(codigo_uf: integer;cnf: integer;modelo: integer;
  serie: integer;nnf: integer;tpemi: integer;vdata: WideString;cnpj: WideString): WideString; stdcall;
- function VerificarSCAN: Integer;
  function VerificarSVC(pUF: string): Integer;
  function Cpf(Num: string): boolean;
  function cgc(Num: string): boolean;
@@ -568,13 +566,6 @@ begin
   }
 end;
 
-function Status: WideString; stdcall;
-begin
-   ACBrNFe1.WebServices.StatusServico.Executar;
-   Result := WideString(UTF8Encode(ACBrNFe1.WebServices.StatusServico.RetWS));
-end;
-
-
 function TerminaNFE: LongBool;stdcall;
 begin
    Result:=true;
@@ -878,38 +869,6 @@ begin
 end;
 
 
-
-function verificarRecibolote(vnumrecibo: WideString): WideString; stdcall;
-var
- atvis: Boolean;
- voriginal: TpcnTipoEmissao;
-begin
-// Testar aqui o DPEC  mais a frente...
- voriginal:=ACBrNFe1.Configuracoes.Geral.FormaEmissao;
- if voriginal = teSCAN then
- begin
-  Application.MessageBox(PWideChar('Contingência SCAN ativada.'), 'Atenção', MB_ICONWARNING + MB_OK);
- end
- else
-  if voriginal = teDPEC then
-  begin
-   Application.MessageBox(PWideChar('Contingência DPEC ativada. Não consulta Lote!'), 'Atenção', MB_ICONWARNING + MB_OK);
-   result:='FALHOU DPEC';
-  end;
-  try
-   atvis:=ACBrNFe1.Configuracoes.WebServices.Visualizar;
-   ACBrNFe1.Configuracoes.WebServices.Visualizar:=true;
-   ACBrNFe1.WebServices.Recibo.Recibo:=vnumrecibo;
-   ACBrNFe1.WebServices.Recibo.Executar;
-   ACBrNFe1.Configuracoes.WebServices.Visualizar:=atvis;
-   result:='OK';
-  except
-   on e: exception do
-   begin
-    result:=PWideChar('FALHOU ERRO: '+e.Message);
-   end;
-  end;
-end;
 
 
 function GeraChaveNFe(codigo_uf: integer;cnf: integer;modelo: integer;
@@ -2761,26 +2720,6 @@ begin
     end;
 end;
 
-function VerificarSCAN: Integer;
-var
- atvis: boolean;
-begin
- try
-   ACBrNFe1.Configuracoes.Geral.FormaEmissao:=teSCAN;
-   atvis:=ACBrNFe1.Configuracoes.WebServices.Visualizar;
-   ACBrNFe1.Configuracoes.WebServices.Visualizar:=true;
-   ACBrNFe1.WebServices.StatusServico.Executar;
-   ACBrNFe1.Configuracoes.WebServices.Visualizar:=atvis;
-   Result:=ACBrNFe1.WebServices.StatusServico.cStat;
- except
-  on e: exception do
-  begin
-   Application.MessageBox(PWideChar('2273 ' + E.Message),PWideChar('Error'), MB_OK);
-   result:=0;
-  end;
- end;
-end;
-
 function VerificarSVC(pUF: string): Integer;
 var
  atvis: boolean;
@@ -3036,15 +2975,12 @@ exports
  LerConfiguracao,
  IniciaNFE,
  ExecutarDLL,
- status,
  GeraNFe,
  InutilizarNFe,
  leCertificadoNFe,
  verificarStatusWeb,
  TerminaNFE,
- VerificarSCAN,
  ConsultaCadastro,
- verificarRecibolote,
  GeraChaveNFe,
  EnviarMDFE,
  ConsultarMDFE,

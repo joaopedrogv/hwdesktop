@@ -64,11 +64,9 @@ type
     RadioButton3: TRadioButton;
     Label4: TLabel;
     lbforma: TLabel;
-    Button3: TButton;
     Button4: TButton;
     Button5: TButton;
     procedure Button4Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure btnConsCadClick(Sender: TObject);
@@ -101,7 +99,6 @@ type
     function EnviarEmail_NFe: Boolean;
     function CancelarNFE: boolean;
     function Mconsultasefazor(vuf: string;vchave: string;vserie: string): boolean;
-    function LerSCAN: integer;
     function ConsultaNFEDLL: boolean;
     function enviaEvento(vidlote: integer): boolean;
     function enviaEventoEmail(codigoEvento: string): boolean;
@@ -437,17 +434,6 @@ begin
     else
      Application.MessageBox(PWideChar('Nenhuma NF-e marcada para envio. Tente novamente '),PWideChar('Error'), MB_OK);
   end;
-end;
-
-procedure TFrmAdmNfe.Button3Click(Sender: TObject);
-var
- vresstatus: string;
-begin
- if CadNfeVenda.dataSet.FieldByName('NFE_RECIBO').AsString <> '' then
- begin
-  leconfigNFE(CadNfeVenda);
-    vresstatus:=verificarRecibolote(PWideChar(CadNfeVenda.dataSet.FieldByName('NFE_RECIBO').AsString));
- end;
 end;
 
 procedure TFrmAdmNfe.Button4Click(Sender: TObject);
@@ -2123,12 +2109,6 @@ begin
     LerConfiguracao(certif, geral, webservice,'N');
 //==========================================================
    ACBrNFe1.NotasFiscais.Clear;
-end;
-
-function TFrmAdmNfe.LerSCAN: integer;
-begin
- leconfigNFE(CadNfeVenda);
- result:=VerificarSCAN;
 end;
 
 function TFrmAdmNfe.Mconsultasefazor(vuf, vchave, vserie: string): boolean;

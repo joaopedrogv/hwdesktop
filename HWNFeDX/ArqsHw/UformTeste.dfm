@@ -100,15 +100,6 @@ object frmTestes_DFe: TfrmTestes_DFe
         TabOrder = 7
         OnClick = BitBtn3Click
       end
-      object BitBtn5: TBitBtn
-        Left = 152
-        Top = 39
-        Width = 125
-        Height = 25
-        Caption = 'Verifica SCAN'
-        TabOrder = 8
-        OnClick = BitBtn5Click
-      end
       object Button4: TButton
         Left = 152
         Top = 70
@@ -664,15 +655,6 @@ object frmTestes_DFe: TfrmTestes_DFe
           TabOrder = 2
           Visible = False
           OnClick = BitBtn34Click
-        end
-        object BitBtn39: TBitBtn
-          Left = 143
-          Top = 24
-          Width = 162
-          Height = 25
-          Caption = 'ImprimirNFSe'
-          TabOrder = 3
-          OnClick = BitBtn39Click
         end
       end
       object edEmpConf: TSpinEdit

@@ -52,7 +52,6 @@ type
     Button12: TButton;
     Button13: TButton;
     BitBtn3: TBitBtn;
-    BitBtn5: TBitBtn;
     Button4: TButton;
     BitBtn2: TBitBtn;
     Button6: TButton;
@@ -109,7 +108,6 @@ type
     Label8: TLabel;
     edEmpConf: TSpinEdit;
     edBancoConf: TComboBox;
-    BitBtn39: TBitBtn;
     edLogNFSeConfig: TMemo;
     TabSheet10: TTabSheet;
     BitBtn40: TBitBtn;
@@ -159,7 +157,6 @@ type
     procedure BitBtn8Click(Sender: TObject);
     procedure BitBtn7Click(Sender: TObject);
     procedure BitBtn6Click(Sender: TObject);
-    procedure BitBtn5Click(Sender: TObject);
     procedure BitBtn4Click(Sender: TObject);
     procedure BitBtn3Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -194,7 +191,6 @@ type
     procedure BitBtn36Click(Sender: TObject);
     procedure BitBtn37Click(Sender: TObject);
     procedure edBancoConfChange(Sender: TObject);
-    procedure BitBtn39Click(Sender: TObject);
     procedure BitBtn40Click(Sender: TObject);
     procedure BitBtn41Click(Sender: TObject);
     procedure BitBtn42Click(Sender: TObject);
@@ -230,7 +226,6 @@ type
 //
 //  function GeraNFe(hide, hemit, hDest, temVeic, veiculo, htotal: array of shortstring; detProd: ArrayBi; tipoOP: pchar; vnLote: Integer; tipoI_F: Integer;var resposta: Pchar;Ddup: ArrayBi;DTransp:array of shortstring): Pchar; stdcall; external 'HWNFe.dll';
 //
-//  function Status: Pchar; stdcall; external 'HWNFe.dll';
 //
 //  procedure StatusChange; external 'HWNFe.dll';
 //
@@ -261,7 +256,6 @@ type
  function ImprimirEventoMDFE(vnmdfe: integer;codempresa: integer;vendBanco: PChar;vusuario: Pchar):LongBool;stdcall;external 'hw.nfe.dx.dll';
  function EnviarEmailMDFE(vnmdfe: integer;codempresa,vtpop: integer;vendBanco: PChar;vusuario: Pchar):LongBool;stdcall;external 'hw.nfe.dx.dll';
  function hw_LerXMLNFe(AListParams: WideString): WideString; stdcall; external 'hw.nfe.dx.dll';
- function EnviarEmailNFSe(vendBanco: WideString;codempresa: integer;vusuario: WideString; vos: integer; var AEnviarEmail, AEnviarBoleto, AImprimir: Boolean): LongBool; stdcall;external 'hw.nfe.dx.dll';
 // vtpop = 2 Email MDFe vtpop = 3 Email do Evento Anexado ao MDFe
 
   function EnviaOSNFSe_Silent(vendBanco: WideString;codempresa: integer;vusuario: WideString; vos: integer; var AEnviarEmail, AEnviarBoleto, AImprimir: Boolean): LongBool; stdcall; external 'hw.nfe.dx.dll';
@@ -858,30 +852,6 @@ begin
     memoNFe400.Lines.Add(str);
 end;
 
-procedure TfrmTestes_DFe.BitBtn39Click(Sender: TObject);
-var
-  db: WideString;
-begin
-  db := edBancoConf.Text;
-
-  var envEmail := false;
-  var impBol := false;
-  var imprimir := True;
-
-  try
-    var foi := EnviarEmailNFSe(db, edEmpConf.Value, 'HW', 2430, envEmail, impBol, imprimir);
-
-    edLogNFSeConfig.Lines.Add(IfThen(foi, 'Retorno True', 'Retorno False'));
-    edLogNFSeConfig.Lines.Add(IfThen(imprimir, 'Var Imprimir True', 'Var Imprimir False'));
-
-  except on E: Exception do
-    begin
-      edLogNFSeConfig.Lines.Add('-- Erro: ' + e.Message);
-      edLogNFSeConfig.Lines.Add('');
-    end;
-  end;
-end;
-
 procedure TfrmTestes_DFe.BitBtn3Click(Sender: TObject);
 var
  vuf,vchave,vserie: string;
@@ -1071,11 +1041,6 @@ begin
 // if (InputQuery('Chave NFe', 'Entre com a Chave', vchave)) then
 //  vresp:=ConsultaRFB(Pchar(vchave),'HW');
  ShowMessage(vresp);
-end;
-
-procedure TfrmTestes_DFe.BitBtn5Click(Sender: TObject);
-begin
-  VerificaSCAN(1,'192.168.254.11:d:\clientes\exemplo\Hwauto.fdb');
 end;
 
 procedure TfrmTestes_DFe.BitBtn6Click(Sender: TObject);

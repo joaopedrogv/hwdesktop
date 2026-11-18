@@ -878,92 +878,6 @@ begin
 end;
 
 
-function EnviarEmailNFSe(vendBanco: WideString;codempresa: integer;vusuario: WideString; vos: integer; var AEnviarEmail, AEnviarBoleto, AImprimir: Boolean): LongBool; stdcall;
-var
-  Aret_SendMail: Boolean;
-  Aanexos: TStrings;
-  I: Integer;
-begin
-  Result := True;
-
-  CreateFormAdmNFSe();
-  try
-    SetAttrFormAdmNFSe(vendBanco, codempresa, vusuario);
-
-    if not FrmAdmNFSe.CadNFSe.conectaBanco then
-      Exit;
-
-    with FrmAdmNFSe.CadNFSe do
-    begin
-      SilentMode := True;
-      SendMail   := False;
-      SendBoleto := False;
-
-      CadEmpresa.dadosGNfe;
-      vercidadeNFSe;
-      vospesq := IntToStr(vos);
-
-      if pesqOsNFSe(vos) then
-      begin
-        iniciaNFSE;
-        nomecliente := dataSet.FieldByName('NOME_CLIENTE').AsString;
-//        Result := montarRPSEnv(dataSet.FieldByName('NPED').AsInteger, dataSet.FieldByName('ALIQ_ISS').AsInteger, '', 0);
-//        if not Result then
-//          Exit;
-      end
-      else
-        Exit(False);
-
-      Aret_SendMail := True;//controla se o email foi enviado com sucesso
-      SendMail   := AEnviarEmail;
-      SendBoleto := AEnviarBoleto;
-      Imprimir   := AImprimir;
-
-      if SendMail or SendBoleto or Imprimir then
-        dataSet.Refresh
-      else
-        Exit;
-
-      dataSet.First;
-      while not dataSet.Eof do
-      begin
-        var iRPS := dataSet.FieldByName('COD_RPS').AsInteger;
-        var iNF := dataSet.FieldByName('N_NF').AsLargeInt;
-        if (iRPS > 0)and (iNF > 0) then
-        begin
-          iniciaNFSE;
-          abrirRPSDireto;
-          nomecliente := dataSet.FieldByName('NOME_CLIENTE').AsString;
-
-          if AEnviarEmail then
-          begin
-            Aanexos := getArquivosBoletoParaAnexos;
-            enviaemailNFSe(3, AAnexos);
-            if Aret_SendMail then
-              Aret_SendMail := not ErrorSendEmail;
-
-            if Assigned(Aanexos) then
-              for I := 0 to Aanexos.Count - 1  do
-                DeleteFile(PWideChar(Aanexos[I]));
-          end;
-
-          if AImprimir then
-            imprimedireto(2);
-        end;
-
-        dataSet.Next;
-      end;
-
-      AEnviarEmail  := SendMail and Aret_SendMail;
-      AEnviarBoleto := SendBoleto;
-      AImprimir     := Imprimir;
-    end;
-
-  finally
-    ReleaseFormAdmNFSe;
-  end;
-end;
-
 function GerarPdfNFSe(parametros: WideString): WideString; stdcall;
 var
   Aanexos: TStrings;
@@ -1360,20 +1274,6 @@ begin
   end;
 end;
 
-function hw_LerXMLNFeSaida(AListParams: WideString): WideString; stdcall;
-var
-  ANFe: TClassNfVenda;
-begin
-  DtmNFEHW := TDtmNFEHW.create(nil);
-  ANFe := TClassNfVenda.create;
-  try
-    Result := ANFe.AddNFeInDBFromXMLSaida(AListParams);
-  finally
-    FreeAndNil(ANFe);
-    FreeAndNil(DtmNFEHW);
-  end;
-end;
-
 function nfse_get_regime_especial_trib(vendBanco: WideString; codempresa: integer): WideString; stdcall;
 begin
   DtmNFEHW := TDtmNFEHW.create(nil);
@@ -1423,7 +1323,6 @@ exports
    VisualizaNFSe,
    EnviaOSNFSe,
    EnviaOSNFSe_Silent,
-   EnviarEmailNFSe,
    GerarPdfNFSe,
    ValidaChaveNFe,
    EnviarEvento,
@@ -1431,7 +1330,6 @@ exports
    NFDownload,
    SendMailByACBr,
    hw_LerXMLNFe,
-   hw_LerXMLNFeSaida,
    nfse_get_regime_especial_trib,
    ConsisteInscricaoEstadual;
 

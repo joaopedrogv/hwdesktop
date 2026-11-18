@@ -2488,15 +2488,6 @@ object FrmAdmNfe: TFrmAdmNfe
         TabOrder = 7
         OnClick = Button1Click
       end
-      object Button3: TButton
-        Left = 285
-        Top = 10
-        Width = 132
-        Height = 28
-        Caption = '(F10)Cons. Recibo de Lote'
-        TabOrder = 8
-        OnClick = Button3Click
-      end
     end
     object TabSheet2: TTabSheet
       Caption = 'Utilit'#225'rios'

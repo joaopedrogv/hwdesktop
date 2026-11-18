@@ -50,10 +50,8 @@ type
   TTerminaNFE = function: LongBool; stdcall;
   TExecutarDLL = function(ttipo: WideString; Aux: WideString; Just: WideString; var resposta: WideString; sisint: WideString;
     NFTP: WideString; codempresa: WideString; vtipocons: WideString; statusNFE: WideString): WideString; stdcall;
-   TStatus= function : WideString; stdcall;
 //  TConsultaRFB=function(vChave: WideString;vusuario: WideString): WideString; stdcall;
   TConsultaSefazOr = function(vUF: WideString;vChave: WideString;vserie: WideString;vusuario: WideString;codempresa: integer;vendbanco: WideString): longbool; stdcall;
-  //TVerificaSCAN = function(codempresa: integer;vendbanco: WideString): integer; stdcall;
   TConsNFEDLL=function(vendBanco: WideString;codempresa: integer; vversao: WideString; vnumnf: integer; tipoNF: WideString; vsubserie:WideString; vusuario: WideString): longbool; stdcall;
   TValidaChaveNFe = function (vchave: WideString): longbool; stdcall;
 //  TEnviarCCe = function(vendBanco: WideString; codempresa, idLote: integer; vusuario: WideString): longbool; stdcall;
@@ -76,10 +74,8 @@ type
   TTerminaNFE = function: LongBool; stdcall;
   TExecutarDLL = function(ttipo: PChar; Aux: PChar; Just: PChar; var resposta: PChar; sisint: PChar;
     NFTP: PChar; codempresa: PChar; vtipocons: PChar; statusNFE: PChar): PChar; stdcall;
-   TStatus= function : PChar; stdcall;
   TConsultaRFB=function(vChave: PChar;vusuario: PChar): PChar; stdcall;
   TConsultaSefazOr = function(vUF: PChar;vChave: PChar;vserie: PChar;vusuario: PChar;codempresa: integer;vendbanco: PChar): longbool; stdcall;
-  TVerificaSCAN = function(codempresa: integer;vendbanco: PChar): integer; stdcall;
   TConsNFEDLL=function(vendBanco: PChar;codempresa: integer; vversao: PChar; vnumnf: integer; tipoNF: PChar; vsubserie:PChar; vusuario: PChar): longbool; stdcall;
   TValidaChaveNFe = function (vchave: PChar): longbool; stdcall;
 //  TEnviarCCe = function(vendBanco: PChar; codempresa, idLote: integer; vusuario: PChar): longbool; stdcall;
@@ -108,10 +104,8 @@ var
   GeraNFe: TGeraNFe;
   TerminaNFE: TTerminaNFE;
   ExecutarDLL: TExecutarDLL;
-  Status :TStatus;
 //  ConsultaRFB: TConsultaRFB;
   ConsultaSefazOr: TConsultaSefazOr;
-//  VerificaSCAN: TVerificaSCAN;
   ConsNFEDLL: TConsNFEDLL;
   ValidaChaveNFe: TValidaChaveNFe;
 //  EnviarCCe: TEnviarCCe;
@@ -162,7 +156,6 @@ begin
     @ExecutarDLL := GetProcAddress(hdNFE, PAnsiChar('ExecutarDLL'));
 //    @ConsultaRFB:=GetProcAddress(hdNFE, PAnsiChar('ConsultaRFB'));
     @ConsultaSefazOr:= GetProcAddress(hdNFE, PAnsiChar('ConsultaSefazOr'));
-//    @VerificaSCAN:= GetProcAddress(hdNFE, PAnsiChar('VerificaSCAN'));
     @ConsNFEDLL := GetProcAddress(hdNFE, PAnsiChar('ConsNFEDLL'));
     @ValidaChaveNFe:=GetProcAddress(hdNFE, PAnsiChar('ValidaChaveNFe'));
 //    @EnviarCCe:=GetProcAddress(hdNFE, PAnsiChar('EnviarCCe'));
