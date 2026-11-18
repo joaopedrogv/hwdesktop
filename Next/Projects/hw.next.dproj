@@ -174,6 +174,7 @@
         <DCCReference Include="..\Queries\Shared\NextQueryDefinition.pas"/>
         <DCCReference Include="..\Queries\Shared\QueryColumnDefinition.pas"/>
         <DCCReference Include="..\UI\Presenters\Shared\PresenterConsultaBase.pas"/>
+        <DCCReference Include="..\UI\Presenters\Shared\PresenterCadastroBase.pas"/>
         <DCCReference Include="..\Queries\Features\EventosRtc\EventosRtcQueryDefinition.pas"/>
         <DCCReference Include="..\Queries\Features\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsQueryDefinition.pas"/>
         <DCCReference Include="..\UI\Presenters\Features\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsPresenter.pas"/>

@@ -6,10 +6,7 @@ uses
   Vcl.Controls, ValidationEntityOutputUnit;
 
 type
-  // Contrato comum do editor de uma aba de cadastro da ConsultaBase. A base
-  // consulta pendencias, encaminha o foco e entrega o resultado de validacao da
-  // gravacao sem conhecer o frame de cada funcionalidade. A aba continua sendo a
-  // dona do editor e do rascunho.
+  // A aba e dona do editor; o editor, do rascunho.
   IEditorCadastro = interface
     ['{6E0B5E59-6A1E-4A8A-9E1A-7F2F9B7C3D11}']
     // True enquanto o rascunho da aba ainda precisa ser gravado ou descartado.
@@ -27,6 +24,23 @@ type
   // recusa a aba. A funcao nao retem a aba nem o editor.
   TCriarEditorCadastro = reference to function(const AChave: string;
     AParent: TWinControl): TWinControl;
+
+  // Editor que traz os proprios comandos Salvar/Cancelar; a ConsultaBase nao
+  // cria o rodape dessa aba.
+  IEditorCadastroComandos = interface
+    ['{9C4A7E52-1B3D-4F68-8E27-5A6B1D9C3F02}']
+  end;
+
+  // Destino dos comandos concluidos no editor; o hospedeiro decide quando
+  // fechar a aba.
+  IEditorCadastroHost = interface
+    ['{4E8B2D71-6C5A-4A93-B1F7-2D8E0C6A9B54}']
+    procedure EditorSalvo(const AEditor: TWinControl);
+    procedure EditorCancelado(const AEditor: TWinControl);
+  end;
+
+  TCriarEditorCadastroComandos = function(const AChave: string;
+    AParent: TWinControl; const AHost: IEditorCadastroHost): TWinControl;
 
 implementation
 

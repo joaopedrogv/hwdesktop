@@ -3,8 +3,8 @@ unit NextBaseForm;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.Classes, System.UITypes,
-  Vcl.Forms, Vcl.Controls, Vcl.Dialogs, ViewFeedback;
+  Winapi.Windows, Winapi.Messages, System.Classes, Vcl.Forms, Vcl.Controls,
+  ViewFeedback;
 
 type
   TfrmNextBase = class(TForm, IViewFeedback)
@@ -39,38 +39,36 @@ type
 
 implementation
 
+uses
+  NextDialogs;
+
 procedure TfrmNextBase.DoInitializeView;
 begin
 end;
 
 procedure TfrmNextBase.ShowInformation(const AMessage: string);
 begin
-  Application.MessageBox(PChar(AMessage), 'Informação',
-    MB_OK or MB_ICONINFORMATION);
+  TNextDialogs.ShowInformation(AMessage);
 end;
 
 procedure TfrmNextBase.ShowWarning(const AMessage: string);
 begin
-  Application.MessageBox(PChar(AMessage), 'Atenção',
-    MB_OK or MB_ICONWARNING);
+  TNextDialogs.ShowWarning(AMessage);
 end;
 
 procedure TfrmNextBase.ShowError(const AMessage: string);
 begin
-  Application.MessageBox(PChar(AMessage), 'Erro',
-    MB_OK or MB_ICONERROR);
+  TNextDialogs.ShowError(AMessage);
 end;
 
 function TfrmNextBase.ShowDangerQuestion(const AMessage: string): boolean;
 begin
-  Result := Application.MessageBox(PChar(AMessage), 'Confirmação',
-    MB_YESNO or MB_ICONWARNING or MB_DEFBUTTON2) = ID_YES;
+  Result := TNextDialogs.ShowDangerQuestion(AMessage);
 end;
 
 function TfrmNextBase.ShowQuestion(const AMessage: string): boolean;
 begin
-  Result := Application.MessageBox(PChar(AMessage), 'Confirmação',
-    MB_YESNO or MB_ICONQUESTION) = ID_YES;
+  Result := TNextDialogs.ShowQuestion(AMessage);
 end;
 
 function TfrmNextBase.HasPendingChanges: Boolean;

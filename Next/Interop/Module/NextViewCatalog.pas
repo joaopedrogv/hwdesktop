@@ -27,7 +27,8 @@ end;
 initialization
   FRegistry := TNextViewRegistry.Create;
   FRegistry.Register('rtc.events', CreateEventosRtcView);
-  FRegistry.Register('operacoes.fiscais.ibscbs', CreateOperacoesFiscaisIbsCbsView);
+  FRegistry.Register('operacoes.fiscais.ibscbs',
+    TOperacoesFiscaisIbsCbsComposition.CriarConsulta);
   FRegistry.Register('grupos.fiscais', CreateGruposFiscaisView);
 
 finalization

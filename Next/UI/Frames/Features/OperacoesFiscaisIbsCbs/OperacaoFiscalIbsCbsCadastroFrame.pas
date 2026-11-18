@@ -4,23 +4,20 @@ interface
 
 uses
   System.SysUtils, System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls,
-  Vcl.Mask, Vcl.ComCtrls, Vcl.CheckLst, Vcl.Buttons,
-  EditorCadastro, TipoComunsUnit, DateTimeServiceUnit, StringNullableUnit,
-  DateAndTimeNullableUnit, OperacaoFiscalIbsCbsEtdUnit,
-  OperacaoFiscalIbsCbsCondicaoEtdUnit, SeletorEntidadeFrame,
-  RegraFiscalSelecaoFrame, EmpresaChecklistFrame, ValidationPanelFrame,
-  ValidationEntityOutputUnit;
+  Vcl.Mask, Vcl.ComCtrls, Vcl.CheckLst, Vcl.Buttons, CadastroEditorFrame,
+  EditorCadastro, OperacoesFiscaisIbsCbsCadastroView,
+  OperacoesFiscaisIbsCbsCadastroPresenter, TipoComunsUnit,
+  DateTimeServiceUnit, StringNullableUnit, DateAndTimeNullableUnit,
+  OperacaoFiscalIbsCbsEtdUnit, OperacaoFiscalIbsCbsCondicaoEtdUnit,
+  SeletorEntidadeFrame, RegraFiscalSelecaoFrame, EmpresaChecklistFrame,
+  ValidationPanelFrame, ValidationEntityOutputUnit;
 
 type
-  TVerificarCondicoesEvent = procedure(
-    const ARascunho: OperacaoFiscalIbsCbsEtd) of object;
-
-  // Editor da aba de Operacoes Fiscais IBS/CBS. O frame apresenta as sub-abas
-  // Cadastro e Condicoes, carrega os seletores e as empresas na preparacao e e o
-  // dono do rascunho: a autorizacao, a gravacao e a troca de sessao pertencem ao
-  // formulario que o contem. As mensagens do caso de uso sao apresentadas pelo
-  // painel comum, agrupadas pelo campo que as originou.
-  TfrmOperacaoFiscalIbsCbsCadastroFrame = class(TFrame, IEditorCadastro)
+  // Editor da aba de Operacoes Fiscais IBS/CBS; dono do rascunho e do
+  // apresentador do cadastro.
+  TfrmOperacaoFiscalIbsCbsCadastroFrame = class(TfrmCadastroEditor,
+    IOperacoesFiscaisIbsCbsCadastroView)
+    sbCampos: TScrollBox;
     pcSecoes: TPageControl;
     tsCadastro: TTabSheet;
     lblOperacaoInterna: TLabel;
@@ -61,7 +58,15 @@ type
     FCodigosTipoEmissao: TArrayInteger;
     FCodigosNatureza: TArrayInteger;
     FCodigosTipoOrgaoPublico: TArrayInteger;
-    FOnVerificarCondicoes: TVerificarCondicoesEvent;
+    // Acesso tipado ao apresentador que a base possui e libera.
+    function GetPresenter: TOperacoesFiscaisIbsCbsCadastroPresenter;
+    // Nao valida nem grava: normalizacao e validacao pertencem ao dominio e a
+    // gravacao ao apresentador.
+    function AplicarCamposAoRascunho: Boolean;
+    // Limpa os campos, as listas e a validacao, devolvendo o editor ao estado
+    // neutro. Nao libera o rascunho, que pertence ao ciclo da aba.
+    procedure LimparCampos;
+    procedure LimparValidacao;
     // As opcoes das condicoes sao fixas e independem da preparacao: monta-las
     // uma unica vez mantem as listas disponiveis em todas as abas.
     procedure CarregarOpcoesCondicoes;
@@ -105,13 +110,17 @@ type
     // A primeira mensagem do resultado define a sub-aba apresentada.
     procedure AtivarSecaoDaValidacao(
       const AValidacao: ValidationEntityOutput);
+
+    property Presenter: TOperacoesFiscaisIbsCbsCadastroPresenter read GetPresenter;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TComponent; const AHost: IEditorCadastroHost); override;
     destructor Destroy; override;
+    // A composicao entrega o apresentador ao frame, que passa a libera-lo.
+    procedure ConfigurarPresenter(APresenter: TOperacoesFiscaisIbsCbsCadastroPresenter);
     // Reinicia o frame para uma inclusao: descarta o rascunho anterior, limpa os
     // campos e carrega os seletores e as empresas permitidas. Devolve False
-    // quando qualquer carga falha; o frame nao apresenta mensagem e nao deixa
-    // rascunho, porque o formulario descarta a aba parcial.
+    // quando qualquer carga falha; o apresentador apresenta o motivo e o
+    // formulario descarta a aba parcial.
     function PrepararInclusao: Boolean;
     // Prepara a alteracao de uma operacao existente. A entidade recebida nao e
     // assumida: o frame guarda uma copia propria, com empresas e valores de
@@ -120,35 +129,31 @@ type
     function PrepararAlteracao(
       const AOperacao: OperacaoFiscalIbsCbsEtd): Boolean;
     // Motivo da ultima falha de preparacao; vazio quando todas as cargas foram
-    // concluidas. O frame nao apresenta mensagem: o formulario inclui o motivo
-    // no aviso unico da aba descartada.
+    // concluidas. O apresentador inclui o motivo no aviso unico da aba
+    // descartada.
     function FalhaCarga: string;
-    // Transfere os campos editados para o rascunho. Nao valida nem grava: a
-    // normalizacao e a validacao pertencem ao dominio e a gravacao ao
-    // formulario. Retorna False quando nao ha rascunho.
-    function AplicarCamposAoRascunho: Boolean;
-    // Limpa os campos, as listas e a validacao, devolvendo o editor ao estado
-    // neutro. Nao libera o rascunho, que pertence ao ciclo da aba.
-    procedure LimparCampos;
-    procedure LimparValidacao;
     // Contrato comum da aba de cadastro: a base consulta pendencias, encaminha o
     // foco e entrega a validacao sem conhecer este frame.
-    function HasPendingChanges: Boolean;
-    function TryFocus: Boolean;
+    function HasPendingChanges: Boolean; override;
+    function TryFocus: Boolean; override;
     procedure ShowValidation(const AValidacao: ValidationEntityOutput);
-    property OnVerificarCondicoes: TVerificarCondicoesEvent
-      read FOnVerificarCondicoes write FOnVerificarCondicoes;
-    property Rascunho: OperacaoFiscalIbsCbsEtd read FRascunho;
+      override;
+    procedure ExibirAnaliseCondicoes(const AResumo, ARelatorio: string);
+  protected
+    function Salvar: Boolean; override;
   end;
 
 implementation
 
 {$R *.dfm}
 
+uses
+  AnaliseCondicoesForm;
+
 const
   OperacaoNaoInformadaMessage =
     'A operação fiscal da alteração não foi informada.';
-  // Identificação das cargas que interrompem a preparação da aba. O formulário
+  // Identificação das cargas que interrompem a preparação da aba. O apresentador
   // apresenta o motivo no aviso único da aba descartada.
   FalhaOperacaoInterna = 'Operação Interna';
   FalhaGrupoFiscal = 'Grupo Fiscal';
@@ -157,9 +162,10 @@ const
 
 { TfrmOperacaoFiscalIbsCbsCadastroFrame }
 
-constructor TfrmOperacaoFiscalIbsCbsCadastroFrame.Create(AOwner: TComponent);
+constructor TfrmOperacaoFiscalIbsCbsCadastroFrame.Create(AOwner: TComponent;
+  const AHost: IEditorCadastroHost);
 begin
-  inherited Create(AOwner);
+  inherited Create(AOwner, AHost);
 
   // O frame ja possui os proprios controles: a classe base carrega o DFM antes
   // deste trecho, portanto as opcoes podem ser montadas aqui.
@@ -189,6 +195,16 @@ destructor TfrmOperacaoFiscalIbsCbsCadastroFrame.Destroy;
 begin
   FreeAndNil(FRascunho);
   inherited;
+end;
+
+procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.ConfigurarPresenter(
+  APresenter: TOperacoesFiscaisIbsCbsCadastroPresenter);
+begin
+  if APresenter = nil then
+    raise Exception.Create(
+      'O apresentador do cadastro de Operações Fiscais IBS/CBS não foi informado.');
+
+  AssociarPresenter(APresenter);
 end;
 
 procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.CarregarOpcoesCondicoes;
@@ -524,8 +540,7 @@ procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.btnVerificarCondicoesClick(
 begin
   if not AplicarCamposAoRascunho then
     Exit;
-  if Assigned(FOnVerificarCondicoes) then
-    FOnVerificarCondicoes(FRascunho);
+  Presenter.AnalisarCondicoes(FRascunho);
 end;
 
 function TfrmOperacaoFiscalIbsCbsCadastroFrame.PrepararInclusao: Boolean;
@@ -536,9 +551,9 @@ begin
   FreeAndNil(FRascunho);
   LimparCampos;
 
-  // Sem as listas carregadas nao ha aba: o formulario descarta a aba parcial e
-  // apresenta o aviso com o motivo registrado aqui. O rascunho so nasce depois
-  // de todas as cargas.
+  // Sem as listas carregadas nao ha aba: o apresentador apresenta o aviso com o
+  // motivo registrado aqui e o formulario descarta a aba parcial. O rascunho so
+  // nasce depois de todas as cargas.
   if not fraOperacaoInterna.Carregar('') then
   begin
     FFalhaCarga := FalhaOperacaoInterna;
@@ -594,6 +609,22 @@ begin
   PreencherCondicoes(FRascunho.Condicoes);
   AtualizarEscopo;
   Result := True;
+end;
+
+function TfrmOperacaoFiscalIbsCbsCadastroFrame.Salvar: Boolean;
+begin
+  Result := False;
+
+  LimparValidacao;
+  if not AplicarCamposAoRascunho then
+    Exit;
+
+  Result := Presenter.Salvar(FRascunho);
+end;
+
+function TfrmOperacaoFiscalIbsCbsCadastroFrame.GetPresenter(): TOperacoesFiscaisIbsCbsCadastroPresenter;
+begin
+  Result := TOperacoesFiscaisIbsCbsCadastroPresenter(PresenterCadastro);
 end;
 
 function TfrmOperacaoFiscalIbsCbsCadastroFrame.AplicarCamposAoRascunho: Boolean;
@@ -714,6 +745,20 @@ begin
   // usuario veja a secao a que o painel se refere.
   AtivarSecaoDaValidacao(AValidacao);
   fraValidacao.ExibirValidacao(AValidacao);
+end;
+
+procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.ExibirAnaliseCondicoes(
+  const AResumo, ARelatorio: string);
+var
+  Dialogo: TfrmAnaliseCondicoes;
+begin
+  Dialogo := TfrmAnaliseCondicoes.Create(nil);
+  try
+    Dialogo.Configure(AResumo, ARelatorio);
+    Dialogo.ShowModal;
+  finally
+    Dialogo.Free;
+  end;
 end;
 
 end.
