@@ -20,6 +20,8 @@ approved behavior and existing common contracts.
   the existing base and shared contracts. Feature forms provide typed editor
   preparation and feature behavior. Reuse established mechanisms before creating
   helpers or another form inheritance level.
+- Cadastro editors keep the common visual structure in TfrmCadastroEditor;
+  descendants inherit the frame and declare only their feature fields.
 - Presenters orchestrate feature authorization and Use Cases and communicate
   through their View contracts. Keep business rules in their owning Modern code.
 - Each editor keeps its own draft. Preserve independent inclusion/editing tabs,

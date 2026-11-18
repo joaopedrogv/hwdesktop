@@ -1,25 +1,9 @@
-object frmOperacaoFiscalIbsCbsCadastroFrame: TfrmOperacaoFiscalIbsCbsCadastroFrame
-  Left = 0
-  Top = 0
+inherited frmOperacaoFiscalIbsCbsCadastroFrame: TfrmOperacaoFiscalIbsCbsCadastroFrame
   Width = 752
   Height = 540
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'Tahoma'
-  Font.Style = []
-  ParentColor = False
-  ParentFont = False
-  TabOrder = 0
-  object sbCampos: TScrollBox
-    Left = 0
-    Top = 0
-    Width = 752
-    Height = 496
-    Align = alClient
-    BorderStyle = bsNone
-    TabOrder = 0
+  inherited pnCampos: TPanel
+    Height = 376
     object pcSecoes: TPageControl
       Left = 0
       Top = 0
@@ -225,18 +209,6 @@ object frmOperacaoFiscalIbsCbsCadastroFrame: TfrmOperacaoFiscalIbsCbsCadastroFra
           OnClick = btnVerificarCondicoesClick
         end
       end
-    end
-    inline fraValidacao: TfrmValidationPanelFrame
-      Left = 0
-      Top = 376
-      Width = 752
-      Height = 120
-      Align = alTop
-      TabOrder = 1
-      ExplicitLeft = 0
-      ExplicitTop = 376
-      ExplicitWidth = 736
-      ExplicitHeight = 120
     end
   end
 end

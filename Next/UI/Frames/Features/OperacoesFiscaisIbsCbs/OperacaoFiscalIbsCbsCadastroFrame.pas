@@ -3,7 +3,7 @@ unit OperacaoFiscalIbsCbsCadastroFrame;
 interface
 
 uses
-  System.SysUtils, System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls,
+  System.SysUtils, System.Classes, Vcl.Controls, Vcl.StdCtrls,
   Vcl.Mask, Vcl.ComCtrls, Vcl.CheckLst, Vcl.Buttons, CadastroEditorFrame,
   EditorCadastro, OperacoesFiscaisIbsCbsCadastroView,
   OperacoesFiscaisIbsCbsCadastroPresenter, TipoComunsUnit,
@@ -17,7 +17,6 @@ type
   // apresentador do cadastro.
   TfrmOperacaoFiscalIbsCbsCadastroFrame = class(TfrmCadastroEditor,
     IOperacoesFiscaisIbsCbsCadastroView)
-    sbCampos: TScrollBox;
     pcSecoes: TPageControl;
     tsCadastro: TTabSheet;
     lblOperacaoInterna: TLabel;
@@ -41,7 +40,6 @@ type
     clbNatureza: TCheckListBox;
     gbTipoOrgaoPublico: TGroupBox;
     clbTipoOrgaoPublico: TCheckListBox;
-    fraValidacao: TfrmValidationPanelFrame;
     btnVerificarCondicoes: TSpeedButton;
     procedure ckFimVigenciaClick(Sender: TObject);
     procedure btnVerificarCondicoesClick(Sender: TObject);
@@ -178,7 +176,6 @@ begin
   // O erro das condicoes e agrupado pelo dominio: o vinculo leva o foco ao
   // primeiro checklist, que esta na sub-aba Condicoes.
   fraValidacao.Bind('Condicoes', clbTipoEmissao, '');
-  AssociarPainelValidacao(fraValidacao);
 
   pcSecoes.ActivePage := tsCadastro;
 end;

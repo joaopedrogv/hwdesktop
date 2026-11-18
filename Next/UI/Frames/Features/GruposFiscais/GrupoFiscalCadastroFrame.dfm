@@ -1,28 +1,6 @@
-object frmGrupoFiscalCadastroFrame: TfrmGrupoFiscalCadastroFrame
-  Left = 0
-  Top = 0
-  Width = 736
-  Height = 404
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -13
-  Font.Name = 'Tahoma'
-  Font.Style = []
-  ParentColor = False
-  ParentFont = False
-  TabOrder = 0
-  DesignSize = (
-    736
-    404)
-  object sbCampos: TScrollBox
-    Left = 0
-    Top = 0
-    Width = 736
-    Height = 360
-    Align = alClient
-    BorderStyle = bsNone
-    TabOrder = 0
+inherited frmGrupoFiscalCadastroFrame: TfrmGrupoFiscalCadastroFrame
+  inherited pnCampos: TPanel
+    Height = 236
     object lblDescricao: TLabel
       Left = 16
       Top = 12
@@ -79,25 +57,6 @@ object frmGrupoFiscalCadastroFrame: TfrmGrupoFiscalCadastroFrame
       TabOrder = 2
       ExplicitLeft = 16
       ExplicitTop = 126
-    end
-    inline fraValidacao: TfrmValidationPanelFrame
-      Left = 0
-      Top = 240
-      Width = 736
-      Height = 120
-      Anchors = [akLeft, akTop, akRight]
-      Color = clBtnFace
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentColor = False
-      ParentFont = False
-      TabOrder = 3
-      Visible = False
-      ExplicitLeft = 0
-      ExplicitTop = 240
     end
   end
 end

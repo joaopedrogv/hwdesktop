@@ -8,26 +8,24 @@ uses
   ValidationEntityOutputUnit, PresenterCadastroBase;
 
 type
-  // Base dos editores de cadastro: rodape proprio e contratos comuns da aba.
+  // Base dos editores de cadastro: estrutura visual comum e contratos da aba.
   TfrmCadastroEditor = class(TFrame, ICadastroEditorView, IEditorCadastro)
-  private
-    FHost: IEditorCadastroHost;
-    FRodape: TPanel;
-    FBtnSalvar: TButton;
-    FBtnCancelar: TButton;
-    // Apresentador da funcionalidade. A base responde pela liberacao a partir da  associacao aceita.
-    FPresenterCadastro: TPresenterCadastroBase;
-    // Painel de validacao da funcionalidade; o componente continua sendo do frame concreto.
-    FPainelValidacao: TfrmValidationPanelFrame;
-    procedure CriarRodape;
+    sbCampos: TScrollBox;
+    pnCampos: TPanel;
+    fraValidacao: TfrmValidationPanelFrame;
+    pnRodape: TPanel;
+    btnSalvar: TButton;
+    btnCancelar: TButton;
     procedure btnSalvarClick(Sender: TObject);
     procedure btnCancelarClick(Sender: TObject);
+  private
+    FHost: IEditorCadastroHost;
+    // Apresentador da funcionalidade. A base responde pela liberacao a partir da  associacao aceita.
+    FPresenterCadastro: TPresenterCadastroBase;
   protected
     // Associa o apresentador da funcionalidade. Ate a atribuicao a composicao continua dona do apresentador e o
     // libera se a associacao for recusada.
     procedure AssociarPresenter(APresenter: TPresenterCadastroBase);
-    // Registra o painel que o frame concreto ja exibe e que continua sendo dele.
-    procedure AssociarPainelValidacao(APainel: TfrmValidationPanelFrame);
     // Executa a gravacao da funcionalidade; False mantem o editor e os dados.
     function Salvar: Boolean; virtual;
     property PresenterCadastro: TPresenterCadastroBase read FPresenterCadastro;
@@ -49,6 +47,8 @@ type
 
 implementation
 
+{$R *.dfm}
+
 uses
   NextDialogs;
 
@@ -59,7 +59,6 @@ begin
     raise Exception.Create('O hospedeiro do editor de cadastro não foi informado.');
   inherited Create(AOwner);
   FHost := AHost;
-  CriarRodape;
 end;
 
 destructor TfrmCadastroEditor.Destroy;
@@ -68,42 +67,12 @@ begin
   inherited;
 end;
 
-procedure TfrmCadastroEditor.CriarRodape;
-begin
-  FRodape := TPanel.Create(Self);
-  FRodape.Parent := Self;
-  FRodape.Align := alBottom;
-  FRodape.Height := 44;
-  FRodape.BevelOuter := bvNone;
-  FRodape.Caption := '';
-
-  FBtnCancelar := TButton.Create(FRodape);
-  FBtnCancelar.Parent := FRodape;
-  FBtnCancelar.Caption := 'Cancelar';
-  FBtnCancelar.Width := 110;
-  FBtnCancelar.Height := 32;
-  FBtnCancelar.Top := 6;
-  FBtnCancelar.Anchors := [akTop, akRight];
-  FBtnCancelar.Left := ClientWidth - 16 - FBtnCancelar.Width;
-  FBtnCancelar.OnClick := btnCancelarClick;
-
-  FBtnSalvar := TButton.Create(FRodape);
-  FBtnSalvar.Parent := FRodape;
-  FBtnSalvar.Caption := 'Salvar';
-  FBtnSalvar.Width := 110;
-  FBtnSalvar.Height := 32;
-  FBtnSalvar.Top := 6;
-  FBtnSalvar.Anchors := [akTop, akRight];
-  FBtnSalvar.Left := FBtnCancelar.Left - FBtnSalvar.Width - 8;
-  FBtnSalvar.OnClick := btnSalvarClick;
-end;
-
 procedure TfrmCadastroEditor.btnSalvarClick(Sender: TObject);
 var
   Notificado: Boolean;
 begin
-  FBtnSalvar.Enabled := False;
-  FBtnCancelar.Enabled := False;
+  btnSalvar.Enabled := False;
+  btnCancelar.Enabled := False;
   Notificado := False;
   try
     if Salvar then
@@ -115,16 +84,16 @@ begin
     // Com o fechamento pendente os comandos continuam desabilitados.
     if not Notificado then
     begin
-      FBtnSalvar.Enabled := True;
-      FBtnCancelar.Enabled := True;
+      btnSalvar.Enabled := True;
+      btnCancelar.Enabled := True;
     end;
   end;
 end;
 
 procedure TfrmCadastroEditor.btnCancelarClick(Sender: TObject);
 begin
-  FBtnSalvar.Enabled := False;
-  FBtnCancelar.Enabled := False;
+  btnSalvar.Enabled := False;
+  btnCancelar.Enabled := False;
   FHost.EditorCancelado(Self);
 end;
 
@@ -134,15 +103,6 @@ begin
     raise Exception.Create('O apresentador da consulta nao foi informado');
 
   FPresenterCadastro := APresenter;
-end;
-
-procedure TfrmCadastroEditor.AssociarPainelValidacao(
-  APainel: TfrmValidationPanelFrame);
-begin
-  if APainel = nil then
-    raise Exception.Create('O painel de validação do editor de cadastro não foi informado.');
-
-  FPainelValidacao := APainel;
 end;
 
 function TfrmCadastroEditor.Salvar: Boolean;
@@ -163,8 +123,7 @@ end;
 procedure TfrmCadastroEditor.ShowValidation(
   const AValidacao: ValidationEntityOutput);
 begin
-  if FPainelValidacao <> nil then
-    FPainelValidacao.ExibirValidacao(AValidacao);
+  fraValidacao.ExibirValidacao(AValidacao);
 end;
 
 procedure TfrmCadastroEditor.ShowInformation(const AMessage: string);

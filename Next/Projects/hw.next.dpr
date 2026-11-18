@@ -15,7 +15,7 @@ uses
   FilterFrame in '..\UI\Frames\Shared\Filters\FilterFrame.pas' {frmFilterFrame: TFrame},
   ColumnSelectionFrame in '..\UI\Frames\Shared\Columns\ColumnSelectionFrame.pas' {frmColumnSelectionFrame: TFrame},
   ValidationPanelFrame in '..\UI\Frames\Shared\Validation\ValidationPanelFrame.pas' {frmValidationPanelFrame: TFrame},
-  CadastroEditorFrame in '..\UI\Frames\Shared\Cadastro\CadastroEditorFrame.pas',
+  CadastroEditorFrame in '..\UI\Frames\Shared\Cadastro\CadastroEditorFrame.pas' {frmCadastroEditor: TFrame},
   EmpresaChecklistFrame in '..\UI\Frames\Shared\Empresas\EmpresaChecklistFrame.pas' {frmEmpresaChecklistFrame: TFrame},
   GrupoFiscalCadastroFrame in '..\UI\Frames\Features\GruposFiscais\GrupoFiscalCadastroFrame.pas' {frmGrupoFiscalCadastroFrame: TFrame},
   SeletorEntidadeFrame in '..\UI\Frames\Shared\Seletores\SeletorEntidadeFrame.pas' {frmSeletorEntidadeFrame: TFrame},

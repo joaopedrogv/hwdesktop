@@ -3,7 +3,7 @@ unit GrupoFiscalCadastroFrame;
 interface
 
 uses
-  System.SysUtils, System.Classes, Vcl.Forms,
+  System.SysUtils, System.Classes,
   Vcl.StdCtrls, CadastroEditorFrame, EditorCadastro, GruposFiscaisCadastroView,
   GruposFiscaisCadastroPresenter, TipoTributoFiscalEnumUnit, GrupoFiscalEtdUnit,
   ValidationPanelFrame, EmpresaChecklistFrame;
@@ -13,14 +13,12 @@ type
   // cadastro.
   TfrmGrupoFiscalCadastroFrame = class(TfrmCadastroEditor,
     IGruposFiscaisCadastroView)
-    sbCampos: TScrollBox;
     lblDescricao: TLabel;
     edDescricao: TEdit;
     lblTipoTributo: TLabel;
     cbTipoTributo: TComboBox;
     lblEmpresas: TLabel;
     fraEmpresas: TfrmEmpresaChecklistFrame;
-    fraValidacao: TfrmValidationPanelFrame;
   private
     // Rascunho da aba. A inclusao cria a entidade e a alteracao recebe uma copia
     // independente do registro carregado; o frame libera o rascunho ao ser
@@ -82,7 +80,6 @@ begin
   // metadata do grupo fiscal usado pelo validador.
   fraValidacao.Bind(edDescricao);
   fraValidacao.Bind(cbTipoTributo);
-  AssociarPainelValidacao(fraValidacao);
 end;
 
 destructor TfrmGrupoFiscalCadastroFrame.Destroy;
