@@ -131,7 +131,7 @@ begin
 end;
 
 procedure TfrmCadOperacoesFiscaisIbsCbs.BitBtn3Click(Sender: TObject);
-begin           
+begin
   if not FAuditor.Processo('MOD021').Inserir()
     .Permitido() then
     Exit;
@@ -399,22 +399,22 @@ var
 begin
   if Length(ACondicoes) = 0 then
   begin
-    Result := 'Condi'#231#245'es: sem restri'#231#227'o';
+    Result := 'Condições: sem restrição';
     Exit;
   end;
 
-  Result := 'Condi'#231#245'es:';
+  Result := 'Condições:';
   for i := 0 to High(ACondicoes) do
   begin
     Condicao := ACondicoes[i];
 
     case Condicao.Atributo of
       ocaTipoEmissao:
-        NomeAtributo := 'Emiss'#227'o';
+        NomeAtributo := 'Emissão';
       ocaNaturezaEmissao:
         NomeAtributo := 'Natureza';
       ocaTipoOrgaoPublico:
-        NomeAtributo := #211'rg'#227'o';
+        NomeAtributo := 'Órgão';
     else
       NomeAtributo := OperacaoFiscalIbsCbsCondicoes.DescricaoAtributo(
         Condicao.Atributo);
@@ -441,7 +441,7 @@ var
 begin
   if FState.GrupoFiscalId.ToText('') = '' then
     lbEscopoCondicoes.Caption :=
-      'Escopo: Padr'#227'o (sem Grupo Fiscal) - aplica-se somente quando n'#227'o houver v'#237'nculo do grupo'
+      'Escopo: Padrão (sem Grupo Fiscal) - aplica-se somente quando não houver vínculo do grupo'
   else
   begin
     Grupo := edPickerGrupoFiscal.GetSelectedEntity();
@@ -658,7 +658,7 @@ procedure TfrmCadOperacoesFiscaisIbsCbs.SpeedButton2Click(Sender: TObject);
 begin
   if FData.IsEmpty() or
     (ShowConfirmacao('Deseja mesmo enviar oa registro para a lixeira?') <> ID_YES) then
-    Exit;       
+    Exit;
 
   if not FData.GetAuditorFill('MOD024').Excluir()
     .Permitido() then

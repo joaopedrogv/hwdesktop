@@ -6,7 +6,6 @@ uses
   Winapi.Windows, Vcl.Controls, NextBaseForm, EditorCadastro;
 
 type
-  // Composicao da tela e do editor de Operacoes Fiscais IBS/CBS.
   TOperacoesFiscaisIbsCbsComposition = class
   public
     class function CriarConsulta(AParent: HWND): TfrmNextBase; static;
@@ -30,8 +29,7 @@ uses
   ObterOperacaoFiscalIbsCbsPorIdUseCaseUnit,
   RemoverOperacaoFiscalIbsCbsUseCaseUnit, ResolverRegraFiscalIbsCbsUseCaseUnit;
 
-class function TOperacoesFiscaisIbsCbsComposition.CriarConsulta(
-  AParent: HWND): TfrmNextBase;
+class function TOperacoesFiscaisIbsCbsComposition.CriarConsulta(AParent: HWND): TfrmNextBase;
 var
   View: TfrmOperacoesFiscaisIbsCbs;
   Preferences: ILocalPreferences;
@@ -42,24 +40,16 @@ begin
 
   View := TfrmOperacoesFiscaisIbsCbs.CreateParented(AParent);
   try
-    // A definicao pertence a esta tela e recebe as preferencias de colunas e o
-    // metodo que le a opcao do checkbox: o estado e consultado a cada pesquisa,
-    // nao na abertura.
-    Definition := TOperacoesFiscaisIbsCbsQueryDefinition.Create(
-      NextSetupInstance.Resolve<ISqlDataSetReaderFactory>,
-      NextSetupInstance.Resolve<IQueryResultOperations>,
-      NextSetupInstance.Resolve<IColumnLayoutPreferences>,
+    // A definicao pertence a tela; o estado do checkbox e lido a cada pesquisa, nao na abertura.
+    Definition := TOperacoesFiscaisIbsCbsQueryDefinition.Create(NextSetupInstance.Resolve<ISqlDataSetReaderFactory>,
+      NextSetupInstance.Resolve<IQueryResultOperations>, NextSetupInstance.Resolve<IColumnLayoutPreferences>,
       View.IsLixeiraSearch);
 
     Presenter := TOperacoesFiscaisIbsCbsPresenter.Create(View, Definition,
-      NextSetupInstance.Resolve<IAuthorizationService>,
-      NextSetupInstance.Resolve<RemoverOperacaoFiscalIbsCbsUseCase>);
+      NextSetupInstance.Resolve<IAuthorizationService>, NextSetupInstance.Resolve<RemoverOperacaoFiscalIbsCbsUseCase>);
     try
-      // A tela configura a criacao do editor, associa a definicao, configura os
-      // filtros e so entao assume a posse do apresentador; uma falha antes disso
-      // mantem a posse aqui.
-      View.ConfigurarTela(Definition, Presenter, Preferences,
-        TOperacoesFiscaisIbsCbsComposition.CriarEditor);
+      // A tela so assume a posse do apresentador no fim de ConfigurarTela; uma falha anterior mantem a posse aqui.
+      View.ConfigurarTela(Definition, Presenter, Preferences, TOperacoesFiscaisIbsCbsComposition.CriarEditor);
     except
       Presenter.Free;
       raise;
@@ -72,8 +62,7 @@ begin
   end;
 end;
 
-class function TOperacoesFiscaisIbsCbsComposition.CriarEditor(
-  const AChave: string; AParent: TWinControl;
+class function TOperacoesFiscaisIbsCbsComposition.CriarEditor(const AChave: string; AParent: TWinControl;
   const AHost: IEditorCadastroHost): TWinControl;
 var
   Frame: TfrmOperacaoFiscalIbsCbsCadastroFrame;
@@ -87,18 +76,14 @@ begin
     NextSetupInstance.Resolve<ListarOperacoesInternasUseCase>);
   CarregarGrupoFiscal := CriarCarregadorGruposFiscais(
     NextSetupInstance.Resolve<IListarAtualeTodosGruposFiscaisUseCase>);
-  CarregarRegraFiscal := CriarCarregadorRegrasFiscais(
-    NextSetupInstance.Resolve<ListarRegrasFiscaisUseCase>);
-  CarregarEmpresas := CriarCarregadorEmpresas(
-    NextSetupInstance.Resolve<ListarEmpresasUseCase>,
+  CarregarRegraFiscal := CriarCarregadorRegrasFiscais(NextSetupInstance.Resolve<ListarRegrasFiscaisUseCase>);
+  CarregarEmpresas := CriarCarregadorEmpresas(NextSetupInstance.Resolve<ListarEmpresasUseCase>,
     NextSetupInstance.SessionContext);
 
   Frame := TfrmOperacaoFiscalIbsCbsCadastroFrame.Create(AParent, AHost);
   try
-    // Somente o Grupo Fiscal aceita a opcao vazia, que representa o vinculo
-    // nulo no rascunho.
-    Frame.fraOperacaoInterna.ConfigurarCarregamento(CarregarOperacaoInterna,
-      False);
+    // Somente o Grupo Fiscal aceita a opcao vazia, que representa o vinculo nulo no rascunho.
+    Frame.fraOperacaoInterna.ConfigurarCarregamento(CarregarOperacaoInterna, False);
     Frame.fraGrupoFiscal.ConfigurarCarregamento(CarregarGrupoFiscal, True);
     Frame.fraRegraFiscal.ConfigurarCarregamento(CarregarRegraFiscal);
     Frame.fraEmpresas.ConfigurarCarregamento(CarregarEmpresas);

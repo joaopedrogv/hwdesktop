@@ -7,8 +7,7 @@ uses
   Vcl.Menus, Vcl.CheckLst;
 
 type
-  // Item recebido: identidade estavel, rotulo, estado marcado e se a marcacao
-  // pode ser alterada. A ordem recebida e a ordem exibida.
+  // A ordem recebida é a ordem exibida.
   TColumnSelectionEntry = record
     Key: string;
     Title: string;
@@ -18,7 +17,6 @@ type
 
   TColumnSelectionEntries = TArray<TColumnSelectionEntry>;
 
-  // Resultado: identidade estavel e estado marcado corrente.
   TColumnSelectionResult = record
     Key: string;
     Checked: Boolean;
@@ -26,11 +24,7 @@ type
 
   TColumnSelectionResults = TArray<TColumnSelectionResult>;
 
-  // Lista reutilizavel de selecao. O chamador informa a chave estavel, o rotulo
-  // exibido, o estado marcado e se a marcacao pode ser alterada. O frame nao
-  // conhece conjunto, grade, definicao de coluna nem persistencia; por isso
-  // serve tambem a outras listas de itens elegiveis. Nao aplica nada durante a
-  // interacao: o chamador le a selecao no aceite da tela que o contem.
+  // Não aplica a seleção: o chamador lê o resultado no aceite da tela que o contém.
   TfrmColumnSelectionFrame = class(TFrame)
     pnLista: TPanel;
     clbColunas: TCheckListBox;
@@ -40,22 +34,18 @@ type
     miInverterSelecao: TMenuItem;
   private
     FEntries: TColumnSelectionEntries;
-    // Os comandos coletivos alteram apenas itens habilitados; itens fixos
-    // permanecem com o estado recebido.
+    // Os comandos coletivos alteram apenas itens habilitados; os demais mantêm o estado.
     procedure SetEnabledState(AValue: Boolean);
     procedure InvertEnabledState;
   published
-    // Eventos referenciados pelo DFM precisam ser publicados para que o
-    // streaming do VCL resolva os metodos ao carregar o frame.
+    // O streaming do VCL só resolve eventos do DFM em métodos publicados.
     procedure miSelecionarTodosClick(Sender: TObject);
     procedure miRemoverSelecaoClick(Sender: TObject);
     procedure miInverterSelecaoClick(Sender: TObject);
   public
-    // Reconstroi a lista na ordem recebida. A chave deve ser unica e nao vazia;
-    // essa verificacao pertence ao chamador, dono do significado da chave.
+    // A chave deve ser única e não vazia; a verificação pertence ao chamador.
     procedure Configure(const AEntries: TColumnSelectionEntries);
-    // Devolve todos os itens, na ordem da lista, inclusive os desabilitados. O
-    // chamador decide quais aplicar.
+    // Inclui os itens desabilitados; o chamador decide quais aplicar.
     function CollectSelection: TColumnSelectionResults;
   end;
 
@@ -63,8 +53,7 @@ implementation
 
 {$R *.dfm}
 
-procedure TfrmColumnSelectionFrame.Configure(
-  const AEntries: TColumnSelectionEntries);
+procedure TfrmColumnSelectionFrame.Configure(const AEntries: TColumnSelectionEntries);
 var
   I: Integer;
 begin

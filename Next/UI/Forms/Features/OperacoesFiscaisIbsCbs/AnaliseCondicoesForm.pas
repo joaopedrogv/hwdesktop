@@ -7,8 +7,7 @@ uses
   NextBaseForm;
 
 type
-  // Diálogo local de conferência das condições. Apenas apresenta o resumo e o
-  // relatório; Copiar escreve o relatório no clipboard e Fechar encerra.
+  // Apenas apresenta o resumo e o relatório; Copiar escreve o relatório no clipboard e Fechar encerra.
   TfrmAnaliseCondicoes = class(TfrmNextBase)
     pnResumo: TPanel;
     lblResumo: TLabel;

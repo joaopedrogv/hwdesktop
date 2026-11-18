@@ -16,18 +16,14 @@ type
   protected
     procedure DoInitializeView; virtual;
   public
-    procedure InitializeNextView(const AIdentifier: string;
-      AInstanceNumber: Integer; ACloseTarget: HWND;
+    procedure InitializeNextView(const AIdentifier: string; AInstanceNumber: Integer; ACloseTarget: HWND;
       ACloseDiscardsEdits: Boolean);
     function HasPendingChanges: Boolean; virtual;
     function ConfirmClose: Boolean;
     procedure RequestClose;
-    // Descartar resultados e selecoes que pertenciam a sessao anterior. A base
-    // nao possui estado de consulta; cada descendente sobrescreve o necessario.
+    // A base nao tem estado de consulta; cada descendente descarta o que mantem.
     procedure ResetForSessionChange; virtual;
     procedure FocusView; virtual;
-    // Feedback visual comum das telas Next. O titulo e a mensagem vem do
-    // chamador; os botoes seguem o idioma do Windows.
     procedure ShowInformation(const AMessage: string);
     procedure ShowWarning(const AMessage: string);
     procedure ShowError(const AMessage: string);
@@ -91,8 +87,7 @@ begin
     Result := ShowQuestion('Há alteações pendentes. Deseja continuar?');
 end;
 
-procedure TfrmNextBase.InitializeNextView(const AIdentifier: string;
-  AInstanceNumber: Integer; ACloseTarget: HWND;
+procedure TfrmNextBase.InitializeNextView(const AIdentifier: string; AInstanceNumber: Integer; ACloseTarget: HWND;
   ACloseDiscardsEdits: Boolean);
 begin
   FViewIdentifier := AIdentifier;
@@ -104,7 +99,7 @@ end;
 
 procedure TfrmNextBase.RequestClose;
 begin
-  // Closing belongs to the Delphi 2006 host; the Rio view only asks for it.
+  // O fechamento pertence ao host Delphi 2006; a view Rio apenas o solicita.
   if IsWindow(FCloseTarget) then
     PostMessage(FCloseTarget, WM_CLOSE, 0, 0);
 end;

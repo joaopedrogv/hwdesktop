@@ -6,13 +6,9 @@ interface
 uses
   HwNextViewApi;
 
-// Callback sincrono consultado pelo modulo Next. O processo, a acao textual e a
-// tabela vem do chamador: quais processos e acoes cada tela usa pertencem a
-// funcionalidade, nao ao host. A verificacao usa TAudit_OOP, que obtem a
-// empresa, o usuario e a conexao da sessao ERP corrente e aplica a regra do
-// processo recebido. O host nao abre dialogo; negativa, senha de gerente e
-// cancelamento continuam sendo apresentados pelo mecanismo legado. Nenhuma
-// excecao atravessa a fronteira da DLL.
+// Callback sincrono consultado pelo modulo Next para autorizar uma tela. A verificacao usa TAudit_OOP, que obtem
+// empresa, usuario e conexao da sessao ERP corrente. O host nao abre dialogo: negativa, senha de gerente e cancelamento
+// continuam no mecanismo legado. Nenhuma excecao cruza a DLL.
 
 function HwNextAuthorize(AProcessCode, AAction, ATable: PWideChar): Integer; stdcall;
 
@@ -21,8 +17,8 @@ implementation
 uses
   SysUtils, hw_audit_utils;
 
-// Os buffers pertencem ao chamador e valem somente durante a chamada. A
-// conversao e sincrona e nenhum ponteiro e retido.
+// Os buffers pertencem ao chamador e valem somente durante a chamada. A conversao e sincrona e nenhum ponteiro e
+// retido.
 function CallbackText(AValue: PWideChar): string;
 begin
   if AValue = nil then
@@ -43,17 +39,14 @@ begin
     Action := CallbackText(AAction);
     TableName := CallbackText(ATable);
 
-    // O processo e a acao identificam a regra consultada; a tabela apenas
-    // acompanha a auditoria e pode vir vazia.
+    // O processo e a acao identificam a regra consultada; a tabela apenas acompanha a auditoria e pode vir vazia.
     if (ProcessCode = '') or (Action = '') then
       Exit;
 
     Auditor := TAudit_OOP.Create;
     try
       Auditor.Tabela := TableName;
-      // AcaoPermitida aplica a acao recebida ao processo informado usando a
-      // sessao corrente. A liberacao da senha de gerente e a mensagem de
-      // negativa ou cancelamento pertencem a esse mecanismo.
+      // A senha de gerente e as mensagens de negativa ou cancelamento pertencem a AcaoPermitida.
       if Auditor.Processo(ProcessCode).AcaoPermitida(Action) then
         Result := HW_NEXT_AUTH_ALLOWED
       else

@@ -3,23 +3,14 @@ unit GridColumnDefinition;
 interface
 
 type
-  // Alinhamento de apresentacao da coluna. qcaDefault preserva o padrao da grade.
+  // qcaDefault preserva o padrao da grade.
   TGridColumnDefinitionAlignment = (qcaDefault, qcaLeft, qcaCenter, qcaRight);
 
-  // Comportamento de visibilidade da coluna. A ordem dos valores corresponde ao
-  // Field.Tag do cadastro padrao legado: 0 configuravel, 1 invisivel,
-  // 2 sempre visivel, 3 configuravel mas invisivel ao criar novo usuario.
-  TGridColumnBehavior = (
-    gcbConfigurableVisible,
-    gcbAlwaysHidden,
-    gcbAlwaysVisible,
-    gcbConfigurableHidden
-  );
+  // A ordem dos valores corresponde ao Field.Tag do cadastro padrao legado: 0 configuravel, 1 invisivel, 2 sempre
+  // visivel, 3 configuravel mas invisivel ao criar novo usuario.
+  TGridColumnBehavior = (gcbConfigurableVisible, gcbAlwaysHidden, gcbAlwaysVisible, gcbConfigurableHidden);
 
-  // Metadados de apresentacao de uma coluna. Width igual a zero preserva a
-  // largura padrao da grade. Behavior define a visibilidade inicial e se o
-  // usuario pode altera-la na tela. DisplayFormat vazio preserva a formatacao
-  // do proprio campo.
+  // Width zero usa a largura padrao da grade; DisplayFormat vazio usa a formatacao do campo.
   TGridColumnDefinition = record
     FieldName: string;
     Title: string;
@@ -38,10 +29,8 @@ function GridColumn(const AFieldName, ATitle: string;
   const ADisplayFormat: string = ''): TGridColumnDefinition;
 function GridColumns(const AItems: array of TGridColumnDefinition): TGridColumnDefinitions;
 
-// Visibilidade inicial derivada apenas do comportamento.
 function GridColumnVisibleByDefault(const ABehavior: TGridColumnBehavior): Boolean;
 
-// Verdadeiro somente para os comportamentos que o usuario pode alterar (0 e 3).
 function GridColumnConfigurable(const ABehavior: TGridColumnBehavior): Boolean;
 
 implementation
@@ -59,8 +48,7 @@ begin
   Result.DisplayFormat := ADisplayFormat;
 end;
 
-function GridColumnVisibleByDefault(
-  const ABehavior: TGridColumnBehavior): Boolean;
+function GridColumnVisibleByDefault(const ABehavior: TGridColumnBehavior): Boolean;
 begin
   Result := ABehavior in [gcbConfigurableVisible, gcbAlwaysVisible];
 end;

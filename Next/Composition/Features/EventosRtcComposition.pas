@@ -24,16 +24,10 @@ begin
 
   View := TfrmEventosRtc.CreateParented(AParent);
   try
-    // A definicao pertence a esta tela: recebe a fabrica, as operacoes e as
-    // preferencias de colunas da composicao, a sessao vigente e o metodo que le
-    // a opcao do checkbox. A empresa e a opcao sao consultadas a cada pesquisa,
-    // nao na abertura.
-    Definition := TEventosRtcQueryDefinition.Create(
-      NextSetupInstance.Resolve<ISqlDataSetReaderFactory>,
-      NextSetupInstance.Resolve<IQueryResultOperations>,
-      NextSetupInstance.Resolve<IColumnLayoutPreferences>,
-      NextSetupInstance.SessionContext,
-      View.IsOnlyAuthorizedNFe);
+    // A definicao pertence a tela; empresa e opcao do checkbox sao lidas a cada pesquisa, nao na abertura.
+    Definition := TEventosRtcQueryDefinition.Create(NextSetupInstance.Resolve<ISqlDataSetReaderFactory>,
+      NextSetupInstance.Resolve<IQueryResultOperations>, NextSetupInstance.Resolve<IColumnLayoutPreferences>,
+      NextSetupInstance.SessionContext, View.IsOnlyAuthorizedNFe);
     View.ConfigurarTela(Definition, Preferences);
 
     Result := View;

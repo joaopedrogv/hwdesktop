@@ -6,8 +6,7 @@ uses
   FilterDefinition, GridColumnDefinition;
 
 type
-  // Declaracao unica de uma coluna da consulta: a grade e os filtros da tela
-  // saem desta mesma lista, sem repetir campo, titulo e tipo em cada lugar.
+  // Declaracao unica de uma coluna da consulta: a grade e os filtros saem desta mesma lista.
   TQueryColumnDefinition = record
     FieldName: string;
     Title: string;
@@ -22,28 +21,22 @@ type
 
   TQueryColumnDefinitions = TArray<TQueryColumnDefinition>;
 
-function QueryColumn(const AFieldName, ATitle: string;
-  AValueType: TFilterFieldType; AWidth: Integer = 0;
-  AAlignment: TGridColumnDefinitionAlignment = qcaDefault;
-  ABehavior: TGridColumnBehavior = gcbConfigurableVisible;
-  const ADisplayFormat: string = '';
-  AFilterEnabled: Boolean = True;
+function QueryColumn(const AFieldName, ATitle: string; AValueType: TFilterFieldType; AWidth: Integer = 0;
+  AAlignment: TGridColumnDefinitionAlignment = qcaDefault; ABehavior: TGridColumnBehavior = gcbConfigurableVisible;
+  const ADisplayFormat: string = ''; AFilterEnabled: Boolean = True;
   const AFilterOperators: TFilterOperatorSet = []): TQueryColumnDefinition;
 function QueryColumns(const AItems: array of TQueryColumnDefinition): TQueryColumnDefinitions;
 
 // Metadados de apresentacao da grade, na ordem das declaracoes recebidas.
 function BuildGridColumns(const AColumns: TQueryColumnDefinitions): TGridColumnDefinitions;
 
-// Campos de filtro das declaracoes elegiveis. Fica de fora o que o usuario nunca
-// ve (gcbAlwaysHidden) e o que a funcionalidade marca como nao filtravel; os
-// campos internos do SQL nao fazem parte da declaracao.
-function BuildFilterDefinition(const AColumns: TQueryColumnDefinitions;
-  AAllowAll: Boolean = True): TFilterDefinition;
+// Campos de filtro das declaracoes elegiveis: ficam de fora o que o usuario nunca ve (gcbAlwaysHidden) e o que a
+// funcionalidade marca como nao filtravel.
+function BuildFilterDefinition(const AColumns: TQueryColumnDefinitions; AAllowAll: Boolean = True): TFilterDefinition;
 
 implementation
 
-function QueryColumn(const AFieldName, ATitle: string;
-  AValueType: TFilterFieldType; AWidth: Integer;
+function QueryColumn(const AFieldName, ATitle: string; AValueType: TFilterFieldType; AWidth: Integer;
   AAlignment: TGridColumnDefinitionAlignment; ABehavior: TGridColumnBehavior;
   const ADisplayFormat: string; AFilterEnabled: Boolean;
   const AFilterOperators: TFilterOperatorSet): TQueryColumnDefinition;
@@ -68,8 +61,6 @@ begin
     Result[Index] := AItems[Index];
 end;
 
-// Verdadeiro apenas para as declaracoes publicadas como coluna visivel ao
-// usuario, que sao as que ganham campo de filtro.
 function FilterEligible(const AColumn: TQueryColumnDefinition): Boolean;
 begin
   Result := AColumn.FilterEnabled and (AColumn.Behavior in
@@ -87,16 +78,14 @@ begin
       AColumns[Index].Behavior, AColumns[Index].DisplayFormat);
 end;
 
-function BuildFilterDefinition(const AColumns: TQueryColumnDefinitions;
-  AAllowAll: Boolean): TFilterDefinition;
+function BuildFilterDefinition(const AColumns: TQueryColumnDefinitions; AAllowAll: Boolean): TFilterDefinition;
 var
   Column: TQueryColumnDefinition;
   Fields: TFilterFieldDefinitions;
   FieldCount: Integer;
   Operators: TFilterOperatorSet;
 begin
-  // Reserva o tamanho maximo e reduz ao total realmente elegivel; o conjunto
-  // vazio de operadores continua significando o padrao do tipo.
+  // Conjunto vazio de operadores significa o padrao do tipo.
   SetLength(Fields, Length(AColumns));
   FieldCount := 0;
   for Column in AColumns do
@@ -107,8 +96,7 @@ begin
       else
         Operators := FilterDefaultOperators(Column.ValueType);
 
-      Fields[FieldCount] := FilterField(Column.FieldName, Column.Title,
-        Column.ValueType, Operators);
+      Fields[FieldCount] := FilterField(Column.FieldName, Column.Title, Column.ValueType, Operators);
       Inc(FieldCount);
     end;
 

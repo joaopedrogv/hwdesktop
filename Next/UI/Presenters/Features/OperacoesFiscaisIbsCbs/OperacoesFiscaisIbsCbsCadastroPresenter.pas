@@ -8,26 +8,23 @@ uses
   PresenterCadastroBase;
 
 type
-  // Apresentador do cadastro; nao conhece a consulta, a grade nem as abas.
+  // Nao conhece a consulta, a grade nem as abas.
   TOperacoesFiscaisIbsCbsCadastroPresenter = class(TPresenterCadastroBase)
   private
-    // A view pertence ao frame do editor e as demais dependencias ao container de
-    // composicao: o apresentador apenas as utiliza e nunca as libera.
+    // A view pertence ao frame do editor e as demais dependencias ao container de composicao: o apresentador apenas as
+    // utiliza e nunca as libera.
     FView: IOperacoesFiscaisIbsCbsCadastroView;
     FObter: ObterOperacaoFiscalIbsCbsPorIdUseCase;
     FSalvar: SalvarOperacaoFiscalIbsCbsUseCase;
     FResolver: ResolverRegraFiscalIbsCbsUseCase;
   public
-    constructor Create(const AView: IOperacoesFiscaisIbsCbsCadastroView;
-      const AAuthorization: IAuthorizationService;
+    constructor Create(const AView: IOperacoesFiscaisIbsCbsCadastroView; const AAuthorization: IAuthorizationService;
       AObter: ObterOperacaoFiscalIbsCbsPorIdUseCase;
-      ASalvar: SalvarOperacaoFiscalIbsCbsUseCase;
-      AResolver: ResolverRegraFiscalIbsCbsUseCase);
+      ASalvar: SalvarOperacaoFiscalIbsCbsUseCase; AResolver: ResolverRegraFiscalIbsCbsUseCase);
     function PrepararInclusao: Boolean; override;
     function PrepararAlteracao(const AId: string): Boolean; override;
     function Salvar(const ARascunho: OperacaoFiscalIbsCbsEtd): Boolean;
-    function AnalisarCondicoes(
-      const ARascunho: OperacaoFiscalIbsCbsEtd): Boolean;
+    function AnalisarCondicoes(const ARascunho: OperacaoFiscalIbsCbsEtd): Boolean;
   end;
 
 implementation
@@ -43,8 +40,7 @@ const
   ProcessoRestauracao = 'MOD025';
   TabelaOperacoesFiscais = 'OP_FISCAIS_IBSCBS';
 
-function DescricaoConfiguracao(
-  const ARascunho: OperacaoFiscalIbsCbsEtd): string;
+function DescricaoConfiguracao(const ARascunho: OperacaoFiscalIbsCbsEtd): string;
 var
   OperacaoInterna: string;
   GrupoFiscal: string;
@@ -66,8 +62,7 @@ begin
     [OperacaoInterna, GrupoFiscal, RegraFiscal]);
 end;
 
-function SecaoApontamentos(const ATitulo: string;
-  const AApontamentos: ResolverRegraFiscalIbsCbsApontamentoArray;
+function SecaoApontamentos(const ATitulo: string; const AApontamentos: ResolverRegraFiscalIbsCbsApontamentoArray;
   ATipo: ResolverRegraFiscalIbsCbsApontamentoTipo): string;
 var
   I: Integer;
@@ -88,8 +83,7 @@ begin
     if Quantidade = 1 then
       TituloSecao := 'Uma observação sobre as opções selecionadas'
     else
-      TituloSecao := Format('%d observações sobre as opções selecionadas',
-        [Quantidade]);
+      TituloSecao := Format('%d observações sobre as opções selecionadas', [Quantidade]);
   end
   else
     TituloSecao := ATitulo;
@@ -100,8 +94,7 @@ begin
       Result := Result + sLineBreak + #149 + ' ' + AApontamentos[I].Texto;
 
   if ATipo = ratObservacaoOpcoes then
-    Result := Result + sLineBreak +
-      'Esses campos aceitam todas as opções disponíveis. Por isso, a aplicação ' +
+    Result := Result + sLineBreak + 'Esses campos aceitam todas as opções disponíveis. Por isso, a aplicação ' +
       'desta configuração depende dos demais critérios. Se essa abrangência é a ' +
       'desejada, mantenha as opções. Para limitar a configuração, marque somente ' +
       'as opções que ela deve aceitar.';
@@ -117,28 +110,19 @@ begin
   ATexto := ATexto + ABloco;
 end;
 
-{ TOperacoesFiscaisIbsCbsCadastroPresenter }
-
-constructor TOperacoesFiscaisIbsCbsCadastroPresenter.Create(
-  const AView: IOperacoesFiscaisIbsCbsCadastroView;
-  const AAuthorization: IAuthorizationService;
-  AObter: ObterOperacaoFiscalIbsCbsPorIdUseCase;
-  ASalvar: SalvarOperacaoFiscalIbsCbsUseCase;
-  AResolver: ResolverRegraFiscalIbsCbsUseCase);
+constructor TOperacoesFiscaisIbsCbsCadastroPresenter.Create(const AView: IOperacoesFiscaisIbsCbsCadastroView;
+  const AAuthorization: IAuthorizationService; AObter: ObterOperacaoFiscalIbsCbsPorIdUseCase;
+  ASalvar: SalvarOperacaoFiscalIbsCbsUseCase; AResolver: ResolverRegraFiscalIbsCbsUseCase);
 begin
   inherited Create(AAuthorization, TabelaOperacoesFiscais);
   if AView = nil then
-    raise Exception.Create(
-      'A view de Operações Fiscais IBS/CBS não foi informada.');
+    raise Exception.Create('A view de Operações Fiscais IBS/CBS não foi informada.');
   if AObter = nil then
-    raise Exception.Create(
-      'O caso de uso de carregamento de Operações Fiscais IBS/CBS não foi informado.');
+    raise Exception.Create('O caso de uso de carregamento de Operações Fiscais IBS/CBS não foi informado.');
   if ASalvar = nil then
-    raise Exception.Create(
-      'O caso de uso de gravação de Operações Fiscais IBS/CBS não foi informado.');
+    raise Exception.Create('O caso de uso de gravação de Operações Fiscais IBS/CBS não foi informado.');
   if AResolver = nil then
-    raise Exception.Create(
-      'O caso de uso de análise das condições de Operações Fiscais IBS/CBS não foi informado.');
+    raise Exception.Create('O caso de uso de análise das condições de Operações Fiscais IBS/CBS não foi informado.');
 
   FView := AView;
   FObter := AObter;
@@ -162,15 +146,13 @@ begin
     Exit;
   end;
 
-  Mensagem :=
-    'Não foi possível carregar os seletores e as empresas para a inclusão';
+  Mensagem := 'Não foi possível carregar os seletores e as empresas para a inclusão';
   if FView.FalhaCarga <> '' then
     Mensagem := Mensagem + ': ' + FView.FalhaCarga;
   FView.ShowWarning(Mensagem + '.');
 end;
 
-function TOperacoesFiscaisIbsCbsCadastroPresenter.PrepararAlteracao(
-  const AId: string): Boolean;
+function TOperacoesFiscaisIbsCbsCadastroPresenter.PrepararAlteracao(const AId: string): Boolean;
 var
   Carregada: OperacaoFiscalIbsCbsEtd;
   Descricao: string;
@@ -200,8 +182,7 @@ begin
         if Trim(Carregada.GrupoFiscalDescricao) <> '' then
           Descricao := Descricao + ' / ' + Trim(Carregada.GrupoFiscalDescricao);
 
-        if not FView.ShowQuestion(Format(
-          'A operação fiscal "%s" está na lixeira. Deseja restaurar o registro?',
+        if not FView.ShowQuestion(Format('A operação fiscal "%s" está na lixeira. Deseja restaurar o registro?',
           [Descricao])) then
           Exit;
 
@@ -214,8 +195,7 @@ begin
 
       if not FView.PrepararAlteracao(Carregada) then
       begin
-        Mensagem :=
-          'Não foi possível carregar os seletores e as empresas para a alteração';
+        Mensagem := 'Não foi possível carregar os seletores e as empresas para a alteração';
         if FView.FalhaCarga <> '' then
           Mensagem := Mensagem + ': ' + FView.FalhaCarga;
         FView.ShowWarning(Mensagem + '.');
@@ -228,18 +208,16 @@ begin
         FView.ShowError(E.Message);
       on E: Exception do
         // O texto tecnico do banco nao deve chegar a interface.
-        FView.ShowError(
-          'Não foi possível carregar a operação fiscal para alteração.');
+        FView.ShowError('Não foi possível carregar a operação fiscal para alteração.');
     end;
   finally
-    // A view copia a operacao para o rascunho do frame; a entidade continua
-    // pertencendo a este metodo e e liberada no finally.
+    // A view copia a operacao para o rascunho do frame; a entidade continua pertencendo a este metodo e e liberada no
+    // finally.
     Carregada.Free;
   end;
 end;
 
-function TOperacoesFiscaisIbsCbsCadastroPresenter.Salvar(
-  const ARascunho: OperacaoFiscalIbsCbsEtd): Boolean;
+function TOperacoesFiscaisIbsCbsCadastroPresenter.Salvar(const ARascunho: OperacaoFiscalIbsCbsEtd): Boolean;
 var
   Resultado: CreateEntityUseCaseOutPut;
 begin
@@ -272,14 +250,12 @@ begin
         FView.ShowError('Não foi possível salvar a operação fiscal.');
     end;
   finally
-    // O resultado do caso de uso libera a entidade persistida; o apresentador
-    // nunca a devolve nem a retem.
+    // O resultado do caso de uso libera a entidade persistida; o apresentador nunca a devolve nem a retem.
     Resultado.Free;
   end;
 end;
 
-function TOperacoesFiscaisIbsCbsCadastroPresenter.AnalisarCondicoes(
-  const ARascunho: OperacaoFiscalIbsCbsEtd): Boolean;
+function TOperacoesFiscaisIbsCbsCadastroPresenter.AnalisarCondicoes(const ARascunho: OperacaoFiscalIbsCbsEtd): Boolean;
 var
   Analise: ResolverRegraFiscalIbsCbsAnalise;
   EmpresaId: Integer;
@@ -314,39 +290,32 @@ begin
         DataTexto := 'data não informada';
 
       Relatorio := 'Conferência da configuração' + sLineBreak + sLineBreak +
-        'Configuração analisada' + sLineBreak +
-        DescricaoConfiguracao(ARascunho) + sLineBreak + sLineBreak +
+        'Configuração analisada' + sLineBreak + DescricaoConfiguracao(ARascunho) +
+        sLineBreak + sLineBreak +
         'Empresa analisada: ' + EmpresaTexto + sLineBreak + sLineBreak +
         'Data considerada' + sLineBreak + DataTexto;
 
       Corpo := '';
-      AdicionarBloco(Corpo, SecaoApontamentos(
-        'Uma observação sobre as opções selecionadas', Analise.Apontamentos,
-        ratObservacaoOpcoes));
-      AdicionarBloco(Corpo, SecaoApontamentos(
-        'Possível duplicidade', Analise.Apontamentos, ratDuplicidade));
-      AdicionarBloco(Corpo, SecaoApontamentos(
-        'Possível conflito', Analise.Apontamentos, ratConflito));
-      AdicionarBloco(Corpo, SecaoApontamentos(
-        'Regra fiscal não encontrada', Analise.Apontamentos, ratRegraAusente));
-      AdicionarBloco(Corpo, SecaoApontamentos(
-        'Valor inválido', Analise.Apontamentos, ratValorInvalido));
+      AdicionarBloco(Corpo, SecaoApontamentos('Uma observação sobre as opções selecionadas',
+        Analise.Apontamentos, ratObservacaoOpcoes));
+      AdicionarBloco(Corpo, SecaoApontamentos('Possível duplicidade', Analise.Apontamentos, ratDuplicidade));
+      AdicionarBloco(Corpo, SecaoApontamentos('Possível conflito', Analise.Apontamentos, ratConflito));
+      AdicionarBloco(Corpo, SecaoApontamentos('Regra fiscal não encontrada', Analise.Apontamentos, ratRegraAusente));
+      AdicionarBloco(Corpo, SecaoApontamentos('Valor inválido', Analise.Apontamentos, ratValorInvalido));
 
       if Corpo = '' then
         Corpo := 'Nenhuma inconsistência ou possível duplicidade foi encontrada ' +
           'nas configurações consideradas para esta empresa e esta data.';
 
       Relatorio := Relatorio + sLineBreak + sLineBreak + Corpo + sLineBreak +
-        sLineBreak +
-        'A conferência considera as alterações deste cadastro e os demais ' +
+        sLineBreak + 'A conferência considera as alterações deste cadastro e os demais ' +
         'cadastros já salvos para a empresa e a data indicadas. As outras ' +
         'empresas selecionadas precisam de uma conferência própria.';
 
       if Length(Analise.Apontamentos) = 0 then
         Resumo := 'Nenhum problema encontrado'
       else
-        Resumo := Format('%d ponto(s) para revisar',
-          [Length(Analise.Apontamentos)]);
+        Resumo := Format('%d ponto(s) para revisar', [Length(Analise.Apontamentos)]);
 
       FView.ExibirAnaliseCondicoes(Resumo, Relatorio);
       Result := True;
@@ -354,8 +323,7 @@ begin
       on E: EValidacaoNegocio do
         FView.ShowError(E.Message);
       on E: Exception do
-        FView.ShowError(
-          'Não foi possível analisar as condições da operação fiscal.');
+        FView.ShowError('Não foi possível analisar as condições da operação fiscal.');
     end;
   finally
     Analise.Free;

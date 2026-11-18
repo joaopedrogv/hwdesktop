@@ -7,18 +7,12 @@ uses
   ListarOperacoesInternasUseCaseUnit, ListarGruposFiscaisUseCaseUnit,
   ListarRegrasFiscaisUseCaseUnit;
 
-// Cria os carregadores dos seletores do cadastro de Operacoes Fiscais IBS/CBS.
-// As dependencias sao capturadas uma unica vez e cada carga consulta o registro
-// atual, para que um vinculo fora da lista vigente continue selecionavel. As
-// listas de entidades pertencem ao carregador e sao liberadas ao final de cada
-// carga; nenhuma entidade chega a tela. A falha devolve False sem opcoes
-// parciais e a preparacao da aba e interrompida.
-function CriarCarregadorOperacoesInternas(
-  AListar: ListarOperacoesInternasUseCase): TCarregarSelecaoEntidade;
-function CriarCarregadorGruposFiscais(
-  AListar: IListarAtualeTodosGruposFiscaisUseCase): TCarregarSelecaoEntidade;
-function CriarCarregadorRegrasFiscais(
-  AListar: ListarRegrasFiscaisUseCase): TCarregarRegraFiscalSelecao;
+// Cria os carregadores dos seletores do cadastro de Operacoes Fiscais IBS/CBS. Cada carga consulta o registro atual,
+// para que um vinculo fora da lista vigente continue selecionavel. As listas pertencem ao carregador, sao liberadas ao
+// final de cada carga e nenhuma entidade chega a tela.
+function CriarCarregadorOperacoesInternas(AListar: ListarOperacoesInternasUseCase): TCarregarSelecaoEntidade;
+function CriarCarregadorGruposFiscais(AListar: IListarAtualeTodosGruposFiscaisUseCase): TCarregarSelecaoEntidade;
+function CriarCarregadorRegrasFiscais(AListar: ListarRegrasFiscaisUseCase): TCarregarRegraFiscalSelecao;
 
 implementation
 
@@ -31,10 +25,8 @@ const
   ClassTribMask = '000-000;0;';
   RegraFiscalTextFormat = '%s : %s';
 
-// Identifica a regra fiscal pela classificacao e pela descricao. A
-// classificacao chega do cadastro e pode nao caber na mascara; nesse caso o
-// texto gravado e usado, porque o titulo da opcao nao pode interromper a carga
-// das demais regras.
+// Identifica a regra fiscal pela classificacao e pela descricao. Se a classificacao nao couber na mascara, usa o texto
+// gravado, porque o titulo da opcao nao pode interromper a carga das demais regras.
 function TextoRegraFiscal(const ARegra: RegraFiscalIbsCbsEtd): string;
 var
   ClassTrib: string;
@@ -48,11 +40,8 @@ begin
   Result := Format(RegraFiscalTextFormat, [ClassTrib, ARegra.Descricao]);
 end;
 
-// Converte as operacoes internas recebidas em opcoes do seletor. O caso de uso
-// ja devolve o registro corrente junto dos ativos, por isso AIdAtual e apenas
-// repassado e nao existe opcao provisoria.
-function MontarOpcoesOperacoesInternas(
-  AListar: ListarOperacoesInternasUseCase; const AIdAtual: string;
+// O caso de uso ja devolve o registro corrente junto dos ativos; nao ha opcao provisoria.
+function MontarOpcoesOperacoesInternas(AListar: ListarOperacoesInternasUseCase; const AIdAtual: string;
   out AOpcoes: TSelecaoEntidadeOptions): Boolean;
 var
   Lista: OperacoesInternasEtd;
@@ -90,11 +79,8 @@ begin
   end;
 end;
 
-// Converte os grupos fiscais recebidos em opcoes do seletor, com o mesmo
-// criterio de AIdAtual das operacoes internas. A opcao vazia do campo anulavel
-// pertence ao seletor e nao e criada aqui.
-function MontarOpcoesGruposFiscais(
-  AListar: IListarAtualeTodosGruposFiscaisUseCase; const AIdAtual: string;
+// A opcao vazia do campo anulavel pertence ao seletor e nao e criada aqui.
+function MontarOpcoesGruposFiscais(AListar: IListarAtualeTodosGruposFiscaisUseCase; const AIdAtual: string;
   out AOpcoes: TSelecaoEntidadeOptions): Boolean;
 var
   Lista: GruposFiscaisEtd;
@@ -132,9 +118,7 @@ begin
   end;
 end;
 
-// Converte as regras fiscais recebidas em opcoes do seletor. A classificacao
-// formatada identifica a regra e a vigencia acompanha a opcao para o rotulo do
-// seletor; sem fim de vigencia a data permanece zero e nao e apresentada.
+// Sem fim de vigencia a data permanece zero e nao e apresentada; a classificacao formatada identifica a regra.
 function MontarOpcoesRegrasFiscais(AListar: ListarRegrasFiscaisUseCase;
   const AIdAtual: string; out AOpcoes: TRegraFiscalSelecaoOptions): Boolean;
 var
@@ -182,34 +166,28 @@ begin
   end;
 end;
 
-function CriarCarregadorOperacoesInternas(
-  AListar: ListarOperacoesInternasUseCase): TCarregarSelecaoEntidade;
+function CriarCarregadorOperacoesInternas(AListar: ListarOperacoesInternasUseCase): TCarregarSelecaoEntidade;
 begin
   Result :=
-    function(const AIdAtual: string;
-      out AOpcoes: TSelecaoEntidadeOptions): Boolean
+    function(const AIdAtual: string; out AOpcoes: TSelecaoEntidadeOptions): Boolean
     begin
       Result := MontarOpcoesOperacoesInternas(AListar, AIdAtual, AOpcoes);
     end;
 end;
 
-function CriarCarregadorGruposFiscais(
-  AListar: IListarAtualeTodosGruposFiscaisUseCase): TCarregarSelecaoEntidade;
+function CriarCarregadorGruposFiscais(AListar: IListarAtualeTodosGruposFiscaisUseCase): TCarregarSelecaoEntidade;
 begin
   Result :=
-    function(const AIdAtual: string;
-      out AOpcoes: TSelecaoEntidadeOptions): Boolean
+    function(const AIdAtual: string; out AOpcoes: TSelecaoEntidadeOptions): Boolean
     begin
       Result := MontarOpcoesGruposFiscais(AListar, AIdAtual, AOpcoes);
     end;
 end;
 
-function CriarCarregadorRegrasFiscais(
-  AListar: ListarRegrasFiscaisUseCase): TCarregarRegraFiscalSelecao;
+function CriarCarregadorRegrasFiscais(AListar: ListarRegrasFiscaisUseCase): TCarregarRegraFiscalSelecao;
 begin
   Result :=
-    function(const AIdAtual: string;
-      out AOpcoes: TRegraFiscalSelecaoOptions): Boolean
+    function(const AIdAtual: string; out AOpcoes: TRegraFiscalSelecaoOptions): Boolean
     begin
       Result := MontarOpcoesRegrasFiscais(AListar, AIdAtual, AOpcoes);
     end;

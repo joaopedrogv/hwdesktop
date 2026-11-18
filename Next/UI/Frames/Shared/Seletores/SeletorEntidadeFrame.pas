@@ -6,61 +6,37 @@ uses
   System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, SelecaoEntidadeOption;
 
 type
-  // Seletor de entidade por identificador, usado por Operacao Interna e Grupo
-  // Fiscal. O frame apresenta somente o texto de cada opcao e devolve o
-  // identificador selecionado; a carga pertence a composicao e a falha nao deixa
-  // lista parcial. O identificador vazio representa a opcao vazia, quando ela e
-  // permitida pelo chamador.
   TfrmSeletorEntidadeFrame = class(TFrame)
     cbSelecao: TComboBox;
     procedure cbSelecaoChange(Sender: TObject);
   private
-    // Identificador de cada item, na mesma ordem dos itens exibidos. O item da
-    // opcao vazia tem identificador ''.
+    // Identificadores na mesma ordem dos itens exibidos; a opção vazia usa ''.
     FIds: TArray<string>;
-    // Carregamento fornecido pela composicao. A referencia e gerenciada e cai
-    // junto com o frame; o seletor nunca libera o caso de uso que a produziu.
+    // Referência gerenciada pela composição: o seletor nunca a libera.
     FCarregar: TCarregarSelecaoEntidade;
     FPermiteVazio: Boolean;
-    // Suprime a notificacao durante a carga e a limpeza: o evento pertence a
-    // mudanca feita pelo usuario.
     FSilencioso: Boolean;
-    // Notificacao de mudanca feita pelo usuario.
     FOnSelecaoAlterada: TNotifyEvent;
     procedure NotificarSelecao;
     function IndiceDoId(const AId: string): Integer;
   public
-    // Recebe o carregamento e informa se a lista aceita a opcao vazia. A
-    // composicao chama uma unica vez, logo apos criar o frame.
-    procedure ConfigurarCarregamento(const ACarregar: TCarregarSelecaoEntidade;
-      APermiteVazio: Boolean);
-    // Limpa a lista e a selecao, executa o carregamento e seleciona AIdAtual. A
-    // opcao vazia e selecionada quando AIdAtual = '' e ela e permitida; sem
-    // permissao, nenhum item fica selecionado. Um identificador informado que
-    // nao consta da carga devolve False sem deixar lista ou selecao parcial e
-    // sem criar item provisorio, para que o chamador interrompa a preparacao em
-    // vez de perder o vinculo.
+    procedure ConfigurarCarregamento(const ACarregar: TCarregarSelecaoEntidade; APermiteVazio: Boolean);
+    // Um identificador fora da carga devolve False e descarta lista e seleção, sem item provisório, para o chamador
+    // interromper a preparação em vez de perder o vínculo.
     function Carregar(const AIdAtual: string): Boolean;
-    // Identificador do item corrente; '' para a opcao vazia ou sem selecao.
+    // Identificador do item corrente; '' para a opção vazia ou sem seleção.
     function IdSelecionado: string;
-    // Texto do item corrente, usado pelos rotulos da tela.
     function TextoSelecionado: string;
     procedure Limpar;
-    // Controle que recebe o foco e o vinculo do painel de validacao.
+    // Controle que recebe o foco e o vínculo do painel de validação.
     function ControleEdicao: TWinControl;
-    // Notifica a mudanca feita pelo usuario; a carga e a limpeza nao notificam.
-    property OnSelecaoAlterada: TNotifyEvent read FOnSelecaoAlterada
-      write FOnSelecaoAlterada;
+    // Notifica apenas a mudança feita pelo usuário; a carga e a limpeza não notificam.
+    property OnSelecaoAlterada: TNotifyEvent read FOnSelecaoAlterada write FOnSelecaoAlterada;
   end;
 
 implementation
 
 {$R *.dfm}
-
-const
-  TextoOpcaoVazia = '[ Vazio ]';
-
-{ TfrmSeletorEntidadeFrame }
 
 procedure TfrmSeletorEntidadeFrame.ConfigurarCarregamento(
   const ACarregar: TCarregarSelecaoEntidade; APermiteVazio: Boolean);
@@ -77,8 +53,7 @@ var
 begin
   Result := False;
 
-  // Uma carga nova substitui a lista anterior; a falha nao deixa opcoes parciais
-  // nem a selecao da preparacao anterior.
+  // A falha não deixa opções parciais nem a seleção da preparação anterior.
   Limpar;
   if not Assigned(FCarregar) then
     Exit;
@@ -93,7 +68,7 @@ begin
       begin
         SetLength(FIds, 1);
         FIds[0] := '';
-        cbSelecao.Items.Add(TextoOpcaoVazia);
+        cbSelecao.Items.Add('[ Vazio ]');
       end;
 
       for I := 0 to High(Opcoes) do
@@ -108,8 +83,8 @@ begin
 
     if AIdAtual = '' then
     begin
-      // Grupo Fiscal vazio e uma selecao valida; Operacao Interna sem valor
-      // apenas permanece sem item selecionado ate o usuario escolher.
+      // Grupo Fiscal vazio é uma seleção válida; Operação Interna apenas fica sem item selecionado até o usuário
+      // escolher.
       if FPermiteVazio then
         cbSelecao.ItemIndex := 0;
       Result := True;
@@ -119,8 +94,7 @@ begin
     Indice := IndiceDoId(AIdAtual);
     if Indice < 0 then
     begin
-      // O vinculo informado continua existindo para o chamador: sem item
-      // provisorio, a lista e a selecao sao descartadas e a preparacao falha.
+      // O vínculo continua existindo para o chamador: sem item provisório, a preparação falha.
       Limpar;
       Exit;
     end;
@@ -158,9 +132,7 @@ procedure TfrmSeletorEntidadeFrame.Limpar;
 var
   Anterior: Boolean;
 begin
-  // Clear reinicia os itens, a selecao e a lista interna do controle; limpar
-  // apenas os itens deixaria o estado anterior para tras. A limpeza nao dispara
-  // OnSelecaoAlterada, mesmo quando interrompe uma selecao existente.
+  // Clear reinicia itens e lista interna. A limpeza não dispara OnSelecaoAlterada, mesmo interrompendo uma seleção.
   Anterior := FSilencioso;
   FSilencioso := True;
   try

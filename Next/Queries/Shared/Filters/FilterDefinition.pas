@@ -3,8 +3,7 @@ unit FilterDefinition;
 interface
 
 type
-  TFilterFieldType = (fftString, fftInteger, fftInt64, fftCurrency,
-    fftDate, fftDateTime);
+  TFilterFieldType = (fftString, fftInteger, fftInt64, fftCurrency, fftDate, fftDateTime);
 
   // A ordem preserva o catalogo ativo legado de filtros.
   TFilterOperator = (foEquals, foStartsWith, foContains, foEndsWith, foRange,
@@ -13,13 +12,9 @@ type
 
   TFilterOperatorSet = set of TFilterOperator;
 
-  // Caminho que executa o criterio. Cada caminho declara apenas os operadores
-  // que sabe traduzir.
+  // Caminho que executa o criterio. Cada caminho declara apenas os operadores que sabe traduzir.
   TFilterPath = (fpQuerySql, fpLoadedDataSet);
 
-  // Politica de mascara por operador. A mascara de fragmento e usada por
-  // Comeca/Contem/Termina com; a de valor completo por Igual/Diferente/
-  // Entre; as demais condicoes usam a mascara padrao.
   TFilterMaskPolicy = record
   private
     FDefaultMask: string;
@@ -27,10 +22,8 @@ type
     FFragmentMask: string;
   public
     class function None: TFilterMaskPolicy; static;
-    class function DateMask(
-      const AMask: string = '!99/99/0000;1;_'): TFilterMaskPolicy; static;
-    class function FromMasks(const ADefaultMask, AFullValueMask,
-      AFragmentMask: string): TFilterMaskPolicy; static;
+    class function DateMask(const AMask: string = '!99/99/0000;1;_'): TFilterMaskPolicy; static;
+    class function FromMasks(const ADefaultMask, AFullValueMask, AFragmentMask: string): TFilterMaskPolicy; static;
     function MaskFor(const AOperator: TFilterOperator): string;
     property DefaultMask: string read FDefaultMask;
     property FullValueMask: string read FFullValueMask;
@@ -39,7 +32,7 @@ type
 
   TFilterFieldDefinition = record
     Id: string;                 // identificador estavel; nao usar o rotulo
-    Label_: string;             // rotulo exibido
+    Label_: string;
     ValueType: TFilterFieldType;
     Operators: TFilterOperatorSet; // vazio = conjunto padrao do tipo
     MaskPolicy: TFilterMaskPolicy;
@@ -49,45 +42,30 @@ type
 
   TFilterDefinition = record
     Fields: TFilterFieldDefinitions;
-    AllowAll: Boolean;          // habilita a opcao Todos
+    AllowAll: Boolean;
     function FieldIndex(const AId: string): Integer;
-    function FindField(const AId: string;
-      out AField: TFilterFieldDefinition): Boolean;
+    function FindField(const AId: string; out AField: TFilterFieldDefinition): Boolean;
     function FirstFieldIndex: Integer;
   end;
 
-function FilterField(const AId, ALabel: string;
-  AValueType: TFilterFieldType): TFilterFieldDefinition; overload;
-function FilterField(const AId, ALabel: string;
-  AValueType: TFilterFieldType;
+function FilterField(const AId, ALabel: string; AValueType: TFilterFieldType): TFilterFieldDefinition; overload;
+function FilterField(const AId, ALabel: string; AValueType: TFilterFieldType;
   const AOperators: TFilterOperatorSet): TFilterFieldDefinition; overload;
-function FilterField(const AId, ALabel: string;
-  AValueType: TFilterFieldType;
-  const AOperators: TFilterOperatorSet;
-  const AMaskPolicy: TFilterMaskPolicy): TFilterFieldDefinition; overload;
-function FilterDefinitionOf(
-  const AFields: array of TFilterFieldDefinition;
-  AAllowAll: Boolean): TFilterDefinition;
+function FilterField(const AId, ALabel: string; AValueType: TFilterFieldType;
+  const AOperators: TFilterOperatorSet; const AMaskPolicy: TFilterMaskPolicy): TFilterFieldDefinition; overload;
+function FilterDefinitionOf(const AFields: array of TFilterFieldDefinition; AAllowAll: Boolean): TFilterDefinition;
 
 function FilterOperatorLabel(const AOperator: TFilterOperator): string;
 function FilterOperatorCode(const AOperator: TFilterOperator): string;
-function TryFilterOperatorFromCode(const ACode: string;
-  out AOperator: TFilterOperator): Boolean;
+function TryFilterOperatorFromCode(const ACode: string; out AOperator: TFilterOperator): Boolean;
 function FilterOperatorArity(const AOperator: TFilterOperator): Integer;
-function FilterDefaultOperators(
-  const AValueType: TFilterFieldType): TFilterOperatorSet;
-function FilterFieldOperators(
-  const AField: TFilterFieldDefinition): TFilterOperatorSet;
-function FilterPathOperators(const APath: TFilterPath;
-  const AValueType: TFilterFieldType): TFilterOperatorSet;
-function FilterPathFieldOperators(const APath: TFilterPath;
-  const AField: TFilterFieldDefinition): TFilterOperatorSet;
-function FilterDefaultOperator(
-  const AValueType: TFilterFieldType): TFilterOperator;
-function FilterFieldSupportsOperator(const AField: TFilterFieldDefinition;
-  const AOperator: TFilterOperator): Boolean;
-function FilterMaskForOperator(const AField: TFilterFieldDefinition;
-  const AOperator: TFilterOperator): string;
+function FilterDefaultOperators(const AValueType: TFilterFieldType): TFilterOperatorSet;
+function FilterFieldOperators(const AField: TFilterFieldDefinition): TFilterOperatorSet;
+function FilterPathOperators(const APath: TFilterPath; const AValueType: TFilterFieldType): TFilterOperatorSet;
+function FilterPathFieldOperators(const APath: TFilterPath; const AField: TFilterFieldDefinition): TFilterOperatorSet;
+function FilterDefaultOperator(const AValueType: TFilterFieldType): TFilterOperator;
+function FilterFieldSupportsOperator(const AField: TFilterFieldDefinition; const AOperator: TFilterOperator): Boolean;
+function FilterMaskForOperator(const AField: TFilterFieldDefinition; const AOperator: TFilterOperator): string;
 
 implementation
 
@@ -121,15 +99,12 @@ const
     1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 0, 0, 0, 0
   );
 
-{ TFilterMaskPolicy }
-
 class function TFilterMaskPolicy.None: TFilterMaskPolicy;
 begin
   Result := TFilterMaskPolicy.FromMasks('', '', '');
 end;
 
-class function TFilterMaskPolicy.DateMask(
-  const AMask: string): TFilterMaskPolicy;
+class function TFilterMaskPolicy.DateMask(const AMask: string): TFilterMaskPolicy;
 begin
   Result := TFilterMaskPolicy.FromMasks(AMask, AMask, '');
 end;
@@ -142,8 +117,7 @@ begin
   Result.FFragmentMask := AFragmentMask;
 end;
 
-function TFilterMaskPolicy.MaskFor(
-  const AOperator: TFilterOperator): string;
+function TFilterMaskPolicy.MaskFor(const AOperator: TFilterOperator): string;
 begin
   case AOperator of
     foStartsWith, foContains, foEndsWith:
@@ -154,8 +128,6 @@ begin
     Result := FDefaultMask;
   end;
 end;
-
-{ TFilterDefinition }
 
 function TFilterDefinition.FieldIndex(const AId: string): Integer;
 var
@@ -171,8 +143,7 @@ begin
   Result := -1;
 end;
 
-function TFilterDefinition.FindField(const AId: string;
-  out AField: TFilterFieldDefinition): Boolean;
+function TFilterDefinition.FindField(const AId: string; out AField: TFilterFieldDefinition): Boolean;
 var
   Index: Integer;
 begin
@@ -193,27 +164,19 @@ begin
     Result := 0;
 end;
 
-{ Construtores de campo e definicao }
-
-function FilterField(const AId, ALabel: string;
-  AValueType: TFilterFieldType): TFilterFieldDefinition;
+function FilterField(const AId, ALabel: string; AValueType: TFilterFieldType): TFilterFieldDefinition;
 begin
-  Result := FilterField(AId, ALabel, AValueType, [],
-    TFilterMaskPolicy.None);
+  Result := FilterField(AId, ALabel, AValueType, [], TFilterMaskPolicy.None);
 end;
 
-function FilterField(const AId, ALabel: string;
-  AValueType: TFilterFieldType;
+function FilterField(const AId, ALabel: string; AValueType: TFilterFieldType;
   const AOperators: TFilterOperatorSet): TFilterFieldDefinition;
 begin
-  Result := FilterField(AId, ALabel, AValueType, AOperators,
-    TFilterMaskPolicy.None);
+  Result := FilterField(AId, ALabel, AValueType, AOperators, TFilterMaskPolicy.None);
 end;
 
-function FilterField(const AId, ALabel: string;
-  AValueType: TFilterFieldType;
-  const AOperators: TFilterOperatorSet;
-  const AMaskPolicy: TFilterMaskPolicy): TFilterFieldDefinition;
+function FilterField(const AId, ALabel: string; AValueType: TFilterFieldType;
+  const AOperators: TFilterOperatorSet; const AMaskPolicy: TFilterMaskPolicy): TFilterFieldDefinition;
 begin
   Result.Id := AId;
   Result.Label_ := ALabel;
@@ -222,9 +185,7 @@ begin
   Result.MaskPolicy := AMaskPolicy;
 end;
 
-function FilterDefinitionOf(
-  const AFields: array of TFilterFieldDefinition;
-  AAllowAll: Boolean): TFilterDefinition;
+function FilterDefinitionOf(const AFields: array of TFilterFieldDefinition; AAllowAll: Boolean): TFilterDefinition;
 var
   I: Integer;
 begin
@@ -234,8 +195,6 @@ begin
 
   Result.AllowAll := AAllowAll;
 end;
-
-{ Catalogo de operadores }
 
 function FilterOperatorLabel(const AOperator: TFilterOperator): string;
 begin
@@ -247,8 +206,7 @@ begin
   Result := OperatorCodes[AOperator];
 end;
 
-function TryFilterOperatorFromCode(const ACode: string;
-  out AOperator: TFilterOperator): Boolean;
+function TryFilterOperatorFromCode(const ACode: string; out AOperator: TFilterOperator): Boolean;
 var
   Candidate: TFilterOperator;
   NormalizedCode: string;
@@ -270,8 +228,7 @@ begin
   Result := OperatorArities[AOperator];
 end;
 
-function FilterDefaultOperators(
-  const AValueType: TFilterFieldType): TFilterOperatorSet;
+function FilterDefaultOperators(const AValueType: TFilterFieldType): TFilterOperatorSet;
 begin
   case AValueType of
     fftString:
@@ -283,8 +240,7 @@ begin
   end;
 end;
 
-function TypedFilterOperators(
-  const AValueType: TFilterFieldType): TFilterOperatorSet;
+function TypedFilterOperators(const AValueType: TFilterFieldType): TFilterOperatorSet;
 begin
   case AValueType of
     fftString:
@@ -296,12 +252,10 @@ begin
   end;
 end;
 
-function FilterPathOperators(const APath: TFilterPath;
-  const AValueType: TFilterFieldType): TFilterOperatorSet;
+function FilterPathOperators(const APath: TFilterPath; const AValueType: TFilterFieldType): TFilterOperatorSet;
 begin
-  // Os dois caminhos executam os mesmos conjuntos tipados. A restricao por
-  // tipo fisico do filtro rapido pertence ao conjunto explicito montado pela
-  // grade a partir de QuickFilterOperators.
+  // Os dois caminhos executam os mesmos conjuntos tipados. A restricao por tipo fisico do filtro rapido pertence ao
+  // conjunto explicito montado pela grade a partir de QuickFilterOperators.
   case APath of
     fpQuerySql, fpLoadedDataSet:
       Result := TypedFilterOperators(AValueType);
@@ -310,15 +264,12 @@ begin
   end;
 end;
 
-function FilterPathFieldOperators(const APath: TFilterPath;
-  const AField: TFilterFieldDefinition): TFilterOperatorSet;
+function FilterPathFieldOperators(const APath: TFilterPath; const AField: TFilterFieldDefinition): TFilterOperatorSet;
 begin
-  Result := FilterFieldOperators(AField) *
-    FilterPathOperators(APath, AField.ValueType);
+  Result := FilterFieldOperators(AField) * FilterPathOperators(APath, AField.ValueType);
 end;
 
-function FilterFieldOperators(
-  const AField: TFilterFieldDefinition): TFilterOperatorSet;
+function FilterFieldOperators(const AField: TFilterFieldDefinition): TFilterOperatorSet;
 begin
   if AField.Operators <> [] then
     Result := AField.Operators
@@ -326,8 +277,7 @@ begin
     Result := FilterDefaultOperators(AField.ValueType);
 end;
 
-function FilterDefaultOperator(
-  const AValueType: TFilterFieldType): TFilterOperator;
+function FilterDefaultOperator(const AValueType: TFilterFieldType): TFilterOperator;
 begin
   if AValueType in [fftDate, fftDateTime] then
     Result := foRange
@@ -335,14 +285,12 @@ begin
     Result := foEquals;
 end;
 
-function FilterFieldSupportsOperator(const AField: TFilterFieldDefinition;
-  const AOperator: TFilterOperator): Boolean;
+function FilterFieldSupportsOperator(const AField: TFilterFieldDefinition; const AOperator: TFilterOperator): Boolean;
 begin
   Result := AOperator in FilterFieldOperators(AField);
 end;
 
-function FilterMaskForOperator(const AField: TFilterFieldDefinition;
-  const AOperator: TFilterOperator): string;
+function FilterMaskForOperator(const AField: TFilterFieldDefinition; const AOperator: TFilterOperator): string;
 var
   MaskPolicy: TFilterMaskPolicy;
 begin

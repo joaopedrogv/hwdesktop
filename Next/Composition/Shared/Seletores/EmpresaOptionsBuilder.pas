@@ -5,10 +5,8 @@ interface
 uses
   EmpresaOption, ListarEmpresasUseCaseUnit, ISessionContextUnit, TipoComunsUnit;
 
-// Cria o carregador de opcoes do seletor de empresas da tela. As dependencias
-// sao capturadas uma unica vez; o login continua sendo lido a cada carga. A
-// inclusao preserva a marca das permitidas; a alteracao usa os vinculos
-// gravados, inclusive os de itens bloqueados.
+// Cria o carregador de opcoes do seletor de empresas. A inclusao preserva a marca das permitidas; a alteracao usa os
+// vinculos gravados, inclusive os de itens bloqueados, e o login e lido a cada carga.
 function CriarCarregadorEmpresas(AListarEmpresas: ListarEmpresasUseCase;
   ASession: ISessionContext): TCarregarOpcoesEmpresas;
 
@@ -17,10 +15,8 @@ implementation
 uses
   System.SysUtils, System.Classes, System.Contnrs, EmpresaEtdUnit;
 
-// Le todas as empresas do cadastro e as permitidas ao login corrente e devolve
-// uma opcao por empresa, na ordem da lista total. O login e lido a cada chamada
-// porque o host pode trocar o usuario mantendo a janela viva. A falha de leitura
-// ou de montagem devolve False e nenhuma opcao parcial.
+// Le todas as empresas e as permitidas ao login corrente, devolvendo uma opcao por empresa na ordem da lista total. O
+// login e lido a cada chamada porque o host pode trocar o usuario mantendo a janela viva.
 function MontarOpcoesEmpresas(AListarEmpresas: ListarEmpresasUseCase;
   ASession: ISessionContext; out AOpcoes: TEmpresaOptions): Boolean;
 var
@@ -52,16 +48,13 @@ begin
       if (TodasEmpresas = nil) or (EmpresasPermitidas = nil) then
         Exit;
 
-      // A ordem e a da lista total (COD_EMPRESA). Empresas permitidas que nao
-      // constam dela sao ignoradas, como no legado. Nenhuma entidade chega a
-      // tela.
+      // A ordem e a da lista total (COD_EMPRESA); permitidas fora dela sao ignoradas, como no legado.
       SetLength(AOpcoes, TodasEmpresas.Count);
       for I := 0 to TodasEmpresas.Count - 1 do
       begin
         Empresa := EmpresaEtd(TodasEmpresas.Items[I]);
         Opcao.Id := Empresa.Id;
-        Opcao.Texto := Format('%d - %s',
-          [Empresa.Id, Empresa.Identificacao]);
+        Opcao.Texto := Format('%d - %s', [Empresa.Id, Empresa.Identificacao]);
         Opcao.Habilitada := False;
         for J := 0 to EmpresasPermitidas.Count - 1 do
           if EmpresaEtd(EmpresasPermitidas.Items[J]).Id = Empresa.Id then
@@ -70,8 +63,7 @@ begin
             Break;
           end;
 
-        // A inclusao marca toda empresa permitida; a alteracao substitui a
-        // marca pelo vinculo gravado.
+        // A inclusao marca toda empresa permitida; a alteracao substitui a marca pelo vinculo gravado.
         Opcao.Marcada := Opcao.Habilitada;
         AOpcoes[I] := Opcao;
       end;
@@ -86,11 +78,9 @@ begin
   end;
 end;
 
-// Zera as marcas recebidas e marca somente os vinculos gravados. A permissao
-// apenas habilita a troca: um vinculo sem permissao continua marcado e
-// bloqueado. Sem vinculos, todas as empresas ficam desmarcadas.
-procedure MarcarEmpresasVinculadas(var AOpcoes: TEmpresaOptions;
-  const AEmpresasVinculadas: TArrayInteger);
+// Zera as marcas recebidas e marca somente os vinculos gravados. A permissao apenas habilita a troca: um vinculo sem
+// permissao continua marcado e bloqueado.
+procedure MarcarEmpresasVinculadas(var AOpcoes: TEmpresaOptions; const AEmpresasVinculadas: TArrayInteger);
 var
   I: Integer;
   J: Integer;
@@ -111,8 +101,7 @@ function CriarCarregadorEmpresas(AListarEmpresas: ListarEmpresasUseCase;
   ASession: ISessionContext): TCarregarOpcoesEmpresas;
 begin
   Result :=
-    function(APreparacao: TPreparacaoEmpresas;
-      const AEmpresasVinculadas: TArrayInteger;
+    function(APreparacao: TPreparacaoEmpresas; const AEmpresasVinculadas: TArrayInteger;
       out AOpcoes: TEmpresaOptions): Boolean
     begin
       Result := MontarOpcoesEmpresas(AListarEmpresas, ASession, AOpcoes);

@@ -13,10 +13,7 @@ uses
   ValidationPanelFrame;
 
 type
-  // Editor da aba de Operacoes Fiscais IBS/CBS; dono do rascunho e do
-  // apresentador do cadastro.
-  TfrmOperacaoFiscalIbsCbsCadastroFrame = class(TfrmCadastroEditor,
-    IOperacoesFiscaisIbsCbsCadastroView)
+  TfrmOperacaoFiscalIbsCbsCadastroFrame = class(TfrmCadastroEditor, IOperacoesFiscaisIbsCbsCadastroView)
     pcSecoes: TPageControl;
     tsCadastro: TTabSheet;
     lblOperacaoInterna: TLabel;
@@ -44,62 +41,42 @@ type
     procedure ckFimVigenciaClick(Sender: TObject);
     procedure btnVerificarCondicoesClick(Sender: TObject);
   private
-    // Rascunho da aba. A inclusao cria a entidade e a alteracao recebe uma copia
-    // independente do registro carregado; o frame libera o rascunho ao ser
-    // destruido, junto com a aba.
+    // A alteração recebe uma cópia independente do registro carregado; o frame libera o rascunho ao ser destruído,
+    // junto com a aba.
     FRascunho: OperacaoFiscalIbsCbsEtd;
-    // Motivo da ultima falha de carga, identificado pela carga que nao
-    // concluiu. Cada preparacao reinicia o valor.
+    // Motivo da última carga que falhou; cada preparação reinicia o valor.
     FFalhaCarga: string;
-    // Codigos do dominio na mesma ordem dos itens de cada checklist. As marcas
-    // sao lidas e gravadas pelo codigo, nunca pelo texto apresentado.
+    // Códigos do domínio na mesma ordem dos itens; as marcas usam o código, nunca o texto apresentado.
     FCodigosTipoEmissao: TArrayInteger;
     FCodigosNatureza: TArrayInteger;
     FCodigosTipoOrgaoPublico: TArrayInteger;
-    // Acesso tipado ao apresentador que a base possui e libera.
     function GetPresenter: TOperacoesFiscaisIbsCbsCadastroPresenter;
-    // Nao valida nem grava: normalizacao e validacao pertencem ao dominio e a
-    // gravacao ao apresentador.
+    // Não valida nem grava: normalização e validação pertencem ao domínio, a gravação ao apresentador.
     function AplicarCamposAoRascunho: Boolean;
-    // Limpa os campos, as listas e a validacao, devolvendo o editor ao estado
-    // neutro. Nao libera o rascunho, que pertence ao ciclo da aba.
+    // Não libera o rascunho, que pertence ao ciclo da aba.
     procedure LimparCampos;
     procedure LimparValidacao;
-    // As opcoes das condicoes sao fixas e independem da preparacao: monta-las
-    // uma unica vez mantem as listas disponiveis em todas as abas.
+    // As opções das condições são fixas: as listas são montadas uma única vez.
     procedure CarregarOpcoesCondicoes;
     procedure CarregarCheckList(const ACheckList: TCheckListBox;
-      const AAtributo: OperacaoFiscalIbsCbsCondicaoAtributo;
-      var ACodigos: TArrayInteger);
-    function CheckListDoAtributo(
-      const AAtributo: OperacaoFiscalIbsCbsCondicaoAtributo): TCheckListBox;
-    function CodigosDoAtributo(
-      const AAtributo: OperacaoFiscalIbsCbsCondicaoAtributo): TArrayInteger;
-    function ValoresMarcados(const ACheckList: TCheckListBox;
-      const ACodigos: TArrayInteger): TArrayInteger;
+      const AAtributo: OperacaoFiscalIbsCbsCondicaoAtributo; var ACodigos: TArrayInteger);
+    function CheckListDoAtributo(const AAtributo: OperacaoFiscalIbsCbsCondicaoAtributo): TCheckListBox;
+    function CodigosDoAtributo(const AAtributo: OperacaoFiscalIbsCbsCondicaoAtributo): TArrayInteger;
+    function ValoresMarcados(const ACheckList: TCheckListBox; const ACodigos: TArrayInteger): TArrayInteger;
     procedure LimparCondicoes;
-    procedure MarcarCondicao(
-      const ACondicao: OperacaoFiscalIbsCbsCondicaoEtd);
-    procedure PreencherCondicoes(
-      const ACondicoes: OperacaoFiscalIbsCbsCondicaoEtdArray);
+    procedure MarcarCondicao(const ACondicao: OperacaoFiscalIbsCbsCondicaoEtd);
+    procedure PreencherCondicoes(const ACondicoes: OperacaoFiscalIbsCbsCondicaoEtdArray);
     function CondicoesDosCampos: OperacaoFiscalIbsCbsCondicaoEtdArray;
     function CopiarCondicoes(
-      const ACondicoes: OperacaoFiscalIbsCbsCondicaoEtdArray)
-      : OperacaoFiscalIbsCbsCondicaoEtdArray;
-    // Uma condicao carregada que os checklists nao representam nao pode ser
-    // descartada: o dominio precisa reportar a configuracao invalida.
-    function CondicaoForaDoDominio(
-      const ACondicao: OperacaoFiscalIbsCbsCondicaoEtd): Boolean;
-    function AtributoNasCondicoes(
-      const ACondicoes: OperacaoFiscalIbsCbsCondicaoEtdArray;
+      const ACondicoes: OperacaoFiscalIbsCbsCondicaoEtdArray): OperacaoFiscalIbsCbsCondicaoEtdArray;
+    // Uma condição que os checklists não representam não pode ser descartada: o domínio precisa reportar a configuração
+    // inválida.
+    function CondicaoForaDoDominio(const ACondicao: OperacaoFiscalIbsCbsCondicaoEtd): Boolean;
+    function AtributoNasCondicoes(const ACondicoes: OperacaoFiscalIbsCbsCondicaoEtdArray;
       const AAtributo: OperacaoFiscalIbsCbsCondicaoAtributo): Boolean;
-    function CopiarOperacao(
-      const AOperacao: OperacaoFiscalIbsCbsEtd): OperacaoFiscalIbsCbsEtd;
-    function CarregarSeletores(
-      const AOperacao: OperacaoFiscalIbsCbsEtd): Boolean;
-    procedure PreencherVigencias(
-      const AOperacao: OperacaoFiscalIbsCbsEtd);
-    // O rotulo de escopo das condicoes acompanha o Grupo Fiscal selecionado.
+    function CopiarOperacao(const AOperacao: OperacaoFiscalIbsCbsEtd): OperacaoFiscalIbsCbsEtd;
+    function CarregarSeletores(const AOperacao: OperacaoFiscalIbsCbsEtd): Boolean;
+    procedure PreencherVigencias(const AOperacao: OperacaoFiscalIbsCbsEtd);
     procedure AtualizarEscopo;
     procedure GrupoFiscalAlterado(Sender: TObject);
 
@@ -107,25 +84,14 @@ type
   public
     constructor Create(AOwner: TComponent; const AHost: IEditorCadastroHost); override;
     destructor Destroy; override;
-    // A composicao entrega o apresentador ao frame, que passa a libera-lo.
+    // A composição entrega o apresentador ao frame, que passa a liberá-lo.
     procedure ConfigurarPresenter(APresenter: TOperacoesFiscaisIbsCbsCadastroPresenter);
-    // Reinicia o frame para uma inclusao: descarta o rascunho anterior, limpa os
-    // campos e carrega os seletores e as empresas permitidas. Devolve False
-    // quando qualquer carga falha; o apresentador apresenta o motivo e o
-    // formulario descarta a aba parcial.
     function PrepararInclusao: Boolean;
-    // Prepara a alteracao de uma operacao existente. A entidade recebida nao e
-    // assumida: o frame guarda uma copia propria, com empresas e valores de
-    // condicao independentes. Um vinculo que a carga nao devolve interrompe a
-    // preparacao, para nao perder o vinculo em silencio.
-    function PrepararAlteracao(
-      const AOperacao: OperacaoFiscalIbsCbsEtd): Boolean;
-    // Motivo da ultima falha de preparacao; vazio quando todas as cargas foram
-    // concluidas. O apresentador inclui o motivo no aviso unico da aba
-    // descartada.
+    // A entidade recebida não é assumida: o frame guarda uma cópia própria, com empresas e valores de condição
+    // independentes. Um vínculo que a carga não devolve interrompe a preparação, para não perdê-lo em silêncio.
+    function PrepararAlteracao(const AOperacao: OperacaoFiscalIbsCbsEtd): Boolean;
+    // Motivo da última falha de preparação; o apresentador o inclui no aviso único da aba descartada.
     function FalhaCarga: string;
-    // Contrato comum da aba de cadastro: a base consulta pendencias, encaminha o
-    // foco e entrega a validacao sem conhecer este frame.
     function HasPendingChanges: Boolean; override;
     function TryFocus: Boolean; override;
     procedure ExibirAnaliseCondicoes(const AResumo, ARelatorio: string);
@@ -141,40 +107,29 @@ uses
   AnaliseCondicoesForm;
 
 const
-  OperacaoNaoInformadaMessage =
-    'A operação fiscal da alteração não foi informada.';
-  // Identificação das cargas que interrompem a preparação da aba. O apresentador
-  // apresenta o motivo no aviso único da aba descartada.
+  // Identificação das cargas que interrompem a preparação da aba.
   FalhaOperacaoInterna = 'Operação Interna';
   FalhaGrupoFiscal = 'Grupo Fiscal';
   FalhaRegraFiscal = 'Regra Fiscal';
   FalhaEmpresas = 'Empresas';
 
-{ TfrmOperacaoFiscalIbsCbsCadastroFrame }
-
-constructor TfrmOperacaoFiscalIbsCbsCadastroFrame.Create(AOwner: TComponent;
-  const AHost: IEditorCadastroHost);
+constructor TfrmOperacaoFiscalIbsCbsCadastroFrame.Create(AOwner: TComponent; const AHost: IEditorCadastroHost);
 begin
   inherited Create(AOwner, AHost);
 
-  // O frame ja possui os proprios controles: a classe base carrega o DFM antes
-  // deste trecho, portanto as opcoes podem ser montadas aqui.
+  // A base carrega o DFM antes deste trecho, portanto as opções podem ser montadas aqui.
   CarregarOpcoesCondicoes;
 
-  // O rotulo de escopo acompanha apenas a escolha feita pelo usuario: a carga e
-  // a limpeza do seletor nao notificam.
+  // O rótulo de escopo acompanha apenas a escolha do usuário: a carga e a limpeza do seletor não notificam.
   fraGrupoFiscal.OnSelecaoAlterada := GrupoFiscalAlterado;
 
-  // O painel deriva o campo do nome do controle; o rotulo exibido vem do
-  // metadata da operacao fiscal usado pelo validador.
   fraValidacao.Bind('OperacaoInternaId', fraOperacaoInterna.ControleEdicao, '');
   fraValidacao.Bind('GrupoFiscalId', fraGrupoFiscal.ControleEdicao, '');
   fraValidacao.Bind('RegraFiscalId', fraRegraFiscal.ControleEdicao, '');
   fraValidacao.Bind('InicioVigencia', edInicioVigencia, '');
   fraValidacao.Bind('FimVigencia', edFimVigencia, '');
 
-  // O erro das condicoes e agrupado pelo dominio: o vinculo leva o foco ao
-  // primeiro checklist, que esta na sub-aba Condicoes.
+  // O erro de Condicoes leva o foco ao primeiro checklist, que fica na sub-aba Condições.
   fraValidacao.Bind('Condicoes', clbTipoEmissao, '');
 
   pcSecoes.ActivePage := tsCadastro;
@@ -190,8 +145,7 @@ procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.ConfigurarPresenter(
   APresenter: TOperacoesFiscaisIbsCbsCadastroPresenter);
 begin
   if APresenter = nil then
-    raise Exception.Create(
-      'O apresentador do cadastro de Operações Fiscais IBS/CBS não foi informado.');
+    raise Exception.Create('O apresentador do cadastro de Operações Fiscais IBS/CBS não foi informado.');
 
   AssociarPresenter(APresenter);
 end;
@@ -200,25 +154,19 @@ procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.CarregarOpcoesCondicoes;
 begin
   CarregarCheckList(clbTipoEmissao, ocaTipoEmissao, FCodigosTipoEmissao);
   CarregarCheckList(clbNatureza, ocaNaturezaEmissao, FCodigosNatureza);
-  CarregarCheckList(clbTipoOrgaoPublico, ocaTipoOrgaoPublico,
-    FCodigosTipoOrgaoPublico);
+  CarregarCheckList(clbTipoOrgaoPublico, ocaTipoOrgaoPublico, FCodigosTipoOrgaoPublico);
 end;
 
-procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.CarregarCheckList(
-  const ACheckList: TCheckListBox;
-  const AAtributo: OperacaoFiscalIbsCbsCondicaoAtributo;
-  var ACodigos: TArrayInteger);
+procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.CarregarCheckList(const ACheckList: TCheckListBox;
+  const AAtributo: OperacaoFiscalIbsCbsCondicaoAtributo; var ACodigos: TArrayInteger);
 var
   I: Integer;
 begin
   ACheckList.Items.Clear;
 
-  // O dominio define os valores e o texto de cada opcao; a tela apenas os
-  // apresenta na mesma ordem em que guarda os codigos.
   ACodigos := OperacaoFiscalIbsCbsCondicoes.ValoresDoDominio(AAtributo);
   for I := 0 to High(ACodigos) do
-    ACheckList.Items.Add(
-      OperacaoFiscalIbsCbsCondicoes.DescricaoValor(AAtributo, ACodigos[I]));
+    ACheckList.Items.Add(OperacaoFiscalIbsCbsCondicoes.DescricaoValor(AAtributo, ACodigos[I]));
 end;
 
 function TfrmOperacaoFiscalIbsCbsCadastroFrame.CheckListDoAtributo(
@@ -232,8 +180,7 @@ begin
     ocaTipoOrgaoPublico:
       Result := clbTipoOrgaoPublico;
   else
-    // Atributo nao suportado (vinculo carregado de configuracao invalida) nao
-    // tem editor; o dominio reporta a condicao na gravacao.
+    // Atributo sem editor (configuração inválida): o domínio reporta na gravação.
     Result := nil;
   end;
 end;
@@ -253,8 +200,7 @@ begin
   end;
 end;
 
-function TfrmOperacaoFiscalIbsCbsCadastroFrame.ValoresMarcados(
-  const ACheckList: TCheckListBox;
+function TfrmOperacaoFiscalIbsCbsCadastroFrame.ValoresMarcados(const ACheckList: TCheckListBox;
   const ACodigos: TArrayInteger): TArrayInteger;
 var
   I: Integer;
@@ -283,8 +229,7 @@ begin
     clbTipoOrgaoPublico.Checked[I] := False;
 end;
 
-procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.MarcarCondicao(
-  const ACondicao: OperacaoFiscalIbsCbsCondicaoEtd);
+procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.MarcarCondicao(const ACondicao: OperacaoFiscalIbsCbsCondicaoEtd);
 var
   CheckList: TCheckListBox;
   Codigos: TArrayInteger;
@@ -310,46 +255,35 @@ begin
     MarcarCondicao(ACondicoes[I]);
 end;
 
-function TfrmOperacaoFiscalIbsCbsCadastroFrame.CondicoesDosCampos:
-  OperacaoFiscalIbsCbsCondicaoEtdArray;
-  procedure Adicionar(const AAtributo: OperacaoFiscalIbsCbsCondicaoAtributo;
-    const AValores: TArrayInteger);
+function TfrmOperacaoFiscalIbsCbsCadastroFrame.CondicoesDosCampos: OperacaoFiscalIbsCbsCondicaoEtdArray;
+  procedure Adicionar(const AAtributo: OperacaoFiscalIbsCbsCondicaoAtributo; const AValores: TArrayInteger);
   begin
-    // Um atributo sem valor marcado nao vira condicao; o conjunto vazio tambem
-    // nao e gravado.
+    // Um atributo sem valor marcado não vira condição; o conjunto vazio não é gravado.
     if Length(AValores) = 0 then
       Exit;
 
     SetLength(Result, Length(Result) + 1);
-    Result[High(Result)] :=
-      OperacaoFiscalIbsCbsCondicaoEtd.Create(AAtributo, AValores);
+    Result[High(Result)] := OperacaoFiscalIbsCbsCondicaoEtd.Create(AAtributo, AValores);
   end;
 begin
   SetLength(Result, 0);
 
-  // A ordem segue o cadastro legado; o dominio normaliza os valores e a ordem
-  // do conjunto antes de gravar.
-  Adicionar(ocaTipoEmissao,
-    ValoresMarcados(clbTipoEmissao, FCodigosTipoEmissao));
-  Adicionar(ocaNaturezaEmissao,
-    ValoresMarcados(clbNatureza, FCodigosNatureza));
-  Adicionar(ocaTipoOrgaoPublico,
-    ValoresMarcados(clbTipoOrgaoPublico, FCodigosTipoOrgaoPublico));
+  // A ordem segue o cadastro legado; o domínio normaliza valores e ordem antes de gravar.
+  Adicionar(ocaTipoEmissao, ValoresMarcados(clbTipoEmissao, FCodigosTipoEmissao));
+  Adicionar(ocaNaturezaEmissao, ValoresMarcados(clbNatureza, FCodigosNatureza));
+  Adicionar(ocaTipoOrgaoPublico, ValoresMarcados(clbTipoOrgaoPublico, FCodigosTipoOrgaoPublico));
 end;
 
 function TfrmOperacaoFiscalIbsCbsCadastroFrame.CopiarCondicoes(
-  const ACondicoes: OperacaoFiscalIbsCbsCondicaoEtdArray)
-  : OperacaoFiscalIbsCbsCondicaoEtdArray;
+  const ACondicoes: OperacaoFiscalIbsCbsCondicaoEtdArray): OperacaoFiscalIbsCbsCondicaoEtdArray;
 var
   I: Integer;
 begin
   SetLength(Result, Length(ACondicoes));
   for I := 0 to High(ACondicoes) do
-    // Os valores sao copiados um a um: a aba edita um conjunto proprio e nao
-    // compartilha o array da entidade de origem.
+    // A aba edita um conjunto próprio: os valores não compartilham o array de origem.
     Result[I] := OperacaoFiscalIbsCbsCondicaoEtd.Create(
-      ACondicoes[I].Atributo,
-      Copy(ACondicoes[I].Valores, 0, Length(ACondicoes[I].Valores)));
+      ACondicoes[I].Atributo, Copy(ACondicoes[I].Valores, 0, Length(ACondicoes[I].Valores)));
 end;
 
 function TfrmOperacaoFiscalIbsCbsCadastroFrame.CondicaoForaDoDominio(
@@ -357,15 +291,13 @@ function TfrmOperacaoFiscalIbsCbsCadastroFrame.CondicaoForaDoDominio(
 var
   I: Integer;
 begin
-  // Atributo sem editor e valor que o dominio nao aceita: os checklists nao
-  // conseguem apresentar nem recriar a condicao.
+  // Atributo sem editor ou valor não aceito: os checklists não recriam a condição.
   Result := ACondicao.Atributo = ocaInvalida;
   if Result then
     Exit;
 
   for I := 0 to High(ACondicao.Valores) do
-    if not OperacaoFiscalIbsCbsCondicoes.CodigoValido(ACondicao.Atributo,
-      ACondicao.Valores[I]) then
+    if not OperacaoFiscalIbsCbsCondicoes.CodigoValido(ACondicao.Atributo, ACondicao.Valores[I]) then
     begin
       Result := True;
       Exit;
@@ -378,8 +310,7 @@ function TfrmOperacaoFiscalIbsCbsCadastroFrame.AtributoNasCondicoes(
 var
   I: Integer;
 begin
-  // Cada atributo admite uma unica condicao no vinculo: o atributo presente
-  // no conjunto indica que os checklists ja representam essa condicao.
+  // Cada atributo admite uma única condição no vínculo: se o atributo está no conjunto, os checklists já a representam.
   Result := False;
   for I := 0 to High(ACondicoes) do
     if ACondicoes[I].Atributo = AAtributo then
@@ -392,18 +323,11 @@ end;
 function TfrmOperacaoFiscalIbsCbsCadastroFrame.CopiarOperacao(
   const AOperacao: OperacaoFiscalIbsCbsEtd): OperacaoFiscalIbsCbsEtd;
 begin
-  // A entidade nao possui Clone: a copia usa o construtor completo e, depois,
-  // substitui os arrays por copias independentes.
+  // A entidade não possui Clone: a cópia usa o construtor completo e substitui os arrays por cópias independentes.
   Result := OperacaoFiscalIbsCbsEtd.Create(
-    AOperacao.Id,
-    AOperacao.OperacaoInternaId,
-    AOperacao.RegraFiscalId,
-    AOperacao.GrupoFiscalId,
-    AOperacao.InicioVigencia,
-    AOperacao.FimVigencia,
-    AOperacao.DataCadastro,
-    AOperacao.DataAlteracao,
-    AOperacao.Ativo,
+    AOperacao.Id, AOperacao.OperacaoInternaId, AOperacao.RegraFiscalId,
+    AOperacao.GrupoFiscalId, AOperacao.InicioVigencia, AOperacao.FimVigencia,
+    AOperacao.DataCadastro, AOperacao.DataAlteracao, AOperacao.Ativo,
     Copy(AOperacao.EmpresasId, 0, Length(AOperacao.EmpresasId)));
 
   Result.OperacaoInternaDescricao := AOperacao.OperacaoInternaDescricao;
@@ -412,8 +336,7 @@ begin
   Result.Condicoes := CopiarCondicoes(AOperacao.Condicoes);
 end;
 
-function TfrmOperacaoFiscalIbsCbsCadastroFrame.CarregarSeletores(
-  const AOperacao: OperacaoFiscalIbsCbsEtd): Boolean;
+function TfrmOperacaoFiscalIbsCbsCadastroFrame.CarregarSeletores(const AOperacao: OperacaoFiscalIbsCbsEtd): Boolean;
 begin
   Result := False;
 
@@ -422,7 +345,7 @@ begin
     FFalhaCarga := FalhaOperacaoInterna;
     Exit;
   end;
-  // Grupo Fiscal vazio e uma selecao valida e volta para a opcao vazia.
+  // Grupo Fiscal vazio é uma seleção válida e volta para a opção vazia.
   if not fraGrupoFiscal.Carregar(AOperacao.GrupoFiscalId.ToText('')) then
   begin
     FFalhaCarga := FalhaGrupoFiscal;
@@ -443,18 +366,17 @@ begin
   Result := True;
 end;
 
-procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.PreencherVigencias(
-  const AOperacao: OperacaoFiscalIbsCbsEtd);
+procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.PreencherVigencias(const AOperacao: OperacaoFiscalIbsCbsEtd);
 begin
-  // O inicio e obrigatorio: uma data zerada permanece em branco e o dominio
-  // reporta o campo, em vez de a tela inventar um valor.
+  // O início é obrigatório: uma data zerada permanece em branco e o domínio reporta o campo em vez de a tela inventar
+  // um valor.
   if AOperacao.InicioVigencia > 0 then
     edInicioVigencia.Text := DateService.ParseLocal(AOperacao.InicioVigencia)
   else
     edInicioVigencia.Clear;
 
-  // O fim nulo desabilita a mascara: o painel de validacao pula o campo e a
-  // marcacao e a unica forma de informar a data.
+  // O fim nulo desabilita a máscara: o painel de validação pula o campo e a marcação é a única forma de informar a
+  // data.
   ckFimVigencia.Checked := not AOperacao.FimVigencia.IsNull;
   edFimVigencia.Enabled := ckFimVigencia.Checked;
   if AOperacao.FimVigencia.IsNull then
@@ -468,26 +390,21 @@ begin
   if fraGrupoFiscal.IdSelecionado = '' then
     lblEscopo.Caption := 'Escopo: Padrão (sem Grupo Fiscal)'
   else
-    lblEscopo.Caption :=
-      'Escopo: Grupo Fiscal ' + fraGrupoFiscal.TextoSelecionado;
+    lblEscopo.Caption := 'Escopo: Grupo Fiscal ' + fraGrupoFiscal.TextoSelecionado;
 end;
 
-procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.GrupoFiscalAlterado(
-  Sender: TObject);
+procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.GrupoFiscalAlterado(Sender: TObject);
 begin
   AtualizarEscopo;
 end;
 
-procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.ckFimVigenciaClick(
-  Sender: TObject);
+procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.ckFimVigenciaClick(Sender: TObject);
 begin
-  // Desmarcado significa fim de vigencia nulo: a mascara nao aceita edicao
-  // enquanto a data nao for informada.
+  // Desmarcado significa fim de vigência nulo: a máscara não aceita edição enquanto a data não for informada.
   edFimVigencia.Enabled := ckFimVigencia.Checked;
 end;
 
-procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.btnVerificarCondicoesClick(
-  Sender: TObject);
+procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.btnVerificarCondicoesClick(Sender: TObject);
 begin
   if not AplicarCamposAoRascunho then
     Exit;
@@ -502,9 +419,8 @@ begin
   FreeAndNil(FRascunho);
   LimparCampos;
 
-  // Sem as listas carregadas nao ha aba: o apresentador apresenta o aviso com o
-  // motivo registrado aqui e o formulario descarta a aba parcial. O rascunho so
-  // nasce depois de todas as cargas.
+  // Sem as listas carregadas não há aba: o apresentador apresenta o motivo registrado aqui e o rascunho só nasce depois
+  // de todas as cargas.
   if not fraOperacaoInterna.Carregar('') then
   begin
     FFalhaCarga := FalhaOperacaoInterna;
@@ -531,24 +447,21 @@ begin
   Result := True;
 end;
 
-function TfrmOperacaoFiscalIbsCbsCadastroFrame.PrepararAlteracao(
-  const AOperacao: OperacaoFiscalIbsCbsEtd): Boolean;
+function TfrmOperacaoFiscalIbsCbsCadastroFrame.PrepararAlteracao(const AOperacao: OperacaoFiscalIbsCbsEtd): Boolean;
 begin
   Result := False;
   if AOperacao = nil then
-    raise Exception.Create(OperacaoNaoInformadaMessage);
+    raise Exception.Create('A operação fiscal da alteração não foi informada.');
 
   FFalhaCarga := '';
 
-  // A copia e assumida pela aba antes da carga, para que uma falha libere
-  // exatamente o rascunho desta preparacao.
+  // A cópia é assumida pela aba antes da carga, para que uma falha libere exatamente o rascunho desta preparação.
   FreeAndNil(FRascunho);
   FRascunho := CopiarOperacao(AOperacao);
 
   LimparCampos;
 
-  // Os seletores recebem os vinculos gravados. Um identificador ausente devolve
-  // False e a preparacao e descartada, em vez de apagar o vinculo em silencio.
+  // Um identificador ausente devolve False e descarta a preparação, em vez de apagar o vínculo em silêncio.
   if not CarregarSeletores(FRascunho) then
   begin
     FreeAndNil(FRascunho);
@@ -587,36 +500,27 @@ begin
   if not Result then
     Exit;
 
-  // Somente os campos das duas sub-abas sao mapeados; os demais permanecem com
-  // os valores da criacao ou da copia carregada.
   FRascunho.OperacaoInternaId := fraOperacaoInterna.IdSelecionado;
   FRascunho.RegraFiscalId := fraRegraFiscal.IdSelecionado;
 
-  // A opcao vazia do Grupo Fiscal volta a ser vinculo nulo.
+  // A opção vazia do Grupo Fiscal volta a ser vínculo nulo.
   if fraGrupoFiscal.IdSelecionado = '' then
     FRascunho.GrupoFiscalId := StringNullable.NullInstance()
   else
-    FRascunho.GrupoFiscalId :=
-      StringNullable.CreateOrNull(fraGrupoFiscal.IdSelecionado);
+    FRascunho.GrupoFiscalId := StringNullable.CreateOrNull(fraGrupoFiscal.IdSelecionado);
 
-  // A data incompleta vira zero e o dominio reporta o campo obrigatorio; a tela
-  // nao valida nem corrige o que foi digitado.
-  FRascunho.InicioVigencia :=
-    DateService.FromLocalToDateDef(edInicioVigencia.Text, 0);
+  // Data incompleta vira zero e o domínio reporta o campo; a tela não corrige o que foi digitado.
+  FRascunho.InicioVigencia := DateService.FromLocalToDateDef(edInicioVigencia.Text, 0);
 
   if ckFimVigencia.Checked then
-    FRascunho.FimVigencia :=
-      DateNullable.Create(DateService.FromLocalToDateDef(edFimVigencia.Text, 0))
+    FRascunho.FimVigencia := DateNullable.Create(DateService.FromLocalToDateDef(edFimVigencia.Text, 0))
   else
     FRascunho.FimVigencia := DateNullable.NullInstance();
 
   FRascunho.EmpresasId := fraEmpresas.EmpresasSelecionadas;
 
-  // Os checklists so representam atributo e valores do dominio. A condicao
-  // carregada fora desse conjunto e mantida enquanto o usuario nao escolher
-  // valores validos para o mesmo atributo, para o dominio reportar a
-  // configuracao invalida em vez de perde-la; escolher valores validos
-  // substitui a condicao invalida.
+  // A condição carregada fora do domínio é mantida até o usuário escolher valores válidos para o mesmo atributo, para o
+  // domínio reportar a configuração inválida em vez de perdê-la.
   Condicoes := CondicoesDosCampos;
   for I := 0 to High(FRascunho.Condicoes) do
     if CondicaoForaDoDominio(FRascunho.Condicoes[I]) and
@@ -649,7 +553,7 @@ begin
   fraEmpresas.Limpar;
   LimparCondicoes;
 
-  // A limpeza nao notifica o seletor de grupo: o rotulo e atualizado aqui.
+  // A limpeza não notifica o seletor de grupo: o rótulo é atualizado aqui.
   AtualizarEscopo;
   pcSecoes.ActivePage := tsCadastro;
   LimparValidacao;
@@ -667,8 +571,6 @@ end;
 
 function TfrmOperacaoFiscalIbsCbsCadastroFrame.HasPendingChanges: Boolean;
 begin
-  // Um rascunho aberto ja e pendencia: a inclusao nasce com dados a gravar e a
-  // alteracao com a copia carregada do registro.
   Result := FRascunho <> nil;
 end;
 
@@ -678,7 +580,7 @@ begin
   if Result then
     Exit;
 
-  // Sem erro vinculado, a operacao interna continua sendo o primeiro campo.
+  // Sem erro vinculado, a operação interna continua sendo o primeiro campo.
   pcSecoes.ActivePage := tsCadastro;
   Result := False;
   if fraOperacaoInterna.ControleEdicao.CanFocus then
@@ -688,8 +590,7 @@ begin
   end;
 end;
 
-procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.ExibirAnaliseCondicoes(
-  const AResumo, ARelatorio: string);
+procedure TfrmOperacaoFiscalIbsCbsCadastroFrame.ExibirAnaliseCondicoes(const AResumo, ARelatorio: string);
 var
   Dialogo: TfrmAnaliseCondicoes;
 begin

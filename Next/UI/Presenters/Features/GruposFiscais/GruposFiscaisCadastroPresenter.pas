@@ -7,19 +7,17 @@ uses
   SalvarGrupoFiscalUseCaseUnit, GrupoFiscalEtdUnit, PresenterCadastroBase;
 
 type
-  // Apresentador do cadastro; nao conhece a consulta, a grade nem as abas.
+  // Nao conhece a consulta, a grade nem as abas.
   TGruposFiscaisCadastroPresenter = class(TPresenterCadastroBase)
   private
-    // A view pertence ao frame do editor e as demais dependencias ao container
-    // de composicao: o apresentador apenas as utiliza e nunca as libera.
+    // A view pertence ao frame do editor e as demais dependencias ao container de composicao: o apresentador apenas as
+    // utiliza e nunca as libera.
     FView: IGruposFiscaisCadastroView;
     FObterGrupoFiscal: ObterGrupoFiscalPorIdUseCase;
     FSalvarGrupoFiscal: ISalvarGrupoFiscalUseCase;
   public
-    constructor Create(const AView: IGruposFiscaisCadastroView;
-      const AAuthorization: IAuthorizationService;
-      AObterGrupoFiscal: ObterGrupoFiscalPorIdUseCase;
-      ASalvarGrupoFiscal: ISalvarGrupoFiscalUseCase);
+    constructor Create(const AView: IGruposFiscaisCadastroView; const AAuthorization: IAuthorizationService;
+      AObterGrupoFiscal: ObterGrupoFiscalPorIdUseCase; ASalvarGrupoFiscal: ISalvarGrupoFiscalUseCase);
     function PrepararInclusao: Boolean; override;
     function PrepararAlteracao(const AId: string): Boolean; override;
     function Salvar(const ARascunho: GrupoFiscalEtd): Boolean;
@@ -32,29 +30,22 @@ uses
   CreateEntityUseCaseOutputUnit;
 
 const
-  // Codigo do cadastro legado usado por esta funcionalidade. O host recebe o
-  // processo, a acao e a tabela e nao os conhece.
+  // Codigo do cadastro legado usado por esta funcionalidade. O host recebe o processo, a acao e a tabela e nao os
+  // conhece.
   ProcessoGravacao = 'MOD011';
   TabelaGruposFiscais = 'GRUPOS_FISCAIS';
 
-{ TGruposFiscaisCadastroPresenter }
-
-constructor TGruposFiscaisCadastroPresenter.Create(
-  const AView: IGruposFiscaisCadastroView;
+constructor TGruposFiscaisCadastroPresenter.Create(const AView: IGruposFiscaisCadastroView;
   const AAuthorization: IAuthorizationService;
-  AObterGrupoFiscal: ObterGrupoFiscalPorIdUseCase;
-  ASalvarGrupoFiscal: ISalvarGrupoFiscalUseCase);
+  AObterGrupoFiscal: ObterGrupoFiscalPorIdUseCase; ASalvarGrupoFiscal: ISalvarGrupoFiscalUseCase);
 begin
   inherited Create(AAuthorization, TabelaGruposFiscais);
   if AView = nil then
-    raise Exception.Create(
-      'A view do cadastro de Grupos Fiscais não foi informada.');
+    raise Exception.Create('A view do cadastro de Grupos Fiscais não foi informada.');
   if AObterGrupoFiscal = nil then
-    raise Exception.Create(
-      'O caso de uso de carregamento de Grupos Fiscais não foi informado.');
+    raise Exception.Create('O caso de uso de carregamento de Grupos Fiscais não foi informado.');
   if ASalvarGrupoFiscal = nil then
-    raise Exception.Create(
-      'O caso de uso de gravação de Grupos Fiscais não foi informado.');
+    raise Exception.Create('O caso de uso de gravação de Grupos Fiscais não foi informado.');
 
   FView := AView;
   FObterGrupoFiscal := AObterGrupoFiscal;
@@ -70,8 +61,7 @@ begin
   FView.ShowWarning('Não foi possível carregar as empresas para a inclusão.');
 end;
 
-function TGruposFiscaisCadastroPresenter.PrepararAlteracao(
-  const AId: string): Boolean;
+function TGruposFiscaisCadastroPresenter.PrepararAlteracao(const AId: string): Boolean;
 var
   Carregado: GrupoFiscalEtd;
 begin
@@ -90,15 +80,13 @@ begin
       // A consulta apresenta apenas registros ativos.
       if Carregado.Ativo <> saAtivo then
       begin
-        FView.ShowError(
-          'O grupo fiscal selecionado está fora da consulta de ativos.');
+        FView.ShowError('O grupo fiscal selecionado está fora da consulta de ativos.');
         Exit;
       end;
 
       if not FView.PrepararAlteracao(Carregado) then
       begin
-        FView.ShowWarning(
-          'Não foi possível carregar as empresas para a alteração.');
+        FView.ShowWarning('Não foi possível carregar as empresas para a alteração.');
         Exit;
       end;
 
@@ -108,18 +96,16 @@ begin
         FView.ShowError(E.Message);
       on E: Exception do
         // O texto tecnico do banco nao deve chegar a interface.
-        FView.ShowError(
-          'Não foi possível carregar o grupo fiscal para alteração.');
+        FView.ShowError('Não foi possível carregar o grupo fiscal para alteração.');
     end;
   finally
-    // A view copia o grupo para o rascunho do frame; a entidade continua
-    // pertencendo a este metodo e e liberada no finally.
+    // A view copia o grupo para o rascunho do frame; a entidade continua pertencendo a este metodo e e liberada no
+    // finally.
     Carregado.Free;
   end;
 end;
 
-function TGruposFiscaisCadastroPresenter.Salvar(
-  const ARascunho: GrupoFiscalEtd): Boolean;
+function TGruposFiscaisCadastroPresenter.Salvar(const ARascunho: GrupoFiscalEtd): Boolean;
 var
   Resultado: CreateEntityUseCaseOutPut;
 begin
@@ -152,8 +138,7 @@ begin
         FView.ShowError('Não foi possível salvar o grupo fiscal.');
     end;
   finally
-    // O resultado do caso de uso libera a entidade persistida; o apresentador
-    // nunca a devolve nem a retem.
+    // O resultado do caso de uso libera a entidade persistida; o apresentador nunca a devolve nem a retem.
     Resultado.Free;
   end;
 end;

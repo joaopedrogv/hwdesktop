@@ -9,10 +9,8 @@ uses
   FilterDefinition, FilterCriterion, LocalPreferences;
 
 type
-  // Contrato minimo frame -> host para o host apresentar a mensagem. O frame
-  // reutilizavel nao cria dialogo proprio.
-  TFrameFeedbackEvent = procedure(Sender: TObject;
-    const AMensagem: string) of object;
+  // Contrato minimo frame -> host para o host apresentar a mensagem. O frame reutilizavel nao cria dialogo proprio.
+  TFrameFeedbackEvent = procedure(Sender: TObject; const AMensagem: string) of object;
 
   TfrmFilterFrame = class(TFrame)
     pnCampo: TPanel;
@@ -46,24 +44,18 @@ type
     FConfigured: Boolean;
     FSingleMode: Boolean;
     FUpdating: Boolean;
-    // Campo real correspondente ao estado atual dos editores. O OnChange do
-    // combo ja entrega o novo item selecionado, por isso a persistencia do
-    // campo anterior se apoia nesta identidade.
+    // Campo real correspondente ao estado atual dos editores. O OnChange do combo ja entrega o novo item selecionado,
+    // por isso a persistencia do campo anterior se apoia nesta identidade.
     FActiveFieldId: string;
-    // Preferencias
     function FieldKey(const AFieldId, ASuffix: string): string;
     procedure RestorePreferences;
     procedure PersistCurrentIfValid;
-    procedure PersistFieldIfValid(const AField: TFilterFieldDefinition;
-      const AOperator: TFilterOperator);
+    procedure PersistFieldIfValid(const AField: TFilterFieldDefinition; const AOperator: TFilterOperator);
     procedure LoadFieldPreferences(const AField: TFilterFieldDefinition);
-    procedure LoadFieldValues(const AField: TFilterFieldDefinition;
-      const AOperator: TFilterOperator);
-    function TryBuildCriterionFor(const AField: TFilterFieldDefinition;
-      const AOperator: TFilterOperator; const AValue1, AValue2: string;
-      out ACriterion: TFilterCriterion; out AHasInput, AIsValid: Boolean;
+    procedure LoadFieldValues(const AField: TFilterFieldDefinition; const AOperator: TFilterOperator);
+    function TryBuildCriterionFor(const AField: TFilterFieldDefinition; const AOperator: TFilterOperator;
+      const AValue1, AValue2: string; out ACriterion: TFilterCriterion; out AHasInput, AIsValid: Boolean;
       out AMessage: string): Boolean;
-    // Estado do editor
     function CurrentField(out AField: TFilterFieldDefinition): Boolean;
     function CurrentOperator(out AOperator: TFilterOperator): Boolean;
     procedure ApplyOperator(const AOperator: TFilterOperator);
@@ -72,13 +64,10 @@ type
     procedure UpdateArity;
     procedure UpdateCounter;
     procedure PopulateOperators(const AField: TFilterFieldDefinition);
-    procedure ApplyCriterionValues(const AField: TFilterFieldDefinition;
-      const ACriterion: TFilterCriterion);
-    function FormatCriterionValue(const AValue: TFilterValue;
-      const AValueType: TFilterFieldType): string;
+    procedure ApplyCriterionValues(const AField: TFilterFieldDefinition; const ACriterion: TFilterCriterion);
+    function FormatCriterionValue(const AValue: TFilterValue; const AValueType: TFilterFieldType): string;
     procedure ClearValues;
-    function ReadCurrentCriterion(out ACriterion: TFilterCriterion;
-      out AMessage: string): Boolean;
+    function ReadCurrentCriterion(out ACriterion: TFilterCriterion; out AMessage: string): Boolean;
     function TryBuildCurrentCriterion(out ACriterion: TFilterCriterion;
       out AHasInput, AIsValid: Boolean; out AMessage: string): Boolean;
     function IsEditorBlank(const AText, AMask: string): Boolean;
@@ -89,29 +78,25 @@ type
     procedure FocusFirstContentField;
     procedure ReportarFeedback(const AMensagem: string);
   published
-    // Eventos referenciados pelo DFM precisam ser publicados para que o
-    // streaming do VCL resolva os metodos ao carregar o frame.
+    // Eventos referenciados pelo DFM precisam ser publicados para que o streaming do VCL resolva os metodos ao carregar
+    // o frame.
     procedure CampoChange(Sender: TObject);
     procedure CondicaoChange(Sender: TObject);
     procedure ValorExit(Sender: TObject);
     procedure AdicionarClick(Sender: TObject);
     procedure ContadorClick(Sender: TObject);
   public
-    procedure Configure(const ADefinition: TFilterDefinition;
-      const APreferences: ILocalPreferences; const AIdentity: string;
-      APath: TFilterPath);
+    procedure Configure(const ADefinition: TFilterDefinition; const APreferences: ILocalPreferences;
+      const AIdentity: string; APath: TFilterPath);
     procedure ConfigureSingle(const ADefinition: TFilterDefinition;
       const ACriterion: TFilterCriterion; APath: TFilterPath);
-    // Seleciona o campo pelo Id sem coletar nem alterar os criterios ja
-    // adicionados. Devolve False quando o campo nao pertence a definicao.
+    // Apenas seleciona o campo; nao coleta nem altera os criterios adicionados.
     function TrySelectField(const AFieldId: string): Boolean;
     function CollectCriteria: TFilterCriteriaResult;
-    function CollectSingleCriterion(out ACriterion: TFilterCriterion;
-      out AMessage: string): Boolean;
+    function CollectSingleCriterion(out ACriterion: TFilterCriterion; out AMessage: string): Boolean;
     property Definition: TFilterDefinition read FDefinition;
     property Identity: string read FIdentity;
-    property OnFeedback: TFrameFeedbackEvent
-      read FOnFeedback write FOnFeedback;
+    property OnFeedback: TFrameFeedbackEvent read FOnFeedback write FOnFeedback;
   end;
 
 implementation
@@ -134,16 +119,14 @@ end;
 
 function FilterMaskFillChar(const AMask: string): Char;
 begin
-  // O terceiro campo da mascara VCL (formato mascara;salvar;preenchimento)
-  // define o caractere exibido nas posicoes ainda nao preenchidas. Quando o
-  // campo nao existe, o VCL usa sublinhado.
+  // O terceiro campo da mascara VCL (formato mascara;salvar;preenchimento) define o caractere exibido nas posicoes
+  // ainda nao preenchidas. Quando o campo nao existe, o VCL usa sublinhado.
   Result := MaskGetMaskBlank(AMask);
 end;
 
 function FilterMaskIsBlankChar(const AChar, AFillChar: Char): Boolean;
 begin
-  Result := (AChar = AFillChar) or (AChar = #0) or (AChar = ' ') or
-    (AChar = #9) or (AChar = #10) or (AChar = #13);
+  Result := (AChar = AFillChar) or (AChar = #0) or (AChar = ' ') or (AChar = #9) or (AChar = #10) or (AChar = #13);
 end;
 
 function FilterMaskTextIsBlank(const AMask, AText: string): Boolean;
@@ -156,7 +139,6 @@ var
 begin
   Result := True;
 
-  // Sem mascara, apenas espacos e controles nao representam conteudo.
   if AMask = '' then
   begin
     for I := 1 to Length(AText) do
@@ -168,9 +150,8 @@ begin
 
   FillChar := FilterMaskFillChar(AMask);
 
-  // Percorre a mascara ativa. Um literal so e ignorado na posicao em que a
-  // mascara o define; nas posicoes editaveis o caractere e conteudo, mesmo que
-  // coincida com um literal existente em outro ponto da mascara.
+  // Percorre a mascara ativa. Um literal so e ignorado na posicao em que a mascara o define; nas posicoes editaveis o
+  // caractere e conteudo, mesmo que coincida com um literal existente em outro ponto da mascara.
   for I := 1 to Length(AMask) do
   begin
     CharType := MaskGetCharType(AMask, I);
@@ -179,7 +160,7 @@ begin
 
     DisplayOffset := MaskOffsetToOffset(AMask, I);
     if (DisplayOffset < 1) or (DisplayOffset > Length(AText)) then
-      Continue; // posicao ausente equivale a vazia
+      Continue;
 
     TextChar := AText[DisplayOffset];
 
@@ -218,9 +199,8 @@ begin
   Text := AEdit.EditText;
   FillChar := FilterMaskFillChar(AEdit.EditMask);
 
-  // Cada posicao de conteudo da mascara precisa estar preenchida, inclusive as
-  // opcionais do VCL, para manter a data completa. O preenchimento configuravel
-  // indica posicao ainda vazia, seja qual for o caractere escolhido.
+  // Cada posicao de conteudo da mascara precisa estar preenchida, inclusive as opcionais do VCL, para manter a data
+  // completa. O preenchimento configuravel indica posicao ainda vazia, seja qual for o caractere escolhido.
   for I := 1 to Length(AEdit.EditMask) do
   begin
     CharType := MaskGetCharType(AEdit.EditMask, I);
@@ -244,22 +224,20 @@ begin
     else
       AEdit.Text := AText;
   except
-    // Preferencia local nao critica: texto incompativel com a mascara atual
-    // volta ao vazio, sem interromper a restauracao do frame.
+    // Preferencia local nao critica: texto incompativel com a mascara atual volta ao vazio, sem interromper a
+    // restauracao do frame.
     AEdit.Clear;
   end;
 end;
 
-procedure AssignVerifiedPreference(const AEdit: TMaskEdit;
-  const AValueType: TFilterFieldType; const AText: string);
+procedure AssignVerifiedPreference(const AEdit: TMaskEdit; const AValueType: TFilterFieldType; const AText: string);
 var
   ParsedValue: TFilterValue;
 begin
   AssignPreferenceText(AEdit, AText);
 
-  // O texto restaurado so permanece quando, apos aplicar a mascara ativa,
-  // forma um valor completo e compativel com o tipo do campo. Caso contrario,
-  // o editor volta ao vazio para nao falhar apenas na coleta.
+  // O texto restaurado so permanece quando, apos aplicar a mascara ativa, forma um valor completo e compativel com o
+  // tipo do campo. Caso contrario, o editor volta ao vazio para nao falhar apenas na coleta.
   if AText = '' then
     Exit;
 
@@ -275,8 +253,8 @@ end;
 
 procedure AssignCriterionText(const AEdit: TMaskEdit; const AText: string);
 begin
-  // O criterio ja validado e apenas transportado para o editor; um valor
-  // incompativel com a mascara ativa nao interrompe a abertura do modal.
+  // O criterio ja validado e apenas transportado para o editor; um valor incompativel com a mascara ativa nao
+  // interrompe a abertura do modal.
   try
     if AText = '' then
       AEdit.Clear
@@ -289,8 +267,7 @@ end;
 
 function TfrmFilterFrame.FieldKey(const AFieldId, ASuffix: string): string;
 begin
-  // Chave logica por campo: Field.<id>.<sufixo>. O id e estavel; o rotulo
-  // exibido pelo combo nao participa da chave.
+  // O id e estavel; o rotulo exibido pelo combo nao participa da chave.
   Result := 'Field.' + AFieldId;
   if ASuffix <> '' then
     Result := Result + '.' + ASuffix;
@@ -303,8 +280,8 @@ var
   FieldIndex: Integer;
   PreviousUpdating: Boolean;
 begin
-  // A secao logica e a identidade estavel do frame. Todos e a lista acumulada
-  // nao sao persistidos e nunca sao restaurados.
+  // A secao logica e a identidade estavel do frame. Todos e a lista acumulada nao sao persistidos e nunca sao
+  // restaurados.
   FTodosSelected := False;
 
   StoredFieldId := '';
@@ -346,8 +323,6 @@ begin
     FUpdating := PreviousUpdating;
   end;
 
-  // Aplica o campo e carrega condicao/valores compativeis com a definicao
-  // atual. Incompatibilidades voltam aos padroes do campo.
   ApplyField(Field);
 end;
 
@@ -368,8 +343,7 @@ begin
   PersistFieldIfValid(Field, Operator);
 end;
 
-procedure TfrmFilterFrame.PersistFieldIfValid(
-  const AField: TFilterFieldDefinition; const AOperator: TFilterOperator);
+procedure TfrmFilterFrame.PersistFieldIfValid(const AField: TFilterFieldDefinition; const AOperator: TFilterOperator);
 var
   Criterion: TFilterCriterion;
   HasInput: Boolean;
@@ -387,10 +361,8 @@ begin
   IsValid := False;
   Message := '';
 
-  TryBuildCriterionFor(AField, AOperator, edValor1.EditText,
-    edValor2.EditText, Criterion, HasInput, IsValid, Message);
+  TryBuildCriterionFor(AField, AOperator, edValor1.EditText, edValor2.EditText, Criterion, HasInput, IsValid, Message);
 
-  // Sem conteudo ou com conteudo invalido nao ha preferencia a gravar.
   if (not HasInput) or (not IsValid) then
     Exit;
 
@@ -406,14 +378,12 @@ begin
     Value2 := '';
 
   FPreferences.WriteString(FIdentity, 'Field', AField.Id);
-  FPreferences.WriteString(FIdentity, FieldKey(AField.Id, 'Operator'),
-    FilterOperatorCode(AOperator));
+  FPreferences.WriteString(FIdentity, FieldKey(AField.Id, 'Operator'), FilterOperatorCode(AOperator));
   FPreferences.WriteString(FIdentity, FieldKey(AField.Id, 'Value1'), Value1);
   FPreferences.WriteString(FIdentity, FieldKey(AField.Id, 'Value2'), Value2);
 end;
 
-procedure TfrmFilterFrame.LoadFieldPreferences(
-  const AField: TFilterFieldDefinition);
+procedure TfrmFilterFrame.LoadFieldPreferences(const AField: TFilterFieldDefinition);
 var
   Operators: TFilterOperatorSet;
   Operator: TFilterOperator;
@@ -427,13 +397,11 @@ begin
   if Operators = [] then
     Exit;
 
-  StoredCode := FPreferences.ReadString(FIdentity,
-    FieldKey(AField.Id, 'Operator'), '');
+  StoredCode := FPreferences.ReadString(FIdentity, FieldKey(AField.Id, 'Operator'), '');
 
-  // A condicao gravada so e usada quando existe e pertence ao campo atual;
-  // caso contrario, aplica o padrao do tipo ou a primeira condicao permitida.
-  if not (TryFilterOperatorFromCode(StoredCode, Preferred) and
-    (Preferred in Operators)) then
+  // A condicao gravada so e usada quando existe e pertence ao campo atual; caso contrario, aplica o padrao do tipo ou a
+  // primeira condicao permitida.
+  if not (TryFilterOperatorFromCode(StoredCode, Preferred) and (Preferred in Operators)) then
   begin
     Preferred := FilterDefaultOperator(AField.ValueType);
     if not (Preferred in Operators) then
@@ -455,8 +423,7 @@ begin
   LoadFieldValues(AField, Preferred);
 end;
 
-procedure TfrmFilterFrame.LoadFieldValues(
-  const AField: TFilterFieldDefinition; const AOperator: TFilterOperator);
+procedure TfrmFilterFrame.LoadFieldValues(const AField: TFilterFieldDefinition; const AOperator: TFilterOperator);
 var
   Arity: Integer;
   StoredValue: string;
@@ -472,8 +439,7 @@ begin
   begin
     if Arity >= 1 then
     begin
-      StoredValue := FPreferences.ReadString(FIdentity,
-        FieldKey(AField.Id, 'Value1'), '');
+      StoredValue := FPreferences.ReadString(FIdentity, FieldKey(AField.Id, 'Value1'), '');
       if (not IsEditorBlank(StoredValue, edValor1.EditMask)) and
         TryParseFilterValue(StoredValue, AField.ValueType, ParsedValue) then
         Value1 := StoredValue;
@@ -481,8 +447,7 @@ begin
 
     if Arity >= 2 then
     begin
-      StoredValue := FPreferences.ReadString(FIdentity,
-        FieldKey(AField.Id, 'Value2'), '');
+      StoredValue := FPreferences.ReadString(FIdentity, FieldKey(AField.Id, 'Value2'), '');
       if (not IsEditorBlank(StoredValue, edValor2.EditMask)) and
         TryParseFilterValue(StoredValue, AField.ValueType, ParsedValue) then
         Value2 := StoredValue;
@@ -496,16 +461,14 @@ begin
     ClearValues;
 end;
 
-function TfrmFilterFrame.CurrentField(
-  out AField: TFilterFieldDefinition): Boolean;
+function TfrmFilterFrame.CurrentField(out AField: TFilterFieldDefinition): Boolean;
 var
   RawIndex: NativeInt;
 begin
   AField := Default(TFilterFieldDefinition);
   Result := False;
 
-  if (cbCampo.ItemIndex < 0) or
-    (cbCampo.ItemIndex >= Length(FDefinition.Fields)) then
+  if (cbCampo.ItemIndex < 0) or (cbCampo.ItemIndex >= Length(FDefinition.Fields)) then
     Exit;
 
   RawIndex := NativeInt(cbCampo.Items.Objects[cbCampo.ItemIndex]);
@@ -516,21 +479,18 @@ begin
   Result := True;
 end;
 
-function TfrmFilterFrame.CurrentOperator(
-  out AOperator: TFilterOperator): Boolean;
+function TfrmFilterFrame.CurrentOperator(out AOperator: TFilterOperator): Boolean;
 var
   RawOperator: NativeInt;
 begin
   AOperator := Low(TFilterOperator);
   Result := False;
 
-  if (cbCondicao.ItemIndex < 0) or
-    (cbCondicao.ItemIndex >= cbCondicao.Items.Count) then
+  if (cbCondicao.ItemIndex < 0) or (cbCondicao.ItemIndex >= cbCondicao.Items.Count) then
     Exit;
 
   RawOperator := NativeInt(cbCondicao.Items.Objects[cbCondicao.ItemIndex]);
-  if (RawOperator < Ord(Low(TFilterOperator))) or
-    (RawOperator > Ord(High(TFilterOperator))) then
+  if (RawOperator < Ord(Low(TFilterOperator))) or (RawOperator > Ord(High(TFilterOperator))) then
     Exit;
 
   AOperator := TFilterOperator(RawOperator);
@@ -586,8 +546,7 @@ begin
     ClearValues;
 end;
 
-procedure TfrmFilterFrame.PopulateOperators(
-  const AField: TFilterFieldDefinition);
+procedure TfrmFilterFrame.PopulateOperators(const AField: TFilterFieldDefinition);
 var
   Operators: TFilterOperatorSet;
   Operator: TFilterOperator;
@@ -603,8 +562,7 @@ begin
       cbCondicao.Items.Clear;
       for Operator := Low(TFilterOperator) to High(TFilterOperator) do
         if Operator in Operators then
-          cbCondicao.Items.AddObject(FilterOperatorLabel(Operator),
-            TObject(NativeInt(Ord(Operator))));
+          cbCondicao.Items.AddObject(FilterOperatorLabel(Operator), TObject(NativeInt(Ord(Operator))));
     finally
       cbCondicao.Items.EndUpdate;
     end;
@@ -639,8 +597,6 @@ begin
     Exit;
   end;
 
-  // Restaura a condicao e os valores compativeis do campo, aplicando os
-  // padroes quando ainda nao ha preferencia gravada.
   LoadFieldPreferences(AField);
   FActiveFieldId := AField.Id;
 end;
@@ -743,7 +699,6 @@ begin
   lblContador.ShowHint := True;
   Count := Length(FAccumulated);
 
-  // Contador vazio em zero; a partir de um item exibe +N.
   if Count = 0 then
   begin
     lblContador.Caption := ' ';
@@ -760,8 +715,7 @@ begin
     if I > 0 then
       HintText := HintText + sLineBreak + '-' + sLineBreak;
 
-    HintText := HintText +
-      FilterCriterionDisplayText(FAccumulated[I], FDefinition);
+    HintText := HintText + FilterCriterionDisplayText(FAccumulated[I], FDefinition);
   end;
 
   lblContador.Hint := HintText;
@@ -773,8 +727,7 @@ begin
   edValor2.Clear;
 end;
 
-function TfrmFilterFrame.FormatCriterionValue(const AValue: TFilterValue;
-  const AValueType: TFilterFieldType): string;
+function TfrmFilterFrame.FormatCriterionValue(const AValue: TFilterValue; const AValueType: TFilterFieldType): string;
 begin
   Result := '';
   if not FilterValueMatchesFieldType(AValue, AValueType) then
@@ -831,8 +784,7 @@ begin
     ClearValues;
 end;
 
-function TfrmFilterFrame.ReadCurrentCriterion(
-  out ACriterion: TFilterCriterion; out AMessage: string): Boolean;
+function TfrmFilterFrame.ReadCurrentCriterion(out ACriterion: TFilterCriterion; out AMessage: string): Boolean;
 var
   AHasInput: Boolean;
   AIsValid: Boolean;
@@ -841,10 +793,8 @@ begin
   Result := AIsValid;
 end;
 
-function TfrmFilterFrame.TryBuildCriterionFor(
-  const AField: TFilterFieldDefinition; const AOperator: TFilterOperator;
-  const AValue1, AValue2: string;
-  out ACriterion: TFilterCriterion; out AHasInput, AIsValid: Boolean;
+function TfrmFilterFrame.TryBuildCriterionFor(const AField: TFilterFieldDefinition; const AOperator: TFilterOperator;
+  const AValue1, AValue2: string; out ACriterion: TFilterCriterion; out AHasInput, AIsValid: Boolean;
   out AMessage: string): Boolean;
 var
   Arity: Integer;
@@ -866,13 +816,12 @@ begin
   ACriterion.FieldId := AField.Id;
   ACriterion.Operator := AOperator;
 
-  // Operadores sem valor (Vazio, Nao vazio, Nulo, Nao nulo) formam um criterio
-  // completo assim que o campo e a condicao estao definidos.
+  // Operadores sem valor (Vazio, Nao vazio, Nulo, Nao nulo) formam um criterio completo assim que o campo e a condicao
+  // estao definidos.
   if Arity = 0 then
   begin
     AHasInput := True;
-    AIsValid := ValidateFilterCriterion(ACriterion, FDefinition, FPath,
-      AMessage);
+    AIsValid := ValidateFilterCriterion(ACriterion, FDefinition, FPath, AMessage);
     Result := AIsValid;
     Exit;
   end;
@@ -902,7 +851,6 @@ begin
 
   AHasInput := True;
 
-  // Valor obrigatorio ausente em um operador de dois valores.
   for I := 0 to High(RequiredTexts) do
   begin
     if I = 0 then
@@ -927,22 +875,18 @@ begin
   end;
 
   // Mascara ativa com posicoes nao preenchidas caracteriza valor incompleto.
-  if (not FilterMaskComplete(edValor1)) or
-    ((Arity >= 2) and (not FilterMaskComplete(edValor2))) then
+  if (not FilterMaskComplete(edValor1)) or ((Arity >= 2) and (not FilterMaskComplete(edValor2))) then
   begin
-    AMessage := Format('O valor informado está incompleto para o campo "%s".',
-      [FieldCaptionText]);
+    AMessage := Format('O valor informado está incompleto para o campo "%s".', [FieldCaptionText]);
     Exit;
   end;
 
   SetLength(Values, Arity);
   for I := 0 to High(RequiredTexts) do
   begin
-    if not TryParseFilterValue(RequiredTexts[I], AField.ValueType,
-      ParsedValue) then
+    if not TryParseFilterValue(RequiredTexts[I], AField.ValueType, ParsedValue) then
     begin
-      AMessage := Format('O valor informado não é válido para o campo "%s".',
-        [FieldCaptionText]);
+      AMessage := Format('O valor informado não é válido para o campo "%s".', [FieldCaptionText]);
       Exit;
     end;
 
@@ -950,13 +894,11 @@ begin
   end;
 
   ACriterion.Values := Values;
-  AIsValid := ValidateFilterCriterion(ACriterion, FDefinition, FPath,
-    AMessage);
+  AIsValid := ValidateFilterCriterion(ACriterion, FDefinition, FPath, AMessage);
   Result := AIsValid;
 end;
 
-function TfrmFilterFrame.TryBuildCurrentCriterion(
-  out ACriterion: TFilterCriterion; out AHasInput, AIsValid: Boolean;
+function TfrmFilterFrame.TryBuildCurrentCriterion(out ACriterion: TFilterCriterion; out AHasInput, AIsValid: Boolean;
   out AMessage: string): Boolean;
 var
   Field: TFilterFieldDefinition;
@@ -970,9 +912,7 @@ begin
   AMessage := '';
   Result := False;
 
-  // Todos e ausencia de campo ou condicao real nao geram criterio corrente.
-  if FTodosSelected or (not CurrentField(Field)) or
-    (not CurrentOperator(Operator)) then
+  if FTodosSelected or (not CurrentField(Field)) or (not CurrentOperator(Operator)) then
     Exit;
 
   Value1 := edValor1.EditText;
@@ -981,16 +921,11 @@ begin
   else
     Value2 := '';
 
-  Result := TryBuildCriterionFor(Field, Operator, Value1, Value2,
-    ACriterion, AHasInput, AIsValid, AMessage);
+  Result := TryBuildCriterionFor(Field, Operator, Value1, Value2, ACriterion, AHasInput, AIsValid, AMessage);
 end;
 
 function TfrmFilterFrame.IsEditorBlank(const AText, AMask: string): Boolean;
 begin
-  // A deteccao e posicional: literais da mascara so sao ignorados na propria
-  // posicao; nas posicoes editaveis, o preenchimento e espacos sao vazios mas
-  // qualquer outro caractere e conteudo, inclusive quando coincide com um
-  // literal existente em outro ponto da mascara.
   Result := FilterMaskTextIsBlank(AMask, AText);
 end;
 
@@ -999,10 +934,9 @@ var
   Field: TFilterFieldDefinition;
   Operator: TFilterOperator;
 begin
-  // O OnChange ja aponta para o novo campo, mas os editores e a condicao ainda
-  // representam o campo anterior. Persiste esse estado antes de trocar.
-  if FConfigured and (not FTodosSelected) and
-    FDefinition.FindField(FActiveFieldId, Field) and
+  // O OnChange ja aponta para o novo campo, mas os editores e a condicao ainda representam o campo anterior. Persiste
+  // esse estado antes de trocar.
+  if FConfigured and (not FTodosSelected) and FDefinition.FindField(FActiveFieldId, Field) and
     CurrentOperator(Operator) then
     PersistFieldIfValid(Field, Operator);
 end;
@@ -1022,15 +956,13 @@ end;
 
 procedure TfrmFilterFrame.FocusFirstContentField;
 begin
-  // O foco vai para o primeiro campo de conteudo disponivel; operadores sem
-  // valor mantem o foco onde estava.
+  // O foco vai para o primeiro campo de conteudo disponivel; operadores sem valor mantem o foco onde estava.
   if edValor1.Visible and edValor1.Enabled and edValor1.CanFocus then
     edValor1.SetFocus;
 end;
 
 procedure TfrmFilterFrame.ReportarFeedback(const AMensagem: string);
 begin
-  // O frame reutilizavel nao abre dialogo proprio; o host apresenta.
   if Assigned(FOnFeedback) then
     FOnFeedback(Self, AMensagem);
 end;
@@ -1042,7 +974,6 @@ var
 begin
   Result := False;
 
-  // A tela sem definicao configurada nao possui campo para preparar.
   if (not FConfigured) or FSingleMode then
     Exit;
 
@@ -1057,8 +988,6 @@ begin
     Exit(True);
   end;
 
-  // A troca segue o caminho do combo Campo: persiste o campo anterior valido,
-  // seleciona o novo item e aplica condicao, mascara e preferencias.
   PersistActiveField;
   FTodosSelected := False;
   SelectFieldIndex(FieldIndex);
@@ -1117,11 +1046,9 @@ begin
     Exit;
   end;
 
-  // Aplica mascara, rotulos e aridade da condicao escolhida.
   ApplyOperator(Operator);
 
-  // Grava o estado corrente quando ele forma um criterio valido com a nova
-  // condicao e, em seguida, recarrega os valores gravados para o campo.
+  // Persiste o estado corrente antes de recarregar os valores gravados.
   PersistCurrentIfValid;
 
   if CurrentField(Field) then
@@ -1132,7 +1059,6 @@ end;
 
 procedure TfrmFilterFrame.ValorExit(Sender: TObject);
 begin
-  // A saida de qualquer editor de valor grava o criterio corrente valido.
   PersistCurrentIfValid;
 end;
 
@@ -1155,7 +1081,6 @@ begin
   Message := '';
   TryBuildCurrentCriterion(Criterion, HasInput, IsValid, Message);
 
-  // Sem conteudo digitado nao ha criterio corrente para adicionar.
   if not HasInput then
     Exit;
 
@@ -1246,9 +1171,8 @@ begin
   UpdateCounter;
 end;
 
-procedure TfrmFilterFrame.Configure(const ADefinition: TFilterDefinition;
-  const APreferences: ILocalPreferences; const AIdentity: string;
-  APath: TFilterPath);
+procedure TfrmFilterFrame.Configure(const ADefinition: TFilterDefinition; const APreferences: ILocalPreferences;
+  const AIdentity: string; APath: TFilterPath);
 var
   I: Integer;
   PreviousUpdating: Boolean;
@@ -1257,12 +1181,10 @@ begin
     raise Exception.Create('O frame de filtros já foi configurado.');
 
   if APreferences = nil then
-    raise Exception.Create(
-      'As preferências locais do frame de filtros não foram informadas.');
+    raise Exception.Create('As preferências locais do frame de filtros não foram informadas.');
 
   if Trim(AIdentity) = '' then
-    raise Exception.Create(
-      'A identidade do frame de filtros não foi informada.');
+    raise Exception.Create('A identidade do frame de filtros não foi informada.');
 
   FDefinition := ADefinition;
   FPreferences := APreferences;
@@ -1278,8 +1200,7 @@ begin
     try
       cbCampo.Items.Clear;
       for I := 0 to High(FDefinition.Fields) do
-        cbCampo.Items.AddObject(FrameFieldCaption(FDefinition.Fields[I]),
-          TObject(NativeInt(I)));
+        cbCampo.Items.AddObject(FrameFieldCaption(FDefinition.Fields[I]), TObject(NativeInt(I)));
 
       if FDefinition.AllowAll then
         cbCampo.Items.AddObject('Todos', nil);
@@ -1290,8 +1211,6 @@ begin
     FUpdating := PreviousUpdating;
   end;
 
-  // Restaura o ultimo campo valido e suas preferencias; sem preferencia,
-  // aplica o primeiro campo da definicao. Todos nunca e restaurado.
   RestorePreferences;
 
   FConfigured := True;
@@ -1310,8 +1229,7 @@ begin
 
   FieldIndex := ADefinition.FieldIndex(ACriterion.FieldId);
   if FieldIndex < 0 then
-    raise Exception.Create(
-      'O campo do filtro não pertence à definição informada.');
+    raise Exception.Create('O campo do filtro não pertence à definição informada.');
 
   FDefinition := ADefinition;
   FPreferences := nil;
@@ -1329,8 +1247,7 @@ begin
     try
       cbCampo.Items.Clear;
       for I := 0 to High(FDefinition.Fields) do
-        cbCampo.Items.AddObject(FrameFieldCaption(FDefinition.Fields[I]),
-          TObject(NativeInt(I)));
+        cbCampo.Items.AddObject(FrameFieldCaption(FDefinition.Fields[I]), TObject(NativeInt(I)));
 
       cbCampo.ItemIndex := FieldIndex;
     finally
@@ -1340,8 +1257,8 @@ begin
     FUpdating := PreviousUpdating;
   end;
 
-  // O campo e fixo: o modal representa um criterio vinculado a celula ou ao
-  // criterio existente. A inclusao acumulada e o contador nao se aplicam.
+  // O campo e fixo: o modal representa um criterio vinculado a celula ou ao criterio existente. A inclusao acumulada e
+  // o contador nao se aplicam.
   cbCampo.Enabled := False;
   btnAdicionar.Visible := False;
   btnAdicionar.Enabled := False;
@@ -1351,8 +1268,7 @@ begin
 
   Field := FDefinition.Fields[FieldIndex];
   if not (ACriterion.Operator in FilterPathFieldOperators(FPath, Field)) then
-    raise Exception.Create(
-      'A condição do filtro não é permitida para o campo informado.');
+    raise Exception.Create('A condição do filtro não é permitida para o campo informado.');
 
   PopulateOperators(Field);
   SelectOperator(ACriterion.Operator);
@@ -1375,8 +1291,7 @@ begin
     raise Exception.Create('O frame de filtros ainda não foi configurado.');
 
   if FSingleMode then
-    raise Exception.Create(
-      'O frame de filtros está no modo de critério único.');
+    raise Exception.Create('O frame de filtros está no modo de critério único.');
 
   // A coleta tambem grava o criterio corrente valido, mesmo sem "+".
   PersistCurrentIfValid;
@@ -1419,14 +1334,13 @@ begin
     Result := TFilterCriteriaResult.Valid(Collected);
 end;
 
-function TfrmFilterFrame.CollectSingleCriterion(
-  out ACriterion: TFilterCriterion; out AMessage: string): Boolean;
+function TfrmFilterFrame.CollectSingleCriterion(out ACriterion: TFilterCriterion; out AMessage: string): Boolean;
 begin
   if not FConfigured then
     raise Exception.Create('O frame de filtros ainda não foi configurado.');
 
-  // No modo de criterio unico a coleta usa somente os editores correntes; a
-  // lista acumulada e as preferencias locais nao participam.
+  // No modo de criterio unico a coleta usa somente os editores correntes; a lista acumulada e as preferencias locais
+  // nao participam.
   Result := ReadCurrentCriterion(ACriterion, AMessage);
   if (not Result) and (Trim(AMessage) = '') then
     AMessage := 'Informe o valor do filtro.';

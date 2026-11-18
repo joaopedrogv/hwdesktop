@@ -8,25 +8,20 @@ uses
   OperacoesFiscaisIbsCbsQueryDefinition, PresenterConsultaBase;
 
 type
-  // Apresentador da consulta; preparacao, gravacao e conferencia do registro
-  // pertencem ao apresentador do cadastro.
+  // A preparacao, a gravacao e a conferencia do registro pertencem ao apresentador do cadastro.
   TOperacoesFiscaisIbsCbsPresenter = class(TPresenterConsultaBase)
   private
-    // A view pertence a tela e as demais dependencias ao container de
-    // composicao: o apresentador apenas as utiliza e nunca as libera.
+    // A view pertence a tela e as demais dependencias ao container de composicao: o apresentador apenas as utiliza e
+    // nunca as libera.
     FView: IOperacoesFiscaisIbsCbsView;
     FQueryDefinition: INextQueryDefinition<TOperacaoFiscalSelecionada>;
     FRemover: RemoverOperacaoFiscalIbsCbsUseCase;
   public
     constructor Create(const AView: IOperacoesFiscaisIbsCbsView;
       const AQueryDefinition: INextQueryDefinition<TOperacaoFiscalSelecionada>;
-      const AAuthorization: IAuthorizationService;
-      ARemover: RemoverOperacaoFiscalIbsCbsUseCase);
+      const AAuthorization: IAuthorizationService; ARemover: RemoverOperacaoFiscalIbsCbsUseCase);
     function EnviarParaLixeira: Boolean;
-    // Reapresenta a aba de inclusao ja aberta em vez de criar outra.
     function SolicitarInclusao: Boolean;
-    // Reapresenta a aba da linha corrente ja aberta em vez de recarregar o
-    // registro; sem linha valida a view informa a selecao obrigatoria.
     function SolicitarEdicao: Boolean;
   end;
 
@@ -36,33 +31,26 @@ uses
   System.SysUtils, EValidacaoNegocioUnit;
 
 const
-  // Codigos do cadastro legado usados por esta funcionalidade. O host recebe o
-  // processo, a acao e a tabela e nao os conhece.
+  // Codigos do cadastro legado usados por esta funcionalidade. O host recebe o processo, a acao e a tabela e nao os
+  // conhece.
   ProcessoConsulta = 'MOD020';
   ProcessoExclusao = 'MOD024';
   TabelaOperacoesFiscais = 'OP_FISCAIS_IBSCBS';
   SelecaoObrigatoriaMessage = 'Selecione uma operação fiscal na grade.';
 
-{ TOperacoesFiscaisIbsCbsPresenter }
-
 constructor TOperacoesFiscaisIbsCbsPresenter.Create(
   const AView: IOperacoesFiscaisIbsCbsView;
   const AQueryDefinition: INextQueryDefinition<TOperacaoFiscalSelecionada>;
-  const AAuthorization: IAuthorizationService;
-  ARemover: RemoverOperacaoFiscalIbsCbsUseCase);
+  const AAuthorization: IAuthorizationService; ARemover: RemoverOperacaoFiscalIbsCbsUseCase);
 begin
-  // O processo de pesquisa e a tabela padrao ficam na base, que tambem responde
-  // pela permissao da consulta.
+  // O processo de pesquisa e a tabela padrao ficam na base, que tambem responde pela permissao da consulta.
   inherited Create(AAuthorization, ProcessoConsulta, TabelaOperacoesFiscais);
   if AView = nil then
-    raise Exception.Create(
-      'A view de Operações Fiscais IBS/CBS não foi informada.');
+    raise Exception.Create('A view de Operações Fiscais IBS/CBS não foi informada.');
   if AQueryDefinition = nil then
-    raise Exception.Create(
-      'A consulta de Operações Fiscais IBS/CBS não foi informada.');
+    raise Exception.Create('A consulta de Operações Fiscais IBS/CBS não foi informada.');
   if ARemover = nil then
-    raise Exception.Create(
-      'O caso de uso de remoção de Operações Fiscais IBS/CBS não foi informado.');
+    raise Exception.Create('O caso de uso de remoção de Operações Fiscais IBS/CBS não foi informado.');
 
   FView := AView;
   FQueryDefinition := AQueryDefinition;
@@ -85,8 +73,7 @@ begin
   if Trim(Selected.GrupoFiscalDescricao) <> '' then
     Descricao := Descricao + ' / ' + Trim(Selected.GrupoFiscalDescricao);
 
-  if not FView.ShowDangerQuestion(Format(
-    'Deseja enviar a operação fiscal "%s" para a lixeira?', [Descricao])) then
+  if not FView.ShowDangerQuestion(Format('Deseja enviar a operação fiscal "%s" para a lixeira?', [Descricao])) then
     Exit;
 
   if not Autorizar(ProcessoExclusao, aaExcluir) then
@@ -99,8 +86,7 @@ begin
     on E: EValidacaoNegocio do
       FView.ShowError(E.Message);
     on E: Exception do
-      FView.ShowError(
-        'Não foi possível enviar a operação fiscal para a lixeira.');
+      FView.ShowError('Não foi possível enviar a operação fiscal para a lixeira.');
   end;
 end;
 

@@ -7,27 +7,19 @@ uses
   NextQueryDefinition, GruposFiscaisQueryDefinition, PresenterConsultaBase;
 
 type
-  // Apresentador da consulta; a preparacao, o carregamento e a gravacao do
-  // registro pertencem ao apresentador do cadastro.
+  // A preparacao, o carregamento e a gravacao do registro pertencem ao apresentador do cadastro.
   TGruposFiscaisPresenter = class(TPresenterConsultaBase)
   private
-    // A view pertence a tela e as demais dependencias ao container de
-    // composicao: o apresentador apenas as utiliza e nunca as libera.
+    // A view pertence a tela e as demais dependencias ao container de composicao: o apresentador apenas as utiliza e
+    // nunca as libera.
     FView: IGruposFiscaisView;
     FQueryDefinition: INextQueryDefinition<TGrupoSelecionado>;
     FRemoverGrupoFiscal: IRemoverGrupoFiscalUseCase;
   public
-    constructor Create(AView: IGruposFiscaisView;
-      AQueryDefinition: INextQueryDefinition<TGrupoSelecionado>;
-      AAuthorization: IAuthorizationService;
-      ARemoverGrupoFiscal: IRemoverGrupoFiscalUseCase);
+    constructor Create(AView: IGruposFiscaisView; AQueryDefinition: INextQueryDefinition<TGrupoSelecionado>;
+      AAuthorization: IAuthorizationService; ARemoverGrupoFiscal: IRemoverGrupoFiscalUseCase);
     function EnviarParaLixeira(): Boolean;
-    // Reapresenta a aba de inclusao ja aberta; sem aba, autoriza a inclusao e
-    // entrega a abertura ao editor, que cria o proprio rascunho.
     function SolicitarInclusao: Boolean;
-    // Reapresenta a aba da linha corrente ja aberta; sem aba, autoriza a
-    // alteracao e entrega a abertura ao editor, que carrega o registro. Sem
-    // linha valida a view informa que a selecao e obrigatoria.
     function SolicitarEdicao: Boolean;
   end;
 
@@ -37,8 +29,8 @@ uses
   System.SysUtils, EValidacaoNegocioUnit;
 
 const
-  // Codigos do cadastro legado usados por esta funcionalidade. O host recebe o
-  // processo, a acao e a tabela e nao os conhece.
+  // Codigos do cadastro legado usados por esta funcionalidade. O host recebe o processo, a acao e a tabela e nao os
+  // conhece.
   ProcessoConsulta = 'MOD008';
   ProcessoInclusao = 'MOD009';
   ProcessoAlteracao = 'MOD010';
@@ -47,23 +39,18 @@ const
 
   SelecaoObrigatoriaMessage = 'Selecione um grupo fiscal na grade.';
 
-{ TGruposFiscaisPresenter }
-
 constructor TGruposFiscaisPresenter.Create(AView: IGruposFiscaisView;
   AQueryDefinition: INextQueryDefinition<TGrupoSelecionado>;
-  AAuthorization: IAuthorizationService;
-  ARemoverGrupoFiscal: IRemoverGrupoFiscalUseCase);
+  AAuthorization: IAuthorizationService; ARemoverGrupoFiscal: IRemoverGrupoFiscalUseCase);
 begin
-  // O processo de pesquisa e a tabela padrao ficam na base, que tambem responde
-  // pela permissao da consulta.
+  // O processo de pesquisa e a tabela padrao ficam na base, que tambem responde pela permissao da consulta.
   inherited Create(AAuthorization, ProcessoConsulta, TabelaGruposFiscais);
   if AView = nil then
     raise Exception.Create('A view de Grupos Fiscais não foi informada.');
   if AQueryDefinition = nil then
     raise Exception.Create('A consulta de Grupos Fiscais não foi informada.');
   if ARemoverGrupoFiscal = nil then
-    raise Exception.Create(
-      'O caso de uso de remoção de Grupos Fiscais não foi informado.');
+    raise Exception.Create('O caso de uso de remoção de Grupos Fiscais não foi informado.');
 
   FView := AView;
   FQueryDefinition := AQueryDefinition;
@@ -76,8 +63,7 @@ var
 begin
   Result := False;
 
-  // A linha corrente e lida uma unica vez; o mesmo registro identificado na
-  // confirmacao e enviado para a lixeira.
+  // A linha corrente e lida uma unica vez; o mesmo registro identificado na confirmacao e enviado para a lixeira.
   if not FQueryDefinition.TryGetSelected(Selected) then
   begin
     FView.ShowError('O grupo fiscal a enviar para a lixeira não foi identificado.');
@@ -146,8 +132,7 @@ begin
     Exit;
   end;
 
-  // A permissao de alteracao e verificada antes de o cadastro carregar o
-  // registro.
+  // A permissao de alteracao e verificada antes de o cadastro carregar o registro.
   if not Autorizar(ProcessoAlteracao, aaAlterar) then
     Exit;
 

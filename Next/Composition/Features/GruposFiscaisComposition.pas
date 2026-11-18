@@ -6,7 +6,6 @@ uses
   Winapi.Windows, Vcl.Controls, NextBaseForm, EditorCadastro;
 
 type
-  // Composicao da tela e do editor de Grupos Fiscais.
   TGruposFiscaisComposition = class
   public
     class function CriarConsulta(AParent: HWND): TfrmNextBase; static;
@@ -24,8 +23,7 @@ uses
   SalvarGrupoFiscalUseCaseUnit, ObterGruposFiscaisUseCaseUnit,
   ListarEmpresasUseCaseUnit;
 
-class function TGruposFiscaisComposition.CriarConsulta(
-  AParent: HWND): TfrmNextBase;
+class function TGruposFiscaisComposition.CriarConsulta(AParent: HWND): TfrmNextBase;
 var
   View: TfrmGruposFiscais;
   Preferences: ILocalPreferences;
@@ -38,15 +36,11 @@ begin
   try
     Definition := NextSetupInstance.Resolve<INextQueryDefinition<TGrupoSelecionado>>;
 
-    Presenter := TGruposFiscaisPresenter.Create(View, Definition,
-      NextSetupInstance.Resolve<IAuthorizationService>,
+    Presenter := TGruposFiscaisPresenter.Create(View, Definition, NextSetupInstance.Resolve<IAuthorizationService>,
       NextSetupInstance.Resolve<IRemoverGrupoFiscalUseCase>);
     try
-      // A tela configura a criacao do editor, associa a definicao, configura os
-      // filtros e so entao assume a posse do apresentador; uma falha antes disso
-      // mantem a posse aqui.
-      View.ConfigurarTela(Definition, Presenter, Preferences,
-        TGruposFiscaisComposition.CriarEditor);
+      // A tela so assume a posse do apresentador no fim de ConfigurarTela; uma falha anterior mantem a posse aqui.
+      View.ConfigurarTela(Definition, Presenter, Preferences, TGruposFiscaisComposition.CriarEditor);
     except
       Presenter.Free;
       raise;
@@ -66,20 +60,16 @@ var
   Presenter: TGruposFiscaisCadastroPresenter;
   CarregarEmpresas: TCarregarOpcoesEmpresas;
 begin
-  // A leitura das empresas e da sessao pertence a composicao; o login e lido a
-  // cada carga.
-  CarregarEmpresas := CriarCarregadorEmpresas(
-    NextSetupInstance.Resolve<ListarEmpresasUseCase>,
+  // A leitura das empresas pertence a composicao; o login e lido a cada carga.
+  CarregarEmpresas := CriarCarregadorEmpresas(NextSetupInstance.Resolve<ListarEmpresasUseCase>,
     NextSetupInstance.SessionContext);
 
   Frame := TfrmGrupoFiscalCadastroFrame.Create(AParent, AHost);
   try
     Frame.fraEmpresas.ConfigurarCarregamento(CarregarEmpresas);
 
-    Presenter := TGruposFiscaisCadastroPresenter.Create(Frame,
-      NextSetupInstance.Resolve<IAuthorizationService>,
-      NextSetupInstance.Resolve<ObterGrupoFiscalPorIdUseCase>,
-      NextSetupInstance.Resolve<ISalvarGrupoFiscalUseCase>);
+    Presenter := TGruposFiscaisCadastroPresenter.Create(Frame, NextSetupInstance.Resolve<IAuthorizationService>,
+      NextSetupInstance.Resolve<ObterGrupoFiscalPorIdUseCase>, NextSetupInstance.Resolve<ISalvarGrupoFiscalUseCase>);
     Frame.ConfigurarPresenter(Presenter);
     Result := Frame;
   except

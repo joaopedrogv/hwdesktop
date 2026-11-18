@@ -7,9 +7,8 @@ uses
   NextBaseForm, ColumnSelectionFrame;
 
 type
-  // Dialogo local de configuracao de colunas. Nao e registrado no catalogo de
-  // telas e nao e aberto pelo host: a selecao volta de forma sincrona ao frame
-  // que o abriu. Aplicar confirma; Sair, Esc e o X descartam.
+  // Nao e registrado no catalogo de telas: a selecao volta de forma sincrona ao frame que o abriu. Aplicar confirma;
+  // Sair, Esc e o X descartam.
   TfrmColumnSelection = class(TfrmNextBase)
     pnConteudo: TPanel;
     fraColunas: TfrmColumnSelectionFrame;
@@ -25,13 +24,12 @@ implementation
 
 {$R *.dfm}
 
-procedure TfrmColumnSelection.Configure(
-  const AEntries: TColumnSelectionEntries);
+procedure TfrmColumnSelection.Configure(const AEntries: TColumnSelectionEntries);
 begin
   fraColunas.Configure(AEntries);
 
-  // O foco inicial fica na lista para as setas e o espaco operarem os itens. A
-  // propriedade ativa o controle quando o dialogo e exibido.
+  // O foco inicial fica na lista para as setas e o espaco operarem os itens. A propriedade ativa o controle quando o
+  // dialogo e exibido.
   ActiveControl := fraColunas.clbColunas;
 end;
 

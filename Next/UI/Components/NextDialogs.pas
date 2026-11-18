@@ -19,8 +19,7 @@ uses
 
 class procedure TNextDialogs.ShowInformation(const AMessage: string);
 begin
-  Application.MessageBox(PChar(AMessage), 'Informação',
-    MB_OK or MB_ICONINFORMATION);
+  Application.MessageBox(PChar(AMessage), 'Informação', MB_OK or MB_ICONINFORMATION);
 end;
 
 class procedure TNextDialogs.ShowWarning(const AMessage: string);
@@ -41,8 +40,7 @@ end;
 
 class function TNextDialogs.ShowQuestion(const AMessage: string): Boolean;
 begin
-  Result := Application.MessageBox(PChar(AMessage), 'Confirmação',
-    MB_YESNO or MB_ICONQUESTION) = ID_YES;
+  Result := Application.MessageBox(PChar(AMessage), 'Confirmação', MB_YESNO or MB_ICONQUESTION) = ID_YES;
 end;
 
 end.

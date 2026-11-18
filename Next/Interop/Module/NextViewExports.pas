@@ -45,15 +45,13 @@ begin
   if AIdentifier = '' then
     raise Exception.Create('O identificador do formulário Next não pode ser vazio.');
   if Length(AIdentifier) > HW_NEXT_IDENTIFIER_MAX_CHARS then
-    raise Exception.CreateFmt(
-      'O identificador do formulário Next deve ter no máximo %d caracteres.',
+    raise Exception.CreateFmt('O identificador do formulário Next deve ter no máximo %d caracteres.',
       [HW_NEXT_IDENTIFIER_MAX_CHARS]);
   for I := 1 to Length(AIdentifier) do
   begin
     Code := Ord(AIdentifier[I]);
     if (Code < 32) or (Code > 126) then
-      raise Exception.Create(
-        'O identificador do formulário Next deve conter apenas caracteres ASCII imprimíveis.');
+      raise Exception.Create('O identificador do formulário Next deve conter apenas caracteres ASCII imprimíveis.');
   end;
 end;
 
@@ -80,8 +78,7 @@ begin
   Result := HW_NEXT_VIEW_API_VERSION;
 end;
 
-function HwNextSetContext(ACompanyCode: Integer;
-  AUserLogin, ADatabaseName, ADatabaseUserName,
+function HwNextSetContext(ACompanyCode: Integer; AUserLogin, ADatabaseName, ADatabaseUserName,
   ADatabasePassword: PWideChar): LongBool; stdcall;
 var
   UserLogin: string;
@@ -123,15 +120,12 @@ begin
 
         IdentityChanged := not NextSetupInstance.HasContext;
         if not IdentityChanged then
-          IdentityChanged :=
-            (NextSetupInstance.SessionContext.EmpresaId <> ACompanyCode) or
+          IdentityChanged := (NextSetupInstance.SessionContext.EmpresaId <> ACompanyCode) or
             (NextSetupInstance.SessionContext.UsuarioLogin <> UserLogin);
 
-        // A identidade e aplicada mesmo com telas abertas. Em um banco ja
-        // configurado, o Setup preserva adaptador, container e a instancia de
-        // sessao, atualizando somente empresa e login.
-        NextSetupInstance.SetContext(ACompanyCode, UserLogin, DatabaseName,
-          DatabaseUserName, DatabasePassword);
+        // A identidade e aplicada mesmo com telas abertas. Em um banco ja configurado, o Setup preserva adaptador,
+        // container e a instancia de sessao, atualizando somente empresa e login.
+        NextSetupInstance.SetContext(ACompanyCode, UserLogin, DatabaseName, DatabaseUserName, DatabasePassword);
       except
         RecordError(ContextRejectedMessage);
         Exit;
@@ -142,9 +136,8 @@ begin
 
       if IdentityChanged then
       begin
-        // Toda tela registrada, inclusive oculta, descarta o resultado da
-        // identidade anterior. Uma falha bloqueia o descarregamento do modulo
-        // e desabilita a tela afetada, mas as demais continuam sendo processadas.
+        // Toda tela registrada, inclusive oculta, descarta o resultado da identidade anterior. Uma falha bloqueia o
+        // descarregamento do modulo e desabilita a tela afetada, mas as demais continuam sendo processadas.
         for I := 0 to Views.Count - 1 do
         begin
           View := TfrmNextBase(Views[I]);
@@ -166,8 +159,7 @@ begin
     except
       on E: Exception do
       begin
-        // Falha inesperada depois da identidade: a sessao nova permanece
-        // aplicada e o descarregamento fica bloqueado.
+        // Falha inesperada depois da identidade: a sessao nova permanece aplicada e o descarregamento fica bloqueado.
         CleanupIncomplete := True;
         if LastErrorText = '' then
           RecordError(E.Message);
@@ -202,14 +194,11 @@ begin
     if (AOptions and not KnownOptionsMask) <> 0 then
       raise Exception.Create('As opções de abertura do formulário Next são inválidas.');
     if (AOptions and HW_NEXT_OPT_MODAL) <> 0 then
-      if ((AOptions and HW_NEXT_OPT_MULTIPLE) = 0) or
-        ((AOptions and HW_NEXT_OPT_DESTROY) = 0) then
-        raise Exception.Create(
-          'A abertura modal exige múltiplas instâncias e destruição no fechamento.');
+      if ((AOptions and HW_NEXT_OPT_MULTIPLE) = 0) or ((AOptions and HW_NEXT_OPT_DESTROY) = 0) then
+        raise Exception.Create('A abertura modal exige múltiplas instâncias e destruição no fechamento.');
     if AInstanceNumber <= 0 then
       raise Exception.Create('O número da instância Next deve ser positivo.');
-    if not IsWindow(AParent) or not IsWindow(ACloseTarget) or
-      not IsWindow(AApplication) then
+    if not IsWindow(AParent) or not IsWindow(ACloseTarget) or not IsWindow(AApplication) then
       raise Exception.Create('A janela hospedeira não está disponível.');
     if GetWindowThreadProcessId(AParent, nil) <> GetCurrentThreadId then
       raise Exception.Create('A janela hospedeira e o módulo devem usar a mesma thread visual.');
@@ -220,13 +209,11 @@ begin
       HostApplication := AApplication;
       Application.Handle := AApplication;
     end
-    else if (UiThread <> GetCurrentThreadId) or
-      (HostApplication <> AApplication) then
+    else if (UiThread <> GetCurrentThreadId) or (HostApplication <> AApplication) then
       raise Exception.Create('O módulo Next usa uma única aplicação e thread visual.');
 
     View := NextViewCreate(Identifier, AParent);
-    View.InitializeNextView(Identifier, AInstanceNumber, ACloseTarget,
-      (AOptions and HW_NEXT_OPT_DESTROY) <> 0);
+    View.InitializeNextView(Identifier, AInstanceNumber, ACloseTarget, (AOptions and HW_NEXT_OPT_DESTROY) <> 0);
     GetClientRect(AParent, ClientRect);
     View.SetBounds(0, 0, ClientRect.Right, ClientRect.Bottom);
     Views.Add(View);
@@ -329,8 +316,8 @@ begin
   ClearError;
   View := nil;
 
-  // Only an unknown view or a foreign target rejects the message before any
-  // processing. The host then leaves the key to its normal path.
+  // Somente view desconhecida ou alvo estranho rejeitam a mensagem antes de qualquer processamento; o host segue o
+  // caminho normal da tecla.
   try
     View := RequireView(AView);
     if (AMessage < WM_KEYFIRST) or (AMessage > WM_KEYLAST) or
@@ -344,8 +331,8 @@ begin
     end;
   end;
 
-  // The view and target are accepted. Any failure from here is recorded but
-  // reported as handled, so the host never delivers the same key twice.
+  // View e alvo aceitos. Daqui em diante qualquer falha e registrada mas reportada como tratada, para o host nao
+  // entregar a mesma tecla duas vezes.
   try
     Target := ATarget;
     Control := FindControl(Target);
@@ -363,8 +350,8 @@ begin
     Msg.time := GetMessageTime;
     GetCursorPos(Msg.pt);
 
-    // Preprocess and route through the Rio VCL exactly once; no additional
-    // message loop, message pump or private queue is created in this module.
+    // Preprocessar e rotear pelo VCL do Rio uma unica vez; este modulo nao cria outro loop, bomba de mensagens ou fila
+    // privada.
     Handled := False;
     if Control <> nil then
     begin
@@ -438,11 +425,11 @@ begin
         RecordError('A limpeza anterior da tela Next não foi concluída; a biblioteca não pode ser descarregada.');
       Exit;
     end;
-    // O callback pertence ao host: a biblioteca nao o mantem depois de
-    // encerrar as telas, antes de liberar a conexao compartilhada.
+    // O callback pertence ao host: a biblioteca nao o mantem depois de encerrar as telas, antes de liberar a conexao
+    // compartilhada.
     NextAuthorizationBridge.SetAuthorizationCallback(nil);
-    // Cada tela devolveu seu leitor ao ser liberada. Somente depois disso o
-    // adaptador libera a conexao compartilhada que os leitores utilizavam.
+    // Cada tela devolveu seu leitor ao ser liberada. Somente depois disso o adaptador libera a conexao compartilhada
+    // que os leitores utilizavam.
     NextSetupInstance.Release;
     ClearModuleBinding;
     Result := True;
@@ -455,11 +442,10 @@ begin
   end;
 end;
 
-function HwNextSetAuthorizationCallback(
-  ACallback: THwNextAuthorizationCallback): LongBool; stdcall;
+function HwNextSetAuthorizationCallback(ACallback: THwNextAuthorizationCallback): LongBool; stdcall;
 begin
-  // O host informa o callback na carga e o remove antes de descarregar a
-  // biblioteca; a ponte apenas guarda o ponteiro e nao assume sua propriedade.
+  // O host informa o callback na carga e o remove antes de descarregar a biblioteca; a ponte apenas guarda o ponteiro e
+  // nao assume sua propriedade.
   NextAuthorizationBridge.SetAuthorizationCallback(ACallback);
   Result := True;
 end;

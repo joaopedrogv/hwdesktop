@@ -7,9 +7,6 @@ uses
   NextBaseForm;
 
 type
-  // The common signature: the function receives the host parent HWND, builds
-  // the concrete screen, performs the dependency injection owned by the
-  // catalog and returns it as the base type.
   TNextViewCreateFunc = function(AParent: HWND): TfrmNextBase;
 
   TNextViewEntry = record
@@ -24,8 +21,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Register(const AIdentifier: string;
-      ACreateFunc: TNextViewCreateFunc);
+    procedure Register(const AIdentifier: string; ACreateFunc: TNextViewCreateFunc);
     function CreateView(const AIdentifier: string; AParent: HWND): TfrmNextBase;
     function IsRegistered(const AIdentifier: string): Boolean;
   end;
@@ -40,15 +36,13 @@ begin
   if AIdentifier = '' then
     raise Exception.Create('O identificador do formulário Next não pode ser vazio.');
   if Length(AIdentifier) > HW_NEXT_IDENTIFIER_MAX_CHARS then
-    raise Exception.CreateFmt(
-      'O identificador do formulário Next deve ter no máximo %d caracteres.',
+    raise Exception.CreateFmt('O identificador do formulário Next deve ter no máximo %d caracteres.',
       [HW_NEXT_IDENTIFIER_MAX_CHARS]);
   for I := 1 to Length(AIdentifier) do
   begin
     Code := Ord(AIdentifier[I]);
     if (Code < 32) or (Code > 126) then
-      raise Exception.Create(
-        'O identificador do formulário Next deve conter apenas caracteres ASCII imprimíveis.');
+      raise Exception.Create('O identificador do formulário Next deve conter apenas caracteres ASCII imprimíveis.');
   end;
 end;
 
@@ -65,8 +59,7 @@ begin
   inherited;
 end;
 
-function TNextViewRegistry.IndexOfIdentifier(
-  const AIdentifier: string): Integer;
+function TNextViewRegistry.IndexOfIdentifier(const AIdentifier: string): Integer;
 var
   I: Integer;
   Entry: TNextViewEntry;
@@ -83,25 +76,21 @@ begin
   Result := -1;
 end;
 
-procedure TNextViewRegistry.Register(const AIdentifier: string;
-  ACreateFunc: TNextViewCreateFunc);
+procedure TNextViewRegistry.Register(const AIdentifier: string; ACreateFunc: TNextViewCreateFunc);
 var
   Entry: TNextViewEntry;
 begin
   ValidateIdentifier(AIdentifier);
   if not Assigned(ACreateFunc) then
-    raise Exception.Create(
-      'A fun'#231#227'o de cria'#231#227'o do formul'#225'rio Next n'#227'o foi informada.');
+    raise Exception.Create('A função de criação do formulário Next não foi informada.');
   if IndexOfIdentifier(AIdentifier) >= 0 then
-    raise Exception.CreateFmt('O formulário Next já está registrado: %s.',
-      [AIdentifier]);
+    raise Exception.CreateFmt('O formulário Next já está registrado: %s.', [AIdentifier]);
   Entry.Identifier := AIdentifier;
   Entry.CreateFunc := ACreateFunc;
   FEntries.Add(Entry);
 end;
 
-function TNextViewRegistry.CreateView(const AIdentifier: string;
-  AParent: HWND): TfrmNextBase;
+function TNextViewRegistry.CreateView(const AIdentifier: string; AParent: HWND): TfrmNextBase;
 var
   Index: Integer;
   Entry: TNextViewEntry;
@@ -109,20 +98,16 @@ var
 begin
   Index := IndexOfIdentifier(AIdentifier);
   if Index < 0 then
-    raise Exception.CreateFmt('Formulário Next não registrado: %s.',
-      [AIdentifier]);
+    raise Exception.CreateFmt('Formulário Next não registrado: %s.', [AIdentifier]);
   Entry := FEntries[Index];
   CreateFunc := Entry.CreateFunc;
   if not Assigned(CreateFunc) then
-    raise Exception.CreateFmt(
-      'A fun'#231#227'o de cria'#231#227'o do formul'#225'rio Next n'#227'o foi informada: %s.',
+    raise Exception.CreateFmt('A função de criação do formulário Next não foi informada: %s.',
       [AIdentifier]);
-  // Lazy creation: this is the only place the function is invoked, so a
-  // re-presented view never constructs another instance.
+  // Unico ponto que invoca a funcao de criacao; reapresentar nao constroi outra instancia.
   Result := CreateFunc(AParent);
   if Result = nil then
-    raise Exception.CreateFmt(
-      'A fun'#231#227'o de cria'#231#227'o do formul'#225'rio Next n'#227'o criou a tela: %s.',
+    raise Exception.CreateFmt('A função de criação do formulário Next não criou a tela: %s.',
       [AIdentifier]);
 end;
 

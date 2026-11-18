@@ -6,10 +6,8 @@ uses
   FilterDefinition;
 
 type
-  TFilterValueKind = (fvkNull, fvkString, fvkInteger, fvkInt64,
-    fvkCurrency, fvkDate, fvkDateTime);
+  TFilterValueKind = (fvkNull, fvkString, fvkInteger, fvkInt64, fvkCurrency, fvkDate, fvkDateTime);
 
-  // Valor tipado do filtro. Kind discrimina qual campo contem o valor.
   TFilterValue = record
     Kind: TFilterValueKind;
     StringValue: string;
@@ -55,22 +53,16 @@ function CloneFilterValue(const AValue: TFilterValue): TFilterValue;
 function CloneFilterCriterion(const ACriterion: TFilterCriterion): TFilterCriterion;
 function CloneFilterCriteria(const ACriteria: TFilterCriteria): TFilterCriteria;
 function SameFilterCriterion(const ALeft, ARight: TFilterCriterion): Boolean;
-function FilterCriterionDisplayText(const ACriterion: TFilterCriterion;
-  const ADefinition: TFilterDefinition): string;
+function FilterCriterionDisplayText(const ACriterion: TFilterCriterion; const ADefinition: TFilterDefinition): string;
 function ValidateFilterCriterion(const ACriterion: TFilterCriterion;
-  const ADefinition: TFilterDefinition; APath: TFilterPath;
-  out AMessage: string): Boolean;
-function TryParseFilterValue(const AText: string; AValueType: TFilterFieldType;
-  out AValue: TFilterValue): Boolean;
-function FilterValueMatchesFieldType(const AValue: TFilterValue;
-  AValueType: TFilterFieldType): Boolean;
+  const ADefinition: TFilterDefinition; APath: TFilterPath; out AMessage: string): Boolean;
+function TryParseFilterValue(const AText: string; AValueType: TFilterFieldType; out AValue: TFilterValue): Boolean;
+function FilterValueMatchesFieldType(const AValue: TFilterValue; AValueType: TFilterFieldType): Boolean;
 
 implementation
 
 uses
   System.SysUtils, System.DateUtils;
-
-{ TFilterValue }
 
 class function TFilterValue.Null: TFilterValue;
 begin
@@ -174,8 +166,6 @@ begin
   end;
 end;
 
-{ Copia de valores e criterios }
-
 function CloneFilterValue(const AValue: TFilterValue): TFilterValue;
 begin
   Result := AValue;
@@ -231,10 +221,7 @@ begin
   Result := True;
 end;
 
-{ Resultado da coleta }
-
-class function TFilterCriteriaResult.Valid(
-  const ACriteria: TFilterCriteria): TFilterCriteriaResult;
+class function TFilterCriteriaResult.Valid(const ACriteria: TFilterCriteria): TFilterCriteriaResult;
 begin
   Result.Status := fcsValidCriteria;
   Result.Criteria := CloneFilterCriteria(ACriteria);
@@ -242,8 +229,7 @@ begin
   Result.ValidationMessage := '';
 end;
 
-class function TFilterCriteriaResult.NoUserFilters(
-  AAllSelected: Boolean): TFilterCriteriaResult;
+class function TFilterCriteriaResult.NoUserFilters(AAllSelected: Boolean): TFilterCriteriaResult;
 begin
   Result.Status := fcsNoUserFilters;
   Result.Criteria := nil;
@@ -251,16 +237,13 @@ begin
   Result.ValidationMessage := '';
 end;
 
-class function TFilterCriteriaResult.Invalid(
-  const AMessage: string): TFilterCriteriaResult;
+class function TFilterCriteriaResult.Invalid(const AMessage: string): TFilterCriteriaResult;
 begin
   Result.Status := fcsInvalid;
   Result.Criteria := nil;
   Result.AllSelected := False;
   Result.ValidationMessage := AMessage;
 end;
-
-{ Apresentacao }
 
 function FieldCaption(const AField: TFilterFieldDefinition): string;
 begin
@@ -269,8 +252,7 @@ begin
     Result := AField.Id;
 end;
 
-function FilterCriterionDisplayText(const ACriterion: TFilterCriterion;
-  const ADefinition: TFilterDefinition): string;
+function FilterCriterionDisplayText(const ACriterion: TFilterCriterion; const ADefinition: TFilterDefinition): string;
 var
   Criterion: TFilterCriterion;
   Definition: TFilterDefinition;
@@ -300,8 +282,7 @@ begin
   else if Arity = 2 then
   begin
     if Length(Criterion.Values) >= 2 then
-      ValueText := Criterion.Values[0].DisplayText + ' e ' +
-        Criterion.Values[1].DisplayText
+      ValueText := Criterion.Values[0].DisplayText + ' e ' + Criterion.Values[1].DisplayText
     else if Length(Criterion.Values) = 1 then
       ValueText := Criterion.Values[0].DisplayText;
   end;
@@ -309,11 +290,8 @@ begin
   Result := Format('[%s] %s [%s]', [Caption, OperatorText, ValueText]);
 end;
 
-{ Validacao }
-
 function ValidateFilterCriterion(const ACriterion: TFilterCriterion;
-  const ADefinition: TFilterDefinition; APath: TFilterPath;
-  out AMessage: string): Boolean;
+  const ADefinition: TFilterDefinition; APath: TFilterPath; out AMessage: string): Boolean;
 var
   Definition: TFilterDefinition;
   Field: TFilterFieldDefinition;
@@ -332,8 +310,7 @@ begin
     if Trim(ACriterion.FieldId) = '' then
       AMessage := 'Campo de filtro não informado.'
     else
-      AMessage := Format('Campo de filtro "%s" não encontrado.',
-        [ACriterion.FieldId]);
+      AMessage := Format('Campo de filtro "%s" não encontrado.', [ACriterion.FieldId]);
     Exit;
   end;
 
@@ -342,8 +319,7 @@ begin
 
   if not (ACriterion.Operator in FilterPathFieldOperators(APath, Field)) then
   begin
-    AMessage := Format(
-      'A condição "%s" não está disponível para o campo "%s" nesta consulta.',
+    AMessage := Format('A condição "%s" não está disponível para o campo "%s" nesta consulta.',
       [OperatorLabel, FieldCaptionText]);
     Exit;
   end;
@@ -353,17 +329,13 @@ begin
   begin
     case Arity of
       0:
-        AMessage := Format('A condição "%s" não aceita valores.',
-          [OperatorLabel]);
+        AMessage := Format('A condição "%s" não aceita valores.', [OperatorLabel]);
       1:
-        AMessage := Format('A condição "%s" exige um valor.',
-          [OperatorLabel]);
+        AMessage := Format('A condição "%s" exige um valor.', [OperatorLabel]);
       2:
-        AMessage := Format('A condição "%s" exige dois valores.',
-          [OperatorLabel]);
+        AMessage := Format('A condição "%s" exige dois valores.', [OperatorLabel]);
     else
-      AMessage := Format('A condição "%s" exige %d valores.',
-        [OperatorLabel, Arity]);
+      AMessage := Format('A condição "%s" exige %d valores.', [OperatorLabel, Arity]);
     end;
     Exit;
   end;
@@ -374,8 +346,7 @@ begin
 
     if not FilterValueMatchesFieldType(Value, Field.ValueType) then
     begin
-      AMessage := Format('O valor informado não é válido para o campo "%s".',
-        [FieldCaptionText]);
+      AMessage := Format('O valor informado não é válido para o campo "%s".', [FieldCaptionText]);
       Exit;
     end;
 
@@ -401,27 +372,22 @@ begin
   begin
     if Field.ValueType = fftInteger then
     begin
-      if ACriterion.Values[0].IntegerValue >
-        ACriterion.Values[1].IntegerValue then
+      if ACriterion.Values[0].IntegerValue > ACriterion.Values[1].IntegerValue then
         AMessage := 'O valor inicial deve ser menor ou igual ao valor final.';
     end
     else if Field.ValueType = fftInt64 then
     begin
-      if ACriterion.Values[0].Int64Value >
-        ACriterion.Values[1].Int64Value then
+      if ACriterion.Values[0].Int64Value > ACriterion.Values[1].Int64Value then
         AMessage := 'O valor inicial deve ser menor ou igual ao valor final.';
     end
     else if Field.ValueType = fftCurrency then
     begin
-      if ACriterion.Values[0].CurrencyValue >
-        ACriterion.Values[1].CurrencyValue then
+      if ACriterion.Values[0].CurrencyValue > ACriterion.Values[1].CurrencyValue then
         AMessage := 'O valor inicial deve ser menor ou igual ao valor final.';
     end
-    else if (Field.ValueType = fftDate) or
-      (Field.ValueType = fftDateTime) then
+    else if (Field.ValueType = fftDate) or (Field.ValueType = fftDateTime) then
     begin
-      if DateOf(ACriterion.Values[0].DateTimeValue) >
-        DateOf(ACriterion.Values[1].DateTimeValue) then
+      if DateOf(ACriterion.Values[0].DateTimeValue) > DateOf(ACriterion.Values[1].DateTimeValue) then
         AMessage := 'A data inicial deve ser menor ou igual à data final.';
     end;
 
@@ -432,8 +398,7 @@ begin
   Result := True;
 end;
 
-function FilterValueMatchesFieldType(const AValue: TFilterValue;
-  AValueType: TFilterFieldType): Boolean;
+function FilterValueMatchesFieldType(const AValue: TFilterValue; AValueType: TFilterFieldType): Boolean;
 begin
   case AValueType of
     fftString:
@@ -453,15 +418,12 @@ begin
   end;
 end;
 
-{ Leitura tipada }
-
 function FilterTextHasTimePart(const AText: string): Boolean;
 begin
   Result := (Pos(':', AText) > 0) or (Pos('h', LowerCase(AText)) > 0);
 end;
 
-function TryParseFilterValue(const AText: string; AValueType: TFilterFieldType;
-  out AValue: TFilterValue): Boolean;
+function TryParseFilterValue(const AText: string; AValueType: TFilterFieldType; out AValue: TFilterValue): Boolean;
 var
   Text: string;
   ParsedInteger: Integer;

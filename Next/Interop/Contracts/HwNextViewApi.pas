@@ -15,14 +15,13 @@ const
   HW_NEXT_ERROR_CAPACITY       = 1024; // buffer do chamador, incluindo #0
   HW_NEXT_IDENTIFIER_MAX_CHARS = 63;
 
-  // Resultado da consulta de autorizacao devolvido pelo callback do host.
   // Qualquer outro valor e tratado pelo modulo como indisponivel.
   HW_NEXT_AUTH_UNAVAILABLE = 0;
   HW_NEXT_AUTH_DENIED      = 1;
   HW_NEXT_AUTH_ALLOWED     = 2;
 
-  // Bits de opcao passados em AOptions. Zero e o padrao das consultas:
-  // MDI, instancia unica, ocultar no fechamento individual.
+  // Bits de opcao passados em AOptions. Zero e o padrao das consultas: MDI, instancia unica, ocultar no fechamento
+  // individual.
   HW_NEXT_OPT_MODAL    = $00000001;
   HW_NEXT_OPT_MULTIPLE = $00000002;
   HW_NEXT_OPT_DESTROY  = $00000004;
@@ -35,27 +34,21 @@ type
   THwNextResizeView = function(AView: HWND; AWidth, AHeight: Integer): LongBool; stdcall;
   THwNextFocusView = function(AView: HWND): LongBool; stdcall;
   THwNextDestroyView = function(AView: HWND): LongBool; stdcall;
-  // Returns True when the view can be closed now. The module/base asks the
-  // user only when the view reports pending changes. False means "do not
-  // close" (cancel, query failure, or unknown view).
+  // Verdadeiro quando a view pode fechar agora; False tambem cobre falha da consulta ou view desconhecida.
   THwNextCanCloseView = function(AView: HWND): LongBool; stdcall;
   THwNextProcessKey = function(AView, ATarget: HWND; AMessage: Cardinal;
     AWParam: WPARAM; ALParam: LPARAM): LongBool; stdcall;
   THwNextViewCount = function: Integer; stdcall;
   THwNextShutdown = function: LongBool; stdcall;
   THwNextLastError = function(ABuffer: PWideChar; ACapacity: Integer): Integer; stdcall;
-  // Contexto ERP de uso unico. Apenas valores: os buffers de caracteres
-  // pertencem ao chamador e sao validos somente durante a chamada.
-  THwNextSetContext = function(ACompanyCode: Integer;
-    AUserLogin, ADatabaseName, ADatabaseUserName,
+  // Contexto ERP de uso unico. Apenas valores: os buffers de caracteres pertencem ao chamador e sao validos somente
+  // durante a chamada.
+  THwNextSetContext = function(ACompanyCode: Integer; AUserLogin, ADatabaseName, ADatabaseUserName,
     ADatabasePassword: PWideChar): LongBool; stdcall;
-  // Callback sincrono de autorizacao. Recebe o codigo do processo, a acao ja
-  // convertida em texto e a tabela da regra, todos definidos pelo modulo. Os
-  // buffers de caracteres pertencem ao chamador e sao validos somente durante
-  // a chamada. O retorno usa HW_NEXT_AUTH_*; o host aplica a regra do processo
-  // e da acao informados.
-  THwNextAuthorizationCallback = function(
-    AProcessCode, AAction, ATable: PWideChar): Integer; stdcall;
+  // Callback sincrono de autorizacao: recebe o codigo do processo, a acao ja convertida em texto e a tabela da regra,
+  // todos definidos pelo modulo. Os buffers pertencem ao chamador e valem somente durante a chamada; o host aplica a
+  // regra do processo e da acao.
+  THwNextAuthorizationCallback = function(AProcessCode, AAction, ATable: PWideChar): Integer; stdcall;
   THwNextSetAuthorizationCallback = function(
     ACallback: THwNextAuthorizationCallback): LongBool; stdcall;
 

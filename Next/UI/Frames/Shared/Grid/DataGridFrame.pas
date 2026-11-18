@@ -12,10 +12,9 @@ uses
   QueryColumnLayout, IDataSetSorterUnit;
 
 type
-  // Controles de um criterio na faixa. Os slots sao reaproveitados na ordem
-  // dos criterios, evitando recriar a faixa inteira a cada remocao. O painel
-  // agrupa botao e rotulo para que o splitter nao dispute o alinhamento a
-  // esquerda com controles irmaos.
+  // Controles de um criterio na faixa. Os slots sao reaproveitados na ordem dos criterios, evitando recriar a faixa
+  // inteira a cada remocao. O painel agrupa botao e rotulo para que o splitter nao dispute o alinhamento a esquerda com
+  // controles irmaos.
   TCriterionBandSlot = record
     Panel: TPanel;
     FilterPanel: TPanel;
@@ -27,18 +26,15 @@ type
     MenuItem: TMenuItem;
   end;
 
-  // Estado original do titulo de uma coluna ordenada. A legenda e o estilo sao
-  // restaurados quando a coluna deixa de participar da ordem.
   TSortedColumnState = record
     FieldName: string;
     Caption: string;
     FontStyle: TFontStyles;
   end;
 
-  // Ctrl+clique no titulo encaminha o campo da coluna para a tela, que decide
-  // se o gesto prepara o filtro em vez de ordenar.
-  TColumnTitleCtrlClickEvent = procedure(Sender: TObject;
-    const AFieldName: string) of object;
+  // Ctrl+clique no titulo encaminha o campo da coluna para a tela, que decide se o gesto prepara o filtro em vez de
+  // ordenar.
+  TColumnTitleCtrlClickEvent = procedure(Sender: TObject; const AFieldName: string) of object;
 
   TfrmDataGridFrame = class(TFrame)
     pnComandos: TPanel;
@@ -59,8 +55,7 @@ type
     miSalvarConfigColunas: TMenuItem;
     miRestaurarColunasPadrao: TMenuItem;
     miSomaContagemColuna: TMenuItem;
-    procedure DrawCheckboxCell(const Rect: TRect;
-      const State: TGridDrawState; AState: Boolean);
+    procedure DrawCheckboxCell(const Rect: TRect; const State: TGridDrawState; AState: Boolean);
     procedure dbgDadosDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
       State: TGridDrawState);
     procedure dbgDadosCellClick(Column: TColumn);
@@ -95,11 +90,8 @@ type
     FSuppressDataSetChange: Boolean;
     FOnTitleCtrlClick: TColumnTitleCtrlClickEvent;
     FOnFeedback: TFrameFeedbackEvent;
-    // Definicoes recebidas da tela. Sao a fonte da lista de configuracao de
-    // colunas, inclusive quando o conjunto esta vazio ou desvinculado.
+    // Alimentam a configuracao de colunas mesmo sem conjunto vinculado.
     FColumnDefinitions: TGridColumnDefinitions;
-    // Definicao recebida da tela: fonte das colunas padrao, da identidade e das
-    // operacoes de layout. A grade usa apenas esses membros.
     FColumnLayout: INextQueryDefinitionBase;
 
     function GetDataSource: TDataSource;
@@ -117,10 +109,8 @@ type
     procedure miAlterarCriterioClick(Sender: TObject);
     procedure miRemoverCriterioClick(Sender: TObject);
     function BuildQuickFilterDefinition: TFilterDefinition;
-    function ShowQuickFilterModal(const ACaption: string;
-      const ADefinition: TFilterDefinition;
-      const ACriterion: TFilterCriterion;
-      out AResult: TFilterCriterion): Boolean;
+    function ShowQuickFilterModal(const ACaption: string; const ADefinition: TFilterDefinition;
+      const ACriterion: TFilterCriterion; out AResult: TFilterCriterion): Boolean;
     procedure ShowQuickFilterMessage(const AMessage: string);
     function SortingAvailable(): Boolean;
     function IsSortableColumn(Column: TColumn): Boolean;
@@ -144,42 +134,26 @@ type
     function ColumnLayoutAvailable: Boolean;
     function FindColumnDefinitionIndex(const AFieldName: string): Integer;
     function BuildColumnLayoutEntries: TColumnLayoutEntries;
-    // Cria a coluna ja com ordem, largura e visibilidade resolvidas pela
-    // definicao; a coluna de marcacao permanece sempre visivel.
     procedure AddColumn(const AItem: TQueryColumnLayoutItem);
     procedure ReportarFeedback(const AMensagem: string);
-    procedure ModalFeedback(Sender: TObject;
-      const AMensagem: string);
+    procedure ModalFeedback(Sender: TObject; const AMensagem: string);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    // Marcacao, filtro rapido e ordenacao sao configuracoes independentes. A
-    // ordenacao e automatica para toda coluna visivel cujo campo o conjunto
-    // aceita ordenar; a coluna SEL nunca participa.
-    procedure Configure(AOperations: IQueryResultOperations = nil;
-      AQuickFilterEnabled: Boolean = False);
-    // Liga a grade a definicao da consulta: colunas padrao, QueryId e operacoes
-    // de layout passam a vir dela. Chamar antes de ConfigureColumns.
-    procedure AttachColumnLayoutSource(
-      const ADefinition: INextQueryDefinitionBase);
-    // Cria as colunas em uma unica passagem, na ordem e com a visibilidade ja
-    // resolvidas pela definicao.
+    // Marcacao, filtro rapido e ordenacao sao configuracoes independentes. A ordenacao e automatica para toda coluna
+    // visivel cujo campo o conjunto aceita ordenar; a coluna SEL nunca participa.
+    procedure Configure(AOperations: IQueryResultOperations = nil; AQuickFilterEnabled: Boolean = False);
+    // Define a fonte de colunas padrao e de layout; chamar antes de ConfigureColumns.
+    procedure AttachColumnLayoutSource(const ADefinition: INextQueryDefinitionBase);
     procedure ConfigureColumns;
     procedure ReloadColumnLayout;
     procedure SaveColumnLayout;
     procedure RestoreColumnLayoutDefaults;
-    // Remove todos os criterios rapidos sem alterar as marcacoes. Usado pela
-    // tela antes de cada pesquisa, para o novo resultado comecar completo.
     procedure ClearQuickFilters();
-    // Retira a ordenacao exibida e devolve o conjunto corrente a ordem padrao da
-    // consulta, preservando filtro, marcacoes e linha corrente.
     procedure ClearSorting();
     property DataSource: TDataSource read GetDataSource write SetDataSource;
-    // Campo da coluna clicada com Ctrl; a tela decide se prepara o filtro.
-    property OnTitleCtrlClick: TColumnTitleCtrlClickEvent
-      read FOnTitleCtrlClick write FOnTitleCtrlClick;
-    property OnFeedback: TFrameFeedbackEvent
-      read FOnFeedback write FOnFeedback;
+    property OnTitleCtrlClick: TColumnTitleCtrlClickEvent read FOnTitleCtrlClick write FOnTitleCtrlClick;
+    property OnFeedback: TFrameFeedbackEvent read FOnFeedback write FOnFeedback;
   end;
 
 implementation
@@ -190,53 +164,24 @@ uses
 {$R *.dfm}
 
 const
-  QuickFilterTitle = 'Filtro r'#225'pido';
-  QuickFilterFailureMessage =
-    'N'#227'o foi poss'#237'vel filtrar pelo valor selecionado.';
-  QuickFilterAddFailureMessage =
-    'N'#227'o foi poss'#237'vel adicionar o filtro. Verifique se ele j'#225' est'#225' aplicado.';
-  QuickFilterUpdateFailureMessage =
-    'N'#227'o foi poss'#237'vel alterar o filtro. Verifique se ele j'#225' est'#225' aplicado.';
-  QuickFilterMissingMessage =
-    'O filtro selecionado n'#227'o est'#225' mais ativo.';
-  QuickFilterInvalidMessage =
-    'O filtro informado n'#227'o '#233' v'#225'lido.';
-  CopyFailureMessage =
-    'N'#227'o foi poss'#237'vel copiar o valor da c'#233'lula.';
-  ColumnsTitle = 'Configurar colunas';
-  ColumnsFailureMessage =
-    'N'#227'o foi poss'#237'vel configurar as colunas.';
-  ColumnsSaveTitle = 'Salvar configura'#231#227'o das colunas';
-  ColumnsSaveFailureMessage =
-    'N'#227'o foi poss'#237'vel salvar a configura'#231#227'o das colunas.';
-  ColumnsRestoreTitle = 'Restaurar padr'#227'o das colunas';
-  ColumnsRestoreFailureMessage =
-    'N'#227'o foi poss'#237'vel restaurar a configura'#231#227'o padr'#227'o das colunas.';
-  ColumnSummaryTitle = 'Soma e contagem da coluna';
-  ColumnSummaryFailureMessage =
-    'N'#227'o foi poss'#237'vel calcular o resumo da coluna.';
-  MissingColumnLayoutPreferencesMessage =
-    'As prefer'#234'ncias de colunas n'#227'o foram informadas.';
-  ColumnLayoutAlreadyAttachedMessage =
-    'As prefer'#234'ncias de colunas j'#225' foram associadas a esta grade.';
-  // Respiro horizontal somado a largura calculada, como no reajuste de colunas
-  // do cadastro padrao legado.
+  ColumnSummaryFailureMessage = 'Não foi possível calcular o resumo da coluna.';
+  MissingColumnLayoutPreferencesMessage = 'As preferências de colunas não foram informadas.';
+  // Respiro horizontal somado a largura calculada, como no reajuste de colunas do cadastro padrao legado.
   ColumnWidthPadding = 10;
-  // Codigo da tecla C no atalho Ctrl+C da grade. A constante VK_C nao existe
-  // na unit Winapi.Windows desta versao do compilador.
+  // Codigo da tecla C no atalho Ctrl+C da grade. A constante VK_C nao existe na unit Winapi.Windows desta versao do
+  // compilador.
   KeyC = Ord('C');
 
 type
-  // Acesso as coordenadas de celula da grade. MouseCoord e protegido; o
-  // descendente local identifica a coluna sob o mouse sem forcar a coluna 0
-  // nem alterar a linha atual.
+  // Acesso as coordenadas de celula da grade. MouseCoord e protegido; o descendente local identifica a coluna sob o
+  // mouse sem forcar a coluna 0 nem alterar a linha atual.
   TDBGridCellAccess = class(TDBGrid)
   public
     function ColumnAt(const X, Y: Integer): TColumn;
   end;
 
-  // Observa a troca do conjunto para limpar a ordenacao exibida quando a tela
-  // apresenta um novo resultado. O frame nao instala eventos na origem.
+  // Observa a troca do conjunto para limpar a ordenacao exibida quando a tela apresenta um novo resultado. O frame nao
+  // instala eventos na origem.
   TGridDataLink = class(TDataLink)
   private
     FFrame: TfrmDataGridFrame;
@@ -269,7 +214,6 @@ begin
   if (Cell.Y < 0) or (Cell.X < IndicatorOffset) then
     Exit;
 
-  // A linha de titulos nao representa um valor de dados.
   if (dgTitles in Options) and (Cell.Y = 0) then
     Exit;
 
@@ -280,14 +224,12 @@ begin
   Result := Columns[DataCol];
 end;
 
-function QuickFilterMaskPolicy(
-  const AValueType: TFilterFieldType): TFilterMaskPolicy;
+function QuickFilterMaskPolicy(const AValueType: TFilterFieldType): TFilterMaskPolicy;
 begin
-  // O modal usa a mesma mascara do frame de filtros: data completa para o
-  // limite unico e data/hora completa para o intervalo.
+  // O modal usa a mesma mascara do frame de filtros: data completa para o limite unico e data/hora completa para o
+  // intervalo.
   if AValueType = fftDateTime then
-    Result := TFilterMaskPolicy.FromMasks(
-      '!99/99/0000 99:99:99;1;_', '!99/99/0000 99:99:99;1;_', '')
+    Result := TFilterMaskPolicy.FromMasks('!99/99/0000 99:99:99;1;_', '!99/99/0000 99:99:99;1;_', '')
   else if AValueType = fftDate then
     Result := TFilterMaskPolicy.DateMask
   else
@@ -312,9 +254,8 @@ begin
     FDataLink := nil;
   end;
 
-  // Os menus pertencem ao frame; liberar antes dos controles evita referencias
-  // pendentes. Painel, botao e rotulo pertencem a cadeia de pais do VCL e sao
-  // destruidos por ela, sem liberacao duplicada aqui.
+  // Os menus pertencem ao frame; liberar antes dos controles evita referencias pendentes. Painel, botao e rotulo
+  // pertencem a cadeia de pais do VCL e sao destruidos por ela, sem liberacao duplicada aqui.
   if FCriterionSlots <> nil then
   begin
     for I := 0 to FCriterionSlots.Count - 1 do
@@ -336,11 +277,8 @@ end;
 
 function TfrmDataGridFrame.MarkingActive: Boolean;
 begin
-  Result := (FMarkingColumn <> '')
-    and (FOperations <> nil)
-    and (dbgDados.DataSource <> nil)
-    and (dbgDados.DataSource.DataSet <> nil)
-    and dbgDados.DataSource.DataSet.Active;
+  Result := (FMarkingColumn <> '') and (FOperations <> nil) and (dbgDados.DataSource <> nil)
+    and (dbgDados.DataSource.DataSet <> nil) and dbgDados.DataSource.DataSet.Active;
 end;
 
 function TfrmDataGridFrame.MarkingEnabled: Boolean;
@@ -359,8 +297,7 @@ begin
     Exit;
 
   dts := dbgDados.DataSource.DataSet;
-  Result := (dts <> nil) and dts.Active and
-    (dts.FindField(FContextColumnName) <> nil);
+  Result := (dts <> nil) and dts.Active and (dts.FindField(FContextColumnName) <> nil);
 end;
 
 function TfrmDataGridFrame.ColumnSummaryLabel(const AField: TField): string;
@@ -387,11 +324,8 @@ end;
 
 function TfrmDataGridFrame.QuickFilterAvailable: Boolean;
 begin
-  Result := FQuickFilterEnabled
-    and (FOperations <> nil)
-    and (dbgDados.DataSource <> nil)
-    and (dbgDados.DataSource.DataSet <> nil)
-    and dbgDados.DataSource.DataSet.Active;
+  Result := FQuickFilterEnabled and (FOperations <> nil) and (dbgDados.DataSource <> nil)
+    and (dbgDados.DataSource.DataSet <> nil) and dbgDados.DataSource.DataSet.Active;
 end;
 
 function TfrmDataGridFrame.QuickFilterField: TField;
@@ -399,8 +333,7 @@ begin
   Result := nil;
   if not QuickFilterAvailable() then
     Exit;
-  if (FQuickFilterColumnName = '')
-    or SameText(FQuickFilterColumnName, FMarkingColumn) then
+  if (FQuickFilterColumnName = '') or SameText(FQuickFilterColumnName, FMarkingColumn) then
     Exit;
 
   Result := dbgDados.DataSource.DataSet.FindField(FQuickFilterColumnName);
@@ -479,10 +412,6 @@ begin
     Slot.Splitter := TSplitter.Create(pnCriterios);
     Slot.Splitter.Parent := pnCriterios;
     Slot.Splitter.Visible := False;
-    // Slot.Splitter.Width := 5;
-    // Slot.Splitter.Height := 36;
-    // Slot.Splitter.MinSize := 60;
-    // Slot.Splitter.ResizeStyle := rsUpdate;
     Slot.Splitter.Align := alLeft;
     Slot.Splitter.Left := Slot.Panel.Left + Slot.Panel.Width + 5;
     Slot.Splitter.Beveled := True;
@@ -492,8 +421,7 @@ begin
     Slot.Splitter.Margins.Top := 6;
     Slot.Splitter.Margins.Bottom := 6;
 
-    // O menu pertence ao slot e recebe o criterio corrente pelo Tag, sem
-    // OnPopup para preservar a ligacao RLINK32.
+    // O menu pertence ao slot e recebe o criterio corrente pelo Tag, sem OnPopup para preservar a ligacao RLINK32.
     Slot.Menu := TPopupMenu.Create(Self);
     Slot.AlterarItem := TMenuItem.Create(Slot.Menu);
     Slot.AlterarItem.Caption := 'Alterar filtro';
@@ -521,7 +449,6 @@ var
 begin
   Count := CriteriaCount();
 
-  // Cada linha da lista ocupa um slot proprio e mantem a ordem de insercao.
   for I := 0 to Count - 1 do
   begin
     EnsureCriterionSlot(I);
@@ -546,8 +473,8 @@ begin
     Slot.MenuItem.Tag := AId;
   end;
 
-  // Slots que excedem a quantidade atual ficam ocultos, mas preservados para
-  // reutilizacao quando um novo criterio for inserido.
+  // Slots que excedem a quantidade atual ficam ocultos, mas preservados para reutilizacao quando um novo criterio for
+  // inserido.
   for I := Count to FCriterionSlots.Count - 1 do
   begin
     Slot := FCriterionSlots[I];
@@ -572,8 +499,8 @@ begin
   MarkingOn := MarkingEnabled();
   FilterOn := (FOperations <> nil) and FOperations.QuickFilterActive();
 
-  // Os botoes de marcacao formam um bloco unico para que o alinhamento a
-  // esquerda nao os reordene ao alternar entre os estados da faixa.
+  // Os botoes de marcacao formam um bloco unico para que o alinhamento a esquerda nao os reordene ao alternar entre os
+  // estados da faixa.
   pnMarcacao.Visible := MarkingOn;
   pnCriterios.Visible := FilterOn;
 
@@ -586,8 +513,8 @@ end;
 
 procedure TfrmDataGridFrame.SetDataSource(const Value: TDataSource);
 begin
-  // Uma nova origem de dados comeca sem criterios e sem ordenacao exibida; a
-  // faixa e o titulo do resultado anterior nao sobrevivem a troca do conjunto.
+  // Uma nova origem de dados comeca sem criterios e sem ordenacao exibida; a faixa e o titulo do resultado anterior nao
+  // sobrevivem a troca do conjunto.
   if FOperations <> nil then
     FOperations.ClearQuickFilters();
   FQuickFilterColumnName := '';
@@ -612,8 +539,6 @@ begin
   if (Button.Tag = 0) or (Button.PopupMenu = nil) then
     Exit;
 
-  // O menu e aberto pelo clique; o Tag do item identifica somente este
-  // criterio e nao ha OnPopup para preservar a ligacao RLINK32.
   PopupPoint := Button.ClientToScreen(Point(0, Button.Height));
   Button.PopupMenu.Popup(PopupPoint.X, PopupPoint.Y);
 end;
@@ -629,7 +554,6 @@ begin
   if (FOperations = nil) or (AId = 0) then
     Exit;
 
-  // Remove apenas o criterio escolhido; a faixa e recalculada na ordem restante.
   FOperations.RemoveQuickFilter(AId);
   UpdateCommandBandLayout();
   dbgDados.Invalidate();
@@ -642,8 +566,8 @@ end;
 
 function TfrmDataGridFrame.CopiaDisponivel: Boolean;
 begin
-  // Condicao unica do menu e do atalho. A copia nao exige marcacao configurada;
-  // apenas exclui a coluna SEL, que nao tem texto de celula.
+  // Condicao unica do menu e do atalho. A copia nao exige marcacao configurada; apenas exclui a coluna SEL, que nao tem
+  // texto de celula.
   Result := False;
   if (dbgDados.DataSource = nil) or (dbgDados.DataSource.DataSet = nil) then
     Exit;
@@ -653,8 +577,7 @@ begin
     Exit;
   if dbgDados.SelectedField = nil then
     Exit;
-  if (FMarkingColumn <> '') and
-    SameText(dbgDados.SelectedField.FieldName, FMarkingColumn) then
+  if (FMarkingColumn <> '') and SameText(dbgDados.SelectedField.FieldName, FMarkingColumn) then
     Exit;
   Result := True;
 end;
@@ -677,15 +600,15 @@ begin
     Clipboard.AsText := Texto;
   except
     // Cobre falha de conversao e de abertura/escrita do clipboard.
-    ReportarFeedback(CopyFailureMessage);
+    ReportarFeedback('Não foi possível copiar o valor da célula.');
   end;
 end;
 
 procedure TfrmDataGridFrame.ReajustarLarguraColunas;
 var
   dts: TDataSet;
-  // Winapi.Windows declara TBitmap como tagBITMAP no escopo da implementacao;
-  // o tipo qualificado garante o bitmap do VCL usado na medicao.
+  // Winapi.Windows declara TBitmap como tagBITMAP no escopo da implementacao; o tipo qualificado garante o bitmap do
+  // VCL usado na medicao.
   Bitmap: Vcl.Graphics.TBitmap;
   Bookmark: TBookmark;
   I: Integer;
@@ -701,10 +624,8 @@ begin
   if (dts = nil) or (not dts.Active) or (dts.State <> dsBrowse) then
     Exit;
 
-  // A medicao usa um canvas proprio para nao alterar a fonte da grade. Cada
-  // largura parte do titulo; o conteudo formatado das linhas visiveis prevalece
-  // quando for maior. O filtro rapido restringe o proprio conjunto, entao a
-  // navegacao considera apenas as linhas que a grade apresenta.
+  // A medicao usa um canvas proprio para nao alterar a fonte da grade. O filtro rapido restringe o proprio conjunto,
+  // entao a navegacao considera apenas as linhas que a grade apresenta.
   Bitmap := Vcl.Graphics.TBitmap.Create;
   try
     // O canvas do bitmap precisa de um contexto valido para medir o texto.
@@ -720,8 +641,7 @@ begin
             Continue;
 
           // A coluna de marcacao desenha o checkbox e mantem a largura atual.
-          if (FMarkingColumn <> '') and
-            SameText(Column.FieldName, FMarkingColumn) then
+          if (FMarkingColumn <> '') and SameText(Column.FieldName, FMarkingColumn) then
             Continue;
 
           Bitmap.Canvas.Font.Assign(Column.Title.Font);
@@ -738,14 +658,12 @@ begin
             dts.Next;
           end;
 
-          // Sem linhas, a largura fica restrita ao titulo. O respiro garante uma
-          // coluna utilizavel mesmo para um titulo vazio.
+          // O respiro garante uma coluna utilizavel mesmo para um titulo vazio.
           Column.Width := Largura + ColumnWidthPadding;
         end;
       finally
-        // A posicao original e restaurada sem editar, filtrar ou ordenar. Um
-        // bookmark invalido apenas deixa o conjunto na posicao em que terminou.
-        // A memoria do bookmark e liberada mesmo se a restauracao falhar.
+        // Um bookmark invalido apenas deixa o conjunto na posicao em que terminou. A memoria do bookmark e liberada
+        // mesmo se a restauracao falhar.
         if Bookmark <> nil then
         begin
           try
@@ -757,8 +675,7 @@ begin
         end;
       end;
     finally
-      // Os controles voltam a acompanhar o conjunto mesmo se a medicao ou a
-      // restauracao da posicao falhar.
+      // Os controles voltam a acompanhar o conjunto mesmo se a medicao ou a restauracao da posicao falhar.
       dts.EnableControls;
     end;
   finally
@@ -773,10 +690,8 @@ begin
     FOnFeedback(Self, AMensagem);
 end;
 
-procedure TfrmDataGridFrame.ModalFeedback(Sender: TObject;
-  const AMensagem: string);
+procedure TfrmDataGridFrame.ModalFeedback(Sender: TObject; const AMensagem: string);
 begin
-  // O modal de filtro usa o mesmo destino de feedback da grade.
   ReportarFeedback(AMensagem);
 end;
 
@@ -790,8 +705,7 @@ begin
   ReajustarLarguraColunas;
 end;
 
-function TfrmDataGridFrame.IsMarkingColumn(
-  const AFieldName: string): Boolean;
+function TfrmDataGridFrame.IsMarkingColumn(const AFieldName: string): Boolean;
 begin
   Result := (FMarkingColumn <> '') and SameText(AFieldName, FMarkingColumn);
 end;
@@ -830,8 +744,7 @@ begin
     SetLength(Result, Count + 1);
     Result[Count].Key := Definition.FieldName;
 
-    // O titulo vem da definicao; o titulo da coluna pode conter a seta de
-    // ordenacao acrescentada na grade.
+    // O titulo vem da definicao; o titulo da coluna pode conter a seta de ordenacao acrescentada na grade.
     if Trim(Definition.Title) <> '' then
       Result[Count].Title := Definition.Title
     else
@@ -839,8 +752,8 @@ begin
 
     Result[Count].Enabled := GridColumnConfigurable(Definition.Behavior);
 
-    // A marcacao reflete a visibilidade corrente da grade; sem coluna criada,
-    // vale a visibilidade inicial do comportamento.
+    // A marcacao reflete a visibilidade corrente da grade; sem coluna criada, vale a visibilidade inicial do
+    // comportamento.
     Column := FindColumnByFieldName(Definition.FieldName);
     if Column <> nil then
       Result[Count].Checked := Column.Visible
@@ -851,16 +764,15 @@ begin
   end;
 end;
 
-procedure TfrmDataGridFrame.ApplyColumnSelection(
-  const ASelection: TColumnSelectionResults);
+procedure TfrmDataGridFrame.ApplyColumnSelection(const ASelection: TColumnSelectionResults);
 var
   I: Integer;
   J: Integer;
   Definition: TGridColumnDefinition;
   Column: TColumn;
 begin
-  // Somente a visibilidade das colunas configuraveis muda. Ordem, largura,
-  // conjunto, filtros, ordenacao e marcacoes permanecem intactos.
+  // Somente a visibilidade das colunas configuraveis muda. Ordem, largura, conjunto, filtros, ordenacao e marcacoes
+  // permanecem intactos.
   for I := 0 to High(FColumnDefinitions) do
   begin
     Definition := FColumnDefinitions[I];
@@ -898,7 +810,7 @@ begin
       if Dialog.ShowModal = mrOk then
         ApplyColumnSelection(Dialog.CollectSelection);
     except
-      ReportarFeedback(ColumnsFailureMessage);
+      ReportarFeedback('Não foi possível configurar as colunas.');
     end;
   finally
     Dialog.Free;
@@ -945,26 +857,21 @@ begin
   end;
 
   ColumnLabel := ColumnSummaryLabel(DataField);
-  MessageText := Format('Coluna: %s'#13'Quantidade de registros: %d',
-    [ColumnLabel, Summary.RecordCount]);
+  MessageText := Format('Coluna: %s'#13'Quantidade de registros: %d', [ColumnLabel, Summary.RecordCount]);
   if Summary.IsNumeric then
-    MessageText := MessageText + #13'Soma: ' +
-      FormatCurr('#,##0.00##', Summary.Sum);
+    MessageText := MessageText + #13'Soma: ' + FormatCurr('#,##0.00##', Summary.Sum);
 
   if Summary.MarkingEnabled then
   begin
-    MessageText := MessageText + #13'Quantidade de registros marcados: ' +
-      IntToStr(Summary.MarkedCount);
+    MessageText := MessageText + #13'Quantidade de registros marcados: ' + IntToStr(Summary.MarkedCount);
     if Summary.IsNumeric then
-      MessageText := MessageText + #13'Soma dos registros marcados: ' +
-        FormatCurr('#,##0.00##', Summary.MarkedSum);
+      MessageText := MessageText + #13'Soma dos registros marcados: ' + FormatCurr('#,##0.00##', Summary.MarkedSum);
   end;
 
   ReportarFeedback(MessageText);
 end;
 
-function TfrmDataGridFrame.FindColumnDefinitionIndex(
-  const AFieldName: string): Integer;
+function TfrmDataGridFrame.FindColumnDefinitionIndex(const AFieldName: string): Integer;
 var
   I: Integer;
 begin
@@ -981,8 +888,7 @@ end;
 function TfrmDataGridFrame.ColumnLayoutAvailable: Boolean;
 begin
   // A marcacao e as colunas sempre ocultas nao geram persistencia.
-  Result := (FColumnLayout <> nil) and
-    QueryColumnLayoutAvailable(FColumnDefinitions, FMarkingColumn);
+  Result := (FColumnLayout <> nil) and QueryColumnLayoutAvailable(FColumnDefinitions, FMarkingColumn);
 end;
 
 function TfrmDataGridFrame.BuildColumnLayoutEntries: TColumnLayoutEntries;
@@ -995,36 +901,33 @@ begin
   SetLength(Result, 0);
   Count := 0;
 
-  // A ordem visual corrente da grade e a fonte, inclusive apos reordenacao pelo
-  // cabecalho.
+  // A ordem visual corrente da grade e a fonte, inclusive apos reordenacao pelo cabecalho.
   for I := 0 to dbgDados.Columns.Count - 1 do
   begin
     Column := dbgDados.Columns[I];
     DefinitionIndex := FindColumnDefinitionIndex(Column.FieldName);
     if DefinitionIndex < 0 then
       Continue;
-    if not QueryColumnPersistable(FColumnDefinitions[DefinitionIndex],
-      FMarkingColumn) then
+    if not QueryColumnPersistable(FColumnDefinitions[DefinitionIndex], FMarkingColumn) then
       Continue;
 
     SetLength(Result, Count + 1);
     Result[Count].FieldName := Column.FieldName;
     Result[Count].Visible := Column.Visible;
-    // A ordem e a posicao entre as colunas participantes: a marcacao e as
-    // colunas sempre ocultas intercaladas nao deslocam o valor gravado.
+    // A ordem e a posicao entre as colunas participantes: a marcacao e as colunas sempre ocultas intercaladas nao
+    // deslocam o valor gravado.
     Result[Count].Order := Count;
     Result[Count].Width := Column.Width;
     Inc(Count);
   end;
 end;
 
-procedure TfrmDataGridFrame.AttachColumnLayoutSource(
-  const ADefinition: INextQueryDefinitionBase);
+procedure TfrmDataGridFrame.AttachColumnLayoutSource(const ADefinition: INextQueryDefinitionBase);
 begin
   if ADefinition = nil then
     raise Exception.Create(MissingColumnLayoutPreferencesMessage);
   if FColumnLayout <> nil then
-    raise Exception.Create(ColumnLayoutAlreadyAttachedMessage);
+    raise Exception.Create('As preferências de colunas já foram associadas a esta grade.');
 
   FColumnLayout := ADefinition;
 end;
@@ -1047,13 +950,11 @@ begin
   end;
 
   // A coluna de marcacao permanece visivel ainda que o plano a oculte.
-  Column.Visible := AItem.Visible or
-    IsMarkingColumn(AItem.Definition.FieldName);
+  Column.Visible := AItem.Visible or IsMarkingColumn(AItem.Definition.FieldName);
 end;
 
 procedure TfrmDataGridFrame.ReloadColumnLayout;
 begin
-  // A leitura pertence a definicao; uma falha chega aqui como plano padrao.
   if FColumnLayout = nil then
     Exit;
   ConfigureColumns;
@@ -1071,7 +972,7 @@ begin
     FColumnLayout.SaveColumnLayout(Entries);
   except
     // A grade permanece como esta; o host apresenta a falha.
-    ReportarFeedback(ColumnsSaveFailureMessage);
+    ReportarFeedback('Não foi possível salvar a configuração das colunas.');
   end;
 end;
 
@@ -1084,12 +985,12 @@ begin
     FColumnLayout.ResetColumnLayout;
   except
     // Sem a restauracao no banco a grade nao pode divergir do que esta gravado.
-    ReportarFeedback(ColumnsRestoreFailureMessage);
+    ReportarFeedback('Não foi possível restaurar a configuração padrão das colunas.');
     Exit;
   end;
 
-  // A preferencia foi limpa: a nova leitura devolve o padrao da definicao,
-  // inclusive para colunas ocultas por um layout anterior.
+  // A preferencia foi limpa: a nova leitura devolve o padrao da definicao, inclusive para colunas ocultas por um layout
+  // anterior.
   ReloadColumnLayout;
 end;
 
@@ -1108,8 +1009,7 @@ begin
   DoMarkOperation(moMarkAll);
 end;
 
-procedure TfrmDataGridFrame.Configure(AOperations: IQueryResultOperations = nil;
-  AQuickFilterEnabled: Boolean = False);
+procedure TfrmDataGridFrame.Configure(AOperations: IQueryResultOperations = nil; AQuickFilterEnabled: Boolean = False);
 begin
   ResetSortState();
   FOperations := AOperations;
@@ -1122,10 +1022,6 @@ begin
   else
     FMarkingColumn := '';
 
-  // Marcacao, filtros rapidos e ordenacao sao independentes. A coluna SEL
-  // controla apenas os comandos de marcacao e nao e elegivel para filtro nem
-  // para ordenacao.
-  // Uma nova configuracao comeca sem criterios e recalcula a faixa.
   if FOperations <> nil then
     FOperations.ClearQuickFilters();
   UpdateCommandBandLayout();
@@ -1137,9 +1033,8 @@ var
   Definition: TGridColumnDefinition;
   DataField: TField;
 begin
-  // A definicao e a autoridade sobre a apresentacao: apenas as colunas que
-  // declaram formato alteram o campo do conjunto corrente. O campo pertence ao
-  // conjunto, entao a formatacao vale para a grade e para o resumo da coluna.
+  // A definicao e a autoridade sobre a apresentacao: apenas as colunas que declaram formato alteram o campo do conjunto
+  // corrente. O campo pertence ao conjunto, entao a formatacao vale para a grade e para o resumo da coluna.
   if ADataSet = nil then
     Exit;
 
@@ -1150,8 +1045,7 @@ begin
       Continue;
 
     DataField := ADataSet.FindField(Definition.FieldName);
-    // DisplayFormat pertence aos campos numericos do conjunto; os demais tipos
-    // conservam a formatacao do proprio campo.
+    // DisplayFormat pertence aos campos numericos do conjunto; os demais tipos conservam a formatacao do proprio campo.
     if DataField is TNumericField then
       TNumericField(DataField).DisplayFormat := Definition.DisplayFormat;
   end;
@@ -1165,8 +1059,8 @@ begin
   if FColumnLayout = nil then
     raise Exception.Create(MissingColumnLayoutPreferencesMessage);
 
-  // A leitura acontece antes de tocar na grade: nenhuma coluna e criada para
-  // depois ser reordenada. Uma falha de leitura chega aqui como plano padrao.
+  // A leitura acontece antes de tocar na grade: nenhuma coluna e criada para depois ser reordenada. Uma falha de
+  // leitura chega aqui como plano padrao.
   Layout := FColumnLayout.LoadColumnLayout;
   FColumnDefinitions := Copy(FColumnLayout.ColumnsDef);
 
@@ -1179,28 +1073,23 @@ begin
     dbgDados.Columns.EndUpdate;
   end;
 
-  // A reconstrucao devolve as legendas da definicao; a ordenacao exibida
-  // continua valendo para o conjunto corrente.
+  // A reconstrucao devolve as legendas da definicao; a ordenacao exibida continua valendo para o conjunto corrente.
   if Length(FSortFields) > 0 then
     ApplySortedTitles;
 
   dbgDados.Invalidate;
 
-  // A faixa de comandos e recalculada sobre a grade reconstruida, mantendo os
-  // paineis e o menu coerentes com o estado corrente.
   UpdateCommandBandLayout();
 
-  // Configurar as colunas antes de a pesquisa chegar deixa a definicao pronta
-  // para o conjunto ja associado; os resultados seguintes vem pela troca
-  // observada em ObserveDataSetChange.
+  // Configurar as colunas antes de a pesquisa chegar deixa a definicao pronta para o conjunto ja associado; os
+  // resultados seguintes vem pela troca observada em ObserveDataSetChange.
   if (dbgDados.DataSource <> nil) and (dbgDados.DataSource.DataSet <> nil) then
     ApplyColumnDisplayFormats(dbgDados.DataSource.DataSet);
 end;
 
 procedure TfrmDataGridFrame.ClearQuickFilters;
 begin
-  // Retira somente os criterios rapidos; as marcacoes existentes sao
-  // preservadas.
+  // Retira somente os criterios rapidos; as marcacoes existentes sao preservadas.
   if FOperations <> nil then
     FOperations.ClearQuickFilters();
   UpdateCommandBandLayout();
@@ -1209,9 +1098,7 @@ end;
 
 function TfrmDataGridFrame.SortingAvailable: Boolean;
 begin
-  Result := (FOperations <> nil)
-    and (dbgDados.DataSource <> nil)
-    and (dbgDados.DataSource.DataSet <> nil)
+  Result := (FOperations <> nil) and (dbgDados.DataSource <> nil) and (dbgDados.DataSource.DataSet <> nil)
     and dbgDados.DataSource.DataSet.Active;
 end;
 
@@ -1234,8 +1121,7 @@ begin
   Result := FOperations.CanSortField(dts, Column.FieldName);
 end;
 
-function TfrmDataGridFrame.FindColumnByFieldName(
-  const AFieldName: string): TColumn;
+function TfrmDataGridFrame.FindColumnByFieldName(const AFieldName: string): TColumn;
 var
   I: Integer;
 begin
@@ -1243,15 +1129,14 @@ begin
   if AFieldName = '' then
     Exit;
 
-  // A busca pelo nome do campo evita manter uma referencia a TColumn, que pode
-  // ser recriada quando as colunas sao reconstruidas.
+  // A busca pelo nome do campo evita manter uma referencia a TColumn, que pode ser recriada quando as colunas sao
+  // reconstruidas.
   for I := 0 to dbgDados.Columns.Count - 1 do
     if SameText(dbgDados.Columns[I].FieldName, AFieldName) then
       Exit(dbgDados.Columns[I]);
 end;
 
-function TfrmDataGridFrame.FindSortFieldIndex(
-  const AFieldName: string): Integer;
+function TfrmDataGridFrame.FindSortFieldIndex(const AFieldName: string): Integer;
 var
   I: Integer;
 begin
@@ -1292,8 +1177,8 @@ var
   State: TSortedColumnState;
   DirectionMark: string;
 begin
-  // As legendas e os estilos originais sao recuperados antes de marcar o novo
-  // conjunto; assim somente as colunas da ordem atual ficam destacadas.
+  // As legendas e os estilos originais sao recuperados antes de marcar o novo conjunto; assim somente as colunas da
+  // ordem atual ficam destacadas.
   RestoreSortedTitles();
 
   for I := 0 to High(FSortFields) do
@@ -1319,13 +1204,10 @@ begin
   end;
 end;
 
-function TfrmDataGridFrame.TryApplySort(
-  const ASorts: TDataSetSortFields): Boolean;
+function TfrmDataGridFrame.TryApplySort(const ASorts: TDataSetSortFields): Boolean;
 var
   dts: TDataSet;
 begin
-  // Caminho unico: o frame apenas encaminha a especificacao; o contrato de
-  // operacoes aplica a ordenacao ao conjunto carregado.
   if FOperations = nil then
     Exit(False);
   if not SortingAvailable() then
@@ -1350,13 +1232,12 @@ begin
   if Current = FObservedDataSet then
     Exit;
 
-  // Um conjunto novo comeca na ordem padrao da consulta, sem seta, prioridade
-  // ou negrito do resultado anterior.
+  // Um conjunto novo comeca na ordem padrao da consulta, sem seta, prioridade ou negrito do resultado anterior.
   FObservedDataSet := Current;
   ResetSortState();
 
-  // Os formatos declarados na definicao sao aplicados ao resultado recem
-  // associado, depois de as colunas poderem ter sido criadas.
+  // Os formatos declarados na definicao sao aplicados ao resultado recem associado, depois de as colunas poderem ter
+  // sido criadas.
   ApplyColumnDisplayFormats(Current);
 end;
 
@@ -1383,8 +1264,8 @@ var
   NewSorts: TDataSetSortFields;
   Index: Integer;
 begin
-  // Ctrl+clique prepara o filtro da coluna antes de qualquer ordenacao. O
-  // gesto nunca altera a ordem, mesmo quando a tela nao trata o campo.
+  // Ctrl+clique prepara o filtro da coluna antes de qualquer ordenacao. O gesto nunca altera a ordem, mesmo quando a
+  // tela nao trata o campo.
   if GetKeyState(VK_CONTROL) < 0 then
   begin
     if Assigned(FOnTitleCtrlClick) and (Column <> nil) then
@@ -1395,10 +1276,9 @@ begin
   if not IsSortableColumn(Column) then
     Exit;
 
-  // O clique simples alterna a direcao somente quando a coluna e a unica da
-  // ordem; qualquer outra combinacao recomeca com essa coluna ascendente.
-  // Shift+clique acrescenta a coluna ao fim ou alterna sua direcao sem mudar
-  // sua prioridade.
+  // O clique simples alterna a direcao somente quando a coluna e a unica da ordem; qualquer outra combinacao recomeca
+  // com essa coluna ascendente.
+  // Shift+clique acrescenta a coluna ao fim ou alterna sua direcao sem mudar sua prioridade.
   if GetKeyState(VK_SHIFT) < 0 then
   begin
     NewSorts := Copy(FSortFields);
@@ -1416,15 +1296,14 @@ begin
   begin
     SetLength(NewSorts, 1);
     NewSorts[0].FieldName := Column.FieldName;
-    if (Length(FSortFields) = 1) and
-      SameText(FSortFields[0].FieldName, Column.FieldName) then
+    if (Length(FSortFields) = 1) and SameText(FSortFields[0].FieldName, Column.FieldName) then
       NewSorts[0].Ascending := not FSortFields[0].Ascending
     else
       NewSorts[0].Ascending := True;
   end;
 
-  // A ordenacao e efetivada antes do titulo. Uma recusa mantem a ordem, as
-  // setas, as prioridades e o negrito anteriores.
+  // A ordenacao e efetivada antes do titulo. Uma recusa mantem a ordem, as setas, as prioridades e o negrito
+  // anteriores.
   if not TryApplySort(NewSorts) then
     Exit;
 
@@ -1444,8 +1323,7 @@ begin
     Exit;
 
   miCopiar.Enabled := CopiaDisponivel;
-  miReajustarColunas.Enabled := (dbgDados.DataSource <> nil) and
-    (dbgDados.DataSource.DataSet <> nil) and
+  miReajustarColunas.Enabled := (dbgDados.DataSource <> nil) and (dbgDados.DataSource.DataSet <> nil) and
     dbgDados.DataSource.DataSet.Active;
   miConfigurarColunas.Enabled := ColumnSelectionAvailable;
   miSalvarConfigColunas.Enabled := ColumnLayoutAvailable;
@@ -1463,10 +1341,9 @@ begin
   miSomaContagemColuna.Enabled := ColumnSummaryAvailable;
   FQuickFilterColumnName := Column.FieldName;
   DataField := QuickFilterField();
-  // Filtrar por este valor exige um valor de celula; Filtrar quando abre o
-  // modal tambem sobre celula nula para escolher Vazio/Nulo.
-  miFiltrarValor.Enabled := (DataField <> nil) and
-    TryBuildEqualityCriterion(DataField, TempCriterion);
+  // Filtrar por este valor exige um valor de celula; Filtrar quando abre o modal tambem sobre celula nula para escolher
+  // Vazio/Nulo.
+  miFiltrarValor.Enabled := (DataField <> nil) and TryBuildEqualityCriterion(DataField, TempCriterion);
   miFiltrarQuando.Enabled := DataField <> nil;
 end;
 
@@ -1480,8 +1357,7 @@ begin
   if DataField = nil then
     Exit;
 
-  // Cada aceite acrescenta um criterio; os anteriores continuam ativos. A
-  // mensagem especifica do filtro substitui a generica quando disponivel.
+  // A mensagem especifica do filtro substitui a generica quando disponivel.
   if FOperations.AddQuickFilter(DataField, AId, Msg) then
   begin
     UpdateCommandBandLayout();
@@ -1490,7 +1366,7 @@ begin
   else
   begin
     if Trim(Msg) = '' then
-      Msg := QuickFilterFailureMessage;
+      Msg := 'Não foi possível filtrar pelo valor selecionado.';
     ReportarFeedback(Msg);
   end;
 end;
@@ -1512,16 +1388,13 @@ begin
     Exit;
   end;
 
-  // A definicao do modal usa as colunas de dados da grade, sem a coluna de
-  // marcacao, com os operadores que o filtro local executa para o tipo fisico.
-  // A visibilidade atual nao e considerada: colunas ocultas na grade tambem
-  // entram na definicao.
+  // A definicao do modal usa as colunas de dados da grade, sem a coluna de marcacao, com os operadores que o filtro
+  // local executa para o tipo fisico. A visibilidade atual nao e considerada: colunas ocultas na grade tambem entram na
+  // definicao.
   for I := 0 to dbgDados.Columns.Count - 1 do
   begin
     Column := dbgDados.Columns[I];
-    if (Column.Field = nil) or
-      ((FMarkingColumn <> '') and
-       SameText(Column.FieldName, FMarkingColumn)) then
+    if (Column.Field = nil) or ((FMarkingColumn <> '') and SameText(Column.FieldName, FMarkingColumn)) then
       Continue;
 
     ValueType := QuickFilterFieldTypeFor(Column.Field);
@@ -1545,13 +1418,11 @@ end;
 
 procedure TfrmDataGridFrame.ShowQuickFilterMessage(const AMessage: string);
 begin
-  // O frame nao abre dialogo proprio; a mensagem segue para o host.
   ReportarFeedback(AMessage);
 end;
 
-function TfrmDataGridFrame.ShowQuickFilterModal(const ACaption: string;
-  const ADefinition: TFilterDefinition; const ACriterion: TFilterCriterion;
-  out AResult: TFilterCriterion): Boolean;
+function TfrmDataGridFrame.ShowQuickFilterModal(const ACaption: string; const ADefinition: TFilterDefinition;
+  const ACriterion: TFilterCriterion; out AResult: TFilterCriterion): Boolean;
 var
   ModalForm: TForm;
   FilterView: TfrmFilterFrame;
@@ -1626,7 +1497,7 @@ begin
       else
       begin
         if Trim(MessageText) = '' then
-          MessageText := QuickFilterInvalidMessage;
+          MessageText := 'O filtro informado não é válido.';
         ShowQuickFilterMessage(MessageText);
       end;
     end;
@@ -1647,21 +1518,20 @@ begin
   if DataField = nil then
     Exit;
 
-  // Celula sem valor abre o modal com o campo e o operador padrao/primeiro
-  // disponivel, para o usuario escolher Vazio, Nulo ou informar o valor.
+  // Celula sem valor abre o modal com o campo e o operador padrao/primeiro disponivel, para o usuario escolher Vazio,
+  // Nulo ou informar o valor.
   if not TryBuildEqualityCriterion(DataField, InitialCriterion) then
     if not TryBuildDefaultQuickFilterCriterion(DataField, InitialCriterion) then
       Exit;
 
   Definition := BuildQuickFilterDefinition();
-  if not ShowQuickFilterModal('Filtrar quando', Definition, InitialCriterion,
-    NewCriterion) then
+  if not ShowQuickFilterModal('Filtrar quando', Definition, InitialCriterion, NewCriterion) then
     Exit;
 
   if not FOperations.AddQuickFilterCriterion(NewCriterion, Msg) then
   begin
     if Trim(Msg) = '' then
-      Msg := QuickFilterAddFailureMessage;
+      Msg := 'Não foi possível adicionar o filtro. Verifique se ele já está aplicado.';
     ReportarFeedback(Msg);
     Exit;
   end;
@@ -1687,20 +1557,19 @@ begin
 
   if not FOperations.GetQuickFilterCriterion(AId, CurrentCriterion) then
   begin
-    ReportarFeedback(QuickFilterMissingMessage);
+    ReportarFeedback('O filtro selecionado não está mais ativo.');
     UpdateCommandBandLayout();
     Exit;
   end;
 
   Definition := BuildQuickFilterDefinition();
-  if not ShowQuickFilterModal('Alterar filtro', Definition, CurrentCriterion,
-    NewCriterion) then
+  if not ShowQuickFilterModal('Alterar filtro', Definition, CurrentCriterion, NewCriterion) then
     Exit;
 
   if not FOperations.UpdateQuickFilter(AId, NewCriterion, Msg) then
   begin
     if Trim(Msg) = '' then
-      Msg := QuickFilterUpdateFailureMessage;
+      Msg := 'Não foi possível alterar o filtro. Verifique se ele já está aplicado.';
     ReportarFeedback(Msg);
     Exit;
   end;
@@ -1734,13 +1603,12 @@ end;
 
 procedure TfrmDataGridFrame.dbgDadosExit(Sender: TObject);
 begin
-//
 end;
 
 procedure TfrmDataGridFrame.dbgDadosKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  // Ctrl+C so existe na grade; editores de digitacao mantem o atalho nativo do
-  // VCL porque nao passam por este manipulador.
+  // Ctrl+C so existe na grade; editores de digitacao mantem o atalho nativo do VCL porque nao passam por este
+  // manipulador.
   if (Key = KeyC) and (Shift = [ssCtrl]) then
   begin
     CopiarCelulaAtual;
@@ -1762,8 +1630,8 @@ begin
 
   dset := dbgDados.DataSource.DataSet;
 
-  // O desvinculo transitorio nao e uma nova pesquisa: a ordenacao exibida e as
-  // marcacoes continuam valendo apos os comandos.
+  // O desvinculo transitorio nao e uma nova pesquisa: a ordenacao exibida e as marcacoes continuam valendo apos os
+  // comandos.
   FSuppressDataSetChange := True;
   try
     dbgDados.DataSource.DataSet := nil;
@@ -1782,8 +1650,7 @@ begin
   end;
 end;
 
-procedure TfrmDataGridFrame.DrawCheckboxCell(const Rect: TRect;
-  const State: TGridDrawState; AState: Boolean);
+procedure TfrmDataGridFrame.DrawCheckboxCell(const Rect: TRect; const State: TGridDrawState; AState: Boolean);
 var
   Marked: Boolean;
   R: TRect;

@@ -7,8 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.ExtCtrls, Vcl.StdCtrls, ValidationEntityOutputUnit;
 
 type
-  // Link de campo do painel. O SysLink nao declara o Enter nem o entrega ao
-  // frame; o descendente pede a tecla e dispara a mesma ativacao do clique.
+  // O SysLink não recebe o Enter: o descendente pede a tecla e ativa como no clique.
   TVisualValidationLink = class(TLinkLabel)
   private
     FNomeCampo: string;
@@ -17,26 +16,19 @@ type
     property NomeCampo: string read FNomeCampo write FNomeCampo;
   end;
 
-  // Vinculo entre o nome de campo produzido pelo validador e o editor que o
-  // representa. O nome exibido identifica o campo para o usuario.
   TVinculoCampoValidacao = record
     NomeCampo: string;
     Controle: TWinControl;
     NomeExibicao: string;
   end;
 
-  // Linha apresentada: o link do campo, quando existe vinculo, seguido do texto
-  // das mensagens. Os controles pertencem ao painel e sao reposicionados quando
-  // a largura disponivel muda.
+  // Os controles pertencem ao painel e são reposicionados pela largura disponível.
   TLinhaValidacao = record
     Link: TVisualValidationLink;
     Texto: TLabel;
   end;
 
-  // Painel reutilizavel de erros de validacao. Recebe o resultado produzido pelo
-  // caso de uso e agrupa as mensagens por campo. A navegacao depende apenas dos
-  // vinculos registrados pela tela, portanto o painel nao conhece a
-  // funcionalidade que o utiliza.
+  // A navegação usa apenas os vínculos registrados pela tela.
   TfrmValidationPanelFrame = class(TFrame)
     pnTitulo: TPanel;
     lblTitulo: TLabel;
@@ -48,14 +40,10 @@ type
     FAjustando: Boolean;
     procedure LimparLinhas;
     function IndiceVinculo(const ANomeCampo: string): Integer;
-    // Deriva o nome do campo do validador a partir do nome do editor.
     function NomeCampoDoControle(AControle: TWinControl): string;
-    function JaAgrupado(const ACampos: TArray<string>;
-      const ANomeCampo: string): Boolean;
-    function MensagensDoCampo(const AValidacao: ValidationEntityOutput;
-      const ANomeCampo: string): string;
-    procedure CriarLinha(const ANomeCampo, ATexto: string;
-      AControle: TWinControl; const ANomeExibicao: string);
+    function JaAgrupado(const ACampos: TArray<string>; const ANomeCampo: string): Boolean;
+    function MensagensDoCampo(const AValidacao: ValidationEntityOutput; const ANomeCampo: string): string;
+    procedure CriarLinha(const ANomeCampo, ATexto: string; AControle: TWinControl; const ANomeExibicao: string);
     function LarguraDisponivel: Integer;
     procedure ReorganizarLinhas;
     procedure PrepararControle(AControle: TControl);
@@ -63,24 +51,17 @@ type
     procedure RolarPainelEmVista;
     procedure ApresentarSecaoDoPrimeiroCampo;
     function AtivarCampo(const ANomeCampo: string): Boolean;
-    procedure LinkClick(Sender: TObject; const ALink: string;
-      ALinkType: TSysLinkType);
-    procedure LinkKeyDown(Sender: TObject; var AKey: Word;
-      AShift: TShiftState);
+    procedure LinkClick(Sender: TObject; const ALink: string; ALinkType: TSysLinkType);
+    procedure LinkKeyDown(Sender: TObject; var AKey: Word; AShift: TShiftState);
   public
     destructor Destroy; override;
-    // Registra o editor responsavel por um campo do validador. O vinculo
-    // repetido substitui o anterior, porque um campo possui um unico editor.
-    procedure Bind(const ANomeCampo: string; AControle: TWinControl;
-      const ANomeExibicao: string); overload;
-    // Registra o editor pelo sufixo do proprio nome e deixa o rotulo para o
-    // texto do metadata devolvido na validacao.
+    // O vínculo repetido substitui o anterior: um campo possui um único editor.
+    procedure Bind(const ANomeCampo: string; AControle: TWinControl; const ANomeExibicao: string); overload;
+    // O campo é derivado do sufixo do nome do controle; o rótulo vem do metadata.
     procedure Bind(AControle: TWinControl); overload;
-    // Substitui as linhas anteriores pelas mensagens do resultado recebido.
     procedure ExibirValidacao(const AValidacao: ValidationEntityOutput);
     procedure Limpar;
-    // Navega ate o primeiro campo vinculado com erro; campos sem vinculo nao
-    // recebem foco.
+    // Campos sem vínculo não recebem foco.
     function FocarPrimeiroErro: Boolean;
   end;
 
@@ -92,18 +73,13 @@ uses
   Vcl.ComCtrls, Vcl.Graphics;
 
 const
-  // Medidas internas do painel: margem das linhas, intervalo entre o link e o
-  // texto e entre linhas.
   MargemLinha = 10;
   IntervaloLinkTexto = 2;
   IntervaloEntreLinhas = 8;
   LarguraMinimaTexto = 120;
 
-// Mede a altura do bloco de texto quebrado na largura informada. O rotulo usa
-// largura fixa e nao se auto-dimensiona, portanto a altura precisa ser calculada
-// com a mesma fonte antes de posicionar a linha seguinte.
-function AlturaDoTextoQuebrado(const ATexto: string; AFonte: TFont;
-  ALargura: Integer): Integer;
+// O rótulo não se auto-dimensiona: a altura é medida com a mesma fonte antes de posicionar a linha seguinte.
+function AlturaDoTextoQuebrado(const ATexto: string; AFonte: TFont; ALargura: Integer): Integer;
 var
   Bitmap: TBitmap;
   Area: TRect;
@@ -119,8 +95,7 @@ begin
     Area.Top := 0;
     Area.Right := ALargura;
     Area.Bottom := 0;
-    DrawText(Bitmap.Canvas.Handle, PChar(ATexto), Length(ATexto), Area,
-      DT_CALCRECT or DT_WORDBREAK or DT_NOPREFIX);
+    DrawText(Bitmap.Canvas.Handle, PChar(ATexto), Length(ATexto), Area, DT_CALCRECT or DT_WORDBREAK or DT_NOPREFIX);
     if (Area.Bottom - Area.Top) > Result then
       Result := Area.Bottom - Area.Top;
   finally
@@ -130,28 +105,22 @@ end;
 
 procedure TVisualValidationLink.WMGetDlgCode(var AMessage: TWMGetDlgCode);
 begin
-  // Sem DLGC_WANTALLKEYS o dialogo entrega o Enter ao botao padrao do rodape e
-  // o link nunca recebe WM_KEYDOWN.
+  // Sem DLGC_WANTALLKEYS o diálogo entrega o Enter ao botão padrão e o link não recebe WM_KEYDOWN.
   AMessage.Result := DLGC_WANTALLKEYS;
 end;
 
-{ TfrmValidationPanelFrame }
-
 destructor TfrmValidationPanelFrame.Destroy;
 begin
-  // As linhas pertencem ao painel: libera-las aqui nao depende da ordem de
-  // destruicao dos componentes do frame.
+  // As linhas pertencem ao painel: liberá-las aqui não depende da ordem de destruição dos componentes.
   LimparLinhas;
   inherited;
 end;
 
-procedure TfrmValidationPanelFrame.Bind(const ANomeCampo: string;
-  AControle: TWinControl; const ANomeExibicao: string);
+procedure TfrmValidationPanelFrame.Bind(const ANomeCampo: string; AControle: TWinControl; const ANomeExibicao: string);
 var
   Indice: Integer;
   Vinculo: TVinculoCampoValidacao;
 begin
-  // Sem editor nao existe destino para o link: o campo permanece sem vinculo.
   if AControle = nil then
     Exit;
 
@@ -171,16 +140,13 @@ end;
 
 procedure TfrmValidationPanelFrame.Bind(AControle: TWinControl);
 begin
-  // Sem controle nao ha campo para vincular.
   if AControle = nil then
     Exit;
 
-  // O rotulo fica vazio: a exibicao usa o texto do metadata, quando existir.
   Bind(NomeCampoDoControle(AControle), AControle, '');
 end;
 
-procedure TfrmValidationPanelFrame.ExibirValidacao(
-  const AValidacao: ValidationEntityOutput);
+procedure TfrmValidationPanelFrame.ExibirValidacao(const AValidacao: ValidationEntityOutput);
 var
   Campos: TArray<string>;
   I: Integer;
@@ -194,7 +160,7 @@ begin
   if AValidacao.IsValid then
     Exit;
 
-  // A ordem dos grupos e a da primeira ocorrencia no resultado do validador.
+  // A ordem dos grupos é a da primeira ocorrência no resultado do validador.
   for I := 0 to High(AValidacao.Validations) do
   begin
     NomeCampo := Trim(AValidacao.Validations[I].FieldName);
@@ -208,8 +174,7 @@ begin
     if Indice >= 0 then
     begin
       Controle := FVinculos[Indice].Controle;
-      // O rotulo informado pela tela tem prioridade; sem ele, o metadata do
-      // validador nomeia o campo, e o proprio nome e a ultima alternativa.
+      // O rótulo da tela tem prioridade; depois o metadata do validador e, por último, o nome do campo.
       NomeExibicao := FVinculos[Indice].NomeExibicao;
       if NomeExibicao = '' then
         NomeExibicao := AValidacao.Validations[I].Display;
@@ -222,13 +187,11 @@ begin
       NomeExibicao := '';
     end;
 
-    CriarLinha(NomeCampo, MensagensDoCampo(AValidacao, NomeCampo), Controle,
-      NomeExibicao);
+    CriarLinha(NomeCampo, MensagensDoCampo(AValidacao, NomeCampo), Controle, NomeExibicao);
   end;
 
   Visible := True;
-  // A primeira exibicao acontece com o painel recem-visivel: a largura real e a
-  // altura das mensagens quebradas so podem ser calculadas depois disso.
+  // A largura real só existe depois que o painel fica visível; medir antes daria altura errada.
   ReorganizarLinhas;
   ApresentarSecaoDoPrimeiroCampo;
   RolarPainelEmVista;
@@ -250,8 +213,7 @@ begin
     if FLinhas[I].Link = nil then
       Continue;
 
-    // Um campo vinculado pode nao aceitar foco agora: a proxima linha
-    // vinculada ainda pode ser o destino util.
+    // Um campo vinculado pode não aceitar foco agora: a próxima linha ainda pode ser o destino útil.
     if AtivarCampo(FLinhas[I].Link.NomeCampo) then
       Exit(True);
   end;
@@ -262,9 +224,8 @@ var
   Linhas: TArray<TLinhaValidacao>;
   I: Integer;
 begin
-  // A lista e esvaziada antes de liberar os controles: o redimensionamento das
-  // barras que acompanha a liberacao pode chegar ao painel, que nao deve tocar
-  // em linhas ja destruidas.
+  // A lista é esvaziada antes de liberar os controles: o redimensionamento que acompanha a liberação pode chegar ao
+  // painel, que não deve tocar em linhas já destruídas.
   Linhas := FLinhas;
   SetLength(FLinhas, 0);
 
@@ -276,8 +237,7 @@ begin
   end;
 end;
 
-function TfrmValidationPanelFrame.IndiceVinculo(
-  const ANomeCampo: string): Integer;
+function TfrmValidationPanelFrame.IndiceVinculo(const ANomeCampo: string): Integer;
 var
   I: Integer;
 begin
@@ -287,8 +247,7 @@ begin
       Exit(I);
 end;
 
-function TfrmValidationPanelFrame.NomeCampoDoControle(
-  AControle: TWinControl): string;
+function TfrmValidationPanelFrame.NomeCampoDoControle(AControle: TWinControl): string;
 const
   Prefixos: array[0..5] of string = ('ed_', 'cb_', 'ck_', 'ed', 'cb', 'ck');
 var
@@ -297,13 +256,12 @@ var
 begin
   Result := AControle.Name;
 
-  // Os prefixos com sublinhado vem antes dos curtos porque ed_ tambem comeca
-  // com ed; sem prefixo conhecido o proprio nome do controle e a chave.
+  // Os prefixos com sublinhado vêm antes porque ed_ também começa com ed; sem prefixo conhecido, o nome do controle é a
+  // chave.
   for I := Low(Prefixos) to High(Prefixos) do
   begin
     Prefixo := Prefixos[I];
-    if (Length(Result) > Length(Prefixo)) and
-      SameText(Copy(Result, 1, Length(Prefixo)), Prefixo) then
+    if (Length(Result) > Length(Prefixo)) and SameText(Copy(Result, 1, Length(Prefixo)), Prefixo) then
     begin
       Result := Copy(Result, Length(Prefixo) + 1, Length(Result));
       Exit;
@@ -311,8 +269,7 @@ begin
   end;
 end;
 
-function TfrmValidationPanelFrame.JaAgrupado(const ACampos: TArray<string>;
-  const ANomeCampo: string): Boolean;
+function TfrmValidationPanelFrame.JaAgrupado(const ACampos: TArray<string>; const ANomeCampo: string): Boolean;
 var
   I: Integer;
 begin
@@ -322,8 +279,7 @@ begin
       Exit(True);
 end;
 
-function TfrmValidationPanelFrame.MensagensDoCampo(
-  const AValidacao: ValidationEntityOutput;
+function TfrmValidationPanelFrame.MensagensDoCampo(const AValidacao: ValidationEntityOutput;
   const ANomeCampo: string): string;
 var
   I: Integer;
@@ -341,8 +297,7 @@ begin
     if Mensagem = '' then
       Continue;
 
-    // Itens distintos podem produzir o mesmo texto: a linha apresenta cada
-    // mensagem uma unica vez.
+    // Itens distintos podem repetir o texto: cada mensagem aparece uma única vez.
     for J := 0 to High(Mensagens) do
       if SameText(Mensagens[J], Mensagem) then
       begin
@@ -381,16 +336,13 @@ begin
     Linha.Link.TabStop := True;
     Linha.Link.OnLinkClick := LinkClick;
     Linha.Link.OnKeyDown := LinkKeyDown;
-    // O href preserva o nome do validador; o texto e o rotulo conhecido pela
-    // tela, usado para localizar o editor do campo.
-    Linha.Link.Caption := Format('<a href="%s">%s</a>',
-      [ANomeCampo, ANomeExibicao]);
+    // O href preserva o nome do validador; o texto é o rótulo conhecido pela tela.
+    Linha.Link.Caption := Format('<a href="%s">%s</a>', [ANomeCampo, ANomeExibicao]);
   end;
 
   Mensagem := ATexto;
   if (Linha.Link = nil) and (ANomeCampo <> '') then
-    // Sem vinculo nao existe destino de foco: a linha identifica o campo apenas
-    // pelo texto, quando o validador informou o nome.
+    // Sem vínculo não há destino de foco: a linha identifica o campo pelo texto.
     Mensagem := ANomeCampo + ': ' + Mensagem;
 
   Linha.Texto := TLabel.Create(Self);
@@ -418,8 +370,7 @@ var
   I: Integer;
   Y: Integer;
 begin
-  // O ajuste altera a altura das mensagens e, com ela, as barras do painel: o
-  // evento de redimensionamento que chega durante o ajuste nao deve reentrar.
+  // O ajuste altera a altura das mensagens e as barras do painel: o evento de redimensionamento não deve reentrar.
   if FAjustando then
     Exit;
 
@@ -440,8 +391,7 @@ begin
       FLinhas[I].Texto.Left := MargemLinha;
       FLinhas[I].Texto.Top := Y;
       FLinhas[I].Texto.Width := LarguraDisponivel;
-      FLinhas[I].Texto.Height := AlturaDoTextoQuebrado(
-        FLinhas[I].Texto.Caption, FLinhas[I].Texto.Font,
+      FLinhas[I].Texto.Height := AlturaDoTextoQuebrado(FLinhas[I].Texto.Caption, FLinhas[I].Texto.Font,
         FLinhas[I].Texto.Width);
       Y := Y + FLinhas[I].Texto.Height + IntervaloEntreLinhas;
     end;
@@ -462,8 +412,8 @@ begin
   Ancestral := AControle.Parent;
   while Ancestral <> nil do
   begin
-    // A cadeia ShowControl do VCL apresenta a pagina ancestral do campo; as
-    // restricoes de visibilidade e habilitacao do controle continuam da tela.
+    // A cadeia ShowControl do VCL apresenta a página ancestral; as restrições de visibilidade e habilitação do controle
+    // continuam com a tela.
     if Ancestral is TTabSheet then
       Ancestral.Show;
     Ancestral := Ancestral.Parent;
@@ -507,8 +457,7 @@ begin
   RolarControleEmVista(Self);
 end;
 
-function TfrmValidationPanelFrame.AtivarCampo(
-  const ANomeCampo: string): Boolean;
+function TfrmValidationPanelFrame.AtivarCampo(const ANomeCampo: string): Boolean;
 var
   Indice: Integer;
   Controle: TWinControl;
@@ -533,8 +482,7 @@ begin
   end;
 end;
 
-procedure TfrmValidationPanelFrame.LinkClick(Sender: TObject;
-  const ALink: string; ALinkType: TSysLinkType);
+procedure TfrmValidationPanelFrame.LinkClick(Sender: TObject; const ALink: string; ALinkType: TSysLinkType);
 begin
   if Sender is TVisualValidationLink then
     AtivarCampo(TVisualValidationLink(Sender).NomeCampo)
@@ -542,13 +490,12 @@ begin
     AtivarCampo(ALink);
 end;
 
-procedure TfrmValidationPanelFrame.LinkKeyDown(Sender: TObject; var AKey: Word;
-  AShift: TShiftState);
+procedure TfrmValidationPanelFrame.LinkKeyDown(Sender: TObject; var AKey: Word; AShift: TShiftState);
 begin
   if AKey <> VK_RETURN then
     Exit;
 
-  // O Enter pertence ao link focado, nao ao comando padrao do rodape.
+  // O Enter pertence ao link focado, não ao comando padrão do rodapé.
   AKey := 0;
   if Sender is TVisualValidationLink then
     AtivarCampo(TVisualValidationLink(Sender).NomeCampo);

@@ -8,7 +8,6 @@ uses
   ValidationEntityOutputUnit, PresenterCadastroBase;
 
 type
-  // Base dos editores de cadastro: estrutura visual comum e contratos da aba.
   TfrmCadastroEditor = class(TFrame, ICadastroEditorView, IEditorCadastro)
     sbCampos: TScrollBox;
     pnCampos: TPanel;
@@ -20,18 +19,14 @@ type
     procedure btnCancelarClick(Sender: TObject);
   private
     FHost: IEditorCadastroHost;
-    // Apresentador da funcionalidade. A base responde pela liberacao a partir da  associacao aceita.
     FPresenterCadastro: TPresenterCadastroBase;
   protected
-    // Associa o apresentador da funcionalidade. Ate a atribuicao a composicao continua dona do apresentador e o
-    // libera se a associacao for recusada.
+    // Até a atribuição, a composição continua dona do apresentador e o libera se a associação falhar.
     procedure AssociarPresenter(APresenter: TPresenterCadastroBase);
-    // Executa a gravacao da funcionalidade; False mantem o editor e os dados.
     function Salvar: Boolean; virtual;
     property PresenterCadastro: TPresenterCadastroBase read FPresenterCadastro;
   public
-    constructor Create(AOwner: TComponent;
-      const AHost: IEditorCadastroHost); reintroduce; virtual;
+    constructor Create(AOwner: TComponent; const AHost: IEditorCadastroHost); reintroduce; virtual;
     destructor Destroy; override;
     procedure ShowInformation(const AMessage: string);
     procedure ShowWarning(const AMessage: string);
@@ -52,8 +47,7 @@ implementation
 uses
   NextDialogs;
 
-constructor TfrmCadastroEditor.Create(AOwner: TComponent;
-  const AHost: IEditorCadastroHost);
+constructor TfrmCadastroEditor.Create(AOwner: TComponent; const AHost: IEditorCadastroHost);
 begin
   if AHost = nil then
     raise Exception.Create('O hospedeiro do editor de cadastro não foi informado.');
@@ -120,8 +114,7 @@ begin
   Result := False;
 end;
 
-procedure TfrmCadastroEditor.ShowValidation(
-  const AValidacao: ValidationEntityOutput);
+procedure TfrmCadastroEditor.ShowValidation(const AValidacao: ValidationEntityOutput);
 begin
   fraValidacao.ExibirValidacao(AValidacao);
 end;
@@ -141,8 +134,7 @@ begin
   TNextDialogs.ShowError(AMessage);
 end;
 
-function TfrmCadastroEditor.ShowDangerQuestion(
-  const AMessage: string): Boolean;
+function TfrmCadastroEditor.ShowDangerQuestion(const AMessage: string): Boolean;
 begin
   Result := TNextDialogs.ShowDangerQuestion(AMessage);
 end;

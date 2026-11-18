@@ -6,20 +6,17 @@ uses
   AuthorizationService;
 
 type
-  // Autorizacao compartilhada pelos apresentadores; cada funcionalidade informa
-  // a tabela padrao.
+  // Cada funcionalidade informa a tabela padrao usada nas verificacoes.
   TPresenterAutorizacao = class
   private
     FAuthorization: IAuthorizationService;
     FTabelaPadrao: string;
   protected
-    function Autorizar(const AProcessCode: string;
-      AAction: TAuthorizationAction): Boolean; overload;
+    function Autorizar(const AProcessCode: string; AAction: TAuthorizationAction): Boolean; overload;
     function Autorizar(const AProcessCode: string;
       AAction: TAuthorizationAction; const ATabela: string): Boolean; overload;
   public
-    constructor Create(AAuthorization: IAuthorizationService;
-      const ATabelaPadrao: string);
+    constructor Create(AAuthorization: IAuthorizationService; const ATabelaPadrao: string);
   end;
 
 implementation
@@ -27,26 +24,20 @@ implementation
 uses
   System.SysUtils;
 
-const
-  MissingAuthorizationMessage =
-    'O servico de autorizacao do apresentador nao foi informado.';
-  MissingTableMessage = 'A tabela padrao do apresentador nao foi informada.';
-
 constructor TPresenterAutorizacao.Create(AAuthorization: IAuthorizationService;
   const ATabelaPadrao: string);
 begin
   inherited Create;
   if AAuthorization = nil then
-    raise Exception.Create(MissingAuthorizationMessage);
+    raise Exception.Create('O servico de autorizacao do apresentador nao foi informado.');
   if Trim(ATabelaPadrao) = '' then
-    raise Exception.Create(MissingTableMessage);
+    raise Exception.Create('A tabela padrao do apresentador nao foi informada.');
 
   FAuthorization := AAuthorization;
   FTabelaPadrao := ATabelaPadrao;
 end;
 
-function TPresenterAutorizacao.Autorizar(const AProcessCode: string;
-  AAction: TAuthorizationAction): Boolean;
+function TPresenterAutorizacao.Autorizar(const AProcessCode: string; AAction: TAuthorizationAction): Boolean;
 begin
   Result := Autorizar(AProcessCode, AAction, FTabelaPadrao);
 end;
@@ -54,8 +45,7 @@ end;
 function TPresenterAutorizacao.Autorizar(const AProcessCode: string;
   AAction: TAuthorizationAction; const ATabela: string): Boolean;
 begin
-  Result := FAuthorization.Authorize(AProcessCode, AAction, ATabela).Outcome =
-    aoAllowed;
+  Result := FAuthorization.Authorize(AProcessCode, AAction, ATabela).Outcome = aoAllowed;
 end;
 
 end.
