@@ -30,6 +30,11 @@ behavior. When migrating a visual screen, inspect its DFM for the actual layout.
 Resolve missing business decisions through the assignment's existing process;
 this Skill does not define permissions, schema or fiscal behavior.
 
+Compare the required processes with existing definitions using the
+[process registration Rule](../../rules/next-architecture.md#authorization-and-process-registration).
+Identify reused processes and missing registrations in the plan. Deliver approved
+new registrations together with the protected actions.
+
 ## Assemble the consultation
 
 1. Implement the feature's query definition using TNextQueryDefinitionBase and,
@@ -98,6 +103,8 @@ tabs and reactivation; validation links across pages; save, cancel and failed
 refresh; company restrictions, pending edits and session replacement when relevant.
 Check inherited DFM consistency, original dimensions and designer opening for
 visual changes. Distinguish checks executed from the developer's runtime checks.
+For new process registrations, include first initialization and repeated
+initialization for the company in validation, preserving existing process settings.
 
 During authorized implementation, compile with
 `pwsh -NoProfile -File ./_automation/build/build-next.ps1` as required by

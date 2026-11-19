@@ -37,6 +37,25 @@ checkout-relative.
   the tab owns its editor and the editor owns its draft. Apply
   .ai/rules/implementation-quality.md before adding source explanations of ownership.
 
+## Authorization and process registration
+
+- Map protected actions to their processes, authorization actions and audited
+  tables. Reuse processes representing the required permission. Present new
+  definitions and unresolved security settings in the plan for review; another
+  feature or an example does not establish those decisions.
+- Keep Next process definitions in
+  [ProcessosProviderUnit.pas](../../Next/Composition/Processos/ProcessosProviderUnit.pas).
+  Include approved codes, descriptions, levels, manager-approval and auditing
+  settings in new integer version blocks. Preserve applied blocks and existing
+  process settings; do not add new Next registrations to the legacy setup.
+- Registration runs through Next initialization and the existing
+  [RegistrarProcessosUseCase](../../Modern/ERP.Features/Core/Application/UseCases/Processos/RegistrarProcessosUseCaseUnit.pas)
+  before protected actions. Preserve the per-company version and construction of
+  only pending blocks. Reuse the process and configuration repositories; forms
+  and Presenters do not seed processes or maintain a parallel setup.
+- The definitions in source are authoritative. Do not maintain duplicate process
+  catalogs in documentation or Skills.
+
 ## Reads and host boundary
 
 - Query definitions supply columns, filters, query identity and the result
