@@ -86,7 +86,7 @@ Observações:
   declaração (`:92`, incluindo `export;`), implementação (`:2189`), `exports` (`:2855`) e as cargas do
   wrapper/app de teste.
 
-## 7. Estado do desmonte (partes 1 a 3 aplicadas; DLL compilada)
+## 7. Estado do desmonte (partes 1 a 4 aplicadas; DLL compilada)
 
 Verificado no working tree em 18/11/2026 (alterações não commitadas):
 
@@ -134,8 +134,8 @@ e `Result := False` no ramo legado de `imprimeNotaFiscal`.
 | `EnviarNFeHW` | removido; restam apenas comentários (`UClassesVeiculosCCIA.pas:7658`, bloco legado do `DFeHwLibUnit`) |
 | `EnviarEvento` `tpop=4` | vivo em `uClassesNotasFiscais_nfe.pas:1269,1327,1493,1707` |
 | EPEC 4.0 | via `dllNFe.AutorizarNFe` / `nfe_evento_*` (não usa `ExecutarDLL`) |
-| `ImprimirNFe` | vivo no viewer F8 (`btnImprimirClick`) |
-| `ExecutarDLL` | vivo só por `ImprimirNFe` (`ExecutarDLL('Imprimir')`) |
+| `ImprimirNFe` | removido (era o F8 do viewer) |
+| `ExecutarDLL` | removido (declaração, implementação, `exports` e cargas) |
 
 ### Decisão pendente do desenvolvedor
 
@@ -147,15 +147,26 @@ Nota de release: a tabela de exports mudou (remoção de `EnviarNFeHW` e ordinai
 publicada junto com o ERP 4.0; executáveis antigos que importem o símbolo estaticamente falham ao
 carregar.
 
-### Próximas partes
+### Parte 4 aplicada (F8 + `ImprimirNFe` + `ExecutarDLL`)
 
-1. Viewer: remover `btnImprimir`/`btnImprimirClick` (`UAdmNFe.pas:322-326` + DFM) — último consumidor
-   de `ImprimirNFe`.
-2. DLL: remover `ImprimirNFe`, `ExecutarDLL` (declaração `:92` com `export;`, implementação e
-   `exports` da unit), as cargas de `TExecutarDLL` em `DFeHwLibUnit.pas`/`uFuncHwNFE.pas` e o
-   comentário `Validar` (`UAdmNFe.pas`).
-3. Opcional: atualizar o rótulo de log `'procedure cadNfpeloComando Erro'`
-   (`uClassesNotasFiscais.pas:34827`) e remover o comentário `EnviarNFeHW` em
-   `UClassesVeiculosCCIA.pas:7658`.
-4. Compilar `pkAtivos`/`PrTesteDll` quando autorizado (os 4 arquivos fora do projeto da DLL não têm
-   evidência de compilação) e smoke do viewer.
+- `UAdmNFe.pas`/`.dfm`: removidos `btnImprimir`, `btnImprimirClick`, `ImprimirNFe` e o bloco
+  comentado de `Validar`; `vChaveNF` saiu da declaração de variáveis.
+- `UFuncoesDll.pas`: removidos declaração (`export;`), implementação, `exports` e as variáveis
+  `vTipoOP`/`vAux`, que ficaram sem uso.
+- `DFeHwLibUnit.pas`/`uFuncHwNFE.pas`: removidos tipo, variável e `GetProcAddress` de `ExecutarDLL`.
+- `UformTeste.pas`: removidos os comentários remanescentes de `ExecutarDLL`.
+- Build DLL: exit 0; `bpl\hw.nfe.dx.dll` 68.936.722 bytes (19/11/2026 10:06:37); binário sem
+  `ExecutarDLL`/`ImprimirNFe` e com `GeraNFe`/`verificarStatusWeb`/`TerminaNFE`/`ConsultaCadastro`.
+- Revisão independente: sem bloqueantes. Notas: perda do F8 "Imprimir DANFE" (resta o botão de PDF);
+  export table alterada (publicar junto com o ERP 4.0); `TabOrder` 5 vago (cosmético); o bloco
+  comentado de `TEvent.btExecutarClick` cita `vAux`/`vtipoOP` e não compilaria se fosse reativado.
+
+### Pendências finais
+
+1. Compilar `pkAtivos`/`PrTesteDll` quando autorizado e smoke do viewer (`ShowModal`, abrir NF,
+   conferir que o F8 não existe mais e que o PDF continua funcionando).
+2. Decidir o retorno de `EnviarEvento` para `tpop` ≠ 4 (`else Result := False` ou documentar).
+3. Opcional: limpar o rótulo de log `'procedure cadNfpeloComando Erro'`
+   (`uClassesNotasFiscais.pas:34827`) e o comentário `EnviarNFeHW` em `UClassesVeiculosCCIA.pas:7658`.
+4. Backlog separado: `GeraNFe`, `verificarStatusWeb` e `TerminaNFE` continuam exportados e usados
+   internamente pelo viewer; limpar as cargas mortas dos wrappers.

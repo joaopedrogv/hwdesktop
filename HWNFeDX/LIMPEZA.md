@@ -33,7 +33,7 @@
 | 12 | `BuscaTroca` | **aplicado pelo desenvolvedor** | helper removido |
 | 13 | `GeraChaveNFe` | **export removido pelo desenvolvedor** | função/implementação permanece (uso interno) |
 | 14 | `ShowfrStatus` | **aplicado pelo desenvolvedor** | helper removido |
-| 15 | `ExecutarDLL` + 4 métodos legados | **em desmonte — limpeza morta aplicada; DLL compilada** | `LIMPEZA-EXECUTARDLL.md` §7; falta o F8 do viewer e o `ExecutarDLL` |
+| 15 | `ExecutarDLL` + 4 métodos legados | **aplicado — F8, `ImprimirNFe` e `ExecutarDLL` removidos; DLL compilada; teste pendente** | `LIMPEZA-EXECUTARDLL.md` §7 |
 | 16 | `GeraNFe`, `verificarStatusWeb`, `TerminaNFE` (export + cargas) | backlog | exports permanecem; limpar loaders |
 | — | `LerConfiguracao` + `IniciaNFE` | preservar por enquanto | usadas por `leconfigNFE`, que atende o viewer |
 | — | `nfce_serv_*` | preservar | usados pelos EXEs de serviço |

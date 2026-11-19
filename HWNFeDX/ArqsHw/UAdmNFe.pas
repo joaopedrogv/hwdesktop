@@ -36,7 +36,6 @@ type
     btnConsultar: TButton;
     btnContingenciaNF: TButton;
     btnConsCad: TButton;
-    btnImprimir: TButton;
     btnCriarEnviar: TButton;
     btnValidarXML: TButton;
     btnGerarPDF: TButton;
@@ -74,7 +73,6 @@ type
     procedure btnGerarPDFClick(Sender: TObject);
     procedure btnValidarXMLClick(Sender: TObject);
     procedure btnContingenciaNFClick(Sender: TObject);
-    procedure btnImprimirClick(Sender: TObject);
     procedure btnConsultarClick(Sender: TObject);
     procedure btnStatusServClick(Sender: TObject);
     procedure ComboBox3Exit(Sender: TObject);
@@ -92,7 +90,6 @@ type
     procedure configuraVisual(nomeCampo: string);
     procedure leconfigNFE(vClass: TClassNfe);
     function enviaNFe: boolean;
-    function ImprimirNFe: boolean;
     function EnviarEmail_NFe: Boolean;
     function Mconsultasefazor(vuf: string;vchave: string;vserie: string): boolean;
     function ConsultaNFEDLL: boolean;
@@ -117,7 +114,7 @@ var
    DDadTransp: array of shortstring;
    tProd,DDadosdup,DdadosCupom: ArrayBi;
    x, i,vNLote: Integer;
-   vTipoOP, vChaveNF: string;
+   vTipoOP: string;
    vresposta: WideString;
    vItemDI: array of Record_Item_DI;
 
@@ -310,12 +307,6 @@ begin
   end;
 end;
 
-procedure TFrmAdmNfe.btnImprimirClick(Sender: TObject);
-begin
-  if CadNfeVenda.PesqPros(true,'HW516',CadNfeVenda.dataSet.FieldByName('CHAVE_NFE').AsString) then
-   imprimirNFe;
-end;
-
 procedure TFrmAdmNfe.btnStatusServClick(Sender: TObject);
 var
  vresstatus: string;
@@ -334,18 +325,6 @@ begin
 //    application.CreateForm(TFrmRecuperaXML,FrmRecuperaXML);
 //    FrmRecuperaXML.ShowModal;
 //    FrmRecuperaXML.Free;
-{    leconfigNFE(CadNfeVenda);
-    OpenDialog1.Title := 'Selecione a NFE';
-    OpenDialog1.DefaultExt := '*-nfe.XML';
-    OpenDialog1.Filter := 'Arquivos NFE (*-nfe.XML)|*-nfe.XML|Arquivos XML (*.XML)|*.XML|Todos os Arquivos (*.*)|*.*';
-     OpenDialog1.InitialDir := CadNfeVenda.cadempresa.vNFE_LOGPATH;
-     if OpenDialog1.Execute then
-      vChaveNF:=ExtractFilePath(OpenDialog1.FileName)+extractfilename(opendialog1.filename);
-     if vChaveNF <> ''  then
-     begin
-      vresposta:='                    ';
-      ExecutarDLL(PWideChar('Validar'), PWideChar(trim(vChaveNF)),PWideChar('.'),PWideChar(vresposta),PWideChar('1'),PWideChar('NF_VENDA'),PWideChar('1'),PWideChar('NORMAL'),PWideChar('Autorizada'),'');
-     end;}
   end;
 end;
 
@@ -1740,14 +1719,6 @@ begin
   if CadNfeVenda.cadempresa.codempresa = 0 then
     raise Exception.Create('Codigo da empresa não definido');
   PageControl1.ActivePage := TabSheet1;
-end;
-
-function TFrmAdmNfe.ImprimirNFe: boolean;
-begin
- leconfigNFE(CadNfeVenda);
- ExecutarDLL('Imprimir',PWideChar(CadNfeVenda.dataSet.FieldByName('CHAVE_NFE').AsString+'-nfe.XML'),'',vresposta,'1',
- 'NF_VENDA',PWideChar(inttostr(CadNfeVenda.cadempresa.codempresa)),PWideChar(CadNfeVenda.dataSet.FieldByName('TIPONFE').AsString),
- PWideChar(CadNfeVenda.dataSet.FieldByName('SITUACAO_NFE').AsString),PWideChar(CadNfeVenda.dataSet.FieldByName('NFE_DPEC_NREGDPEC').asstring), PWideChar(CadNfeVenda.cadempresa.vWEBSERV_UF));
 end;
 
 procedure TFrmAdmNfe.leconfigNFE(vClass: TClassNfe);

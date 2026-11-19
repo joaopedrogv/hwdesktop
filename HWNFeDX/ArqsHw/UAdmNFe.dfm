@@ -2450,15 +2450,6 @@ object FrmAdmNfe: TFrmAdmNfe
         TabOrder = 4
         OnClick = btnConsCadClick
       end
-      object btnImprimir: TButton
-        Left = 423
-        Top = 10
-        Width = 132
-        Height = 28
-        Caption = '(F8) Imprimir DANFE'
-        TabOrder = 5
-        OnClick = btnImprimirClick
-      end
       object btnCriarEnviar: TButton
         Left = 3
         Top = 10

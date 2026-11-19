@@ -227,7 +227,6 @@ type
 //
 //  procedure StatusChange; external 'HWNFe.dll';
 //
-//  function ExecutarDLL(ttipo: pchar; Aux: Pchar; Just: Pchar;var resposta:Pchar;sisint: Pchar;NFTP: Pchar;codempresa: Pchar;vtipocons: Pchar;statusNFE: Pchar): Pchar; stdcall; external 'HWNFe.dll';
 //
 //
 //  function VisualizaNFe(comveic,vendBanco: PChar;codempresa: integer;vversao: Pchar): longbool; stdcall; external 'HWNFe.dll';
@@ -722,7 +721,6 @@ begin
 //            Pchar(vcaminho + '\Validado\'+vAux), true);
    ACBrNFe1.NotasFiscais.clear;
 
-//   ExecutarDLL('Validar', pchar(vChaveNF),'',vresposta,'1','NF_VENDA','1','NORMAL','Autorizada');
  }
 end;
 

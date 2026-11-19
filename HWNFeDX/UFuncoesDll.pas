@@ -13,14 +13,9 @@ uses
   Messages,
   windows,
   Vcl.Graphics,
-//  SHDocVw,
   ACBrNFe,
   pcnConversao,
-//  ACBrNFeDANFEClass,
-//  ACBrNFeDANFERave,
   ACBrNFeDANFeRLClass,
-//  pcnNFeW,
-//  pcnConsSitNFe,
   pcnAuxiliar,
   ACBrDFe.Conversao,
   UAdmNFe,
@@ -30,14 +25,9 @@ uses
   uDataSet_OOP_DX;
 
 type
-
-//   ArrayBi = array of array of shortstring;
    TEvent = class
    public
-
-      class procedure btExecutarClick(Sender: TObject); virtual;
       class procedure FrStatusShow(Sender: TObject); virtual;
-//      class procedure GerarLog(const Mensagem: String);
       class procedure GerarLog(const Mensagem: String; var Tratado: Boolean);
       class procedure FrStatusShowMDFe(Sender: TObject); virtual;
    end;
@@ -89,7 +79,6 @@ type
  function verificarStatusWeb(verresultado: WideString): WideString; stdcall;
  function GeraNFe(hide, hemit, hDest, temVeic, veiculo, htotal: array of shortstring; tProd: ArrayBi; tipoOP: WideString; vNLote: Integer; tipoI_F: Integer;var resposta: WideString;sisint: WideString;NFTP: WideString;codempresa: WideString;Ddup: ArrayBi;DTransp:array of shortstring;vinfadic: WideString;hretirada,hentrega: array of shortstring;DdadosCupom:ArrayBi; pItemDI: array of Record_Item_DI; hexporta: array of shortstring; hrefNFe: array of shortstring): WideString; stdcall;
  function TerminaNFE: LongBool;stdcall;
- function ExecutarDLL(ttipo: WideString; Aux: WideString; Just: WideString;var resposta:WideString;sisint: WideString;NFTP: WideString;codempresa: WideString;vtipocons: WideString;statusNFE: WideString;nregdpec: WideString; pUFWS: WideString): WideString; stdcall;export;
  function ConsultaCadastro(vuf,cnpjcpf,mostrarretorno: WideString): WideString;stdcall;export;
 
 
@@ -99,16 +88,12 @@ type
    ACBrNFeDANFeRL1: TACBrNFeDANFeRL;
    OpenDialog1: TOpenDialog;
    Form: TForm;
-//   frstatus: TForm;
    Button1: TButton;
    Edit1: TEdit;
    Label1: TLabel;
-   vTipoOP, vAux: shortstring;
    MemoResp: TMemo;
-//   WBResposta: TWebBrowser;
    j: Integer;
    Resultado: WideString;
-//   LocNFeW: TNFeW;
    vcaminho: string;
    vendbanco: string;
    vcodempresa: string;
@@ -439,55 +424,6 @@ begin
 
    if ACBrNFe1.Configuracoes.Geral.SSLLib <> libOpenSSL then
      ACBrNFe1.Configuracoes.Certificados.NumeroSerie:= AConfigLegado.Certificado.NumeroSerie;
-end;
-
-class procedure TEvent.btExecutarClick(Sender: TObject);
-begin
-{
-   try
-      OpenDialog1 := TOpenDialog.Create(Form);
-      OpenDialog1.Title := 'Selecione a NFE';
-      OpenDialog1.DefaultExt := '*-nfe.XML';
-      OpenDialog1.Filter := 'Arquivos NFE (*-nfe.XML)|*-nfe.XML|Arquivos XML (*.XML)|*.XML|Todos os Arquivos (*.*)|*.*';
-
-      OpenDialog1.InitialDir := ACBrNFe1.Configuracoes.Geral.PathSalvar;
-
-      begin
-         if vtipoOP = 'Consulta' then
-         begin
-            ACBrNFe1.NotasFiscais.Clear;
-            ACBrNFe1.NotasFiscais.LoadFromFile(OpenDialog1.FileName);
-            ACBrNFe1.Consultar;
-//          MemoResp.Lines.Text := UTF8Encode(ACBrNFe1.WebServices.Consulta.RetWS);
-            Resultado := UTF8Encode(ACBrNFe1.WebServices.Consulta.RetWS);
-         end;
-
-         if vtipoOP = 'Imprimir' then
-         begin
-            ACBrNFe1.NotasFiscais.Clear;
-            ACBrNFe1.NotasFiscais.LoadFromFile(OpenDialog1.FileName);
-            ACBrNFe1.NotasFiscais.Imprimir;
-         end;
-         if vtipoOP = 'Cancelar' then
-         begin
-            ACBrNFe1.Cancelamento(vAux);
-            CopyFile(WideString(OpenDialog1.FileName), WideString('C:\BasesAuto\NFE\Cancelado\' + extractfilename(opendialog1.filename)), True);
-         end;
-      end;
-
-      if vtipoOP = 'Validar' then
-      begin
-         ACBrNFe1.NotasFiscais.Clear;
-         ACBrNFe1.NotasFiscais.LoadFromFile(vAux);
-         ACBrNFe1.NotasFiscais.Valida;
-         Application.MessageBox('Nota Fiscal Eletrônica Valida', 'Atenção', MB_ICONWARNING + MB_OK);
-         CopyFile(WideString(OpenDialog1.FileName), WideString(ACBrNFe1.Configuracoes.Geral.PathSalvar + '\Validado\' + extractfilename(opendialog1.filename)), True);
-      end;
-
-   finally
-      Form.Close;
-   end;
-  }
 end;
 
 function TerminaNFE: LongBool;stdcall;
@@ -2185,250 +2121,6 @@ begin
    end;
 end;
 
-
-function ExecutarDLL(ttipo: WideString; Aux: WideString; Just: WideString;var resposta:WideString;sisint: WideString;NFTP: WideString;codempresa: WideString;vtipocons: WideString;statusNFE: WideString;nregdpec: WideString; pUFWS: WideString): WideString; stdcall;
-var
-  vstatcomp, vExisteArquivo: Boolean;
-  vcamint: string;
-  vflgacao: integer;
-  vteste, vArquivoTeste: string;
-//  vcpmemo: Tmemo;
-begin
-   vAux := Aux;
-   vTipoOP := ttipo;
-   if vtipoOP = 'Validar' then
-   begin
-      try
-//      try
-//       StrToInt('A');
-       ACBrNFe1.NotasFiscais.clear;
-       ACBrNFe1.NotasFiscais.LoadFromFile(vAux);// Para este caso
-                                                // Serão enviados a pasta e o nome do arquivo
-       try
-        ACBrNFe1.NotasFiscais.Validar;
-       except
-
-       end;
-//           CopyFile(WideString(ACBrNFe1.Configuracoes.Geral.PathSalvar+'\'+
-//            vAux),
-//            WideString(vcaminho + '\Validado\'+vAux), true);
-       ACBrNFe1.NotasFiscais.clear;
-       Application.MessageBox(WideString('Nota Fiscal Eletrônica Válida'),WideString('Aviso'), MB_OK);
-       resposta:='OK';
-//       resposta:=WideString(inttostr(ACBrNFe1.NotasFiscais.Count));
-//       showmessage();
-      except
-        on e: exception do
-        begin
-         Application.MessageBox(PWideChar('1916 ' + E.Message),PWideChar('Error'), MB_OK);
-         resposta:='Erro';
-        end;
-      end;
-//      except
-//       on E: Exception do
-//       begin
-//        showmessage(E.message);
-//        resposta:='Falha Validação';
-//       end;
-//      end;
-      Result := 'Validação';
-//      Application.MessageBox('Nota Fiscal Eletrônica Valida', 'Atenção', MB_ICONWARNING + MB_OK);
-//      CopyFile(WideString(ACBrNFe1.Configuracoes.Geral.PathSalvar + '\validado\' + vAux), WideString(ACBrNFe1.Configuracoes.Geral.PathSalvar + '\Validado\' + vAux), True);
-   end;
-
-   if vtipoOP = 'Consulta' then
-   begin
-      try
-        if (statusNFE = 'Autorizada') or (statusNFE = 'Cancelada') then
-        begin
-          vcamint:=vcaminho+'\Autorizado';
-          ACBrNFe1.Configuracoes.Arquivos.SalvarApenasNFeProcessadas := True;
-        end
-        else
-          vcamint:=vcaminho;
-
-        if FileExists(vcamint+'\' + vAux) then
-        begin
-         if vtipocons = 'SCAN' then
-            ACBrNFe1.Configuracoes.Geral.FormaEmissao:=teSCAN
-         else if vtipocons = 'SVC' then
-            ACBrNFe1.Configuracoes.Geral.FormaEmissao:= TpEmisUFToStr(string(pUFWS))
-         else
-          ACBrNFe1.Configuracoes.Geral.FormaEmissao:=teNormal;
-         try
-           vflgacao:=0;
-           ACBrNFe1.NotasFiscais.Clear;
-           ACBrNFe1.NotasFiscais.LoadFromFile(vcamint+'\' + vAux);
-           ACBrNFe1.Consultar;
-         except
-          on e: exception do
-          begin
-           Application.MessageBox(PWideChar('1952 ' + E.Message),PWideChar('Error'), MB_OK);
-           vflgacao:=1;
-          end;
-         end;
-        end
-        else
-        begin
-         Application.MessageBox(PWideChar('Arquivo XML da NFe não encontrado no caminho: '+#13+vcamint+'\' + vAux),PWideChar('Error'), MB_OK);
-         vflgacao:=1;
-        end;
-      finally
-        ACBrNFe1.Configuracoes.Arquivos.SalvarApenasNFeProcessadas := False;
-      end;
-      if vflgacao = 1 then
-        resposta:='Prob. Consulta'
-      else
-        resposta:='OK';
-      Result := WideString(UTF8Encode(ACBrNFe1.WebServices.Consulta.RetWS));
-   end;
-
-   if vtipoOP = 'Imprimir' then
-   begin
-      ACBrNFe1.NotasFiscais.Clear;
-      try
-        {
-        if trim(nregdpec) <> '' then
-        begin
-           try
-             ACBrNFe1.NotasFiscais.LoadFromFile(ACBrNFe1.Configuracoes.Arquivos.PathSalvar + '\' + vAux);
-             ACBrNFe1.DANFE.ProtocoloNFe:=nregdpec;
-             ACBrNFe1.NotasFiscais.Imprimir;
-           except
-             ACBrNFe1.NotasFiscais.LoadFromFile(ACBrNFe1.Configuracoes.Arquivos.PathSalvar + '\Autorizado\' + vAux);
-//             ACBrNFe1.DANFE.ProtocoloNFe:=nregdpec;
-             ACBrNFe1.NotasFiscais.Imprimir;
-           end;
-        end
-        else
-        }
-        begin
-          if FileExists(ACBrNFe1.Configuracoes.Arquivos.PathSalvar + '\Autorizado\' + vAux) then
-          begin
-           ACBrNFe1.NotasFiscais.LoadFromFile(ACBrNFe1.Configuracoes.Arquivos.PathSalvar + '\Autorizado\' + vAux);
-           if ACBrNFe1.NotasFiscais.Count > 0 then
-             if ACBrNFe1.NotasFiscais.Items[0].NFe.Ide.tpEmis = teDPEC then
-             begin
-               ACBrNFe1.DANFE.Protocolo :=
-                 ACBrNFe1.NotasFiscais.Items[0].NFe.procNFe.nProt + ' ' +
-                 FormatDateTime('DD/MM/YYYY hh:nn:ss', ACBrNFe1.NotasFiscais.Items[0].NFe.procNFe.dhRecbto);
-             end;
-           ACBrNFe1.NotasFiscais.Imprimir;
-          end
-          else
-           application.messagebox('NF-e Não Autorizada, Impressão não permitida', 'Confirmação', MB_OK);
-          resposta:='OK';
-        end
-      except
-       on E: Exception do
-       begin
-        showmessage(E.message);
-        resposta:='Falha Imprimir';
-       end;
-      end;
-      Result := 'Impressão';
-   end;
-
-   if vtipoOP = 'ImprimirEvento' then
-   begin
-      ACBrNFe1.NotasFiscais.Clear;
-      try
-        if FileExists(ACBrNFe1.Configuracoes.Arquivos.PathSalvar + '\Autorizado\' + vAux+'-nfe.XML') then
-        begin
-         ACBrNFe1.NotasFiscais.LoadFromFile(ACBrNFe1.Configuracoes.Arquivos.PathSalvar + '\Autorizado\' + vAux+'-nfe.XML');
-         ACBrNFe1.EventoNFe.Evento.Clear;
-         vArquivoTeste := ACBrNFe1.Configuracoes.Arquivos.PathSalvar + '\Autorizado\' + vAux+codempresa+nregdpec+
-          '-ProcEventoNFe.XML';
-         vExisteArquivo := FileExists(vArquivoTeste);
-         if (not vExisteArquivo) and (Length(Trim(nregdpec)) = 1) then
-         begin
-           nregdpec := WideString('0' + Trim(string(nregdpec)));
-           vArquivoTeste := ACBrNFe1.Configuracoes.Arquivos.PathSalvar + '\Autorizado\' + vAux+codempresa+nregdpec+'-ProcEventoNFe.XML';
-           vExisteArquivo := FileExists(vArquivoTeste);
-         end;
-         if (not vExisteArquivo) then
-         begin
-           if Length(Trim(string(nregdpec))) = 1 then
-             nregdpec := WideString('0' + Trim(string(nregdpec)));
-           vArquivoTeste := ACBrNFe1.Configuracoes.Arquivos.PathSalvar + '\Autorizado\' + codempresa + vAux + nregdpec + '-ProcEventoNFe.XML';
-           vExisteArquivo := FileExists(vArquivoTeste);
-         end;
-         if vExisteArquivo then
-         begin
-          ACBrNFe1.EventoNFe.LerXML(vArquivoTeste) ;
-          ACBrNFe1.ImprimirEvento;
-         end
-         else
-          application.messagebox('Evento Não Autorizado, Impressão não permitida', 'Confirmação', MB_OK);
-        end
-        else
-         application.messagebox('NF-e Não Autorizada, Impressão não permitida', 'Confirmação', MB_OK);
-        resposta:='OK';
-
-      except
-       on E: Exception do
-       begin
-        showmessage(E.message);
-        resposta:='Falha Imprimir';
-       end;
-      end;
-      Result := 'Impressão';
-   end;
-
-   if vtipoOP = 'Cancelar' then
-   begin
-      vflgacao:=0;
-      try
-       if vtipocons = 'SCAN' then
-          ACBrNFe1.Configuracoes.Geral.FormaEmissao:=teSCAN
-       else if vtipocons = 'SVC' then
-          ACBrNFe1.Configuracoes.Geral.FormaEmissao:= TpEmisUFToStr(string(pUFWS))
-       else
-        ACBrNFe1.Configuracoes.Geral.FormaEmissao:=teNormal;
-       vstatcomp:=ACBrNFe1.Configuracoes.WebServices.Visualizar;
-       ACBrNFe1.Configuracoes.WebServices.Visualizar:=true;
-       ACBrNFe1.NotasFiscais.Clear;
-       if FileExists(vcaminho+ '\Autorizado\' + vAux) then
-       begin
-        ACBrNFe1.NotasFiscais.LoadFromFile(vcaminho+ '\Autorizado\' + vAux);
-        if ACBrNFe1.Cancelamento(Just) then
-        begin
-         //vcpmemo:=TMemo.create;
-//         vcpmemo.Lines.text:=UTF8Encode(ACBrNFe1.WebServices.Cancelamento.RetWS);
-//         vteste:=vcaminho +ACBrNFe1.WebServices.Cancelamento.NFeChave+'-ProcCancNFe.xml';
-//         vteste:=vcaminho + 'retcanc\'+
-//         ACBrNFe1.WebServices.Cancelamento.NFeChave+'-ProcCancNFe.xml';
-{         if not CopyFile(WideString(vcaminho +ACBrNFe1.WebServices.Cancelamento.NFeChave+'-ProcCancNFe.xml'),
-         WideString(vcaminho + 'retcanc\'+
-         ACBrNFe1.WebServices.Cancelamento.NFeChave+'-ProcCancNFe.xml'), true) then
-          application.messagebox('Arquivo de cancelamento não foi copiado para a pasta '+
-          'retcanc, Favor verificar se existe esta pasta', 'Confirmação', MB_OK)}
-        end;
-       end
-       else
-       begin
-        Application.MessageBox(PWideChar('Arquivo XML da NFe não encontrado no caminho: '+#13+vcaminho+'\' + vAux),PWideChar('Error'), MB_OK);
-        vflgacao:=1;
-       end;
-       ACBrNFe1.Configuracoes.WebServices.Visualizar:=vstatcomp;
-      except
-        on e: exception do
-        begin
-         ACBrNFe1.Configuracoes.WebServices.Visualizar:=vstatcomp;
-         Application.MessageBox(PWideChar('2076 ' + E.Message),PWideChar('Error'), MB_OK);
-         vflgacao:=1;
-        end;
-      end;
-       if vflgacao = 1  then
-        resposta:='Falha Cancelamento'
-      else
-        resposta:='OK';
-      Result := WideString(UTF8Encode(ACBrNFe1.WebServices.Consulta.RetWS));
-//    CopyFile(WideString(OpenDialog1.FileName), WideString('C:\BasesAuto\NFE\Cancelado\' + extractfilename(opendialog1.filename)), True);
-   end;
-//   resposta:='TESTE';
-end;
-
 function ConsultaCadastro(vuf,cnpjcpf,mostrarretorno: WideString): WideString;stdcall;export;
 var
  vataviso: boolean;
@@ -2852,7 +2544,6 @@ end;
 
 
 exports
- ExecutarDLL,
  GeraNFe,
  verificarStatusWeb,
  TerminaNFE,

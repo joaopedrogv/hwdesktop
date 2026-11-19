@@ -43,8 +43,6 @@ type
     ArrayBi; tipoOP: WideString; vNLote: Integer; tipoI_F: Integer; var resposta: WideString; sisint: WideString;
     NFTP: WideString; codempresa: WideString; Ddup: ArrayBi; DTransp: array of shortstring): WideString; stdcall;
   TTerminaNFE = function: LongBool; stdcall;
-  TExecutarDLL = function(ttipo: WideString; Aux: WideString; Just: WideString; var resposta: WideString; sisint: WideString;
-    NFTP: WideString; codempresa: WideString; vtipocons: WideString; statusNFE: WideString): WideString; stdcall;
   TConsultaSefazOr = function(vUF: WideString;vChave: WideString;vserie: WideString;vusuario: WideString;codempresa: integer;vendbanco: WideString): longbool; stdcall;
   TConsNFEDLL=function(vendBanco: WideString;codempresa: integer; vversao: WideString; vnumnf: integer; tipoNF: WideString; vsubserie:WideString; vusuario: WideString): longbool; stdcall;
   TValidaChaveNFe = function (vchave: WideString): longbool; stdcall;
@@ -62,7 +60,6 @@ var
   verificarStatusWeb: TverificarStatusWeb;
   GeraNFe: TGeraNFe;
   TerminaNFE: TTerminaNFE;
-  ExecutarDLL: TExecutarDLL;
   ConsultaSefazOr: TConsultaSefazOr;
   ConsNFEDLL: TConsNFEDLL;
   ValidaChaveNFe: TValidaChaveNFe;
@@ -100,7 +97,6 @@ begin
     @verificarStatusWeb := GetProcAddress(hdNFE, PAnsiChar('verificarStatusWeb'));
     @GeraNFe := GetProcAddress(hdNFE, PAnsiChar('GeraNFe'));
     @TerminaNFE := GetProcAddress(hdNFE, PAnsiChar('TerminaNFE'));
-    @ExecutarDLL := GetProcAddress(hdNFE, PAnsiChar('ExecutarDLL'));
     @ConsultaSefazOr:= GetProcAddress(hdNFE, PAnsiChar('ConsultaSefazOr'));
     @ConsNFEDLL := GetProcAddress(hdNFE, PAnsiChar('ConsNFEDLL'));
     @ValidaChaveNFe:=GetProcAddress(hdNFE, PAnsiChar('ValidaChaveNFe'));
