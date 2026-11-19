@@ -8,7 +8,6 @@ uses
   System.Net.HttpClient, System.Net.HttpClientComponent, DFeDLLHeader{, EnterantHw};
 
 type
-  ArrayBi = array of array of shortstring;
   TfrmTestes_DFe = class(TForm)
     OpenDialog1: TOpenDialog;
     PageControl1: TPageControl;
@@ -222,7 +221,6 @@ type
 
 //
 //
-//  function GeraNFe(hide, hemit, hDest, temVeic, veiculo, htotal: array of shortstring; detProd: ArrayBi; tipoOP: pchar; vnLote: Integer; tipoI_F: Integer;var resposta: Pchar;Ddup: ArrayBi;DTransp:array of shortstring): Pchar; stdcall; external 'HWNFe.dll';
 //
 //
 //  procedure StatusChange; external 'HWNFe.dll';
@@ -231,9 +229,7 @@ type
 //
 //  function VisualizaNFe(comveic,vendBanco: PChar;codempresa: integer;vversao: Pchar): longbool; stdcall; external 'HWNFe.dll';
 //
-//  function verificarStatusWeb: PChar;  stdcall; external 'HWNFe.dll';
 //
-//  function TerminaNFE: LongBool;stdcall;external 'HWNFe.dll';
 //
 // function ConsultaRFB(vChave: PChar;vusuario: Pchar): Pchar; stdcall;external 'hw.nfe.dx.dll';
  function ValidaChaveNFe(vchave: Pchar): longbool; stdcall;external 'hw.nfe.dx.dll';
@@ -705,7 +701,6 @@ begin
    if OpenDialog1.Execute then
    vChaveNF:=extractfilename(opendialog1.filename);
 //   ConfiguracoesDLL;
-//   verificarStatusWeb;
    ACBrNFe1.NotasFiscais.Clear;
 //      try
 //       StrToInt('A');

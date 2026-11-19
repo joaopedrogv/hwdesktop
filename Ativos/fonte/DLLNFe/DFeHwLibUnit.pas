@@ -34,15 +34,9 @@ type
   Tfile_open_dialog          = function (var Afolter: WideString): Boolean; stdcall;
 
 
-  ArrayBi = array of array of shortstring;
 
   TVisualizaNFe = function(comveic, vendBanco: WideString; codempresa: integer; vversao: WideString;vusuario: WideString):
     longbool; stdcall;
-  TverificarStatusWeb = function(verresultado: WideString): WideString; stdcall;
-  TGeraNFe = function(hide, hemit, hDest, temVeic, veiculo, htotal: array of shortstring; tProd:
-    ArrayBi; tipoOP: WideString; vNLote: Integer; tipoI_F: Integer; var resposta: WideString; sisint: WideString;
-    NFTP: WideString; codempresa: WideString; Ddup: ArrayBi; DTransp: array of shortstring): WideString; stdcall;
-  TTerminaNFE = function: LongBool; stdcall;
   TConsultaSefazOr = function(vUF: WideString;vChave: WideString;vserie: WideString;vusuario: WideString;codempresa: integer;vendbanco: WideString): longbool; stdcall;
   TConsNFEDLL=function(vendBanco: WideString;codempresa: integer; vversao: WideString; vnumnf: integer; tipoNF: WideString; vsubserie:WideString; vusuario: WideString): longbool; stdcall;
   TValidaChaveNFe = function (vchave: WideString): longbool; stdcall;
@@ -57,9 +51,6 @@ procedure destroyDLLNfe;
 var
   hdNFE: thandle;
   VisualizaNFe: TVisualizaNFe;
-  verificarStatusWeb: TverificarStatusWeb;
-  GeraNFe: TGeraNFe;
-  TerminaNFE: TTerminaNFE;
   ConsultaSefazOr: TConsultaSefazOr;
   ConsNFEDLL: TConsNFEDLL;
   ValidaChaveNFe: TValidaChaveNFe;
@@ -94,9 +85,6 @@ begin
   if hdNFE <> 0 then
   begin
     @VisualizaNFe := GetProcAddress(hdNFE, PAnsiChar('VisualizaNFe'));
-    @verificarStatusWeb := GetProcAddress(hdNFE, PAnsiChar('verificarStatusWeb'));
-    @GeraNFe := GetProcAddress(hdNFE, PAnsiChar('GeraNFe'));
-    @TerminaNFE := GetProcAddress(hdNFE, PAnsiChar('TerminaNFE'));
     @ConsultaSefazOr:= GetProcAddress(hdNFE, PAnsiChar('ConsultaSefazOr'));
     @ConsNFEDLL := GetProcAddress(hdNFE, PAnsiChar('ConsNFEDLL'));
     @ValidaChaveNFe:=GetProcAddress(hdNFE, PAnsiChar('ValidaChaveNFe'));

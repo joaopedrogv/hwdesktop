@@ -161,12 +161,83 @@ carregar.
   export table alterada (publicar junto com o ERP 4.0); `TabOrder` 5 vago (cosmético); o bloco
   comentado de `TEvent.btExecutarClick` cita `vAux`/`vtipoOP` e não compilaria se fosse reativado.
 
+## 8. Nova decisão (2026-11-19): remover `enviaNFe` e os botões F2/F3
+
+Decisão do desenvolvedor: remover `TFrmAdmNfe.enviaNFe` e, por consequência, `btnCriarEnviarClick`
+(botão "(F2) Enviar NFe"); remover também `btnStatusServClick` (botão "(F3) Status Serviço").
+
+### Impacto
+
+- `enviaNFe`: declaração `UAdmNFe.pas:92`; implementação `:971-1667`; único chamador
+  `btnCriarEnviarClick` (`:247`).
+- `btnStatusServClick` (`:310-316`) chama `verificarStatusWeb('S')` (`:315`).
+- Não há `ShortCut`/`VK_F2`/`VK_F3`; F2/F3 são apenas texto do caption.
+
+Cascata:
+
+| Símbolo | Situação após a remoção | Ação |
+|---|---|---|
+| `GeraNFe` | chamadas `:1627,:1641` estavam em `enviaNFe` | remover função (`UFuncoesDll.pas:757-2123`), decl `:80`, export `:2547` e cargas |
+| `verificarStatusWeb` | chamadas `:315,:1056`; a de `:1056` está em `enviaNFe` | remover função (`:470-732`), decl `:79`, export `:2548` e cargas |
+| `TerminaNFE` | continua chamado por `FormClose` (`:1702`) | manter função/export; cargas dos wrappers removidas |
+| `vultstatus` | escrito por `verificarStatusWeb`/`enviaNFe`, lido por `GeraNFe` | remover (`UFuncoesDll.pas:100`) |
+| `GeraChaveNFe` | usado em `UAdmNFe:466,755` e `uGerarChaveNFe:137` | manter |
+| vars `UAdmNFe:113-119` | sem uso fora de `enviaNFe` | remover `tIde`, `temit`, `tdest`, `temVeic`, `veiculo`, `ttotal`, `ttipo`, `tretirada`, `tentrega`, `tExporta`, `DDadTransp`, `tProd`, `DDadosdup`, `DdadosCupom`, `vNLote`, `vTipoOP`, `vresposta`, `vItemDI` (manter `x`, `i`) |
+| `ArrayBi` | `UAdmNFe:11` só serve à var `:115`; `uFuncHwNFE:6` só a `TGeraNFe`; `dpr:480` já sem uso | remover os três |
+
+### Ordem proposta
+
+1. UI/viewer: remover `btnStatusServ`/handler, `btnCriarEnviar`/handler, `enviaNFe` e as vars órfãs.
+2. DLL: remover `GeraNFe`, `verificarStatusWeb` (funções e exports), `vultstatus` e as cargas nos
+   wrappers; `TerminaNFE` fica.
+3. Build DLL; `pkAtivos`/`PrTesteDll` e smoke quando autorizado.
+
+### Efeito visível
+
+O viewer perde "Enviar NFe" (F2) e "Status Serviço" (F3). O envio de NFe no 4.0 é feito pelo ERP via
+`dllNFe`; `FormClose` continua chamando `TerminaNFE`.
+
+### Exports resultantes
+
+Saem `GeraNFe` e `verificarStatusWeb`. Permanecem `TerminaNFE`, `ConsultaCadastro` e os exports MDFe
+da unit; no `.dpr`, `VisualizaNFe`, `EnviarEvento` e os demais não mudam.
+
+### Execução (partes 1 e 2 aplicadas)
+
+**Parte 1** (`UAdmNFe.pas`/`.dfm`): removidos os dois botões/handlers, `enviaNFe` (697 linhas), o
+comentário `//  enviaNFe` e as vars que ficaram sem uso. Desvio necessário: `ArrayBi`, `DDadTransp` e
+`tProd,DDadosdup,DdadosCupom` ficaram porque `UFuncoesDll.GeraNFe` (ainda presente) usa `ArrayBi` na
+assinatura e `DDadosdup`/`DDadTransp` no corpo; `x`/`i` ficaram sem uso. Build intermediário: exit 0
+(68.903.802 bytes, 15:15:30) — **não publicar** (o `GeraNFe` exportado podia falhar).
+
+**Parte 2** (5 arquivos, +1/−1.664):
+
+- `UFuncoesDll.pas`: removidos `GeraNFe`/`verificarStatusWeb` (declaração, implementação e exports),
+  `vultstatus`, `UAdmNFe` do `uses` e o comentário `// result:=vresposta`. Exports restantes:
+  `TerminaNFE`, `ConsultaCadastro` e os 6 MDFe.
+- `uFuncHwNFE.pas`/`DFeHwLibUnit.pas`: removidos `TverificarStatusWeb` e `TGeraNFe` (tipos, vars e
+  `GetProcAddress`); as cargas de `TerminaNFE` também foram removidas depois (3 linhas por unit).
+- `UAdmNFe.pas`: `ArrayBi` removido e o bloco de vars reduzido a `FrmAdmNfe`.
+- `hw.nfe.dx.dpr`: removido `ArrayBi` e o `type` vazio (necessário para compilar).
+- Build: exit 0; `bpl\hw.nfe.dx.dll` 68.825.912 bytes (19/11/2026 15:48:31).
+- Revisão independente: sem bloqueantes/graves.
+
+**Limpeza final de código morto (aplicada)** — 2 arquivos, 66 remoções:
+
+- `UFuncoesDll.pas`: removidos `getCampoPipe`, `strIn` e `Split` (declarações e implementações), as
+  vars `OpenDialog1`, `Form`, `Button1`, `Edit1`, `Label1`, `MemoResp`, `j`, `Resultado`, `vcaminho`,
+  `vendbanco`, `vcodempresa` e as atribuições órfãs em `LerConfiguracao`.
+- `UformTeste.pas`: removidos o tipo `ArrayBi` e os comentários de `GeraNFe`/`verificarStatusWeb`.
+- **`VerificarSVC` mantido** (chamador vivo em `UConfcontingencia.pas:59`).
+- Build: exit 0; `bpl\hw.nfe.dx.dll` 68.824.725 bytes (19/11/2026 16:07:31).
+- Revisão independente: sem bloqueantes; confirmado no diff que as duas linhas removidas de
+  `LerConfiguracao` eram leituras puras (não atribuíam `Result`).
+- Resíduo conhecido, fora de escopo: `TNFeGeralLegado.CaminhoBanco` ficou write-only (`UAdmNFe:974`).
+
 ### Pendências finais
 
-1. Compilar `pkAtivos`/`PrTesteDll` quando autorizado e smoke do viewer (`ShowModal`, abrir NF,
-   conferir que o F8 não existe mais e que o PDF continua funcionando).
-2. Decidir o retorno de `EnviarEvento` para `tpop` ≠ 4 (`else Result := False` ou documentar).
-3. Opcional: limpar o rótulo de log `'procedure cadNfpeloComando Erro'`
-   (`uClassesNotasFiscais.pas:34827`) e o comentário `EnviarNFeHW` em `UClassesVeiculosCCIA.pas:7658`.
-4. Backlog separado: `GeraNFe`, `verificarStatusWeb` e `TerminaNFE` continuam exportados e usados
-   internamente pelo viewer; limpar as cargas mortas dos wrappers.
+1. Compilar `PrTesteDll` (o `pkAtivos` já foi compilado e o visual do `FrmAdmNfe` conferido pelo
+   desenvolvedor).
+2. Backlog: `CaminhoBanco` write-only (`UAdmNFe:974`) e `uses` Vcl sem uso em `UFuncoesDll`.
+3. Release notes: exports `EnviarNFeHW`, `ExecutarDLL`, `GeraNFe` e `verificarStatusWeb` removidos;
+   F2/F3/F8 removidos; publicar apenas com o ERP 4.0.

@@ -475,10 +475,6 @@ uses
   LocalIncidenciaEnumUnit in '..\Modern\Fiscal.Calculos\Core\Domain\Entities\LocalIncidenciaEnumUnit.pas',
   IndicadorOpNbsClassificacaoEtdUnit in '..\Modern\Fiscal.Calculos\Core\Domain\Entities\IndicadorOpNbsClassificacaoEtdUnit.pas';
 
-type
-
-   ArrayBi = array of array of shortstring;
-
 {$R *.res}
 
 procedure CreateFormAdmNFe;
@@ -937,13 +933,27 @@ begin
         begin
           with FrmAdmNfe do
           begin
-            if CadNfevenda.buscaNFDestinada(idLote, codempresa, '') then
-              Result := enviaeventoNFeDestinadas(idLote)
-            else
-              Result := false;
-            CadNfevenda.datasetnfdest.Close;
+            try try
+              if CadNfevenda.buscaNFDestinada(idLote, codempresa, '') then
+                Result := enviaeventoNFeDestinadas(idLote)
+              else
+                Result := false;              
+            except
+              on E: Exception do
+              begin
+                Result := False;
+                Application.MessageBox(
+                    PWideChar(Format('Erro de evento manifestação: %s', [E.Message])), 'Erro', MB_ICONERROR or MB_OK
+                );
+              end;
+            end;
+            finally
+              CadNfevenda.datasetnfdest.Close;
+            end;
           end;
         end;
+      else
+        Result := False;
     end;
   finally
     ReleaseFormAdmNFe;

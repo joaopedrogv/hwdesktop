@@ -2409,15 +2409,6 @@ object FrmAdmNfe: TFrmAdmNfe
     TabOrder = 10
     object TabSheet1: TTabSheet
       Caption = 'Opera'#231#245'es NF-e'
-      object btnStatusServ: TButton
-        Left = 3
-        Top = 46
-        Width = 132
-        Height = 28
-        Caption = '(F3) Status Servi'#231'o'
-        TabOrder = 0
-        OnClick = btnStatusServClick
-      end
       object btnConsultar: TButton
         Left = 147
         Top = 46
@@ -2449,15 +2440,6 @@ object FrmAdmNfe: TFrmAdmNfe
         Caption = '(F7) Consulta Cadastro'
         TabOrder = 4
         OnClick = btnConsCadClick
-      end
-      object btnCriarEnviar: TButton
-        Left = 3
-        Top = 10
-        Width = 132
-        Height = 28
-        Caption = '(F2) Enviar NFe'
-        TabOrder = 6
-        OnClick = btnCriarEnviarClick
       end
       object Button1: TButton
         Left = 147
