@@ -7649,26 +7649,10 @@ begin
           end;
         end;
      end;
-
-  //  if (trim(dataSet.FieldByName('MODELO_NF').AsString) = '55') and (trim(dataSet.FieldByName('SITUACAO_NFE').AsString) <> 'Inutilizada') and
-  //    (trim(dataSet.FieldByName('SITUACAO_NFE').AsString) <> 'Cancelada') then
-  //  begin
-  //    if not ((dataSet.FieldByName('CONFUS').AsString = 'S') and (dataSet.FieldByName('NUM_NOTA_V').IsNull)) then
-  //    begin
-  //      if not EnviarNFeHW('N', Pchar(vDadosIni.vBancoHW),strtoint(vDadosIni.CodEmpresa),'4.0', dataSet.FieldByName('NUM_NOTA_V').AsInteger,'COM_FAT','3',
-  //       Pchar(dataSet.FieldByName('SUB_SERIE').AsString), Pchar(vDadosIni.vNomeUsuario)) then
-  //      begin
-  //        Application.MessageBox('Nota Fiscal não cancelada no Web Service', 'Informação', MB_OK + MB_ICONINFORMATION +
-  //          MB_DEFBUTTON1);
-  //        exit;
-  //        end;
-  //    end;
-  //  end;
   finally
      if (dataSet.State in [dsInsert, dsEdit]) then
        dataSet.Cancel;
   end;
-
 end;
 
 function TComFat.ExisteEquipamento: Integer;

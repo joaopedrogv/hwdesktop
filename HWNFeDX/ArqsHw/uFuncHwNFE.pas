@@ -6,8 +6,6 @@ type
   ArrayBi = array of array of shortstring;
   TVisualizaNFe = function(comveic, vendBanco: WideString; codempresa: integer; vversao: WideString;vusuario: WideString):
     longbool; stdcall;
-  TEnviarNFeHW = function(comveic: WideString; vendBanco: WideString; codempresa: integer; vversao: WideString;
-    vnumnf: integer; tipoNF: WideString; tpop: WideString; vsubserie: WideString;vusuario: WideString): longbool; stdcall;
   TverificarStatusWeb = function(verresultado: WideString): WideString; stdcall;
   TGeraNFe = function(hide, hemit, hDest, temVeic, veiculo, htotal: array of shortstring; tProd:
     ArrayBi; tipoOP: WideString; vNLote: Integer; tipoI_F: Integer; var resposta: WideString; sisint: WideString;
@@ -27,7 +25,6 @@ procedure destroyDLLNfe;
 var
   hdNFE: thandle;
   VisualizaNFe: TVisualizaNFe;
-  EnviarNFeHW: TEnviarNFeHW;
   verificarStatusWeb: TverificarStatusWeb;
   GeraNFe: TGeraNFe;
   TerminaNFE: TTerminaNFE;
@@ -51,7 +48,6 @@ begin
   if hdNFE <> 0 then
   begin
     @VisualizaNFe := GetProcAddress(hdNFE, WideString('VisualizaNFe'));
-    @EnviarNFeHW := GetProcAddress(hdNFE, WideString('EnviarNFeHW'));
     @verificarStatusWeb := GetProcAddress(hdNFE, WideString('verificarStatusWeb'));
     @GeraNFe := GetProcAddress(hdNFE, WideString('GeraNFe'));
     @TerminaNFE := GetProcAddress(hdNFE, WideString('TerminaNFE'));

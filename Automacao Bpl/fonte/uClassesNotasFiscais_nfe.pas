@@ -243,37 +243,18 @@ begin
     end;
   end;
 
-  if (FOwner as TNFCab).versaoNFe = vnf400 then
-  begin
-    AenvNFe := True;
-    if Assigned((FOwner as TNFCab).confNFeForm) then
-      AenvNFe := (FOwner as TNFCab).confNFeForm(Aprint, AsendMail, AcomBol, tipoDANFe);
-    if AenvNFe then    
-      if not (FOwner as TNFCab).dllNFe.AutorizarNFe([(FOwner as TNFCab).campo_cod_nf]) then
-      begin
-        if Trim((FOwner as TNFCab).dllNFe.retornoStr.Text) <> '' then
-          vDadosIni.ShowErro((FOwner as TNFCab).dllNFe.retornoStr.Text);
-      end
-      else if _CC_eAutorizada then
-      begin
-//        if (FOwner as TNFCab).dataSet.FieldByName('natureza_nf').AsString = 'S' then
-//          (FOwner as TNFCab).verificarImpressaoBoleto;
-//        if AsendMail then
-//          (FOwner as TNFCab).emailNFe(AcomBol);
-      end;
-  end
-  else
-    EnviarEvento((vDadosIni.vBancoHW), StrToInt(vDadosIni.codEmpresa), ALote, (vDadosIni.vNomeUsuario), '1');
+  AenvNFe := True;
+  if Assigned((FOwner as TNFCab).confNFeForm) then
+    AenvNFe := (FOwner as TNFCab).confNFeForm(Aprint, AsendMail, AcomBol, tipoDANFe);
+  if AenvNFe then    
+    if not (FOwner as TNFCab).dllNFe.AutorizarNFe([(FOwner as TNFCab).campo_cod_nf]) then
+    begin
+      if Trim((FOwner as TNFCab).dllNFe.retornoStr.Text) <> '' then
+        vDadosIni.ShowErro((FOwner as TNFCab).dllNFe.retornoStr.Text);
+    end;
 
   montaSelect('select * from notafiscal_carta_correcao' +
     ' where cod_nf = ' + IntToStr(ACodNF) + ' and cod_empresa = ' + vDadosIni.codEmpresa + ' order by idlote');
-
-  if not ((FOwner as TNFCab).versaoNFe in [vnf400]) then
-    if _CC_eAutorizada then
-    begin
-      _imprimirEvento;
-      _enviarEmailEvento;
-    end;
 
   Result := _CC_eAutorizada;
 end;
@@ -444,18 +425,9 @@ begin
   if FNFeEmEPEC then
     raiseExceptionCreate('NFe ainda não Autorizada com Evento EPEC Autorizado. É necessário Autorizar a NFe para novos eventos', '');
 
-//  dataSet.Last;
-
-//  if Date() then
-
-  if (FOwner as TNFCab).versaoNFe = vnf400 then
-  begin
-    if not (FOwner as TNFCab).dllNFe.nfe_evento_enviar((FOwner as TNFCab).campo_cod_nf, dataSet.FieldByName('idlote').AsInteger) then
-      if Trim((FOwner as TNFCab).dllNFe.retornoStr.Text) <> '' then
-        vDadosIni.ShowErro((FOwner as TNFCab).dllNFe.retornoStr.Text);
-  end
-  else
-    EnviarEvento(pchar(vDadosIni.vBancoHW), StrToInt(vDadosIni.codEmpresa), dataSet.FieldByName('idlote').AsInteger, pchar(vDadosIni.vNomeUsuario), '1');
+  if not (FOwner as TNFCab).dllNFe.nfe_evento_enviar((FOwner as TNFCab).campo_cod_nf, dataSet.FieldByName('idlote').AsInteger) then
+    if Trim((FOwner as TNFCab).dllNFe.retornoStr.Text) <> '' then
+      vDadosIni.ShowErro((FOwner as TNFCab).dllNFe.retornoStr.Text);
 
   idLote := dataSet.FieldByName('idlote').AsInteger;
 
@@ -477,16 +449,9 @@ begin
   if not vDadosIni.PesqPros('NF0147', 'ENVIAR', '', 'NOTAFISCAL_CARTA_CORRECAO', dataSet.FieldByName('IDLOTE').AsString, buscas, True) then
     Exit;
 
-//  dataSet.Last;
-
-  if (FOwner as TNFCab).versaoNFe = vnf400 then
-  begin
-    if not (FOwner as TNFCab).dllNFe.nfe_evento_enviar((FOwner as TNFCab).campo_cod_nf, dataSet.FieldByName('idlote').AsInteger) then
-      if Trim((FOwner as TNFCab).dllNFe.retornoStr.Text) <> '' then
-        vDadosIni.ShowErro((FOwner as TNFCab).dllNFe.retornoStr.Text);
-  end
-  else
-    EnviarEvento(pchar(vDadosIni.vBancoHW), StrToInt(vDadosIni.codEmpresa), dataSet.FieldByName('idlote').AsInteger, pchar(vDadosIni.vNomeUsuario), '1');
+  if not (FOwner as TNFCab).dllNFe.nfe_evento_enviar((FOwner as TNFCab).campo_cod_nf, dataSet.FieldByName('idlote').AsInteger) then
+    if Trim((FOwner as TNFCab).dllNFe.retornoStr.Text) <> '' then
+      vDadosIni.ShowErro((FOwner as TNFCab).dllNFe.retornoStr.Text);
 
   idLote := dataSet.FieldByName('idlote').AsInteger;
 
@@ -502,25 +467,19 @@ var
   Aemail: string;
 begin
   if _CC_eAutorizada then
-    if (FOwner as TNFCab).versaoNFe = vnf400 then
     begin
       Aemail := (FOwner as TNFCab).dataSet.FieldByName('dest_email').AsString;
       if not InputQuery('Email', 'Enviar evento para o email', Aemail) then
         Exit
       else if Trim(Aemail) <> '' then
         (FOwner as TNFCab).dllNFe.nfe_evento_email((FOwner as TNFCab).campo_cod_nf, dataSet.FieldByName('idlote').AsInteger, Aemail, '');
-    end
-    else
-      EnviarEvento(pchar(vDadosIni.vBancoHW), StrToInt(vDadosIni.codEmpresa), dataSet.FieldByName('idlote').AsInteger, pchar(vDadosIni.vNomeUsuario), '3');
+    end;
 end;
 
 function TNF_CCe._imprimirEvento: Boolean;
 begin
   if _CC_eAutorizada then
-    if (FOwner as TNFCab).versaoNFe = vnf400 then
-      (FOwner as TNFCab).dllNFe.nfe_evento_imprimir((FOwner as TNFCab).campo_cod_nf, dataSet.FieldByName('idlote').AsInteger, True, False, '')
-    else
-      EnviarEvento(pchar(vDadosIni.vBancoHW), StrToInt(vDadosIni.codEmpresa), dataSet.FieldByName('idlote').AsInteger, pchar(vDadosIni.vNomeUsuario), '2');
+    (FOwner as TNFCab).dllNFe.nfe_evento_imprimir((FOwner as TNFCab).campo_cod_nf, dataSet.FieldByName('idlote').AsInteger, True, False, '');
 end;
 
 function TNF_CCe._NF_e_Cancelada: Boolean;

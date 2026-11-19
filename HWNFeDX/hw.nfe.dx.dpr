@@ -525,83 +525,6 @@ begin
   end;
 end;
 
-
-function EnviarNFeHW(comveic: WideString;vendBanco: WideString;codempresa: integer;vversao: WideString;vnumnf: integer;tipoNF: WideString;tpop: WideString;vsubserie:WideString;vusuario: WideString): longbool; stdcall;
-var
-  AAnexos: TStrings;
-  I: Integer;
-begin
-  Result := True;
-
-  CreateFormAdmNFe();
-  try
-    SetAttrFormAdmNFe(comveic, vendBanco, codempresa, vversao, vusuario);
-
-    if not FrmAdmNfe.CadNfeVenda.conectaBanco then
-      Exit;
-
-    FrmAdmNfe.CadNfeVenda.CadEmpresa.dadosGNfe;
-
-    with FrmAdmNfe do
-    begin
-      FrmAdmNfe.DBText2.DataField := 'CIDADE';
-      FrmAdmNfe.DBText1.DataField := 'NOME_CLIENTE';
-
-      CadNfevenda.pesquisaNF(vnumnf,codempresa,vsubserie);
-      CadNfevenda.marcaSel;
-
-      case StrToIntDef(tpop, -1) of
-        1 :
-          begin
-            CadNfeVenda.Imprimir := False;
-            CadNfeVenda.SendMail := False;
-            Result := enviaNFe;
-            if Result then
-            begin
-              CadNfeVenda.Imprimir := True;
-              Result := ImprimirNFe;
-            end;
-            {
-            if Result then
-            begin
-              if UFuncoesDll.ACBrNFe1.NotasFiscais.Count > 0 then
-              begin
-                CadNfeVenda.SendMail := True;
-
-                Aanexos := CadNfeVenda.getArquivosBoletoParaAnexos;
-
-                CadNfeVenda.enviaEmail(UFuncoesDll.ACBrNFe1, 1, 0, '0', AAnexos );
-
-                if Assigned(Aanexos) then
-                  for I := 0 to Aanexos.Count - 1  do
-                    DeleteFile(PWideChar(Aanexos[I]));
-              end;
-            end;
-            }
-          end;
-        2 :
-          begin
-            if (Trim(CadNfevenda.dataSet.FieldByName('situacao_nfe').AsString) = '') and
-               (Trim(CadNfevenda.dataSet.FieldByName('nfe_dpec_nregdpec').AsString) <> '') then
-            begin
-               leconfigNFE(CadNfevenda);
-               Result := CadNfevenda.cadCCe.ImprimirEventoEPEC(CadNfevenda.dataSet.FieldByName('cod_nf').AsInteger, codempresa, ACBrNFe1);
-            end
-            else
-              Result := ImprimirNFe;
-          end;
-        3 :
-          begin
-            Result := CancelarNFE;
-          end;
-      end;
-    end;
-
-  finally
-    ReleaseFormAdmNFe;
-  end;
-end;
-
 function ConsultaSefazOr(vUF: WideString;vChave: WideString;vserie: WideString;vusuario: WideString;codempresa: integer;vendbanco: WideString): longbool; stdcall;
 begin
   Result := True;
@@ -1010,35 +933,6 @@ begin
     FrmAdmNfe.CadNfeVenda.CadEmpresa.dadosGNfe;
 
     case StrToIntDef(tpop, -1) of
-      1 : // Enviar Evento
-        begin
-          Result := FrmAdmNfe.enviaEvento(idlote);
-        end;
-      2 : // Imprimir Evento
-        begin
-          with FrmAdmNfe do
-          begin
-            CadNfevenda.cadCCe.buscaEvento(idLote,codempresa);
-            CadNfevenda.pesquisaNF(strtoint(CadNfevenda.cadCCe.vnumnf),codempresa,CadNfevenda.cadCCe.vserie);
-
-             if (Trim(CadNfevenda.cadCCe.dataSet.FieldByName('tipo_evento').AsString) = 'EPE') then
-             begin
-               leconfigNFE(CadNfevenda);
-               Result := CadNfevenda.cadCCe.ImprimirEventoEPEC(CadNfevenda.dataSet.FieldByName('cod_nf').AsInteger, codempresa, ACBrNFe1);
-             end
-             else
-               Result := ImprimirEvento(CadNfevenda.cadCCe.codigoEvento);
-          end;
-        end;
-      3 : // Enviar email para o cliente do evento...
-        begin
-          with FrmAdmNfe do
-          begin
-            CadNfevenda.cadCCe.buscaEvento(idLote,codempresa);
-            CadNfevenda.pesquisaNF(strtoint(CadNfevenda.cadCCe.vnumnf),codempresa,CadNfevenda.cadCCe.vserie);
-            enviaEventoEmail(CadNfevenda.cadCCe.codigoEvento);
-          end;
-        end;
       4 : // Quando for 4 será envio de evento para nfdestinadas
         begin
           with FrmAdmNfe do
@@ -1315,7 +1209,6 @@ end;
 
 exports
    VisualizaNFe,
-   EnviarNFeHW,
    ConsultaSefazOr,
    ConsNFEDLL,
    EnviarEmailNFe,

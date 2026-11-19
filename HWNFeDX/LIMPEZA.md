@@ -32,8 +32,9 @@
 | 11 | `InutilizarNFe` | **aplicado — DLL compilada; teste pendente** | função + export + botão + form apagados |
 | 12 | `BuscaTroca` | **aplicado pelo desenvolvedor** | helper removido |
 | 13 | `GeraChaveNFe` | **export removido pelo desenvolvedor** | função/implementação permanece (uso interno) |
-| 14 | `ShowfrStatus` (helper sem chamadores) | **proposto — próximo** | implementação-only em `UFuncoesDll.pas` |
-| 15 | cargas mortas do wrapper (`ExecutarDLL`, `GeraNFe`, `verificarStatusWeb`, `TerminaNFE`) | backlog | exports permanecem; limpar tipo/var/GetProcAddress |
+| 14 | `ShowfrStatus` | **aplicado pelo desenvolvedor** | helper removido |
+| 15 | `ExecutarDLL` + 4 métodos legados | **em desmonte — limpeza morta aplicada; DLL compilada** | `LIMPEZA-EXECUTARDLL.md` §7; falta o F8 do viewer e o `ExecutarDLL` |
+| 16 | `GeraNFe`, `verificarStatusWeb`, `TerminaNFE` (export + cargas) | backlog | exports permanecem; limpar loaders |
 | — | `LerConfiguracao` + `IniciaNFE` | preservar por enquanto | usadas por `leconfigNFE`, que atende o viewer |
 | — | `nfce_serv_*` | preservar | usados pelos EXEs de serviço |
 | — | variantes `*CSharpBuffer` e exports ativos | preservar | usados por C#/ERP |
@@ -230,6 +231,40 @@ situação do `BuscaTroca` que você removeu.
 **Depois:** candidatos a export com carga morta no wrapper (`ExecutarDLL`, `GeraNFe`,
 `verificarStatusWeb`, `TerminaNFE`) — remover a entrada do `exports` e o tipo/variável/`GetProcAddress`
 em `DFeHwLibUnit.pas`/`uFuncHwNFE.pas`, mantendo as funções internas do viewer.
+
+## Demanda 13 — `ExecutarDLL` (export + cargas mortas) — proposta
+
+**Por que é o próximo:** não há mais função morta no projeto (a varredura não encontrou nenhum helper
+sem chamadores). `ExecutarDLL` é o primeiro dos exports cuja **função continua necessária internamente**
+(mas o export e as cargas do app são mortos). O padrão é o mesmo do `LerConfiguracao`/`GeraChaveNFe`:
+remove-se a superfície pública e o lixo do wrapper, sem tocar no viewer.
+
+**Evidências**
+
+- Interface: `UFuncoesDll.pas:92` — `function ExecutarDLL(...): WideString; stdcall; export;` (atenção:
+  tem a diretiva `export;`, então não basta remover a linha do `exports`).
+- Implementação: `UFuncoesDll.pas:2189`; export: `:2855`.
+- Usos internos (ficam): `UAdmNFe.pas:356,524,1159,2020,2028` (validar, cancelar, consultar, imprimir,
+  imprimir evento).
+- Cargas mortas no ERP: `DFeHwLibUnit.pas` — `TExecutarDLL` (`:48`), cópia comentada (`:69`),
+  variável (`:98`) e `GetProcAddress` (`:146`).
+- Cargas mortas no app de teste/DLL: `uFuncHwNFE.pas` — tipo (`:16-17`), variável (`:34`) e
+  `GetProcAddress` (`:58`).
+- Nenhuma chamada ao ponteiro no ERP.
+
+**Ajustes**
+
+1. Remover `export;` da declaração (`UFuncoesDll.pas:92`) e a entrada `ExecutarDLL,` do `exports`.
+2. Manter declaração/implementação para `UAdmNFe` (não há como remover a função sem remover as 5 ações
+   do viewer).
+3. Remover tipo/variável/`GetProcAddress` em `DFeHwLibUnit.pas` (incluindo a cópia comentada) e em
+   `uFuncHwNFE.pas`.
+4. Compilar a DLL (quando autorizado).
+
+**Risco:** a tabela pública de exports muda (inclusive ordinais) — registrar em release notes; nenhum
+consumidor no repositório.
+
+**Depois:** mesmo padrão para `GeraNFe`, `verificarStatusWeb` e `TerminaNFE`.
 
 ## Limpeza de referências residuais (2026-11-18)
 

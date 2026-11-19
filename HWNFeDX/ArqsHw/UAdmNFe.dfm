@@ -2432,14 +2432,14 @@ object FrmAdmNfe: TFrmAdmNfe
         TabOrder = 1
         OnClick = btnConsultarClick
       end
-      object btnCancNF: TButton
+      object btnContingenciaNF: TButton
         Left = 423
         Top = 44
         Width = 132
         Height = 28
         Caption = '(F6) Config. Conting'#234'ncia'
         TabOrder = 3
-        OnClick = btnCancNFClick
+        OnClick = btnContingenciaNFClick
       end
       object btnConsCad: TButton
         Left = 561

@@ -34,7 +34,7 @@ type
     BitBtn2: TBitBtn;
     btnStatusServ: TButton;
     btnConsultar: TButton;
-    btnCancNF: TButton;
+    btnContingenciaNF: TButton;
     btnConsCad: TButton;
     btnImprimir: TButton;
     btnCriarEnviar: TButton;
@@ -73,7 +73,7 @@ type
     procedure btnEnviarEmailClick(Sender: TObject);
     procedure btnGerarPDFClick(Sender: TObject);
     procedure btnValidarXMLClick(Sender: TObject);
-    procedure btnCancNFClick(Sender: TObject);
+    procedure btnContingenciaNFClick(Sender: TObject);
     procedure btnImprimirClick(Sender: TObject);
     procedure btnConsultarClick(Sender: TObject);
     procedure btnStatusServClick(Sender: TObject);
@@ -93,13 +93,9 @@ type
     procedure leconfigNFE(vClass: TClassNfe);
     function enviaNFe: boolean;
     function ImprimirNFe: boolean;
-    function ImprimirEvento(codigoEvento: string): boolean;
     function EnviarEmail_NFe: Boolean;
-    function CancelarNFE: boolean;
     function Mconsultasefazor(vuf: string;vchave: string;vserie: string): boolean;
     function ConsultaNFEDLL: boolean;
-    function enviaEvento(vidlote: integer): boolean;
-    function enviaEventoEmail(codigoEvento: string): boolean;
     function verificaNFedestinadas(indnfe, indemi: string;vtpop: integer;{vtpcons: integer;}nsuespec: string): boolean;
     function enviaeventoNFeDestinadas(idlote: integer): boolean;
     function NFDownload(vchave: string): boolean;
@@ -178,23 +174,18 @@ begin
       ComboBox1.SetFocus;
 end;
 
-procedure TFrmAdmNfe.btnCancNFClick(Sender: TObject);
+procedure TFrmAdmNfe.btnContingenciaNFClick(Sender: TObject);
 begin
   if CadNfeVenda.PesqPros(true,'HW515','') then
   begin
-//   if CadNfeVenda.dataSet.FieldByName('SITUACAO_NFE').AsString <> 'Cancelada' then
-//    CancelarNFE
-//   else
-   leconfigNFE(CadNfeVenda);
-   Application.CreateForm(TFrmConfContingencia,FrmConfContingencia);
-//   try
-     FrmConfContingencia.cadempresa:=CadNfeVenda.cadempresa;
-     FrmConfContingencia.ShowModal;
-     lbforma.Caption := CadNfeVenda.cadempresa.dataSet.FieldByName('NFE_DANFE_FOREMISS').AsString;
-//   finally
+    leconfigNFE(CadNfeVenda);
+    Application.CreateForm(TFrmConfContingencia,FrmConfContingencia);
 
-     FrmConfContingencia.free;
-//   end;
+    FrmConfContingencia.cadempresa:=CadNfeVenda.cadempresa;
+    FrmConfContingencia.ShowModal;
+    lbforma.Caption := CadNfeVenda.cadempresa.dataSet.FieldByName('NFE_DANFE_FOREMISS').AsString;
+
+    FrmConfContingencia.free;
   end;
 end;
 
@@ -502,39 +493,6 @@ procedure TFrmAdmNfe.Button5Click(Sender: TObject);
 begin
   Application.CreateForm(TFrmHelperDFe, FrmHelperDFe);
   FrmHelperDFe.ShowModal;
-end;
-
-function TFrmAdmNfe.CancelarNFE: boolean;
-var
- vjust: string;
-begin
- result:=true;
- if not (InputQuery('WebServices Cancelamento', 'Justificativa', vjust)) then
- begin
-   Result:=false;
-   exit;
- end;
- if vjust = '' then
- begin
-   Application.MessageBox(PWideChar('Justificativa precisa ser preenchida'),PWideChar('Error'), MB_OK);
-   Result:=false;
-   exit;
- end;
- leconfigNFE(CadNfeVenda);
- ExecutarDLL('Cancelar',PWideChar(CadNfeVenda.dataSet.FieldByName('CHAVE_NFE').AsString+'-nfe.XML'),(vjust),vresposta,'1',
- 'NF_VENDA',PWideChar(inttostr(CadNfeVenda.cadempresa.codempresa)),PWideChar(CadNfeVenda.dataSet.FieldByName('TIPONFE').AsString),
- PWideChar(CadNfeVenda.dataSet.FieldByName('SITUACAO_NFE').AsString),'',PWideChar(CadNfeVenda.cadempresa.vWEBSERV_UF));
- if vresposta = 'OK' then
- begin
-   CadNfeVenda.obtemdadostotaisnf;
-   CadNfeVenda.CancelaNFEint(strtoint(CadNfeVenda.VNUMNOTA),vjust);
-   if CadNfeVenda.cadempresa.vENVIAEMAILNFE = 'S' then
-     CadNfeVenda.enviaEmail(ACBrNFe1,2,0,'0');
- end
- else
- begin
-  Result:=false;
- end;
 end;
 
 procedure TFrmAdmNfe.ComboBox1Enter(Sender: TObject);
@@ -981,236 +939,6 @@ begin
     DBCheckBox1.SetFocus;
     SendMessage(DBCheckBox1.Handle, WM_Char, word(Key), 0);
   end;
-end;
-
-function TFrmAdmNfe.enviaEvento(vidlote: integer): boolean;
-var
- vstvis: boolean;
- vflagevento: integer;
- I, J, ACodNF: integer;
- ANFe: NotaFiscal;
- AFileName: string;
- AWriteNewNFe: Boolean;
-begin
- result:=false;
- try
-   leconfigNFE(CadNfeVenda);
-   ACBrNFe1.Configuracoes.Geral.VersaoDF := ve400;
-   if CadNfeVenda.cadCCe.buscaEvento(vidlote,CadNfeVenda.cadempresa.codempresa) then
-   begin
-     if CadNfeVenda.cadCCe.dataSet.FieldByName('TIPO_EVENTO').AsString = 'EPE' then
-     begin
-       if CadNfeVenda.cadCCe.dataSet.FieldByName('situacao').AsString = 'Autorizada' then
-         raise Exception.Create('Evento já autorizado');
-
-       if CadNfeVenda.cadCCe.dataSet.FieldByName('nseqevento').AsInteger <> 1 then
-         raise Exception.Create('Evento EPEC permitido deve ser o primeiro');
-
-       ACodNF := CadNfeVenda.cadCCe.dataSet.FieldByName('cod_nf').AsInteger;
-
-       CadNfeVenda.buscas.Close;
-       CadNfeVenda.buscas.SQL.Text :=
-         'select nf.situacao_nfe, ev.situacao, ev.xml_nfe_epec, ev.xml_evento from NOTAFISCAL nf' +
-         ' inner join NOTAFISCAL_CARTA_CORRECAO ev on ev.cod_nf = nf.cod_nf and ev.cod_empresa = nf.cod_empresa' +
-         '   and ev.idlote = ' + IntToStr(vidlote) + ' and nseqevento = 1' +
-         ' where nf.cod_nf = ' + IntToStr(ACodNF) +
-         ' and nf.cod_empresa = '+inttostr(CadNfeVenda.cadempresa.codempresa);
-       CadNfeVenda.buscas.Open;
-
-       //fazer os testes aqui
-       if CadNfeVenda.buscas.FieldByName('situacao_nfe').AsString <> '' then
-         raise Exception.Create('Nota Fiscal já possui status: ' + CadNfeVenda.buscas.FieldByName('situacao_nfe').AsString + #13 +
-           'Não é possível enviar Evento EPEC');
-
-       ACBrNFe1.NotasFiscais.Clear;
-       ACBrNFe1.EventoNFe.Evento.Clear;
-
-       AWriteNewNFe := (Trim(CadNfeVenda.buscas.FieldByName('situacao').AsString) = '') or
-                       (Trim(CadNfeVenda.buscas.FieldByName('situacao').AsString) = 'Rejeitada');
-
-       if (not AWriteNewNFe) and (Trim(CadNfeVenda.buscas.FieldByName('xml_nfe_epec').AsString) <> '') then
-         ACBrNFe1.NotasFiscais.LoadFromString(Trim(CadNfeVenda.buscas.FieldByName('xml_nfe_epec').AsString), False)
-       else
-         CadNfeVenda.AddNotaFiscalToACBrNFe(ACodNF, 4 {DPEC}, ACBrNFe1);
-
-       if ACBrNFe1.NotasFiscais.Count > 0 then
-       begin
-//         ACBrNFe1.NotasFiscais.GerarNFe;
-         ACBrNFe1.NotasFiscais.Assinar;
-
-         if (not AWriteNewNFe) and (Trim(CadNfeVenda.buscas.FieldByName('xml_evento').AsString) <> '') then
-           ACBrNFe1.EventoNFe.LerXMLFromString(Trim(CadNfeVenda.buscas.FieldByName('xml_evento').AsString))
-         else
-         begin
-           with ACBrNFe1.EventoNFe.Evento.Add do
-           begin
-             with ACBrNFe1.NotasFiscais.Items[0] do
-             begin
-               InfEvento.id                           := NFe.infNFe.ID;
-               InfEvento.cOrgao                       := 91;
-               InfEvento.tpAmb                        := NFe.Ide.tpAmb;
-               InfEvento.CNPJ                         := NFe.Emit.CNPJCPF;
-               InfEvento.chNFe                        := NumID;
-               InfEvento.dhEvento                     := Now;
-               InfEvento.tpEvento                     := teEPECNFe;
-               InfEvento.nSeqEvento                   := 1;
-               //InfEvento.versaoEvento               := '';
-               //InfEvento.detEvento.versao           := '';
-               InfEvento.detEvento.descEvento         := 'EPEC';
-               InfEvento.detEvento.cOrgaoAutor        := NFe.Ide.cUF;
-               InfEvento.detEvento.verAplic           := NFe.Ide.verProc;
-               InfEvento.detEvento.dhEmi              := NFe.Ide.dEmi;
-               InfEvento.detEvento.tpNF               := NFe.Ide.tpNF;
-               InfEvento.detEvento.IE                 := NFe.Emit.IE;
-               InfEvento.detEvento.dest.UF            := NFe.Dest.EnderDest.UF;
-               InfEvento.detEvento.dest.CNPJCPF       := NFe.Dest.CNPJCPF;
-               InfEvento.detEvento.dest.idEstrangeiro := NFe.Dest.idEstrangeiro;
-               InfEvento.detEvento.dest.IE            := NFe.Dest.IE;
-               InfEvento.detEvento.vNF                := NFe.Total.ICMSTot.vNF;
-               InfEvento.detEvento.vICMS              := NFe.Total.ICMSTot.vICMS;
-               InfEvento.detEvento.vST                := NFe.Total.ICMSTot.vST;
-             end;
-           end;
-         end;
-         ACBrNFe1.EventoNFe.GerarXML;
-         ACBrNFe1.Configuracoes.WebServices.Visualizar:=false;
-
-         ACBrNFe1.EnviarEvento(vidlote);
-         with ACBrNFe1.WebServices do
-         begin
-           if EnvEvento.EventoRetorno.retEvento.Count > 0 then
-           begin
-             case EnvEvento.EventoRetorno.retEvento.Items[0].RetInfEvento.cStat of
-               485:
-                 begin
-                   ACBrNFe1.Consultar();
-                   for I := 0 to ACBrNFe1.WebServices.Consulta.procEventoNFe.Count - 1 do
-                     for J := 0 to ACBrNFe1.WebServices.Consulta.procEventoNFe.Items[I].RetEventoNFe.retEvento.Count - 1 do
-                       if (ACBrNFe1.WebServices.Consulta.procEventoNFe.Items[I].RetEventoNFe.retEvento.Items[J].RetInfEvento.tpEvento = teEPECNFe) then
-                         CadNfeVenda.cadCCe.GravaRetornoEvento(
-                           ACBrNFe1.WebServices.Consulta.procEventoNFe.Items[I].RetEventoNFe,
-                           ACBrNFe1.NotasFiscais.Items[0], True);
-                 end;
-               else
-                 CadNfeVenda.cadCCe.GravaRetornoEvento(EnvEvento.EventoRetorno, ACBrNFe1.NotasFiscais.Items[0], True);
-             end;
-           end;
-         end;
-       end;
-     end
-     else
-     begin
-        CadNfeVenda.pesquisaNF(strtoint(CadNfeVenda.cadCCe.vnumnf),CadNfeVenda.cadempresa.codempresa,CadNfeVenda.cadCCe.vserie);
-        ACBrNFe1.EventoNFe.Evento.clear;
-        ACBrNFe1.EventoNFe.idLote:=vidLote;
-        with ACBrNFe1.EventoNFe.Evento.Add do
-        begin
-         infEvento.chNFe := CadNfeVenda.cadCCe.chavenfe;
-         if CadNfeVenda.dataSet.FieldByName('TIPONFE').AsString = 'SCAN' then
-           ACBrNFe1.Configuracoes.Geral.FormaEmissao:=teSCAN
-         else if CadNfeVenda.dataSet.FieldByName('TIPONFE').AsString = 'SVC' then
-         begin
-           if (CadNfeVenda.cadCCe.TipoEvento = 2) and (Now > (CadNfeVenda.dataSet.FieldByName('DATA_AUTORIZACAO').AsDateTime + 1)) then
-           begin
-             if Application.MessageBox('Cancelamento Extemporâneo?', 'Confirmação', MB_ICONQUESTION + MB_YESNO) = IDYES then
-               ACBrNFe1.Configuracoes.Geral.FormaEmissao:=teNormal
-             else
-               ACBrNFe1.Configuracoes.Geral.FormaEmissao:=CadNfeVenda.cadempresa.TpEmisUFToStr(CadNfeVenda.cadempresa.vWEBSERV_UF);
-           end
-           else
-             ACBrNFe1.Configuracoes.Geral.FormaEmissao:=CadNfeVenda.cadempresa.TpEmisUFToStr(CadNfeVenda.cadempresa.vWEBSERV_UF)
-         end
-         else
-          ACBrNFe1.Configuracoes.Geral.FormaEmissao:=teNormal;
-    //     if strtoint(CadNfeVenda.cadCCe.vserie) >= 900 then
-    //       infEvento.cOrgao := 90
-    //     else
-    //      infEvento.cOrgao := CadNfeVenda.cadempresa.dataSet.FieldByName('IBGE_CODIGO_UF').asinteger;
-    //     except
-    //      infEvento.cOrgao := CadNfeVenda.cadempresa.dataSet.FieldByName('IBGE_CODIGO_UF').asinteger;
-    //     end;
-         infEvento.CNPJ   := trim(CadNfeVenda.cadempresa.dataset.FieldByName('CGC_EMP').AsString);
-         infEvento.dhEvento := now;
-         if CadNfeVenda.cadCCe.TipoEvento = 1 then
-         begin
-           // SVC nao aceita evento de CCe
-           if CadNfeVenda.dataSet.FieldByName('TIPONFE').AsString = 'SVC' then
-             ACBrNFe1.Configuracoes.Geral.FormaEmissao:=teNormal;
-           infEvento.tpEvento :=tecce;
-           infEvento.detEvento.descEvento := 'Carta de Correção';
-         end;
-         if CadNfeVenda.cadCCe.TipoEvento = 2 then
-         begin
-           infEvento.tpEvento :=teCancelamento;
-           infEvento.detEvento.descEvento := 'Cancelamento';
-           InfEvento.detEvento.nProt:=CadNfeVenda.cadCCe.vprotocolo;
-           InfEvento.detEvento.xJust:=CadNfeVenda.cadCCe.dataSet.FieldByName('XCORRECAO').AsString;
-         end;
-         //110110;
-         infEvento.nSeqEvento := CadNfeVenda.cadCCe.dataSet.FieldByName('NSEQEVENTO').AsInteger;
-         infEvento.versaoEvento := '1.00';
-         infEvento.detEvento.xCorrecao :=CadNfeVenda.cadCCe.dataSet.FieldByName('XCORRECAO').AsString;
-         infEvento.detEvento.xCondUso := ''; //Texto fixo conforme NT 2011.003 -  http://www.nfe.fazenda.gov.br/portal/exibirArquivo.aspx?conteudo=tsiloeZ6vBw=
-        end;
-        vstvis:=ACBrNFe1.Configuracoes.WebServices.Visualizar;
-        ACBrNFe1.Configuracoes.WebServices.Visualizar:=true;
-        vflagevento:=-1;
-        // Consultar para ver se tem retorno 2.01 ou se a NFe existe na base da SEFAZ
-        ExecutarDLL('Consulta',PWideChar(CadNfeVenda.dataSet.FieldByName('CHAVE_NFE').AsString+'-nfe.XML'),PWideChar(''),vresposta,'1',
-        'NF_VENDA',PWideChar(inttostr(CadNfeVenda.cadempresa.codempresa)),PWideChar(CadNfeVenda.dataSet.FieldByName('TIPONFE').AsString),
-        PWideChar(CadNfeVenda.dataSet.FieldByName('SITUACAO_NFE').AsString),'', PWideChar(CadNfeVenda.cadempresa.vWEBSERV_UF));
-        if vresposta = 'OK' then
-        begin
-          if CadNfeVenda.cadCCe.TipoEvento = 1 then // Envio de Evento(CC-e) para a Sefaz de Origem quando for SCAN ou SVC
-          begin
-           if CadNfeVenda.dataSet.FieldByName('TIPONFE').AsString = 'SCAN' then
-            ACBrNFe1.Configuracoes.Geral.FormaEmissao:=teNormal
-           else if CadNfeVenda.dataSet.FieldByName('TIPONFE').AsString = 'SVC' then
-            ACBrNFe1.Configuracoes.Geral.FormaEmissao:=teNormal;
-          end;
-          if ACBrNFe1.WebServices.Consulta.procEventoNFe.Count > 0 then
-           for i:=0 to ACBrNFe1.WebServices.Consulta.procEventoNFe.Count-1 do
-           begin
-             if (ACBrNFe1.WebServices.Consulta.procEventoNFe.Items[i].RetEventoNFe.InfEvento.nSeqEvento = CadNfeVenda.cadCCe.vnseqevento)
-             and (ACBrNFe1.WebServices.Consulta.procEventoNFe.Items[i].RetEventoNFe.InfEvento.tpEvento = ACBrNFe1.EventoNFe.Evento.Items[0].InfEvento.tpEvento) then
-             begin
-              vflagevento:=i;
-              break;
-             end;
-           end;
-           ACBrNFe1.Configuracoes.WebServices.Visualizar:=false;
-           if vflagevento = -1 then
-            ACBrNFe1.EnviarEvento(vidlote);
-           if CadNfeVenda.cadCCe.GravaRetornoEvento(ACBrNFe1,vidlote,vflagevento) then
-           begin
-            if CadNfeVenda.cadCCe.TipoEvento = 2 then
-              CadNfeVenda.CancelaNFEint(strtoint(CadNfeVenda.cadCCe.vnumnf),CadNfeVenda.cadCCe.dataSet.FieldByName('XCORRECAO').AsString);
-           end
-           else
-           begin
-            Application.MessageBox(PWideChar('Retorno do Evento: '+CadNfeVenda.cadCCe.dataset.FieldByName('CSTAT').AsString+
-            ' '+CadNfeVenda.cadCCe.dataset.FieldByName('XMOTIVO').AsString),PWideChar('Advertência'), MB_OK);
-            result:=false;
-           end;
-        end;
-     end;
-    ACBrNFe1.Configuracoes.WebServices.Visualizar:=vstvis;
-   end;
- except
-  on e: exception do
-  begin
-   if application.messagebox('Erro ao processar Evento. Mostrar Erro?', 'Confirmação', mb_yesno + MB_DEFBUTTON2) = IDYES then
-    Application.MessageBox(PWideChar(E.Message),PWideChar('Error'), MB_OK);
-   result:=false;
-  end;
- end;
-end;
-
-function TFrmAdmNfe.enviaEventoEmail(codigoEvento: string): boolean;
-begin
-//
- leconfigNFE(CadNfeVenda);
- CadNfeVenda.enviaEmail(ACBrNFe1,5,CadNfeVenda.cadCCe.dataSet.FieldByName('nseqevento').AsInteger,codigoEvento);
 end;
 
 function TFrmAdmNfe.enviaeventoNFeDestinadas(idlote: integer): boolean;
@@ -2021,15 +1749,6 @@ begin
  'NF_VENDA',PWideChar(inttostr(CadNfeVenda.cadempresa.codempresa)),PWideChar(CadNfeVenda.dataSet.FieldByName('TIPONFE').AsString),
  PWideChar(CadNfeVenda.dataSet.FieldByName('SITUACAO_NFE').AsString),PWideChar(CadNfeVenda.dataSet.FieldByName('NFE_DPEC_NREGDPEC').asstring), PWideChar(CadNfeVenda.cadempresa.vWEBSERV_UF));
 end;
-
-function TFrmAdmNfe.ImprimirEvento(codigoEvento: string): boolean;
-begin
- leconfigNFE(CadNfeVenda);
- ExecutarDLL('ImprimirEvento',PWideChar(CadNfeVenda.dataSet.FieldByName('CHAVE_NFE').AsString),'',vresposta,'1',
- 'NF_VENDA',PWideChar(codigoEvento{Código do evento aqui no lugar do codigo da empresa}),PWideChar(''),
- PWideChar(''),PWideChar(CadNfeVenda.cadCCe.dataSet.FieldByName('NSEQEVENTO').AsString), PWideChar(CadNfeVenda.cadempresa.vWEBSERV_UF));
-end;
-
 
 procedure TFrmAdmNfe.leconfigNFE(vClass: TClassNfe);
 var
