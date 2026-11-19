@@ -3,16 +3,12 @@ unit UFuncoesDll;
 interface
 uses
   Vcl.Forms,
-  Vcl.StdCtrls,
   SysUtils,
   Vcl.Controls,
-  Vcl.Buttons,
   Classes,
   inifiles,
-  Vcl.Dialogs,
   Messages,
   windows,
-  Vcl.Graphics,
   ACBrNFe,
   pcnConversao,
   ACBrNFeDANFeRLClass,
@@ -44,7 +40,6 @@ type
     SalvarArquivos: string;
     PathSalvar: string;
     EnderecoPDF: string;
-    CaminhoBanco: string;
     AguardarConsultaRet: string;
     GravarLog: string;
     Sistema: string;
@@ -73,7 +68,7 @@ type
  function cgc(Num: string): boolean;
 
  function TerminaNFE: LongBool;stdcall;
- function ConsultaCadastro(vuf,cnpjcpf,mostrarretorno: WideString): WideString;stdcall;export;
+ function ConsultaCadastro(vuf,cnpjcpf,mostrarretorno: WideString): WideString;stdcall;
 
 
  var
@@ -470,7 +465,7 @@ begin
 //  result:='FALHA';
 end;
 
-function ConsultaCadastro(vuf,cnpjcpf,mostrarretorno: WideString): WideString;stdcall;export;
+function ConsultaCadastro(vuf,cnpjcpf,mostrarretorno: WideString): WideString;stdcall;
 var
  vataviso: boolean;
  vformemiss: TpcnTipoEmissao;
@@ -763,7 +758,6 @@ begin
     end;
   finally
   end;
-//  result:=vresposta;
   cadMDFe.DesconectaBanco;
   cadMDFe.Free;
   cadMDFe:=nil;
@@ -792,7 +786,6 @@ begin
    result:=cadMDFe.ImprimirEventoMDFE(vnmdfe);
   finally
   end;
-//  result:=vresposta;
   cadMDFe.DesconectaBanco;
   cadMDFe.Free;
   cadMDFe:=nil;
@@ -847,8 +840,6 @@ end;
 
 
 exports
- TerminaNFE,
- ConsultaCadastro,
  EnviarMDFE,
  ConsultarMDFE,
  EnviaEventoMDFE,

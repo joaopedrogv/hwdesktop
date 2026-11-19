@@ -246,8 +246,6 @@ begin
 end;
 
 procedure TFrmAdmNfe.btnValidarXMLClick(Sender: TObject);
-var
- i: integer;
 begin
   if CadNfeVenda.PesqPros(true,'HW518','') then
   begin
@@ -971,8 +969,6 @@ begin
    AConfigLegado.Geral.SalvarArquivos := '1'; //<Salvar Arquivos de Envio e Resposta>
    AConfigLegado.Geral.PathSalvar := vClass.cadempresa.dataSet.FieldByName('NFE_LOGPATH').AsString; //<PathSalvar>
    AConfigLegado.Geral.EnderecoPDF := vClass.cadempresa.dataSet.FieldByName('NFE_ENDERECOPDF').AsString;// Endereço de geração do arquivo PDF
-   AConfigLegado.Geral.CaminhoBanco := vClass.vcaminhobanco;// Endereço do banco de dados.Caso for em branco o sistema não considerará
-                                                          // Nosso banco de dados...
    AConfigLegado.Geral.AguardarConsultaRet :=vClass.cadempresa.dataSet.FieldByName('NFE_TMPRETORNOMIL').AsString; // sleep para retorno do webservice.
    AConfigLegado.Geral.GravarLog :=vClass.cadempresa.dataSet.FieldByName('NFE_GRAVALOG').AsString; // sleep para retorno do webservice.
    AConfigLegado.Geral.Sistema :=vClass.cadempresa.vSISTEMA; // Dados do desenvolvedor

@@ -35,7 +35,7 @@
 | 14 | `ShowfrStatus` | **aplicado pelo desenvolvedor** | helper removido |
 | 15 | `ExecutarDLL` + 4 métodos legados | **aplicado — F8, `ImprimirNFe` e `ExecutarDLL` removidos; DLL compilada; teste pendente** | `LIMPEZA-EXECUTARDLL.md` §7 |
 | 16 | `GeraNFe`, `verificarStatusWeb`, `TerminaNFE` (export + cargas) | **resolvida — funções/cargas removidas; `TerminaNFE` permanece e as cargas saíram dos wrappers** | `LIMPEZA-EXECUTARDLL.md` §8 |
-| 17 | `enviaNFe` + botões F2/F3 + cascata `GeraNFe`/`verificarStatusWeb` + código morto | **aplicado — DLL compilada; pkAtivos ok; PrTesteDll/teste do viewer pendentes** | `LIMPEZA-EXECUTARDLL.md` §8 |
+| 17 | `enviaNFe` + botões F2/F3 + cascata `GeraNFe`/`verificarStatusWeb` + código morto | **aplicado — DLL compilada; pkAtivos ok; `TerminaNFE`/`ConsultaCadastro` fora dos exports; PrTesteDll pendente** | `LIMPEZA-EXECUTARDLL.md` §8 |
 | — | `LerConfiguracao` + `IniciaNFE` | preservar por enquanto | usadas por `leconfigNFE`, que atende o viewer |
 | — | `nfce_serv_*` | preservar | usados pelos EXEs de serviço |
 | — | variantes `*CSharpBuffer` e exports ativos | preservar | usados por C#/ERP |

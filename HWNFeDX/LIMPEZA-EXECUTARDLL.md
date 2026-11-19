@@ -213,8 +213,8 @@ assinatura e `DDadosdup`/`DDadTransp` no corpo; `x`/`i` ficaram sem uso. Build i
 **Parte 2** (5 arquivos, +1/−1.664):
 
 - `UFuncoesDll.pas`: removidos `GeraNFe`/`verificarStatusWeb` (declaração, implementação e exports),
-  `vultstatus`, `UAdmNFe` do `uses` e o comentário `// result:=vresposta`. Exports restantes:
-  `TerminaNFE`, `ConsultaCadastro` e os 6 MDFe.
+  `vultstatus`, `UAdmNFe` do `uses` e o comentário `// result:=vresposta`. Exports restantes na época:
+  `TerminaNFE`, `ConsultaCadastro` e os 6 MDFe (os dois primeiros saíram na limpeza final).
 - `uFuncHwNFE.pas`/`DFeHwLibUnit.pas`: removidos `TverificarStatusWeb` e `TGeraNFe` (tipos, vars e
   `GetProcAddress`); as cargas de `TerminaNFE` também foram removidas depois (3 linhas por unit).
 - `UAdmNFe.pas`: `ArrayBi` removido e o bloco de vars reduzido a `FrmAdmNfe`.
@@ -234,10 +234,24 @@ assinatura e `DDadosdup`/`DDadTransp` no corpo; `x`/`i` ficaram sem uso. Build i
   `LerConfiguracao` eram leituras puras (não atribuíam `Result`).
 - Resíduo conhecido, fora de escopo: `TNFeGeralLegado.CaminhoBanco` ficou write-only (`UAdmNFe:974`).
 
+**Limpeza final (CaminhoBanco, `destroyDLLNfe`, cosméticos e exports)** — 4 arquivos, +2/−23:
+
+- `UFuncoesDll.pas`: removidos o campo `TNFeGeralLegado.CaminhoBanco`, os `uses` Vcl sem uso
+  (`Vcl.StdCtrls`, `Vcl.Buttons`, `Vcl.Dialogs`, `Vcl.Graphics`) e os comentários
+  `// result:=vresposta`; removido `export;` da declaração **e** da implementação de
+  `ConsultaCadastro`; `TerminaNFE` e `ConsultaCadastro` saíram do `exports` (funções mantidas).
+- `UAdmNFe.pas`: removida a atribuição de `CaminhoBanco` e o `var i` sem uso em `btnValidarXMLClick`.
+- `uFuncHwNFE.pas`: removido `destroyDLLNfe` (sem chamador); `carregaDLLNfe` mantido.
+- `UformTeste.pas`: removido o comentário `//destroyDLLNfe;`.
+- Build: exit 0; `bpl\hw.nfe.dx.dll` 68.824.642 bytes (19/11/2026 19:04:51).
+- Export table conferida com `tdump -e`: `TerminaNFE` e `ConsultaCadastro` ausentes; os 6 MDFe
+  exportados. As duas funções continuam compiladas e chamadas internamente (`UAdmNFe.FormClose`,
+  `UFormconsCad`).
+- Revisão independente: sem bloqueantes.
+
 ### Pendências finais
 
 1. Compilar `PrTesteDll` (o `pkAtivos` já foi compilado e o visual do `FrmAdmNfe` conferido pelo
    desenvolvedor).
-2. Backlog: `CaminhoBanco` write-only (`UAdmNFe:974`) e `uses` Vcl sem uso em `UFuncoesDll`.
-3. Release notes: exports `EnviarNFeHW`, `ExecutarDLL`, `GeraNFe` e `verificarStatusWeb` removidos;
-   F2/F3/F8 removidos; publicar apenas com o ERP 4.0.
+2. Release notes: exports `EnviarNFeHW`, `ExecutarDLL`, `GeraNFe`, `verificarStatusWeb`, `TerminaNFE`
+   e `ConsultaCadastro` removidos; F2/F3/F8 removidos; publicar apenas com o ERP 4.0.

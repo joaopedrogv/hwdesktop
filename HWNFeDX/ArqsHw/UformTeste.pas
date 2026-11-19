@@ -1320,7 +1320,6 @@ end;
 
 procedure TfrmTestes_DFe.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-//destroyDLLNfe;
 
   RegistroWin.Write(Self.ClassName, 'edEmpresaNFSeX', edEmpresaNFSeX.Value);
 end;

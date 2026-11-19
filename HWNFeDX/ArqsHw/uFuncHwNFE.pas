@@ -12,7 +12,6 @@ type
   TEnviaOSNFSe=function(vendBanco: WideString;codempresa: integer;vusuario: WideString;vos: integer): longbool; stdcall;
 
 function carregaDLLNfe: boolean;
-procedure destroyDLLNfe;
 
 var
   hdNFE: thandle;
@@ -42,12 +41,6 @@ begin
     @VisualizaNFSe:=GetProcAddress(hdNFE, WideString('VisualizaNFSe'));
     @EnviaOSNFSe:=GetProcAddress(hdNFE, WideString('EnviaOSNFSe'));
   end;
-end;
-
-procedure destroyDLLNfe;
-begin
-  if hdNFE <> 0 then
-   FreeLibrary(hdNFE);
 end;
 
 end.
