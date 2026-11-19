@@ -11,10 +11,14 @@ uses
 
 const
   KnownOptionsMask: Cardinal = HW_NEXT_OPT_KNOWN;
-  ContextRejectedMessage = 'O contexto da empresa nao foi aceito.';
+  SessionRejectedMessage = 'O contexto da empresa nao foi aceito.';
+  InitializationFailedMessage = 'Nao foi possivel inicializar o Next para a empresa atual.';
+  AvailabilityMessage = 'O Next nao esta disponivel para a empresa atual.';
 
 var
   Views: TList;
+  ViewsAwaitingInitialization: TList; // desabilitadas pela troca de identidade; reabilitadas apos inicializacao
+  ViewsBlockedByCleanup: TList;       // falha de limpeza; nunca reabilitar
   LastErrorText: UnicodeString;
   UiThread: Cardinal;
   HostApplication: HWND;
@@ -78,13 +82,9 @@ begin
   Result := HW_NEXT_VIEW_API_VERSION;
 end;
 
-function HwNextSetContext(ACompanyCode: Integer; AUserLogin, ADatabaseName, ADatabaseUserName,
-  ADatabasePassword: PWideChar): LongBool; stdcall;
+function HwNextSetSession(ACompanyCode: Integer; AUserLogin: PWideChar): LongBool; stdcall;
 var
   UserLogin: string;
-  DatabaseName: string;
-  DatabaseUserName: string;
-  DatabasePassword: string;
   View: TfrmNextBase;
   I: Integer;
   IdentityChanged: Boolean;
@@ -92,42 +92,25 @@ begin
   Result := False;
   ClearError;
   UserLogin := '';
-  DatabaseName := '';
-  DatabaseUserName := '';
-  DatabasePassword := '';
   try
     try
       try
         if AUserLogin <> nil then
           UserLogin := AUserLogin;
-        if ADatabaseName <> nil then
-          DatabaseName := ADatabaseName;
-        if ADatabaseUserName <> nil then
-          DatabaseUserName := ADatabaseUserName;
-        if ADatabasePassword <> nil then
-          DatabasePassword := ADatabasePassword;
 
         if ACompanyCode <= 0 then
-          raise Exception.Create(ContextRejectedMessage);
+          raise Exception.Create(SessionRejectedMessage);
         if UserLogin = '' then
-          raise Exception.Create(ContextRejectedMessage);
-        if DatabaseName = '' then
-          raise Exception.Create(ContextRejectedMessage);
-        if DatabaseUserName = '' then
-          raise Exception.Create(ContextRejectedMessage);
-        if DatabasePassword = '' then
-          raise Exception.Create(ContextRejectedMessage);
+          raise Exception.Create(SessionRejectedMessage);
 
-        IdentityChanged := not NextSetupInstance.HasContext;
+        IdentityChanged := not NextSetupInstance.HasSession;
         if not IdentityChanged then
           IdentityChanged := (NextSetupInstance.SessionContext.EmpresaId <> ACompanyCode) or
             (NextSetupInstance.SessionContext.UsuarioLogin <> UserLogin);
 
-        // A identidade e aplicada mesmo com telas abertas. Em um banco ja configurado, o Setup preserva adaptador,
-        // container e a instancia de sessao, atualizando somente empresa e login.
-        NextSetupInstance.SetContext(ACompanyCode, UserLogin, DatabaseName, DatabaseUserName, DatabasePassword);
+        NextSetupInstance.SetSession(ACompanyCode, UserLogin);
       except
-        RecordError(ContextRejectedMessage);
+        RecordError(SessionRejectedMessage);
         Exit;
       end;
 
@@ -137,10 +120,13 @@ begin
       if IdentityChanged then
       begin
         // Toda tela registrada, inclusive oculta, descarta o resultado da identidade anterior. Uma falha bloqueia o
-        // descarregamento do modulo e desabilita a tela afetada, mas as demais continuam sendo processadas.
+        // descarregamento do modulo e desabilita a tela permanentemente.
         for I := 0 to Views.Count - 1 do
         begin
           View := TfrmNextBase(Views[I]);
+          if ViewsBlockedByCleanup.IndexOf(View) >= 0 then
+            Continue;
+
           try
             View.ResetForSessionChange;
           except
@@ -148,11 +134,24 @@ begin
             begin
               CleanupIncomplete := True;
               RecordError(E.Message);
+              ViewsAwaitingInitialization.Remove(View);
+              if ViewsBlockedByCleanup.IndexOf(View) < 0 then
+                ViewsBlockedByCleanup.Add(View);
               try
                 View.Enabled := False;
               except
               end;
+              Continue;
             end;
+          end;
+
+          if ViewsAwaitingInitialization.IndexOf(View) < 0 then
+            ViewsAwaitingInitialization.Add(View);
+          try
+            View.Enabled := False;
+          except
+            on E: Exception do
+              RecordError(E.Message);
           end;
         end;
       end;
@@ -167,10 +166,66 @@ begin
     end;
   finally
     UserLogin := '';
+  end;
+end;
+
+function HwNextInitialize(ADatabaseName, ADatabaseUserName, ADatabasePassword: PWideChar): LongBool; stdcall;
+var
+  DatabaseName: string;
+  DatabaseUserName: string;
+  DatabasePassword: string;
+  View: TfrmNextBase;
+  I: Integer;
+begin
+  Result := False;
+  ClearError;
+  DatabaseName := '';
+  DatabaseUserName := '';
+  DatabasePassword := '';
+  try
+    try
+      if ADatabaseName <> nil then
+        DatabaseName := ADatabaseName;
+      if ADatabaseUserName <> nil then
+        DatabaseUserName := ADatabaseUserName;
+      if ADatabasePassword <> nil then
+        DatabasePassword := ADatabasePassword;
+
+      NextSetupInstance.Initialize(DatabaseName, DatabaseUserName, DatabasePassword);
+    except
+      RecordError(InitializationFailedMessage);
+      Exit;
+    end;
+
+    Result := True;
+
+    // Reabilita somente as telas desabilitadas pela troca de identidade; as bloqueadas por falha de limpeza ficam fora
+    // desta lista.
+    for I := ViewsAwaitingInitialization.Count - 1 downto 0 do
+    begin
+      View := TfrmNextBase(ViewsAwaitingInitialization[I]);
+      ViewsAwaitingInitialization.Delete(I);
+      if Views.IndexOf(View) < 0 then
+        Continue;
+      try
+        View.Enabled := True;
+      except
+        on E: Exception do
+          RecordError(E.Message);
+      end;
+    end;
+  finally
     DatabaseName := '';
     DatabaseUserName := '';
     DatabasePassword := '';
   end;
+end;
+
+function HwNextIsAvailable: LongBool; stdcall;
+begin
+  Result := NextSetupInstance.IsAvailable;
+  if (not Result) and (LastErrorText = '') then
+    RecordError(AvailabilityMessage);
 end;
 
 function HwNextOpenView(AIdentifier: PWideChar; AParent, ACloseTarget,
@@ -202,6 +257,9 @@ begin
       raise Exception.Create('A janela hospedeira não está disponível.');
     if GetWindowThreadProcessId(AParent, nil) <> GetCurrentThreadId then
       raise Exception.Create('A janela hospedeira e o módulo devem usar a mesma thread visual.');
+    if not NextSetupInstance.IsAvailable then
+      raise Exception.Create(AvailabilityMessage);
+
     if Views.Count = 0 then
     begin
       InitialBinding := True;
@@ -286,6 +344,8 @@ begin
   ClearError;
   try
     View := RequireView(AView);
+    ViewsAwaitingInitialization.Remove(View);
+    ViewsBlockedByCleanup.Remove(View);
     Views.Remove(View);
     try
       View.Free;
@@ -419,6 +479,8 @@ begin
         end;
       end;
     end;
+    ViewsAwaitingInitialization.Clear;
+    ViewsBlockedByCleanup.Clear;
     if CleanupIncomplete then
     begin
       if LastErrorText = '' then
@@ -468,7 +530,9 @@ end;
 
 exports
   HwNextApiVersion name 'HwNextApiVersion',
-  HwNextSetContext name 'HwNextSetContext',
+  HwNextSetSession name 'HwNextSetSession',
+  HwNextInitialize name 'HwNextInitialize',
+  HwNextIsAvailable name 'HwNextIsAvailable',
   HwNextOpenView name 'HwNextOpenView',
   HwNextResizeView name 'HwNextResizeView',
   HwNextFocusView name 'HwNextFocusView',
@@ -482,6 +546,8 @@ exports
 
 initialization
   Views := TList.Create;
+  ViewsAwaitingInitialization := TList.Create;
+  ViewsBlockedByCleanup := TList.Create;
 
 finalization
   // A descarga do modulo nao deixa ponteiro para o callback do host.
@@ -492,6 +558,8 @@ finalization
     Views.Delete(Views.Count - 1);
   end;
   Views.Free;
+  ViewsAwaitingInitialization.Free;
+  ViewsBlockedByCleanup.Free;
   Application.Handle := 0;
 
 end.

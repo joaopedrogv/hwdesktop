@@ -24,6 +24,9 @@ type
     function GetEmailConfig(RemetenteConfig: EmailConfigRemetenteEnum): EmailConfigModel; virtual; abstract;
     procedure SaveLegacy(const AConfigs: ConfigLegacyData); virtual; abstract;
     function GetLegacyPrefeituraNFSe(): string; virtual; abstract;
+    function ObterValorNumerico(const AChave: string; AEmpresaId: Integer): Double; virtual; abstract;
+    function ReivindicarValorNumerico(const AChave: string; AEmpresaId: Integer;
+      AValorAtual, ANovoValor: Double): Boolean; virtual; abstract;
   end;
 
 implementation

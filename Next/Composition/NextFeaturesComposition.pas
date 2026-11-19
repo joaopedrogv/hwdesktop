@@ -26,7 +26,11 @@ uses
   ListarOperacoesInternasUseCaseUnit, ListarRegrasFiscaisUseCaseUnit,
   NextQueryDefinition, GruposFiscaisQueryDefinition,
   ColumnLayoutPreferences, ColumnLayoutPreferencesRepository,
-  LocalPreferences, WindowsRegistryLocalPreferences;
+  LocalPreferences, WindowsRegistryLocalPreferences,
+  IConfiguracoesRepositoryUnit, ConfiguracoesRepositoryUnit,
+  IProcessosProviderUnit, ProcessosProviderUnit,
+  IProcessosRepositoryUnit, ProcessosRepositoryUnit,
+  RegistrarProcessosUseCaseUnit;
 
 procedure RegisterNextFeatures(const AContainer: TContainer);
 begin
@@ -40,6 +44,12 @@ begin
 
   // A secao e a chave sao recebidas a cada operacao; a instancia unica atende todas as telas.
   AContainer.RegisterType<ILocalPreferences, TWindowsRegistryLocalPreferences>.AsSingleton;
+
+  // O registro de processos usa a conexao do Setup e e resolvido a cada preparacao da empresa.
+  AContainer.RegisterType<IProcessosRepository, ProcessosRepository>.AsSingleton;
+  AContainer.RegisterType<IConfiguracoesRepository, ConfiguracoesRepository>.AsSingleton;
+  AContainer.RegisterType<IProcessosProvider, TProcessosProvider>.AsSingleton;
+  AContainer.RegisterType<IRegistrarProcessosUseCase, RegistrarProcessosUseCase>.AsTransient;
 
 
   // A remocao reutiliza a conexao compartilhada do Setup; sem estado, o repositorio fica como instancia unica de posse

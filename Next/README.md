@@ -54,7 +54,11 @@ perguntas individuais.
 
 ## Compilar a DLL e o host
 
-A [ABI v3](Interop/Contracts/HwNextViewApi.pas) inclui `HwNextCanCloseView`.
-Compile a DLL Rio Win32 e os pacotes Delphi 2006 `pkAtivos` e `pkAutomacao` da
-mesma revisão. A saída do projeto Next é `bpl/hw.next.dll` na raiz do clone.
-Confira se o ERP carrega esse binário ao validar.
+A [ABI 11](Interop/Contracts/HwNextViewApi.pas) separa a sessão da inicialização:
+`HwNextSetSession` publica empresa e login, `HwNextInitialize` monta a
+infraestrutura com os dados do banco e prepara a empresa atual, e
+`HwNextIsAvailable` informa se ela está pronta. O login usa `SetNextHostSession` e
+`InicializarNext`, nessa ordem, antes de abrir telas. Compile a DLL Rio Win32 e os
+pacotes Delphi 2006 `pkAtivos` e `pkAutomacao` da mesma revisão. A saída do projeto
+Next é `bpl/hw.next.dll` na raiz do clone. Confira se o ERP carrega esse binário ao
+validar.

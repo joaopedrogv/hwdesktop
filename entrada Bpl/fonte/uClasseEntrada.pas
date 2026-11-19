@@ -287,7 +287,7 @@ var
   vRetornoEmailValido: Integer;
   setPadraoEmpresaId: TsetPadraoEmpresaId;
   Session: ISessionContext;
-  NextContext: THwNextErpContext;
+  NextConfig: THwNextDatabaseConfig;
 begin
   vDadosIni.codEmpresa := vEmpresa.dataSet.FieldByName('cod_empresa').AsString;
 
@@ -372,23 +372,18 @@ begin
   );
   DFeHwLib.Setup(vDadosIni.vBancoHW, vDadosIni.cod_empresa);
 
-  if (dtmAtivo <> nil) and (dtmAtivo.bancoHw <> nil) then
+  if (dtmAtivo <> nil) and (dtmAtivo.bancoHw <> nil) and
+     (Session.EmpresaId > 0) and (Trim(Session.UsuarioLogin) <> '') then
   begin
-    NextContext.CompanyCode := Session.EmpresaId;
-    NextContext.UserLogin := Session.UsuarioLogin;
-    NextContext.DatabaseName := dtmAtivo.bancoHw.DatabaseName;
-    NextContext.DatabaseUserName := dtmAtivo.bancoHw.Params.Values['user_name'];
-    try
-      NextContext.DatabasePassword := dtmAtivo.bancoHw.Params.Values['password'];
+    SetNextHostSession(Session.EmpresaId, Session.UsuarioLogin);
 
-      if (NextContext.CompanyCode > 0) and
-         (Trim(NextContext.UserLogin) <> '') and
-         (Trim(NextContext.DatabaseName) <> '') and
-         (Trim(NextContext.DatabaseUserName) <> '') and
-         (Trim(NextContext.DatabasePassword) <> '') then
-        SetNextHostContext(NextContext);
+    NextConfig.DatabaseName := dtmAtivo.bancoHw.DatabaseName;
+    NextConfig.DatabaseUserName := dtmAtivo.bancoHw.Params.Values['user_name'];
+    try
+      NextConfig.DatabasePassword := dtmAtivo.bancoHw.Params.Values['password'];
+      InicializarNext(NextConfig);
     finally
-      NextContext.DatabasePassword := '';
+      NextConfig.DatabasePassword := '';
     end;
   end;
 

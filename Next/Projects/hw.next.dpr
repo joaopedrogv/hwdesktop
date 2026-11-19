@@ -28,6 +28,7 @@ uses
   AnaliseCondicoesForm in '..\UI\Forms\Features\OperacoesFiscaisIbsCbs\AnaliseCondicoesForm.pas' {frmAnaliseCondicoes: TForm},
   NextSetup in '..\Composition\NextSetup.pas',
   NextFeaturesComposition in '..\Composition\NextFeaturesComposition.pas',
+  ProcessosProviderUnit in '..\Composition\Processos\ProcessosProviderUnit.pas',
   ISessionContextUnit in '..\..\Modern\Core\Domain\Ports\Shared\ISessionContextUnit.pas',
   SessionContextUnit in '..\..\Modern\Core\Application\Contexts\SessionContextUnit.pas',
   NextQueryDefinition in '..\Queries\Shared\NextQueryDefinition.pas',

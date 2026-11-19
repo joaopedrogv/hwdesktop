@@ -18,9 +18,7 @@ type
     DisplayTitle: string;
   end;
 
-  THwNextErpContext = record
-    CompanyCode: Integer;
-    UserLogin: string;
+  THwNextDatabaseConfig = record
     DatabaseName: string;
     DatabaseUserName: string;
     DatabasePassword: string;
@@ -30,7 +28,8 @@ function NextQueryOptions: THwNextOpenOptions;
 function NextMultipleOptions(ADestroyOnClose: Boolean): THwNextOpenOptions;
 function NextModalOptions: THwNextOpenOptions;
 
-function SetNextHostContext(const AContext: THwNextErpContext): Boolean;
+function SetNextHostSession(ACompanyCode: Integer; const AUserLogin: string): Boolean;
+function InicializarNext(const AConfig: THwNextDatabaseConfig): Boolean;
 
 function OpenNextView(AOwner: TForm; const AIdentifier: string; const AOptions: THwNextOpenOptions): Boolean;
 
@@ -46,7 +45,9 @@ uses
 const
   HW_NEXT_DLL_NAME = 'hw.next.dll';
   EXPORT_API_VERSION: AnsiString = 'HwNextApiVersion';
-  EXPORT_SET_CONTEXT: AnsiString = 'HwNextSetContext';
+  EXPORT_SET_SESSION: AnsiString = 'HwNextSetSession';
+  EXPORT_INITIALIZE: AnsiString = 'HwNextInitialize';
+  EXPORT_IS_AVAILABLE: AnsiString = 'HwNextIsAvailable';
   EXPORT_OPEN_VIEW: AnsiString = 'HwNextOpenView';
   EXPORT_RESIZE_VIEW: AnsiString = 'HwNextResizeView';
   EXPORT_FOCUS_VIEW: AnsiString = 'HwNextFocusView';
@@ -73,7 +74,9 @@ type
     ViewCount: THwNextViewCount;
     Shutdown: THwNextShutdown;
     LastError: THwNextLastError;
-    SetContext: THwNextSetContext;
+    SetSession: THwNextSetSession;
+    Initialize: THwNextInitialize;
+    IsAvailable: THwNextIsAvailable;
     SetAuthorizationCallback: THwNextSetAuthorizationCallback;
   end;
 
@@ -115,7 +118,8 @@ type
     function ProcessKey(AView: HWND; const AMsg: TMsg): Boolean;
     function ViewCount: Integer;
     function Shutdown: Boolean;
-    function SetContext(const AContext: THwNextErpContext): Boolean;
+    function SetSession(ACompanyCode: Integer; const AUserLogin: string): Boolean;
+    function Initialize(const AConfig: THwNextDatabaseConfig): Boolean;
     function CloseAll(AReason: THwNextCloseReason): Boolean;
     function Invalidate: Boolean;
     function ShutdownHost: Boolean;
@@ -269,9 +273,14 @@ begin
   Result := FBridge.ShutdownHost;
 end;
 
-function SetNextHostContext(const AContext: THwNextErpContext): Boolean;
+function SetNextHostSession(ACompanyCode: Integer; const AUserLogin: string): Boolean;
 begin
-  Result := FBridge.SetContext(AContext);
+  Result := FBridge.SetSession(ACompanyCode, AUserLogin);
+end;
+
+function InicializarNext(const AConfig: THwNextDatabaseConfig): Boolean;
+begin
+  Result := FBridge.Initialize(AConfig);
 end;
 
 constructor THwNextHostBridge.Create;
@@ -303,6 +312,8 @@ begin
   begin
     // HwNextShutdown limpa o callback sem descarregar a biblioteca; uma liberacao anormal pode deixar a DLL carregada
     // sem o callback do host, e este caminho garante o registro.
+    if not Assigned(FApi.SetSession) or not Assigned(FApi.Initialize) or not Assigned(FApi.IsAvailable) then
+      raise Exception.Create('A interface de hw.next.dll não expõe a sessão do Next.');
     if not Assigned(FApi.SetAuthorizationCallback) then
       raise Exception.Create(
         'A interface de hw.next.dll não expôe o registro do callback ' + 'de autorização.');
@@ -342,7 +353,9 @@ begin
     FApi.ViewCount := THwNextViewCount(ResolveExport(EXPORT_VIEW_COUNT));
     FApi.Shutdown := THwNextShutdown(ResolveExport(EXPORT_SHUTDOWN));
     FApi.LastError := THwNextLastError(ResolveExport(EXPORT_LAST_ERROR));
-    FApi.SetContext := THwNextSetContext(ResolveExport(EXPORT_SET_CONTEXT));
+    FApi.SetSession := THwNextSetSession(ResolveExport(EXPORT_SET_SESSION));
+    FApi.Initialize := THwNextInitialize(ResolveExport(EXPORT_INITIALIZE));
+    FApi.IsAvailable := THwNextIsAvailable(ResolveExport(EXPORT_IS_AVAILABLE));
     // A consulta de autorizacao pertence ao host; falha no registro desfaz a carga da biblioteca.
     FApi.SetAuthorizationCallback := THwNextSetAuthorizationCallback(ResolveExport(EXPORT_SET_AUTHORIZATION_CALLBACK));
     if FApi.SetAuthorizationCallback(@HwNextAuthorize) = False then
@@ -498,6 +511,17 @@ begin
   try
     try
       EnsureLibrary;
+      if not Assigned(FApi.IsAvailable) then
+      begin
+        ShowFailure('Não foi possível abrir a tela Next.',
+          'A interface de hw.next.dll não expõe a disponibilidade do Next.');
+        Exit;
+      end;
+      if FApi.IsAvailable() = False then
+      begin
+        ShowFailure('Não foi possível abrir a tela Next.', LastErrorDetail);
+        Exit;
+      end;
       FMdiParent := AOwner;
 
       if AOptions.Presentation = npModal then
@@ -714,28 +738,19 @@ begin
   end;
 end;
 
-function THwNextHostBridge.SetContext(const AContext: THwNextErpContext): Boolean;
+function THwNextHostBridge.SetSession(ACompanyCode: Integer; const AUserLogin: string): Boolean;
 const
-  ContextFailure = 'Nao foi possivel preparar a tela Eventos RTC.';
-  ContextRejected = 'O contexto da empresa nao foi aceito.';
+  SessionFailure = 'Não foi possível publicar a sessão do Next.';
 var
   UserLogin: WideString;
-  DatabaseName: WideString;
-  DatabaseUserName: WideString;
-  DatabasePassword: WideString;
 begin
   Result := False;
   UserLogin := '';
-  DatabaseName := '';
-  DatabaseUserName := '';
-  DatabasePassword := '';
   try
-    // O buffer PWideChar termina em nulo; um #0 interno truncaria o valor silenciosamente antes que o modulo pudesse
-    // valida-lo.
-    if (Pos(#0, AContext.UserLogin) > 0) or (Pos(#0, AContext.DatabaseName) > 0) or
-      (Pos(#0, AContext.DatabaseUserName) > 0) or (Pos(#0, AContext.DatabasePassword) > 0) then
+    // O buffer PWideChar termina em nulo; um #0 interno truncaria o valor silenciosamente.
+    if (ACompanyCode <= 0) or (Trim(AUserLogin) = '') or (Pos(#0, AUserLogin) > 0) then
     begin
-      ShowFailure(ContextFailure, ContextRejected);
+      ShowFailure(SessionFailure, '');
       Exit;
     end;
 
@@ -744,35 +759,82 @@ begin
     except
       on E: Exception do
       begin
-        // Diagnosticos de carga, versao e exportacao nunca contem valores do contexto.
-        ShowFailure(ContextFailure, E.Message);
+        // Diagnosticos de carga, versao e exportacao nunca contem a identidade recebida.
+        ShowFailure(SessionFailure, E.Message);
         Exit;
       end;
     end;
 
-    if not Assigned(FApi.SetContext) then
+    if not Assigned(FApi.SetSession) then
     begin
-      ShowFailure(ContextFailure, ContextRejected);
+      ShowFailure(SessionFailure, 'A interface de hw.next.dll não expõe a sessão do Next.');
       Exit;
     end;
 
-    UserLogin := AContext.UserLogin;
-    DatabaseName := AContext.DatabaseName;
-    DatabaseUserName := AContext.DatabaseUserName;
-    DatabasePassword := AContext.DatabasePassword;
-
-    // O host nao armazena uma copia do contexto. O modulo possui os valores recebidos e estes buffers locais sao limpos
-    // antes do retorno.
-    if FApi.SetContext(AContext.CompanyCode, PWideChar(UserLogin), PWideChar(DatabaseName), PWideChar(DatabaseUserName),
-      PWideChar(DatabasePassword)) = False then
+    UserLogin := AUserLogin;
+    if FApi.SetSession(ACompanyCode, PWideChar(UserLogin)) = False then
     begin
-      ShowFailure(ContextFailure, ContextRejected);
+      ShowFailure(SessionFailure, LastErrorDetail);
       Exit;
     end;
 
     Result := True;
   finally
     UserLogin := '';
+  end;
+end;
+
+function THwNextHostBridge.Initialize(const AConfig: THwNextDatabaseConfig): Boolean;
+const
+  InitializationFailure = 'Não foi possível inicializar o Next.';
+var
+  DatabaseName: WideString;
+  DatabaseUserName: WideString;
+  DatabasePassword: WideString;
+begin
+  Result := False;
+  DatabaseName := '';
+  DatabaseUserName := '';
+  DatabasePassword := '';
+  try
+    // Os buffers PWideChar terminam em nulo; um #0 interno truncaria o valor silenciosamente. A mensagem nunca repete
+    // nome de banco, usuario ou senha.
+    if (Pos(#0, AConfig.DatabaseName) > 0) or (Pos(#0, AConfig.DatabaseUserName) > 0) or
+      (Pos(#0, AConfig.DatabasePassword) > 0) then
+    begin
+      ShowFailure(InitializationFailure, 'A configuração do banco não foi aceita.');
+      Exit;
+    end;
+
+    try
+      EnsureLibrary;
+    except
+      on E: Exception do
+      begin
+        ShowFailure(InitializationFailure, E.Message);
+        Exit;
+      end;
+    end;
+
+    if not Assigned(FApi.Initialize) then
+    begin
+      ShowFailure(InitializationFailure, 'A interface de hw.next.dll não expõe a inicialização do Next.');
+      Exit;
+    end;
+
+    DatabaseName := AConfig.DatabaseName;
+    DatabaseUserName := AConfig.DatabaseUserName;
+    DatabasePassword := AConfig.DatabasePassword;
+
+    if FApi.Initialize(PWideChar(DatabaseName), PWideChar(DatabaseUserName),
+      PWideChar(DatabasePassword)) = False then
+    begin
+      ShowFailure(InitializationFailure, LastErrorDetail);
+      Exit;
+    end;
+
+    Result := True;
+  finally
     DatabaseName := '';
     DatabaseUserName := '';
     DatabasePassword := '';

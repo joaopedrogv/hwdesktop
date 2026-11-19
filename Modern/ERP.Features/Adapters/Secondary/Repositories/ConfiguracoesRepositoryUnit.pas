@@ -29,6 +29,9 @@ type
     function GetEmailConfig(RemetenteConfig: EmailConfigRemetenteEnum): EmailConfigModel; override;
     procedure SaveLegacy(const AConfigs: ConfigLegacyData); override;
     function GetLegacyPrefeituraNFSe(): string; override;
+    function ObterValorNumerico(const AChave: string; AEmpresaId: Integer): Double; override;
+    function ReivindicarValorNumerico(const AChave: string; AEmpresaId: Integer;
+      AValorAtual, ANovoValor: Double): Boolean; override;
   end;
 
 implementation
@@ -294,6 +297,58 @@ begin
   finally
     Q.Free();
   end;
+end;
+
+function ConfiguracoesRepository.ObterValorNumerico(const AChave: string;
+  AEmpresaId: Integer): Double;
+begin
+  Result := FConnection.ExecuteScalar(
+    'SELECT VALUE1_F FROM CONFIG_SISTEMA ' +
+    'WHERE CHAVE = :CHAVE AND COD_EMPRESA = :COD_EMPRESA',
+    ParametersBuilder.Create(2)
+      .ByName('CHAVE', AChave)
+      .ByName('COD_EMPRESA', AEmpresaId)
+      .Build()).AsFloat;
+end;
+
+function ConfiguracoesRepository.ReivindicarValorNumerico(const AChave: string;
+  AEmpresaId: Integer; AValorAtual, ANovoValor: Double): Boolean;
+begin
+  FConnection.ExecuteCommand(
+    'UPDATE CONFIG_SISTEMA SET VALUE1_F = :NOVO_VALOR ' +
+    'WHERE CHAVE = :CHAVE AND COD_EMPRESA = :COD_EMPRESA ' +
+    'AND (VALUE1_F IS NULL OR VALUE1_F <= :VALOR_ATUAL)',
+    ParametersBuilder.Create(4)
+      .ByNameF('NOVO_VALOR', ANovoValor)
+      .ByName('CHAVE', AChave)
+      .ByName('COD_EMPRESA', AEmpresaId)
+      .ByNameF('VALOR_ATUAL', AValorAtual)
+      .Build());
+
+  if ObterValorNumerico(AChave, AEmpresaId) = ANovoValor then
+  begin
+    Result := True;
+    Exit;
+  end;
+
+  FConnection.ExecuteCommand(
+    'INSERT INTO CONFIG_SISTEMA (CHAVE, COD_EMPRESA, DISPLAY_, TAG, TYPE1_, VALUE1_F, ATIVO) ' +
+    'SELECT :CHAVE_VALOR, :COD_EMPRESA_VALOR, :DISPLAY_VALOR, :TAG_VALOR, :TYPE1_VALOR, ' +
+    ':NOVO_VALOR_VALOR, 1 FROM RDB$DATABASE ' +
+    'WHERE NOT EXISTS (SELECT 1 FROM CONFIG_SISTEMA C ' +
+    'WHERE C.CHAVE = :CHAVE_FILTRO AND C.COD_EMPRESA = :COD_EMPRESA_FILTRO)',
+    ParametersBuilder.Create(8)
+      .ByName('CHAVE_VALOR', AChave)
+      .ByName('COD_EMPRESA_VALOR', AEmpresaId)
+      .ByName('DISPLAY_VALOR', AChave)
+      .ByName('TAG_VALOR', '')
+      .ByName('TYPE1_VALOR', 'float')
+      .ByNameF('NOVO_VALOR_VALOR', ANovoValor)
+      .ByName('CHAVE_FILTRO', AChave)
+      .ByName('COD_EMPRESA_FILTRO', AEmpresaId)
+      .Build());
+
+  Result := ObterValorNumerico(AChave, AEmpresaId) = ANovoValor;
 end;
 
 procedure ConfiguracoesRepository.Post(Input: ConfiguracaoEtd);

@@ -11,7 +11,7 @@ uses
   {$ENDIF};
 
 const
-  HW_NEXT_VIEW_API_VERSION     = 10;
+  HW_NEXT_VIEW_API_VERSION     = 11;
   HW_NEXT_ERROR_CAPACITY       = 1024; // buffer do chamador, incluindo #0
   HW_NEXT_IDENTIFIER_MAX_CHARS = 63;
 
@@ -41,10 +41,13 @@ type
   THwNextViewCount = function: Integer; stdcall;
   THwNextShutdown = function: LongBool; stdcall;
   THwNextLastError = function(ABuffer: PWideChar; ACapacity: Integer): Integer; stdcall;
-  // Contexto ERP de uso unico. Apenas valores: os buffers de caracteres pertencem ao chamador e sao validos somente
-  // durante a chamada.
-  THwNextSetContext = function(ACompanyCode: Integer; AUserLogin, ADatabaseName, ADatabaseUserName,
-    ADatabasePassword: PWideChar): LongBool; stdcall;
+  // Publica apenas a identidade da sessao, sem abrir conexao, consultar o banco ou montar a infraestrutura do Next.
+  // Os buffers de caracteres pertencem ao chamador e sao validos somente durante a chamada.
+  THwNextSetSession = function(ACompanyCode: Integer; AUserLogin: PWideChar): LongBool; stdcall;
+  // Inicializa a infraestrutura e prepara a empresa atual. Repetivel; os buffers pertencem ao chamador.
+  THwNextInitialize = function(ADatabaseName, ADatabaseUserName, ADatabasePassword: PWideChar): LongBool; stdcall;
+  // Verdadeiro somente quando a empresa atual esta preparada para uso.
+  THwNextIsAvailable = function: LongBool; stdcall;
   // Callback sincrono de autorizacao: recebe o codigo do processo, a acao ja convertida em texto e a tabela da regra,
   // todos definidos pelo modulo. Os buffers pertencem ao chamador e valem somente durante a chamada; o host aplica a
   // regra do processo e da acao.
