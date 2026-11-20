@@ -32,6 +32,7 @@ uses
   ISessionContextUnit in '..\..\Modern\Core\Domain\Ports\Shared\ISessionContextUnit.pas',
   SessionContextUnit in '..\..\Modern\Core\Application\Contexts\SessionContextUnit.pas',
   NextQueryDefinition in '..\Queries\Shared\NextQueryDefinition.pas',
+  NextSqlQueryDefinition in '..\Queries\Shared\NextSqlQueryDefinition.pas',
   QueryColumnDefinition in '..\Queries\Shared\QueryColumnDefinition.pas',
   PresenterConsultaBase in '..\UI\Presenters\Shared\PresenterConsultaBase.pas',
   PresenterCadastroBase in '..\UI\Presenters\Shared\PresenterCadastroBase.pas',

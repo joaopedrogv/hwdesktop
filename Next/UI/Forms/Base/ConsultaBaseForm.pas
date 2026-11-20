@@ -166,7 +166,7 @@ type
     destructor Destroy; override;
     procedure ResetForSessionChange; override;
     function AtivarEdicao(const AChave: string): Boolean;
-    function AtivarInclusao: Boolean;
+    function AtivarInclusao(const AChave: string = '@inclusao'): Boolean;
     // Qualquer aba de cadastro com rascunho pendente impede o fechamento; cada editor responde pela propria pendencia.
     function HasPendingChanges: Boolean; override;
     // A aba de cadastro ativa recebe o foco quando o editor consegue; caso contrario o foco continua com o host.
@@ -735,9 +735,9 @@ begin
   Result := TryAtivarAba(AChave);
 end;
 
-function TfrmConsultaBase.AtivarInclusao: Boolean;
+function TfrmConsultaBase.AtivarInclusao(const AChave: string = '@inclusao'): Boolean;
 begin
-  Result := TryAtivarAba(ChaveAbaInclusao);
+  Result := TryAtivarAba(AChave);
 end;
 
 function TfrmConsultaBase.ListaAbasCadastro: TObjectList<TAbaCadastro>;

@@ -3,9 +3,9 @@ unit GruposFiscaisQueryDefinition;
 interface
 
 uses
-  Data.DB, FilterCriterion, NextQueryDefinition, GridColumnDefinition,
-  FilterDefinition, IDataSetReaderUnit, QueryResultOperations,
-  ColumnLayoutPreferences;
+  Data.DB, FilterCriterion, NextQueryDefinition, NextSqlQueryDefinition,
+  GridColumnDefinition, FilterDefinition, IDataSetReaderUnit,
+  QueryResultOperations, ColumnLayoutPreferences;
 
 type
   // Identificacao do grupo escolhido na grade, copiada por valor: nenhum objeto precisa ser liberado pela tela ou pelo
@@ -15,7 +15,7 @@ type
     Descricao: string;
   end;
 
-  TGruposFiscaisQueryDefinition = class(TNextQueryDefinitionBase, INextQueryDefinition<TGrupoSelecionado>)
+  TGruposFiscaisQueryDefinition = class(TNextSqlQueryDefinitionBase, INextQueryDefinition<TGrupoSelecionado>)
   public
     constructor Create(AReaderFactory: ISqlDataSetReaderFactory; AOperation: IQueryResultOperations;
       ALayoutPreferences: IColumnLayoutPreferences);

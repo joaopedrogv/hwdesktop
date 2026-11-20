@@ -3,7 +3,7 @@ unit QueryFilterSqlBuilder;
 interface
 
 uses
-  NextQueryDefinition, FilterDefinition, FilterCriterion, ParameterValueUnit;
+  NextSqlQueryDefinition, FilterDefinition, FilterCriterion, ParameterValueUnit;
 
 type
   // Traduz criterios tipados em condicoes parametrizadas: o SQL base informa o ponto de insercao e a definicao informa

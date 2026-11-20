@@ -4,17 +4,10 @@ interface
 
 uses
   Data.DB, IDataSetReaderUnit, FilterCriterion, QueryResultOperations,
-  GridColumnDefinition, FilterDefinition, ParameterValueUnit,
-  ColumnLayoutPreferences, QueryColumnLayout;
+  GridColumnDefinition, FilterDefinition, ColumnLayoutPreferences,
+  QueryColumnLayout;
 
 type
-  // Definicao de leitura independente de driver. Contem apenas SQL, parametros e metadados de colunas; nao executa
-  // consulta nem conhece conexao.
-  TNextQueryDefinition = record
-    Sql: string;
-    Parameters: ParametersValues;
-  end;
-
   // A base possui o leitor e associa as operacoes ao leitor vigente.
   INextQueryDefinitionBase = interface
     ['{D1A2B3C4-D5E6-F7A8-B9C0-D1E2F3A4B5C6}']
@@ -49,7 +42,6 @@ type
   protected
     FOperation: IQueryResultOperations;
     FReader: IDataSetReader;
-    FReaderFactory: ISqlDataSetReaderFactory;
     FLayoutPreferences: IColumnLayoutPreferences;
     // Identidade do layout em CONFIG_COLUNAS. Cada definicao atribui na primeira linha de Configure, que roda na
     // construcao da base e nao pode depender de campos da classe derivada.
@@ -57,13 +49,13 @@ type
     FFiltersDef: TFilterDefinition;
     FColumnsDef: TGridColumnDefinitions;
     procedure Configure(); virtual;
-    function CreateQueryDefinition(const ACriteria: TFilterCriteria): TNextQueryDefinition; virtual; abstract;
+    function CreateReader(const ACriteria: TFilterCriteria): IDataSetReader; virtual; abstract;
   public
-    constructor Create(AReaderFactory: ISqlDataSetReaderFactory; AOperation: IQueryResultOperations;
+    constructor Create(AOperation: IQueryResultOperations;
       ALayoutPreferences: IColumnLayoutPreferences);
     procedure Search(const ACriteria: TFilterCriteria);
     procedure Refresh;
-    procedure Clear;
+    procedure Clear; virtual;
     function GetResultOperation(): IQueryResultOperations;
     function GetColumnsDef: TGridColumnDefinitions;
     function GetFiltersDef(): TFilterDefinition;
@@ -82,18 +74,15 @@ uses
 const
   MissingReaderMessage = 'O leitor de dados da consulta nao foi informado.';
 
-constructor TNextQueryDefinitionBase.Create(AReaderFactory: ISqlDataSetReaderFactory;
-  AOperation: IQueryResultOperations; ALayoutPreferences: IColumnLayoutPreferences);
+constructor TNextQueryDefinitionBase.Create(AOperation: IQueryResultOperations;
+  ALayoutPreferences: IColumnLayoutPreferences);
 begin
   inherited Create;
-  if AReaderFactory = nil then
-    raise Exception.Create('A fabrica de leitores da consulta nao foi informada.');
   if AOperation = nil then
     raise Exception.Create('As operacoes do resultado da consulta nao foram informadas.');
   if ALayoutPreferences = nil then
     raise Exception.Create('As preferencias de colunas nao foram informadas.');
 
-  FReaderFactory := AReaderFactory;
   FOperation := AOperation;
   FLayoutPreferences := ALayoutPreferences;
   Configure();
@@ -147,13 +136,10 @@ begin
 end;
 
 procedure TNextQueryDefinitionBase.Search(const ACriteria: TFilterCriteria);
-var
-  QueryDefinition: TNextQueryDefinition;
 begin
   // Uma pesquisa substitui a anterior: nenhum leitor antigo permanece ativo nem associado as operacoes.
   Clear;
-  QueryDefinition := CreateQueryDefinition(ACriteria);
-  FReader := FReaderFactory.CreateReader(QueryDefinition.Sql, QueryDefinition.Parameters);
+  FReader := CreateReader(ACriteria);
   try
     if FReader = nil then
       raise Exception.Create(MissingReaderMessage);

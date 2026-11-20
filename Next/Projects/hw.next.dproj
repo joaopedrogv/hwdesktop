@@ -173,6 +173,7 @@
         <DCCReference Include="..\..\Modern\Core\Domain\Ports\Shared\ISessionContextUnit.pas"/>
         <DCCReference Include="..\..\Modern\Core\Application\Contexts\SessionContextUnit.pas"/>
         <DCCReference Include="..\Queries\Shared\NextQueryDefinition.pas"/>
+        <DCCReference Include="..\Queries\Shared\NextSqlQueryDefinition.pas"/>
         <DCCReference Include="..\Queries\Shared\QueryColumnDefinition.pas"/>
         <DCCReference Include="..\UI\Presenters\Shared\PresenterConsultaBase.pas"/>
         <DCCReference Include="..\UI\Presenters\Shared\PresenterCadastroBase.pas"/>
