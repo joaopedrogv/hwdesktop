@@ -274,9 +274,9 @@ begin
   Q := FConnection.CreateQuery(
     'select ' +
     'e.cidade_emp, e.endereco_pref, e.bairro_pref, es.sigla_uf, e.cep_pref ' +
-    'from empresa e ' +                                                                 
+    'from empresa e ' +
     'left join estados es on es.codigo_uf = e.uf_emp ' +
-    'where e.cod_empresa = %d',                                 
+    'where e.cod_empresa = %d',
      [ FSession.EmpresaId ]);
 
   try
@@ -301,14 +301,17 @@ end;
 
 function ConfiguracoesRepository.ObterValorNumerico(const AChave: string;
   AEmpresaId: Integer): Double;
+var
+  SC: ScalarResult;
 begin
-  Result := FConnection.ExecuteScalar(
+  SC := FConnection.ExecuteScalar(
     'SELECT VALUE1_F FROM CONFIG_SISTEMA ' +
     'WHERE CHAVE = :CHAVE AND COD_EMPRESA = :COD_EMPRESA',
     ParametersBuilder.Create(2)
       .ByName('CHAVE', AChave)
       .ByName('COD_EMPRESA', AEmpresaId)
-      .Build()).AsFloat;
+      .Build());
+  Result := SC.AsFloat;
 end;
 
 function ConfiguracoesRepository.ReivindicarValorNumerico(const AChave: string;

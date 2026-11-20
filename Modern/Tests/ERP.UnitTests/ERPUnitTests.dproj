@@ -134,6 +134,19 @@
         <DCCReference Include="Domain\Services\Test_SincronizacaoCalculadoraLockService.pas"/>
         <DCCReference Include="Domain\Services\Test_SincronizadorCalculadoraService.pas"/>
         <DCCReference Include="Support\Fakes\FakeTokenDecryptorUnit.pas"/>
+        <DCCReference Include="Support\Fakes\StubSessionContextUnit.pas"/>
+        <DCCReference Include="Support\Fakes\StubEventosDFeRepositoryUnit.pas"/>
+        <DCCReference Include="Support\Fakes\StubEventoDFe112150RepositoryUnit.pas"/>
+        <DCCReference Include="Support\Fakes\StubEventoDFe211130RepositoryUnit.pas"/>
+        <DCCReference Include="Application\UseCases\Test_SalvarEventoDFe112150UseCase.pas"/>
+        <DCCReference Include="Application\UseCases\Test_ObterEventoDFe112150PorIdUseCase.pas"/>
+        <DCCReference Include="Application\UseCases\Test_SalvarEventoDFe211130UseCase.pas"/>
+        <DCCReference Include="Application\UseCases\Test_ObterEventoDFe211130PorIdUseCase.pas"/>
+        <DCCReference Include="Application\UseCases\Test_RemoverEventoDFeUseCase.pas"/>
+        <DCCReference Include="Application\UseCases\Test_ObterProximoSeqIdEventoDFeUseCase.pas"/>
+        <DCCReference Include="Domain\Entities\Test_EventoDFe211130Itens.pas"/>
+        <DCCReference Include="Domain\Entities\Test_EventoDFeEtd.pas"/>
+        <DCCReference Include="Domain\Validation\Test_EventoDFeMetadata.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -15,7 +15,9 @@ type
   public
     constructor Create(AComunicator: IAuthorizationComunicator);
     function Authorize(const AProcessCode: string; AAction: TAuthorizationAction;
-      const ATable: string): TAuthorizationResult;
+      const ATable: string): TAuthorizationResult; overload;
+    function Authorize(const AProcessCode: string; AAction: TAuthorizationAction;
+      const ATable, ABusinessKey: string): TAuthorizationResult; overload;
     procedure SetComunicator(AComunicator: IAuthorizationComunicator);
   end;
 
@@ -36,8 +38,14 @@ end;
 
 function TNextAuthorizationAdapter.Authorize(const AProcessCode: string;
   AAction: TAuthorizationAction; const ATable: string): TAuthorizationResult;
+begin
+  Result := Authorize(AProcessCode, AAction, ATable, '');
+end;
+
+function TNextAuthorizationAdapter.Authorize(const AProcessCode: string;
+  AAction: TAuthorizationAction; const ATable, ABusinessKey: string): TAuthorizationResult;
 var
-  Callback: THwNextAuthorizationCallback;
+  Callback: THwNextAuthorizationCallbackV2;
   ActionText: string;
   AuthResult: Integer;
 begin
@@ -46,7 +54,7 @@ begin
 
   // Os parenteses forcam a chamada da funcao; sem eles o compilador tenta atribuir a propria rotina (register) ao
   // ponteiro stdcall.
-  Callback := GetAuthorizationCallback();
+  Callback := GetAuthorizationCallbackV2();
   if not Assigned(Callback) then
   begin
     DoComunication('Callback de autorização não está disponível');
@@ -76,7 +84,8 @@ begin
 
   try
     // A tabela identifica o recurso auditado e e repassada sem interpretacao do host.
-    AuthResult := Callback(PWideChar(AProcessCode), PWideChar(ActionText), PWideChar(ATable));
+    AuthResult := Callback(PWideChar(AProcessCode), PWideChar(ActionText), PWideChar(ATable),
+      PWideChar(ABusinessKey));
     case AuthResult of
       HW_NEXT_AUTH_ALLOWED:
         Result.Outcome := aoAllowed;

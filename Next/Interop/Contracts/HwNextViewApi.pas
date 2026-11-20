@@ -11,7 +11,7 @@ uses
   {$ENDIF};
 
 const
-  HW_NEXT_VIEW_API_VERSION     = 11;
+  HW_NEXT_VIEW_API_VERSION     = 12;
   HW_NEXT_ERROR_CAPACITY       = 1024; // buffer do chamador, incluindo #0
   HW_NEXT_IDENTIFIER_MAX_CHARS = 63;
 
@@ -48,12 +48,13 @@ type
   THwNextInitialize = function(ADatabaseName, ADatabaseUserName, ADatabasePassword: PWideChar): LongBool; stdcall;
   // Verdadeiro somente quando a empresa atual esta preparada para uso.
   THwNextIsAvailable = function: LongBool; stdcall;
-  // Callback sincrono de autorizacao: recebe o codigo do processo, a acao ja convertida em texto e a tabela da regra,
-  // todos definidos pelo modulo. Os buffers pertencem ao chamador e valem somente durante a chamada; o host aplica a
-  // regra do processo e da acao.
-  THwNextAuthorizationCallback = function(AProcessCode, AAction, ATable: PWideChar): Integer; stdcall;
-  THwNextSetAuthorizationCallback = function(
-    ACallback: THwNextAuthorizationCallback): LongBool; stdcall;
+  // Callback sincrono de autorizacao: recebe o codigo do processo, a acao ja convertida em texto, a tabela da regra e a
+  // chave de negocio do registro, todos definidos pelo modulo. Os buffers pertencem ao chamador e valem somente durante
+  // a chamada; o host aplica a regra do processo e da acao.
+  THwNextAuthorizationCallbackV2 = function(AProcessCode, AAction, ATable,
+    ABusinessKey: PWideChar): Integer; stdcall;
+  THwNextSetAuthorizationCallbackV2 = function(
+    ACallback: THwNextAuthorizationCallbackV2): LongBool; stdcall;
 
 implementation
 

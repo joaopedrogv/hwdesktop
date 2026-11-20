@@ -11,7 +11,7 @@ type
     // Reativa a aba sem repetir a autorizacao nem recarregar o registro; False quando a aba nao existe.
     function AtivarEdicao(const AChave: string): Boolean;
     // Reativa a aba de inclusao sem repetir a autorizacao nem recarregar a preparacao; False quando a aba nao existe.
-    function AtivarInclusao: Boolean;
+    function AtivarInclusao(const AChave: string = '@inclusao'): Boolean;
   end;
 
 implementation

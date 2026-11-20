@@ -46,7 +46,26 @@ uses
   Test_ResolverRegraFiscalIbsCbsService in 'Domain\Services\Test_ResolverRegraFiscalIbsCbsService.pas',
   Test_SalvarOperacaoFiscalIbsCbsUseCase in 'Application\UseCases\Test_SalvarOperacaoFiscalIbsCbsUseCase.pas',
   Test_CalcularTributosNFSeService in 'Application\Services\Test_CalcularTributosNFSeService.pas',
-  FakeTokenDecryptorUnit in 'Support\Fakes\FakeTokenDecryptorUnit.pas';
+  ObterProximoSeqIdEventoDFeUseCaseUnit in '..\..\ERP.Features\Core\Application\UseCases\EventosDFe\ObterProximoSeqIdEventoDFeUseCaseUnit.pas',
+  SalvarEventoDFe112150UseCaseUnit in '..\..\ERP.Features\Core\Application\UseCases\EventosDFe\SalvarEventoDFe112150UseCaseUnit.pas',
+  ObterEventoDFe112150PorIdUseCaseUnit in '..\..\ERP.Features\Core\Application\UseCases\EventosDFe\ObterEventoDFe112150PorIdUseCaseUnit.pas',
+  SalvarEventoDFe211130UseCaseUnit in '..\..\ERP.Features\Core\Application\UseCases\EventosDFe\SalvarEventoDFe211130UseCaseUnit.pas',
+  ObterEventoDFe211130PorIdUseCaseUnit in '..\..\ERP.Features\Core\Application\UseCases\EventosDFe\ObterEventoDFe211130PorIdUseCaseUnit.pas',
+  RemoverEventoDFeUseCaseUnit in '..\..\ERP.Features\Core\Application\UseCases\EventosDFe\RemoverEventoDFeUseCaseUnit.pas',
+  FakeTokenDecryptorUnit in 'Support\Fakes\FakeTokenDecryptorUnit.pas',
+  StubSessionContextUnit in 'Support\Fakes\StubSessionContextUnit.pas',
+  StubEventosDFeRepositoryUnit in 'Support\Fakes\StubEventosDFeRepositoryUnit.pas',
+  StubEventoDFe112150RepositoryUnit in 'Support\Fakes\StubEventoDFe112150RepositoryUnit.pas',
+  StubEventoDFe211130RepositoryUnit in 'Support\Fakes\StubEventoDFe211130RepositoryUnit.pas',
+  Test_SalvarEventoDFe112150UseCase in 'Application\UseCases\Test_SalvarEventoDFe112150UseCase.pas',
+  Test_ObterEventoDFe112150PorIdUseCase in 'Application\UseCases\Test_ObterEventoDFe112150PorIdUseCase.pas',
+  Test_SalvarEventoDFe211130UseCase in 'Application\UseCases\Test_SalvarEventoDFe211130UseCase.pas',
+  Test_ObterEventoDFe211130PorIdUseCase in 'Application\UseCases\Test_ObterEventoDFe211130PorIdUseCase.pas',
+  Test_RemoverEventoDFeUseCase in 'Application\UseCases\Test_RemoverEventoDFeUseCase.pas',
+  Test_ObterProximoSeqIdEventoDFeUseCase in 'Application\UseCases\Test_ObterProximoSeqIdEventoDFeUseCase.pas',
+  Test_EventoDFe211130Itens in 'Domain\Entities\Test_EventoDFe211130Itens.pas',
+  Test_EventoDFeEtd in 'Domain\Entities\Test_EventoDFeEtd.pas',
+  Test_EventoDFeMetadata in 'Domain\Validation\Test_EventoDFeMetadata.pas';
 
 { Keep this comment to prevent the IDE from removing the conditional below when adding a unit. }
 {$IFNDEF USE_TESTINSIGHT}

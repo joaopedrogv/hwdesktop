@@ -10,7 +10,8 @@ uses
 // empresa, usuario e conexao da sessao ERP corrente. O host nao abre dialogo: negativa, senha de gerente e cancelamento
 // continuam no mecanismo legado. Nenhuma excecao cruza a DLL.
 
-function HwNextAuthorize(AProcessCode, AAction, ATable: PWideChar): Integer; stdcall;
+function HwNextAuthorizeV2(AProcessCode, AAction, ATable,
+  ABusinessKey: PWideChar): Integer; stdcall;
 
 implementation
 
@@ -27,9 +28,10 @@ begin
     Result := string(WideString(AValue));
 end;
 
-function HwNextAuthorize(AProcessCode, AAction, ATable: PWideChar): Integer; stdcall;
+function HwNextAuthorizeV2(AProcessCode, AAction, ATable,
+  ABusinessKey: PWideChar): Integer; stdcall;
 var
-  ProcessCode, Action, TableName: string;
+  ProcessCode, Action, TableName, BusinessKey: string;
   Auditor: TAudit_OOP;
 begin
   // Padrao seguro: dado incompleto ou falha mantem a operacao bloqueada.
@@ -38,16 +40,21 @@ begin
     ProcessCode := CallbackText(AProcessCode);
     Action := CallbackText(AAction);
     TableName := CallbackText(ATable);
+    BusinessKey := CallbackText(ABusinessKey);
 
-    // O processo e a acao identificam a regra consultada; a tabela apenas acompanha a auditoria e pode vir vazia.
+    // O processo e a acao identificam a regra consultada; a tabela e a chave apenas acompanham a auditoria e podem vir
+    // vazias.
     if (ProcessCode = '') or (Action = '') then
       Exit;
 
     Auditor := TAudit_OOP.Create;
     try
       Auditor.Tabela := TableName;
+      // Processo limpa a chave; a chave de negocio do registro e definida depois.
+      Auditor.Processo(ProcessCode);
+      Auditor.Chave := BusinessKey;
       // A senha de gerente e as mensagens de negativa ou cancelamento pertencem a AcaoPermitida.
-      if Auditor.Processo(ProcessCode).AcaoPermitida(Action) then
+      if Auditor.AcaoPermitida(Action) then
         Result := HW_NEXT_AUTH_ALLOWED
       else
         Result := HW_NEXT_AUTH_DENIED;

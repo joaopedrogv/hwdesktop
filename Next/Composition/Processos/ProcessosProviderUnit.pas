@@ -119,6 +119,18 @@ begin
       Add('NEXT007', 'PESQUISAR ANEXOS', 5),
       Add('NEXT008', 'NOVO ANEXO', 5)
     ]);
+
+  if VersaoAtualMenor(3) then
+    AdicionarLote([
+      Add('EVT001', 'CONSULTA EVENTOS DFE', 5),
+      Add('EVT002', 'INCLUIR EVENTO DFE', 5),
+      Add('EVT003', 'ALTERAR EVENTO DFE', 5),
+      Add('EVT004', 'SALVAR EVENTO DFE 112150', 5),
+      Add('EVT005', 'SALVAR EVENTO DFE 211130', 5),
+      Add('EVT006', 'EXCLUIR EVENTO DFE 112150', 10, True),
+      Add('EVT007', 'EXCLUIR EVENTO DFE 211130', 10, True),
+      Add('EVT008', 'RESTAURAR EVENTO DFE', 10, True)
+    ]);
 end;
 
 end.

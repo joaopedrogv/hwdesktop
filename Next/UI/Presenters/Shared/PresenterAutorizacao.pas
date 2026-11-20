@@ -15,6 +15,8 @@ type
     function Autorizar(const AProcessCode: string; AAction: TAuthorizationAction): Boolean; overload;
     function Autorizar(const AProcessCode: string;
       AAction: TAuthorizationAction; const ATabela: string): Boolean; overload;
+    function Autorizar(const AProcessCode: string;
+      AAction: TAuthorizationAction; const ATabela, AChaveNegocio: string): Boolean; overload;
   public
     constructor Create(AAuthorization: IAuthorizationService; const ATabelaPadrao: string);
   end;
@@ -45,7 +47,13 @@ end;
 function TPresenterAutorizacao.Autorizar(const AProcessCode: string;
   AAction: TAuthorizationAction; const ATabela: string): Boolean;
 begin
-  Result := FAuthorization.Authorize(AProcessCode, AAction, ATabela).Outcome = aoAllowed;
+  Result := Autorizar(AProcessCode, AAction, ATabela, '');
+end;
+
+function TPresenterAutorizacao.Autorizar(const AProcessCode: string;
+  AAction: TAuthorizationAction; const ATabela, AChaveNegocio: string): Boolean;
+begin
+  Result := FAuthorization.Authorize(AProcessCode, AAction, ATabela, AChaveNegocio).Outcome = aoAllowed;
 end;
 
 end.

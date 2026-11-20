@@ -4007,8 +4007,8 @@ var
   Options: THwNextOpenOptions;
 begin
   Options := NextMultipleOptions(True);
-  Options.DisplayTitle := 'Eventos RTC';
-  OpenNextView(Self, 'rtc.events', Options);
+  Options.DisplayTitle := 'Eventos DFe';
+  OpenNextView(Self, 'eventos.dfe', Options);
 end;
 
 procedure TfrmPrincipalS.ExibirMensagemChavePeriodica;

@@ -30,7 +30,13 @@ uses
   IConfiguracoesRepositoryUnit, ConfiguracoesRepositoryUnit,
   IProcessosProviderUnit, ProcessosProviderUnit,
   IProcessosRepositoryUnit, ProcessosRepositoryUnit,
-  RegistrarProcessosUseCaseUnit;
+  RegistrarProcessosUseCaseUnit,
+  IEventosDFeRepositoryUnit, EventosDFeRepositoryUnit,
+  IEventoDFe112150RepositoryUnit, EventoDFe112150RepositoryUnit,
+  IEventoDFe211130RepositoryUnit, EventoDFe211130RepositoryUnit,
+  SalvarEventoDFe112150UseCaseUnit, ObterEventoDFe112150PorIdUseCaseUnit,
+  SalvarEventoDFe211130UseCaseUnit, ObterEventoDFe211130PorIdUseCaseUnit,
+  RemoverEventoDFeUseCaseUnit, ObterProximoSeqIdEventoDFeUseCaseUnit;
 
 procedure RegisterNextFeatures(const AContainer: TContainer);
 begin
@@ -83,6 +89,18 @@ begin
   // A analise consulta os dois repositorios ja registrados; sem estado, o caso de uso fica como instancia unica.
   AContainer.RegisterType<IResolverRegraFiscalIbsCbsService, ResolverRegraFiscalIbsCbsService>.AsTransient;
   AContainer.RegisterType<ResolverRegraFiscalIbsCbsUseCase>.AsSingleton;
+
+  // Eventos DF-e: repositorios e leituras nao guardam estado e usam a conexao do Setup;
+  // as gravacoes usam variaveis locais e sao transientes.
+  AContainer.RegisterType<IEventosDFeRepository, EventosDFeRepository>.AsSingleton;
+  AContainer.RegisterType<IEventoDFe112150Repository, EventoDFe112150Repository>.AsSingleton;
+  AContainer.RegisterType<IEventoDFe211130Repository, EventoDFe211130Repository>.AsSingleton;
+  AContainer.RegisterType<ISalvarEventoDFe112150UseCase, SalvarEventoDFe112150UseCase>.AsTransient;
+  AContainer.RegisterType<ObterEventoDFe112150PorIdUseCase>.AsSingleton;
+  AContainer.RegisterType<ISalvarEventoDFe211130UseCase, SalvarEventoDFe211130UseCase>.AsTransient;
+  AContainer.RegisterType<ObterEventoDFe211130PorIdUseCase>.AsSingleton;
+  AContainer.RegisterType<IRemoverEventoDFeUseCase, RemoverEventoDFeUseCase>.AsTransient;
+  AContainer.RegisterType<IObterProximoSeqIdEventoDFeUseCase, ObterProximoSeqIdEventoDFeUseCase>.AsTransient;
 end;
 
 end.

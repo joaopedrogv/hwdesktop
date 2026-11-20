@@ -57,7 +57,7 @@ const
   EXPORT_VIEW_COUNT: AnsiString = 'HwNextViewCount';
   EXPORT_SHUTDOWN: AnsiString = 'HwNextShutdown';
   EXPORT_LAST_ERROR: AnsiString = 'HwNextLastError';
-  EXPORT_SET_AUTHORIZATION_CALLBACK: AnsiString = 'HwNextSetAuthorizationCallback';
+  EXPORT_SET_AUTHORIZATION_CALLBACK_V2: AnsiString = 'HwNextSetAuthorizationCallbackV2';
 
 type
   // O fechamento individual e sempre ncrUser; os demais motivos pertencem as operacoes coletivas.
@@ -77,7 +77,7 @@ type
     SetSession: THwNextSetSession;
     Initialize: THwNextInitialize;
     IsAvailable: THwNextIsAvailable;
-    SetAuthorizationCallback: THwNextSetAuthorizationCallback;
+    SetAuthorizationCallbackV2: THwNextSetAuthorizationCallbackV2;
   end;
 
   TfrmHwNextHost = class;
@@ -314,10 +314,10 @@ begin
     // sem o callback do host, e este caminho garante o registro.
     if not Assigned(FApi.SetSession) or not Assigned(FApi.Initialize) or not Assigned(FApi.IsAvailable) then
       raise Exception.Create('A interface de hw.next.dll não expõe a sessão do Next.');
-    if not Assigned(FApi.SetAuthorizationCallback) then
+    if not Assigned(FApi.SetAuthorizationCallbackV2) then
       raise Exception.Create(
         'A interface de hw.next.dll não expôe o registro do callback ' + 'de autorização.');
-    if FApi.SetAuthorizationCallback(@HwNextAuthorize) = False then
+    if FApi.SetAuthorizationCallbackV2(@HwNextAuthorizeV2) = False then
       raise Exception.Create('A DLL hw.next.dll não aceitou o callback de autorização.');
     Exit;
   end;
@@ -357,8 +357,9 @@ begin
     FApi.Initialize := THwNextInitialize(ResolveExport(EXPORT_INITIALIZE));
     FApi.IsAvailable := THwNextIsAvailable(ResolveExport(EXPORT_IS_AVAILABLE));
     // A consulta de autorizacao pertence ao host; falha no registro desfaz a carga da biblioteca.
-    FApi.SetAuthorizationCallback := THwNextSetAuthorizationCallback(ResolveExport(EXPORT_SET_AUTHORIZATION_CALLBACK));
-    if FApi.SetAuthorizationCallback(@HwNextAuthorize) = False then
+    FApi.SetAuthorizationCallbackV2 :=
+      THwNextSetAuthorizationCallbackV2(ResolveExport(EXPORT_SET_AUTHORIZATION_CALLBACK_V2));
+    if FApi.SetAuthorizationCallbackV2(@HwNextAuthorizeV2) = False then
       raise Exception.Create('A DLL hw.next.dll não aceitou o callback de autorização.');
   except
     FreeLibrary(FLibraryHandle);
@@ -980,8 +981,8 @@ begin
     Exit;
 
   // O callback pertence ao host e nao sobrevive a descarga da biblioteca; a proxima abertura o registra novamente.
-  if Assigned(FApi.SetAuthorizationCallback) then
-    FApi.SetAuthorizationCallback(nil);
+  if Assigned(FApi.SetAuthorizationCallbackV2) then
+    FApi.SetAuthorizationCallbackV2(nil);
 
   FreeLibrary(FLibraryHandle);
   FLibraryHandle := 0;

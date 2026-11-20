@@ -489,7 +489,7 @@ begin
     end;
     // O callback pertence ao host: a biblioteca nao o mantem depois de encerrar as telas, antes de liberar a conexao
     // compartilhada.
-    NextAuthorizationBridge.SetAuthorizationCallback(nil);
+    NextAuthorizationBridge.SetAuthorizationCallbackV2(nil);
     // Cada tela devolveu seu leitor ao ser liberada. Somente depois disso o adaptador libera a conexao compartilhada
     // que os leitores utilizavam.
     NextSetupInstance.Release;
@@ -504,11 +504,11 @@ begin
   end;
 end;
 
-function HwNextSetAuthorizationCallback(ACallback: THwNextAuthorizationCallback): LongBool; stdcall;
+function HwNextSetAuthorizationCallbackV2(ACallback: THwNextAuthorizationCallbackV2): LongBool; stdcall;
 begin
   // O host informa o callback na carga e o remove antes de descarregar a biblioteca; a ponte apenas guarda o ponteiro e
   // nao assume sua propriedade.
-  NextAuthorizationBridge.SetAuthorizationCallback(ACallback);
+  NextAuthorizationBridge.SetAuthorizationCallbackV2(ACallback);
   Result := True;
 end;
 
@@ -541,7 +541,7 @@ exports
   HwNextProcessKey name 'HwNextProcessKey',
   HwNextViewCount name 'HwNextViewCount',
   HwNextShutdown name 'HwNextShutdown',
-  HwNextSetAuthorizationCallback name 'HwNextSetAuthorizationCallback',
+  HwNextSetAuthorizationCallbackV2 name 'HwNextSetAuthorizationCallbackV2',
   HwNextLastError name 'HwNextLastError';
 
 initialization
@@ -551,7 +551,7 @@ initialization
 
 finalization
   // A descarga do modulo nao deixa ponteiro para o callback do host.
-  NextAuthorizationBridge.SetAuthorizationCallback(nil);
+  NextAuthorizationBridge.SetAuthorizationCallbackV2(nil);
   while Views.Count > 0 do
   begin
     TfrmNextBase(Views[Views.Count - 1]).Free;

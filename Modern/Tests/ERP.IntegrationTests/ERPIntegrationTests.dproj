@@ -122,6 +122,7 @@
         <DCCReference Include="..\Common\Services\JsonResourceUnit.pas"/>
         <DCCReference Include="SetupTestUnit.pas"/>
         <DCCReference Include="Synchronization\Teste_SincronizacaoFiscal.pas"/>
+        <DCCReference Include="EventosDFe\Test_EventosDFeRepository.pas"/>
         <None Include="resources\test-config.json"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

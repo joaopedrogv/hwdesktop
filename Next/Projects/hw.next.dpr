@@ -76,7 +76,16 @@ uses
   ResolverRegraFiscalIbsCbsServiceUnit in '..\..\Modern\ERP.Features\Core\Domain\Services\RegrasFiscais\ResolverRegraFiscalIbsCbsServiceUnit.pas',
   GruposFiscaisQueryDefinition in '..\Queries\Features\GruposFiscais\GruposFiscaisQueryDefinition.pas',
   OperacoesFiscaisIbsCbsComposition in '..\Composition\Features\OperacoesFiscaisIbsCbsComposition.pas',
-  GruposFiscaisComposition in '..\Composition\Features\GruposFiscaisComposition.pas';
+  GruposFiscaisComposition in '..\Composition\Features\GruposFiscaisComposition.pas',
+  EventosDFeQueryDefinition in '..\Queries\Features\EventosDFe\EventosDFeQueryDefinition.pas',
+  EventosDFeView in '..\Contracts\Features\EventosDFe\EventosDFeView.pas',
+  EventosDFePresenter in '..\UI\Presenters\Features\EventosDFe\EventosDFePresenter.pas',
+  EventosDFeForm in '..\UI\Forms\Features\EventosDFe\EventosDFeForm.pas' {frmEventosDFe},
+  SelecaoEventoDFeForm in '..\UI\Forms\Features\EventosDFe\SelecaoEventoDFeForm.pas' {frmSelecaoEventoDFe},
+  EventoDFe112150CadastroView in '..\Contracts\Features\EventosDFe\EventoDFe112150CadastroView.pas',
+  EventoDFe112150CadastroPresenter in '..\UI\Presenters\Features\EventosDFe\EventoDFe112150CadastroPresenter.pas',
+  EventoDFe112150CadastroFrame in '..\UI\Frames\Features\EventosDFe\EventoDFe112150CadastroFrame.pas' {frmEventoDFe112150CadastroFrame: TFrame},
+  EventosDFeComposition in '..\Composition\Features\EventosDFeComposition.pas';
 
 {$R *.res}
 

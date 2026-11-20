@@ -5,25 +5,26 @@ interface
 uses
   HwNextViewApi;
 
-// Ponte do callback de autorizacao informado pelo host; o modulo apenas guarda o ponteiro recebido. A troca ocorre na
-// thread visual, antes de qualquer tela ser criada e depois que todas forem liberadas, por isso nao ha sincronizacao.
+// Ponte do callback de autorizacao V2 informado pelo host; o modulo apenas guarda o ponteiro recebido. A troca
+// ocorre na thread visual, antes de qualquer tela ser criada e depois que todas forem liberadas, por isso nao ha
+// sincronizacao.
 
-procedure SetAuthorizationCallback(ACallback: THwNextAuthorizationCallback);
-function GetAuthorizationCallback: THwNextAuthorizationCallback;
+procedure SetAuthorizationCallbackV2(ACallback: THwNextAuthorizationCallbackV2);
+function GetAuthorizationCallbackV2: THwNextAuthorizationCallbackV2;
 
 implementation
 
 var
-  AuthorizationCallback: THwNextAuthorizationCallback;
+  AuthorizationCallbackV2: THwNextAuthorizationCallbackV2;
 
-procedure SetAuthorizationCallback(ACallback: THwNextAuthorizationCallback);
+procedure SetAuthorizationCallbackV2(ACallback: THwNextAuthorizationCallbackV2);
 begin
-  AuthorizationCallback := ACallback;
+  AuthorizationCallbackV2 := ACallback;
 end;
 
-function GetAuthorizationCallback: THwNextAuthorizationCallback;
+function GetAuthorizationCallbackV2: THwNextAuthorizationCallbackV2;
 begin
-  Result := AuthorizationCallback;
+  Result := AuthorizationCallbackV2;
 end;
 
 end.
