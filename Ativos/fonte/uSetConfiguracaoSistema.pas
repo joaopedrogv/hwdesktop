@@ -4450,15 +4450,15 @@ begin
 
         Aconf.WriteString('Conf', 'Empresas'                 , vEmpresas)
         	.Comment('Conf', ['Empresas',
-          									'	0 - Todas Empresas',
+          						 '	0 - Todas Empresas',
                             '	1 - Empresa 1',
                             '	1,2,3 - Empresa 1, 2 e 3']);
         Aconf.WriteString('Conf', 'SomarEmpresaSemEstoque'   , vSomarEmpresaSemEstoque)
         	.Comment('Conf', ['SomarEmpresaSemEstoque',
-          								  '	S - Somar ao estoque do produto empresas com estoque negativo']);
+          						'	S - Somar ao estoque do produto empresas com estoque negativo']);
         Aconf.WriteString('Conf', 'ExibirSomaTotalEstoque' , vExibirSomaTotalEstoque)
         	.Comment('Conf', ['ExibirSomaTotalEstoque',
-          								  '	S - Apresentar total do estoque do produto']);
+          						'	S - Apresentar total do estoque do produto']);
 
         try
           vStringList := TStringList.Create;
@@ -5414,6 +5414,118 @@ begin
     if VersaoBancoMenor(25.62) then
     begin
       setConfSisInt('grade_alt_lote_reg', 100, buscas,
+        'Salvar no banco de dados a cada x registros.',
+        'Caso informe 0 será salvo somente após o termino da alteração/sincronização em lote');
+    end;
+
+    if VersaoBancoMenor(25.63) then
+    begin
+      Aconf := TConfig_sistema_class.getConf('hw_cloud_ia_conf', buscas, vDadosIni.cod_empresa);
+      try
+        if (Aconf.AsString = '') or (Aconf.AsString = '1') then
+        begin
+          Aconf.value1_vc := '2';
+          Aconf.WriteString('Configuracao', 'TimerConsultaTarefas', '15')
+            .Comment('Configuracao', 'UsarServicoMensageria')
+            .Comment('Configuracao', '  S - Habilitar o uso do serviço de mensageria pelo ERP')
+            .Comment('Configuracao', '  S - Desabilitar o uso do serviço de mensageria pelo ERP')
+            .Comment('Configuracao', 'CodTipoContatoPadrao')
+            .Comment('Configuracao', '  Código do tipo de contato utilizado para enviar mensagem de outros contatos (contato avulso)')
+            .Comment('Configuracao', '  Código do tipo de contato utilizado para utilizado para sincronizar contatos da tabela antiga para nova tabela')
+            .Comment('Configuracao', 'SomenteContatosAceitos')
+            .Comment('Configuracao', '  S - Enviar mensagens somente para contatos onde o cliente aceita')
+            .Comment('Configuracao', '  N - Enviar mensagens para todos contatos')
+            .Comment('Configuracao', 'TimerConsultaMensagem')
+            .Comment('Configuracao', '  Consultar mensagem a cada x minutos')
+            .Comment('Configuracao', 'TimerConsultaTarefas')
+            .Comment('Configuracao', '  Consultar tarefas pendentes a cada x minutos')
+            .Comment('Configuracao', 'QtdeMensagensConsultadasPorVez')
+            .Comment('Configuracao', '  Quantidade de mensagens consultadas por vez')
+            .Comment('Configuracao', 'QtdeDiasConsMensagensEnviadas')
+            .Comment('Configuracao', '	Consultar mensagens enviadas nos últimos x dias')
+            .Comment('Configuracao', 'UnicoArqCompactado')
+            .Comment('Configuracao', '  S - Gerar unico arquivo compactado do(s) anexo(s)')
+            .Comment('Configuracao', '  N - Não gerar unico arquivo compactado do(s) anexo(s)')
+            .Comment('Configuracao', 'GerarLinkAnexos')
+            .Comment('Configuracao', '  S - Gerar link do(s) anexo(s)')
+            .Comment('Configuracao', '  N - Não gerar link do(s) anexo(s)')
+            .Comment('Configuracao', 'AnexosDocFiscal')
+            .Comment('Configuracao', '  pdf, xml - Enviar xml e pdf')
+            .Comment('Configuracao', '  pdf - Enviar pdf')
+            .Comment('Configuracao', '  xml - Enviar xml')
+            .Comment('Configuracao', 'ExibirAcrescDescPedido')
+            .Comment('Configuracao', '  Acrescimo, Desconto - Exibir acréscimo e desconto dos pedidos recebibos')
+            .Comment('Configuracao', '  Acrescimo - Exibir acréscimo dos pedidos recebibos')
+            .Comment('Configuracao', '  Desconto - Exibir desconto dos pedidos recebibos')
+        	 	.Comment('Configuracao', 'UsarVendaOnline')
+            .Comment('Configuracao', '  S - Habilitar campos para o uso do venda online pelo ERP')
+            .Comment('Configuracao', '  S - Desabilitar campos para o uso do venda online pelo ERP');
+          Aconf.SaveConfDB(buscas);
+        end;
+      finally
+        FreeAndNil(Aconf);
+      end;
+    end;
+
+    if VersaoBancoMenor(25.64) then
+    begin
+      Aconf := TConfig_sistema_class.getConf('hw_cloud_ia_conf', buscas, vDadosIni.cod_empresa);
+      try
+        if (Aconf.AsString = '') or (Aconf.AsString = '1') or (Aconf.AsString = '2') then
+        begin
+          Aconf.value1_vc := '3';
+          Aconf
+            .Comment('Configuracao', 'UsarServicoMensageria')
+            .Comment('Configuracao', '  S - Habilitar o uso do serviço de mensageria pelo ERP')
+            .Comment('Configuracao', '  S - Desabilitar o uso do serviço de mensageria pelo ERP')
+            .Comment('Configuracao', 'CodTipoContatoPadrao')
+            .Comment('Configuracao', '  Código do tipo de contato utilizado para enviar mensagem de outros contatos (contato avulso)')
+            .Comment('Configuracao', '  Código do tipo de contato utilizado para utilizado para sincronizar contatos da tabela antiga para nova tabela')
+            .Comment('Configuracao', 'SomenteContatosAceitos')
+            .Comment('Configuracao', '  S - Enviar mensagens somente para contatos onde o cliente aceita')
+            .Comment('Configuracao', '  N - Enviar mensagens para todos contatos')
+            .Comment('Configuracao', 'TimerConsultaMensagem')
+            .Comment('Configuracao', '  Consultar mensagem a cada x minutos')
+            .Comment('Configuracao', 'TimerConsultaTarefas')
+            .Comment('Configuracao', '  Consultar tarefas pendentes a cada x minutos')
+            .Comment('Configuracao', 'QtdeMensagensConsultadasPorVez')
+            .Comment('Configuracao', '  Quantidade de mensagens consultadas por vez')
+            .Comment('Configuracao', 'QtdeDiasConsMensagensEnviadas')
+            .Comment('Configuracao', '	Consultar mensagens enviadas nos últimos x dias')
+            .Comment('Configuracao', 'UnicoArqCompactado')
+            .Comment('Configuracao', '  S - Gerar unico arquivo compactado do(s) anexo(s)')
+            .Comment('Configuracao', '  N - Não gerar unico arquivo compactado do(s) anexo(s)')
+            .Comment('Configuracao', 'GerarLinkAnexos')
+            .Comment('Configuracao', '  S - Gerar link do(s) anexo(s)')
+            .Comment('Configuracao', '  N - Não gerar link do(s) anexo(s)')
+            .Comment('Configuracao', 'AnexosDocFiscal')
+            .Comment('Configuracao', '  pdf, xml - Enviar xml e pdf')
+            .Comment('Configuracao', '  pdf - Enviar pdf')
+            .Comment('Configuracao', '  xml - Enviar xml')
+            .Comment('Configuracao', 'ExibirAcrescDescPedido')
+            .Comment('Configuracao', '  Acrescimo, Desconto - Exibir acréscimo e desconto dos pedidos recebibos')
+            .Comment('Configuracao', '  Acrescimo - Exibir acréscimo dos pedidos recebibos')
+            .Comment('Configuracao', '  Desconto - Exibir desconto dos pedidos recebibos')
+        	 	.Comment('Configuracao', 'UsarVendaOnline')
+            .Comment('Configuracao', '  S - Habilitar campos para o uso do venda online pelo ERP')
+            .Comment('Configuracao', '  S - Desabilitar campos para o uso do venda online pelo ERP');
+          Aconf.SaveConfDB(buscas);
+        end;
+      finally
+        FreeAndNil(Aconf);
+      end;
+    end;
+
+    if VersaoBancoMenor(25.65) then
+    begin
+      setConfSisInt('col_cad_alt_lote_reg', 100, buscas,
+        'Salvar no banco de dados a cada x registros.',
+        'Caso informe 0 será salvo somente após o termino da alteração/sincronização em lote');
+    end;
+
+    if VersaoBancoMenor(25.66) then
+    begin
+      setConfSisInt('contratos_clientes_alt_lote_reg', 100, buscas,
         'Salvar no banco de dados a cada x registros.',
         'Caso informe 0 será salvo somente após o termino da alteração/sincronização em lote');
     end;

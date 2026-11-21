@@ -459,7 +459,7 @@ type
     property tipo_envio: string read Ftipo_envio write Ftipo_envio;
   end;
 
-  TUpdateMensageria = class(TPersistent)
+  TUpdateMensageriaStatus = class(TPersistent)
   private
     Fcnpj: string;
     Forigem: string;
@@ -469,6 +469,25 @@ type
     property cnpj: string read Fcnpj write Fcnpj;
     property origem: string read Forigem write Forigem;
     property status: string read Fstatus write Fstatus;
+    property uuid: string read Fuuid write Fuuid;
+  end;
+
+  TUpdateMensageriaAtribuirProf = class(TPersistent)
+  private
+    Fcnpj: string;
+    Forigem: string;
+    Fcdpessoa_prof: string;
+    Ftipo_pessoa_prof: string;
+    Fplat_atribuida_prof: string;
+    Fcod_user_atribuido_prof: string;
+    Fuuid: string;
+  published
+    property cnpj: string read Fcnpj write Fcnpj;
+    property origem: string read Forigem write Forigem;
+    property cdpessoa_prof: string read Fcdpessoa_prof write Fcdpessoa_prof;
+    property tipo_pessoa_prof: string read Ftipo_pessoa_prof write Ftipo_pessoa_prof;
+    property plat_atribuida_prof: string read Fplat_atribuida_prof write Fplat_atribuida_prof;
+    property cod_user_atribuido_prof: string read Fcod_user_atribuido_prof write Fcod_user_atribuido_prof;
     property uuid: string read Fuuid write Fuuid;
   end;
 
@@ -488,6 +507,31 @@ type
     property cnpj: string read Fcnpj write Fcnpj;
     property data_inicial: string read Fdata_inicial write Fdata_inicial;
     property data_final: string read Fdata_final write Fdata_final;
+  end;
+
+  TDadosTipoTarefaPessoa = class
+  private
+    Ffiltro_geral_analisado: string;
+    Flimite: Integer;
+    Fpagina: Integer;
+  published
+    property filtro_geral_analisado: string read Ffiltro_geral_analisado write Ffiltro_geral_analisado;
+    property limite: Integer read Flimite write Flimite;
+    property pagina: Integer read Fpagina write Fpagina;
+  end;
+
+  TBuscarTipoTarefaPessoa = class(TPersistent)
+  private
+    Fcnpj: string;
+    Fdados: TArray<TDadosTipoTarefaPessoa>;
+    Ftpdados: string;
+  public
+    constructor Create();
+    destructor Destroy; override;
+  published
+    property cnpj: string read Fcnpj write Fcnpj;
+    property dados: TArray<TDadosTipoTarefaPessoa> read Fdados write Fdados;
+    property tpdados: string read Ftpdados write Ftpdados;
   end;
 
 implementation
@@ -660,6 +704,19 @@ begin
 end;
 
 destructor TCadUsuarioSenha.Destroy;
+begin
+  Fdados := nil;
+  inherited;
+end;
+
+{ TBuscarTipoTarefaPessoa }
+
+constructor TBuscarTipoTarefaPessoa.Create;
+begin
+  SetLength(Fdados, 0);
+end;
+
+destructor TBuscarTipoTarefaPessoa.Destroy;
 begin
   Fdados := nil;
   inherited;

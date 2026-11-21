@@ -8,8 +8,8 @@ inherited frmFormPag2: TfrmFormPag2
   Position = poScreenCenter
   Scaled = False
   OnClose = FormClose
-  ExplicitWidth = 779
-  ExplicitHeight = 537
+  ExplicitWidth = 787
+  ExplicitHeight = 542
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
@@ -319,7 +319,7 @@ inherited frmFormPag2: TfrmFormPag2
       Top = 6
       Width = 526
       Height = 268
-      ActivePage = tabRecibos
+      ActivePage = tabInicial
       Align = alClient
       Style = tsFlatButtons
       TabOrder = 1
@@ -1695,13 +1695,13 @@ inherited frmFormPag2: TfrmFormPag2
             Columns = <
               item
                 Expanded = False
-                FieldName = 'SELEC'
-                Width = 15
+                FieldName = 'SEL'
                 Visible = True
               end
               item
                 Expanded = False
                 FieldName = 'COD_EMP_MULT'
+                Width = 64
                 Visible = True
               end
               item
@@ -2371,7 +2371,7 @@ inherited frmFormPag2: TfrmFormPag2
               ForceNewColumn = False
               ForceNewPage = False
               Size.Values = (
-                703.791666666666800000
+                703.791666666666700000
                 2100.791666666667000000)
               PreCaluculateBandHeight = False
               KeepOnOnePage = False

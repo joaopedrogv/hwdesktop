@@ -50,7 +50,8 @@ uses
   System.Net.URLClient,
   System.Net.HttpClientComponent,
   System.Net.Mime,
-  System.Zip;
+  System.Zip,
+  System.Types;
 
 { TUseCaseEnvMensageria }
 
@@ -80,7 +81,7 @@ var
   vmensagem: string;
   vtemplate: string;
   varquivos: TArray<WideString>;
-  vvariaveis: TArray<WideString>;
+  vvariaveis: TWideStringDynArray;
   vStringListArquivos, vStringListDelArquivo: TStringList;
   vTagMacro: TTagMacro;
   vAplicativo: string;
@@ -125,7 +126,8 @@ begin
 
       vAplicativo := repo.GetAplicativo(pCodAplicativo);
  
-      if (pGerarLinkArquivo) and (vStringListArquivos.Count > 0) then
+      if ((pGerarLinkArquivo) and (vStringListArquivos.Count > 0))
+        or ((trim(vAplicativo) = 'WHATSAPP') and (vStringListArquivos.Count > 0)) then
       begin
         SetLength(varquivos, 0);
 
@@ -199,8 +201,7 @@ begin
           end;
         end;
       end
-      else if ((pUnicoArquivoCompactado) and (vStringListArquivos.Count > 0))
-        or ((trim(vAplicativo) = 'WHATSAPP') and (vStringListArquivos.Count > 0)) then
+      else if ((pUnicoArquivoCompactado) and (vStringListArquivos.Count > 0)) then
       begin
         SetLength(varquivos, 1);
 
@@ -268,10 +269,10 @@ begin
         Exit;
 
       // Apagar contatos colaboradores
-      var contatosColaboradorPlataforma :=
+      var contatosApagarColaboradorPlataforma :=
         repo.GetContatoColaboradoresApagar;
 
-      for var contato in contatosColaboradorPlataforma.Contatos do
+      for var contato in contatosApagarColaboradorPlataforma.Contatos do
       begin
         if Assigned(contato) then
         begin
@@ -291,7 +292,36 @@ begin
             if not repo.ApagarContato(
               contato.id) then
                 if not silent then
-                  raise Exception.Create('Falha ao atualizar contatos');
+                  raise Exception.Create('Falha ao atualizar contato colaborador');
+          end;
+        end;
+      end;
+
+      // Apagar contatos clientes
+      var contatosApagarClientePlataforma :=
+        repo.GetContatoClientesApagar;
+
+      for var contato in contatosApagarClientePlataforma.Contatos do
+      begin
+        if Assigned(contato) then
+        begin
+          useCaseContato := TUseCaseCadContato.Create(pParamsList);
+          Result := useCaseContato.Run(
+            contato.id,
+            contato.cod_cliente,
+            0,
+            contato.plataforma,
+            contato.identificador,
+            contato.contato,
+            contato.tipo_pessoa,
+            'D');
+
+          if Result then
+          begin
+            if not repo.ApagarContato(
+              contato.id) then
+                if not silent then
+                  raise Exception.Create('Falha ao atualizar contato cliente');
           end;
         end;
       end;
@@ -307,35 +337,6 @@ begin
 
         if not Result then
           Exit;
-
-        // Apagar contatos Cliente
-        var contatosClientePlataforma :=
-          repo.GetContatoClienteApagar(pCodCliente);
-
-        for var contato in contatosClientePlataforma.Contatos do
-        begin
-          if Assigned(contato) then
-          begin
-            useCaseContato := TUseCaseCadContato.Create(pParamsList);
-            Result := useCaseContato.Run(
-              contato.id,
-              contato.cod_cliente,
-              0,
-              contato.plataforma,
-              contato.identificador,
-              contato.contato,
-              contato.tipo_pessoa,
-              'D');
-
-            if not Result then
-              Exit;
-
-            if not repo.ApagarContato(
-              contato.id) then
-                if not silent then
-                  raise Exception.Create('Falha ao atualizar contatos');
-          end;
-        end;
       end;
 
       if (pContatoAvulso) or (pCodCliente <= 0) then
@@ -588,7 +589,7 @@ begin
 
             if (vtemplate.Trim() <> '') then
             begin
-              vvariaveis := TArray<WideString>(
+              vvariaveis := (
                 vTagMacro.retornaVariaveisTemplate(
                   pOrigem,
                   contato.cod_carta,

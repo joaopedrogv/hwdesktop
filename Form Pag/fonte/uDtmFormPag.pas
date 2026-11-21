@@ -588,6 +588,7 @@ type
     cdsValeCupomNUM_DOC: TIntegerField;
     cdsValeCupomTIPO_DOC: TStringField;
     cdsValeCupomCOD_EMP_DOC: TIntegerField;
+    cdsReciboSEL: TStringField;
     procedure cdsBuscasBeforeOpen(DataSet: TDataSet);
   private
     { Private declarations }

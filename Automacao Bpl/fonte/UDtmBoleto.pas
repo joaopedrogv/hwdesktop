@@ -763,6 +763,10 @@ type
     cdsBoletosDATA_ENV_MENS: TDateTimeField;
     qrBoletoNossoNumeroRepetidoDATA_ENV_MENS: TDateTimeField;
     cdsBoletoNossoNumeroRepetidoDATA_ENV_MENS: TDateTimeField;
+    cdsCobreBemAC_TIT_APOS_VENC: TStringField;
+    cdsCobreBemDIAS_AC_TIT_APOS_VENC: TIntegerField;
+    cdsCobreBemBolAC_TIT_APOS_VENC: TStringField;
+    cdsCobreBemBolDIAS_AC_TIT_APOS_VENC: TIntegerField;
     procedure cdsArquivosBoletoDOCGetText(Sender: TField; var Text: string;
       DisplayText: Boolean);
     procedure cdsCobreBemHTMLBOLETOEMAILGetText(Sender: TField;

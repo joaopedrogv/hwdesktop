@@ -1,4 +1,4 @@
-unit UseCaseUpdateMensageria;
+unit UseCaseUpdateMensageriaStatus;
 
 interface
 
@@ -6,13 +6,13 @@ uses
   BaseUseCaseHwCloud, System.Classes, System.Generics.Collections, System.TypInfo;
 
 type
-  TUseCaseUpdateMensageria = class(TUseCaseBaseHwCloud)
+  TUseCaseUpdateMensageriaStatus = class(TUseCaseBaseHwCloud)
   public
     function Run(
       pCodMens: Integer;
+      pUuid: WideString;
       pOrigem: WideString;
-      pStatus: WideString;
-      pUuid: WideString): Boolean;
+      pStatus: WideString): Boolean;
   end;
 
 implementation
@@ -29,15 +29,15 @@ uses
   hw_win_utils,
   config_sistema_class, System.JSON;
 
-{ TUseCaseUpdateMensageria }
+{ TUseCaseUpdateMensageriaStatus }
 
-function TUseCaseUpdateMensageria.Run(
+function TUseCaseUpdateMensageriaStatus.Run(
   pCodMens: Integer;
+  pUuid: WideString;
   pOrigem: WideString;
-  pStatus: WideString;
-  pUuid: WideString): Boolean;
+  pStatus: WideString): Boolean;
 var
-  updateMensageria: TUpdateMensageria;
+  updateMensageriaStatus: TUpdateMensageriaStatus;
 begin
   Result := False;
   try
@@ -53,13 +53,13 @@ begin
         raise Exception.Create('Configuração para hwcloud não encontrada no Cadastro de API');
 
     try
-      updateMensageria := TUpdateMensageria.Create;
-      updateMensageria.cnpj := conf.cnpj;
-      updateMensageria.origem := pOrigem;
-      updateMensageria.status := pStatus;
-      updateMensageria.uuid := pUuid;
+      updateMensageriaStatus := TUpdateMensageriaStatus.Create;
+      updateMensageriaStatus.cnpj := conf.cnpj;
+      updateMensageriaStatus.origem := pOrigem;
+      updateMensageriaStatus.status := pStatus;
+      updateMensageriaStatus.uuid := pUuid;
 
-      var useCase := api.UpdateMensageria(updateMensageria);
+      var useCase := api.updateMensageriaStatus(updateMensageriaStatus);
 
       if not Assigned(useCase) then
         if not silent then
@@ -69,10 +69,10 @@ begin
         if not silent then
           raise Exception.Create(useCase.resposta.Trim());
 
-      Result := repo.UpdateMensagem(pCodMens, updateMensageria, useCase);
+      Result := repo.UpdateMensagemStatus(pCodMens, pStatus, updateMensageriaStatus, useCase);
     finally
-      if Assigned(updateMensageria) then
-        FreeAndNil(updateMensageria);
+      if Assigned(updateMensageriaStatus) then
+        FreeAndNil(updateMensageriaStatus);
     end;
   except on E: Exception do
     begin

@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, uCadPadraoModal, AppEvnts, ExtCtrls, Menus, ComCtrls, StdCtrls,
-  Buttons, Grids, DBGrids, Mask, DB, DBCtrls, QRCtrls, QuickRpt;
+  Buttons, Grids, DBGrids, Mask, DB, DBCtrls, QRCtrls, QuickRpt, DateUtils;
 
 type
   TfrmCadMensMob = class(TfrmCadPadraoM)
@@ -105,13 +105,20 @@ type
     SplitterMensageriaPost: TSplitter;
     SplitterMensageriaGet: TSplitter;
     SplitterMensageriaUpdate: TSplitter;
+    Panel4: TPanel;
     GroupBox7: TGroupBox;
+    GroupBox8: TGroupBox;
+    Label8: TLabel;
+    Label12: TLabel;
     ckOrigemErp: TCheckBox;
     ckOrigemBot: TCheckBox;
     ckDestinoErp: TCheckBox;
     ckDestinoBot: TCheckBox;
-    Label8: TLabel;
-    Label12: TLabel;
+    ckTarefa: TCheckBox;
+    ckMensagem: TCheckBox;
+    pnTarefaAtrasada: TPanel;
+    procedure SpeedButton11Click(Sender: TObject);
+    procedure SpeedButton7Click(Sender: TObject);
     procedure SplitterMensageriaUpdateMoved(Sender: TObject);
     procedure SplitterMensageriaGetMoved(Sender: TObject);
     procedure SplitterMensageriaPostMoved(Sender: TObject);
@@ -176,9 +183,10 @@ type
 
 var
   frmCadMensMob: TfrmCadMensMob;
+  vDataHoraBanco: TDateTime;
   vCampoAdcional: string;
   vCondAdcional: string;
-	vSqlAdcional: string;
+  vSqlAdcional: string;
   cod_mobile, cod_usuario_env: Integer;
 
 implementation
@@ -192,11 +200,6 @@ function _markdownToHtml(Markdown: WideString): WideString; stdcall; external 'M
 
 procedure TfrmCadMensMob.BitBtn1Click(Sender: TObject);
 var
-	vOrigMens: string;
-  vStatusEnv: string;
-  vOrigem: string;
-  vDestino: string;
-  vTemp: string;
   I: Integer;
 begin
 	try
@@ -208,53 +211,48 @@ begin
     SpeedButton5.Visible := False;
     SpeedButton1.Visible := True;
 
-    vOrigMens  := '';
-    vStatusEnv := '';
-    vOrigem    := '';
-    vDestino   := '';
-    if CheckBox3.Checked then
-    begin
-    	if ckAplicativo.Checked then
-        vOrigMens := vDadosIni.IfThen(trim(vOrigMens) = '', '', trim(vOrigMens) + ',') + QuotedStr('A');
-      if ckMobile.Checked then
-        vOrigMens := vDadosIni.IfThen(trim(vOrigMens) = '', '', trim(vOrigMens) + ',') + QuotedStr('M');
-      if ckEcommerce.Checked then
-        vOrigMens := vDadosIni.IfThen(trim(vOrigMens) = '', '', trim(vOrigMens) + ',') + QuotedStr('E');
-      if ckFinanceiro.Checked then
-        vOrigMens := vDadosIni.IfThen(trim(vOrigMens) = '', '', trim(vOrigMens) + ',') + QuotedStr('F');
-      if ckPagOnline.Checked then
-        vOrigMens := vDadosIni.IfThen(trim(vOrigMens) = '', '', trim(vOrigMens) + ',') + QuotedStr('P');
-
-      if ckStatusNO.Checked then
-         vStatusEnv := vDadosIni.IfThen(trim(vStatusEnv) = '', '', trim(vStatusEnv) + ',') + QuotedStr('NO');
-       if ckStatusEP.Checked then
-         vStatusEnv := vDadosIni.IfThen(trim(vStatusEnv) = '', '', trim(vStatusEnv) + ',') + QuotedStr('EP');
-       if ckStatusAC.Checked then
-         vStatusEnv := vDadosIni.IfThen(trim(vStatusEnv) = '', '', trim(vStatusEnv) + ',') + QuotedStr('AC');
-       if ckStatusER.Checked then
-         vStatusEnv := vDadosIni.IfThen(trim(vStatusEnv) = '', '', trim(vStatusEnv) + ',') + QuotedStr('ER');
-       if ckStatusPP.Checked then
-         vStatusEnv := vDadosIni.IfThen(trim(vStatusEnv) = '', '', trim(vStatusEnv) + ',') + QuotedStr('PP');
-
-       if ckOrigemErp.Checked then
-         vOrigem := vDadosIni.IfThen(trim(vOrigem) = '', '', trim(vOrigem) + ',') + QuotedStr('erp');
-       if ckOrigemBot.Checked then
-         vOrigem := vDadosIni.IfThen(trim(vOrigem) = '', '', trim(vOrigem) + ',') + QuotedStr('bot');
-
-       if ckDestinoErp.Checked then
-         vDestino := vDadosIni.IfThen(trim(vDestino) = '', '', trim(vDestino) + ',') + QuotedStr('erp');
-       if ckDestinoBot.Checked then
-         vDestino := vDadosIni.IfThen(trim(vDestino) = '', '', trim(vDestino) + ',') + QuotedStr('bot');
-    end;
-
-    if MaskEdit2.Visible then
-      vTemp := '*D*A*T*A*'
-    else
-      vTemp := MaskEdit3.Text;
-
     Screen.Cursor := crHourGlass;
-    if CadMensMobile._pesquisa(ComboBox1.Text, ComboBox3.Text, vTemp, MaskEdit1.Text, MaskEdit2.Text, CheckBox2.checked, vOrigMens, vStatusEnv, vOrigem, vDestino,
-      CheckBox1.Checked, ComboBox11.Text, ComboBox12.Text, MaskEdit7.Text, MaskEdit9.Text, MaskEdit8.Text, MaskEdit9.Visible) then
+
+    vDataHoraBanco := vDadosIni.getDataBanco(CadMensMobile.buscas);
+
+    CadMensMobile.vMensMob.vCampo := ComboBox1.Text;
+    CadMensMobile.vMensMob.vCondicao := ComboBox3.Text;
+    CadMensMobile.vMensMob.vValor := vDadosIni.IfThen(MaskEdit2.Visible, '*D*A*T*A*', MaskEdit3.Text);
+    CadMensMobile.vMensMob.vData1 := MaskEdit1.Text;
+    CadMensMobile.vMensMob.vData2 := MaskEdit2.Text;
+    CadMensMobile.vMensMob.vNaolidas := CheckBox2.checked;
+
+    CadMensMobile.vMensMob.vAvancado := CheckBox3.Checked;
+
+    CadMensMobile.vMensMob.vAplicativo := ckAplicativo.Checked;
+    CadMensMobile.vMensMob.vMobile := ckMobile.Checked;
+    CadMensMobile.vMensMob.vEcommerce := ckEcommerce.Checked;
+    CadMensMobile.vMensMob.vFinanceiro := ckFinanceiro.Checked;
+    CadMensMobile.vMensMob.vPagOnline := ckPagOnline.Checked;
+
+    CadMensMobile.vMensMob.vStatusNO := ckStatusNO.Checked;
+    CadMensMobile.vMensMob.vStatusEP := ckStatusEP.Checked;
+    CadMensMobile.vMensMob.vStatusAC := ckStatusAC.Checked;
+    CadMensMobile.vMensMob.vStatusER := ckStatusER.Checked;
+    CadMensMobile.vMensMob.vStatusPP := ckStatusPP.Checked;
+
+    CadMensMobile.vMensMob.vMensagem := ckMensagem.Checked;
+    CadMensMobile.vMensMob.vTarefa := ckTarefa.Checked;
+
+    CadMensMobile.vMensMob.vOrigemErp := ckOrigemErp.Checked;
+    CadMensMobile.vMensMob.vOrigemBot := ckOrigemBot.Checked;
+    CadMensMobile.vMensMob.vDestinoErp := ckDestinoErp.Checked;
+    CadMensMobile.vMensMob.vDestinoBot := ckDestinoBot.Checked;
+
+    CadMensMobile.vMensMob.vAdicional := CheckBox1.Checked;
+    CadMensMobile.vMensMob.vCampoAd := ComboBox11.Text;
+    CadMensMobile.vMensMob.vCondicaoAd := ComboBox12.Text;
+    CadMensMobile.vMensMob.vValorAd := MaskEdit7.Text;
+    CadMensMobile.vMensMob.vData1Ad := MaskEdit9.Text;
+    CadMensMobile.vMensMob.vData2Ad := MaskEdit8.Text;
+    CadMensMobile.vMensMob.vPorDataAd := MaskEdit9.Visible;
+
+    if CadMensMobile._pesquisa then
     begin
       if (Self.Enabled) and (Self.Visible) and (DBGrid1.CanFocus) then
         DBGrid1.SetFocus;
@@ -549,23 +547,55 @@ begin
     end;
   TDBGrid(sender).DefaultDrawColumnCell(rect, DataCol, Column, State);
 
-  if (trim(CadMensMobile.dataSet.FieldByName('ORIG_MENS').AsString) = 'A') then
-  	//
-  else if (CadMensMobile.dataSet.FieldByName('IDSEQM').AsInteger > 0) then
+//  if (trim(CadMensMobile.dataSet.FieldByName('ORIG_MENS').AsString) = 'A') then
+//  begin
+//    if ((trim(CadMensMobile.dataset.FieldByName('STATUS_ENV').AsString) = 'NO')
+//    		or (trim(CadMensMobile.dataset.FieldByName('STATUS_ENV').AsString) = 'EP'))
+//      and (CadMensMobile.dataset.FieldByName('COD_TAREFA').AsInteger > 0)
+//      and (not CadMensMobile.dataset.FieldByName('DATA_TAREFA').IsNull) then
+//    begin
+//      if (vDataHoraBanco > IncSecond(CadMensMobile.dataset.FieldByName('DATA_TAREFA').AsDateTime, vDadosIni.vHwCloudIA.vQtdeSegundosTarefaAtrasada)) then
+//      begin
+//        if (gdFocused in State) then
+//        begin
+//          TDBGrid(sender).canvas.brush.color := clWindow;
+//          TDBGrid(sender).canvas.Font.color := clWindowText;
+//        end
+//        else
+//        begin
+//          TDBGrid(sender).canvas.brush.color := pnTarefaAtrasada.Color;
+//          TDBGrid(sender).canvas.Font.color := clWindowText;
+//        end;
+//      end
+//      else if (gdFocused in State) then
+//      begin
+//        TDBGrid(sender).canvas.brush.color := clWindow;
+//        TDBGrid(sender).canvas.Font.color := clWindowText;
+//      end
+//      else
+//      begin
+//        TDBGrid(sender).canvas.brush.color := pnMensagemNaoLidas.Color;
+//        TDBGrid(sender).canvas.Font.color := clWindowText;
+//      end;
+//    end;
+//    TDBGrid(sender).DefaultDrawColumnCell(rect, DataCol, Column, State);
+//  end
+//  else
+  if (CadMensMobile.dataSet.FieldByName('IDSEQM').AsInteger > 0) then
   begin
     if ((CadMensMobile.dataSet.FieldByName('DATA_RECEPCAO').IsNull)
     	and (CadMensMobile.dataSet.FieldByName('HORA_RECEPCAO').IsNull)) then
     begin
-     if (gdFocused in State) then
-     begin
-       TDBGrid(sender).canvas.brush.color := clWindow;
-       TDBGrid(sender).canvas.Font.color := clWindowText;
-     end
-     else
-     begin
-       TDBGrid(sender).canvas.brush.color := pnMensagemNaoLidas.Color;
-       TDBGrid(sender).canvas.Font.color := clWindowText;
-     end;
+      if (gdFocused in State) then
+      begin
+        TDBGrid(sender).canvas.brush.color := clWindow;
+        TDBGrid(sender).canvas.Font.color := clWindowText;
+      end
+      else
+      begin
+        TDBGrid(sender).canvas.brush.color := pnMensagemNaoLidas.Color;
+        TDBGrid(sender).canvas.Font.color := clWindowText;
+      end;
     end;
     TDBGrid(sender).DefaultDrawColumnCell(rect, DataCol, Column, State);
   end;
@@ -885,6 +915,9 @@ begin
     _GravaConfiguracoesBoolean(ckStatusER.Name, ckStatusER.Checked);
     _GravaConfiguracoesBoolean(ckStatusPP.Name, ckStatusPP.Checked);
 
+    _GravaConfiguracoesBoolean(ckMensagem.Name, ckMensagem.Checked);
+    _GravaConfiguracoesBoolean(ckTarefa.Name, ckTarefa.Checked);
+
     _GravaConfiguracoesBoolean(ckOrigemErp.Name, ckOrigemErp.Checked);
     _GravaConfiguracoesBoolean(ckOrigemBot.Name, ckOrigemBot.Checked);
 
@@ -968,6 +1001,9 @@ begin
     ckStatusER.Checked := _LerConfiguracoesRegistroBoolean(ckStatusER.Name);
     ckStatusPP.Checked := _LerConfiguracoesRegistroBoolean(ckStatusPP.Name);
 
+    ckMensagem.Checked := _LerConfiguracoesRegistroBoolean(ckMensagem.Name);
+    ckTarefa.Checked := _LerConfiguracoesRegistroBoolean(ckTarefa.Name);
+
     ckOrigemErp.Checked := _LerConfiguracoesRegistroBoolean(ckOrigemErp.Name);
     ckOrigemBot.Checked := _LerConfiguracoesRegistroBoolean(ckOrigemBot.Name);
 
@@ -1034,6 +1070,26 @@ begin
   end;
 end;
 
+procedure TfrmCadMensMob.SpeedButton11Click(Sender: TObject);
+begin
+  try
+    if CadMensMobile.dataSet.IsEmpty then
+      Exit;
+
+    if not CadMensMobile.AtualizarStatus then
+      Exit;
+  except
+    on E: Exception do
+    begin
+      Application.MessageBox(pchar('Erro inesperado. Tente novamente ' + e.Message), 'Erro',
+        MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
+      vDadosIni.registraErro(e.Message);
+      CadMensMobile.Cancel;
+      CadMensMobile.RollBackTransacao;
+    end;
+  end;
+end;
+
 procedure TfrmCadMensMob.SpeedButton1Click(Sender: TObject);
 var
 	vAssunto, vHtml: string;
@@ -1044,9 +1100,17 @@ begin
 
     if CadMensMobile.dataSet.FieldByName('ORIG_MENS').AsString = 'A' then
     begin
+      vDataHoraBanco := vDadosIni.getDataBanco(CadMensMobile.buscas);
+      
       vHtml := CadMensMobile.dataset.FieldByName('HTML').AsString;
 //      vHtml := vDadosIni._converterTagsImage(vHtml, CadMensMobile.buscas, true);
-      vAssunto := CadMensMobile.dataset.FieldByName('ASSUNTO').AsString;
+      vAssunto := CadMensMobile.dataset.FieldByName('ASSUNTO').AsString + ' - ' +
+         'Status: ' + vDadosIni.IfThen((trim(CadMensMobile.dataset.FieldByName('STATUS_ENV').AsString) = 'NO') or (trim(CadMensMobile.dataset.FieldByName('STATUS_ENV').AsString) = 'EP'),
+         	'Aberta', 'Fechada'); //+
+//         vDadosIni.IfThen((trim(CadMensMobile.dataset.FieldByName('STATUS_ENV').AsString) = 'NO') or (trim(CadMensMobile.dataset.FieldByName('STATUS_ENV').AsString) = 'EP'),
+//            vDadosIni.IfThen((CadMensMobile.dataset.FieldByName('COD_TAREFA').AsInteger > 0) and (not CadMensMobile.dataset.FieldByName('DATA_TAREFA').IsNull),
+//               ' - Prazo: ' + vDadosIni.IfThen(IncSecond(CadMensMobile.dataset.FieldByName('DATA_TAREFA').AsDateTime, vDadosIni.vHwCloudIA.vQtdeSegundosTarefaAtrasada) > vDataHoraBanco,
+//                  'No Prazo', 'Atrasada'), ''), '');
 //      vAssunto := vDadosIni._converterTagsImage(vAssunto, CadMensMobile.buscas, true);
       if (CadMensMobile.dataset.FieldByName('APLICATIVO').AsString = 'WHATSAPP') or (CadMensMobile.dataset.FieldByName('APLICATIVO').AsString = 'TELEGRAM') then
          vHtml := _markdownToHtml(vHtml);
@@ -1164,6 +1228,26 @@ begin
       Exit;
 
     if not CadMensMobile.LerMensagem then
+      Exit;
+  except
+    on E: Exception do
+    begin
+      Application.MessageBox(pchar('Erro inesperado. Tente novamente ' + e.Message), 'Erro',
+        MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
+      vDadosIni.registraErro(e.Message);
+      CadMensMobile.Cancel;
+      CadMensMobile.RollBackTransacao;
+    end;
+  end;
+end;
+
+procedure TfrmCadMensMob.SpeedButton7Click(Sender: TObject);
+begin
+  try
+    if CadMensMobile.dataSet.IsEmpty then
+      Exit;
+
+    if not CadMensMobile.AtribuirProf then
       Exit;
   except
     on E: Exception do

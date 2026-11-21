@@ -129,7 +129,14 @@ begin
           item.TituloValor := Format('%0.2f', [boletosDB.ffloat('vl_doc_bol')]);
         item.TituloNumeroDocumento := boletosDB.fstr('n_doc_bol');
         item.TituloDataEmissao := FormatDateTime('dd/MM/yyyy', boletosDB.fdate('data_em_bol'));
-        item.TituloDataVencimento := FormatDateTime('dd/MM/yyyy', boletosDB.fdate('data_ven_bol'));
+        item.TituloDataVencimento  := FormatDateTime('dd/MM/yyyy', boletosDB.fdate('data_ven_bol'));
+
+        if trim(boletosDB.fstr('ac_tit_apos_venc')) = 'S' then
+        begin
+          item.TituloDataLimite := FormatDateTime('dd/MM/yyyy', boletosDB.fdate('data_ven_bol') + boletosDB.fint('dias_ac_tit_apos_venc'));
+          item.IndicadorAceiteTituloVencido := 'S';
+        end;
+
         item.TituloDocEspecie := boletosDB.fstr('n_doc_bol');
         item.TituloLocalPagamento := UTF8Encode(boletosDB.fstr('localpag'));
         item.TituloCodDesconto := '';

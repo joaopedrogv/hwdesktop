@@ -1863,6 +1863,16 @@ type
     cdsModCartasID_CONSULTAS_SQL: TStringField;
     cdsModCartasUNICO_DOC: TStringField;
     cdsFeriadoTIPO_FERIADO: TStringField;
+    dspModCartasCampoDig: TDataSetProvider;
+    qrModCartasCampoDig: TIBQuery;
+    cdsModCartasCampoDig: TClientDataSet;
+    dsModCartasCampoDig: TDataSource;
+    cdsModCartasCampoDigCOD_CARTA: TIntegerField;
+    cdsModCartasCampoDigCOD_EMPRESA: TIntegerField;
+    cdsModCartasCampoDigTAG: TStringField;
+    cdsModCartasCampoDigTEXTO: TMemoField;
+    procedure cdsModCartasCampoDigTEXTOGetText(Sender: TField; var Text: string;
+      DisplayText: Boolean);
     procedure cdsProdutosEC_CADESCR_PROD_COMPLGetText(Sender: TField;
       var Text: string; DisplayText: Boolean);
     procedure cdsPerfilComissaoTABELAS_PERFILGetText(Sender: TField;
@@ -1922,6 +1932,13 @@ end;
 procedure TDtmCadBasicos.cdsMetasVendasBeforeOpen(DataSet: TDataSet);
 begin
 dtmAtivo.mudaSelect(TClientDataSet(DataSet), self);
+end;
+
+procedure TDtmCadBasicos.cdsModCartasCampoDigTEXTOGetText(Sender: TField;
+  var Text: string; DisplayText: Boolean);
+begin
+  if not cdsModCartasCampoDigTEXTO.IsNull then
+    Text := Copy(cdsModCartasCampoDigTEXTO.AsString, 1, 100) + '...';
 end;
 
 procedure TDtmCadBasicos.cdsModCartasDADOS_CARTAGetText(Sender: TField;

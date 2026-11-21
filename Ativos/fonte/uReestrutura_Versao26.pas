@@ -25,7 +25,7 @@ implementation
 procedure TfrmReestruturaVersao26.FormCreate(Sender: TObject);
 begin
   inherited;
-  FBuild := 333;
+  FBuild := 339;
 end;         
 
 initialization

@@ -18,7 +18,7 @@ type
     Label6: TLabel;
     DBLookupComboBox1: TDBLookupComboBox;
     DBLookupComboBox2: TDBLookupComboBox;
-    tsOrigemTipoContrato: TTabSheet;
+    tsOrigemTipoContato: TTabSheet;
     pnOrigemTipoContato: TPanel;
     ScrollBox5: TScrollBox;
     GroupBox5: TGroupBox;
@@ -78,7 +78,7 @@ uses
 procedure TfrmTipoContatoOrigem.BitBtn1Click(Sender: TObject);
 begin
   inherited;
-	if not vDadosIni.PesqPros('CFG065', 'CONSULTA', '', 'MSG_TIPO_CONTATO_ORIGEM', '',
+  if not vDadosIni.PesqPros('CFG065', 'CONSULTA', '', 'MSG_TIPO_CONTATO_ORIGEM', '',
     MsgTipoContatoOrigem.buscas, true) then
     Exit;
 
@@ -190,7 +190,7 @@ end;
 procedure TfrmTipoContatoOrigem.BitBtn5Click(Sender: TObject);
 begin
   inherited;
-	MsgTipoContatoOrigem.Cancel;
+  MsgTipoContatoOrigem.Cancel;
   MsgTipoContatoOrigem.RollBackTransacao;
 end;
 
@@ -225,7 +225,7 @@ end;
 procedure TfrmTipoContatoOrigem.DBGrid1CellClick(Column: TColumn);
 begin
   inherited;
-	if Column.FieldName = 'SEL' then
+  if Column.FieldName = 'SEL' then
   	MsgTipoContatoOrigem._marcaDesmarcaLinha;
 end;
 
@@ -271,7 +271,7 @@ procedure TfrmTipoContatoOrigem.DBGrid1KeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   inherited;
-	if (key = VK_RETURN) then
+  if (key = VK_RETURN) then
     SpeedButton1Click(Sender)
   else if key = VK_DELETE then
     SpeedButton2Click(Sender)
@@ -302,7 +302,7 @@ begin
   inherited;
   MsgTipoContatoOrigem := TMsgTipoContatoOrigem.create;
   tsCadastro.TabVisible := False;
-  tsOrigemTipoContrato.TabVisible := False;
+  tsOrigemTipoContato.TabVisible := False;
   PageControl1.ActivePage := TabSheet2;
   TabSheet3.TabVisible := False;
 
@@ -315,7 +315,7 @@ procedure TfrmTipoContatoOrigem.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   inherited;
-	if key = VK_INSERT then
+  if key = VK_INSERT then
   begin
     if PageControl1.ActivePage = TabSheet2 then
       BitBtn3Click(Sender);

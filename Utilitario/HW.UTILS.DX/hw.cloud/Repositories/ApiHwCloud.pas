@@ -43,12 +43,16 @@ type
       payload: TCadMensageriaComTemplateSemAnexo): TMensageriaResponse;
     function CadMensageriaComTemplateComAnexo(
       payload: TCadMensageriaComTemplateComAnexo): TMensageriaResponse;
-    function UpdateMensageria(
-      payload: TUpdateMensageria): TMensageriaResponse;
+    function UpdateMensageriaStatus(
+      payload: TUpdateMensageriaStatus): TMensageriaResponse;
+    function updateMensageriaAtribuirProf(
+      payload: TUpdateMensageriaAtribuirProf): TMensageriaResponse;
     function BuscarConfig(
       payload: TBuscarConfig): TConfigResponse;
     function BuscarCustos(
       payload: TBuscarCusto): TCustoResponse;
+    function BuscarTipoTarefaPessoa(
+      payload: TBuscarTipoTarefaPessoa): TTipoTarefaPessoaResponse;
     function logsHwCloud(Atext: string; Afilename: string; Asingleline: Boolean = False; AtimeStart: TDateTime = 0): Boolean;
   end;
 
@@ -65,7 +69,9 @@ uses
   hw_win_utils,
   hw_jsondx,
   SHFolder,
-  System.TypInfo, Neon.Core.Serializers.RTL, System.JSON;
+  System.TypInfo,
+  Neon.Core.Serializers.RTL,
+  System.JSON;
 
 { TApiHwCloud }
 
@@ -138,18 +144,18 @@ begin
 end;
 
 
-function TApiHwCloud.UpdateMensageria(
-  payload: TUpdateMensageria): TMensageriaResponse;
+function TApiHwCloud.updateMensageriaAtribuirProf(
+  payload: TUpdateMensageriaAtribuirProf): TMensageriaResponse;
 begin
   try
     Result := nil;
 
-    logsHwCloud(Self.ClassName + '.UpdateMensageria - Request' + TJsonUtilsDX.Serialize(payload), 'HwCloud');
+    logsHwCloud(Self.ClassName + '.updateMensageriaAtribuirProf - Request' + TJsonUtilsDX.Serialize(payload), 'HwCloud');
 
     Result := TMensageriaResponse.Create;
     with Call(TReq.New('tarefa_mensageria', '', TJsonUtilsDX.Serialize(payload)), ReqMethod.rmPost) do
     begin
-      logsHwCloud(Self.ClassName + '.UpdateMensageria - Response ' + data, 'HwCloud');
+      logsHwCloud(Self.ClassName + '.updateMensageriaAtribuirProf - Response ' + data, 'HwCloud');
 
       if isSuccess then
       begin
@@ -157,12 +163,40 @@ begin
       end
       else
       begin
-        LogApp.Error(Self.ClassName + '.UpdateMensageria Code: %d Data: %s', [code, data]);
+        LogApp.Error(Self.ClassName + '.updateMensageriaAtribuirProf Code: %d Data: %s', [code, data]);
         Result := TJsonUtilsDX.Deseerialize<TMensageriaResponse>(data);
       end;
     end;
   finally
-    logsHwCloud(Self.ClassName + '.UpdateMensageria - end', 'HwCloud');
+    logsHwCloud(Self.ClassName + '.updateMensageriaAtribuirProf - end', 'HwCloud');
+  end;
+end;
+
+function TApiHwCloud.UpdateMensageriaStatus(
+  payload: TUpdateMensageriaStatus): TMensageriaResponse;
+begin
+  try
+    Result := nil;
+
+    logsHwCloud(Self.ClassName + '.UpdateMensageriaStatus - Request' + TJsonUtilsDX.Serialize(payload), 'HwCloud');
+
+    Result := TMensageriaResponse.Create;
+    with Call(TReq.New('tarefa_mensageria', '', TJsonUtilsDX.Serialize(payload)), ReqMethod.rmPost) do
+    begin
+      logsHwCloud(Self.ClassName + '.UpdateMensageriaStatus - Response ' + data, 'HwCloud');
+
+      if isSuccess then
+      begin
+        Result := TJsonUtilsDX.Deseerialize<TMensageriaResponse>(data);
+      end
+      else
+      begin
+        LogApp.Error(Self.ClassName + '.UpdateMensageriaStatus Code: %d Data: %s', [code, data]);
+        Result := TJsonUtilsDX.Deseerialize<TMensageriaResponse>(data);
+      end;
+    end;
+  finally
+    logsHwCloud(Self.ClassName + '.UpdateMensageriaStatus - end', 'HwCloud');
   end;
 end;
 
@@ -353,6 +387,33 @@ begin
     end;
   finally
     logsHwCloud(Self.ClassName + '.BuscarCustos - end', 'HwCloud');
+  end;
+end;
+
+function TApiHwCloud.BuscarTipoTarefaPessoa(payload: TBuscarTipoTarefaPessoa): TTipoTarefaPessoaResponse;
+begin
+  try
+    Result := nil;
+
+    logsHwCloud(Self.ClassName + '.BuscarTipoTarefaPessoa - Request' + TJsonUtilsDX.Serialize(payload), 'HwCloud');
+
+    Result := TTipoTarefaPessoaResponse.Create;
+    with Call(TReq.New('busca_dados_cad', '', TJsonUtilsDX.Serialize(payload)), ReqMethod.rmPost) do
+    begin
+      logsHwCloud(Self.ClassName + '.BuscarTipoTarefaPessoa - Response ' + data, 'HwCloud');
+
+      if isSuccess then
+      begin
+        Result := TJsonUtilsDX.Deseerialize<TTipoTarefaPessoaResponse>(data);
+      end
+      else
+      begin
+        LogApp.Error(Self.ClassName + '.BuscarTipoTarefaPessoa Code: %d Data: %s', [code, data]);
+        Result := TJsonUtilsDX.Deseerialize<TTipoTarefaPessoaResponse>(data);
+      end;
+    end;
+  finally
+    logsHwCloud(Self.ClassName + '.BuscarTipoTarefaPessoa - end', 'HwCloud');
   end;
 end;
 

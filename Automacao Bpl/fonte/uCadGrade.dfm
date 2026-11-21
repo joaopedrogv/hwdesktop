@@ -748,6 +748,10 @@ inherited frmCadGrade: TfrmCadGrade
         object tsAlterDadosProc: TTabSheet
           Caption = 'tsAlterDadosProc'
           ImageIndex = 3
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object Panel52: TPanel
             Left = 0
             Top = 0
@@ -962,7 +966,7 @@ inherited frmCadGrade: TfrmCadGrade
               Left = 0
               Top = 0
               Width = 891
-              Height = 54
+              Height = 72
               Align = alTop
               BevelKind = bkTile
               BevelOuter = bvNone
@@ -1390,7 +1394,7 @@ inherited frmCadGrade: TfrmCadGrade
                 OnClick = btSincronizarServicosClick
               end
               object SpeedBSelTodos: TSpeedButton
-                Left = 834
+                Left = 832
                 Top = 8
                 Width = 23
                 Height = 21
@@ -1417,7 +1421,7 @@ inherited frmCadGrade: TfrmCadGrade
                 OnClick = SpeedBSelTodosClick
               end
               object SpeedBDesmarcarTodos: TSpeedButton
-                Left = 860
+                Left = 858
                 Top = 8
                 Width = 23
                 Height = 21
@@ -1574,8 +1578,59 @@ inherited frmCadGrade: TfrmCadGrade
                 ShowHint = True
                 OnClick = SpeedButton25Click
               end
+              object SpeedButton68: TSpeedButton
+                Left = 857
+                Top = 40
+                Width = 23
+                Height = 21
+                Flat = True
+                Glyph.Data = {
+                  36050000424D3605000000000000360400002800000010000000100000000100
+                  08000000000000010000D30E0000D30E00000001000000010000007B00000084
+                  0000008C00000094000008940800009C0800089C080008A50800008C1000088C
+                  100008A5100010A5100018731800318C180021941800109C180010A5180018A5
+                  180010AD1800317B21005A8421001894210018B52100217B2900399429005294
+                  2900299C29004AA5290052A5290018AD290018B5290021B52900428C3100399C
+                  310031A5310021B5310031B5310021BD3100218C390018A5390039A5390029C6
+                  39006B844200188C4200319C4200399C420042B5420029C642005A944A00429C
+                  4A007B9C4A0073AD4A008CB54A0052BD4A0031CE4A00525252006B63520039CE
+                  520031D6520039D652005A5A5A007B735A0018A55A0063A55A008CA55A0021AD
+                  5A004ACE5A0039D65A0063636300736B6300847363008C73630063C6630073C6
+                  630042D66300214A6B006B6B6B006B736B0063D66B0042DE6B004ADE6B0042E7
+                  6B004AE76B00295A73004AE77300294A7B00316B7B00426B7B0073737B00B59C
+                  7B0084BD7B00B5C67B007BCE7B005AE77B0063E77B0052EF7B00104284002952
+                  84005263840018848400CEAD840073B5840073D6840052EF84005AEF84000042
+                  8C00295A8C00426B8C008C8C8C00B5A58C00214A940000529400215294002163
+                  94006BF7940029639C004A849C0073849C009C9C9C009CA59C0031AD9C00C6B5
+                  9C000063A5000863A500006BA5001873A5004A94A500A5A5A50094E7A500006B
+                  AD00086BAD001873AD002173AD009CEFAD008CF7AD001073B500007BB500217B
+                  B500297BB500218CB5003194B50039A5B500C6BDB500ADEFB500007BBD001884
+                  BD002184BD00188CBD0063ADBD0073ADBD00A5C6BD00008CC600108CC600298C
+                  C6001094C60042A5C6009CC6C6000894CE001094CE002994CE00009CCE00089C
+                  CE00109CCE00189CCE00CECECE00CED6CE00089CD60010A5D60018A5D60029A5
+                  D60021ADD60039ADD6005AADD60063C6D6009CCED600D6D6D600DEDED60018A5
+                  DE0021A5DE0029A5DE0042A5DE0031ADDE004AADDE0042B5DE0042BDDE00BDD6
+                  DE00DEDEDE00E7EFDE0029ADE70039ADE70042ADE70031B5E70039B5E70042B5
+                  E70052B5E70063BDE7006BC6E70039B5EF004AB5EF0042BDEF004ABDEF0052C6
+                  EF005AC6EF006BC6EF004ABDF7004AC6F70052C6F700FF00FF005AC6FF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+                  FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00CFCFCFCFCFCF
+                  CFCFCFCFCFCFCFCFCFCFCFCFCFCFCFCFCFCFCF7569CFCFCFCFCFCFCFCFCFCFCF
+                  8483618AA96A6F7BCFCFCFCFCFCFCFCFB6C17B9FB5829A9ECFCFCFCFCFCFCF70
+                  99C8C7C1B5B3A89A6962CFCFCFCFCF6EBECEC8C3747D9E9A7C71CFCFCFCFCFC4
+                  C9C8CBBA4C539A9DA294CFCFCFCFCF268DC8CBBA4C56A8A3A3CFCF3F09001839
+                  78B7ADAF4457A9A9CFCFCF1A50231D39273E2E7937479BA3CFCFCF0D50544339
+                  2F25110E2ACFCFCFCFCF2823545466651510100619CFCFCFCFCF80725F50AF7F
+                  17040A1049CFCFCFCFCFCF4A5050AF7F2D25111BCFCFCFCFCFCFCFCF5D50A46C
+                  303548CFCFCFCFCFCFCFCFCFCF4A6D45341FCFCFCFCFCFCFCFCF}
+                OnClick = SpeedButton68Click
+              end
               object ckPermOpcaoMarcadas: TCheckBox
-                Left = 534
+                Left = 528
                 Top = 0
                 Width = 296
                 Height = 17
@@ -1600,6 +1655,10 @@ inherited frmCadGrade: TfrmCadGrade
         object tsAlterDadosLote: TTabSheet
           Caption = 'tsAlterDadosLote'
           ImageIndex = 4
+          ExplicitLeft = 0
+          ExplicitTop = 0
+          ExplicitWidth = 0
+          ExplicitHeight = 0
           object pnAlteracaoEmLote: TPanel
             Left = 0
             Top = 0
@@ -1653,7 +1712,7 @@ inherited frmCadGrade: TfrmCadGrade
                   Width = 467
                   Height = 21
                   Style = csDropDownList
-                  ItemHeight = 13
+                  ItemHeight = 0
                   TabOrder = 1
                 end
                 object ckTipo1: TCheckBox
@@ -1685,7 +1744,7 @@ inherited frmCadGrade: TfrmCadGrade
                   Width = 467
                   Height = 21
                   Style = csDropDownList
-                  ItemHeight = 13
+                  ItemHeight = 0
                   TabOrder = 1
                 end
                 object ckTipo2: TCheckBox
@@ -1828,12 +1887,6 @@ inherited frmCadGrade: TfrmCadGrade
     Width = 910
     ExplicitTop = 622
     ExplicitWidth = 910
-  end
-  inherited pnStatusProcessamento: TPanel
-    inherited lbTextoProcessamento: TLabel
-      Width = 477
-      Height = 21
-    end
   end
   inherited PopupMenu1: TPopupMenu
     object MarcarTodasGradesClick: TMenuItem

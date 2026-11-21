@@ -1305,6 +1305,8 @@ var
       RetornoDLL := 'OK' //alterar e deletar - view não existe
     else if (Pos('PROCEDURE ', UpperCase(RetornoDLL)) > 0) and (Pos('NOT FOUND', UpperCase(RetornoDLL)) > 0) then
       RetornoDLL := 'OK' //alterar e deletar - procedure não existe
+    else if (Pos('TRIGGER ', UpperCase(RetornoDLL)) > 0) and (Pos('NOT FOUND', UpperCase(RetornoDLL)) > 0) then
+      RetornoDLL := 'OK' //alterar e deletar - trigger não existe
     else if (Pos('CONSTRAINT ', UpperCase(RetornoDLL)) > 0) and (Pos('DOES NOT EXIST', UpperCase(RetornoDLL)) > 0) then
       RetornoDLL := 'OK' //deletar - chave estrangeira não existe
     else if (Pos('EXCEPTION NOT FOUND', UpperCase(RetornoDLL)) > 0) then

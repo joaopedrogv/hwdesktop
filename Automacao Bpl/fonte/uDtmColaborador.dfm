@@ -349,6 +349,11 @@ object dtmColaborador: TdtmColaborador
       DisplayLabel = 'Cod Escala Semanal'
       FieldName = 'COD_ESCALA_SEMANAL'
     end
+    object cdsColabEXEC_TAREFA: TStringField
+      DisplayLabel = 'Executar Tarefas'
+      FieldName = 'EXEC_TAREFA'
+      Size = 1
+    end
   end
   object dsCola: TDataSource
     DataSet = cdsColab

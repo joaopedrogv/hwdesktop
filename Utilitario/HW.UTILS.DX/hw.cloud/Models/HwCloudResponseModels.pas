@@ -349,6 +349,77 @@ type
     property status: string read Fstatus write Fstatus;
   end;
 
+  TResultadoTipoTarefaPessoaResponse = class
+  private
+    Fcdpessoa: string;
+    Fcod_user_plataforma: string;
+    Fconteudo_template: string;
+    Fdescricao_vinculo: string;
+    Fdthr_cadastro: TDateTime;
+    Fgestempid: Integer;
+    Fnivel_pessoa_notifica: Integer;
+    Fnome_template: string;
+    Fnotfica_exec_auto: Boolean;
+    Fplataforma_pad_envio: string;
+    Fsla_seg_int_tarefa: Integer;
+    Ftipo_pessoa: string;
+    Ftipo_tarefa: string;
+    Fvariaveis_template: string;
+  published
+    property cdpessoa: string read Fcdpessoa write Fcdpessoa;
+    property cod_user_plataforma: string read Fcod_user_plataforma write Fcod_user_plataforma;
+    property conteudo_template: string read Fconteudo_template write Fconteudo_template;
+    property descricao_vinculo: string read Fdescricao_vinculo write Fdescricao_vinculo;
+    property dthr_cadastro: TDateTime read Fdthr_cadastro write Fdthr_cadastro;
+    property gestempid: Integer read Fgestempid write Fgestempid;
+    property nivel_pessoa_notifica: Integer read Fnivel_pessoa_notifica write Fnivel_pessoa_notifica;
+    property nome_template: string read Fnome_template write Fnome_template;
+    property notfica_exec_auto: Boolean read Fnotfica_exec_auto write Fnotfica_exec_auto;
+    property plataforma_pad_envio: string read Fplataforma_pad_envio write Fplataforma_pad_envio;
+    property sla_seg_int_tarefa: Integer read Fsla_seg_int_tarefa write Fsla_seg_int_tarefa;
+    property tipo_pessoa: string read Ftipo_pessoa write Ftipo_pessoa;
+    property tipo_tarefa: string read Ftipo_tarefa write Ftipo_tarefa;
+    property variaveis_template: string read Fvariaveis_template write Fvariaveis_template;
+  end;
+
+  TTipoTarefaPessoas = class(TPersistent)
+  private
+    Flimite: Integer;
+    Fpagina: Integer;
+    Fresultado: TArray<TResultadoTipoTarefaPessoaResponse>;
+    Ftotalregistros: Integer;
+  public
+    constructor Create();
+    destructor Destroy; override;
+  published
+    property limite: Integer read Flimite write Flimite;
+    property pagina: Integer read Fpagina write Fpagina;
+    property resultado: TArray<TResultadoTipoTarefaPessoaResponse> read Fresultado write Fresultado;
+    property totalregistros: Integer read Ftotalregistros write Ftotalregistros;
+  end;
+
+  TRespostaTipoTarefaPessoaResponse = class
+  private
+    Ftipo_tarefa_pessoas: TTipoTarefaPessoas;
+  public
+    constructor Create();
+    destructor Destroy; override;
+  published
+    property tipo_tarefa_pessoas: TTipoTarefaPessoas read Ftipo_tarefa_pessoas write Ftipo_tarefa_pessoas;
+  end;
+
+  TTipoTarefaPessoaResponse = class(TPersistent)
+  private
+    Fresposta: TRespostaTipoTarefaPessoaResponse;
+    Fstatus: string;
+  public
+    constructor Create();
+    destructor Destroy; override;
+  published
+    property resposta: TRespostaTipoTarefaPessoaResponse read Fresposta write Fresposta;
+    property status: string read Fstatus write Fstatus;
+  end;
+
 implementation
 
 uses
@@ -526,6 +597,47 @@ destructor TCustoResponse.Destroy;
 begin
   Fresposta.Free;
   Fresposta := nil;
+  inherited;
+end;
+
+{ TTipoTarefaPessoas }
+
+constructor TTipoTarefaPessoas.Create;
+begin
+  SetLength(Fresultado, 0);
+end;
+
+destructor TTipoTarefaPessoas.Destroy;
+begin
+  Fresultado := nil;
+  inherited;
+end;
+
+{ TRespostaTipoTarefaPessoaResponse }
+
+constructor TRespostaTipoTarefaPessoaResponse.Create;
+begin
+  Ftipo_tarefa_pessoas := TTipoTarefaPessoas.Create;
+end;
+
+destructor TRespostaTipoTarefaPessoaResponse.Destroy;
+begin
+  Ftipo_tarefa_pessoas.Free;
+  Ftipo_tarefa_pessoas := nil;
+  inherited;
+end;
+
+{ TTipoTarefaPessoaResponse }
+
+constructor TTipoTarefaPessoaResponse.Create;
+begin
+  FResposta := TRespostaTipoTarefaPessoaResponse.Create;
+end;
+
+destructor TTipoTarefaPessoaResponse.Destroy;
+begin
+  FResposta.Free;
+  FResposta := nil;
   inherited;
 end;
 

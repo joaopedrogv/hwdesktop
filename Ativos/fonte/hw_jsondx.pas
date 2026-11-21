@@ -125,7 +125,7 @@ begin
 
   Result.SetUseUTCDate(False);
 
-  Result.SetPrettyPrint(True);
+  Result.SetPrettyPrint(False);//True);
 
   Result.SetAutoCreate(False);
 

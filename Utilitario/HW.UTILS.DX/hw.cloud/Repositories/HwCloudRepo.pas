@@ -42,6 +42,7 @@ type
     function GetContato(
       codcontato: Integer; tipocliente: string): TContatoPlataformaModel;
     function GetContatoColaboradoresApagar: TContatosPlataformaModel;
+    function GetContatoClientesApagar: TContatosPlataformaModel;
     function GetContatoClienteApagar(
       codcliente: Integer): TContatosPlataformaModel;
     function GetContatoClienteAvulso(
@@ -118,9 +119,17 @@ type
       origem: string;
       destino: string;
       uuid: string): Boolean;
-    function UpdateMensagem(
+    function UpdateMensagemStatus(
       codigo: Integer;
-      mens: TUpdateMensageria;
+      status: string;
+      mens: TUpdateMensageriaStatus;
+      res: TMensageriaResponse): Boolean; overload;
+    function UpdateMensagemAtribuirProf(
+      codigo: Integer;
+      cdpessoa: string;
+      plataforma: string;
+      identificacao: string;
+      mens: TUpdateMensageriaAtribuirProf;
       res: TMensageriaResponse): Boolean; overload;
     function VerificarModeloNotificacao(
       codcarta: Integer;
@@ -133,6 +142,10 @@ type
       configResponse: TConfigResponse): Boolean;
     function RetornaNomeAplicativo(
       pId: Integer): string;
+    procedure RetornaColaborador(
+      pCodVendedor: Integer;
+      var pNomeVendedor: string;
+      var pCpfVendedor: string);
     function SincHwCloudEmpresa: Boolean;
     function SincHwCloudPessoa(codcliente: Integer; tipocliente: string): Boolean;
     function SincHwCloudContato(id: Integer): Boolean;
@@ -784,6 +797,100 @@ begin
   except on E: Exception do
     begin
       LogApp.Error('THwCloudRepo.GetContatoPlataforma - %s', [E.Message]);
+      raise Exception.Create(e.Message);
+    end;
+  end;
+end;
+
+function THwCloudRepo.GetContatoClientesApagar: TContatosPlataformaModel;
+var
+  vtemp: string;
+begin
+  try
+    Result := TContatosPlataformaModel.Create;
+    var query := QueryHelper.CreateObj(QrAux);
+
+    vtemp :=
+      ' select distinct ' +
+      ' msg_contato.id, ' +
+      ' msg_contato.cod_cliente, ' +
+      ' clientes.ativo, ' +
+      ' 0 id_msg_origem, ' +
+      ' msg_contato.id_msg_aplicativo, ' +
+      ' msg_aplicativo.aplicativo, ' +
+      ' msg_tipo_contato_origem_plat.id_msg_plataforma, ' +
+      ' msg_plataforma.plataforma, ' +
+      ' msg_plataforma.identificador_bot, ' +
+      ' ''S'' aceita, ' +
+      ' iif(msg_contato.id_msg_aplicativo = 1, ''S'', ''N'') testar_email, ' +
+      ' iif(msg_contato.id_msg_aplicativo = 2, ''S'', ''N'') testar_celular, ' +
+      ' iif(msg_contato.id_msg_aplicativo = 2, ''S'', ''N'') usar_template, ' +
+      ' msg_contato.contato, ' +
+      ' msg_contato.identificador, ' +
+      ' 0 cod_carta ' +
+      ' from msg_contato ' +
+      ' inner join clientes on clientes.cod_cliente = msg_contato.cod_cliente and clientes.cod_empresa = msg_contato.cod_empresa ' +
+      ' inner join msg_contato_tipo on ' +
+      '     msg_contato_tipo.id_msg_contato = msg_contato.id ' +
+      '     and msg_contato_tipo.cod_empresa = msg_contato.cod_empresa ' +
+      ' inner join tipo_contato on ' +
+      '     tipo_contato.id = msg_contato_tipo.id_tipo_contato ' +
+      '     and tipo_contato.cod_empresa = msg_contato_tipo.cod_empresa ' +
+      ' inner join msg_tipo_contato_origem on ' +
+      '     msg_tipo_contato_origem.id_tipo_contato = msg_contato_tipo.id_tipo_contato ' +
+      '     and msg_tipo_contato_origem.cod_empresa = msg_contato_tipo.cod_empresa ' +
+      ' inner join msg_tipo_contato_origem_plat on ' +
+      '     msg_tipo_contato_origem_plat.id_msg_tipo_contato_origem = msg_tipo_contato_origem.id ' +
+      '     and msg_tipo_contato_origem_plat.cod_empresa = msg_tipo_contato_origem.cod_empresa ' +
+      ' inner join msg_plataforma on ' +
+      '     msg_plataforma.id = msg_tipo_contato_origem_plat.id_msg_plataforma ' +
+      '     and msg_plataforma.cod_empresa = msg_tipo_contato_origem_plat.cod_empresa ' +
+      ' inner join msg_aplicativo on ' +
+      '     msg_aplicativo.id = msg_plataforma.id_msg_aplicativo ' +
+      ' inner join msg_origem on ' +
+      '     msg_origem.id = msg_tipo_contato_origem.id_msg_origem ' +
+      ' where msg_contato.id_msg_aplicativo = msg_plataforma.id_msg_aplicativo ' +
+      ' and msg_contato.cod_empresa = %d ' +
+      ' and msg_contato.ativo = %d ' +
+      ' and msg_contato.cod_cliente > 0 ';
+
+    vtemp := vtemp +
+      ' order by msg_plataforma.id ';
+
+    query.Open(vtemp,
+      [CodEmpresa,
+       99]);
+
+    query.First;
+    while not query.Eof do
+    begin
+      var contatoPlataforma := TContatoPlataformaModel.Create;
+      contatoPlataforma.id := query.fint('id');
+      contatoPlataforma.cod_cliente := query.fint('cod_cliente');
+      contatoPlataforma.tipo_pessoa := 'CE';
+      contatoPlataforma.ativo := query.fint('ativo');
+      contatoPlataforma.id_msg_origem := query.fint('id_msg_origem');
+      contatoPlataforma.id_msg_aplicativo := query.fint('id_msg_aplicativo');
+      contatoPlataforma.aplicativo := query.fstr('aplicativo');
+      contatoPlataforma.id_msg_plataforma := query.fint('id_msg_plataforma');
+      contatoPlataforma.plataforma := query.fstr('plataforma');
+      contatoPlataforma.identificador_bot := query.fstr('identificador_bot');
+      contatoPlataforma.aceita := query.fstr('aceita');
+      contatoPlataforma.testar_email := query.fstr('testar_email');
+      contatoPlataforma.testar_celular := query.fstr('testar_celular');
+      contatoPlataforma.usar_template := query.fstr('usar_template');
+      contatoPlataforma.contato := query.fstr('contato');
+      contatoPlataforma.identificador := query.fstr('identificador');
+      contatoPlataforma.cod_carta := query.fint('cod_carta');
+
+      Result.Contatos.Add(contatoPlataforma);
+
+      query.Next;
+    end;
+
+  except on E: Exception do
+    begin
+      LogApp.Error('THwCloudRepo.GetContatoApagar - %s', [E.Message]);
       raise Exception.Create(e.Message);
     end;
   end;
@@ -1444,6 +1551,34 @@ begin
   end;
 end;
 
+procedure THwCloudRepo.RetornaColaborador(
+  pCodVendedor: Integer;
+  var pNomeVendedor: string;
+  var pCpfVendedor: string);
+begin
+  try
+    var query := QueryHelper.CreateObj(QrAux);
+
+    query.Close;
+    query.SQL(' select nome_vendedor, cpf_vendedor from colaborador ' +
+      ' where cod_vendedor = :cod_vendedor ' +
+      ' and cod_empresa = :cod_empresa ');
+    query.ParamValue('cod_vendedor', pCodVendedor);
+    query.ParamValue('cod_empresa', CodEmpresa);
+    query.Open;
+
+    pNomeVendedor := query.fstr('nome_vendedor', True);
+    pCpfVendedor := query.fstr('cpf_vendedor', True);
+  except on E: Exception do
+    begin
+      if Transacao.InTransaction then
+        Transacao.Rollback;
+      LogApp.Error('THwCloudRepo.RetornaColaborador - %s', [E.Message]);
+      raise Exception.Create(e.Message);
+    end;
+  end;
+end;
+
 function THwCloudRepo.RetornaNomeAplicativo(pId: Integer): string;
 begin
   try
@@ -1561,9 +1696,93 @@ begin
   end;
 end;
 
-function THwCloudRepo.UpdateMensagem(
+function THwCloudRepo.UpdateMensagemAtribuirProf(
   codigo: Integer;
-  mens: TUpdateMensageria;
+  cdpessoa: string;
+  plataforma: string;
+  identificacao: string;
+  mens: TUpdateMensageriaAtribuirProf; res: TMensageriaResponse): Boolean;
+var
+  vIdPlataforma: Integer;
+  vCodProfResp: string;
+begin
+  try
+    var query := QueryHelper.CreateObj(QrAux);
+
+    query.Close;
+    query.SQL(' select cod_prof_resp from mensagem_mob ' +
+      ' where idseqm = :idseqm ' +
+      ' and idmobile = :idmobile ' +
+      ' and cod_empresa = :cod_empresa ');
+    query.ParamValue('idseqm', codigo);
+    query.ParamValue('idmobile', 0);
+    query.ParamValue('cod_empresa', CodEmpresa);
+    query.Open;
+    vCodProfResp := query.fstr('cod_prof_resp');
+
+    if trim(vCodProfResp) <> '' then
+      raise Exception.Create('Tarefa com profissional responsável definido');
+
+    if trim(plataforma) = '' then
+      raise Exception.Create('Plataforma do profissional responsável não informada');
+
+    query.Close;
+    query.SQL(' select id from msg_plataforma ' +
+      ' where plataforma = :plataforma ');
+    query.ParamValue('plataforma', trim(plataforma));
+    query.Open;
+    vIdPlataforma := query.fint('id');
+
+    if (vIdPlataforma <= 0) then
+      raise Exception.Create('Plataforma do profissional responsável não encontrada:' + trim(plataforma));
+
+    query.Close;
+    query.SQL(' update mensagem_mob set ' +
+      ' cod_prof_resp = :cod_prof_resp, ' +
+      ' id_msg_aplicativo_resp = :id_msg_aplicativo_resp, ' +
+      ' id_msg_plataforma_resp = :id_msg_plataforma_resp, ' +
+      ' identificador_resp = :identificador_resp ' +
+      ' where idseqm = :idseqm ' +
+      ' and idmobile = :idmobile ' +
+      ' and cod_empresa = :cod_empresa ');
+    query.ParamValue('idseqm', codigo);
+    query.ParamValue('idmobile', 0);
+    query.ParamValue('cod_empresa', CodEmpresa);
+
+    query.ParamValue('cod_prof_resp', cdpessoa);
+
+    if trim(plataforma) = 'telegram' then
+      query.ParamValue('id_msg_aplicativo_resp', 3)
+    else if ContainsText(trim(plataforma), 'what') then
+      query.ParamValue('id_msg_aplicativo_resp', 2)
+    else
+      query.ParamValue('id_msg_aplicativo_resp', 1);
+
+    query.ParamValue('id_msg_plataforma_resp', vIdPlataforma);
+
+    query.ParamValue('identificador_resp', trim(identificacao));
+
+    query.ExecSQL;
+
+    if Transacao.InTransaction then
+      Transacao.Commit;
+
+    Result := True;
+  except on E: Exception do
+    begin
+      if Transacao.InTransaction then
+        Transacao.Rollback;
+      Result := False;
+      LogApp.Error('THwCloudRepo.UpdateMensagemAtribuirProf - %s', [E.Message]);
+      raise Exception.Create(e.Message);
+    end;
+  end;
+end;
+
+function THwCloudRepo.UpdateMensagemStatus(
+  codigo: Integer;
+  status: string;
+  mens: TUpdateMensageriaStatus;
   res: TMensageriaResponse): Boolean;
 var
   vStringListBodyResp: TStringList;
@@ -1579,6 +1798,17 @@ begin
       vStringListBodyResp.Add(TJsonUtilsDX.Serialize(res));
 
       var query := QueryHelper.CreateObj(QrAux);
+
+      query.Close;
+      query.SQL(' update mensagem_mob set status_env = :status_env ' +
+        ' where idseqm = :idseqm ' +
+        ' and idmobile = :idmobile ' +
+        ' and cod_empresa = :cod_empresa ');
+      query.ParamValue('idseqm', codigo);
+      query.ParamValue('idmobile', 0);
+      query.ParamValue('cod_empresa', CodEmpresa);
+      query.ParamValue('status_env', status);
+      query.ExecSQL;
 
       query.Close;
       query.SQL(' insert into doc_eletronico ' +
@@ -1602,7 +1832,7 @@ begin
       if Transacao.InTransaction then
         Transacao.Rollback;
       Result := False;
-      LogApp.Error('THwCloudRepo.UpdateMensagem - %s', [E.Message]);
+      LogApp.Error('THwCloudRepo.UpdateMensagemStatus - %s', [E.Message]);
       raise Exception.Create(e.Message);
     end;
   end;

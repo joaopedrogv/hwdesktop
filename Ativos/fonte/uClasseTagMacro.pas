@@ -34,7 +34,7 @@ type
       pIdentificacao: string = '';
       pAplicativo: string = '';
       pPlataforma: string = '';
-      pUrlAnexo: string = '') : TStringDynArray;
+      pUrlAnexo: string = '') : TWideStringDynArray;
   	function _TrocaTAGsMacro(
       pOrigem: string;
       pCodCarta: Integer;
@@ -107,107 +107,241 @@ function TTagMacro.retornaVariaveisTemplate(
   pIdentificacao: string = '';
   pAplicativo: string = '';
   pPlataforma: string = '';
-  pUrlAnexo: string = ''): TStringDynArray;
+  pUrlAnexo: string = ''): TWideStringDynArray;
 var
+  vStringListTagsAdc: TStringList;
   vDados: string;
 	Tamanho, Contador, FixoInicial, FixoFinal: Integer;
   VariavelMacro, ValorMacro: string;
   vOK: Boolean;
+  I: Integer;
 begin
-  SetLength(Result, 0);
+  try
+    vStringListTagsAdc := TStringList.Create;
+    vStringListTagsAdc.Clear;
 
-  QrAux.Close;
-  QrAux.SQL.Text := ' select * from modcartas ' +
-    ' where cod_carta = ' + IntToStr(pCodCarta) +
-    ' and cod_empresa = ' + IntToStr(pCodEmpresa) +
-    ' and ativo = 1 ';
-  QrAux.Open;
+    SetLength(Result, 0);
 
-  vDados      := QrAux.FieldByName(pCampo).AsVariant;
+    QrAux.Close;
+    QrAux.SQL.Text := ' select * from modcartas ' +
+      ' where cod_carta = ' + IntToStr(pCodCarta) +
+      ' and cod_empresa = ' + IntToStr(pCodEmpresa) +
+      ' and ativo = 1 ';
+    QrAux.Open;
 
-  Tamanho := length(vDados);
-  FixoInicial := 0;
-  FixoFinal := 0;
-  Contador := 0;
-  while Contador < Tamanho do
-  begin
-    if (trim(pAplicativo) = 'E-MAIL') then
-    begin
-      if (vDados[Contador] = '{') and ((vDados[Contador + 1] = '#') or (vDados[Contador + 1] = '*')) then
-        FixoInicial := Contador + 2;
-    end
-    else if (trim(pAplicativo) = 'WHATSAPP') or (trim(pAplicativo) = 'TELEGRAM') then
-    begin
-      if (vDados[Contador] = '{') and (vDados[Contador + 1] = '{') then
-        FixoInicial := Contador + 2;
-    end
-    else
-    begin
-      if (vDados[Contador] = '<') and ((vDados[Contador + 1] = '#') or (vDados[Contador + 1] = '*')) then
-        FixoInicial := Contador + 2;
-    end;
+    vDados      := QrAux.FieldByName(pCampo).AsVariant;
 
-    vOK := False;
-    if (trim(pAplicativo) = 'E-MAIL') then
+    Tamanho := length(vDados);
+    FixoInicial := 0;
+    FixoFinal := 0;
+    Contador := 0;
+    while Contador < Tamanho do
     begin
-      if (vDados[Contador] = '}') and (FixoInicial > 0) then
-        vOK := True;
-    end
-    else if (trim(pAplicativo) = 'WHATSAPP') or (trim(pAplicativo) = 'TELEGRAM') then
-    begin
-      if (vDados[Contador] = '}') and (vDados[Contador + 1] = '}') and (FixoInicial > 0) then
-        vOK := True;
-    end
-    else
-    begin
-      if (vDados[Contador] = '>') and (FixoInicial > 0) then
-        vOK := True;
-    end;
-
-    if (vOK) then
-    begin
-      FixoFinal := Contador;
-      VariavelMacro := copy(vDados, FixoInicial, (FixoFinal - FixoInicial));
-      if VariavelMacro = 'INI' then
-        ValorMacro := '\INI'
+      if (trim(pAplicativo) = 'E-MAIL') then
+      begin
+        if (vDados[Contador] = '{') and ((vDados[Contador + 1] = '#') or (vDados[Contador + 1] = '*')) then
+          FixoInicial := Contador + 2;
+      end
+      else if (trim(pAplicativo) = 'WHATSAPP') or (trim(pAplicativo) = 'TELEGRAM') then
+      begin
+        if (vDados[Contador] = '{') and (vDados[Contador + 1] = '{') then
+          FixoInicial := Contador + 2;
+      end
       else
       begin
-        ValorMacro :=
-          _retornaValorMacro(
-            pOrigem,
-            VariavelMacro,
-            pCodCarta,
-            pCodEmpresa,
-            pCodCliente,
-            pNDoc,
-            pTipo,
-            pDtCarta,
-            pDiasAtraso,
-            pCtrlCarta,
-            pFinanceiroUnificado,
-            pCodigoUnificada,
-            pContato,
-            pIdentificacao,
-            pAplicativo,
-            pPlataforma,
-            pUrlAnexo
-          );
-
-        SetLength(Result, Length(Result) + 1);
-        Result[Length(Result) - 1] := VariavelMacro + '|' + trim(ValorMacro) + '|';
+        if (vDados[Contador] = '<') and ((vDados[Contador + 1] = '#') or (vDados[Contador + 1] = '*')) then
+          FixoInicial := Contador + 2;
       end;
-      ValorMacro := trim(ValorMacro);
-      //O novo Valor para os vDados já tirado a macro
-      if trim(pAplicativo) = 'E-MAIL' then
-        vDados := Copy(vDados, 1, FixoInicial - 3) + ValorMacro + Copy(vDados, FixoFinal + 1, (Tamanho - FixoFinal + 1))
+
+      vOK := False;
+      if (trim(pAplicativo) = 'E-MAIL') then
+      begin
+        if (vDados[Contador] = '}') and (FixoInicial > 0) then
+          vOK := True;
+      end
+      else if (trim(pAplicativo) = 'WHATSAPP') or (trim(pAplicativo) = 'TELEGRAM') then
+      begin
+        if (vDados[Contador] = '}') and (vDados[Contador + 1] = '}') and (FixoInicial > 0) then
+          vOK := True;
+      end
       else
-        vDados := Copy(vDados, 1, FixoInicial - 3) + ValorMacro + Copy(vDados, FixoFinal + 2, (Tamanho - FixoFinal + 2));
+      begin
+        if (vDados[Contador] = '>') and (FixoInicial > 0) then
+          vOK := True;
+      end;
+
+      if (vOK) then
+      begin
+        FixoFinal := Contador;
+        VariavelMacro := copy(vDados, FixoInicial, (FixoFinal - FixoInicial));
+        if VariavelMacro = 'INI' then
+          ValorMacro := '\INI'
+        else
+        begin
+          ValorMacro :=
+            _retornaValorMacro(
+              pOrigem,
+              VariavelMacro,
+              pCodCarta,
+              pCodEmpresa,
+              pCodCliente,
+              pNDoc,
+              pTipo,
+              pDtCarta,
+              pDiasAtraso,
+              pCtrlCarta,
+              pFinanceiroUnificado,
+              pCodigoUnificada,
+              pContato,
+              pIdentificacao,
+              pAplicativo,
+              pPlataforma,
+              pUrlAnexo
+            );
+
+          QrAux.Close;
+          QrAux.SQL.Text := ' select texto from modcartas_tags_adc ' +
+            ' where cod_carta = ' + IntToStr(pCodCarta) +
+            ' and cod_empresa = ' + IntToStr(pCodEmpresa) +
+            ' and lower(tag) = ' + QuotedStr(LowerCase(trim(VariavelMacro)));
+          QrAux.Open;
+
+          if QrAux.IsEmpty then
+          begin
+            SetLength(Result, Length(Result) + 1);
+            Result[Length(Result) - 1] := VariavelMacro + '¶' + trim(ValorMacro) + '¶';
+          end
+          else
+            vStringListTagsAdc.Add(VariavelMacro);
+        end;
+        ValorMacro := trim(ValorMacro);
+        //O novo Valor para os vDados já tirado a macro
+        if trim(pAplicativo) = 'E-MAIL' then
+          vDados := Copy(vDados, 1, FixoInicial - 3) + ValorMacro + Copy(vDados, FixoFinal + 1, (Tamanho - FixoFinal + 1))
+        else
+          vDados := Copy(vDados, 1, FixoInicial - 3) + ValorMacro + Copy(vDados, FixoFinal + 2, (Tamanho - FixoFinal + 2));
+        Tamanho := length(vDados);
+        Contador := 0;
+        FixoFinal := 0;
+      end
+      else
+        Inc(Contador);
+    end;
+
+    for I := 0 to vStringListTagsAdc.Count - 1 do
+    begin
+      vDados :=
+        _retornaValorMacro(
+          pOrigem,
+          vStringListTagsAdc[I],
+          pCodCarta,
+          pCodEmpresa,
+          pCodCliente,
+          pNDoc,
+          pTipo,
+          pDtCarta,
+          pDiasAtraso,
+          pCtrlCarta,
+          pFinanceiroUnificado,
+          pCodigoUnificada,
+          pContato,
+          pIdentificacao,
+          pAplicativo,
+          pPlataforma,
+          pUrlAnexo
+        );
+
+      vDados := StringReplace(vDados, '¶', '{', [rfReplaceAll]);
+      vDados := StringReplace(vDados, '§', '}', [rfReplaceAll]);
+
       Tamanho := length(vDados);
-      Contador := 0;
+      FixoInicial := 0;
       FixoFinal := 0;
-    end
-    else
-      Inc(Contador);
+      Contador := 0;
+      while Contador < Tamanho do
+      begin
+        if (trim(pAplicativo) = 'E-MAIL') then
+        begin
+          if (vDados[Contador] = '{') and ((vDados[Contador + 1] = '#') or (vDados[Contador + 1] = '*')) then
+            FixoInicial := Contador + 2;
+        end
+        else if (trim(pAplicativo) = 'WHATSAPP') or (trim(pAplicativo) = 'TELEGRAM') then
+        begin
+          if (vDados[Contador] = '{') and (vDados[Contador + 1] = '{') then
+            FixoInicial := Contador + 2;
+        end
+        else
+        begin
+          if (vDados[Contador] = '<') and ((vDados[Contador + 1] = '#') or (vDados[Contador + 1] = '*')) then
+            FixoInicial := Contador + 2;
+        end;
+
+        vOK := False;
+        if (trim(pAplicativo) = 'E-MAIL') then
+        begin
+          if (vDados[Contador] = '}') and (FixoInicial > 0) then
+            vOK := True;
+        end
+        else if (trim(pAplicativo) = 'WHATSAPP') or (trim(pAplicativo) = 'TELEGRAM') then
+        begin
+          if (vDados[Contador] = '}') and (vDados[Contador + 1] = '}') and (FixoInicial > 0) then
+            vOK := True;
+        end
+        else
+        begin
+          if (vDados[Contador] = '>') and (FixoInicial > 0) then
+            vOK := True;
+        end;
+
+        if (vOK) then
+        begin
+          FixoFinal := Contador;
+          VariavelMacro := copy(vDados, FixoInicial, (FixoFinal - FixoInicial));
+          if VariavelMacro = 'INI' then
+            ValorMacro := '\INI'
+          else
+          begin
+            ValorMacro :=
+              _retornaValorMacro(
+                pOrigem,
+                VariavelMacro,
+                pCodCarta,
+                pCodEmpresa,
+                pCodCliente,
+                pNDoc,
+                pTipo,
+                pDtCarta,
+                pDiasAtraso,
+                pCtrlCarta,
+                pFinanceiroUnificado,
+                pCodigoUnificada,
+                pContato,
+                pIdentificacao,
+                pAplicativo,
+                pPlataforma,
+                pUrlAnexo
+              );
+          end;
+          ValorMacro := trim(ValorMacro);
+          //O novo Valor para os vDados já tirado a macro
+          if trim(pAplicativo) = 'E-MAIL' then
+            vDados := Copy(vDados, 1, FixoInicial - 3) + ValorMacro + Copy(vDados, FixoFinal + 1, (Tamanho - FixoFinal + 1))
+          else
+            vDados := Copy(vDados, 1, FixoInicial - 3) + ValorMacro + Copy(vDados, FixoFinal + 2, (Tamanho - FixoFinal + 2));
+          Tamanho := length(vDados);
+          Contador := 0;
+          FixoFinal := 0;
+        end
+        else
+          Inc(Contador);
+      end;
+
+      SetLength(Result, Length(Result) + 1);
+      Result[Length(Result) - 1] := vStringListTagsAdc[I] + '¶' + vDados + '¶';
+    end;
+  finally
+    if Assigned(vStringListTagsAdc) then
+      FreeAndNil(vStringListTagsAdc);
   end;
 end;
 
@@ -393,6 +527,8 @@ var
   end;
 
   function retornaValorCampo(pBuscas: TIBQuery; pNomeMacro: string): string;
+  var
+    vField: TField;
   begin
 //    if pBuscas.FieldByName(pNomeMacro).DataType = ftFloat then
 //      Result := FormatFloat('#.##0,00', pBuscas.FieldByName(pNomeMacro).AsFloat)
@@ -407,7 +543,10 @@ var
 //    else if pBuscas.FieldByName(pNomeMacro).DataType = ftBoolean then
 //      Result := retornoPorCondicao(pBuscas.FieldByName(pNomeMacro).AsBoolean, 'Verdadeiro', 'Falso')
 //    else
-      Result := pBuscas.FieldByName(pNomeMacro).AsString;
+
+      vField := pBuscas.FindField(pNomeMacro);
+      if Assigned(vField) then
+        Result := pBuscas.FieldByName(pNomeMacro).AsString;
   end;
 
 begin
@@ -425,7 +564,22 @@ begin
     vBuscas3.Transaction := QrAux.Transaction;
 
     Result := '';
-    if trim(pNomeMacro) = 'contato_cliente' then
+
+    vBuscas.Close;
+    vBuscas.SQL.Text := ' select texto from modcartas_tags_adc ' +
+      ' where cod_carta = ' + IntToStr(pCodCarta) +
+      ' and cod_empresa = ' + IntToStr(pCodEmpresa) +
+      ' and lower(tag) = ' + QuotedStr(LowerCase(trim(pNomeMacro)));
+    vBuscas.Open;
+
+    if not vBuscas.IsEmpty then
+    begin
+      Result := vBuscas.FieldByName('texto').AsString;
+      Result := StringReplace(Result, '{', '¶', [rfReplaceAll]);
+      Result := StringReplace(Result, '}', '§', [rfReplaceAll]);
+      Exit;
+    end
+    else if trim(pNomeMacro) = 'contato_cliente' then
     begin
       Result := trim(pContato);
       Exit;

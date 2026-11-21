@@ -92,6 +92,8 @@ type
     cdsMensMobilePROF_RESP: TStringField;
     cdsMensMobileAPLICATIVO_RESP: TStringField;
     cdsMensMobilePLATAFORMA_RESP: TStringField;
+    cdsMensMobileTIPO_TAREFA: TStringField;
+    cdsMensMobileDATA_TAREFA: TDateTimeField;
     procedure cdsMensMobileOBS_ENVGetText(Sender: TField; var Text: string;
       DisplayText: Boolean);
     procedure cdsMensMobileHTMLGetText(Sender: TField; var Text: string;

@@ -1270,7 +1270,7 @@ begin
     if AOperacao = orNormal then
       Application.CreateForm(TfrmValorRecibo, frmValorRecibo);
     try
-      if (DataSet.FieldByName('selec').AsString = 'S') then
+      if (DataSet.FieldByName('sel').AsString = 'S') then
       begin
         valorPendenteRecibo := RoundTo(vrRestante, -2); //- valorBaixado;
         if (RoundTo(DataSet.FieldByName('valor').AsFloat, -2) > RoundTo(valorPendenteRecibo, -2))
@@ -1353,7 +1353,7 @@ begin
             DataSet.FieldByName('NDOCANT').AsInteger := nVenda;
             DataSet.FieldByName('HISTORICO_REC').AsString := 'RECIBO QUITADO CONF. ' + tpDoc +
               ' Nº ' + vDadosIni.strzero(nVenda, 5);
-            DataSet.FieldByName('SELEC').AsString := '';
+            DataSet.FieldByName('SEL').AsString := '';
           end;
         end
         else
@@ -1386,7 +1386,7 @@ begin
             DataSet.FieldByName('VALOR').AsCurrency := DataSet.FieldByName('VALOR').AsCurrency -
               RoundTo(valorInformado, -2);
         end;
-        DataSet.FieldByName('SELEC').AsString := '';
+        DataSet.FieldByName('SEL').AsString := '';
         if (dataSet.FieldByName('data_rec').AsDateTime = vDadosIni.getDataBanco(buscas)) and
           (dataSet.FieldByName('deprec').AsString = 'E') and
           (dataSet.FieldByName('recant').AsString = 'S') then
@@ -1430,7 +1430,7 @@ begin
   if vDadosIni.vLocacao.vHabilitarLoc then
     if DataSet.FieldByName('cod_locacao').AsInteger > 0 then
     begin
-      if trim(DataSet.FieldByName('selec').AsString) = '' then
+      if trim(DataSet.FieldByName('sel').AsString) = '' then
       begin
         if not vDadosIni.PesqPros('FPG040', 'PERMITIR', '',
           'RECIBOS', DataSet.FieldByName('NRECIBO').AsString, buscas) then
@@ -1441,7 +1441,7 @@ begin
       end;
     end;
   
-  if (trim(DataSet.FieldByName('selec').AsString) = '') and (DataSet.FieldByName('NRECIBO').AsInteger < 100000) then
+  if (trim(DataSet.FieldByName('sel').AsString) = '') and (DataSet.FieldByName('NRECIBO').AsInteger < 100000) then
   begin
     buscas.Close;
     buscas.SQL.Text := 'select * from formpagamento' +
@@ -1458,10 +1458,10 @@ begin
   if not IsEmpty then
   begin
     Edit;
-    if DataSet.FieldByName('selec').AsString = 'S' then
-      DataSet.FieldByName('selec').AsString := ''
+    if DataSet.FieldByName('sel').AsString = 'S' then
+      DataSet.FieldByName('sel').AsString := ''
     else
-      DataSet.FieldByName('selec').AsString := 'S';
+      DataSet.FieldByName('sel').AsString := 'S';
     post;
   end;
 end;
@@ -1636,7 +1636,7 @@ begin
   if not dataSet.IsEmpty then
   begin
     Edit;
-    DataSet.FieldByName('selec').AsString := '';
+    DataSet.FieldByName('sel').AsString := '';
     post;
   end;
 end;
@@ -1701,7 +1701,7 @@ begin
     DataSet.First;
     while not DataSet.eof do
     begin
-      if DataSet.FieldByName('selec').AsString = 'S' then
+      if DataSet.FieldByName('sel').AsString = 'S' then
         valorTemp := valorTemp + RoundTo(DataSet.FieldByName('valor').AsFloat, -2);
       DataSet.Next;
     end;
@@ -9076,7 +9076,7 @@ begin
       vRecibo.dataSet.First;
       while not vRecibo.dataSet.Eof do
       begin
-        if vRecibo.DataSet.FieldByName('selec').AsString <> 'S' then
+        if vRecibo.DataSet.FieldByName('sel').AsString <> 'S' then
         begin
           vRecibo.dataSet.Next;
           Continue;
@@ -11471,7 +11471,7 @@ begin
         while not vRecibo.dataSet.Eof do
         begin
           vRecibo.dataSet.Edit;
-          vRecibo.dataSet.FieldByName('selec').AsString := 'S';
+          vRecibo.dataSet.FieldByName('sel').AsString := 'S';
           vRecibo.Post;
 
           vRecibo.dataSet.Next;
@@ -11670,7 +11670,7 @@ begin
   else if (Trim(FtipoVenda) = 'MOT') then
   begin
     buscas.close;
-    buscas.Sql.Text := 'select num_nf, serie, clientes_v ' +
+    buscas.Sql.Text := 'select num_nf, serie, cod_cliente ' +
       ' from notafiscal where n_comando = ' + IntToStr(FnumeroVenda) +
       ' and natureza_nf = ''S'' and tipo_nf = ''V'' ' +
       ' and cod_empresa = ' + vDadosIni.codEmpresa + ' and ativo = 1';
@@ -11678,7 +11678,7 @@ begin
     if buscas.FieldByName('num_nf').AsInteger > 0 then
     begin
       FNum_Nf := buscas.FieldByName('num_nf').AsInteger;
-      FCod_ClienteNf := buscas.FieldByName('clientes_v').AsInteger;
+      FCod_ClienteNf := buscas.FieldByName('cod_cliente').AsInteger;
       try
         FSerie_Nf := StrToInt(Trim(buscas.FieldByName('serie').AsString));
       except
@@ -12286,7 +12286,7 @@ begin
         if vRecibo.dataSet.FieldByName('nrecibo').AsInteger = buscas.FieldByName('nrecibo').AsInteger then
         begin
           vRecibo.dataSet.Edit;
-          vRecibo.dataSet.FieldByName('selec').AsString := 'S';
+          vRecibo.dataSet.FieldByName('sel').AsString := 'S';
           vRecibo.Post;
 
           Result := receberRecibo(orAntecipado);
@@ -12750,7 +12750,7 @@ begin
           vRecibo.dataSet.Filter := 'nrecibo = ' + IntToStr(buscas.FieldByName('nrecibo').AsInteger);
           vRecibo.dataSet.Filtered := True;
           vRecibo.dataSet.Edit;
-          vRecibo.dataSet.FieldByName('selec').AsString := 'S';
+          vRecibo.dataSet.FieldByName('sel').AsString := 'S';
           vRecibo.Post;
 
           Result := receberRecibo(orValeDevolucao);
@@ -15696,7 +15696,7 @@ begin
   buscas.First;
   while not buscas.eof do
   begin
-//    if buscas.FieldByName('selec').AsString = 'S' then
+//    if buscas.FieldByName('sel').AsString = 'S' then
     if (trim(localVnd) = trim(buscas.FieldByName('local_venda').AsString))
       and (trim(intermPag) = trim(buscas.FieldByName('intermediador').AsString)) then
     begin
@@ -15727,7 +15727,7 @@ begin
   buscas.First;
   while not buscas.eof do
   begin
-//    if buscas.FieldByName('selec').AsString = 'S' then
+//    if buscas.FieldByName('sel').AsString = 'S' then
       valorTemp := valorTemp + RoundTo(buscas.FieldByName('valordoc').AsFloat, -2);
     buscas.Next;
   end;

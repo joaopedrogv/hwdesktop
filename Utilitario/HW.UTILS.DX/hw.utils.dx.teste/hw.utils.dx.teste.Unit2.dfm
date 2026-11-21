@@ -1326,6 +1326,15 @@ object Form2: TForm2
         TabOrder = 1
         Text = ';cnpj=20599221000216;empresaId=2;caixaId=1;urgency=true'
       end
+      object Button1: TButton
+        Left = 504
+        Top = 280
+        Width = 75
+        Height = 25
+        Caption = 'Button1'
+        TabOrder = 2
+        OnClick = Button1Click
+      end
     end
   end
   object RESTClient1: TRESTClient

@@ -7406,10 +7406,10 @@ begin
       if ckEcommerce.Checked then
         vSqlAdicional := vSqlAdicional +
         	' and (SELECT COUNT(*) FROM PRODUTOS_EC ' +
-          '			 WHERE PRODUTOS_EC.GRUPO_PROD = PRODUTOS.GRUPO_PROD ' +
-          '      AND PRODUTOS_EC.COD_PROD = PRODUTOS.COD_PROD ' +
-          '      AND PRODUTOS_EC.COD_EMPRESA = PRODUTOS.COD_EMPRESA ' +
-          '			 AND ((PRODUTOS_EC.ID_COMMERCE > 0) OR (PRODUTOS_EC.SINC_ECOMMERCE = ''S'')) ) > 0 ';
+          '		 WHERE PRODUTOS_EC.GRUPO_PROD = PRODUTOS.GRUPO_PROD ' +
+          '     AND PRODUTOS_EC.COD_PROD = PRODUTOS.COD_PROD ' +
+          '     AND PRODUTOS_EC.COD_EMPRESA = PRODUTOS.COD_EMPRESA ' +
+          '		 AND ((PRODUTOS_EC.ID_COMMERCE > 0) OR (PRODUTOS_EC.SINC_ECOMMERCE = ''S'')) ) > 0 ';
 
 //      vCampoConteudo := MaskEdit3.Text;
 //      if (not MaskEdit2.Visible) and (not mkGrupo.Visible) and (Copy(vCampoConteudo, 1, 2) = 'G-') then
@@ -19074,7 +19074,7 @@ begin
 
   if Key = VK_F2 then
   begin
-  	if (ckEcommerce.visible) and (ckEcommerce.Enabled) and (PageControl1.ActivePage = TabSheet2) then
+  	 if (ckEcommerce.visible) and (ckEcommerce.Enabled) and (PageControl1.ActivePage = TabSheet2) then
       ckEcommerce.Checked := not ckEcommerce.Checked
     else if (ckEcommerce.visible) and (ckEcommerce.Enabled) and (PageControl1.ActivePage = tsDefinirPromocoes) then
     	ckEcommerce.Checked := not ckEcommerce.Checked

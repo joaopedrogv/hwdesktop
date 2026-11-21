@@ -6,6 +6,28 @@ uses
   uDataSet_OOP, DBClient, DB,RDPrint,Math, CheckLst, StdCtrls, Mask, Buttons;
 
 type
+  RAtualizarCol = record
+    vHabBairro: boolean;
+    vHabCidade: boolean;
+    vHabEstado: boolean;
+    vHabFuncao: boolean;
+    vHabGerente: boolean;
+    vHabVendedorTelevendas: boolean;
+    vHabJornadaTrabalho: boolean;
+    vHabEscalaSemanal: boolean;
+    vHabExecutarTarefas: boolean;
+
+    vCodBairro: Integer; vNomeBairro: string;
+    vCodCidade: Integer; vNomeCidade: string;
+    vCodEstado: Integer;
+    vCodFuncao: Integer;
+    vCodGerente: Integer;
+    vVendedorTelevendas: string;
+    vCodJornadaTrabalho: Integer;
+    vCodEscalaSemanal: Integer;
+    vExecutarTarefas: string;
+  end;
+
   RJornadaTrabalhoDia = record
     segunda: boolean;
     terca: boolean;
@@ -32,6 +54,13 @@ type
     domingo: boolean;
     domingohoraini, domingohorafim: string;
   end;
+
+  CampoColInput = record
+    NomeCampo: string;
+    ValorCampo: Variant;
+  end;
+
+  CamposColInput = array of CampoColInput;
 
   TColaborador = class;
   TCalendColaboradorExc = class;
@@ -193,7 +222,7 @@ type
   	constructor Create(AOwer: TColaborador);
     destructor Destroy; override;
     function Apply: Boolean; override;
-		function Post(pCk_contrato_pla_tipos_contato: TCheckListBox): Boolean; //override;
+	 function Post(pCk_contrato_pla_tipos_contato: TCheckListBox): Boolean; //override;
     function Delete: Boolean; override;
 
     function Abrir: TColaboradorContatoMsg;
@@ -262,9 +291,17 @@ type
     procedure _desmarcarTodos;
     procedure _marcaDesmarcaLinha;
     function cadColaboradorHwCloud(pCodVendedor: Integer): Boolean;
+    function AtualizarColaboradorEmLote: Boolean;
+    function sincronizaColaboradorEmLote: boolean;
+    function BuscarBairro(pCodBairro: Integer): boolean;
+    function BuscarCidade(pCodCidade: Integer): boolean;
+    function BuscarGerente(pCodGerente: Integer): boolean;
+    function BuscarJornadaTrabalho(pCodJornadaTrabalho: Integer): boolean;
+    function BuscarEscalaSemanal(pCodEscalaSemanal: Integer): boolean;
 
     property ContatoMsg: TColaboradorContatoMsg read FContatoMsg write FContatoMsg;
   var
+    vAtualizarCol: RAtualizarCol;
     cadFuncao: TFuncoes;
     CadPerfil_Comissao: TPerfil_comissao;
     cadPerfil_colab: TPerfil_colab;
@@ -276,6 +313,7 @@ type
     vGerente: TGerenteColab;
     vJornadaTrabalho: TJornadaTrabalhoColab;
     vEscalaSemanal: TEscalaSemanalColab;
+    oldCodCol: string;
     ultimasql: string;
   end;
 
@@ -946,6 +984,176 @@ begin
     result := montaSelect(' select * from colaborador ' +
                           ' where cod_empresa = ' + vDadosIni.codEmpresa +
                           ' and ativo = 0 ');
+end;
+
+function TColaborador.sincronizaColaboradorEmLote: Boolean;
+var
+  fTempListaCol: TClientDataSet;
+  vIndexFieldNames: string;
+  vIndexName: string;
+  vRecNo: Integer;
+  vSQL: string;
+  buscasU: TIBQuery;
+  vtempMensagem: string;
+  vinc_a_cada_reg: Integer;
+  vsalvar_a_cada_reg: Integer;
+begin
+  Result := false;
+  vSQL := '';
+  vtempMensagem := 'SALVAR';
+
+  if not vDadosIni.PesqPros('COL065', vtempMensagem, '', 'COLABORADOR', '', buscas, False) then
+  	Exit;
+	try
+  	buscasU := TIBQuery.Create(nil);
+
+  	try
+      buscasU.Database := buscas.Database;
+      buscasU.Transaction := buscas.Transaction;
+
+      vIndexFieldNames := dataSet.IndexFieldNames;
+    	vIndexName       := dataSet.IndexName;
+      vRecNo           := dataSet.RecNo;
+
+    	try
+        dataSet.Filtered := false;
+        dataSet.Filter := 'sel = ''S'' ';
+        dataSet.Filtered := true;
+
+        if dataSet.IsEmpty then
+        begin
+          Application.MessageBox('Nenhum colaborador selecionado.', 'Atenção',
+            MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
+          exit;
+        end;
+
+        if Application.MessageBox('Deseja sincronizar os colaboradores selecionados?',
+        	'Confirmação', MB_YESNO + MB_ICONQUESTION + MB_DEFBUTTON2) <> mrYES then
+          	exit;
+
+        vDadosIni.vDataHora := vDadosIni.getDataHoraBanco(buscas);
+
+        vsalvar_a_cada_reg := vDadosIni.getConfSisInt('col_cad_alt_lote_reg', buscas);
+
+        fTempListaCol := TClientDataSet.Create(nil);
+        fTempListaCol.Close;
+        fTempListaCol.FieldDefs.Clear;
+        fTempListaCol.FieldDefs.Add('COD_VENDEDOR', ftInteger, 0, false);
+        fTempListaCol.close;
+        fTempListaCol.CreateDataSet;
+        fTempListaCol.EmptyDataSet;
+
+        try
+          dataSet.DisableControls;
+          dataSet.First;
+          while not dataSet.Eof do
+          begin
+          	Application.ProcessMessages;
+            vDadosIni.abreStatusProcessamento('', 'Lendo dados colaboradores (' +
+              IntToStr(dataSet.RecNo) + '/' + IntToStr(dataSet.RecordCount) + ')');
+
+            if dataSet.FieldByName('sel').AsString = 'S' then
+            begin
+              fTempListaCol.Insert;
+              fTempListaCol.FieldByName('COD_VENDEDOR').AsInteger := dataSet.FieldByName('COD_VENDEDOR').AsInteger;
+              fTempListaCol.Post;
+            end;
+
+            dataSet.Next;
+          end;
+        finally
+          dataSet.EnableControls;
+        end;
+
+        vSQL := dataSet.CommandText;
+      finally
+        dataSet.Filtered := false;
+      end;
+
+      vinc_a_cada_reg := 0;
+
+      try
+        fTempListaCol.DisableControls;
+        fTempListaCol.First;
+        while not fTempListaCol.Eof do
+        begin
+          Application.ProcessMessages;
+          vDadosIni.abreStatusProcessamento('', 'Sincronizando kits (' +
+            IntToStr(fTempListaCol.RecNo) + '/' + IntToStr(fTempListaCol.RecordCount) + ')');
+
+          buscasU.Close;
+          buscasU.SQL.Text := ' UPDATE KITS_PROD SET ' +
+          	' DATA_MOD_COL = :DATA_MOD_COL ' +
+          	' WHERE COD_VENDEDOR = :PCOD_VENDEDOR ' +
+            ' AND COD_EMPRESA = :PCOD_EMPRESA ';
+          buscasU.ParamByName('PCOD_VENDEDOR').AsInteger := fTempListaCol.FieldByName('COD_VENDEDOR').AsInteger;
+          buscasU.ParamByName('PCOD_EMPRESA').AsInteger  := StrToInt(vDadosIni.codEmpresa);
+          buscasU.ParamByName('DATA_MOD_COL').AsDateTime := vDadosIni.vDataHora;
+          buscasU.ExecSQL;
+
+          vDadosIni.GravaAuditoria('COL065', vtempMensagem, '', 'COLABORADOR',
+            IntToStr(fTempListaCol.FieldByName('CODIGO_KIT').AsInteger), buscas);
+
+          Inc(vinc_a_cada_reg);
+
+          if (vsalvar_a_cada_reg > 0) and (vinc_a_cada_reg >= vsalvar_a_cada_reg) then
+          begin
+            Application.ProcessMessages;
+            vDadosIni.abreStatusProcessamento('', 'Salvando dados colaborador (' +
+              IntToStr(fTempListaCol.RecNo) + '/' + IntToStr(fTempListaCol.RecordCount) + ')');
+
+            vinc_a_cada_reg := 0;
+
+            CommitaTransacao;
+          end;
+
+          fTempListaCol.Next;
+        end;
+      finally
+      	fTempListaCol.First;
+      	fTempListaCol.EnableControls;
+      end;
+
+      Application.ProcessMessages;
+      vDadosIni.abreStatusProcessamento('', 'Atualizando dados colaborador (' +
+        IntToStr(fTempListaCol.RecordCount) + '/' + IntToStr(fTempListaCol.RecordCount) + ')');
+
+      CommitaTransacao;
+
+      dataSet.Close;
+      dataSet.CommandText := vSQL;
+      dataSet.Open;
+
+      vDadosIni.GravaAuditoria('COL065', vtempMensagem,	'SUCESSO', 'COLABORADOR', '', buscas);
+
+      Result := true;
+
+      if Result then
+        dataSet.Refresh;
+    finally
+      dataSet.Filtered        := false;
+      dataSet.IndexName       := vIndexName;
+      dataSet.IndexFieldNames := vIndexFieldNames;
+      if dataSet.RecordCount >= vRecNo then
+	      dataSet.RecNo           := vRecNo;
+      dataSet.EnableControls;
+
+      if Assigned(buscasU) then
+      	FreeAndNil(buscasU);
+
+      vDadosIni.fechaStatusProcessamento;
+    end;
+
+  except
+    on e: exception do
+    begin
+      Result := false;
+      RollBackTransacao;
+      vDadosIni.GravaAuditoria('COL065', vtempMensagem,	'FALHA', 'COLABORADOR', '', buscas);
+      Application.MessageBox(pchar(e.Message), 'Atenção', MB_ICONERROR + MB_OK);
+      registraErro(e.Message);
+    end;
+  end;
 end;
 
 procedure TColaborador.CadColab(TipoForm: integer);
@@ -2008,6 +2216,413 @@ begin
       registraErro(e.Message);
     end;
   end;
+end;
+
+function TColaborador.AtualizarColaboradorEmLote: boolean;
+var
+  fTempListaCol: TClientDataSet;
+  vIndexFieldNames: string;
+  vIndexName: string;
+  vRecNo: Integer;
+  vMensagemTmp: string;
+  vmensagemP, vmensagem: string;
+  vtempMensagem: string;
+  vSQL: string;
+  vUpdate: string;
+  buscas2: TIBQuery;
+  buscasU: TIBQuery;
+  I: Integer;
+  campo: CampoColInput;
+  campos: CamposColInput;
+  vinc_a_cada_reg: Integer;
+  vsalvar_a_cada_reg: Integer;
+
+  procedure AddCampoValue(pNomeCampo: string; pValorCampo: Variant);
+  begin
+  	 vUpdate := vUpdate + ', ' + pNomeCampo + ' = :' + pNomeCampo;
+
+  	 SetLength(campos, Length(campos) + 1);
+
+    campo.NomeCampo  := pNomeCampo;
+    campo.ValorCampo := pValorCampo;
+
+    campos[High(campos)] := campo;
+  end;
+begin
+  Result := false;
+  vSQL := '';
+  vUpdate := '';
+
+  vtempMensagem := 'SALVAR';
+
+  if not vDadosIni.PesqPros('COL064', vtempMensagem, '', 'COLABORADOR', '', buscas, False) then
+  	 Exit;
+
+  try
+    buscas2 := TIBQuery.Create(nil);
+    buscasU := TIBQuery.Create(nil);
+
+  	 try
+      buscas2.Database := buscas.Database;
+      buscas2.Transaction := buscas.Transaction;
+
+      buscasU.Database := buscas.Database;
+      buscasU.Transaction := buscas.Transaction;
+
+      vIndexFieldNames := dataSet.IndexFieldNames;
+    	vIndexName       := dataSet.IndexName;
+      vRecNo           := dataSet.RecNo;
+
+      try
+        dataSet.Filtered := false;
+        dataSet.Filter := 'sel = ''S'' ';
+        dataSet.Filtered := true;
+
+        if dataSet.IsEmpty then
+        begin
+          Application.MessageBox('Nenhum colaborador selecionado.', 'Atenção',
+            MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
+          exit;
+        end;
+
+        with vAtualizarCol do
+        begin
+          if (not vHabBairro)
+          	and (not vHabCidade)
+            and (not vHabEstado)
+            and (not vHabFuncao)
+            and (not vHabGerente)
+            and (not vHabVendedorTelevendas)
+            and (not vHabJornadaTrabalho)
+            and (not vHabEscalaSemanal)
+            and (not vHabExecutarTarefas) then
+              raiseExceptionCreate('Nenhum opção selecionada!', '');
+        end;
+
+        fTempListaCol := TClientDataSet.Create(nil);
+        fTempListaCol.Close;
+        fTempListaCol.FieldDefs.Clear;
+        for I := 0 to dataSet.Fields.Count - 1 do
+        	fTempListaCol.FieldDefs.Add(
+          dataSet.Fields[i].FieldName,
+          dataSet.Fields[i].DataType,
+          dataSet.Fields[i].Size, false);
+        fTempListaCol.close;
+        fTempListaCol.CreateDataSet;
+        fTempListaCol.EmptyDataSet;
+
+        try
+          dataSet.DisableControls;
+          dataSet.First;
+          while not dataSet.Eof do
+          begin
+          	Application.ProcessMessages;
+            vDadosIni.abreStatusProcessamento('', 'Lendo dados colaborador (' +
+              IntToStr(dataSet.RecNo) + '/' + IntToStr(dataSet.RecordCount) + ')');
+
+            if dataSet.FieldByName('sel').AsString = 'S' then
+            begin
+              fTempListaCol.Insert;
+              for I := 0 to dataSet.Fields.Count - 1 do
+              	fTempListaCol.FieldByName(dataSet.Fields[I].FieldName).Value := dataSet.Fields[I].Value;
+              fTempListaCol.Post;
+            end;
+
+            dataSet.Next;
+          end;
+
+        finally
+        	 vDadosIni.fechaStatusProcessamento;
+          dataSet.EnableControls;
+        end;
+
+        vSQL := dataSet.CommandText;
+      finally
+        dataSet.Filtered := false;
+      end;
+
+      vDadosIni.vDataHora := vDadosIni.getDataHoraBanco(buscas);
+
+      vsalvar_a_cada_reg := vDadosIni.getConfSisInt('col_cad_alt_lote_reg', buscas);
+
+      with vAtualizarCol do
+      begin
+        if vHabBairro then
+        begin
+          if vCodBairro <= 0 then
+            raiseExceptionCreate('Bairro deve ser informado', 'EdCodBairro');
+
+          if SqlOpen(' select cod_bairro, nome_bairro from bairros ' +
+            ' where cod_bairro = ' + IntToStr(vCodBairro) +
+            ' and ativo = 1 ', buscas).IsEmpty then
+              raiseExceptionCreate('Bairro não encontrado', 'EdCodBairro');
+
+          vNomeBairro := Trim(buscas.FieldByName('nome_bairro').AsString);
+        end;
+
+        if vHabCidade then
+        begin
+          if vCodCidade <= 0 then
+            raiseExceptionCreate('Cidade deve ser informado', 'EdCodCidade');
+
+          if SqlOpen(' select cod_cidade, nome_cidade from cidades ' +
+            ' where cod_cidade = ' + IntToStr(vCodCidade) +
+            ' and ativo = 1 ', buscas).IsEmpty then
+              raiseExceptionCreate('Cidade não encontrada', 'EdCodCidade');
+
+          vNomeCidade := Trim(buscas.FieldByName('nome_cidade').AsString);
+        end;
+
+        if vHabEstado then
+        begin
+          if vCodEstado <= 0 then
+            raiseExceptionCreate('Estado deve ser informado', 'DBLEstado');
+
+          if SqlOpen(' select codigo_uf from estados ' +
+            ' where codigo_uf = ' + IntToStr(vCodEstado) +
+            ' and ativo = 1 ', buscas).IsEmpty then
+              raiseExceptionCreate('Estado não encontrado', 'DBLEstado');
+        end;
+
+        if vHabFuncao then
+        begin
+          if vCodFuncao <= 0 then
+            raiseExceptionCreate('Função deve ser informado', 'DBLFuncao');
+
+          if SqlOpen(' select cod_funcao from funcoes ' +
+            ' where cod_funcao = ' + IntToStr(vCodFuncao) +
+            ' and ativo = 1 ', buscas).IsEmpty then
+              raiseExceptionCreate('Função não encontrada', 'DBLFuncao');
+        end;
+
+        if vHabGerente then
+        begin
+          if vCodGerente <= 0 then
+            raiseExceptionCreate('Gerente deve ser informado', 'EdCodGerente');
+
+          if SqlOpen(' select cod_vendedor, nome_vendedor from colaborador ' +
+            ' where cod_vendedor = ' + IntToStr(vCodEstado) +
+            ' and cod_empresa = ' + vDadosIni.codEmpresa +
+            ' and ativo = 1 ', buscas).IsEmpty then
+              raiseExceptionCreate('Gerente não encontrado', 'EdCodGerente');
+        end;
+
+        if vHabVendedorTelevendas then
+          if Trim(vVendedorTelevendas) = '' then
+            raiseExceptionCreate('Vendedor Televendas deve ser informado', 'cbVendedorTelevendas');
+
+        if vHabJornadaTrabalho then
+        begin
+          if vCodJornadaTrabalho < 0 then
+            raiseExceptionCreate('Jornada de Trabalho incorreta', 'EdCodJornadaTrabalho');
+
+          if vCodJornadaTrabalho > 0 then
+            if SqlOpen(' select codigo from jornada_trabalho ' +
+              ' where codigo = ' + IntToStr(vCodEstado) +
+              ' and cod_empresa = ' + vDadosIni.codEmpresa, buscas).IsEmpty then
+                raiseExceptionCreate('Jornada de Trabalho não encontrada', 'EdCodJornadaTrabalho');
+        end;
+
+        if vHabEscalaSemanal then
+        begin
+          if vCodEscalaSemanal < 0 then
+            raiseExceptionCreate('Escala Semanal incorreta', 'EdCodEscalaSemanal');
+
+          if vCodEscalaSemanal > 0 then
+            if SqlOpen(' select codigo from calend_escala_semanal ' +
+              ' where codigo = ' + IntToStr(vCodEstado) +
+              ' and cod_empresa = ' + vDadosIni.codEmpresa, buscas).IsEmpty then
+                raiseExceptionCreate('Escala Semanal não encontrada', 'EdCodEscalaSemanal');
+        end;
+
+        if vHabExecutarTarefas then
+          if Trim(vExecutarTarefas) = '' then
+            raiseExceptionCreate('Executar Tarefas deve ser informado', 'CbExecutarTarefas');
+
+        try
+           fTempListaCol.DisableControls;
+           fTempListaCol.First;
+           while not fTempListaCol.Eof do
+           begin
+             Application.ProcessMessages;
+             vDadosIni.abreStatusProcessamento('', 'Atualizando dados colaborador (' +
+               IntToStr(fTempListaCol.RecNo) + '/' + IntToStr(fTempListaCol.RecordCount) + ')');
+
+             vUpdate := 'UPDATE COLABORADOR SET ATIVO = 1 ';
+
+             SetLength(campos, 0);
+
+             oldCodCol := IntToStr(fTempListaCol.FieldByName('COD_VENDEDOR').AsInteger);
+
+             AddCampoValue('DATA_MOD_COL', DateOf(vDadosIni.vDataHora));
+
+             if vHabBairro then
+             begin
+               AddCampoValue('COD_BAIRRO', vCodBairro);
+               AddCampoValue('BAIRRO_VENDEDOR', Trim(vNomeBairro));
+             end;
+
+             if vHabCidade then
+             begin
+               AddCampoValue('COD_CIDADE', vCodCidade);
+               AddCampoValue('CIDADE_VENDEDOR', Trim(vNomeCidade));
+             end;
+
+             if vHabEstado then
+               AddCampoValue('CODIGO_UF', vCodEstado);
+
+             if vHabFuncao then
+               AddCampoValue('COD_FUNCAO', vCodFuncao);
+
+             if vHabVendedorTelevendas then
+               AddCampoValue('VENDEDOR_TLV', vVendedorTelevendas);
+
+             if vHabGerente then
+               AddCampoValue('COD_GERENTE', vCodGerente);
+
+             if vHabJornadaTrabalho then
+               AddCampoValue('COD_JORNADA_TRABALHO', vDadosIni.IfThen(vCodJornadaTrabalho <= 0, Null, vCodJornadaTrabalho));
+
+             if vHabEscalaSemanal then
+               AddCampoValue('COD_ESCALA_SEMANAL', vDadosIni.IfThen(vCodEscalaSemanal <= 0, Null, vCodEscalaSemanal));
+
+             if vHabExecutarTarefas then
+               AddCampoValue('EXEC_TAREFA', vExecutarTarefas);
+
+             vUpdate := vUpdate +
+               ' WHERE COD_VENDEDOR = :PCOD_VENDEDOR ' +
+               ' AND COD_EMPRESA = :PCOD_EMPRESA ';
+
+             buscasU.Close;
+             buscasU.SQL.Text := vUpdate;
+
+             for I := Low(campos) to High(campos) do
+               buscasU.ParamByName(campos[I].NomeCampo).Value := campos[I].ValorCampo;
+
+             buscasU.ParamByName('PCOD_VENDEDOR').AsInteger := fTempListaCol.FieldByName('COD_VENDEDOR').AsInteger;
+             buscasU.ParamByName('PCOD_EMPRESA').AsInteger  := StrToInt(vDadosIni.codEmpresa);
+             buscasU.ExecSQL;
+
+             vDadosIni.GravaAuditoria('COL064', vtempMensagem, '',
+               'COLABORADOR', oldCodCol, buscas);
+
+             Inc(vinc_a_cada_reg);
+
+             if (vsalvar_a_cada_reg > 0) and (vinc_a_cada_reg >= vsalvar_a_cada_reg) then
+             begin
+               Application.ProcessMessages;
+               vDadosIni.abreStatusProcessamento('', 'Salvando dados colaborador (' +
+                 IntToStr(fTempListaCol.RecNo) + '/' + IntToStr(fTempListaCol.RecordCount) + ')');
+
+               vinc_a_cada_reg := 0;
+
+               CommitaTransacao;
+             end;
+
+             fTempListaCol.Next;
+           end;
+        finally
+          fTempListaCol.First;
+          fTempListaCol.EnableControls;
+        end;
+
+        Application.ProcessMessages;
+        vDadosIni.abreStatusProcessamento('', 'Atualizando dados colaborador (' +
+        IntToStr(fTempListaCol.RecordCount) + '/' + IntToStr(fTempListaCol.RecordCount) + ')');
+
+        CommitaTransacao;
+
+        dataSet.Close;
+        dataSet.CommandText := vSQL;
+        dataSet.Open;
+
+        vDadosIni.GravaAuditoria('COL064', vtempMensagem, 'SUCESSO', 'COLABORADOR', '', buscas);
+      end;
+
+      Result := true;
+
+      if Result then
+        dataSet.Refresh;
+    finally
+      dataSet.Filtered        := false;
+      dataSet.IndexName       := vIndexName;
+      dataSet.IndexFieldNames := vIndexFieldNames;
+      if dataSet.RecordCount >= vRecNo then
+        dataSet.RecNo           := vRecNo;
+      dataSet.EnableControls;
+
+      if Assigned(buscas2) then
+        FreeAndNil(buscas2);
+
+      if Assigned(buscasU) then
+        FreeAndNil(buscasU);
+
+      vDadosIni.fechaStatusProcessamento;
+    end;
+  except
+    on e: exception do
+    begin
+      Result := false;
+      RollBackTransacao;
+
+      if trim(vSQL) <> '' then
+      begin
+	      dataSet.Close;
+  	    dataSet.CommandText := vSQL;
+    	  dataSet.Open;
+      end;
+
+      vDadosIni.GravaAuditoria('COL064', vtempMensagem,	'FALHA', 'COLABORADOR', '', buscas);
+      Application.MessageBox(pchar(e.Message), 'Atenção', MB_ICONERROR + MB_OK);
+      registraErro(e.Message);
+    end;
+  end;
+end;
+
+function TColaborador.BuscarBairro(pCodBairro: Integer): boolean;
+begin
+  SqlOpen(' select cod_bairro, nome_bairro from bairros ' +
+          ' where cod_bairro = ' + IntToStr(pCodBairro) +
+          ' and ativo = 1 ', buscas);
+
+  Result := not buscas.IsEmpty;
+end;
+
+function TColaborador.BuscarCidade(pCodCidade: Integer): boolean;
+begin
+  SqlOpen(' select cod_cidade, nome_cidade from cidades ' +
+          ' where cod_cidade = ' + IntToStr(pCodCidade) +
+          ' and ativo = 1 ', buscas);
+
+  Result := not buscas.IsEmpty;
+end;
+
+function TColaborador.BuscarEscalaSemanal(pCodEscalaSemanal: Integer): boolean;
+begin
+  SqlOpen(' select codigo from calend_escala_semanal ' +
+          ' where codigo = ' + IntToStr(pCodEscalaSemanal) +
+          ' and cod_empresa = ' + vDadosIni.codEmpresa, buscas);
+
+  Result := not buscas.IsEmpty;
+end;
+
+function TColaborador.BuscarGerente(pCodGerente: Integer): boolean;
+begin
+  SqlOpen(' select cod_vendedor, nome_vendedor from colaborador ' +
+          ' where cod_vendedor = ' + IntToStr(pCodGerente) +
+          ' and cod_empresa = ' + vDadosIni.codEmpresa +
+          ' and ativo = 1 ', buscas);
+
+  Result := not buscas.IsEmpty;
+end;
+
+function TColaborador.BuscarJornadaTrabalho(pCodJornadaTrabalho: Integer): boolean;
+begin
+  SqlOpen(' select codigo from jornada_trabalho ' +
+          ' where codigo = ' + IntToStr(pCodJornadaTrabalho) +
+          ' and cod_empresa = ' + vDadosIni.codEmpresa, buscas);
+
+  Result := not buscas.IsEmpty;
 end;
 
 function TColaborador.StatusLixeira: boolean;
@@ -3436,7 +4051,9 @@ function TColaboradorContatoMsg.Apply: Boolean;
 var
 	vId: Integer;
 begin
-	prepare_loop();
+  Result := True;
+
+  prepare_loop();
   try
     while not dataSet.Eof do
     begin
@@ -3638,7 +4255,7 @@ begin
   else
     acao := 'INSERIR';
 
-  try
+  try                          
   	 if fint('id_msg_aplicativo') = 0 then
       raiseExceptionCreate('O campo aplicativo deve ser preenchido', 'ed_contato_pla_aplicativo');
 
@@ -3655,23 +4272,23 @@ begin
       if not fempty('identificador') then
       begin
         if (not vDadosIni._ValidarEMail(Trim(fstr('identificador')))) then
-        	raiseExceptionCreate('E-mail "' + Trim(fstr('identificador')) + '" informado inválido', 'ed_contato_pla_identificacao');
+        	 raiseExceptionCreate('E-mail "' + Trim(fstr('identificador')) + '" informado inválido', 'ed_contato_pla_identificacao');
       end;
     end
     else if vDadosIni.retornaNomeAplicativo(fint('id_msg_aplicativo')) = 'WHATSAPP' then
     begin
     	if not fempty('identificador') then
       begin
-      	if (not vDadosIni._ValidarCelular(Trim(fstr('identificador')))) then
-        	raiseExceptionCreate('WhatsApp "' + Trim(fstr('identificador')) + '" informado inválido', 'ed_contato_pla_identificacao');
+        if (not vDadosIni._ValidarCelular(Trim(fstr('identificador')))) then
+        	 raiseExceptionCreate('WhatsApp "' + Trim(fstr('identificador')) + '" informado inválido', 'ed_contato_pla_identificacao');
       end;
     end
     else if vDadosIni.retornaNomeAplicativo(fint('id_msg_aplicativo')) = 'TELEGRAM' then
     begin
     	if not fempty('identificador') then
       begin
-      	if (not vDadosIni._ValidarCelular(Trim(fstr('identificador')))) then
-        	raiseExceptionCreate('Telegram "' + Trim(fstr('identificador')) + '" informado inválido, informar somente números', 'ed_contato_pla_identificacao');
+        if (vDadosIni.apenasNumeros(Trim(fstr('identificador'))) <> Trim(fstr('identificador'))) then
+        	 raiseExceptionCreate('Telegram "' + Trim(fstr('identificador')) + '" informado inválido, informar somente números', 'ed_contato_pla_identificacao');
       end;
     end;
 
@@ -3700,6 +4317,23 @@ begin
 
     if not buscas.IsEmpty then
     	raiseExceptionCreate('Identificação já existe registro para essa Colaborador e Aplicativo:' + #13 + #13 +
+        'Aplicativo: ' + trim(Aplicativo.fstr('aplicativo')) + #13 +
+        'Identificação: ' + trim(fstr('identificador')), 'ed_contato_pla_identificacao');
+
+    SqlOpen(' select msg_contato.id, colaborador.nome_vendedor, colaborador.cpf_vendedor from msg_contato ' +
+            ' inner join colaborador on colaborador.cod_vendedor = msg_contato.cod_vendedor and colaborador.cod_empresa = msg_contato.cod_empresa ' +
+            ' where msg_contato.cod_empresa = %d ' +
+            ' and msg_contato.id_msg_aplicativo = %d ' +
+            ' and msg_contato.identificador = %s ' +
+            ' and msg_contato.ativo = %d ' +
+            ' and msg_contato.id <> %d ' +
+            ' and msg_contato.cod_vendedor > 0 ',
+            [vDadosIni.cod_empresa, fint('id_msg_aplicativo'), trim(fstrq('identificador')), 1, fint('id')], buscas);
+
+    if not buscas.IsEmpty then
+    	raiseExceptionCreate('Identificação e Aplicativo já existe para outro Colaborador:' + #13 + #13 +
+        'Nome: ' + trim(buscas.FieldByName('nome_vendedor').AsString) + #13 +
+        'CPF: ' + trim(buscas.FieldByName('cpf_vendedor').AsString) + #13 +
         'Aplicativo: ' + trim(Aplicativo.fstr('aplicativo')) + #13 +
         'Identificação: ' + trim(fstr('identificador')), 'ed_contato_pla_identificacao');
 

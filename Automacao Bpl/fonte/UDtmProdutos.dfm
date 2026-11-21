@@ -4100,18 +4100,20 @@ object dtmProdutos: TdtmProdutos
     Database = dtmAtivo.bancoHw
     Transaction = IBTransKits
     SQL.Strings = (
-      'SELECT KITS_PROD.*, '
+      'SELECT KITS_PROD.*,  EST.EST_F, EST.ESTOQUE,'
       'KITS_PROD_TOT.REGRA_PESO_DIM,'
       
         'KITS_PROD_TOT.QUANT_PROD_KIT, KITS_PROD_TOT.PREC_CUS_PROD, KITS_' +
         'PROD_TOT.PREC_CUSM_PROD, '
-      'KITS_PROD_TOT.PREC_TAB_PROD, KITS_PROD_TOT.PREC_PUBLICO, '
-      
-        'KITS_PROD_TOT.PREC_30_PROD, KITS_PROD_TOT.PREC_60_PROD, KITS_PRO' +
-        'D_TOT.PREC_90_PROD, '
+      'KITS_PROD_TOT.PREC_TAB_PROD, '
+      'KITS_PROD_TOT.PREC_PUBLICO, '
+      'KITS_PROD_TOT.PREC_30_PROD, '
+      'KITS_PROD_TOT.PREC_60_PROD, '
+      'KITS_PROD_TOT.PREC_90_PROD, '
       'KITS_PROD_TOT.PESO_BRUT_PROD, KITS_PROD_TOT.COMPRIMENTO_PROD, '
-      'KITS_PROD_TOT.LARGURA_PROD, KITS_PROD_TOT.ALTURA_PROD, '
-      'KITS_PROD_TOT.EST_F, KITS_PROD_TOT.VALOR_TAB_PROKIT,'
+      'KITS_PROD_TOT.LARGURA_PROD, '
+      'KITS_PROD_TOT.ALTURA_PROD, '
+      'KITS_PROD_TOT.VALOR_TAB_PROKIT,'
       
         'KITS_PROD_TOT.DESCONTO_VALOR, KITS_PROD_TOT.DESCONTO_PERC, KITS_' +
         'PROD_TOT.VALOR_DESC_TAB_PROKIT'
@@ -4120,6 +4122,9 @@ object dtmProdutos: TdtmProdutos
         'LEFT JOIN KITS_PROD_TOT ON KITS_PROD_TOT.CODIGO_KIT = KITS_PROD.' +
         'CODIGO_KIT AND KITS_PROD_TOT.COD_EMPRESA = KITS_PROD.COD_EMPRESA' +
         ' '
+      
+        'LEFT JOIN GETESTOQUEKIT (KITS_PROD.CODIGO_KIT, KITS_PROD.COD_EMP' +
+        'RESA) EST ON 1 = 1'
       'WHERE 1 = 0')
     Left = 868
     Top = 238
@@ -4199,6 +4204,18 @@ object dtmProdutos: TdtmProdutos
       FieldName = 'URL_IMAGENS'
       BlobType = ftMemo
       Size = 8
+    end
+    object cdsKitsEST_F: TFloatField
+      DisplayLabel = 'Estoque F'#237'sico'
+      FieldName = 'EST_F'
+      ProviderFlags = [pfInWhere]
+      ReadOnly = True
+      DisplayFormat = '##0.000'
+    end
+    object cdsKitsESTOQUE: TFloatField
+      DisplayLabel = 'Estoque Dispon'#237'vel'
+      FieldName = 'ESTOQUE'
+      DisplayFormat = '##0.000'
     end
     object cdsKitsREGRA_PESO_DIM: TStringField
       Tag = 1
@@ -4315,13 +4332,6 @@ object dtmProdutos: TdtmProdutos
       FieldName = 'ALTURA_PROD'
       ProviderFlags = [pfInWhere]
       ReadOnly = True
-    end
-    object cdsKitsEST_F: TFloatField
-      DisplayLabel = 'Total Estoque Fisico'
-      FieldName = 'EST_F'
-      ProviderFlags = [pfInWhere]
-      ReadOnly = True
-      DisplayFormat = '##0.000'
     end
     object cdsKitsSINC_HW_CLOUD: TStringField
       DisplayLabel = 'Venda Online'

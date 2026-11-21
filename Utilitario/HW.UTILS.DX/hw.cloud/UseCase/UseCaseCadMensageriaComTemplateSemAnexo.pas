@@ -96,7 +96,7 @@ begin
         cadMensageria.tipo_envio := 'AVL';
 
       for I := 0 to Length(pVariaveisTemplate) - 1 do
-        cadMensageria.variaveis_template.Add(getCampoPipe(pVariaveisTemplate[I], 1), getCampoPipe(pVariaveisTemplate[I], 2));
+        cadMensageria.variaveis_template.Add(getCampoPipe(pVariaveisTemplate[I], 1, '¶'), getCampoPipe(pVariaveisTemplate[I], 2, '¶'));
 
       var useCase := api.CadMensageriaComTemplateSemAnexo(cadMensageria);
 

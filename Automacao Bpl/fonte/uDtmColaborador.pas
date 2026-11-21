@@ -287,6 +287,7 @@ type
     IntegerField3: TIntegerField;
     StringField1: TStringField;
     dsJornadaTrabalhoCol: TDataSource;
+    cdsColabEXEC_TAREFA: TStringField;
     procedure cdsFuncaoTPDOCS_VNDGetText(Sender: TField; var Text: string;
       DisplayText: Boolean);
     procedure CdsPColabBeforeOpen(DataSet: TDataSet);

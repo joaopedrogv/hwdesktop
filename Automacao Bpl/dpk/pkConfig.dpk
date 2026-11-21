@@ -61,6 +61,8 @@ contains
   uClassesAuditoria_V2 in '..\fonte\uClassesAuditoria_V2.pas',
   uTipoContatoOrigem in '..\fonte\uTipoContatoOrigem.pas' {frmTipoContatoOrigem},
   uTipoContatoOrigemPlataforma in '..\fonte\uTipoContatoOrigemPlataforma.pas' {frmTipoContatoOrigemPlataforma},
-  uModeloCartasOrigem in '..\fonte\uModeloCartasOrigem.pas' {TfrmModcartasOrigem};
+  uModeloCartasOrigem in '..\fonte\uModeloCartasOrigem.pas' {TfrmModcartasOrigem},
+  uTipoTarefaOrigem in '..\fonte\uTipoTarefaOrigem.pas' {frmTipoTarefaOrigem},
+  uTipoTarefa in '..\fonte\uTipoTarefa.pas' {frmTipoTarefa};
 
 end.

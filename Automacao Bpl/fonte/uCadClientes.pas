@@ -1596,6 +1596,10 @@ type
     pn_contatos_pla_view: TPanel;
     grid_contatos_pla: TDBGrid;
     SpeedButton64: TSpeedButton;
+    bt_contatos_pla_sel_all: TSpeedButton;
+    bt_contatos_pla_unsel_all: TSpeedButton;
+    procedure bt_contatos_pla_unsel_allClick(Sender: TObject);
+    procedure bt_contatos_pla_sel_allClick(Sender: TObject);
     procedure ComboBox12Exit(Sender: TObject);
     procedure SpeedButton64Click(Sender: TObject);
     procedure pnDadosPessoais_ContatosPlataformaEnter(Sender: TObject);
@@ -2808,7 +2812,7 @@ begin
       else
       begin
         if not Cliente.ConsultaCampos('CLIENTES', Cliente.vCons.campo,
-          Cliente.vCons.ordem, Cliente.vCons.dataIni, Cliente.vCons.dataFim, vDadosIni.codEmpresa, 0,
+          Cliente.vCons.ordem, Cliente.vCons.dataIni, Cliente.vCons.dataFim, vDadosIni.codEmpresa, 1,
           vDadosIni.IfThen(Cliente.vCons.comCtr, 'DISTINCT', '') + Cliente.Fsql_campos,
           vDadosIni.IfThen(Cliente.vCons.comCtr, ' INNER JOIN CLIENTES_COM_CONTRATO ON CLIENTES_COM_CONTRATO.COD_CLIENTE = CLIENTES.COD_CLIENTE AND CLIENTES_COM_CONTRATO.COD_EMPRESA = CLIENTES.COD_EMPRESA ', '') +
           Cliente.Fsql_inner,
@@ -10054,8 +10058,9 @@ procedure TFrmCadClientes.pn_contatos_pla_cadEnter(Sender: TObject);
 begin
   inherited;
   pn_contatos_pla_view.Enabled := False;
-  pn_contatos_pla_view.Visible := False; 
+  pn_contatos_pla_view.Visible := False;
   bt_contatos_pla_add.Enabled := pn_contatos_pla_view.Enabled;
+  bt_contatos_pla_edit.Enabled := pn_contatos_pla_view.Enabled;
   bt_contatos_pla_del.Enabled := pn_contatos_pla_view.Enabled;
   bt_contatos_pla_save.Enabled := pn_contatos_pla_cad.Enabled;
   bt_contatos_pla_cancel.Enabled := pn_contatos_pla_cad.Enabled;
@@ -10064,9 +10069,10 @@ end;
 procedure TFrmCadClientes.pn_contatos_pla_viewEnter(Sender: TObject);
 begin
   inherited;
-	pn_contatos_pla_cad.Enabled := False;
+  pn_contatos_pla_cad.Enabled := False;
   pn_contatos_pla_cad.Visible := False;
   bt_contatos_pla_add.Enabled := pn_contatos_pla_view.Enabled;
+  bt_contatos_pla_edit.Enabled := pn_contatos_pla_view.Enabled;
   bt_contatos_pla_del.Enabled := pn_contatos_pla_view.Enabled;
   bt_contatos_pla_save.Enabled := pn_contatos_pla_cad.Enabled;
   bt_contatos_pla_cancel.Enabled := pn_contatos_pla_cad.Enabled;
@@ -11334,6 +11340,7 @@ begin
   pn_contatos_pla_view.Visible   := True;
 
   bt_contatos_pla_add.Enabled    := True;
+  bt_contatos_pla_edit.Enabled   := True;
   bt_contatos_pla_del.Enabled    := True;
 
   bt_contatos_pla_save.Enabled   := False;
@@ -12114,8 +12121,8 @@ begin
     GroupBoxContatoPlataforma.SetFocus;
   if Cliente.ContatoMsg.Insert then
   begin
-	  pn_contatos_pla_view.Enabled := False;
-  	pn_contatos_pla_view.Visible := False;
+	 pn_contatos_pla_view.Enabled := False;
+  	 pn_contatos_pla_view.Visible := False;
 
     pn_contatos_pla_cad.Enabled := True;
     pn_contatos_pla_cad.Visible := True;
@@ -12214,6 +12221,24 @@ begin
 
   pn_contatos_pla_view.Enabled := True;
   pn_contatos_pla_view.Visible := True;
+end;
+
+procedure TFrmCadClientes.bt_contatos_pla_sel_allClick(Sender: TObject);
+var
+  I: Integer;
+begin
+  inherited;
+  for I := 0 to ck_contrato_pla_tipos_contato.Count - 1 do
+    ck_contrato_pla_tipos_contato.Checked[I] := True;
+end;
+
+procedure TFrmCadClientes.bt_contatos_pla_unsel_allClick(Sender: TObject);
+var
+  I: Integer;
+begin
+  inherited;
+  for I := 0 to ck_contrato_pla_tipos_contato.Count - 1 do
+    ck_contrato_pla_tipos_contato.Checked[I] := False;
 end;
 
 procedure TFrmCadClientes.bt_contatos_cancelClick(Sender: TObject);

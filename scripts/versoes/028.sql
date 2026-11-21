@@ -1,4 +1,4 @@
-|BLOCO|
+P|BLOCO|
 CREATE OR ALTER TRIGGER TI_DEVOLUCAO_DEBCRED FOR DEVOLUCAO
 ACTIVE AFTER INSERT OR DELETE POSITION 0
 AS
@@ -1894,7 +1894,6 @@ begin
                           'CLIENTES_TRIB_AD',
                           'COBREBEM',
                           'CODIGO',
-                          'COD_ETIQ',
                           'CODIGO_FORNECEDOR',
                           'COD_GRADE_BALANCO',
                           'COD_GRADE_PROD_COMPRA',
@@ -2274,9 +2273,9 @@ CMD:COMMIT|ALTER TABLE NOTIFICACAO_CREDITOS ADD ID_MSG_APLICATIVO INTEGER;
 
 CMD:COMMIT|ALTER TABLE NOTIFICACAO_CREDITOS ADD ID_MSG_PLATAFORMA INTEGER;
 
-CMD:COMMIT|UPDATE NOTIFICACAO_CREDITOS SET ID_MSG_APLICATIVO = 1 WHERE ID_MSG_APLICATIVO IS NULL;;
+CMD:COMMIT|UPDATE NOTIFICACAO_CREDITOS SET ID_MSG_APLICATIVO = 1 WHERE ID_MSG_APLICATIVO IS NULL;
 
-CMD:COMMIT|UPDATE NOTIFICACAO_CREDITOS SET ID_MSG_PLATAFORMA = 0 WHERE ID_MSG_PLATAFORMA IS NULL;;
+CMD:COMMIT|UPDATE NOTIFICACAO_CREDITOS SET ID_MSG_PLATAFORMA = 0 WHERE ID_MSG_PLATAFORMA IS NULL;
 
 CMD:COMMIT|ALTER TABLE MODCARTAS ADD CONSTRAINT FK_MODCARTAS_MSG_APLI FOREIGN KEY (ID_MSG_APLICATIVO) REFERENCES MSG_APLICATIVO (ID) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -2446,9 +2445,9 @@ ALTER TABLE NOTIFICACAO_CREDITOS ADD DESTINO VARCHAR(3);
 
 ALTER TABLE NOTIFICACAO_CREDITOS ADD DATA_HORA_CONS TIMESTAMP;
 
-UPDATE NOTIFICACAO_CREDITOS SET ID_MSG_APLICATIVO = 1 WHERE ID_MSG_APLICATIVO IS NULL;;
+UPDATE NOTIFICACAO_CREDITOS SET ID_MSG_APLICATIVO = 1 WHERE ID_MSG_APLICATIVO IS NULL;
 
-UPDATE NOTIFICACAO_CREDITOS SET ID_MSG_PLATAFORMA = 0 WHERE ID_MSG_PLATAFORMA IS NULL;;
+UPDATE NOTIFICACAO_CREDITOS SET ID_MSG_PLATAFORMA = 0 WHERE ID_MSG_PLATAFORMA IS NULL;
 
 |BLOCO|
 CREATE TABLE MSG_CONTATO (
@@ -2473,7 +2472,7 @@ CMD:COMMIT|ALTER TABLE MSG_CONTATO ADD CONSTRAINT FK_MSG_CONTATO_VEND FOREIGN KE
 
 CMD:COMMIT|ALTER TABLE MSG_CONTATO ADD CONSTRAINT FK_MSG_CONTATO_APLI FOREIGN KEY (ID_MSG_APLICATIVO) REFERENCES MSG_APLICATIVO (ID) ON DELETE CASCADE ON UPDATE CASCADE;
 
-|BLOCO|
+|BLOCO|CMD:INATIVO|
 CREATE OR ALTER TRIGGER MSG_CONTATO_BI_SEQID FOR MSG_CONTATO
 ACTIVE BEFORE INSERT POSITION 0
 AS
@@ -4247,3 +4246,605 @@ DROP TRIGGER KITS_PROD_BI_GUID;
 DROP INDEX KITS_PROD_GUID;
 
 ALTER TABLE KITS_PROD DROP GUIDT;
+
+CMD:COMMIT|CREATE EXCEPTION EXC_MSG_CONTATO_COL 'Aplicativo e identificacao ja existe para outro colaborador';
+
+CMD:COMMIT|CREATE EXCEPTION EXC_MSG_CONTATO_CLI 'Aplicativo e identificacao ja existe para outro cliente';
+
+|BLOCO|
+CREATE OR ALTER TRIGGER TR_MSG_CONTATO_CONF FOR MSG_CONTATO
+ACTIVE BEFORE INSERT OR UPDATE POSITION 0
+AS
+ declare variable vexiste integer; 
+begin
+  /* Trigger text */
+  if (substring(user from 1 for 4) = 'REPL') then
+    exit;
+
+  if (coalesce(new.cod_vendedor, 0) > 0) then
+  begin
+    select msg_contato.id from msg_contato
+    where msg_contato.cod_vendedor = new.cod_vendedor
+    and msg_contato.cod_empresa = new.cod_empresa
+    and msg_contato.id_msg_aplicativo = new.id_msg_aplicativo
+    and msg_contato.identificador = new.identificador
+    and msg_contato.ativo = new.ativo
+    and msg_contato.id <> new.id
+      into :vexiste;
+  end      
+  else 
+  begin
+    select msg_contato.id from msg_contato
+    where msg_contato.cod_cliente = new.cod_cliente
+    and msg_contato.cod_empresa = new.cod_empresa
+    and msg_contato.id_msg_aplicativo = new.id_msg_aplicativo
+    and msg_contato.identificador = new.identificador
+    and msg_contato.ativo = new.ativo
+    and msg_contato.id <> new.id
+      into :vexiste;
+  end      
+
+  if (vexiste > 0) then
+    exception EXC_MSG_CONTATO;
+
+  if ((coalesce(new.cod_vendedor, 0) > 0) and (coalesce(new.ativo, 0) = 1)) then
+  begin
+    select msg_contato.id from msg_contato
+    where msg_contato.cod_empresa = new.cod_empresa
+    and msg_contato.id_msg_aplicativo = new.id_msg_aplicativo
+    and msg_contato.identificador = new.identificador
+    and msg_contato.ativo = new.ativo
+    and msg_contato.id <> new.id
+    and msg_contato.cod_vendedor > 0
+      into :vexiste;
+
+    if (vexiste > 0) then
+      exception EXC_MSG_CONTATO_COL;
+  end
+  else if ((coalesce(new.cod_cliente, 0) > 0) and (coalesce(new.ativo, 0) = 1)) then
+  begin
+    select msg_contato.id from msg_contato
+    where msg_contato.cod_empresa = new.cod_empresa
+    and msg_contato.id_msg_aplicativo = new.id_msg_aplicativo
+    and msg_contato.identificador = new.identificador
+    and msg_contato.ativo = new.ativo
+    and msg_contato.id <> new.id
+    and msg_contato.cod_cliente > 0
+      into :vexiste;
+
+    if (vexiste > 0) then
+      exception EXC_MSG_CONTATO_CLI;
+  end
+end;
+|/BLOCO|
+
+DROP TRIGGER MSG_CONTATO_BI_SEQID;
+
+|BLOCO|
+CREATE TABLE MSG_TIPO_TAREFA (
+	ID 					INTEGER NOT NULL,
+	TIPO				VARCHAR(60)
+);
+|/BLOCO|
+
+CMD:COMMIT|ALTER TABLE MSG_TIPO_TAREFA ADD CONSTRAINT PK_MSG_TIPO_TAREFA PRIMARY KEY (ID);
+
+CREATE INDEX IDX_MSG_TIPO_TAREFA_UNQ ON MSG_TIPO_TAREFA (TIPO);
+
+CMD:INATIVO|INSERT INTO MSG_TIPO_TAREFA (ID, TIPO) VALUES (1, 'Boleto');
+CMD:INATIVO|INSERT INTO MSG_TIPO_TAREFA (ID, TIPO) VALUES (2, 'doc_fiscal');
+
+|BLOCO|
+CREATE TABLE MSG_TIPO_TAREFA_ORIGEM (
+	ID_MSG_TIPO_TAREFA 	INTEGER NOT NULL,
+	ID_MSG_ORIGEM		INTEGER NOT NULL
+);
+|/BLOCO|
+
+CMD:COMMIT|ALTER TABLE MSG_TIPO_TAREFA_ORIGEM ADD CONSTRAINT PK_MSG_TIPO_TAREFA_ORIGEM PRIMARY KEY (ID_MSG_TIPO_TAREFA, ID_MSG_ORIGEM);
+
+CMD:COMMIT|ALTER TABLE MSG_TIPO_TAREFA_ORIGEM ADD CONSTRAINT FK_MSG_TIPO_TAR_TAREFA FOREIGN KEY (ID_MSG_TIPO_TAREFA) REFERENCES MSG_TIPO_TAREFA (ID) ON DELETE CASCADE ON UPDATE CASCADE;
+CMD:COMMIT|ALTER TABLE MSG_TIPO_TAREFA_ORIGEM ADD CONSTRAINT FK_MSG_TIPO_TAR_ORIGEM FOREIGN KEY (ID_MSG_ORIGEM) REFERENCES MSG_ORIGEM (ID) ON DELETE CASCADE ON UPDATE CASCADE;
+
+CMD:INATIVO|INSERT INTO MSG_TIPO_TAREFA_ORIGEM (ID_MSG_TIPO_TAREFA, ID_MSG_ORIGEM) VALUES (1, 4);
+CMD:INATIVO|INSERT INTO MSG_TIPO_TAREFA_ORIGEM (ID_MSG_TIPO_TAREFA, ID_MSG_ORIGEM) VALUES (2, 1); 
+CMD:INATIVO|INSERT INTO MSG_TIPO_TAREFA_ORIGEM (ID_MSG_TIPO_TAREFA, ID_MSG_ORIGEM) VALUES (2, 2); 
+CMD:INATIVO|INSERT INTO MSG_TIPO_TAREFA_ORIGEM (ID_MSG_TIPO_TAREFA, ID_MSG_ORIGEM) VALUES (2, 3); 
+
+CMD:COMMIT|ALTER TABLE MENSAGEM_MOB ADD TIPO_TAREFA VARCHAR(60);
+
+CMD:COMMIT|ALTER TABLE MENSAGEM_MOB ADD DATA_TAREFA TIMESTAMP;
+
+INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA, NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRAVAR_AUDITORIA, DATA_MOD_CAD) VALUES ('MOB021', :COD_EMPRESA, 'BT ATRIBUIR PROFISSIONAL RESPONSAVEL TAREFA', 10, 'FRMCADMENSMOBILE', 1, 'N', 'S', CURRENT_DATE);
+
+|BLOCO|
+CREATE TABLE MODCARTAS_TAGS_ADC (
+    COD_CARTA    INTEGER NOT NULL,
+    COD_EMPRESA  INTEGER NOT NULL,
+    TAG          VARCHAR(50) NOT NULL,
+    TEXTO        BLOB SUB_TYPE 1 SEGMENT SIZE 80
+);
+|/BLOCO|
+
+CMD:COMMIT|ALTER TABLE MODCARTAS_TAGS_ADC ADD CONSTRAINT PK_MODCARTAS_TAGS_ADC PRIMARY KEY (COD_CARTA, COD_EMPRESA, TAG);
+
+CMD:COMMIT|ALTER TABLE MODCARTAS_TAGS_ADC ADD CONSTRAINT FK_MODCARTAS_TAGS_ADC_MODCARTAS FOREIGN KEY (COD_CARTA,COD_EMPRESA) REFERENCES MODCARTAS(COD_CARTA,COD_EMPRESA) ON DELETE CASCADE ON UPDATE CASCADE;
+
+|BLOCO|
+CREATE OR ALTER TRIGGER TR_MSG_ORIGEM_MODCARTAS_CONF FOR MSG_ORIGEM_MODCARTAS
+ACTIVE BEFORE INSERT OR UPDATE POSITION 0
+AS
+  declare variable vexiste integer;
+  declare variable vdoc char(1);
+  declare variable vid_msg_aplicativo integer;
+  declare variable vtemp varchar(100);
+begin
+  /* Trigger text */
+
+  if (substring(user from 1 for 4) = 'REPL') then
+    exit;
+
+  select coalesce(modcartas.doc, '') doc, modcartas.id_msg_aplicativo from modcartas
+  where modcartas.cod_carta = new.cod_carta
+  and modcartas.cod_empresa = new.cod_empresa
+    into :vdoc, :vid_msg_aplicativo;
+
+  vtemp = '''' || vdoc || '''';
+  if ((trim(vdoc) <> 'Q') and (trim(vdoc) <> 'B')) then
+    vtemp = vtemp || ',''Q''';
+
+  select msg_origem_modcartas.id_msg_origem from msg_origem_modcartas
+  inner join modcartas on
+    modcartas.cod_carta = msg_origem_modcartas.cod_carta
+    and modcartas.cod_empresa = msg_origem_modcartas.cod_empresa
+  inner join msg_aplicativo on
+    msg_aplicativo.id = modcartas.id_msg_aplicativo
+  inner join msg_origem on
+    msg_origem.id = msg_origem_modcartas.id_msg_origem
+  where msg_origem_modcartas.id_msg_origem = new.id_msg_origem
+  and msg_origem_modcartas.cod_carta <> new.cod_carta
+  and msg_origem_modcartas.cod_empresa = new.cod_empresa
+  and modcartas.id_msg_aplicativo = :vid_msg_aplicativo
+  and modcartas.doc in (:vtemp)
+    into :vexiste;
+
+  if (vexiste > 0) then
+    exception EXC_MODCARTAS_MSG_ORIG;
+end;
+|/BLOCO|
+
+|BLOCO|
+create or alter procedure SPRI_TABLES_NOTREP
+returns (
+    TABELA varchar(31),
+    ORIGEM smallint)
+as
+begin
+  for select TABELA, 1
+      from RI_TAB_NOTREP
+    union distinct
+    select T.TABELA, 0
+      from SPDB_TABLES T
+        inner join SPDB_EMP_KEY(T.TABELA) EK on 1 = 1
+      where EK.CAMPO_EMP <> '' and
+            T.TABELA in ( 'AGENDA',
+                          'AGENDAMENTO',
+                          'AGENDA_ITENS',
+                          'ANOTACOES',
+                          'APURACAO_BALANCO',
+                          'APURACAO_DEPTO',
+                          'ARQ_FABRICA',
+                          'ATESTADO_ECF',
+                          'AT_TERMINAIS',
+                          'BAIXA_CREDITOS',
+                          'BALANCO_PRODUTOS',
+                          'BOLETAS',
+                          'BOX',
+                          'CADASTROS_EMP',
+                          'CARGA',
+                          'CARGA_ITEM',
+                          'CARGA_ITEM_HISTORICO',
+                          'CHASSI_A_PAGAR',
+                          'CLIENTES_CONTATO',
+                          'CLIENTES_END_DOC_ADD',
+                          'CLIENTES_TRIB_AD',
+                          'COBREBEM',
+                          'CODIGO',
+                          'CODIGO_FORNECEDOR',
+                          'COD_GRADE_BALANCO',
+                          'COD_GRADE_PROD_COMPRA',
+                          'COD_GRADE_PROD_VENDA',
+                          'COMISSAO_CONSORCIO',
+                          'COM_FAT',
+                          'CONFERENCIA_CEGA',
+                          'CONFERENCIA_CEGA_ITENS',
+                          'CONFIG_API',
+                          'CONFIG_EMAILMARK',
+                          'CONSULTA_CREDCL',
+                          'CONTAS_A_PAGAR',
+                          'CONTA_CORRENTE_PROG_FIDELIDADE',
+                          'CONTROLE_ALMOXARIFADO',
+                          'CONTROLE_CHEQUE',
+                          'CONTROLE_CREDITOS',
+                          'COTACAO',
+                          'COTACAO_ITENS',
+                          'COTACAO_P',
+                          'CREDITOS_LANC',
+                          'CUPOM',
+                          'CUPOM2',
+                          'CUPOM_EMIT',
+                          'CUSTOS',
+                          'DADOS_JSON',
+                          'DEL_CA',
+                          'DEL_EC',
+                          'DEL_MOBILE',  
+                          'DEL_TABELA',
+                          'DEPRECIACAO',
+                          'DESPESAS',
+                          'DESPESAS_LANC',
+                          'DESPESAS_LANC_ITENS',
+                          'DESPESAS_US',
+                          'DESPESAS_VEIC',
+                          'DEVOLUCAO',
+                          'DOC_ELETRONICO',
+                          'DOC_NAOFISCAL_TERMINAL',
+                          'ECF',
+                          'EFD_ICMSST_CR_APURACAO',
+                          'EMAIL_MARKETING',
+                          'EMPDESVOLV',
+                          'EMPRESA',
+                          'EMPRESA_FISICA',
+                          'EMPRESA_PROG_FID',
+                          'EMPRESA_SUBSTITUTO',
+                          'ENT_MOTO',
+                          'ENT_MOTO_ITENS',
+                          'EQUIPAMENTO',
+                          'ESTOQUES_SIS',
+                          'ESTOQUE_AJUSTE',
+                          'ESTOQUE_AJUSTE_ITENS',
+                          'ESTOQUE_DIARIO',
+                          'ESTOQUE_INI',
+                          'ESTOQUE_INI_GRADE',
+                          'EST_MOTO',
+                          'EVIDENCIAS_PAF',
+                          'FECD_CXL',
+                          'FECHM',
+                          'FECH_DIA',
+                          'FILA_RESERVA_VEIC',
+                          'FINALIZADORES',
+                          'FINCUPOM',
+                          'FISCAL_VERSOES',
+                          'FLW_ATENDIMENTO',
+                          'FLW_PESQUISA',
+                          'FLW_RESPOSTA',
+                          'FLW_RESPOSTACOMPLEMENTO',
+                          'FORMPAGAMENTO',
+                          'FORMPAGAMENTO_EC',
+                          'FREQTEMP',
+                          'GERADOR_OSBOL',
+                          'HISTC_CLIENTE',
+                          'HISTC_VEICULO',
+                          'HIST_ESTMOTO',
+                          'HIST_ESTOQUE_DIARIO',
+                          'HIST_ESTOQUE_DIARIO_PROD',
+                          'HIST_REC',
+                          'IMP_BAR_PROD',
+                          'INV_BALANCO',
+                          'INV_TIPO74',
+                          'INV_TIPO74_POSSE',
+                          'INV_TIPO74_SPED_SINT',
+                          'ITEMPROD_ORC',
+                          'ITEMPROD_ORC_TERC',
+                          'ITEMSERV_ORC',
+                          'ITEMSR_NFVENDA',
+                          'ITEM_NFVENDA',
+                          'ITEM_NF_ENTRADA',
+                          'ITEM_OUTRAS_NF',
+                          'ITEM_PEDIDO',
+                          'ITEM_PEDIDO_NF_REC',
+                          'ITENS_CARTA',
+                          'ITENS_CARTA_CRED',
+                          'LANCAMENTOS',
+                          'LANCAMENTO_PAG',
+                          'LANCCHEQUE',
+                          'LANCCXL',
+                          'LANC_DEBCRED',
+                          'LEMBRETE_AGENDA',
+                          'LISTA_COTACAO',
+                          'LISTA_COTACAO_ITENS',
+                          'LOG_ESTOQUE',
+                          'LOTE_CXL',
+                          'LOTE_LANC',
+                          'LOTE_QUIT',
+                          'MANUTENCAO',
+                          'MAPA_RESUMO_ALIQ',
+                          'MDFE',
+                          'MDFE_CARREGA',
+                          'MDFE_CONDUTOR',
+                          'MDFE_DESCARGA',
+                          'MDFE_DESCARGA_NFE',
+                          'MDFE_DESCARGA_NFE_UN_TR',
+                          'MDFE_DESCARGA_NFE_UN_TR_CARGA',
+                          'MECANICO_OS',
+                          'MENSAGEM_MOB',
+                          'MOT_VEN',
+                          'MOVIMENTO_CIAP',
+                          'MOVIMENTO_PDV_FINAN',
+                          'MTUSADAS',
+                          'NFCE',
+                          'NFCE_CONFIG',
+                          'NFCE_DEST',
+                          'NFCE_INFADIC',
+                          'NFCE_ITEM',
+                          'NFCE_MOVIMENTO',
+                          'NFCE_MOVIMENTO_LANC',
+                          'NFCE_PAGAMENTO',
+                          'NFC_CENTRAL_ACOES',
+                          'NFC_EMISSOR',
+                          'NFSE_CANCELADAS',
+                          'NF_DESTINADAS',
+                          'NF_ENTRADA',
+                          'NF_SERIE_D',
+                          'NF_SERIE_D_ITENS',
+                          'NF_TRANSITO',
+                          'NF_VENDA',
+                          'NOTAFISCAL',
+                          'NOTAFISCAL_CARTA_CORRECAO',
+                          'NOTAFISCAL_COLETA_ENTREGA',
+                          'NOTAFISCAL_DUP',
+                          'NOTAFISCAL_INUT',
+                          'NOTAFISCAL_ITEM',
+                          'NOTAFISCAL_ITEM_ADI',
+                          'NOTAFISCAL_ITEM_DETEXPORT',
+                          'NOTAFISCAL_ITEM_DI',
+                          'NOTAFISCAL_ITEM_ECF',
+                          'NOTAFISCAL_ITEM_EXPORTIND',
+                          'NOTAFISCAL_ITEM_VEICULO',
+                          'NOTAFISCAL_ITEM_VFE',
+                          'NOTAFISCAL_OBSCONT',
+                          'NOTAFISCAL_PAG',
+                          'NOTAFISCAL_SPED_C110',
+                          'NOTAFISCAL_SPED_C111',
+                          'NOTAFISCAL_SPED_C112',
+                          'NOTAFISCAL_SPED_C113',
+                          'NOTAFISCAL_SPED_C114',
+                          'NOTAFISCAL_SPED_C115',
+                          'NOTAFISCAL_SPED_C120',
+                          'NOTAFISCAL_SPED_C195_C197',
+                          'NOTAS_EMITIDAS',
+                          'NOTIFICACAO_CREDITOS',
+                          'OBSERVACAO',
+                          'OCORRENCIAS_OS',
+                          'OCORRENCIA_SUG',
+                          'OPPRODUTOS',
+                          'ORCAMENTOS',
+                          'ORC_SERV_TERCEIRO',
+                          'ORDEM_SERV',
+                          'OS_ITEM_PROD',
+                          'OS_ITEM_SERV',
+                          'OS_PROD_TERC',
+                          'OUTRAS_NF',
+                          'PAF_DOC_BASE_ATEST',
+                          'PARAMETROS_DADOSADICIONAIS',
+                          'PEDIDO',
+                          'PEDVENDA',
+                          'PEDVENDA_D',
+                          'PEDVENDA_INV_POSSE',
+                          'PEDVENDA_PROD',
+                          'PEDVENDA_PROD_COND_DEV',
+                          'PEDVENDA_PROD_CONF',
+                          'PEDVENDA_PROD_D',
+                          'PEDVENDA_PROD_TERC',
+                          'PEDVENDA_REF_NF',
+                          'PEDVENDA_SERV',
+                          'PEDVENDA_SERV_TERC',
+                          'PEDVENDA_VOLUMES',
+                          'PENDENCIAS',
+                          'PENDENCIAS_CARTAO',
+                          'PENDENCIAS_VEIC',
+                          'PEND_CCV',
+                          'PLANO_PAG',
+                          'PPS_PRODUTOS',
+                          'PRESTACOES_FISCAL',
+                          'PRODUCAO',
+                          'PRODUCAO_ITEM',
+                          'PRODUCAO_ITEM_INDICE',
+                          'PRODUTOS_ALTERACOES',
+                          'PRODUTOS_FORN_NFE',
+                          'PRODUTOS_TMP',
+                          'P_CONTAS_BALANCO',
+                          'P_CONTAS_M',
+                          'RECIBOS',
+                          'REC_CXL',
+                          'REGRAS_VENDAS',
+                          'REGRAVND_CONDPAG',
+                          'REL_VNDH',
+                          'REQVENDA',
+                          'REQVENDAD',
+                          'REQVENDA_ITENS',
+                          'REQVENDA_ITENSD',
+                          'RESERVAG',
+                          'RESERVAGUS',
+                          'RESERVA_ALMOXARIFADO',
+                          'RESERVA_ALMOXARIFADO_ITENS',
+                          'RESUMOD',
+                          'SALDO_DEBCRED',
+                          'SAL_CNT',
+                          'SAL_CTRL',
+                          'SANGSUP',
+                          'SERVICO_TRANSPORTE',
+                          'SERVTP_ORC',
+                          'SERV_TERCEIRO',
+                          'SOLICITACOES_ACESSO',
+                          'SPED_AQUISICAO_BENS',
+                          'SPED_CONT_CRED_FISC',
+                          'SPED_CONT_CRED_FISC_UTIL',
+                          'SPED_DEPREC_AMORT_BENS',
+                          'SPED_ESTOQUE_ABERTURA',
+                          'SPED_F_ICMINTER_AJ',
+                          'SPED_F_ICMINTER_AJ_INF_AD',
+                          'SPED_F_ICMINTER_AJ_INF_DOC',
+                          'SPED_F_ICMINTER_OB_DIFAL',
+                          'SPED_ITEM',
+                          'SPED_OUTRAS_RECEITAS_CREDITOS',
+                          'SQLCONSULTASDIV',
+                          'SUGESTAOCOMPRA',
+                          'SUGESTAOCOMPRAIT',
+                          'SUGESTAOSERVICO',
+                          'SUG_OS',
+                          'TEMP_SUG_SERV',
+                          'TEMP_SUG_SERV_CL',
+                          'TERMINALF',
+                          'TERMINAL_CARTAO',
+                          'TERMINAL_IMPRESSORAS',
+                          'TIPO88_ICMSST_PERIODO',
+                          'TMO_SERV_OS',
+                          'TOTALIZADOR_NAOF',
+                          'TRANSACAO_CARTAO',
+                          'TRANSF_DEP',
+                          'TRANSF_DEP_EST',
+                          'TRANSITO_MOTOS',
+                          'USER_CONSULTASDIV',
+                          'VALE_CUPONS',
+                          'VALORES_CIAP',
+                          'VENDA_PERDIDA',
+                          'WSREPLICACAO_CONSULTAS',
+                          'WSR_CADASTROSBASICOS',
+                          'WSR_CAMPOS',
+                          'WSR_CONSULTAS',
+                          'WSR_DEPENDENCIAS',
+                          'WSR_EMPRESAS',
+                          'WSR_GENERATOR_CODIGO',
+                          'WSR_REPL',
+                          'WSR_SCHEMAS',
+                          'WSR_SCRIPTS',
+                          'WSR_TABELAS',
+                          'WSR_TAB_CHAVESALTERADAS')
+        into :TABELA, :ORIGEM
+  do
+    suspend;
+end;
+|/BLOCO| 
+
+|BLOCO|
+create or alter procedure GETESTOQUEKIT (
+    PCODIGO_KIT integer,
+    PCOD_EMPRESA integer,
+    PESTOQUE_DISP integer)
+returns (
+    ESTOQUE T_D_QUANT,
+    EST_F T_D_QUANT)
+as
+declare variable VEXEC integer;
+declare variable VGRUPO_PROD integer;
+declare variable VCOD_PROD char(6);
+declare variable VQTDE T_D_QUANT;
+declare variable VEST_F T_D_QUANT;
+declare variable VEST_D T_D_QUANT;
+begin
+  /* Procedure Text */
+  est_f = 0;
+  estoque = 0;
+  vexec = 0;
+  for select kits_prod_kits.grupo_prod,
+      kits_prod_kits.cod_prod,
+      produtos.est_f, 
+      sum(coalesce(kits_prod_kits.quant_prod_kit, 0)) quant_prod_kit from kits_prod_kits
+      inner join produtos on produtos.grupo_prod = kits_prod_kits.grupo_prod and produtos.cod_prod = kits_prod_kits.cod_prod and produtos.cod_empresa = kits_prod_kits.cod_empresa
+      where kits_prod_kits.codigo_kit = :pcodigo_kit
+      and kits_prod_kits.cod_empresa = :pcod_empresa
+      group by 1, 2, 3
+        into :vgrupo_prod, :vcod_prod, :vest_f, :vqtde do
+  begin
+    if (pestoque_disp = 1) then
+      select estoque from getestoquedisponivel (:vgrupo_prod, :vcod_prod, 0, :pcod_empresa, 0, '', 0, 0) into :vest_d;
+
+    if (coalesce(vexec, 0) <= 0) then
+    begin
+      est_f = coalesce(vest_f, 0)  / coalesce(vqtde, 0);
+
+      if (pestoque_disp = 1) then
+        estoque = coalesce(vest_d, 0) / coalesce(vqtde, 0);
+
+      vexec = 1;
+    end
+
+    if (coalesce(est_f, 0) > coalesce(vest_f, 0) / coalesce(vqtde, 0)) then
+      est_f = coalesce(vest_f, 0) / coalesce(vqtde, 0);
+
+    if (pestoque_disp = 1) then
+      if (coalesce(estoque, 0) > coalesce(vest_d, 0) / coalesce(vqtde, 0)) then
+        estoque = coalesce(vest_d, 0) / coalesce(vqtde, 0);
+  end
+  suspend;
+end;
+|/BLOCO|
+
+CMD:REPL|update msg_plataforma set id = 0 where plataforma = '' and identificador_bot = '' and id = 1;
+
+ALTER TABLE COBREBEM ADD AC_TIT_APOS_VENC CHAR(1);
+
+ALTER TABLE COBREBEM ADD DIAS_AC_TIT_APOS_VENC INTEGER;
+
+INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA, NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRAVAR_AUDITORIA, DATA_MOD_CAD) VALUES ('MOB022', :COD_EMPRESA, 'BT FINALIZAR TAREFA', 10, 'FRMCADMENSMOBILE', 1, 'N', 'S', CURRENT_DATE);
+
+CREATE INDEX IDX_MENSAGEM_MOB_UUID ON MENSAGEM_MOB (UUID,COD_EMPRESA);
+
+ALTER TABLE MSG_TIPO_TAREFA ADD DESCRICAO_REDUZIDA VARCHAR(60);
+
+ALTER TABLE MSG_TIPO_TAREFA ADD DESCRICAO_COMPLETA BLOB SUB_TYPE 1 SEGMENT SIZE 80;
+
+ALTER TABLE MSG_TIPO_TAREFA ADD SLA_SEG_TAREFA INTEGER;
+
+DELETE FROM MSG_TIPO_TAREFA;
+
+DELETE FROM MSG_TIPO_TAREFA_ORIGEM;
+
+ALTER TABLE MENSAGEM_MOB ADD DATA_AGENDAMENTO TIMESTAMP;
+
+ALTER TABLE MENSAGEM_MOB ADD DATA_ULT_STATUS TIMESTAMP;
+
+ALTER TABLE MENSAGEM_MOB ADD ID_MSG_TIPO_TAREFA INTEGER;
+
+ALTER TABLE MSG_TIPO_TAREFA ADD TEMPO_ADIAMENTO INTEGER;
+
+ALTER TABLE MSG_TIPO_TAREFA ADD QTDE_MAX_ADIAMENTO INTEGER;
+
+ALTER TABLE MSG_TIPO_TAREFA ADD EXEC_AUTO CHAR(1);
+
+CREATE SEQUENCE INC_TIPO_TAREFA;
+
+|BLOCO|
+CREATE OR ALTER TRIGGER GEN_MSG_TIPO_TAREFA FOR MSG_TIPO_TAREFA
+ACTIVE BEFORE INSERT POSITION 0
+AS
+BEGIN
+   IF (NEW.ID IS NULL) THEN
+     NEW.ID = GEN_ID(INC_TIPO_TAREFA,1);
+END
+|/BLOCO|
+
+update RDB$FIELDS set RDB$FIELD_LENGTH = 100, RDB$CHARACTER_LENGTH = 100 where RDB$FIELD_NAME = (select rdb$field_source from rdb$relation_fields where rdb$relation_name = 'MSG_TIPO_TAREFA' and rdb$field_name = 'DESCRICAO_REDUZIDA');
+
+CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA, NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRAVAR_AUDITORIA, DATA_MOD_CAD) VALUES ('CFG082', :COD_EMPRESA, 'ABRIR TELA DE ORIGEM POR TIPO DE TAREFA', 10, 'FRMTIPOTAREFAORIGEM', 1, 'N', 'S', CURRENT_DATE);
+CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA, NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRAVAR_AUDITORIA, DATA_MOD_CAD) VALUES ('CFG083', :COD_EMPRESA, 'BT PESQUISAR ORIGEM POR TIPO DE TAREFA', 10, 'FRMTIPOTAREFAORIGEM', 1, 'N', 'S', CURRENT_DATE);
+CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA, NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRAVAR_AUDITORIA, DATA_MOD_CAD) VALUES ('CFG084', :COD_EMPRESA, 'BT NOVA ORIGEM POR TIPO DE TAREFA', 10, 'FRMTIPOTAREFAORIGEM', 1, 'N', 'S', CURRENT_DATE);
+CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA, NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRAVAR_AUDITORIA, DATA_MOD_CAD) VALUES ('CFG085', :COD_EMPRESA, 'BT ALTERAR ORIGEM POR TIPO DE TAREFA', 10, 'FRMTIPOTAREFAORIGEM', 1, 'N', 'S', CURRENT_DATE);
+CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA, NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRAVAR_AUDITORIA, DATA_MOD_CAD) VALUES ('CFG086', :COD_EMPRESA, 'BT REMOVER ORIGEM POR TIPO DE TAREFA', 10, 'FRMTIPOTAREFAORIGEM', 1, 'N', 'S', CURRENT_DATE);
+CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA, NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRAVAR_AUDITORIA, DATA_MOD_CAD) VALUES ('CFG087', :COD_EMPRESA, 'BT SALVAR ORIGEM POR TIPO DE TAREFA', 10, 'FRMTIPOTAREFAORIGEM', 1, 'N', 'S', CURRENT_DATE);
+
+ALTER TABLE COLABORADOR ADD EXEC_TAREFA CHAR(1);
+
+INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA, NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRAVAR_AUDITORIA, DATA_MOD_CAD) VALUES ('COL063', :COD_EMPRESA, 'ALTERAR DADOS COLABORADOR EM LOTE', 5, 'FRMCADCOLABORADOR', 1, 'N', 'S', CURRENT_DATE);
+INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA, NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRAVAR_AUDITORIA, DATA_MOD_CAD) VALUES ('COL064', :COD_EMPRESA, 'SALVAR DADOS COLABORADOR EM LOTE', 5, 'FRMCADCOLABORADOR', 1, 'S', 'S', CURRENT_DATE);
+INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA, NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRAVAR_AUDITORIA, DATA_MOD_CAD) VALUES ('COL065', :COD_EMPRESA, 'SINCRONIZAR COLABORADOR EM LOTE', 5, 'FRMCADCOLABORADOR', 1, 'S', 'S', CURRENT_DATE);
+
+CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA, NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRAVAR_AUDITORIA, DATA_MOD_CAD) VALUES ('CFG088', :COD_EMPRESA, 'ABRIR TELA TIPO DE TAREFA', 10, 'FRMTIPOTAREFA', 1, 'N', 'S', CURRENT_DATE);
+CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA, NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRAVAR_AUDITORIA, DATA_MOD_CAD) VALUES ('CFG089', :COD_EMPRESA, 'BT PESQUISAR TIPO DE TAREFA', 10, 'FRMTIPOTAREFA', 1, 'N', 'S', CURRENT_DATE);
+CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA, NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRAVAR_AUDITORIA, DATA_MOD_CAD) VALUES ('CFG090', :COD_EMPRESA, 'BT NOVA TIPO DE TAREFA', 10, 'FRMTIPOTAREFA', 1, 'N', 'S', CURRENT_DATE);
+CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA, NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRAVAR_AUDITORIA, DATA_MOD_CAD) VALUES ('CFG091', :COD_EMPRESA, 'BT ALTERAR TIPO DE TAREFA', 10, 'FRMTIPOTAREFA', 1, 'N', 'S', CURRENT_DATE);
+CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA, NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRAVAR_AUDITORIA, DATA_MOD_CAD) VALUES ('CFG092', :COD_EMPRESA, 'BT REMOVER TIPO DE TAREFA', 10, 'FRMTIPOTAREFA', 1, 'N', 'S', CURRENT_DATE);
+CMD:REPL|INSERT INTO TABELA_PROCESSOS (COD_PROCESSO, COD_EMPRESA, NOME_PROCESSO, NIVEL_PROCESSO, FORM, ATIVO, SENHA_GERENTE, GRAVAR_AUDITORIA, DATA_MOD_CAD) VALUES ('CFG093', :COD_EMPRESA, 'BT SALVAR TIPO DE TAREFA', 10, 'FRMTIPOTAREFA', 1, 'N', 'S', CURRENT_DATE);
+
+ALTER TABLE MSG_TIPO_TAREFA ADD PERC_TOLERANCIA T_VL_TODOS;
+ALTER TABLE MSG_TIPO_TAREFA ADD NOD_RESPOSTA VARCHAR(60);

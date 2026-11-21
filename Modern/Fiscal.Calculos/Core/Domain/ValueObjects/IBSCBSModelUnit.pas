@@ -188,7 +188,7 @@ end;
 
 function IBSCBSModel.GetPossuiBaseCalculoIBSCBS: Boolean;
 begin
-  Result := FGIBSCBS.PossuiBaseCalculoIBSCBS;
+  Result := (FGIBSCBS <> nil) and FGIBSCBS.PossuiBaseCalculoIBSCBS;
 end;
 
 function IBSCBSModel.GetValorBaseCalculoIBSCBS: Currency;
@@ -217,7 +217,7 @@ end;
 
 function IBSCBSModel.GetPossuiCbs: Boolean;
 begin
-  Result := FGIBSCBS.PossuiCbs;
+  Result := (FGIBSCBS <> nil) and FGIBSCBS.PossuiCbs;
 end;
 
 function IBSCBSModel.GetPossuiCredPresCbs: Boolean;
@@ -239,12 +239,12 @@ end;
 
 function IBSCBSModel.GetPossuiIBSUF: Boolean;
 begin
-  Result := FGIBSCBS.PossuiIBSUF;
+  Result := (FGIBSCBS <> nil) and FGIBSCBS.PossuiIBSUF;
 end;
 
 function IBSCBSModel.GetPossuiIBSMun: Boolean;
 begin
-  Result := FGIBSCBS.PossuiIBSMun;
+  Result := (FGIBSCBS <> nil) and FGIBSCBS.PossuiIBSMun;
 end;
 
 function IBSCBSModel.GetGIBSUF: IBSUFModel;
@@ -264,7 +264,7 @@ end;
 
 function IBSCBSModel.GetPossuiTributacaoRegular: Boolean;
 begin
-  Result := FGIBSCBS.PossuiTributacaoRegular;
+  Result := (FGIBSCBS <> nil) and FGIBSCBS.PossuiTributacaoRegular;
 end;
 
 function IBSCBSModel.GetTributacaoRegular: TributacaoRegularModel;

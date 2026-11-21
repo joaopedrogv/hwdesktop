@@ -2259,6 +2259,7 @@ type
     cdsKitsDATA_MOD_KIT: TDateTimeField;
     cdsGradeDATA_CAD_GR: TDateTimeField;
     cdsGradeDATA_MOD_GR: TDateTimeField;
+    cdsKitsESTOQUE: TFloatField;
     procedure cdsCodBarraCOD_GRADEGetText(Sender: TField; var Text: string;
       DisplayText: Boolean);
     procedure CdsProdutosUSAR_DEBCREDGetText(Sender: TField; var Text: string;

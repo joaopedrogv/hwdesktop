@@ -364,12 +364,15 @@ uses
   UseCaseBuscarConfig in 'hw.cloud\UseCase\UseCaseBuscarConfig.pas',
   UseCaseLerMensageria in 'hw.cloud\UseCase\UseCaseLerMensageria.pas',
   UseCaseCadMensageriaSemTemplateComAnexo in 'hw.cloud\UseCase\UseCaseCadMensageriaSemTemplateComAnexo.pas',
-  UseCaseUpdateMensageria in 'hw.cloud\UseCase\UseCaseUpdateMensageria.pas',
+  UseCaseUpdateMensageriaStatus in 'hw.cloud\UseCase\UseCaseUpdateMensageriaStatus.pas',
   UseCaseEnvMensageria in 'hw.cloud\UseCase\UseCaseEnvMensageria.pas',
   UseCaseCadMensageria in 'hw.cloud\UseCase\UseCaseCadMensageria.pas',
   USock in '..\..\lib\sock\USock.pas',
   uClasseTagMacro in '..\..\Ativos\fonte\uClasseTagMacro.pas',
-  hw_jsondx in '..\..\Ativos\fonte\hw_jsondx.pas';
+  hw_jsondx in '..\..\Ativos\fonte\hw_jsondx.pas',
+  UseCaseCadAtribuicaoProf in 'hw.cloud\UseCase\UseCaseCadAtribuicaoProf.pas',
+  uAtribuicaoProf in 'hw.cloud\Forms\uAtribuicaoProf.pas' {frmAtribuirProf},
+  UseCaseUpdateMensageriaAtribuirProf in 'hw.cloud\UseCase\UseCaseUpdateMensageriaAtribuirProf.pas';
 
 {$R *.res}
 
@@ -478,6 +481,7 @@ begin
   Application.CreateForm(TformInformarDadosHodometro, formInformarDadosHodometro);
   Application.CreateForm(TformSolicitacaoDevolucaoMontadoraVeiculoZero, formSolicitacaoDevolucaoMontadoraVeiculoZero);
   Application.CreateForm(TformPreviewBoleto, formPreviewBoleto);
+  Application.CreateForm(TfrmAtribuirProf, frmAtribuirProf);
   try
       frmUtilsCentralAcoes.centralSuporte := THW_CentralSuporte(ACentralSuporte);
       frmUtilsCentralAcoes.ShowModal;

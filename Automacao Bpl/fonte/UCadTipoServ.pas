@@ -2867,7 +2867,9 @@ begin
       inherited;
       if not TipoServ.AbrirLixeira then
       begin
-        SpeedButton2.Hint := 'Enviar para Lixeira -  [BAS085]';
+        SpeedButton2.Hint := 'Enviar para Lixeira - [BAS085]';
+        btExcluirRegistro.Hint := 'Enviar para Lixeira - [BAS085]';
+        
         SpeedButton1.Visible := true;
         SpeedButton5.Visible := false;
         SpeedButton6.Visible := true;
@@ -2891,7 +2893,9 @@ begin
       end
       else
       begin
-        SpeedButton2.Hint := 'Excluir registro permanentemente -  [BAS017]';
+        SpeedButton2.Hint := 'Excluir registro permanentemente - [BAS017]';
+        btExcluirRegistro.Hint := 'Excluir registro permanentemente - [BAS017]';
+
         SpeedButton1.Visible := false;
         SpeedButton5.Visible := true;
         SpeedButton6.Visible := false;
@@ -3286,7 +3290,7 @@ begin
 
     if TipoServ.dataSet.IsEmpty then
     begin
-      Application.MessageBox('Nenhum produto selecionado.', 'Atenção',
+      Application.MessageBox('Nenhum tipo de serviço selecionado.', 'Atenção',
         MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
       exit;
     end;

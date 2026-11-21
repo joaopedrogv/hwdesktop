@@ -286,6 +286,7 @@ type
     TabSheet14: TTabSheet;
     BitBtn49: TBitBtn;
     MaskEdit1: TMaskEdit;
+    Button1: TButton;
     procedure BitBtn1Click(Sender: TObject);
     procedure BitBtn2Click(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -335,6 +336,7 @@ type
     procedure BitBtn47Click(Sender: TObject);
     procedure BitBtn48Click(Sender: TObject);
     procedure BitBtn49Click(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
   private
     { Private declarations }
     AJsonEncodedAcessToken: string;
@@ -413,6 +415,7 @@ uses
   System.DateUtils, System.NetEncoding, REST.HttpClient, System.JSON;
 
 function cloud_sinc(paramsList: WideString): Longint; stdcall; external 'hw.utils.dx.dll';
+function hwc_atribuir_prof(AparamsList: WideString; Acod_mens: Integer): Boolean; stdcall; external 'hw.utils.dx.dll';
 
 {$R *.dfm}
 
@@ -1812,6 +1815,14 @@ begin
 //    txtTest.Lines.Add( keyv + ' ' + testeDict.erros.Items[keyv]);
 
   txtTest.Lines.Add(TJson.Format(TJson.ObjectToJsonObject(testeDict, [joDateFormatISO8601])));
+end;
+
+procedure TForm2.Button1Click(Sender: TObject);
+begin
+  hwc_atribuir_prof(
+    Format(';databaseName=%s;empresaid=%s;silent=false;userHW=HW;userLevel=10',
+           ['192.168.254.50:C:\dadosHW\Sys\clientes\teste\Hwauto.gdb', '1']),
+    2456);
 end;
 
 function TForm2.EncodeURIComponent(const ASrc: string): UTF8String;

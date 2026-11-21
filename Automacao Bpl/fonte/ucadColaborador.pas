@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Forms,
   Dialogs, uCadPadrao, ExtCtrls, Menus, ComCtrls, Buttons, Grids, DBGrids,
   StdCtrls, Mask, DBCtrls, DB, QRCtrls, QuickRpt, Controls, UclassesColaborador,UCadPadraoModal,
-  AppEvnts, CheckLst, uDataSet_OOP;
+  AppEvnts, CheckLst, uDataSet_OOP, uEditHw;
 
 type
   TfrmCadcolaborador = class(TfrmCadPadraoM)
@@ -194,6 +194,116 @@ type
     DBEdit44: TDBEdit;
     DBLookupComboBox6: TDBLookupComboBox;
     DBLookupComboBox7: TDBLookupComboBox;
+    bt_contatos_pla_sel_all: TSpeedButton;
+    bt_contatos_pla_unsel_all: TSpeedButton;
+    Label55: TLabel;
+    DBComboBox2: TDBComboBox;
+    tsAlterDadosColaborador: TTabSheet;
+    Panel52: TPanel;
+    btVoltarDadosColaborador: TBitBtn;
+    GroupBox79: TGroupBox;
+    DBText7: TDBText;
+    btVoltarDadosColaborador2: TBitBtn;
+    ckLixeira: TCheckBox;
+    Panel128: TPanel;
+    pnCenterAlterDadosProd: TPanel;
+    SpeedButtonColaborador: TSpeedButton;
+    SpeedBSelTodos: TSpeedButton;
+    SpeedBDesmarcarTodos: TSpeedButton;
+    SpeedButtonColaborador2: TSpeedButton;
+    lbCorLote: TLabel;
+    btExcluirRegistro: TSpeedButton;
+    btLixeiraVazia: TSpeedButton;
+    btRestaurarRegistro: TSpeedButton;
+    btLixeiraCheia: TSpeedButton;
+    SpeedButton68: TSpeedButton;
+    btSincronizarColaborador: TSpeedButton;
+    pnCorLote: TPanel;
+    ckPermOpcaoMarcadas: TCheckBox;
+    btLancarDebCred: TSpeedButton;
+    btSaldoExtrato: TSpeedButton;
+    tsAlterDadosLote: TTabSheet;
+    ScrollBox7: TScrollBox;
+    GroupBox9: TGroupBox;
+    Label473: TLabel;
+    Panel4: TPanel;
+    btnOKAlteracaoEmLote: TBitBtn;
+    btnCancelarAlteracaoEmLote: TBitBtn;
+    btSairColaboradorLote: TBitBtn;
+    pnBairro: TPanel;
+    lbBairro: TLabel;
+    ckBairro: TCheckBox;
+    EdCodBairro: TEditHw;
+    DBLBairro: TDBLookupComboBox;
+    pnCidade: TPanel;
+    lbCidade: TLabel;
+    ckCidade: TCheckBox;
+    EdCodCidade: TEditHw;
+    DBLCidade: TDBLookupComboBox;
+    pnFuncao: TPanel;
+    lbFuncao: TLabel;
+    DBLFuncao: TDBLookupComboBox;
+    ckFuncao: TCheckBox;
+    pnGerente: TPanel;
+    lbGerente: TLabel;
+    EdCodGerente: TEditHw;
+    DBLGerente: TDBLookupComboBox;
+    ckGerente: TCheckBox;
+    pnVendedorTelevendas: TPanel;
+    lbVendedorTelevendas: TLabel;
+    ckVendedorTelevendas: TCheckBox;
+    cbVendedorTelevendas: TComboBox;
+    pnJornadaTrabalho: TPanel;
+    lbJornadaTrabalho: TLabel;
+    ckJornadaTrabalho: TCheckBox;
+    DBLJornadaTrabalho: TDBLookupComboBox;
+    EdCodJornadaTrabalho: TEditHw;
+    pnEscalaSemanal: TPanel;
+    lbEscalaSemanal: TLabel;
+    ckEscalaSemanal: TCheckBox;
+    EdCodEscalaSemanal: TEditHw;
+    DBLEscalaSemanal: TDBLookupComboBox;
+    pnExecutarTarefas: TPanel;
+    lbExecutarTarefas: TLabel;
+    ckExecutarTarefas: TCheckBox;
+    CbExecutarTarefas: TComboBox;
+    pnEstado: TPanel;
+    lbEstado: TLabel;
+    ckEstado: TCheckBox;
+    DBLEstado: TDBLookupComboBox;
+    procedure SpeedButton68Click(Sender: TObject);
+    procedure btSincronizarColaboradorClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure EdCodEscalaSemanalExit(Sender: TObject);
+    procedure EdCodJornadaTrabalhoExit(Sender: TObject);
+    procedure EdCodGerenteExit(Sender: TObject);
+    procedure DBLEscalaSemanalExit(Sender: TObject);
+    procedure DBLJornadaTrabalhoExit(Sender: TObject);
+    procedure DBLGerenteExit(Sender: TObject);
+    procedure DBLCidadeExit(Sender: TObject);
+    procedure DBLBairroExit(Sender: TObject);
+    procedure EdCodCidadeExit(Sender: TObject);
+    procedure EdCodBairroExit(Sender: TObject);
+    procedure ckEstadoClick(Sender: TObject);
+    procedure btnOKAlteracaoEmLoteClick(Sender: TObject);
+    procedure btnCancelarAlteracaoEmLoteClick(Sender: TObject);
+    procedure ckExecutarTarefasClick(Sender: TObject);
+    procedure ckEscalaSemanalClick(Sender: TObject);
+    procedure ckJornadaTrabalhoClick(Sender: TObject);
+    procedure ckVendedorTelevendasClick(Sender: TObject);
+    procedure ckGerenteClick(Sender: TObject);
+    procedure ckFuncaoClick(Sender: TObject);
+    procedure ckCidadeClick(Sender: TObject);
+    procedure ckBairroClick(Sender: TObject);
+    procedure SpeedButtonColaborador2Click(Sender: TObject);
+    procedure SpeedButtonColaboradorClick(Sender: TObject);
+    procedure SpeedBDesmarcarTodosClick(Sender: TObject);
+    procedure SpeedBSelTodosClick(Sender: TObject);
+    procedure btVoltarDadosColaboradorClick(Sender: TObject);
+    procedure SpeedButton12Click(Sender: TObject);
+    procedure ckLixeiraClick(Sender: TObject);
+    procedure bt_contatos_pla_unsel_allClick(Sender: TObject);
+    procedure bt_contatos_pla_sel_allClick(Sender: TObject);
     procedure DBEdit44KeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure DBEdit43KeyDown(Sender: TObject; var Key: Word;
@@ -329,33 +439,85 @@ end;
 
 procedure TfrmCadcolaborador.BitBtn1Click(Sender: TObject);
 begin
-  SpeedButton2.Hint := 'Enviar para Lixeira -  [COL004]';
-  if vDadosIni.PesqPros('COL001', '', '', 'COLABORADOR', '', obColaborador.buscas, true) then
-  begin
-    inherited;
-    if MaskEdit2.Visible then
-    begin
-      if not obColaborador.ConsultaCampos('COLABORADOR', ComboBox1.Text,
-        ComboBox2.text, maskedit1.text, maskedit2.text, vDadosIni.codEmpresa) then
-        	if (Self.Enabled) and (Self.Visible) and (ComboBox1.CanFocus) then
-        		combobox1.setfocus;
-    end
-    else if not obColaborador.ConsultaCampos('COLABORADOR', MaskEdit3.text, ComboBox1.Text,
-      combobox3.Text, ComboBox2.text, true, vDadosIni.codEmpresa) then
-      	if (Self.Enabled) and (Self.Visible) and (ComboBox1.CanFocus) then
-      		ComboBox1.SetFocus;
-          
-    SpeedButton1.Visible := true;
-    SpeedButton5.Visible := false;
-    if obColaborador.StatusLixeira then
-      SpeedButton25.Visible := true
-    else
-      SpeedButton25.Visible := false;
-    obColaborador.ultimasql := obColaborador.dataSet.CommandText;
+  if not vDadosIni.PesqPros('COL001', '', '', 'COLABORADOR', '', obColaborador.buscas, true) then
+    Exit;
 
-    if (Self.Enabled) and (Self.Visible) and (DBGrid1.CanFocus) then
-    	DBGrid1.SetFocus;
-  end;
+   inherited;
+   if MaskEdit2.Visible then
+   begin
+     if (ckLixeira.Checked) and (ckLixeira.Visible) then
+     begin
+       if not obColaborador.ConsultaCamposLixeira('COLABORADOR', ComboBox1.Text,
+         ComboBox2.text, maskedit1.text, maskedit2.text, vDadosIni.codEmpresa) then
+          if (Self.Enabled) and (Self.Visible) and (ComboBox1.CanFocus) then
+             combobox1.setfocus;
+     end
+     else
+     begin
+       if not obColaborador.ConsultaCampos('COLABORADOR', ComboBox1.Text,
+         ComboBox2.text, maskedit1.text, maskedit2.text, vDadosIni.codEmpresa) then
+          if (Self.Enabled) and (Self.Visible) and (ComboBox1.CanFocus) then
+             combobox1.setfocus;
+     end;
+   end
+   else
+   begin
+     if (ckLixeira.Checked) and (ckLixeira.Visible) then
+     begin
+       if not obColaborador.ConsultaCamposLixeira('COLABORADOR', MaskEdit3.text, ComboBox1.Text,
+         combobox3.Text, ComboBox2.text, true, vDadosIni.codEmpresa) then
+          if (Self.Enabled) and (Self.Visible) and (ComboBox1.CanFocus) then
+             ComboBox1.SetFocus;
+     end
+     else
+     begin
+       if not obColaborador.ConsultaCampos('COLABORADOR', MaskEdit3.text, ComboBox1.Text,
+         combobox3.Text, ComboBox2.text, true, vDadosIni.codEmpresa) then
+          if (Self.Enabled) and (Self.Visible) and (ComboBox1.CanFocus) then
+             ComboBox1.SetFocus;
+     end;
+   end;
+   obColaborador.ultimasql := obColaborador.dataSet.CommandText;
+
+   if ckLixeira.Checked then
+   begin
+     SpeedButton1.Visible := false;
+     SpeedButton5.Visible := true;
+     SpeedButton6.Visible := false;
+     SpeedButton8.Visible := false;
+
+     SpeedButtonColaborador2.Visible := false;
+     SpeedButtonColaborador.Visible := false;
+     btLancarDebCred.Visible := false;
+     btSaldoExtrato.Visible := false;
+     btSincronizarColaborador.Visible := false;
+
+     btRestaurarRegistro.Visible := true;
+
+     SpeedButton2.Hint := 'Excluir registro permanentemente - [COL013]';
+     btExcluirRegistro.Hint := 'Excluir registro permanentemente - [COL013]';
+   end
+   else
+   begin
+     SpeedButton1.Visible := true;
+     SpeedButton5.Visible := false;
+     SpeedButton6.Visible := true;
+     SpeedButton8.Visible := true;
+
+     SpeedButtonColaborador2.Visible := true;
+     SpeedButtonColaborador.Visible := true;
+     btLancarDebCred.Visible := true;
+     btSaldoExtrato.Visible := true;
+     btSincronizarColaborador.Visible := true;
+
+     btRestaurarRegistro.Visible := false;
+
+     SpeedButton2.Hint := 'Enviar para Lixeira - [COL004]';
+     btExcluirRegistro.Hint := 'Enviar para Lixeira - [COL004]';
+   end;
+
+   if (Self.Enabled) and (Self.Visible) and (DBGrid1.CanFocus) then
+     DBGrid1.SetFocus;
 end;
 
 procedure TfrmCadcolaborador.BitBtn3Click(Sender: TObject);
@@ -391,6 +553,9 @@ begin
   Label54.Visible := vDadosIni.vHwCloudIA.vUsarServMensageria = 'S';
   DBEdit44.Visible := vDadosIni.vHwCloudIA.vUsarServMensageria = 'S';
   DBLookupComboBox7.Visible := vDadosIni.vHwCloudIA.vUsarServMensageria = 'S';
+
+  Label55.Visible := vDadosIni.vHwCloudIA.vUsarServMensageria = 'S';
+  DBComboBox2.Visible := vDadosIni.vHwCloudIA.vUsarServMensageria = 'S';
 
   SpeedButtonContatoPlataforma.Visible := vDadosIni.vHwCloudIA.vUsarServMensageria = 'S';
 
@@ -469,6 +634,80 @@ begin
   end;
 end;
 
+procedure TfrmCadcolaborador.btnCancelarAlteracaoEmLoteClick(Sender: TObject);
+begin
+  inherited;
+  obColaborador.Cancel;
+  obColaborador.CancelUpdates;
+  obColaborador.RollBackTransacao;
+
+  PageControl1.ActivePage := tsAlterDadosColaborador;
+  tsAlterDadosColaborador.Show;
+end;
+
+procedure TfrmCadcolaborador.btnOKAlteracaoEmLoteClick(Sender: TObject);
+begin
+  inherited;
+  try
+  	 Screen.Cursor := crHourGlass;
+    frmCadColaborador.Enabled := false;
+    DBGrid1.Visible := false;
+
+    obColaborador.vAtualizarCol.vHabBairro := ckBairro.Checked;
+    obColaborador.vAtualizarCol.vHabCidade := ckCidade.Checked;
+    obColaborador.vAtualizarCol.vHabEstado := ckEstado.Checked;
+    obColaborador.vAtualizarCol.vHabFuncao := ckFuncao.Checked;
+    obColaborador.vAtualizarCol.vHabGerente := ckGerente.Checked;
+    obColaborador.vAtualizarCol.vHabVendedorTelevendas := ckVendedorTelevendas.Checked;
+    obColaborador.vAtualizarCol.vHabJornadaTrabalho := ckJornadaTrabalho.Checked;
+    obColaborador.vAtualizarCol.vHabEscalaSemanal := ckEscalaSemanal.Checked;
+    obColaborador.vAtualizarCol.vHabExecutarTarefas := ckExecutarTarefas.Checked;
+
+    obColaborador.vAtualizarCol.vCodBairro := Trunc(EdCodBairro.AsValue);
+    obColaborador.vAtualizarCol.vCodCidade := Trunc(EdCodCidade.AsValue);
+    obColaborador.vAtualizarCol.vCodEstado := vDadosIni.IfThen(DBLEstado.KeyValue = Null, 0, DBLEstado.KeyValue);
+    obColaborador.vAtualizarCol.vCodFuncao := vDadosIni.IfThen(DBLFuncao.KeyValue = Null, 0, DBLFuncao.KeyValue);
+    obColaborador.vAtualizarCol.vCodGerente := Trunc(EdCodGerente.AsValue);
+    obColaborador.vAtualizarCol.vVendedorTelevendas := Trim(CbExecutarTarefas.Text);
+    obColaborador.vAtualizarCol.vCodJornadaTrabalho := Trunc(EdCodJornadaTrabalho.AsValue);
+    obColaborador.vAtualizarCol.vCodEscalaSemanal := Trunc(EdCodEscalaSemanal.AsValue);
+    obColaborador.vAtualizarCol.vExecutarTarefas := Trim(CbExecutarTarefas.Text);
+
+    if not obColaborador.AtualizarColaboradorEmLote then
+	 begin
+      setFocusCampoErro(obColaborador.vNomeCampoErro, obColaborador.vMensagemErro);
+      exit;
+    end;
+  finally
+    _GravaConfiguracoesDouble(EdCodBairro.Name, EdCodBairro.AsValue);
+    _GravaConfiguracoesDouble(EdCodCidade.Name, EdCodCidade.AsValue);
+    _GravaConfiguracoesInteger(DBLEstado.Name, vDadosIni.IfThen(DBLEstado.KeyValue = Null, 0, DBLEstado.KeyValue));
+    _GravaConfiguracoesInteger(DBLFuncao.Name, vDadosIni.IfThen(DBLFuncao.KeyValue = Null, 0, DBLFuncao.KeyValue));
+    _GravaConfiguracoesDouble(EdCodGerente.Name, EdCodGerente.AsValue);
+    _GravaConfiguracoesInteger(cbVendedorTelevendas.Name, cbVendedorTelevendas.ItemIndex);
+    _GravaConfiguracoesDouble(EdCodJornadaTrabalho.Name, EdCodJornadaTrabalho.AsValue);
+    _GravaConfiguracoesDouble(EdCodEscalaSemanal.Name, EdCodJornadaTrabalho.AsValue);
+    _GravaConfiguracoesInteger(CbExecutarTarefas.Name, CbExecutarTarefas.ItemIndex);
+
+    _GravaConfiguracoesBoolean(ckBairro.Name, ckBairro.Checked);
+    _GravaConfiguracoesBoolean(ckCidade.Name, ckCidade.Checked);
+    _GravaConfiguracoesBoolean(ckEstado.Name, ckEstado.Checked);
+    _GravaConfiguracoesBoolean(ckFuncao.Name, ckFuncao.Checked);
+    _GravaConfiguracoesBoolean(ckGerente.Name, ckGerente.Checked);
+    _GravaConfiguracoesBoolean(ckVendedorTelevendas.Name, ckVendedorTelevendas.Checked);
+    _GravaConfiguracoesBoolean(ckJornadaTrabalho.Name, ckJornadaTrabalho.Checked);
+    _GravaConfiguracoesBoolean(ckEscalaSemanal.Name, ckEscalaSemanal.Checked);
+    _GravaConfiguracoesBoolean(ckExecutarTarefas.Name, ckExecutarTarefas.Checked);
+
+    frmCadColaborador.Enabled := true;
+    DBGrid1.Visible := true;
+    Screen.Cursor := crDefault;
+  end;
+
+  PageControl1.ActivePage := tsAlterDadosColaborador;
+  tsAlterDadosColaborador.Show;
+end;
+
 procedure TfrmCadcolaborador.btnOKCancelarClick(Sender: TObject);
 begin
   inherited;
@@ -489,6 +728,22 @@ begin
   end;
 end;
 
+procedure TfrmCadcolaborador.btSincronizarColaboradorClick(Sender: TObject);
+begin
+  inherited;
+  try
+  	 Screen.Cursor := crHourGlass;
+    frmCadcolaborador.Enabled := false;
+    DBGrid1.Visible := false;
+  	 if not obColaborador.sincronizaColaboradorEmLote then
+      exit;
+  finally
+  	 frmCadcolaborador.Enabled := true;
+    DBGrid1.Visible := true;
+    Screen.Cursor := crDefault;
+  end;
+end;
+
 procedure TfrmCadcolaborador.btUnSelectAllClick(Sender: TObject);
 begin
   inherited;
@@ -500,6 +755,34 @@ begin
   finally
     Screen.Cursor := crDefault;
     DBGrid1.Visible := true;
+  end;
+end;
+
+procedure TfrmCadcolaborador.btVoltarDadosColaboradorClick(Sender: TObject);
+begin
+  try
+    inherited;
+    ckLixeira.Visible := True;
+    ckLixeira.Checked := False;
+
+    if ckLixeira.Checked then
+      frmCadcolaborador.Caption := 'Colaboradores (Lixeira)'
+    else
+      frmCadcolaborador.Caption := 'Colaboradores';
+
+    Panel2.Visible := true;
+
+    GroupBox3.Parent := TabSheet2;
+
+    btVoltarDadosColaborador.Parent := Panel52;
+    BitBtn2.Visible := True;
+	 BitBtn3.Visible := True;
+    Panel1.Parent := TabSheet2;
+    PageControl1.ActivePage := TabSheet2;
+    TelaCadastro := 0;
+    Self.fechar  := False;
+  finally
+
   end;
 end;
 
@@ -634,6 +917,24 @@ begin
   pn_contatos_pla_view.Visible := True;
 end;
 
+procedure TfrmCadcolaborador.bt_contatos_pla_sel_allClick(Sender: TObject);
+var
+  I: Integer;
+begin
+  inherited;
+  for I := 0 to ck_contrato_pla_tipos_contato.Count - 1 do
+    ck_contrato_pla_tipos_contato.Checked[I] := True;
+end;
+
+procedure TfrmCadcolaborador.bt_contatos_pla_unsel_allClick(Sender: TObject);
+var
+  I: Integer;
+begin
+  inherited;
+  for I := 0 to ck_contrato_pla_tipos_contato.Count - 1 do
+    ck_contrato_pla_tipos_contato.Checked[I] := False;
+end;
+
 procedure TfrmCadcolaborador.bt_contato_pla_tipoClick(Sender: TObject);
 var
   MenuItem: TMenuItem;
@@ -661,6 +962,225 @@ begin
   end;
 
   pop_menu_tipo_contato_pla.Popup(Mouse.CursorPos.X, Mouse.CursorPos.Y);
+end;
+
+procedure TfrmCadcolaborador.ckBairroClick(Sender: TObject);
+begin
+  inherited;
+  EdCodBairro.Enabled := ckBairro.Checked;
+  DBLBairro.Enabled := ckBairro.Checked;
+  if ckBairro.Checked then
+  begin
+  	 pnBairro.ParentBackground := False;
+	 pnBairro.Color := clYellow;
+  end
+  else
+  begin
+  	 pnBairro.ParentBackground := True;
+  	 pnBairro.Color := clBtnFace;
+  end;
+
+  if (Self.Enabled) and (Self.Visible) and (EdCodBairro.CanFocus) then
+  	EdCodBairro.SetFocus;
+end;
+
+procedure TfrmCadcolaborador.ckCidadeClick(Sender: TObject);
+begin
+  inherited;
+  EdCodCidade.Enabled := ckCidade.Checked;
+  DBLCidade.Enabled := ckCidade.Checked;
+  if ckCidade.Checked then
+  begin
+  	 pnCidade.ParentBackground := False;
+	 pnCidade.Color := clYellow;
+  end
+  else
+  begin
+  	 pnCidade.ParentBackground := True;
+  	 pnCidade.Color := clBtnFace;
+  end;
+
+  if (Self.Enabled) and (Self.Visible) and (EdCodCidade.CanFocus) then
+  	EdCodCidade.SetFocus;
+end;
+
+procedure TfrmCadcolaborador.ckEscalaSemanalClick(Sender: TObject);
+begin
+  inherited;
+  EdCodEscalaSemanal.Enabled := ckEscalaSemanal.Checked;
+  DBLEscalaSemanal.Enabled := ckEscalaSemanal.Checked;
+  if ckEscalaSemanal.Checked then
+  begin
+  	 pnEscalaSemanal.ParentBackground := False;
+	 pnEscalaSemanal.Color := clYellow;
+  end
+  else
+  begin
+  	 pnEscalaSemanal.ParentBackground := True;
+  	 pnEscalaSemanal.Color := clBtnFace;
+  end;
+
+  if (Self.Enabled) and (Self.Visible) and (EdCodEscalaSemanal.CanFocus) then
+  	EdCodEscalaSemanal.SetFocus;
+end;
+
+procedure TfrmCadcolaborador.ckEstadoClick(Sender: TObject);
+begin
+  inherited;
+  DBLEstado.Enabled := ckEstado.Checked;
+  if ckEstado.Checked then
+  begin
+  	 pnEstado.ParentBackground := False;
+	 pnEstado.Color := clYellow;
+  end
+  else
+  begin
+  	 pnEstado.ParentBackground := True;
+  	 pnEstado.Color := clBtnFace;
+  end;
+
+  if (Self.Enabled) and (Self.Visible) and (DBLEstado.CanFocus) then
+  	DBLEstado.SetFocus;
+end;
+
+procedure TfrmCadcolaborador.ckExecutarTarefasClick(Sender: TObject);
+begin
+  inherited;
+  CbExecutarTarefas.Enabled := ckExecutarTarefas.Checked;
+  if ckExecutarTarefas.Checked then
+  begin
+  	 pnExecutarTarefas.ParentBackground := False;
+	 pnExecutarTarefas.Color := clYellow;
+  end
+  else
+  begin
+  	 pnExecutarTarefas.ParentBackground := True;
+  	 pnExecutarTarefas.Color := clBtnFace;
+  end;
+
+  if (Self.Enabled) and (Self.Visible) and (CbExecutarTarefas.CanFocus) then
+  	CbExecutarTarefas.SetFocus;
+end;
+
+procedure TfrmCadcolaborador.ckFuncaoClick(Sender: TObject);
+begin
+  inherited;
+  DBLFuncao.Enabled := ckFuncao.Checked;
+  if ckFuncao.Checked then
+  begin
+  	 pnFuncao.ParentBackground := False;
+	 pnFuncao.Color := clYellow;
+  end
+  else
+  begin
+  	 pnFuncao.ParentBackground := True;
+  	 pnFuncao.Color := clBtnFace;
+  end;
+
+  if (Self.Enabled) and (Self.Visible) and (DBLFuncao.CanFocus) then
+  	DBLFuncao.SetFocus;
+end;
+
+procedure TfrmCadcolaborador.ckLixeiraClick(Sender: TObject);
+begin
+  inherited;
+  if not ckLixeira.Visible then
+    exit;
+
+  if not ckLixeira.Enabled then
+  begin
+  	 if ckLixeira.Checked then
+    begin
+      SpeedButton2.Hint := 'Excluir registro permanentemente - [COL013]';
+      btExcluirRegistro.Hint := 'Excluir registro permanentemente - [COL013]';
+    end
+    else
+    begin
+      SpeedButton2.Hint := 'Enviar para Lixeira - [COL004]';
+      btExcluirRegistro.Hint := 'Enviar para Lixeira - [COL004]';
+    end;
+  	exit;
+  end;
+
+  if ckLixeira.Checked then
+  	 SpeedButton2.Hint := 'Excluir registro permanentemente - [COL013]'
+  else
+ 	 SpeedButton2.Hint := 'Enviar para Lixeira - [COL013]';
+
+  if (PageControl1.ActivePage = tsAlterDadosColaborador) then
+  begin
+    if ckLixeira.Checked then
+      frmCadcolaborador.Caption := 'Alteração Colaboradores em Lote (Lixeira)'
+    else
+      frmCadcolaborador.Caption := 'Alteração Colaboradores em Lote';
+  end
+  else
+  begin
+    if ckLixeira.Checked then
+    	frmCadcolaborador.Caption := 'Colaboradores (Lixeira)'
+    else
+      frmCadcolaborador.Caption := 'Colaboradores';
+  end;
+  BitBtn1Click(Sender);
+end;
+
+procedure TfrmCadcolaborador.ckVendedorTelevendasClick(Sender: TObject);
+begin
+  inherited;
+  cbVendedorTelevendas.Enabled := ckVendedorTelevendas.Checked;
+  if ckVendedorTelevendas.Checked then
+  begin
+  	 pnVendedorTelevendas.ParentBackground := False;
+	 pnVendedorTelevendas.Color := clYellow;
+  end
+  else
+  begin
+  	 pnVendedorTelevendas.ParentBackground := True;
+  	 pnVendedorTelevendas.Color := clBtnFace;
+  end;
+
+  if (Self.Enabled) and (Self.Visible) and (cbVendedorTelevendas.CanFocus) then
+  	cbVendedorTelevendas.SetFocus;
+end;
+
+procedure TfrmCadcolaborador.ckGerenteClick(Sender: TObject);
+begin
+  inherited;
+  EdCodGerente.Enabled := ckGerente.Checked;
+  DBLGerente.Enabled := ckGerente.Checked;
+  if ckGerente.Checked then
+  begin
+  	 pnGerente.ParentBackground := False;
+	 pnGerente.Color := clYellow;
+  end
+  else
+  begin
+  	 pnGerente.ParentBackground := True;
+  	 pnGerente.Color := clBtnFace;
+  end;
+
+  if (Self.Enabled) and (Self.Visible) and (EdCodGerente.CanFocus) then
+  	EdCodGerente.SetFocus;
+end;
+
+procedure TfrmCadcolaborador.ckJornadaTrabalhoClick(Sender: TObject);
+begin
+  inherited;
+  EdCodJornadaTrabalho.Enabled := ckJornadaTrabalho.Checked;
+  DBLJornadaTrabalho.Enabled := ckJornadaTrabalho.Checked;
+  if ckJornadaTrabalho.Checked then
+  begin
+  	 pnJornadaTrabalho.ParentBackground := False;
+	 pnJornadaTrabalho.Color := clYellow;
+  end
+  else
+  begin
+  	 pnJornadaTrabalho.ParentBackground := True;
+  	 pnJornadaTrabalho.Color := clBtnFace;
+  end;
+
+  if (Self.Enabled) and (Self.Visible) and (EdCodJornadaTrabalho.CanFocus) then
+  	EdCodJornadaTrabalho.SetFocus;
 end;
 
 procedure TfrmCadcolaborador.contato_tipo_pla_add(Sender: TObject);
@@ -1299,6 +1819,51 @@ begin
     Perform(WM_NEXTDLGCTL, 0, 0);
 end;
 
+procedure TfrmCadcolaborador.DBLBairroExit(Sender: TObject);
+begin
+  inherited;
+  if DBLBairro.KeyValue = null then
+  	 EdCodBairro.AsValue := 0
+  else
+	 EdCodBairro.AsValue := DBLBairro.KeyValue;
+end;
+
+procedure TfrmCadcolaborador.DBLCidadeExit(Sender: TObject);
+begin
+  inherited;
+  if DBLCidade.KeyValue = null then
+  	 EdCodCidade.AsValue := 0
+  else
+	 EdCodCidade.AsValue := DBLCidade.KeyValue;
+end;
+
+procedure TfrmCadcolaborador.DBLEscalaSemanalExit(Sender: TObject);
+begin
+  inherited;
+  if DBLEscalaSemanal.KeyValue = null then
+  	 EdCodEscalaSemanal.AsValue := 0
+  else
+	 EdCodEscalaSemanal.AsValue := DBLEscalaSemanal.KeyValue;
+end;
+
+procedure TfrmCadcolaborador.DBLGerenteExit(Sender: TObject);
+begin
+  inherited;
+  if DBLGerente.KeyValue = null then
+  	 EdCodGerente.AsValue := 0
+  else
+	 EdCodGerente.AsValue := DBLGerente.KeyValue;
+end;
+
+procedure TfrmCadcolaborador.DBLJornadaTrabalhoExit(Sender: TObject);
+begin
+  inherited;
+  if DBLJornadaTrabalho.KeyValue = null then
+  	 EdCodJornadaTrabalho.AsValue := 0
+  else
+	 EdCodJornadaTrabalho.AsValue := DBLJornadaTrabalho.KeyValue;
+end;
+
 procedure TfrmCadcolaborador.DBLookupComboBox1DropDown(Sender: TObject);
 begin
   inherited;
@@ -1353,6 +1918,116 @@ begin
   end;
 end;
 
+procedure TfrmCadcolaborador.EdCodBairroExit(Sender: TObject);
+begin
+  inherited;
+  if ((ActiveControl = btnOKAlteracaoEmLote)
+  	or (ActiveControl = btnCancelarAlteracaoEmLote)
+    or (ActiveControl = btSairColaboradorLote)) then
+    Exit;
+
+  DBLBairro.KeyValue := EdCodBairro.AsInteger;
+
+  if EdCodBairro.AsInteger <= 0 then
+  	exit;
+
+  if not obColaborador.BuscarBairro(EdCodBairro.AsInteger) then
+  begin
+    Application.MessageBox('Bairro não encontrado ou se encontra na lixeira', 'Informação', MB_OK + MB_ICONINFORMATION + MB_DEFBUTTON1);
+    if (Self.Enabled) and (Self.Visible) and (EdCodBairro.CanFocus) then
+    	EdCodBairro.SetFocus;
+    exit;
+  end;
+end;
+
+procedure TfrmCadcolaborador.EdCodCidadeExit(Sender: TObject);
+begin
+  inherited;
+  if ((ActiveControl = btnOKAlteracaoEmLote)
+  	or (ActiveControl = btnCancelarAlteracaoEmLote)
+    or (ActiveControl = btSairColaboradorLote)) then
+    Exit;
+
+  DBLCidade.KeyValue := EdCodCidade.AsInteger;
+
+  if EdCodCidade.AsInteger <= 0 then
+  	exit;
+
+  if not obColaborador.BuscarCidade(EdCodCidade.AsInteger) then
+  begin
+    Application.MessageBox('Cidade não encontrada ou se encontra na lixeira', 'Informação', MB_OK + MB_ICONINFORMATION + MB_DEFBUTTON1);
+    if (Self.Enabled) and (Self.Visible) and (EdCodCidade.CanFocus) then
+    	EdCodCidade.SetFocus;
+    exit;
+  end;
+end;
+
+procedure TfrmCadcolaborador.EdCodEscalaSemanalExit(Sender: TObject);
+begin
+  inherited;
+  if ((ActiveControl = btnOKAlteracaoEmLote)
+  	or (ActiveControl = btnCancelarAlteracaoEmLote)
+    or (ActiveControl = btSairColaboradorLote)) then
+    Exit;
+
+  DBLEscalaSemanal.KeyValue := EdCodEscalaSemanal.AsInteger;
+
+  if EdCodEscalaSemanal.AsInteger <= 0 then
+  	exit;
+
+  if not obColaborador.BuscarEscalaSemanal(EdCodEscalaSemanal.AsInteger) then
+  begin
+    Application.MessageBox('Escala Semanal não encontrada', 'Informação', MB_OK + MB_ICONINFORMATION + MB_DEFBUTTON1);
+    if (Self.Enabled) and (Self.Visible) and (EdCodEscalaSemanal.CanFocus) then
+    	EdCodEscalaSemanal.SetFocus;
+    exit;
+  end;
+end;
+
+procedure TfrmCadcolaborador.EdCodGerenteExit(Sender: TObject);
+begin
+  inherited;
+  if ((ActiveControl = btnOKAlteracaoEmLote)
+  	or (ActiveControl = btnCancelarAlteracaoEmLote)
+    or (ActiveControl = btSairColaboradorLote)) then
+    Exit;
+
+  DBLGerente.KeyValue := EdCodGerente.AsInteger;
+
+  if EdCodGerente.AsInteger <= 0 then
+  	exit;
+
+  if not obColaborador.BuscarGerente(EdCodGerente.AsInteger) then
+  begin
+    Application.MessageBox('Gerente não encontrado ou se encontra na lixeira', 'Informação', MB_OK + MB_ICONINFORMATION + MB_DEFBUTTON1);
+    if (Self.Enabled) and (Self.Visible) and (EdCodGerente.CanFocus) then
+    	EdCodGerente.SetFocus;
+    exit;
+  end;
+end;
+
+procedure TfrmCadcolaborador.EdCodJornadaTrabalhoExit(Sender: TObject);
+begin
+  inherited;
+  if ((ActiveControl = btnOKAlteracaoEmLote)
+  	or (ActiveControl = btnCancelarAlteracaoEmLote)
+    or (ActiveControl = btSairColaboradorLote)) then
+    Exit;
+
+  DBLJornadaTrabalho.KeyValue := EdCodJornadaTrabalho.AsInteger;
+
+  if EdCodJornadaTrabalho.AsInteger <= 0 then
+  	exit;
+
+  if not obColaborador.BuscarJornadaTrabalho(EdCodJornadaTrabalho.AsInteger) then
+  begin
+    Application.MessageBox('Jornada de Trabalho não encontrada', 'Informação', MB_OK + MB_ICONINFORMATION + MB_DEFBUTTON1);
+    if (Self.Enabled) and (Self.Visible) and (EdCodJornadaTrabalho.CanFocus) then
+    	EdCodJornadaTrabalho.SetFocus;
+    exit;
+  end;
+end;
+
 procedure TfrmCadcolaborador.ed_contato_pla_aplicativoExit(Sender: TObject);
 begin
   inherited;
@@ -1403,9 +2078,26 @@ begin
   inherited;
   TelaCadastro := vDadosIni.vTipoForm;
   obColaborador := TColaborador.create;
+
+  tsAlterDadosColaborador.TabVisible := false;
+  tsAlterDadosLote.TabVisible := false;
+  
   if vDadosIni.vModalOuChild <> 'M' then
     FormStyle := fsMDIChild;
   vDadosIni.vModalOuChild := 'C';
+end;
+
+procedure TfrmCadcolaborador.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  inherited;
+  if Key = VK_F6 then
+  begin
+    if (ckLixeira.visible) and (ckLixeira.Enabled) and (PageControl1.ActivePage = TabSheet2) then
+      ckLixeira.Checked := not ckLixeira.Checked
+    else if (ckLixeira.visible) and (ckLixeira.Enabled) and (PageControl1.ActivePage = tsAlterDadosColaborador) then
+      ckLixeira.Checked := not ckLixeira.Checked;
+  end;
 end;
 
 procedure TfrmCadcolaborador.FormShow(Sender: TObject);
@@ -1501,6 +2193,7 @@ begin
   pn_contatos_pla_view.Enabled := False;
   pn_contatos_pla_view.Visible := False; 
   bt_contatos_pla_add.Enabled := pn_contatos_pla_view.Enabled;
+  bt_contatos_pla_edit.Enabled := pn_contatos_pla_view.Enabled;
   bt_contatos_pla_del.Enabled := pn_contatos_pla_view.Enabled;
   bt_contatos_pla_save.Enabled := pn_contatos_pla_cad.Enabled;
   bt_contatos_pla_cancel.Enabled := pn_contatos_pla_cad.Enabled;
@@ -1512,6 +2205,7 @@ begin
   pn_contatos_pla_cad.Enabled := False;
   pn_contatos_pla_cad.Visible := False;
   bt_contatos_pla_add.Enabled := pn_contatos_pla_view.Enabled;
+  bt_contatos_pla_edit.Enabled := pn_contatos_pla_view.Enabled;
   bt_contatos_pla_del.Enabled := pn_contatos_pla_view.Enabled;
   bt_contatos_pla_save.Enabled := pn_contatos_pla_cad.Enabled;
   bt_contatos_pla_cancel.Enabled := pn_contatos_pla_cad.Enabled;
@@ -1534,11 +2228,87 @@ begin
   vDadosIni.VisualizaRelQrp(Sender, 'Relatório de Colaboradores');
 end;
 
+procedure TfrmCadcolaborador.SpeedBDesmarcarTodosClick(Sender: TObject);
+begin
+  inherited;
+  try
+    Screen.Cursor := crHourGlass;
+    DBGrid1.Visible := false;
+    obColaborador._desmarcarTodos;
+
+  finally
+    Screen.Cursor := crDefault;
+    DBGrid1.Visible := true;
+  end;
+end;
+
+procedure TfrmCadcolaborador.SpeedBSelTodosClick(Sender: TObject);
+begin
+  inherited;
+  try
+    Screen.Cursor := crHourGlass;
+    DBGrid1.Visible := false;
+    obColaborador._marcarTodos;
+
+  finally
+    Screen.Cursor := crDefault;
+    DBGrid1.Visible := true;
+  end;
+end;
+
 procedure TfrmCadcolaborador.SpeedButton11Click(Sender: TObject);
 var
   CalendEscalaSemanal: TCalendEscalaSemanal;
 begin
   CalendEscalaSemanal._cadCalendEscalaSemanal(0);
+end;
+
+procedure TfrmCadcolaborador.SpeedButton12Click(Sender: TObject);
+begin
+  inherited;
+  try
+    Screen.Cursor := crHourGlass;
+    GroupBox3.Parent := Panel52;
+    BitBtn2.Visible := False;
+	 BitBtn3.Visible := False;
+    btVoltarDadosColaborador.Parent := GroupBox3;
+    Panel1.Visible := true;
+    Panel1.Parent := Panel128;
+	 Panel2.Visible := False;
+
+    Panel52.Visible := false;
+    Panel52.Align := alNone;
+
+    GroupBox79.Visible := false;
+    GroupBox79.Align := alNone;
+
+    Panel52.Visible := True;
+    Panel52.Align := alTop;
+
+//    GroupBox79.Visible := True;
+//    GroupBox79.Align := alTop;
+
+    Panel52.Height := GroupBox3.Height;
+
+    _LerConfiguracoesRegistroBoolean(ckPermOpcaoMarcadas.Name, False);
+
+    PageControl1.ActivePage := tsAlterDadosColaborador;
+
+    lbCorLote.Visible := false;
+    pnCorLote.Visible := false;
+
+    TelaCadastro := 5;
+
+    ckPermOpcaoMarcadas.Visible := true;
+    
+    ckLixeira.Visible    := True;
+    if ckLixeira.Checked then
+      frmCadcolaborador.Caption := 'Alteração Colaboradores em Lote (Lixeira)'
+    else
+      frmCadcolaborador.Caption := 'Alteração Colaboradores em Lote';
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 procedure TfrmCadcolaborador.SpeedButton15Click(Sender: TObject);
@@ -1632,6 +2402,9 @@ begin
   DBEdit44.Visible := vDadosIni.vHwCloudIA.vUsarServMensageria = 'S';
   DBLookupComboBox7.Visible := vDadosIni.vHwCloudIA.vUsarServMensageria = 'S';
 
+  Label55.Visible := vDadosIni.vHwCloudIA.vUsarServMensageria = 'S';
+  DBComboBox2.Visible := vDadosIni.vHwCloudIA.vUsarServMensageria = 'S';
+
   SpeedButtonContatoPlataforma.Visible := vDadosIni.vHwCloudIA.vUsarServMensageria = 'S';
 
   PageControl1.ActivePage := TabSheet1;
@@ -1659,17 +2432,49 @@ begin
   if vDadosIni.PesqPros('COL006', 'ABRIR A LIXEIRA', '', 'COLABORADOR', '', obColaborador.buscas, true) then
   begin
     inherited;
-    if not obColaborador.AbrirLixeira then
+    if obColaborador.AbrirLixeira then
     begin
-      SpeedButton2.Hint := 'Enviar para Lixeira - [COL004]';
-      SpeedButton1.Visible := true;
-      SpeedButton5.Visible := false;
+      SpeedButton2.Hint := 'Excluir registro permanentemente - [COL013]';
+      btExcluirRegistro.Hint := 'Excluir registro permanentemente - [COL013]';
+
+      SpeedButton1.Visible := false;
+      SpeedButton5.Visible := true;
+      SpeedButton6.Visible := false;
+      SpeedButton8.Visible := false;
+
+      SpeedButtonColaborador2.Visible := false;
+      SpeedButtonColaborador.Visible := false;
+      btLancarDebCred.Visible := false;
+      btSaldoExtrato.Visible := false;
+      btSincronizarColaborador.Visible := false;
+
+      btRestaurarRegistro.Visible := true;
+
+      ckLixeira.Enabled := false;
+      ckLixeira.Checked := true;
+      ckLixeira.Enabled := true;
     end
     else
     begin
-      SpeedButton2.Hint := 'Excluir registro permanentemente - [COL013]';
-      SpeedButton1.Visible := false;
-      SpeedButton5.Visible := true;
+      SpeedButton2.Hint := 'Enviar para Lixeira - [COL004]';
+      btExcluirRegistro.Hint := 'Enviar para Lixeira - [COL004]';
+      
+      SpeedButton1.Visible := true;
+      SpeedButton5.Visible := false;
+      SpeedButton6.Visible := true;
+      SpeedButton8.Visible := true;
+
+      SpeedButtonColaborador2.Visible := true;
+      SpeedButtonColaborador.Visible := true;
+      btLancarDebCred.Visible := true;
+      btSaldoExtrato.Visible := true;
+      btSincronizarColaborador.Visible := true;
+
+      btRestaurarRegistro.Visible := false;
+
+      ckLixeira.Enabled := false;
+      ckLixeira.Checked := false;
+      ckLixeira.Enabled := true;
     end;
 
     obColaborador.ultimasql := obColaborador.dataSet.CommandText;
@@ -1720,6 +2525,12 @@ begin
     lixeiraVazia(true);
 end;
 
+procedure TfrmCadcolaborador.SpeedButton68Click(Sender: TObject);
+begin
+  inherited;
+  vDadosIni.configurarSistema('col_cad_alt_lote_reg', obColaborador.buscas);
+end;
+
 procedure TfrmCadcolaborador.SpeedButton6Click(Sender: TObject);
 var
   obLancDC: TLancDebitoCredito;
@@ -1749,6 +2560,153 @@ begin
   obColaborador.abreFormSaldoExtrato;
 end;
 
+procedure TfrmCadcolaborador.SpeedButtonColaborador2Click(Sender: TObject);
+var
+  I: Integer;
+  vIndexFieldNames: string;
+  vIndexName: string;
+  vRecNo: Integer;
+begin
+  inherited;
+  if not vDadosIni.PesqPros('COL063', 'ALTERAR', '', 'COLABORADOR', '', obColaborador.buscas, true) then
+	 Exit;
+
+  for I := 0 to ComponentCount - 1 do
+    if (Components[I] is TScrollBox) then
+      TScrollBox(Components[I]).VertScrollBar.Position := 0;
+
+  obColaborador.vBairro.abreBairro;
+  obColaborador.vCidades.abreCidade;
+  obColaborador.vUF.abreUF;
+  obColaborador.cadFuncao.abreFuncoes;
+  obColaborador.vGerente.abreGerente;
+  obColaborador.vJornadaTrabalho.abreJornadaTrabalho;
+  obColaborador.vEscalaSemanal.abreEscalaSemanal;
+
+  pnJornadaTrabalho.Visible := vDadosIni.vHwCloudIA.vUsarServMensageria = 'S';
+  pnEscalaSemanal.Visible := vDadosIni.vHwCloudIA.vUsarServMensageria = 'S';
+  pnExecutarTarefas.Visible := vDadosIni.vHwCloudIA.vUsarServMensageria = 'S';
+
+  EdCodBairro.AsValue := _LerConfiguracoesRegistroDouble(EdCodBairro.Name);
+  EdCodCidade.AsValue := _LerConfiguracoesRegistroDouble(EdCodCidade.Name);
+  DBLEstado.KeyValue := _LerConfiguracoesRegistroInteger(DBLEstado.Name);
+  DBLFuncao.KeyValue := _LerConfiguracoesRegistroInteger(DBLFuncao.Name);
+  EdCodGerente.AsValue := _LerConfiguracoesRegistroDouble(EdCodGerente.Name);
+  cbVendedorTelevendas.ItemIndex := _LerConfiguracoesRegistroInteger(cbVendedorTelevendas.Name);
+  EdCodJornadaTrabalho.AsValue  := _LerConfiguracoesRegistroDouble(EdCodJornadaTrabalho.Name);
+  EdCodEscalaSemanal.AsValue  := _LerConfiguracoesRegistroDouble(EdCodEscalaSemanal.Name);
+  CbExecutarTarefas.ItemIndex := _LerConfiguracoesRegistroInteger(CbExecutarTarefas.Name);
+
+  if ckPermOpcaoMarcadas.Checked then
+	ckBairro.Checked := _LerConfiguracoesRegistroBoolean(ckBairro.Name)
+  else
+  	ckBairro.Checked := false;
+  ckBairroClick(Sender);
+
+  if ckPermOpcaoMarcadas.Checked then
+	ckCidade.Checked := _LerConfiguracoesRegistroBoolean(ckCidade.Name)
+  else
+  	ckCidade.Checked := false;
+  ckCidadeClick(Sender);
+
+  if ckPermOpcaoMarcadas.Checked then
+	ckEstado.Checked := _LerConfiguracoesRegistroBoolean(ckEstado.Name)
+  else
+  	ckEstado.Checked := false;
+  ckEstadoClick(Sender);
+
+  if ckPermOpcaoMarcadas.Checked then
+	ckFuncao.Checked := _LerConfiguracoesRegistroBoolean(ckFuncao.Name)
+  else
+  	ckFuncao.Checked := false;
+  ckFuncaoClick(Sender);
+
+  if ckPermOpcaoMarcadas.Checked then
+	ckGerente.Checked := _LerConfiguracoesRegistroBoolean(ckGerente.Name)
+  else
+  	ckGerente.Checked := false;
+  ckGerenteClick(Sender);
+
+  if ckPermOpcaoMarcadas.Checked then
+	ckVendedorTelevendas.Checked := _LerConfiguracoesRegistroBoolean(ckVendedorTelevendas.Name)
+  else
+  	ckVendedorTelevendas.Checked := false;
+  ckVendedorTelevendasClick(Sender);
+
+  if not pnJornadaTrabalho.Visible then
+   ckJornadaTrabalho.Checked := False
+  else if ckPermOpcaoMarcadas.Checked then
+	ckJornadaTrabalho.Checked := _LerConfiguracoesRegistroBoolean(ckJornadaTrabalho.Name)
+  else
+  	ckJornadaTrabalho.Checked := false;
+  ckJornadaTrabalhoClick(Sender);
+
+  if not pnEscalaSemanal.Visible then
+   ckEscalaSemanal.Checked := False
+  else if ckPermOpcaoMarcadas.Checked then
+	ckEscalaSemanal.Checked := _LerConfiguracoesRegistroBoolean(ckEscalaSemanal.Name)
+  else
+  	ckEscalaSemanal.Checked := false;
+  ckEscalaSemanalClick(Sender);
+
+  if not pnExecutarTarefas.Visible then
+   ckExecutarTarefas.Checked := False
+  else if ckPermOpcaoMarcadas.Checked then
+	ckExecutarTarefas.Checked := _LerConfiguracoesRegistroBoolean(ckExecutarTarefas.Name)
+  else
+  	ckExecutarTarefas.Checked := false;
+  ckExecutarTarefasClick(Sender);
+
+  try
+  	 vIndexFieldNames := obColaborador.dataSet.IndexFieldNames;
+    vIndexName       := obColaborador.dataSet.IndexName;
+    vRecNo           := obColaborador.dataSet.RecNo;
+
+    for I := 0 to obColaborador.dataSet.Fields.Count - 1 do
+    begin
+    	if trim(obColaborador.dataSet.Fields[I].DisplayName) = trim(ComboBox2.text) then
+      begin
+      	vIndexFieldNames := obColaborador.dataSet.Fields[I].FieldName;
+        break;
+      end;
+    end;
+
+    obColaborador.dataSet.DisableControls;
+    obColaborador.dataSet.Filtered := false;
+    obColaborador.dataSet.Filter := 'sel = ''S'' ';
+    obColaborador.dataSet.Filtered := true;
+
+    if obColaborador.dataSet.IsEmpty then
+    begin
+      Application.MessageBox('Nenhum produto selecionado.', 'Atenção',
+        MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
+      exit;
+    end;
+  finally
+  	 obColaborador.dataSet.Filtered        := false;
+    obColaborador.dataSet.IndexName       := vIndexName;
+    obColaborador.dataSet.IndexFieldNames := vIndexFieldNames;
+    if obColaborador.dataSet.RecordCount >= vRecNo then
+	   obColaborador.dataSet.RecNo         := vRecNo;
+    obColaborador.dataSet.EnableControls;
+  end;
+
+  PageControl1.ActivePage := tsAlterDadosLote;
+  tsAlterDadosLote.Show;
+end;
+
+procedure TfrmCadcolaborador.SpeedButtonColaboradorClick(Sender: TObject);
+begin
+  inherited;
+  SpeedButton1Click(Sender);
+
+  if (obColaborador.dataSet.State in [dsInsert, dsEdit]) then
+  begin
+  	 if obColaborador.dataSet.FieldByName('ativo').AsInteger <> 1 then
+     	obColaborador.dataSet.FieldByName('ativo').AsInteger := 1;
+  end;
+end;
+
 procedure TfrmCadcolaborador.SpeedButtonContatoPlataformaClick(Sender: TObject);
 begin
   inherited;
@@ -1762,6 +2720,7 @@ begin
   pn_contatos_pla_view.Visible   := True;
 
   bt_contatos_pla_add.Enabled    := True;
+  bt_contatos_pla_edit.Enabled    := True;
   bt_contatos_pla_del.Enabled    := True;
 
   bt_contatos_pla_save.Enabled   := False;

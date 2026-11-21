@@ -10,6 +10,18 @@ type
   TUsuario = class;
   TSenhas = class;
 
+  RMensMob = record
+    vAvancado: Boolean;
+    vAplicativo, vMobile, vEcommerce, vFinanceiro, vPagOnline: Boolean;
+    vStatusNO, vStatusEP, vStatusAC, vStatusER, vStatusPP: Boolean;
+    vOrigemErp, vOrigemBot: Boolean;
+    vDestinoErp, vDestinoBot: Boolean;
+    vCampo, vCondicao, vValor, vData1, vData2: string;
+    vNaolidas: Boolean;
+    vAdicional: Boolean; vCampoAd, vCondicaoAd, vValorAd, vData1Ad, vData2Ad: string;
+    vPorDataAd: Boolean; vMensagem, vTarefa: Boolean
+  end;
+
   TUsuario = class(TDataset_OOP)
   private
 
@@ -65,10 +77,10 @@ type
     function _lixeiraCheia: boolean;
     procedure _cadMensMobile(pTipoForm: Integer);
     procedure _cadVerMensMobile(pTipoForm: Integer; pOrigMens: string = '');
-    function _pesquisa(pCampo, pCondicao, pValor, pData1, pData2: string;
-    	pNaolidas: Boolean; pOrigMens: string; pStatusEnv: string; pOrigem: string; pDestino: string;
-    	pAvancado: Boolean; pCampoAd, pCondicaoAd, pValorAd, pData1Ad, pData2Ad: string; pPorDataAd: Boolean): Boolean;
+    function _pesquisa: Boolean;
     function lerDadosApiMensagem: Boolean;
+    function AtribuirProf: Boolean;
+    function AtualizarStatus: Boolean;
     procedure _marcarTodos;
     procedure _desmarcarTodos;
     procedure _marcaDesmarcaLinha;
@@ -77,6 +89,7 @@ type
     vUsuario: TUsuario;
     vSenhas: TSenhas;
     vDoc: TDocEletronicoMensMobile;
+    vMensMob: RMensMob;
   end;
 
 	TSenhas = class(TDataset_OOP)
@@ -97,9 +110,12 @@ var
   CadMensMobile: TMensMobile;
 
 implementation
+
 uses uDadosIni, uPadrao, IBDatabase, Forms, Windows, uDtmAtivo, SysUtils, RDprint, Controls,
-  Variants,
-  UDtmMobile, uCadMobile, uCadMensMobile;
+  Variants, UDtmMobile, uCadMobile, uCadMensMobile;
+
+function hwc_atribuir_prof(AparamsList: WideString; Acod_mens: Integer; Auuid: WideString; Aorigem: WideString; Acod_tarefa: Integer; Atipo_tarefa: WideString): Boolean; stdcall; external 'hw.utils.dx.dll';
+function hwc_update_mensageria(AparamsList: WideString; Acod_mens: Integer; Auuid: WideString; Aorigem: WideString; Astatus: WideString): Boolean; stdcall; external 'hw.utils.dx.dll';
 
 { TMobile }
 
@@ -461,6 +477,97 @@ end;
 
 { TMensMobile }
 
+function TMensMobile.AtribuirProf: Boolean;
+begin
+ Result := False;
+
+ if dataSet.IsEmpty then
+   Exit;
+
+ if dataSet.FieldByName('COD_TAREFA').AsInteger <= 0 then
+ begin
+   Application.MessageBox('Mensagem selecionada não é do tipo tarefa.', 'Informação', MB_ICONWARNING + MB_OK);
+   Exit;
+ end;
+
+ if not dataSet.FieldByName('COD_PROF_RESP').IsNull then
+ begin
+   Application.MessageBox('Tarefa com profissional responsável já atribuído.', 'Informação', MB_ICONWARNING + MB_OK);
+   Exit;
+ end;
+
+ if not vDadosIni.PesqPros('MOB021', 'ATRIBUIR', '', 'MENSAGEM_MOB',
+ 	dataSet.FieldByName('IDSEQM').AsString, buscas, False) then
+     Exit;
+
+ if Application.MessageBox('Deseja atribuir profissional a esta tarefa?',
+    'Atenção', MB_YESNO + MB_ICONQUESTION + MB_DEFBUTTON2) <> IDYES then
+    Exit;
+
+ Result := hwc_atribuir_prof(
+    Format(';databaseName=%s;empresaid=%s;silent=false;userHW=HW;userLevel=10',
+           [vDadosIni.vBancoHW, vDadosIni.codEmpresa]),
+    dataSet.FieldByName('IDSEQM').AsInteger,
+    dataSet.FieldByName('UUID').AsString,
+    dataSet.FieldByName('ORIGEM').AsString,
+    dataSet.FieldByName('COD_TAREFA').AsInteger,
+    dataSet.FieldByName('TIPO_TAREFA').AsString);
+
+ if Result then
+ begin
+   Refresh;
+   Application.MessageBox('Profissional atribuído a tarefa.', 'Informação', MB_OK + MB_ICONINFORMATION);
+ end;
+end;
+
+function TMensMobile.AtualizarStatus: Boolean;
+begin
+  Result := False;
+
+ if dataSet.IsEmpty then
+   Exit;
+
+ if dataSet.FieldByName('COD_TAREFA').AsInteger <= 0 then
+ begin
+   Application.MessageBox('Mensagem selecionada não é do tipo tarefa.', 'Informação', MB_ICONWARNING + MB_OK);
+   Exit;
+ end;
+
+ if dataSet.FieldByName('ORIGEM').AsString <> 'bot' then
+ begin
+   Application.MessageBox('Origem da tarefa deve ser do tipo bot.', 'Informação', MB_ICONWARNING + MB_OK);
+   Exit;
+ end;
+
+ if (dataSet.FieldByName('STATUS_ENV').AsString <> 'NO') and (dataSet.FieldByName('STATUS_ENV').AsString <> 'EP') then
+ begin
+   Application.MessageBox('Mensagem com status finalizado.', 'Informação', MB_ICONWARNING + MB_OK);
+   Exit;
+ end;
+
+ if not vDadosIni.PesqPros('MOB022', 'STATUS', '', 'MENSAGEM_MOB',
+ 	dataSet.FieldByName('IDSEQM').AsString, buscas, False) then
+     Exit;
+
+ if Application.MessageBox('Deseja finalizar esta tarefa?',
+    'Atenção', MB_YESNO + MB_ICONQUESTION + MB_DEFBUTTON2) <> IDYES then
+    Exit;
+
+ Result := hwc_update_mensageria(
+    Format(';databaseName=%s;empresaid=%s;silent=false;userHW=HW;userLevel=10',
+           [vDadosIni.vBancoHW, vDadosIni.codEmpresa]),
+    dataSet.FieldByName('IDSEQM').AsInteger,
+    dataSet.FieldByName('UUID').AsString,
+    dataSet.FieldByName('ORIGEM').AsString,
+    'PP');
+
+ if Result then
+ begin
+   Refresh;
+   Application.MessageBox('Status da tarefa finalizado.', 'Informação', MB_OK + MB_ICONINFORMATION);
+ end;
+end;
+
 constructor TMensMobile.create;
 begin
   dataSet := TClientDataSet(dtmMobile.cdsMensMobile);
@@ -687,7 +794,7 @@ begin
       ' left join msg_aplicativo a on a.id = mb.id_msg_aplicativo ' +
       ' left join msg_plataforma p on p.id = mb.id_msg_plataforma and p.cod_empresa = mb.cod_empresa ' +
       ' left join msg_aplicativo ar on ar.id = mb.id_msg_aplicativo_resp ' +
-      ' left join msg_plataforma pr on pr.id = mb.id_msg_plataforma_resp and pr.cod_empresa = mb.id_msg_plataforma_resp ' +
+      ' left join msg_plataforma pr on pr.id = mb.id_msg_plataforma_resp and pr.cod_empresa = mb.cod_empresa ' +
       ' where mb.idseqm = 0 and mb.cod_empresa = 0 and m.ativo = 0 and c.ativo = 0');
 
   if inherited insert then
@@ -982,7 +1089,7 @@ begin
        ' left join msg_aplicativo a on a.id = mb.id_msg_aplicativo ' +
        ' left join msg_plataforma p on p.id = mb.id_msg_plataforma and p.cod_empresa = mb.cod_empresa ' +
        ' left join msg_aplicativo ar on ar.id = mb.id_msg_aplicativo_resp ' +
-       ' left join msg_plataforma pr on pr.id = mb.id_msg_plataforma_resp and pr.cod_empresa = mb.id_msg_plataforma_resp ' +
+       ' left join msg_plataforma pr on pr.id = mb.id_msg_plataforma_resp and pr.cod_empresa = mb.cod_empresa ' +
        ' where mb.ativo = 0 and mb.cod_empresa = ' + vDadosIni.codEmpresa);
 end;
 
@@ -1175,118 +1282,167 @@ begin
   end;
 end;
 
-function TMensMobile._pesquisa(pCampo, pCondicao, pValor, pData1, pData2: string;
-  pNaolidas: Boolean; pOrigMens: string; pStatusEnv: string; pOrigem: string; pDestino: string;
-  pAvancado: Boolean; pCampoAd, pCondicaoAd, pValorAd, pData1Ad, pData2Ad: string; pPorDataAd: Boolean): Boolean;
+function TMensMobile._pesquisa: Boolean;
 var
-	I, erro: Integer;
+  I, erro: Integer;
+  vOrigMens, vStatusEnv, vOrigem: string; vDestino: string;
   formatodata: string;
   vSqlTemp, vSqlTempAd, vSeqm: string;
 begin
   vSqlTemp   := '';
   vSqlTempAd := '';
 
-  if trim(pCampo) = 'Usuario Envio' then
+  if trim(vMensMob.vCampo) = 'Usuario Envio' then
     vSqlTemp := 'f.nome_vendedor '
-  else if trim(pCampo) = 'Usuario Receptor' then
+  else if trim(vMensMob.vCampo) = 'Usuario Receptor' then
     vSqlTemp := 'c.nome_vendedor '
-  else if trim(pCampo) = 'Mobile' then
+  else if trim(vMensMob.vCampo) = 'Mobile' then
   	vSqlTemp := 'm.descricao_mob '
-  else if trim(pCampo) = 'Aplicativo' then
+  else if trim(vMensMob.vCampo) = 'Aplicativo' then
   	vSqlTemp := 'a.aplicativo '
-  else if trim(pCampo) = 'Plataforma' then
+  else if trim(vMensMob.vCampo) = 'Plataforma' then
   	vSqlTemp := 'p.plataforma '
-  else if trim(pCampo) = 'Prof Resp' then
+  else if trim(vMensMob.vCampo) = 'Prof Resp' then
     vSqlTemp := 'r.nome_vendedor'
-  else if trim(pCampo) = 'Aplicativo Resp' then
+  else if trim(vMensMob.vCampo) = 'Aplicativo Resp' then
     vSqlTemp := 'ar.aplicativo'
-  else if trim(pCampo) = 'Plataforma Resp' then
+  else if trim(vMensMob.vCampo) = 'Plataforma Resp' then
     vSqlTemp := 'pr.plataforma';
 
   if vSqlTemp <> '' then
   begin
-    if pCondicao = 'Igual' then
-      pCondicao := '= '
-    else if pCondicao = 'Maior' then
-      pCondicao := '> '
-    else if pCondicao = 'Maior ou Igual' then
-      pCondicao := '>= '
-    else if pCondicao = 'Menor' then
-      pCondicao := '< '
-    else if pCondicao = 'Menor ou Igual' then
-      pCondicao := '<= '
-    else if pCondicao = 'Diferente' then
-      pCondicao := '<> '
-    else if (pCondicao = 'Esta contido') then
-      pCondicao := 'like'
-    else if (pCondicao = 'Começa') then
-      pCondicao := 'Começa'
+    if vMensMob.vCondicao = 'Igual' then
+      vMensMob.vCondicao := '= '
+    else if vMensMob.vCondicao = 'Maior' then
+      vMensMob.vCondicao := '> '
+    else if vMensMob.vCondicao = 'Maior ou Igual' then
+      vMensMob.vCondicao := '>= '
+    else if vMensMob.vCondicao = 'Menor' then
+      vMensMob.vCondicao := '< '
+    else if vMensMob.vCondicao = 'Menor ou Igual' then
+      vMensMob.vCondicao := '<= '
+    else if vMensMob.vCondicao = 'Diferente' then
+      vMensMob.vCondicao := '<> '
+    else if (vMensMob.vCondicao = 'Esta contido') then
+      vMensMob.vCondicao := 'like'
+    else if (vMensMob.vCondicao = 'Começa') then
+      vMensMob.vCondicao := 'Começa'
     else
-      pCondicao := '= ';
+      vMensMob.vCondicao := '= ';
 
-    if pCondicao = 'like' then
-      vSqlTemp := vSqlTemp + pCondicao + QuotedStr('%' + pValor + '%')
-    else if pCondicao = 'Começa' then
-      vSqlTemp := vSqlTemp + 'like' + QuotedStr(pValor + '%')
+    if vMensMob.vCondicao = 'like' then
+      vSqlTemp := vSqlTemp + vMensMob.vCondicao + QuotedStr('%' + vMensMob.vValor + '%')
+    else if vMensMob.vCondicao = 'Começa' then
+      vSqlTemp := vSqlTemp + 'like' + QuotedStr(vMensMob.vValor + '%')
     else
-      vSqlTemp := vSqlTemp + pCondicao + QuotedStr(pValor);
-    pValor := '';
+      vSqlTemp := vSqlTemp + vMensMob.vCondicao + QuotedStr(vMensMob.vValor);
+    vMensMob.vValor := '';
   end;
 
-  if pNaolidas then
+  if vMensMob.vNaolidas then
   begin
   	if trim(vSqlTemp) <> '' then
     	vSqlTemp := vSqlTemp + ' and ';
     vSqlTemp := vSqlTemp + ' mensagem_mob.data_recepcao is null and mensagem_mob.hora_recepcao is null';
   end;
 
-  if trim(pOrigMens) <> '' then
-  begin
-  	if trim(vSqlTemp) <> '' then
-    	vSqlTemp := vSqlTemp + ' and ';
-  	vSqlTemp := vSqlTemp + ' mensagem_mob.orig_mens in (' + pOrigMens + ')';
-  end;
-
-  if trim(pStatusEnv) <> '' then
-  begin
-    if trim(vSqlTemp) <> '' then
-    	vSqlTemp := vSqlTemp + ' and ';
-    vSqlTemp := vSqlTemp + ' mensagem_mob.status_env in (' + pStatusEnv + ')';
-  end;
-
-  if trim(pOrigem) <> '' then
-  begin
-    if trim(vSqlTemp) <> '' then
-    	vSqlTemp := vSqlTemp + ' and ';
-    vSqlTemp := vSqlTemp + ' mensagem_mob.origem in (' + pOrigem + ')';
-  end;
-
-  if trim(pDestino) <> '' then
-  begin
-    if trim(vSqlTemp) <> '' then
-    	vSqlTemp := vSqlTemp + ' and ';
-    vSqlTemp := vSqlTemp + ' mensagem_mob.destino in (' + pDestino + ')';
-  end;
-
   vSeqm := copy(dataSet.IndexName, 5, length(dataSet.IndexName));
   if Trim(vSeqm) = '' then
     vSeqm := 'IDSEQM';
 
-  if pAvancado then
+  vOrigMens  := '';
+  vStatusEnv := '';
+  vOrigem    := '';
+  vDestino   := '';
+
+  if vMensMob.vAvancado then
   begin
-  	if pPorDataAd then
+    if vMensMob.vAplicativo then
+      vOrigMens := vDadosIni.IfThen(trim(vOrigMens) = '', '', trim(vOrigMens) + ',') + QuotedStr('A');
+    if vMensMob.vMobile then
+      vOrigMens := vDadosIni.IfThen(trim(vOrigMens) = '', '', trim(vOrigMens) + ',') + QuotedStr('M');
+    if vMensMob.vEcommerce then
+      vOrigMens := vDadosIni.IfThen(trim(vOrigMens) = '', '', trim(vOrigMens) + ',') + QuotedStr('E');
+    if vMensMob.vFinanceiro then
+      vOrigMens := vDadosIni.IfThen(trim(vOrigMens) = '', '', trim(vOrigMens) + ',') + QuotedStr('F');
+    if vMensMob.vPagOnline then
+      vOrigMens := vDadosIni.IfThen(trim(vOrigMens) = '', '', trim(vOrigMens) + ',') + QuotedStr('P');
+
+    if vMensMob.vStatusNO then
+      vStatusEnv := vDadosIni.IfThen(trim(vStatusEnv) = '', '', trim(vStatusEnv) + ',') + QuotedStr('NO');
+    if vMensMob.vStatusEP then
+      vStatusEnv := vDadosIni.IfThen(trim(vStatusEnv) = '', '', trim(vStatusEnv) + ',') + QuotedStr('EP');
+    if vMensMob.vStatusAC then
+      vStatusEnv := vDadosIni.IfThen(trim(vStatusEnv) = '', '', trim(vStatusEnv) + ',') + QuotedStr('AC');
+    if vMensMob.vStatusER then
+      vStatusEnv := vDadosIni.IfThen(trim(vStatusEnv) = '', '', trim(vStatusEnv) + ',') + QuotedStr('ER');
+    if vMensMob.vStatusPP then
+      vStatusEnv := vDadosIni.IfThen(trim(vStatusEnv) = '', '', trim(vStatusEnv) + ',') + QuotedStr('PP');
+
+    if vMensMob.vOrigemErp then
+      vOrigem := vDadosIni.IfThen(trim(vOrigem) = '', '', trim(vOrigem) + ',') + QuotedStr('erp');
+    if vMensMob.vOrigemBot then
+      vOrigem := vDadosIni.IfThen(trim(vOrigem) = '', '', trim(vOrigem) + ',') + QuotedStr('bot');
+
+    if vMensMob.vDestinoErp then
+      vDestino := vDadosIni.IfThen(trim(vDestino) = '', '', trim(vDestino) + ',') + QuotedStr('erp');
+    if vMensMob.vDestinoBot then
+      vDestino := vDadosIni.IfThen(trim(vDestino) = '', '', trim(vDestino) + ',') + QuotedStr('bot');
+
+    if trim(vOrigMens) <> '' then
+    begin
+      if trim(vSqlTemp) <> '' then
+        vSqlTemp := vSqlTemp + ' and ';
+      vSqlTemp := vSqlTemp + ' mensagem_mob.orig_mens in (' + vOrigMens + ')';
+    end;
+
+    if trim(vStatusEnv) <> '' then
+    begin
+      if trim(vSqlTemp) <> '' then
+        vSqlTemp := vSqlTemp + ' and ';
+      vSqlTemp := vSqlTemp + ' mensagem_mob.status_env in (' + vStatusEnv + ')';
+    end;
+
+    if vMensMob.vMensagem <> vMensMob.vTarefa then
+    begin
+      if trim(vSqlTemp) <> '' then
+        vSqlTemp := vSqlTemp + ' and ';
+      if vMensMob.vMensagem then
+        vSqlTemp := vSqlTemp + ' mensagem_mob.cod_tarefa is null';
+      if vMensMob.vTarefa then
+        vSqlTemp := vSqlTemp + ' mensagem_mob.cod_tarefa > 0';
+    end;
+
+    if trim(vOrigem) <> '' then
+    begin
+      if trim(vSqlTemp) <> '' then
+        vSqlTemp := vSqlTemp + ' and ';
+      vSqlTemp := vSqlTemp + ' mensagem_mob.origem in (' + vOrigem + ')';
+    end;
+
+    if trim(vDestino) <> '' then
+    begin
+      if trim(vSqlTemp) <> '' then
+        vSqlTemp := vSqlTemp + ' and ';
+      vSqlTemp := vSqlTemp + ' mensagem_mob.destino in (' + vDestino + ')';
+    end;
+  end;
+
+  if vMensMob.vAdicional then
+  begin
+  	 if vMensMob.vPorDataAd then
     begin
       try
         erro := 0;
-        StrToDate(pData1Ad);
+        StrToDate(vMensMob.vData1Ad);
         erro := erro + 1;
       except
-        pData1Ad := '';
+        vMensMob.vData1Ad := '';
       end;
       try
-        StrToDate(pData2Ad);
+        StrToDate(vMensMob.vData2Ad);
       except
-        pData2Ad := '';
+        vMensMob.vData2Ad := '';
         erro := erro + 1;
       end;
       if erro = 2 then
@@ -1300,109 +1456,109 @@ begin
           formatodata := 'mm/dd/yyyy'
         else if pos('.', ShortDateFormat) <> 0 then
           formatodata := 'dd.mm.yyyy';
-        if pData1Ad <> '' then
-          pData1Ad := QuotedStr(FormatDateTime(formatodata, strtodate(pData1Ad)));
-        if pData2Ad <> '' then
-          pData2Ad := QuotedStr(FormatDateTime(formatodata, strtodate(pData2Ad)));
+        if vMensMob.vData1Ad <> '' then
+          vMensMob.vData1Ad := QuotedStr(FormatDateTime(formatodata, strtodate(vMensMob.vData1Ad)));
+        if vMensMob.vData2Ad <> '' then
+          vMensMob.vData2Ad := QuotedStr(FormatDateTime(formatodata, strtodate(vMensMob.vData2Ad)));
       end;
     end
     else
     begin
-      pData1Ad := '';
-      pData2Ad := '';
+      vMensMob.vData1Ad := '';
+      vMensMob.vData2Ad := '';
     end;
-    if pCondicaoAd = 'Igual' then
-      pCondicaoAd := '='
-    else if pCondicaoAd = 'Maior' then
-      pCondicaoAd := '>'
-    else if pCondicaoAd = 'Menor' then
-      pCondicaoAd := '<'
-    else if pCondicaoAd = 'Diferente' then
-      pCondicaoAd := '<>'
-    else if (pCondicaoAd = 'Esta contido') then
-      pCondicaoAd := 'like'
-    else if (pCondicaoAd = 'Começa') then
-      pCondicaoAd := 'Começa'
+    if vMensMob.vCondicaoAd = 'Igual' then
+      vMensMob.vCondicaoAd := '='
+    else if vMensMob.vCondicaoAd = 'Maior' then
+      vMensMob.vCondicaoAd := '>'
+    else if vMensMob.vCondicaoAd = 'Menor' then
+      vMensMob.vCondicaoAd := '<'
+    else if vMensMob.vCondicaoAd = 'Diferente' then
+      vMensMob.vCondicaoAd := '<>'
+    else if (vMensMob.vCondicaoAd = 'Esta contido') then
+      vMensMob.vCondicaoAd := 'like'
+    else if (vMensMob.vCondicaoAd = 'Começa') then
+      vMensMob.vCondicaoAd := 'Começa'
     else
-      pCondicaoAd := '=';
+      vMensMob.vCondicaoAd := '=';
 
     for I := 0 to dataSet.FieldCount - 1 do
     begin
       if Dataset.Fields[I].FieldKind = fkData then
       begin
-        if UpperCase(dataset.Fields[I].DisplayName) = UpperCase(pCampoAd) then
+        if UpperCase(dataset.Fields[I].DisplayName) = UpperCase(vMensMob.vCampoAd) then
         begin
-        	if trim(pCampoAd) = 'Usuario Envio' then
-            pCampoAd := 'f.nome_vendedor '
-          else if trim(pCampoAd) = 'Usuario Receptor' then
-            pCampoAd := 'c.nome_vendedor '
-          else if trim(pCampoAd) = 'Mobile' then
-          	pCampoAd := 'm.descricao_mob '
-          else if trim(pCampoAd) = 'Aplicativo' then
-          	pCampoAd := 'a.aplicativo '
-          else if trim(pCampoAd) = 'Plataforma' then
-          	pCampoAd := 'p.plataforma '
-          else if trim(pCampoAd) = 'Prof Resp' then
-            pCampoAd := 'r.nome_vendedor '
-          else if trim(pCampoAd) = 'Aplicativo Resp' then
-            pCampoAd := 'ar.aplicativo '
-          else if trim(pCampoAd) = 'Plataforma Resp' then
-            pCampoAd := 'pr.plataforma '
+        	if trim(vMensMob.vCampoAd) = 'Usuario Envio' then
+            vMensMob.vCampoAd := 'f.nome_vendedor '
+          else if trim(vMensMob.vCampoAd) = 'Usuario Receptor' then
+            vMensMob.vCampoAd := 'c.nome_vendedor '
+          else if trim(vMensMob.vCampoAd) = 'Mobile' then
+          	vMensMob.vCampoAd := 'm.descricao_mob '
+          else if trim(vMensMob.vCampoAd) = 'Aplicativo' then
+          	vMensMob.vCampoAd := 'a.aplicativo '
+          else if trim(vMensMob.vCampoAd) = 'Plataforma' then
+          	vMensMob.vCampoAd := 'p.plataforma '
+          else if trim(vMensMob.vCampoAd) = 'Prof Resp' then
+            vMensMob.vCampoAd := 'r.nome_vendedor '
+          else if trim(vMensMob.vCampoAd) = 'Aplicativo Resp' then
+            vMensMob.vCampoAd := 'ar.aplicativo '
+          else if trim(vMensMob.vCampoAd) = 'Plataforma Resp' then
+            vMensMob.vCampoAd := 'pr.plataforma '
           else
-          	pCampoAd := 'mensagem_mob.' + trim(DataSet.Fields[I].FieldName);
+          	vMensMob.vCampoAd := 'mensagem_mob.' + trim(DataSet.Fields[I].FieldName);
 
           if ((Dataset.Fields[I] is TIntegerField) or (Dataset.Fields[I] is TFloatField) or
             (Dataset.Fields[I] is TCurrencyField) or (DataSet.Fields[I] is TSmallintField)) and
-            ((pCondicaoAd = 'Começa') or (pCondicaoAd = 'Começa')) then
+            ((vMensMob.vCondicaoAd = 'Começa') or (vMensMob.vCondicaoAd = 'Começa')) then
           begin
-            pCondicaoAd := '=';
+            vMensMob.vCondicaoAd := '=';
             if (Dataset.Fields[I] is TIntegerField) or (DataSet.Fields[I] is TSmallintField) then
             begin
               try
                 if (Dataset.Fields[I] is TIntegerField) or (DataSet.Fields[I] is TSmallintField) then
-                  pValorAd := IntToStr(StrToInt(Trim(pValorAd)))
+                  vMensMob.vValorAd := IntToStr(StrToInt(Trim(vMensMob.vValorAd)))
                 else if (DataSet.Fields[I] is TFloatField) or (DataSet.Fields[I] is TCurrencyField) then
-                  pValorAd := FloatToStr(StrToFloat(Trim(pValorAd)))
+                  vMensMob.vValorAd := FloatToStr(StrToFloat(Trim(vMensMob.vValorAd)))
               except
-                pValorAd := '0';
+                vMensMob.vValorAd := '0';
                 Application.MessageBox('Valor inválido', 'Atenção', 0 + 64);
               end;
             end
             else
-              pValorAd := vDadosIni.tirapontos(pValorAd, 4);
+              vMensMob.vValorAd := vDadosIni.tirapontos(vMensMob.vValorAd, 4);
           end
           else if (DataSet.Fields[i] is TDateField) or (DataSet.Fields[i] is TDateTimeField) then
           begin
           	if trim(vSqlTemp) <> '' then
           		vSqlTemp := vSqlTemp + ' and ';
 
-            if (pData1Ad <> '') and (pData2 <> '') then
-              vSqlTemp := vSqlTemp + pCampoAd + ' >= ' + pData1Ad + ' and ' + pCampoAd + ' <= ' + pData2Ad
-            else if (pData2Ad <> '') then
-              vSqlTemp := vSqlTemp + pcampoAd + ' <= ' + pData1Ad
-            else if (pData1Ad <> '') and (pData2Ad <> '') then
-              vSqlTemp := vSqlTemp + pCampoAd + ' >= ' + pData1Ad;
+            if (vMensMob.vData1Ad <> '') and (vMensMob.vData2 <> '') then
+              vSqlTemp := vSqlTemp + vMensMob.vCampoAd + ' >= ' + vMensMob.vData1Ad + ' and ' + vMensMob.vCampoAd + ' <= ' + vMensMob.vData2Ad
+            else if (vMensMob.vData2Ad <> '') then
+              vSqlTemp := vSqlTemp + vMensMob.vCampoAd + ' <= ' + vMensMob.vData1Ad
+            else if (vMensMob.vData1Ad <> '') and (vMensMob.vData2Ad <> '') then
+              vSqlTemp := vSqlTemp + vMensMob.vCampoAd + ' >= ' + vMensMob.vData1Ad;
             Break;
           end;
 
           if trim(vSqlTemp) <> '' then
           	vSqlTemp := vSqlTemp + ' and ';
 
-          if pCondicaoAd = 'like' then
-          	vSqlTemp := vSqlTemp + pCampoAd + ' like ' + QuotedStr('%' + UpperCase(trim(pValorAd)) + '%')
-          else if pCondicaoAd = 'Começa' then
-          	vSqlTemp := vSqlTemp + pCampoAd + ' like ' + QuotedStr(UpperCase(trim(pValorAd)) + '%')
+          if vMensMob.vCondicaoAd = 'like' then
+          	vSqlTemp := vSqlTemp + vMensMob.vCampoAd + ' like ' + QuotedStr('%' + UpperCase(trim(vMensMob.vValorAd)) + '%')
+          else if vMensMob.vCondicaoAd = 'Começa' then
+          	vSqlTemp := vSqlTemp + vMensMob.vCampoAd + ' like ' + QuotedStr(UpperCase(trim(vMensMob.vValorAd)) + '%')
           else
-          	vSqlTemp := vSqlTemp + pCampoAd + ' ' + pCondicaoAd + ' ' + QuotedStr(UpperCase(trim(pValorAd)));
+          	vSqlTemp := vSqlTemp + vMensMob.vCampoAd + ' ' + vMensMob.vCondicaoAd + ' ' + QuotedStr(UpperCase(trim(vMensMob.vValorAd)));
           Break;
         end;
       end;
     end;
   end;
 
-  if pValor <> '*D*A*T*A*' then
+  if vMensMob.vValor <> '*D*A*T*A*' then
   begin
-    Result := ConsultaCampos('MENSAGEM_MOB', pValor, pCampo, pCondicao, vSeqm, True,
+    Result := ConsultaCampos('MENSAGEM_MOB', vMensMob.vValor, vMensMob.vCampo, vMensMob.vCondicao, vSeqm, True,
       vDadosIni.codEmpresa,
       ' mensagem_mob.*, ' +
       ' m.descricao_mob, ' +
@@ -1420,11 +1576,11 @@ begin
       ' left join msg_aplicativo a on a.id = mensagem_mob.id_msg_aplicativo ' +
       ' left join msg_plataforma p on p.id = mensagem_mob.id_msg_plataforma and p.cod_empresa = mensagem_mob.cod_empresa ' +
       ' left join msg_aplicativo ar on ar.id = mensagem_mob.id_msg_aplicativo_resp ' +
-      ' left join msg_plataforma pr on pr.id = mensagem_mob.id_msg_plataforma_resp and pr.cod_empresa = mensagem_mob.id_msg_plataforma_resp ',
+      ' left join msg_plataforma pr on pr.id = mensagem_mob.id_msg_plataforma_resp and pr.cod_empresa = mensagem_mob.cod_empresa ',
       vSqlTemp);
   end
   else
-    Result := ConsultaCampos('MENSAGEM_MOB', pCampo, vSeqm, pData1, pData2, vDadosIni.codEmpresa, 1,
+    Result := ConsultaCampos('MENSAGEM_MOB', vMensMob.vCampo, vSeqm, vMensMob.vData1, vMensMob.vData2, vDadosIni.codEmpresa, 1,
       ' mensagem_mob.*, ' +
       ' m.descricao_mob, ' +
       ' c.nome_vendedor as usuario_leu, ' +
@@ -1441,7 +1597,7 @@ begin
       ' left join msg_aplicativo a on a.id = mensagem_mob.id_msg_aplicativo ' +
       ' left join msg_plataforma p on p.id = mensagem_mob.id_msg_plataforma and p.cod_empresa = mensagem_mob.cod_empresa ' +
       ' left join msg_aplicativo ar on ar.id = mensagem_mob.id_msg_aplicativo_resp ' +
-      ' left join msg_plataforma pr on pr.id = mensagem_mob.id_msg_plataforma_resp and pr.cod_empresa = mensagem_mob.id_msg_plataforma_resp ',
+      ' left join msg_plataforma pr on pr.id = mensagem_mob.id_msg_plataforma_resp and pr.cod_empresa = mensagem_mob.cod_empresa ',
       vSqlTemp);
 end;
 

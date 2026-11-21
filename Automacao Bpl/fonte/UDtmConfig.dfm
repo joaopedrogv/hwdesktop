@@ -3619,6 +3619,7 @@ object dtmConfig: TdtmConfig
       'select msg_origem_modcartas.*,'
       'msg_origem.descricao,'
       'modcartas.descricao as modcarta,'
+      'modcartas.doc,'
       'msg_aplicativo.aplicativo from msg_origem_modcartas'
       'left join modcartas on'
       '    modcartas.cod_carta = msg_origem_modcartas.cod_carta'
@@ -3673,6 +3674,12 @@ object dtmConfig: TdtmConfig
       DisplayLabel = 'Carta'
       FieldName = 'MODCARTA'
       Size = 64
+    end
+    object cdsMsgOrigemModCartasDOC: TStringField
+      DisplayLabel = 'Doc'
+      FieldName = 'DOC'
+      FixedChar = True
+      Size = 1
     end
     object cdsMsgOrigemModCartasID_MSG_ORIGEM: TIntegerField
       DisplayLabel = 'Id Origem'
@@ -3785,5 +3792,202 @@ object dtmConfig: TdtmConfig
     DataSet = cdsCollectionsRag
     Left = 1856
     Top = 456
+  end
+  object qrAbreMsgTipoTarefa: TIBQuery
+    Database = dtmAtivo.bancoHw
+    Transaction = ibTransConfig
+    SQL.Strings = (
+      'select id, tipo, descricao_reduzida,'
+      
+        '(tipo || '#39' | '#39' || descricao_reduzida) tipo_tarefa from msg_tipo_' +
+        'tarefa')
+    Left = 2128
+    Top = 560
+  end
+  object dspAbreMsgTipoTarefa: TDataSetProvider
+    DataSet = qrAbreMsgTipoTarefa
+    Options = [poAllowCommandText, poUseQuoteChar]
+    UpdateMode = upWhereChanged
+    Left = 2128
+    Top = 608
+  end
+  object cdsAbreMsgTipoTarefa: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspAbreMsgTipoTarefa'
+    BeforeOpen = cdsMenusBeforeOpen
+    Left = 2128
+    Top = 656
+    object cdsAbreMsgTipoTarefaID: TIntegerField
+      FieldName = 'ID'
+      Required = True
+    end
+    object cdsAbreMsgTipoTarefaTIPO: TStringField
+      FieldName = 'TIPO'
+      Size = 60
+    end
+    object cdsAbreMsgTipoTarefaDESCRICAO_REDUZIDA: TStringField
+      FieldName = 'DESCRICAO_REDUZIDA'
+      Size = 100
+    end
+    object cdsAbreMsgTipoTarefaDESCRICAO: TStringField
+      FieldName = 'TIPO_TAREFA'
+      Size = 163
+    end
+  end
+  object dsAbreMsgTipoTarefa: TDataSource
+    AutoEdit = False
+    DataSet = cdsAbreMsgTipoTarefa
+    Left = 2128
+    Top = 704
+  end
+  object qrMsgTipoTarefaOrigem: TIBQuery
+    Database = dtmAtivo.bancoHw
+    Transaction = ibTransConfig
+    SQL.Strings = (
+      'select '
+      'msg_tipo_tarefa_origem.*,'
+      
+        'msg_origem.descricao, msg_tipo_tarefa.tipo, msg_tipo_tarefa.desc' +
+        'ricao_reduzida from msg_tipo_tarefa_origem'
+      'left join msg_tipo_tarefa on'
+      
+        '    msg_tipo_tarefa.id = msg_tipo_tarefa_origem.id_msg_tipo_tare' +
+        'fa'
+      'left join msg_origem on '
+      '    msg_origem.id = msg_tipo_tarefa_origem.id_msg_origem')
+    Left = 2000
+    Top = 560
+  end
+  object dspMsgTipoTarefaOrigem: TDataSetProvider
+    DataSet = qrMsgTipoTarefaOrigem
+    Options = [poAllowCommandText, poUseQuoteChar]
+    UpdateMode = upWhereChanged
+    Left = 2000
+    Top = 608
+  end
+  object cdsMsgTipoTarefaOrigem: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspMsgTipoTarefaOrigem'
+    BeforeOpen = cdsMenusBeforeOpen
+    Left = 2000
+    Top = 656
+    object cdsMsgTipoTarefaOrigemSEL: TStringField
+      DisplayLabel = 'Sel'
+      FieldKind = fkInternalCalc
+      FieldName = 'SEL'
+      Size = 1
+    end
+    object cdsMsgTipoTarefaOrigemID_MSG_TIPO_TAREFA: TIntegerField
+      DisplayLabel = 'Id Tipo Tarefa'
+      FieldName = 'ID_MSG_TIPO_TAREFA'
+      Required = True
+    end
+    object cdsMsgTipoTarefaOrigemID_MSG_ORIGEM: TIntegerField
+      DisplayLabel = 'Id Origem'
+      FieldName = 'ID_MSG_ORIGEM'
+      Required = True
+    end
+    object cdsMsgTipoTarefaOrigemTIPO: TStringField
+      DisplayLabel = 'Tipo Tarefa'
+      FieldName = 'TIPO'
+      Size = 60
+    end
+    object cdsMsgTipoTarefaOrigemDESCRICAO_REDUZIDA: TStringField
+      DisplayLabel = 'Descricao Tipo Tarefa'
+      FieldName = 'DESCRICAO_REDUZIDA'
+      Size = 100
+    end
+    object cdsMsgTipoTarefaOrigemDESCRICAO: TStringField
+      DisplayLabel = 'Origem'
+      FieldName = 'DESCRICAO'
+      Size = 50
+    end
+  end
+  object dsMsgTipoTarefaOrigem: TDataSource
+    AutoEdit = False
+    DataSet = cdsMsgTipoTarefaOrigem
+    Left = 2000
+    Top = 704
+  end
+  object qrMsgTipoTarefa: TIBQuery
+    Database = dtmAtivo.bancoHw
+    Transaction = ibTransConfig
+    SQL.Strings = (
+      'select * from msg_tipo_tarefa')
+    Left = 1872
+    Top = 568
+  end
+  object dspMsgTipoTarefa: TDataSetProvider
+    DataSet = qrMsgTipoTarefa
+    Options = [poAllowCommandText, poUseQuoteChar]
+    UpdateMode = upWhereChanged
+    Left = 1872
+    Top = 616
+  end
+  object cdsMsgTipoTarefa: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspMsgTipoTarefa'
+    BeforeOpen = cdsMenusBeforeOpen
+    Left = 1872
+    Top = 664
+    object cdsMsgTipoTarefaID: TIntegerField
+      DisplayLabel = 'Id'
+      FieldName = 'ID'
+      Required = True
+    end
+    object cdsMsgTipoTarefaTIPO: TStringField
+      DisplayLabel = 'Tipo'
+      FieldName = 'TIPO'
+      Size = 60
+    end
+    object cdsMsgTipoTarefaDESCRICAO_REDUZIDA: TStringField
+      DisplayLabel = 'Descricao Reduzida'
+      FieldName = 'DESCRICAO_REDUZIDA'
+      Size = 100
+    end
+    object cdsMsgTipoTarefaDESCRICAO_COMPLETA: TMemoField
+      DisplayLabel = 'Descricao Completa'
+      FieldName = 'DESCRICAO_COMPLETA'
+      OnGetText = cdsMsgTipoTarefaDESCRICAO_COMPLETAGetText
+      BlobType = ftMemo
+      Size = 8
+    end
+    object cdsMsgTipoTarefaSLA_SEG_TAREFA: TIntegerField
+      DisplayLabel = 'Sla Seg Tarefa'
+      FieldName = 'SLA_SEG_TAREFA'
+    end
+    object cdsMsgTipoTarefaTEMPO_ADIAMENTO: TIntegerField
+      DisplayLabel = 'Tempo Adiamento'
+      FieldName = 'TEMPO_ADIAMENTO'
+    end
+    object cdsMsgTipoTarefaQTDE_MAX_ADIAMENTO: TIntegerField
+      DisplayLabel = 'Qtde Max Adiamento'
+      FieldName = 'QTDE_MAX_ADIAMENTO'
+    end
+    object cdsMsgTipoTarefaEXEC_AUTO: TStringField
+      DisplayLabel = 'Exec Auto'
+      FieldName = 'EXEC_AUTO'
+      FixedChar = True
+      Size = 1
+    end
+    object cdsMsgTipoTarefaPERC_TOLERANCIA: TFloatField
+      DisplayLabel = 'Perc Tolerancia'
+      FieldName = 'PERC_TOLERANCIA'
+      DisplayFormat = '#,##0.00'
+    end
+    object cdsMsgTipoTarefaNOD_RESPOSTA: TStringField
+      DisplayLabel = 'Nod Resposta'
+      FieldName = 'NOD_RESPOSTA'
+      Size = 60
+    end
+  end
+  object dsMsgTipoTarefa: TDataSource
+    AutoEdit = False
+    DataSet = cdsMsgTipoTarefa
+    Left = 1872
+    Top = 712
   end
 end

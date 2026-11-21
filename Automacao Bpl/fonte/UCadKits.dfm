@@ -2936,6 +2936,30 @@ inherited FrmCadKits: TFrmCadKits
               TabOrder = 11
               OnClick = ckLixeiraClick
             end
+            object ckEstoqueDisponivel: TCheckBox
+              Left = 692
+              Top = 29
+              Width = 111
+              Height = 17
+              Hint = 'Exibir Estoque Dispon'#237'vel'
+              Caption = 'Estoque Disp (F4)'
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 12
+              OnClick = ckEstoqueDisponivelClick
+            end
+            object ckEcommerce: TCheckBox
+              Left = 692
+              Top = 49
+              Width = 105
+              Height = 17
+              Hint = 'Kit no E-Commerce'
+              Caption = 'E-Commerce (F2)'
+              ParentShowHint = False
+              ShowHint = True
+              TabOrder = 13
+              OnClick = ckEcommerceClick
+            end
           end
           inherited Panel1: TPanel
             Width = 895
@@ -2986,8 +3010,10 @@ inherited FrmCadKits: TFrmCadKits
                 Hint = 'Editar Registro - [PRO112]'
               end
               inherited SpeedButton2: TSpeedButton
+                Top = 6
                 Hint = 'Apagar Registro - [PRO114]'
                 OnClick = SpeedButton2Click
+                ExplicitTop = 6
               end
               inherited SpeedButton3: TSpeedButton
                 Hint = 'Imprimir - [PRO427]'
@@ -5572,6 +5598,7 @@ inherited FrmCadKits: TFrmCadKits
                   2F25110E2ACFCFCFCFCF2823545466651510100619CFCFCFCFCF80725F50AF7F
                   17040A1049CFCFCFCFCFCF4A5050AF7F2D25111BCFCFCFCFCFCFCFCF5D50A46C
                   303548CFCFCFCFCFCFCFCFCFCF4A6D45341FCFCFCFCFCFCFCFCF}
+                OnClick = SpeedButton68Click
               end
               object btSincronizarKit: TSpeedButton
                 Left = 374

@@ -1,8 +1,8 @@
 inherited frmCadMensMob: TfrmCadMensMob
   Caption = 'Mensagens'
   Scaled = False
-  ExplicitWidth = 806
-  ExplicitHeight = 595
+  ExplicitWidth = 814
+  ExplicitHeight = 603
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelFundo: TPanel
@@ -520,12 +520,12 @@ inherited frmCadMensMob: TfrmCadMensMob
               TabOrder = 7
             end
             object pnMensagemNaoLidas: TPanel
-              Left = 263
-              Top = 49
-              Width = 122
+              Left = 257
+              Top = 40
+              Width = 112
               Height = 13
               BevelOuter = bvNone
-              Caption = 'Mensagens n'#227'o lidas'
+              Caption = 'N'#227'o lida / Aberta '
               Color = 12320767
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clBlack
@@ -550,7 +550,7 @@ inherited frmCadMensMob: TfrmCadMensMob
             object GroupBoxAvancado: TGroupBox
               Left = 3
               Top = 69
-              Width = 343
+              Width = 349
               Height = 124
               Caption = 'Op'#231#245'es Avan'#231'adas'
               TabOrder = 0
@@ -558,7 +558,7 @@ inherited frmCadMensMob: TfrmCadMensMob
               object GroupBox5: TGroupBox
                 Left = 2
                 Top = 15
-                Width = 88
+                Width = 87
                 Height = 107
                 Align = alClient
                 Caption = 'Natureza'
@@ -605,9 +605,9 @@ inherited frmCadMensMob: TfrmCadMensMob
                 end
               end
               object GroupBox6: TGroupBox
-                Left = 90
+                Left = 89
                 Top = 15
-                Width = 145
+                Width = 142
                 Height = 107
                 Align = alRight
                 Caption = 'Status Envio'
@@ -653,67 +653,101 @@ inherited frmCadMensMob: TfrmCadMensMob
                   TabOrder = 4
                 end
               end
-              object GroupBox7: TGroupBox
-                Left = 235
+              object Panel4: TPanel
+                Left = 231
                 Top = 15
-                Width = 106
+                Width = 116
                 Height = 107
                 Align = alRight
+                BevelOuter = bvNone
                 TabOrder = 2
-                object Label8: TLabel
-                  Left = 3
-                  Top = 7
-                  Width = 34
-                  Height = 13
-                  Alignment = taCenter
-                  Caption = 'Origem'
-                end
-                object Label12: TLabel
-                  Left = 3
-                  Top = 63
-                  Width = 36
-                  Height = 13
-                  Alignment = taCenter
-                  Caption = 'Destino'
-                end
-                object ckOrigemErp: TCheckBox
-                  Left = 3
-                  Top = 26
-                  Width = 42
-                  Height = 17
-                  Caption = 'erp'
+                object GroupBox7: TGroupBox
+                  Left = 0
+                  Top = 0
+                  Width = 116
+                  Height = 36
+                  Align = alTop
+                  Caption = 'Tipo'
                   TabOrder = 0
+                  object ckTarefa: TCheckBox
+                    Left = 61
+                    Top = 16
+                    Width = 52
+                    Height = 17
+                    Caption = 'tarefa'
+                    TabOrder = 0
+                  end
+                  object ckMensagem: TCheckBox
+                    Left = 3
+                    Top = 16
+                    Width = 52
+                    Height = 17
+                    Caption = 'mens'
+                    TabOrder = 1
+                  end
                 end
-                object ckOrigemBot: TCheckBox
-                  Left = 61
-                  Top = 26
-                  Width = 42
-                  Height = 17
-                  Caption = 'bot'
+                object GroupBox8: TGroupBox
+                  Left = 0
+                  Top = 36
+                  Width = 116
+                  Height = 71
+                  Align = alClient
                   TabOrder = 1
-                end
-                object ckDestinoErp: TCheckBox
-                  Left = 3
-                  Top = 82
-                  Width = 42
-                  Height = 17
-                  Caption = 'erp'
-                  TabOrder = 2
-                end
-                object ckDestinoBot: TCheckBox
-                  Left = 61
-                  Top = 82
-                  Width = 42
-                  Height = 17
-                  Caption = 'bot'
-                  TabOrder = 3
+                  object Label8: TLabel
+                    Left = 3
+                    Top = 6
+                    Width = 34
+                    Height = 13
+                    Alignment = taCenter
+                    Caption = 'Origem'
+                  end
+                  object Label12: TLabel
+                    Left = 3
+                    Top = 40
+                    Width = 36
+                    Height = 13
+                    Alignment = taCenter
+                    Caption = 'Destino'
+                  end
+                  object ckOrigemErp: TCheckBox
+                    Left = 3
+                    Top = 19
+                    Width = 42
+                    Height = 17
+                    Caption = 'erp'
+                    TabOrder = 0
+                  end
+                  object ckOrigemBot: TCheckBox
+                    Left = 61
+                    Top = 19
+                    Width = 42
+                    Height = 17
+                    Caption = 'bot'
+                    TabOrder = 1
+                  end
+                  object ckDestinoErp: TCheckBox
+                    Left = 3
+                    Top = 52
+                    Width = 42
+                    Height = 17
+                    Caption = 'erp'
+                    TabOrder = 2
+                  end
+                  object ckDestinoBot: TCheckBox
+                    Left = 61
+                    Top = 52
+                    Width = 42
+                    Height = 17
+                    Caption = 'bot'
+                    TabOrder = 3
+                  end
                 end
               end
             end
             object groupAdicional: TGroupBox
-              Left = 348
+              Left = 354
               Top = 69
-              Width = 403
+              Width = 397
               Height = 124
               Caption = 'Pesquisa Adicional'
               TabOrder = 1
@@ -807,6 +841,23 @@ inherited frmCadMensMob: TfrmCadMensMob
                   'Menor'
                   'Esta contido')
               end
+            end
+            object pnTarefaAtrasada: TPanel
+              Left = 257
+              Top = 56
+              Width = 112
+              Height = 13
+              BevelOuter = bvNone
+              Caption = 'Atrasada'
+              Color = 14013951
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clBlack
+              Font.Height = -11
+              Font.Name = 'Tahoma'
+              Font.Style = [fsBold]
+              ParentBackground = False
+              ParentFont = False
+              TabOrder = 15
             end
           end
           inherited Panel1: TPanel
@@ -902,7 +953,65 @@ inherited frmCadMensMob: TfrmCadMensMob
                 OnClick = SpeedButton6Click
               end
               inherited SpeedButton7: TSpeedButton
-                Visible = False
+                Hint = 'Atribuir profissional respons'#225'vel - [MOB021]'
+                Glyph.Data = {
+                  F6060000424DF606000000000000360000002800000018000000180000000100
+                  180000000000C0060000120B0000120B00000000000000000000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB98547A35E0FA15D0F9F
+                  5C109E5B109C5A119B5A11995912985812965713945613935614915514905415
+                  8E5315A87B4EFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA662
+                  12A45F0EA35E0FA15D0F9F5C109E5B109C5A119086C59086C698581296571394
+                  5613935614915514905415905619FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFB77D39A65F0EA45F0EA35E0FA15D0F9F5C10C59C6F5A5ADC5B5B
+                  DCC29B70985812965713945613935614915514A57340FFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFE2C9ACA7600DA65F0EA45F0EA35E0FA15D0F
+                  F7F1EB8282E58383E5F6F1EA995912985812965713945613935614DBC7B2FFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD7B58EA8600FA6
+                  5F0EA45F0EB98549FFFFFF7C7CE37C7CE3FFFFFFB3824B995912985812975715
+                  CEB294FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFEBDAC6BB8545A65F0EDABE9DD5EDF75AB9E15AB9E1D5EDF7D7BC9E9B
+                  5A11B1814BE7D8C8FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2E7DABED7DE27A6DA21A9E121A9
+                  E127A5DABED7DEF0E6DBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFCFEFF57C1EB
+                  21B3EF24B5F124B5F121B3EF58C2EDFCFEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFF80D3F628B8F22EBBF431BCF431BCF42EBBF428B8F27BD2F5FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFBFEAFB2AB9F233BDF539C1F73CC2F83CC2F839C1F733BDF52A
+                  B9F2C0EAFBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF95DCF831BDF53BC2F742C5F946C7FB46C7
+                  FB42C5F93BC2F731BDF595DCF8FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFECF8FC38B2E337BFF640C4F9
+                  48C9FC4ECBFD4ECBFD48C9FC40C4F937BFF638B2E4ECF8FCFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDCF2FA35
+                  A4DC39C1F743C6FA4CCBFD51CEFE51CEFE4CCAFD43C6FA39C1F735A3DBDEF2FA
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFF589EDB38C0F641C5F94AC9FC4FCCFE4FCCFE4AC9FC41C5F938
+                  C0F65793D5FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2C70C632BCF43DC3F844C6FA48C8FB48C8
+                  FB44C6FA3DC3F832BAF22C61BCFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF1A62C0249BE136BFF6
+                  3CC2F83FC4F93FC4F93CC2F836BFF6238FDB1950B4FFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF52
+                  8DD11667C11E85D41B71C91661BF1660BF1C72C81F80D21654B84673C4FFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFE3ECF72471C81562BF1565C11566C11564C01561BF155BBB1B
+                  58BAD2DDF1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2F7FC4B90D31564C11565C11564
+                  C01561BF155FBD9DBBE3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  CBDBF085ADDE7BA6DA8CB0DF92B4E0CCDBF0FFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+                OnClick = SpeedButton7Click
               end
               inherited SpeedButton8: TSpeedButton
                 Hint = 'Dados API Mensageria'
@@ -966,7 +1075,65 @@ inherited frmCadMensMob: TfrmCadMensMob
                 OnClick = SpeedButton8Click
               end
               inherited SpeedButton11: TSpeedButton
-                Visible = False
+                Hint = 'Finalizar tarefa - [MOB022]'
+                Glyph.Data = {
+                  F6060000424DF606000000000000360000002800000018000000180000000100
+                  180000000000C0060000120B0000120B00000000000000000000FFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFF7F7F7E8E8E8E7E7E7E7E7E7E7E7E7E7E7E7E7E7E7E7E7
+                  E7E7E7E7E7E7E7E7E7E7E7E7E7E7E7E7E8E8E8F8F8F8FFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFE3E3E3DEDEDEE2E2E2E2E2E2E2E2E2E2E2E2
+                  E2E2E2E2E2E2E2E2E2E2E2E2E2E2E2E2E2E2E2E2E2E2E2E2DDDDDDC1C1C1E0E0
+                  E0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFAFAFAEEEDEDAE90929D76799D
+                  76799D76799D76799D76799D76799D76799D76799D76799D76799D76799D7679
+                  AE9193EEECEDBEBEBEFEFEFEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF1F1F1C5B3
+                  B59C605EB5736AB5736AB5736AB5736AB5736AB5736AB5736AB5736AB5736AB5
+                  736AB5736AB5736A9C605DC0AAADD2D2D2F5F5F5FFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFF2F2F2B59C9EA96962E8C5B3FBE6D2FBE6D2FBE6D2FBE6D2FBE6D2FBE6
+                  D2FBE6D2FBE6D2FBE6D2FBE6D2E8C4B3A96962B59C9ED6D6D6F4F4F4FFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFF2F2F2B59C9EA96962F0D3C0FFEED9FFEED9FFEED9
+                  FFEED9FFEED9FFEED9FFEED9FFEED9FFEED9FFEED9F0D3C0A96962B59C9ED6D6
+                  D6F4F4F4FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2F2F2B59C9EA96962F0D3C0FF
+                  EED9FFEED9FFEED9FFEED9FFEED9FFEED9FFEED9FFEED9FFEED9FFEED9F0D3C0
+                  A96962B59C9ED6D6D6F4F4F4FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2F2F2B59C
+                  9EA96962F0D3C0FFEED9FFEED9FFEED9FFEED9FFEED9FFEED9FFEED9FFEED9FF
+                  EED9FFEED9F0D3C0A96962B59C9ED6D6D6F4F4F4FFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFF2F2F2B59C9EA96962F0D3C0FFEED9FFEED9FFEED9FFEED9FFEED9FFEE
+                  D9FFEED9FFEED9FFEED9FFEED9F0D3C0A96962B59C9ED6D6D6F4F4F4FFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFF2F2F2B59C9EA96962F0D3C0FFEED9FFEED9C7E1BF
+                  46C284B3DCB6FFEED9FFEED9FFEED9FFEED9FFEED9F0D3C0A96962B59C9ED6D6
+                  D6F4F4F4FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2F2F2B59C9EA96962F0D3C0FF
+                  EED9C7E1BF37BE7E3EC08032BE7BB3DCB6FFEED9FFEED9FFEED9FFEED9F0D3C0
+                  A96962B59C9ED6D6D6F4F4F4FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2F2F2B59C
+                  9EA96962F0D3C0FFEED969CA9563C992F3EBD376CD9A32BE7BB3DCB6FFEED9FF
+                  EED9FFEED9F0D3C0A96962B59C9ED6D6D6F4F4F4FFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFF2F2F2B59C9EA96962F0D3C0FFEED9F9ECD6FDEDD8FFEED9FCEDD876CD
+                  9A32BE7BB3DCB6FFEED9FFEED9F0D3C0A96962B59C9ED6D6D6F4F4F4FFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFF2F2F2B59C9EA96962F0D3C0FFEED9FFEED9FFEED9
+                  FFEED9FFEED9FCEDD876CD9A32BE7BB6DDB7FFEED9F0D3C0A96962B59C9ED6D6
+                  D6F4F4F4FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2F2F2B59C9EA96962F0D3C0FF
+                  EED9FFEED9FFEED9FFEED9FFEED9FFEED9FCEDD87BCF9D74CD99FFEED9F0D3C0
+                  A96962B59C9ED6D6D6F4F4F4FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2F2F2B59C
+                  9EA96962F0D3C0FFEED9FFEED9FFEED9FFEED9FFEED9FFEED9FFEED9FFEED9FF
+                  EED9FFEED9F0D3C0A96962B59C9ED6D6D6F4F4F4FFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFF2F2F2B59C9EA96962F0D3C0FFEED9FFEED9FFEED9FFEED9FFEED9FFEE
+                  D9FFEED9FFEED9FFEED9FFEED9F0D3C0A96962B59C9ED6D6D6F4F4F4FFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFF2F2F2B59C9EA96962F0D3C0FFEED9FFEED9FFEED9
+                  FFEED9FFEED9FFEED9FFEED9FFEED9FFEED9FFEED9F0D3C0A96962B59C9ED6D6
+                  D6F4F4F4FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF2F2F2B59C9EA96962EAC7B5FB
+                  E6D2FDD6ABFFC071FFBF70FFBF70FFBF70FFBF70FFC071FDD7ABFBE6D2E9C7B5
+                  A96962B59C9ED6D6D6F5F5F5FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5F5F5C3B0
+                  B29E625FBA786DBA786DDE9E6DF5B66DF9BA6FFEBD6FFEBD6FF9BA6FF5B66DDE
+                  9E6DBA786DBA786D9D625EBEA9ABD4D4D4FDFDFDFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFBFBFBEEEDEDA78689956C70956C70966C6E966B6C885453D09461D194
+                  60885453966B6C966C6E956C70956C70AF9193EDEBEBE1E1E1FFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFAFAFAF2F2F2F0F0F0F0F0F0F0F0F0F1F1F1
+                  AC8C8E9F675A9F685AAC8E90F0F0F0F0F0F0F0F0F0F0F0F0EEEEEEF2F2F2FFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFBFBFBF0F0F0D7CCCDD7CDCEEFEFEFF7F7F7FFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDFDFDF9F9F9F9F9F9FDFDFDFFFFFFFF
+                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
+                OnClick = SpeedButton11Click
               end
               inherited SpeedButton12: TSpeedButton
                 Visible = False
@@ -1831,20 +1998,20 @@ inherited frmCadMensMob: TfrmCadMensMob
     Top = 41
   end
   inherited PopupMenu2: TPopupMenu
-    Left = 742
-    Top = 19
+    Left = 686
+    Top = 3
   end
   inherited Timer1: TTimer
-    Left = 702
-    Top = 19
+    Left = 654
+    Top = 3
   end
   inherited ApplicationEventsPadrao: TApplicationEvents
-    Left = 670
-    Top = 19
+    Left = 622
+    Top = 3
   end
   object DataSource1: TDataSource
     DataSet = dtmMobile.cdsMensMobile
-    Left = 632
-    Top = 16
+    Left = 584
+    Top = 8
   end
 end

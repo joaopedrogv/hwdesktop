@@ -10,7 +10,7 @@ uses
   IdSASLOTP, IdSASLAnonymous, IdSASLExternal, DBCtrls, IBStoredProc, ExtCtrls,
   Forms, Mask, uRecord, Windows, CheckLst, Grids, config_sistema_class, uSetTabelaProcessos, UCrpeClasses, UCrpe32,
   hw_auditoria_class, tabela_processos_class, tabela_processos_usuarios_class, leitura_balanca_peso, EnterantHw, 
-  Buttons, dataset_list, hw_utils, JPEG, MD5, Graphics, Messages;
+  Buttons, dataset_list, hw_utils, JPEG, MD5, Graphics, Messages, Types;
 
 const
   NomeMes: array[1..12] of string = ('Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -1033,8 +1033,26 @@ procedure WriteToMSWord(const RTFText: string; pSenha: string = ''; pDestino: st
 procedure WriteToOpWrite(URL: string);
 function _converterTags(pDados: string; pRtfHtml: string): string;
 function _converterTagsImage(pDados: string; pBuscas: TIBQuery; pMD5toBase64: boolean): string;
+function retornaVariaveisTemplate(
+  pOrigem: string;
+  pCodCarta: Integer;
+  pCodEmpresa: Integer;
+  pCodCliente: Integer;
+  pNDoc: string;
+  pTipo: string;
+  pDtCarta: TDateTime;
+  pDiasAtraso: integer;
+  pCtrlCarta: string;
+  pFinanceiroUnificado: Boolean;
+  pCodigoUnificada: Integer;
+  pCampo: string = 'DADOS_CARTA';
+  pContato: string = '';
+  pIdentificacao: string = '';
+  pAplicativo: string = '';
+  pPlataforma: string = '';
+  pUrlAnexo: string = '') : TWideStringDynArray;
 function _TrocaTAGsDaCarta(
-	pOrigem: TOrigemEnv;
+  pOrigem: TOrigemEnv;
   pCodCarta: Integer;
   pCodCliente: Integer;
   pNDoc: string;
@@ -1043,6 +1061,7 @@ function _TrocaTAGsDaCarta(
   pDiasAtraso: integer = 0;
   pCtrlCarta: string = '-1';
   pCodigoUnificada: Integer = 0): string;
+
 function _RichTextTOHTML(RICH: TRichEdit): string;
 function GetRTFFormat(DataObject: IDataObject; var RTFFormat: TFormatEtc): Boolean;
 procedure leConfiguracoesRegistro(ComboBox1, ComboBox3: TComboBox; MaskEdit1, MaskEdit2, MaskEdit3: TMaskEdit; vCampoPadrao: string);
@@ -13734,9 +13753,36 @@ begin
 
         if not Con.QrAux.IsEmpty then
         begin
-          Application.MessageBox(PChar('Contato já cadastrado: ' + #13 + #13 +
-            'CONTATO' + #13 +
-            Copy(trim(pAplicativo), 1, 1) + LowerCase(Copy(trim(trim(pAplicativo)), 2, Length(trim(trim(pAplicativo))) - 1)) +': ' + trim(pIdentificacao)), 'Atenção', MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
+          Application.MessageBox(PChar('Identificação já existe registro para essa Cliente e Aplicativo: ' + #13 + #13 +
+            'Aplicativo: ' + Copy(trim(pAplicativo), 1, 1) + LowerCase(Copy(trim(trim(pAplicativo)), 2, Length(trim(trim(pAplicativo))) - 1)) + #13 +
+            'Identificação: ' + trim(pIdentificacao)), 'Atenção', MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
+          Exit;
+        end;
+
+        Con.QrAux.Close;
+        Con.QrAux.SQL.Text := ' select msg_contato.id, clientes.nome_cliente, clientes.razao, clientes.cpfcgc from msg_contato ' +
+          ' inner join clientes on clientes.cod_cliente = msg_contato.cod_cliente and clientes.cod_empresa = msg_contato.cod_empresa ' +
+          ' where msg_contato.cod_empresa = :cod_empresa ' +
+          ' and msg_contato.id_msg_aplicativo = :id_msg_aplicativo ' +
+          ' and msg_contato.identificador = :identificador ' +
+          ' and msg_contato.ativo = :ativo ' +
+          ' and msg_contato.id <> :id ' +
+          ' and msg_contato.cod_cliente > 0 ';
+        Con.QrAux.ParamByName('id').AsInteger := pIdContato;
+        Con.QrAux.ParamByName('cod_empresa').AsInteger := StrToInt(codEmpresa);
+        Con.QrAux.ParamByName('id_msg_aplicativo').AsInteger := vAplicativoId;
+        Con.QrAux.ParamByName('identificador').AsString := trim(pIdentificacao);
+        Con.QrAux.ParamByName('ativo').AsInteger := 1;
+        Con.QrAux.Open;
+
+        if not Con.QrAux.IsEmpty then
+        begin
+          Application.MessageBox(PChar('Identificação e Aplicativo já existe para outro Cliente: ' + #13 + #13 +
+            'Nome Fantasia: ' + trim(Con.QrAux.FieldByName('NOME_CLIENTE').AsString) + #13 +
+            'Razão Social: ' + trim(Con.QrAux.FieldByName('RAZAO').AsString) + #13 +
+            'CNPJ/CPF: ' + trim(Con.QrAux.FieldByName('CPFCGC').AsString) + #13 +
+            'Aplicativo: ' + Copy(trim(pAplicativo), 1, 1) + LowerCase(Copy(trim(trim(pAplicativo)), 2, Length(trim(trim(pAplicativo))) - 1)) + #13 +
+            'Identificação: ' + trim(pIdentificacao)), 'Atenção', MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
           Exit;
         end;
       end;
@@ -15355,10 +15401,10 @@ begin
         Con.QrAux);
 
       if Con.QrAux.IsEmpty then
-      	Exit;
+        Exit;
 
       if Con.QrAux.FieldByName('ATIVO').AsInteger = 99 then
-      	Exit;
+        Exit;
 
       if Con.QrAux.FieldByName('SINC_CONTATO').AsString = 'S' then
         Exit;
@@ -15370,16 +15416,18 @@ begin
 
       if not Con.QrAux.IsEmpty then
         Exit;
-
+      
       if vHwCloudIA.vCodTipoContatoPadrao <= 0 then
       begin
         Application.MessageBox(PChar('Código do tipo de contato padrão não definido, favor verificar na configuração (hw_cloud_ia_conf)'), 'Atenção', MB_ICONERROR + MB_OK);
         Exit;
       end;
 
-      if SqlOpen(' select tipo_contato.tipo from tipo_contato ' +
+      SqlOpen(' select tipo_contato.tipo from tipo_contato ' +
         ' where tipo_contato.id = ' + IntToStr(vHwCloudIA.vCodTipoContatoPadrao) +
-        ' and tipo_contato.cod_empresa = ' + codEmpresa, Con.QrAux).IsEmpty then
+        ' and tipo_contato.cod_empresa = ' + codEmpresa, Con.QrAux);
+
+      if Con.QrAux.IsEmpty then
       begin
         Application.MessageBox(PChar('Código do tipo de contato padrão (CodTipoContatoPadrao) não encontrado, favor verificar na configuração (hw_cloud_ia_conf).'), 'Atenção', MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
         Exit;
@@ -15464,57 +15512,43 @@ begin
           begin
             Con.QrAux.Close;
             Con.QrAux.SQL.Text := ' select msg_contato.id from msg_contato ' +
-              ' where msg_contato.cod_cliente = ' + IntToStr(pCodCliente)+
-              ' and msg_contato.cod_empresa = ' + codEmpresa +
+              ' where msg_contato.cod_empresa = ' + codEmpresa +
               ' and msg_contato.id_msg_aplicativo = ' + IntToStr(buscas2.FieldByName('id_msg_aplicativo').AsInteger) +
-              ' and msg_contato.identificador = ' + QuotedStr(trim(vStringListIdentificacao[I]));
+              ' and msg_contato.identificador = ' + QuotedStr(trim(vStringListIdentificacao[I])) +
+              ' and msg_contato.ativo = 1 ' +
+              ' and msg_contato.cod_cliente > 0 ';
             Con.QrAux.Open;
 
             if Con.QrAux.IsEmpty then
             begin
-              vId := Gencodigo('MSG_CONTATO', Con.QrAux, codEmpresa);
-
               Con.QrAux.Close;
-              Con.QrAux.SQL.Text := ' insert into msg_contato ' +
-                ' (id, cod_empresa, cod_cliente, id_msg_aplicativo, contato, identificador, ativo) ' +
-                ' values (:id, :cod_empresa, :cod_cliente, :id_msg_aplicativo, :contato, :identificador, :ativo) ';
-              Con.QrAux.ParamByName('id').AsInteger := vId;
-              Con.QrAux.ParamByName('cod_empresa').AsInteger := cod_empresa;
-              Con.QrAux.ParamByName('cod_cliente').AsInteger := pCodCliente;
-              Con.QrAux.ParamByName('id_msg_aplicativo').AsInteger := buscas2.FieldByName('id_msg_aplicativo').AsInteger;
-              Con.QrAux.ParamByName('contato').AsString := Copy(buscas2.FieldByName('contato').AsString, 1, 32);
-              Con.QrAux.ParamByName('identificador').AsString := Copy(trim(vStringListIdentificacao[I]), 1, 60);
-              Con.QrAux.ParamByName('ativo').AsInteger := 1;
-              Con.QrAux.ExecSQL;
-
-              vTipoId := IfThen(buscas2.FieldByName('tipo_id').AsInteger > 0, buscas2.FieldByName('tipo_id').AsInteger, vHwCloudIA.vCodTipoContatoPadrao);
-
-              Con.QrAux.Close;
-              Con.QrAux.SQL.Text := ' insert into msg_contato_tipo ' +
-                ' (id_msg_contato, id_tipo_contato, cod_empresa) ' +
-                ' values (:id_msg_contato, :id_tipo_contato, :cod_empresa) ';
-              Con.QrAux.ParamByName('id_msg_contato').AsInteger := vId;
-              Con.QrAux.ParamByName('id_tipo_contato').AsInteger := vTipoId;
-              Con.QrAux.ParamByName('cod_empresa').AsInteger := cod_empresa;
-              Con.QrAux.ExecSQL;
-            end
-            else
-            begin
-              vId := Con.QrAux.FieldByName('id').AsInteger;
-              vTipoId := IfThen(buscas2.FieldByName('tipo_id').AsInteger > 0, buscas2.FieldByName('tipo_id').AsInteger, vHwCloudIA.vCodTipoContatoPadrao);
-
-              Con.QrAux.Close;
-              Con.QrAux.SQL.Text := ' select * from msg_contato_tipo ' +
-                ' where id_msg_contato = :id_msg_contato ' +
-                ' and id_tipo_contato = :id_tipo_contato ' +
-                ' and cod_empresa = :cod_empresa ';
-              Con.QrAux.ParamByName('id_msg_contato').AsInteger := vId;
-              Con.QrAux.ParamByName('id_tipo_contato').AsInteger := vTipoId;
-              Con.QrAux.ParamByName('cod_empresa').AsInteger := cod_empresa;
+              Con.QrAux.SQL.Text := ' select msg_contato.id from msg_contato ' +
+                ' where msg_contato.cod_cliente = ' + IntToStr(pCodCliente)+
+                ' and msg_contato.cod_empresa = ' + codEmpresa +
+                ' and msg_contato.id_msg_aplicativo = ' + IntToStr(buscas2.FieldByName('id_msg_aplicativo').AsInteger) +
+                ' and msg_contato.identificador = ' + QuotedStr(trim(vStringListIdentificacao[I])) +
+                ' and msg_contato.ativo = 1 ';
               Con.QrAux.Open;
 
               if Con.QrAux.IsEmpty then
               begin
+                vId := Gencodigo('MSG_CONTATO', Con.QrAux, codEmpresa);
+
+                Con.QrAux.Close;
+                Con.QrAux.SQL.Text := ' insert into msg_contato ' +
+                  ' (id, cod_empresa, cod_cliente, id_msg_aplicativo, contato, identificador, ativo) ' +
+                  ' values (:id, :cod_empresa, :cod_cliente, :id_msg_aplicativo, :contato, :identificador, :ativo) ';
+                Con.QrAux.ParamByName('id').AsInteger := vId;
+                Con.QrAux.ParamByName('cod_empresa').AsInteger := cod_empresa;
+                Con.QrAux.ParamByName('cod_cliente').AsInteger := pCodCliente;
+                Con.QrAux.ParamByName('id_msg_aplicativo').AsInteger := buscas2.FieldByName('id_msg_aplicativo').AsInteger;
+                Con.QrAux.ParamByName('contato').AsString := Copy(buscas2.FieldByName('contato').AsString, 1, 32);
+                Con.QrAux.ParamByName('identificador').AsString := Copy(trim(vStringListIdentificacao[I]), 1, 60);
+                Con.QrAux.ParamByName('ativo').AsInteger := 1;
+                Con.QrAux.ExecSQL;
+
+                vTipoId := IfThen(buscas2.FieldByName('tipo_id').AsInteger > 0, buscas2.FieldByName('tipo_id').AsInteger, vHwCloudIA.vCodTipoContatoPadrao);
+
                 Con.QrAux.Close;
                 Con.QrAux.SQL.Text := ' insert into msg_contato_tipo ' +
                   ' (id_msg_contato, id_tipo_contato, cod_empresa) ' +
@@ -15523,6 +15557,33 @@ begin
                 Con.QrAux.ParamByName('id_tipo_contato').AsInteger := vTipoId;
                 Con.QrAux.ParamByName('cod_empresa').AsInteger := cod_empresa;
                 Con.QrAux.ExecSQL;
+              end
+              else
+              begin
+                vId := Con.QrAux.FieldByName('id').AsInteger;
+                vTipoId := IfThen(buscas2.FieldByName('tipo_id').AsInteger > 0, buscas2.FieldByName('tipo_id').AsInteger, vHwCloudIA.vCodTipoContatoPadrao);
+
+                Con.QrAux.Close;
+                Con.QrAux.SQL.Text := ' select * from msg_contato_tipo ' +
+                  ' where id_msg_contato = :id_msg_contato ' +
+                  ' and id_tipo_contato = :id_tipo_contato ' +
+                  ' and cod_empresa = :cod_empresa ';
+                Con.QrAux.ParamByName('id_msg_contato').AsInteger := vId;
+                Con.QrAux.ParamByName('id_tipo_contato').AsInteger := vTipoId;
+                Con.QrAux.ParamByName('cod_empresa').AsInteger := cod_empresa;
+                Con.QrAux.Open;
+
+                if Con.QrAux.IsEmpty then
+                begin
+                  Con.QrAux.Close;
+                  Con.QrAux.SQL.Text := ' insert into msg_contato_tipo ' +
+                    ' (id_msg_contato, id_tipo_contato, cod_empresa) ' +
+                    ' values (:id_msg_contato, :id_tipo_contato, :cod_empresa) ';
+                  Con.QrAux.ParamByName('id_msg_contato').AsInteger := vId;
+                  Con.QrAux.ParamByName('id_tipo_contato').AsInteger := vTipoId;
+                  Con.QrAux.ParamByName('cod_empresa').AsInteger := cod_empresa;
+                  Con.QrAux.ExecSQL;
+                end;
               end;
             end;
           end;
@@ -15589,14 +15650,14 @@ begin
         Con.QrAux);
 
       if Con.QrAux.IsEmpty then
-      	Exit;
+        Exit;
 
       if Con.QrAux.FieldByName('ATIVO').AsInteger = 99 then
-      	Exit;
+        Exit;
 
       if Con.QrAux.FieldByName('SINC_CONTATO').AsString = 'S' then
         Exit;
-
+      
       SqlOpen(' select first 1 msg_contato.id from msg_contato ' +
         ' where msg_contato.cod_vendedor = ' + IntToStr(pCodColaborador) +
         ' and msg_contato.cod_empresa = ' + codEmpresa,
@@ -15604,16 +15665,18 @@ begin
 
       if not Con.QrAux.IsEmpty then
         Exit;
-
+      
       if vHwCloudIA.vCodTipoContatoPadrao <= 0 then
       begin
         Application.MessageBox(PChar('Código do tipo de contato padrão não definido, favor verificar na configuração (hw_cloud_ia_conf)'), 'Atenção', MB_ICONERROR + MB_OK);
         Exit;
       end;
 
-      if SqlOpen(' select tipo_contato.tipo from tipo_contato ' +
+      SqlOpen(' select tipo_contato.tipo from tipo_contato ' +
         ' where tipo_contato.id = ' + IntToStr(vHwCloudIA.vCodTipoContatoPadrao) +
-        ' and tipo_contato.cod_empresa = ' + codEmpresa, Con.QrAux).IsEmpty then
+        ' and tipo_contato.cod_empresa = ' + codEmpresa, Con.QrAux);
+
+      if Con.QrAux.IsEmpty then
       begin
         Application.MessageBox(PChar('Código do tipo de contato padrão (CodTipoContatoPadrao) não encontrado, favor verificar na configuração (hw_cloud_ia_conf).'), 'Atenção', MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
         Exit;
@@ -15672,57 +15735,43 @@ begin
           begin
             Con.QrAux.Close;
             Con.QrAux.SQL.Text := ' select msg_contato.id from msg_contato ' +
-              ' where msg_contato.cod_vendedor = ' + IntToStr(pCodColaborador)+
-              ' and msg_contato.cod_empresa = ' + codEmpresa +
+              ' where msg_contato.cod_empresa = ' + codEmpresa +
               ' and msg_contato.id_msg_aplicativo = ' + IntToStr(buscas2.FieldByName('id_msg_aplicativo').AsInteger) +
-              ' and msg_contato.identificador = ' + QuotedStr(trim(vStringListIdentificacao[I]));
+              ' and msg_contato.identificador = ' + QuotedStr(trim(vStringListIdentificacao[I])) +
+              ' and msg_contato.ativo = 1 ' +
+              ' and msg_contato.cod_vendedor > 0 ';
             Con.QrAux.Open;
 
             if Con.QrAux.IsEmpty then
             begin
-              vId := Gencodigo('MSG_CONTATO', Con.QrAux, codEmpresa);
-
               Con.QrAux.Close;
-              Con.QrAux.SQL.Text := ' insert into msg_contato ' +
-                ' (id, cod_empresa, cod_vendedor, id_msg_aplicativo, contato, identificador, ativo) ' +
-                ' values (:id, :cod_empresa, :cod_vendedor, :id_msg_aplicativo, :contato, :identificador, :ativo) ';
-              Con.QrAux.ParamByName('id').AsInteger := vId;
-              Con.QrAux.ParamByName('cod_empresa').AsInteger := cod_empresa;
-              Con.QrAux.ParamByName('cod_vendedor').AsInteger := pCodColaborador;
-              Con.QrAux.ParamByName('id_msg_aplicativo').AsInteger := buscas2.FieldByName('id_msg_aplicativo').AsInteger;
-              Con.QrAux.ParamByName('contato').AsString := Copy(buscas2.FieldByName('contato').AsString, 1, 32);
-              Con.QrAux.ParamByName('identificador').AsString := Copy(trim(vStringListIdentificacao[I]), 1, 60);
-              Con.QrAux.ParamByName('ativo').AsInteger := 1;
-              Con.QrAux.ExecSQL;
-
-              vTipoId := IfThen(buscas2.FieldByName('tipo_id').AsInteger > 0, buscas2.FieldByName('tipo_id').AsInteger, vHwCloudIA.vCodTipoContatoPadrao);
-
-              Con.QrAux.Close;
-              Con.QrAux.SQL.Text := ' insert into msg_contato_tipo ' +
-                ' (id_msg_contato, id_tipo_contato, cod_empresa) ' +
-                ' values (:id_msg_contato, :id_tipo_contato, :cod_empresa) ';
-              Con.QrAux.ParamByName('id_msg_contato').AsInteger := vId;
-              Con.QrAux.ParamByName('id_tipo_contato').AsInteger := vTipoId;
-              Con.QrAux.ParamByName('cod_empresa').AsInteger := cod_empresa;
-              Con.QrAux.ExecSQL;
-            end
-            else
-            begin
-              vId := Con.QrAux.FieldByName('id').AsInteger;
-              vTipoId := IfThen(buscas2.FieldByName('tipo_id').AsInteger > 0, buscas2.FieldByName('tipo_id').AsInteger, vHwCloudIA.vCodTipoContatoPadrao);
-
-              Con.QrAux.Close;
-              Con.QrAux.SQL.Text := ' select * from msg_contato_tipo ' +
-                ' where id_msg_contato = :id_msg_contato ' +
-                ' and id_tipo_contato = :id_tipo_contato ' +
-                ' and cod_empresa = :cod_empresa ';
-              Con.QrAux.ParamByName('id_msg_contato').AsInteger := vId;
-              Con.QrAux.ParamByName('id_tipo_contato').AsInteger := vTipoId;
-              Con.QrAux.ParamByName('cod_empresa').AsInteger := cod_empresa;
+              Con.QrAux.SQL.Text := ' select msg_contato.id from msg_contato ' +
+                ' where msg_contato.cod_vendedor = ' + IntToStr(pCodColaborador)+
+                ' and msg_contato.cod_empresa = ' + codEmpresa +
+                ' and msg_contato.id_msg_aplicativo = ' + IntToStr(buscas2.FieldByName('id_msg_aplicativo').AsInteger) +
+                ' and msg_contato.identificador = ' + QuotedStr(trim(vStringListIdentificacao[I])) +
+                ' and msg_contato.ativo = 1 ';
               Con.QrAux.Open;
 
               if Con.QrAux.IsEmpty then
               begin
+                vId := Gencodigo('MSG_CONTATO', Con.QrAux, codEmpresa);
+
+                Con.QrAux.Close;
+                Con.QrAux.SQL.Text := ' insert into msg_contato ' +
+                  ' (id, cod_empresa, cod_vendedor, id_msg_aplicativo, contato, identificador, ativo) ' +
+                  ' values (:id, :cod_empresa, :cod_vendedor, :id_msg_aplicativo, :contato, :identificador, :ativo) ';
+                Con.QrAux.ParamByName('id').AsInteger := vId;
+                Con.QrAux.ParamByName('cod_empresa').AsInteger := cod_empresa;
+                Con.QrAux.ParamByName('cod_vendedor').AsInteger := pCodColaborador;
+                Con.QrAux.ParamByName('id_msg_aplicativo').AsInteger := buscas2.FieldByName('id_msg_aplicativo').AsInteger;
+                Con.QrAux.ParamByName('contato').AsString := Copy(buscas2.FieldByName('contato').AsString, 1, 32);
+                Con.QrAux.ParamByName('identificador').AsString := Copy(trim(vStringListIdentificacao[I]), 1, 60);
+                Con.QrAux.ParamByName('ativo').AsInteger := 1;
+                Con.QrAux.ExecSQL;
+
+                vTipoId := IfThen(buscas2.FieldByName('tipo_id').AsInteger > 0, buscas2.FieldByName('tipo_id').AsInteger, vHwCloudIA.vCodTipoContatoPadrao);
+
                 Con.QrAux.Close;
                 Con.QrAux.SQL.Text := ' insert into msg_contato_tipo ' +
                   ' (id_msg_contato, id_tipo_contato, cod_empresa) ' +
@@ -15731,6 +15780,33 @@ begin
                 Con.QrAux.ParamByName('id_tipo_contato').AsInteger := vTipoId;
                 Con.QrAux.ParamByName('cod_empresa').AsInteger := cod_empresa;
                 Con.QrAux.ExecSQL;
+              end
+              else
+              begin
+                vId := Con.QrAux.FieldByName('id').AsInteger;
+                vTipoId := IfThen(buscas2.FieldByName('tipo_id').AsInteger > 0, buscas2.FieldByName('tipo_id').AsInteger, vHwCloudIA.vCodTipoContatoPadrao);
+
+                Con.QrAux.Close;
+                Con.QrAux.SQL.Text := ' select * from msg_contato_tipo ' +
+                  ' where id_msg_contato = :id_msg_contato ' +
+                  ' and id_tipo_contato = :id_tipo_contato ' +
+                  ' and cod_empresa = :cod_empresa ';
+                Con.QrAux.ParamByName('id_msg_contato').AsInteger := vId;
+                Con.QrAux.ParamByName('id_tipo_contato').AsInteger := vTipoId;
+                Con.QrAux.ParamByName('cod_empresa').AsInteger := cod_empresa;
+                Con.QrAux.Open;
+
+                if Con.QrAux.IsEmpty then
+                begin
+                  Con.QrAux.Close;
+                  Con.QrAux.SQL.Text := ' insert into msg_contato_tipo ' +
+                    ' (id_msg_contato, id_tipo_contato, cod_empresa) ' +
+                    ' values (:id_msg_contato, :id_tipo_contato, :cod_empresa) ';
+                  Con.QrAux.ParamByName('id_msg_contato').AsInteger := vId;
+                  Con.QrAux.ParamByName('id_tipo_contato').AsInteger := vTipoId;
+                  Con.QrAux.ParamByName('cod_empresa').AsInteger := cod_empresa;
+                  Con.QrAux.ExecSQL;
+                end;
               end;
             end;
           end;
@@ -22712,6 +22788,48 @@ begin
       Application.MessageBox(PChar('Erro ao retorna template: ' + pchar(e.Message)), 'Atenção', MB_ICONERROR + MB_OK);
       registraErro('Erro ao retorna template: ' + e.Message);
     end;
+  end;
+end;
+
+function TSingleton.retornaVariaveisTemplate(pOrigem: string; pCodCarta,
+  pCodEmpresa, pCodCliente: Integer; pNDoc, pTipo: string; pDtCarta: TDateTime;
+  pDiasAtraso: integer; pCtrlCarta: string; pFinanceiroUnificado: Boolean;
+  pCodigoUnificada: Integer; pCampo, pContato, pIdentificacao, pAplicativo,
+  pPlataforma, pUrlAnexo: string): TWideStringDynArray;
+var
+  vTagMacro: TTagMacro;
+begin
+  try
+    vTagMacro := TTagMacro.Create;
+
+    try
+      Result := vTagMacro.retornaVariaveisTemplate(
+        pOrigem,
+        pCodCarta,
+        pCodEmpresa,
+        pCodCliente,
+        pNDoc,
+        pTipo,
+        pDtCarta,
+        pDiasAtraso,
+        pCtrlCarta,
+        pFinanceiroUnificado,
+        pCodigoUnificada,
+        pCampo,
+        pContato,
+        pIdentificacao,
+        pAplicativo,
+        pPlataforma,
+        pUrlAnexo);
+    except on E: Exception do
+      begin
+        Application.MessageBox(pchar('Falha ao variaveis template.'), 'Erro', MB_ICONERROR + MB_OK);
+        registraErro('Falha ao retorna variaveis template:' + E.Message);
+      end;
+    end
+  finally
+    if Assigned(vTagMacro) then
+    	FreeAndNil(vTagMacro);
   end;
 end;
 
@@ -29978,24 +30096,31 @@ function TSingleton._TrocaTAGsDaCarta(
   pCtrlCarta: string;
   pCodigoUnificada: Integer): string;
 var
-	vTagMacro: TTagMacro;
+  vTagMacro: TTagMacro;
 begin
-	try
+  try
     vTagMacro := TTagMacro.Create;
 
-    Result := vTagMacro._TrocaTAGsMacro(
-      OrigemEnvStr[pOrigem],
-      pCodCarta,
-      StrToInt(codEmpresa),
-      pCodCliente,
-      pNDoc,
-      pTipo,
-      pDtCarta,
-      pDiasAtraso,
-      pCtrlCarta,
-      vEmp.vFinanceiroUnificado,
-      retornoPorCondicao((vEmp.vFinanceiroUnificado) and (pCodigoUnificada > 0), pCodigoUnificada, 0)
-    );
+    try
+      Result := vTagMacro._TrocaTAGsMacro(
+        OrigemEnvStr[pOrigem],
+        pCodCarta,
+        StrToInt(codEmpresa),
+        pCodCliente,
+        pNDoc,
+        pTipo,
+        pDtCarta,
+        pDiasAtraso,
+        pCtrlCarta,
+        vEmp.vFinanceiroUnificado,
+        retornoPorCondicao((vEmp.vFinanceiroUnificado) and (pCodigoUnificada > 0), pCodigoUnificada, 0)
+      );
+    except on E: Exception do
+      begin
+        Application.MessageBox(pchar('Falha ao trocar tags da carta.'), 'Erro', MB_ICONERROR + MB_OK);
+        registraErro('Falha ao trocar tags da carta:' + E.Message);
+      end;
+    end
   finally
     if Assigned(vTagMacro) then
     	FreeAndNil(vTagMacro);

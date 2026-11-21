@@ -1,7 +1,7 @@
 inherited frmTipoContatoOrigem: TfrmTipoContatoOrigem
   Caption = 'Origem por Tipo de Contato '
-  ExplicitWidth = 806
-  ExplicitHeight = 598
+  ExplicitWidth = 814
+  ExplicitHeight = 603
   PixelsPerInch = 96
   TextHeight = 13
   inherited PanelFundo: TPanel
@@ -302,8 +302,8 @@ inherited frmTipoContatoOrigem: TfrmTipoContatoOrigem
           ExplicitWidth = 783
           ExplicitHeight = 510
         end
-        object tsOrigemTipoContrato: TTabSheet
-          Caption = 'tsOrigemTipoContrato'
+        object tsOrigemTipoContato: TTabSheet
+          Caption = 'tsOrigemTipoContato'
           ImageIndex = 3
           object pnOrigemTipoContato: TPanel
             Left = 1

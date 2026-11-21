@@ -319,6 +319,11 @@ type
     cbVendaOnline: TComboBox;
     btIncluirItemKit: TSpeedButton;
     btEcommerce: TSpeedButton;
+    ckEstoqueDisponivel: TCheckBox;
+    ckEcommerce: TCheckBox;
+    procedure SpeedButton68Click(Sender: TObject);
+    procedure ckEcommerceClick(Sender: TObject);
+    procedure ckEstoqueDisponivelClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure btnCancKitLoteClick(Sender: TObject);
     procedure btSincronizarKitClick(Sender: TObject);
@@ -722,9 +727,17 @@ begin
 end;
 
 procedure TFrmCadKits.BitBtn1Click(Sender: TObject);
+var
+  vEstoqueDisp: Boolean;
 begin
   if not vDadosIni.PesqPros('PRO110', 'PESQUISAR', '','KITS_PROD_KITS','', kit.buscas, true) then
     Exit;
+
+  vEstoqueDisp := False;
+  if not vEstoqueDisp then
+  	vEstoqueDisp := ckEstoqueDisponivel.Checked;
+  if not vEstoqueDisp then
+    vEstoqueDisp := (trim(Kit.dataSet.FieldByName('ESTOQUE').DisplayLabel) = trim(ComboBox1.Text));
 
   try
     Screen.Cursor := crHourGlass;
@@ -735,13 +748,21 @@ begin
     Kit.rKit.vAdicional := CheckBox1.Checked;
     Kit._defineSqlAdicional;
 
+    if ckEcommerce.Checked then
+      Kit.rKit.vSqlAdicional := Kit.rKit.vSqlAdicional +
+        vDadosIni.IfThen(trim(Kit.rKit.vSqlAdicional) <> '', ' and ', '') +
+        ' 	 (SELECT COUNT(*) FROM KITS_PROD_EC ' +
+        '	  WHERE KITS_PROD_EC.CODIGO_KIT = KITS_PROD.CODIGO_KIT ' +
+        '     AND KITS_PROD_EC.COD_EMPRESA = KITS_PROD.COD_EMPRESA ' +
+        '	  AND ((KITS_PROD_EC.ID_COMMERCE > 0) OR (KITS_PROD_EC.SINC_ECOMMERCE = ''S'')) ) > 0 ';
+
     if MaskEdit2.Visible then
     begin
       if (ckLixeira.Checked) and (ckLixeira.Visible) then
       begin
         if not Kit.ConsultaCamposLixeira('KITS_PROD', ComboBox1.Text,
           'CODIGO_KIT', maskedit1.text, maskedit2.text, vDadosIni.codEmpresa, 1,
-          ' KITS_PROD.*, ' +
+          ' KITS_PROD.*, EST.EST_F, ' + vDadosIni.IfThen(vEstoqueDisp, ' EST.ESTOQUE, ', ' CAST(0 AS FLOAT) ESTOQUE, ') +
           ' COALESCE(KITS_PROD_TOT.REGRA_PESO_DIM, '''') REGRA_PESO_DIM, ' +
           ' COALESCE(KITS_PROD_TOT.QUANT_PROD_KIT, 0) QUANT_PROD_KIT, ' +
           ' COALESCE(KITS_PROD_TOT.PREC_CUS_PROD, 0) PREC_CUS_PROD, ' +
@@ -754,13 +775,13 @@ begin
           ' COALESCE(KITS_PROD_TOT.PESO_BRUT_PROD, 0) PESO_BRUT_PROD, ' +
           ' COALESCE(KITS_PROD_TOT.COMPRIMENTO_PROD, 0) COMPRIMENTO_PROD, ' +
           ' COALESCE(KITS_PROD_TOT.LARGURA_PROD, 0) LARGURA_PROD, ' +
-             ' COALESCE(KITS_PROD_TOT.ALTURA_PROD, 0) ALTURA_PROD, ' +
-          ' COALESCE(KITS_PROD_TOT.EST_F, 0) EST_F, ' +
+          ' COALESCE(KITS_PROD_TOT.ALTURA_PROD, 0) ALTURA_PROD, ' +
           ' COALESCE(KITS_PROD_TOT.VALOR_TAB_PROKIT, 0) VALOR_TAB_PROKIT, ' +
           ' COALESCE(KITS_PROD_TOT.DESCONTO_VALOR, 0) DESCONTO_VALOR, ' +
           ' COALESCE(KITS_PROD_TOT.DESCONTO_PERC, 0) DESCONTO_PERC,  ' +
           ' COALESCE(KITS_PROD_TOT.VALOR_DESC_TAB_PROKIT, 0) VALOR_DESC_TAB_PROKIT ',
-          ' LEFT JOIN KITS_PROD_TOT ON KITS_PROD_TOT.CODIGO_KIT = KITS_PROD.CODIGO_KIT AND KITS_PROD_TOT.COD_EMPRESA = KITS_PROD.COD_EMPRESA ',
+          ' LEFT JOIN KITS_PROD_TOT ON KITS_PROD_TOT.CODIGO_KIT = KITS_PROD.CODIGO_KIT AND KITS_PROD_TOT.COD_EMPRESA = KITS_PROD.COD_EMPRESA ' +
+          ' LEFT JOIN GETESTOQUEKIT (KITS_PROD.CODIGO_KIT, KITS_PROD.COD_EMPRESA, ' + vDadosIni.IfThen(vEstoqueDisp, '1', '0') + ') EST ON 1 = 1 ',
           Kit.rKit.vSqlAdicional) then
             if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
               combobox1.setfocus;
@@ -769,7 +790,7 @@ begin
       begin
         if not Kit.ConsultaCampos('KITS_PROD', ComboBox1.Text,
           'CODIGO_KIT', maskedit1.text, maskedit2.text, vDadosIni.codEmpresa, 1,
-          ' KITS_PROD.*, ' +
+          ' KITS_PROD.*, EST.EST_F, ' + vDadosIni.IfThen(vEstoqueDisp, ' EST.ESTOQUE, ', ' CAST(0 AS FLOAT) ESTOQUE, ') + 
           ' COALESCE(KITS_PROD_TOT.REGRA_PESO_DIM, '''') REGRA_PESO_DIM, ' +
           ' COALESCE(KITS_PROD_TOT.QUANT_PROD_KIT, 0) QUANT_PROD_KIT, ' +
           ' COALESCE(KITS_PROD_TOT.PREC_CUS_PROD, 0) PREC_CUS_PROD, ' +
@@ -782,13 +803,13 @@ begin
           ' COALESCE(KITS_PROD_TOT.PESO_BRUT_PROD, 0) PESO_BRUT_PROD, ' +
           ' COALESCE(KITS_PROD_TOT.COMPRIMENTO_PROD, 0) COMPRIMENTO_PROD, ' +
           ' COALESCE(KITS_PROD_TOT.LARGURA_PROD, 0) LARGURA_PROD, ' +
-             ' COALESCE(KITS_PROD_TOT.ALTURA_PROD, 0) ALTURA_PROD, ' +
-          ' COALESCE(KITS_PROD_TOT.EST_F, 0) EST_F, ' +
+          ' COALESCE(KITS_PROD_TOT.ALTURA_PROD, 0) ALTURA_PROD, ' +
           ' COALESCE(KITS_PROD_TOT.VALOR_TAB_PROKIT, 0) VALOR_TAB_PROKIT, ' +
           ' COALESCE(KITS_PROD_TOT.DESCONTO_VALOR, 0) DESCONTO_VALOR, ' +
           ' COALESCE(KITS_PROD_TOT.DESCONTO_PERC, 0) DESCONTO_PERC,  ' +
           ' COALESCE(KITS_PROD_TOT.VALOR_DESC_TAB_PROKIT, 0) VALOR_DESC_TAB_PROKIT ',
-          ' LEFT JOIN KITS_PROD_TOT ON KITS_PROD_TOT.CODIGO_KIT = KITS_PROD.CODIGO_KIT AND KITS_PROD_TOT.COD_EMPRESA = KITS_PROD.COD_EMPRESA ',
+          ' LEFT JOIN KITS_PROD_TOT ON KITS_PROD_TOT.CODIGO_KIT = KITS_PROD.CODIGO_KIT AND KITS_PROD_TOT.COD_EMPRESA = KITS_PROD.COD_EMPRESA ' +
+          ' LEFT JOIN GETESTOQUEKIT (KITS_PROD.CODIGO_KIT, KITS_PROD.COD_EMPRESA, ' + vDadosIni.IfThen(vEstoqueDisp, '1', '0') + ') EST ON 1 = 1 ',
           Kit.rKit.vSqlAdicional) then
             if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
               combobox1.setfocus;
@@ -800,7 +821,7 @@ begin
       begin
         if not Kit.ConsultaCamposLixeira('KITS_PROD', Kit.rKit.vValor, ComboBox1.Text,
           combobox3.Text, 'CODIGO_KIT', true, vDadosIni.codEmpresa,
-          ' KITS_PROD.*, ' +
+          ' KITS_PROD.*, EST.EST_F, ' + vDadosIni.IfThen(vEstoqueDisp, ' EST.ESTOQUE, ', ' CAST(0 AS FLOAT) ESTOQUE, ') + 
           ' COALESCE(KITS_PROD_TOT.REGRA_PESO_DIM, '''') REGRA_PESO_DIM, ' +
           ' COALESCE(KITS_PROD_TOT.QUANT_PROD_KIT, 0) QUANT_PROD_KIT, ' +
           ' COALESCE(KITS_PROD_TOT.PREC_CUS_PROD, 0) PREC_CUS_PROD, ' +
@@ -813,13 +834,13 @@ begin
           ' COALESCE(KITS_PROD_TOT.PESO_BRUT_PROD, 0) PESO_BRUT_PROD, ' +
           ' COALESCE(KITS_PROD_TOT.COMPRIMENTO_PROD, 0) COMPRIMENTO_PROD, ' +
           ' COALESCE(KITS_PROD_TOT.LARGURA_PROD, 0) LARGURA_PROD, ' +
-             ' COALESCE(KITS_PROD_TOT.ALTURA_PROD, 0) ALTURA_PROD, ' +
-          ' COALESCE(KITS_PROD_TOT.EST_F, 0) EST_F, ' +
+          ' COALESCE(KITS_PROD_TOT.ALTURA_PROD, 0) ALTURA_PROD, ' +
           ' COALESCE(KITS_PROD_TOT.VALOR_TAB_PROKIT, 0) VALOR_TAB_PROKIT, ' +
           ' COALESCE(KITS_PROD_TOT.DESCONTO_VALOR, 0) DESCONTO_VALOR, ' +
           ' COALESCE(KITS_PROD_TOT.DESCONTO_PERC, 0) DESCONTO_PERC,  ' +
           ' COALESCE(KITS_PROD_TOT.VALOR_DESC_TAB_PROKIT, 0) VALOR_DESC_TAB_PROKIT ',
-          ' LEFT JOIN KITS_PROD_TOT ON KITS_PROD_TOT.CODIGO_KIT = KITS_PROD.CODIGO_KIT AND KITS_PROD_TOT.COD_EMPRESA = KITS_PROD.COD_EMPRESA ',
+          ' LEFT JOIN KITS_PROD_TOT ON KITS_PROD_TOT.CODIGO_KIT = KITS_PROD.CODIGO_KIT AND KITS_PROD_TOT.COD_EMPRESA = KITS_PROD.COD_EMPRESA ' +
+          ' LEFT JOIN GETESTOQUEKIT (KITS_PROD.CODIGO_KIT, KITS_PROD.COD_EMPRESA, ' + vDadosIni.IfThen(vEstoqueDisp, '1', '0') + ') EST ON 1 = 1 ',
           Kit.rKit.vSqlAdicional) then
             if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
               ComboBox1.SetFocus;
@@ -828,7 +849,7 @@ begin
       begin
         if not Kit.ConsultaCampos('KITS_PROD', Kit.rKit.vValor, ComboBox1.Text,
           combobox3.Text, 'CODIGO_KIT', true, vDadosIni.codEmpresa,
-          ' KITS_PROD.*, ' +
+          ' KITS_PROD.*, EST.EST_F, ' + vDadosIni.IfThen(vEstoqueDisp, ' EST.ESTOQUE, ', ' CAST(0 AS FLOAT) ESTOQUE, ') +
           ' COALESCE(KITS_PROD_TOT.REGRA_PESO_DIM, '''') REGRA_PESO_DIM, ' +
           ' COALESCE(KITS_PROD_TOT.QUANT_PROD_KIT, 0) QUANT_PROD_KIT, ' +
           ' COALESCE(KITS_PROD_TOT.PREC_CUS_PROD, 0) PREC_CUS_PROD, ' +
@@ -841,13 +862,13 @@ begin
           ' COALESCE(KITS_PROD_TOT.PESO_BRUT_PROD, 0) PESO_BRUT_PROD, ' +
           ' COALESCE(KITS_PROD_TOT.COMPRIMENTO_PROD, 0) COMPRIMENTO_PROD, ' +
           ' COALESCE(KITS_PROD_TOT.LARGURA_PROD, 0) LARGURA_PROD, ' +
-             ' COALESCE(KITS_PROD_TOT.ALTURA_PROD, 0) ALTURA_PROD, ' +
-          ' COALESCE(KITS_PROD_TOT.EST_F, 0) EST_F, ' +
+          ' COALESCE(KITS_PROD_TOT.ALTURA_PROD, 0) ALTURA_PROD, ' +
           ' COALESCE(KITS_PROD_TOT.VALOR_TAB_PROKIT, 0) VALOR_TAB_PROKIT, ' +
           ' COALESCE(KITS_PROD_TOT.DESCONTO_VALOR, 0) DESCONTO_VALOR, ' +
           ' COALESCE(KITS_PROD_TOT.DESCONTO_PERC, 0) DESCONTO_PERC,  ' +
           ' COALESCE(KITS_PROD_TOT.VALOR_DESC_TAB_PROKIT, 0) VALOR_DESC_TAB_PROKIT ',
-          ' LEFT JOIN KITS_PROD_TOT ON KITS_PROD_TOT.CODIGO_KIT = KITS_PROD.CODIGO_KIT AND KITS_PROD_TOT.COD_EMPRESA = KITS_PROD.COD_EMPRESA ',
+          ' LEFT JOIN KITS_PROD_TOT ON KITS_PROD_TOT.CODIGO_KIT = KITS_PROD.CODIGO_KIT AND KITS_PROD_TOT.COD_EMPRESA = KITS_PROD.COD_EMPRESA ' +
+          ' LEFT JOIN GETESTOQUEKIT (KITS_PROD.CODIGO_KIT, KITS_PROD.COD_EMPRESA, ' + vDadosIni.IfThen(vEstoqueDisp, '1', '0') + ') EST ON 1 = 1 ',
           Kit.rKit.vSqlAdicional) then
             if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
               ComboBox1.SetFocus;
@@ -880,7 +901,7 @@ begin
       SpeedButton5.Visible := false;
       SpeedButton6.Visible := true;
 
-      SpeedButtonECommerce.Visible := true;
+      SpeedButtonECommerce.Visible := (vDadosIni.vEcommerce.vHabilitarEcommerce) and (trim(vDadosIni.vEcommerce.vEcommerceIntegrado) = 'TRAY');
       SpeedButton7.Visible := true;
 
       SpeedButtonAlterarKit2.Visible := true;
@@ -1483,6 +1504,8 @@ begin
 
     if ckLixeira.Checked then
       FrmCadKits.Caption := 'Kits de Produtos (Lixeira)'
+    else if ckEcommerce.Checked then
+      FrmCadKits.Caption := 'Kits de Produtos (E-Commerce)'
     else
       FrmCadKits.Caption := 'Kits de Produtos';
 
@@ -1511,6 +1534,8 @@ begin
 
     if ckLixeira.Checked then
       FrmCadKits.Caption := 'Kits de Produtos (Lixeira)'
+    else if ckEcommerce.Checked then
+      FrmCadKits.Caption := 'Kits de Produtos (E-Commerce)'
     else
       FrmCadKits.Caption := 'Kits de Produtos';
 
@@ -1585,6 +1610,52 @@ begin
     Label14.Font.Color := clTeal;
     CheckBox2.Font.Color := clTeal;
   end;
+end;
+
+procedure TFrmCadKits.ckEcommerceClick(Sender: TObject);
+var
+	vVisible: boolean;
+begin
+  inherited;
+  vVisible := ckLixeira.Visible;
+  ckLixeira.Visible := false;
+  ckLixeira.Enabled := not ckEcommerce.Checked;
+  if not ckLixeira.Enabled then
+  	ckLixeira.Checked := false;
+  ckLixeira.Visible := vVisible;
+
+  if not ckEcommerce.Visible then
+    exit;
+
+	if (PageControl1.ActivePage = tsAlterDadosKit)
+  	and (TelaCadastro = 5) then
+  begin
+  	 if ckLixeira.Checked then
+      FrmCadKits.Caption := 'Alteração Kits de Produtos em Lote (Lixeira)'
+  	 else if ckEcommerce.Checked then
+      FrmCadKits.Caption := 'Alteração Kits de Produtos em Lote (E-Commerce)'
+    else
+      FrmCadKits.Caption := 'Alteração Kits de Produtos em Lote';
+  end
+  else
+  begin
+  	 if ckLixeira.Checked then
+    	FrmCadKits.Caption := 'Kits de Produtos (Lixeira)'
+    else if ckEcommerce.Checked then
+      FrmCadKits.Caption := 'Kits de Produtos (E-Commerce)'
+    else
+      FrmCadKits.Caption := 'Kits de Produtos';
+  end;
+  BitBtn1Click(Sender);
+end;
+
+procedure TFrmCadKits.ckEstoqueDisponivelClick(Sender: TObject);
+begin
+  inherited;
+  if not ckEstoqueDisponivel.Visible then
+    Exit;
+
+  BitBtn1Click(Sender);
 end;
 
 procedure TFrmCadKits.ckLixeiraClick(Sender: TObject);
@@ -2296,19 +2367,40 @@ begin
       BitBtn5Click(Sender);
     end;
   end
-  else if (key = vk_f2) then
+  else if (key = VK_F2) then
   begin
-    CheckBox2.Checked := not CheckBox2.Checked;
-    if CheckBox2.Checked then
+    if (ckEcommerce.visible) and (ckEcommerce.Enabled) and (PageControl1.ActivePage = TabSheet2) then
+      ckEcommerce.Checked := not ckEcommerce.Checked
+    else if (ckEcommerce.visible) and (ckEcommerce.Enabled) and (PageControl1.ActivePage = tsAlterDadosKit) then
+    	ckEcommerce.Checked := not ckEcommerce.Checked
+    else if (CheckBox2.Visible) and (CheckBox2.Enabled) and (PageControl1.ActivePage = TabSheet4) then
     begin
-      CheckBox2.Font.Color := clRed;
-      Label14.Font.Color := clRed;
-    end
-    else
-    begin
-      Label14.Font.Color := clTeal;
-      CheckBox2.Font.Color := clTeal;
+      CheckBox2.Checked := not CheckBox2.Checked;
+      if CheckBox2.Checked then
+      begin
+        CheckBox2.Font.Color := clRed;
+        Label14.Font.Color := clRed;
+      end
+      else
+      begin
+        Label14.Font.Color := clTeal;
+        CheckBox2.Font.Color := clTeal;
+      end;
     end;
+  end
+  else if Key = VK_F4 then
+  begin
+    if (ckEstoqueDisponivel.Visible) and (ckEstoqueDisponivel.Enabled) and (PageControl1.ActivePage = TabSheet2) then
+      ckEstoqueDisponivel.Checked := not ckEstoqueDisponivel.Checked
+    else if (ckEstoqueDisponivel.Visible) and (ckEstoqueDisponivel.Enabled) and (PageControl1.ActivePage = tsAlterDadosKit) then
+      ckEstoqueDisponivel.Checked := not ckEstoqueDisponivel.Checked;
+  end
+  else if Key = VK_F6 then
+  begin
+    if (ckLixeira.visible) and (ckLixeira.Enabled) and (PageControl1.ActivePage = TabSheet2) then
+      ckLixeira.Checked := not ckLixeira.Checked
+    else if (ckLixeira.visible) and (ckLixeira.Enabled) and (PageControl1.ActivePage = tsAlterDadosKit) then
+      ckLixeira.Checked := not ckLixeira.Checked;
   end;
 end;
 
@@ -2353,8 +2445,8 @@ begin
     abrirDiretorioDestinoImagem;
   end;
 
-  SpeedButtonECommerce.Visible := (vDadosIni.vEcommerce.vHabilitarEcommerce)
-    and (trim(vDadosIni.vEcommerce.vEcommerceIntegrado) = 'TRAY');
+  SpeedButtonECommerce.Visible := (vDadosIni.vEcommerce.vHabilitarEcommerce) and (trim(vDadosIni.vEcommerce.vEcommerceIntegrado) = 'TRAY');
+  ckEcommerce.Visible := (vDadosIni.vEcommerce.vHabilitarEcommerce) and (trim(vDadosIni.vEcommerce.vEcommerceIntegrado) = 'TRAY');
 
   if vCriou = 0 then
     vCriou := 1;
@@ -2865,12 +2957,13 @@ begin
   begin
     if not Kit.AbrirLixeira then
     begin
-      SpeedButton2.Hint := 'Enviar para Lixeira -  [PRO114]';
+      SpeedButton2.Hint := 'Enviar para Lixeira - [PRO114]';
+      btExcluirRegistro.Hint := 'Enviar para Lixeira - [PRO114]';
+
       SpeedButton1.Visible := true;
       SpeedButton5.Visible := false;
       SpeedButton6.Visible := true;
-      SpeedButtonECommerce.Visible := (vDadosIni.vEcommerce.vHabilitarEcommerce)
-    		and (trim(vDadosIni.vEcommerce.vEcommerceIntegrado) = 'TRAY');
+      SpeedButtonECommerce.Visible := (vDadosIni.vEcommerce.vHabilitarEcommerce) and (trim(vDadosIni.vEcommerce.vEcommerceIntegrado) = 'TRAY');
       SpeedButton7.Visible := true;
 
       btRestaurarRegistro.Visible := false;
@@ -2886,7 +2979,9 @@ begin
     end
     else
     begin
-      SpeedButton2.Hint := 'Excluir registro permanentemente -  [PRO113]';
+      SpeedButton2.Hint := 'Excluir registro permanentemente - [PRO113]';
+      btExcluirRegistro.Hint := 'Excluir registro permanentemente - [PRO113]';
+                                
       SpeedButton1.Visible := false;
       SpeedButton5.Visible := true;
       SpeedButton6.Visible := false;
@@ -3470,6 +3565,12 @@ begin
   lixeiraVazia(not vStatusLixeira);
 end;
 
+procedure TFrmCadKits.SpeedButton68Click(Sender: TObject);
+begin
+  inherited;
+  vDadosIni.configurarSistema('kit_cad_alt_lote_reg', Kit.buscas);
+end;
+
 procedure TFrmCadKits.SpeedButton6Click(Sender: TObject);
 begin
   inherited;
@@ -3541,6 +3642,8 @@ begin
     ckLixeira.Visible    := True;
     if ckLixeira.Checked then
       FrmCadKits.Caption := 'Alteração Kits de Produtos em Lote (Lixeira)'
+    else if ckEcommerce.Checked then
+      FrmCadKits.Caption := 'Alteração Kits de Produtos em Lote (E-Commerce)'
     else
       FrmCadKits.Caption := 'Alteração Kits de Produtos em Lote';
   finally
@@ -3652,7 +3755,7 @@ begin
 
     if Kit.dataSet.IsEmpty then
     begin
-      Application.MessageBox('Nenhum produto selecionado.', 'Atenção',
+      Application.MessageBox('Nenhum kit selecionado.', 'Atenção',
         MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
       exit;
     end;

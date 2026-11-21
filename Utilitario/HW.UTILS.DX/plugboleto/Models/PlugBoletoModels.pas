@@ -53,7 +53,10 @@ type
     FTituloValorDescontoTaxa: string;
     FCedenteContaNumeroDV: string;
     FTituloNossoNumero: string;
+    FTituloDataEmissao: string;
     FTituloDataVencimento: string;
+    FIndicadorAceiteTituloVencido: string;
+    FTituloDataLimite: string;
     FTituloOutrosAcrescimos: string;
     FTituloSacadorAvalistaCidade: string;
     FTituloAceite: string;
@@ -68,7 +71,6 @@ type
     FTituloCodProtesto: string;
     FTituloLocalPagamento: string;
     FSacadoCPFCNPJ: string;
-    FTituloDataEmissao: string;
     FTituloEmissaoBoleto: string;
     FTituloCodDesconto2: string;
     FTituloVariacaoCarteira: string;
@@ -122,6 +124,8 @@ type
     property TituloNumeroDocumento: string read FTituloNumeroDocumento write FTituloNumeroDocumento;
     property TituloDataEmissao: string read FTituloDataEmissao write FTituloDataEmissao;
     property TituloDataVencimento: string read FTituloDataVencimento write FTituloDataVencimento;
+    property TituloDataLimite: string read FTituloDataLimite write FTituloDataLimite;
+    property IndicadorAceiteTituloVencido: string read FIndicadorAceiteTituloVencido write FIndicadorAceiteTituloVencido;
     property TituloAceite: string read FTituloAceite write FTituloAceite;
     property TituloDocEspecie: string read FTituloDocEspecie write FTituloDocEspecie;
     property TituloLocalPagamento: string read FTituloLocalPagamento write FTituloLocalPagamento;

@@ -1568,6 +1568,15 @@ object DtmBoletos: TDtmBoletos
       DisplayLabel = 'Vencimento Cerificado'
       FieldName = 'DATA_VENC_CERT'
     end
+    object cdsCobreBemAC_TIT_APOS_VENC: TStringField
+      DisplayLabel = 'Aceita Ap'#243's Vencimento'
+      FieldName = 'AC_TIT_APOS_VENC'
+      Size = 1
+    end
+    object cdsCobreBemDIAS_AC_TIT_APOS_VENC: TIntegerField
+      DisplayLabel = 'Dias Ap'#243's Vencimento'
+      FieldName = 'DIAS_AC_TIT_APOS_VENC'
+    end
   end
   object dspCobreBem: TDataSetProvider
     DataSet = qrCobrebem
@@ -3605,6 +3614,13 @@ object DtmBoletos: TDtmBoletos
     end
     object cdsCobreBemBolDATA_VENC_CERT: TDateTimeField
       FieldName = 'DATA_VENC_CERT'
+    end
+    object cdsCobreBemBolAC_TIT_APOS_VENC: TStringField
+      FieldName = 'AC_TIT_APOS_VENC'
+      Size = 1
+    end
+    object cdsCobreBemBolDIAS_AC_TIT_APOS_VENC: TIntegerField
+      FieldName = 'DIAS_AC_TIT_APOS_VENC'
     end
   end
   object dspCobreBemBol: TDataSetProvider

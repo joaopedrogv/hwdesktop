@@ -8427,7 +8427,7 @@ begin
     if (tipo_item = 'O') and (descricao_item_outras.Count > 0) then
       descricao_item := descricao_item_outras[0];
 
-    if descricao_item = '' then
+    if (tipo_item <> 'V') and (descricao_item = '') then
       FOwnerNF.erros.New('Item %d - Descrição não informada', [nitem]);
 
     if MatchStr(FOwnerNF.tipo_emissao, ['1', '4']) then//(FOwnerNF.tipo_emissao <> '2') and (FOwnerNF.complementar_ent <> 'S') and (FOwnerNF.tipo_nf <> 'O') then

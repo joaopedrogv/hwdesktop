@@ -71,7 +71,7 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <Debugger_HostApplication>C:\Projeto_Fiscal40\bpl\HwSistemas.exe</Debugger_HostApplication>
+        <Debugger_HostApplication>C:\Projeto_Fiscal40\bpl\hw.utils.dx.teste.exe</Debugger_HostApplication>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>None</Manifest_File>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -90,7 +90,7 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DCC_Optimize>false</DCC_Optimize>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <Debugger_HostApplication>C:\Projeto_Fiscal40\bpl\HwSistemas.exe</Debugger_HostApplication>
+        <Debugger_HostApplication>C:\Projeto_Fiscal40\bpl\hw.utils.dx.teste.exe</Debugger_HostApplication>
         <Debugger_RunParams>pkAutomacao TFrmPrincipalS</Debugger_RunParams>
     </PropertyGroup>
     <ItemGroup>
@@ -514,12 +514,18 @@
         <DCCReference Include="hw.cloud\UseCase\UseCaseBuscarConfig.pas"/>
         <DCCReference Include="hw.cloud\UseCase\UseCaseLerMensageria.pas"/>
         <DCCReference Include="hw.cloud\UseCase\UseCaseCadMensageriaSemTemplateComAnexo.pas"/>
-        <DCCReference Include="hw.cloud\UseCase\UseCaseUpdateMensageria.pas"/>
+        <DCCReference Include="hw.cloud\UseCase\UseCaseUpdateMensageriaStatus.pas"/>
+        <DCCReference Include="hw.cloud\UseCase\UseCaseUpdateMensageriaAtribuirProf.pas"/>
         <DCCReference Include="hw.cloud\UseCase\UseCaseEnvMensageria.pas"/>
         <DCCReference Include="hw.cloud\UseCase\UseCaseCadMensageria.pas"/>
         <DCCReference Include="..\..\lib\sock\USock.pas"/>
         <DCCReference Include="..\..\Ativos\fonte\uClasseTagMacro.pas"/>
         <DCCReference Include="..\..\Ativos\fonte\hw_jsondx.pas"/>
+        <DCCReference Include="hw.cloud\UseCase\UseCaseCadAtribuicaoProf.pas"/>
+        <DCCReference Include="hw.cloud\Forms\uAtribuicaoProf.pas">
+            <Form>frmAtribuirProf</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

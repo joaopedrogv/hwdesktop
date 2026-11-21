@@ -591,6 +591,41 @@ type
     cdsPromocaoOrdemECDATA_INI: TDateTimeField;
     cdsPromocaoOrdemECDATA_FIM: TDateTimeField;
     cdsConfigAPIUSAR_API_PEDIDO: TStringField;
+    cdsMsgOrigemModCartasDOC: TStringField;
+    qrAbreMsgTipoTarefa: TIBQuery;
+    dspAbreMsgTipoTarefa: TDataSetProvider;
+    cdsAbreMsgTipoTarefa: TClientDataSet;
+    dsAbreMsgTipoTarefa: TDataSource;
+    qrMsgTipoTarefaOrigem: TIBQuery;
+    dspMsgTipoTarefaOrigem: TDataSetProvider;
+    cdsMsgTipoTarefaOrigem: TClientDataSet;
+    dsMsgTipoTarefaOrigem: TDataSource;
+    cdsMsgTipoTarefaOrigemID_MSG_TIPO_TAREFA: TIntegerField;
+    cdsMsgTipoTarefaOrigemID_MSG_ORIGEM: TIntegerField;
+    cdsMsgTipoTarefaOrigemDESCRICAO: TStringField;
+    cdsMsgTipoTarefaOrigemTIPO: TStringField;
+    cdsMsgTipoTarefaOrigemDESCRICAO_REDUZIDA: TStringField;
+    cdsAbreMsgTipoTarefaID: TIntegerField;
+    cdsAbreMsgTipoTarefaTIPO: TStringField;
+    cdsAbreMsgTipoTarefaDESCRICAO_REDUZIDA: TStringField;
+    cdsMsgTipoTarefaOrigemSEL: TStringField;
+    cdsAbreMsgTipoTarefaDESCRICAO: TStringField;
+    qrMsgTipoTarefa: TIBQuery;
+    dspMsgTipoTarefa: TDataSetProvider;
+    cdsMsgTipoTarefa: TClientDataSet;
+    dsMsgTipoTarefa: TDataSource;
+    cdsMsgTipoTarefaID: TIntegerField;
+    cdsMsgTipoTarefaTIPO: TStringField;
+    cdsMsgTipoTarefaDESCRICAO_REDUZIDA: TStringField;
+    cdsMsgTipoTarefaDESCRICAO_COMPLETA: TMemoField;
+    cdsMsgTipoTarefaSLA_SEG_TAREFA: TIntegerField;
+    cdsMsgTipoTarefaTEMPO_ADIAMENTO: TIntegerField;
+    cdsMsgTipoTarefaQTDE_MAX_ADIAMENTO: TIntegerField;
+    cdsMsgTipoTarefaEXEC_AUTO: TStringField;
+    cdsMsgTipoTarefaPERC_TOLERANCIA: TFloatField;
+    cdsMsgTipoTarefaNOD_RESPOSTA: TStringField;
+    procedure cdsMsgTipoTarefaDESCRICAO_COMPLETAGetText(Sender: TField;
+      var Text: string; DisplayText: Boolean);
     procedure cdswsScriptERROGetText(Sender: TField; var Text: string;
       DisplayText: Boolean);
     procedure cdswsScriptSQLGetText(Sender: TField; var Text: string;
@@ -624,6 +659,13 @@ exports
 procedure TdtmConfig.cdsMenusBeforeOpen(DataSet: TDataSet);
 begin
   dtmAtivo.mudaSelect(TClientDataSet(DataSet),Self);
+end;
+
+procedure TdtmConfig.cdsMsgTipoTarefaDESCRICAO_COMPLETAGetText(Sender: TField;
+  var Text: string; DisplayText: Boolean);
+begin
+  if not cdsMsgTipoTarefaDESCRICAO_COMPLETA.IsNull then
+    Text := Copy(cdsMsgTipoTarefaDESCRICAO_COMPLETA.AsString, 1, 100);
 end;
 
 procedure TdtmConfig.cdswsScriptERROGetText(Sender: TField; var Text: string;

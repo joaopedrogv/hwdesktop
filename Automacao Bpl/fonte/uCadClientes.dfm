@@ -45,6 +45,8 @@ inherited FrmCadClientes: TFrmCadClientes
         ExplicitHeight = 608
         inherited TabSheet1: TTabSheet
           OnShow = TabSheet1Show
+          ExplicitLeft = 4
+          ExplicitTop = 27
           ExplicitWidth = 888
           ExplicitHeight = 577
           inherited ScrollBox1: TScrollBox
@@ -1856,10 +1858,6 @@ inherited FrmCadClientes: TFrmCadClientes
               object TabSheet4: TTabSheet
                 Caption = 'Dados Adicionais'
                 ImageIndex = 1
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object ScrollBox4: TScrollBox
                   Left = 0
                   Top = 0
@@ -2690,18 +2688,10 @@ inherited FrmCadClientes: TFrmCadClientes
                   OnEnter = pgDadosAdEnter
                   object tsDadosAdOutros: TTabSheet
                     Caption = 'Outros'
-                    ExplicitLeft = 0
-                    ExplicitTop = 0
-                    ExplicitWidth = 0
-                    ExplicitHeight = 0
                   end
                   object tsEndDocAdicionais: TTabSheet
                     Caption = 'Adicionais(Entrega, NF-e, etc)'
                     ImageIndex = 1
-                    ExplicitLeft = 0
-                    ExplicitTop = 0
-                    ExplicitWidth = 0
-                    ExplicitHeight = 0
                     object pnAdicionaisEndDoc: TPanel
                       Left = 0
                       Top = 0
@@ -3561,10 +3551,6 @@ inherited FrmCadClientes: TFrmCadClientes
                   object tsDadosAdReferencias: TTabSheet
                     Caption = 'Referencias'
                     ImageIndex = 2
-                    ExplicitLeft = 0
-                    ExplicitTop = 0
-                    ExplicitWidth = 0
-                    ExplicitHeight = 0
                     object GroupBox16: TGroupBox
                       Left = 0
                       Top = 0
@@ -4406,20 +4392,12 @@ inherited FrmCadClientes: TFrmCadClientes
                   object TabSheet11: TTabSheet
                     Caption = 'Rotas de Entrega'
                     ImageIndex = 3
-                    ExplicitLeft = 0
-                    ExplicitTop = 0
-                    ExplicitWidth = 0
-                    ExplicitHeight = 0
                   end
                 end
               end
               object TabSheet5: TTabSheet
                 Caption = 'Dados Complementares'
                 ImageIndex = 2
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object ScrollBox5: TScrollBox
                   Left = 0
                   Top = 0
@@ -4998,10 +4976,6 @@ inherited FrmCadClientes: TFrmCadClientes
               object tsIdetificacoFotografica: TTabSheet
                 Caption = 'Identifica'#231#227'o Fotogr'#225'fica'
                 ImageIndex = 3
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object ScrollBox6: TScrollBox
                   Left = 0
                   Top = 0
@@ -9194,10 +9168,6 @@ inherited FrmCadClientes: TFrmCadClientes
               object tsAtributos: TTabSheet
                 Caption = 'Atributos'
                 ImageIndex = 5
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object GroupBox49: TGroupBox
                   Left = 0
                   Top = 0
@@ -9315,10 +9285,6 @@ inherited FrmCadClientes: TFrmCadClientes
               object tsFormaPag: TTabSheet
                 Caption = 'Forma de Pagamento'
                 ImageIndex = 4
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object Panel27: TPanel
                   Left = 0
                   Top = 0
@@ -9600,10 +9566,6 @@ inherited FrmCadClientes: TFrmCadClientes
               object tsDadosFiscais: TTabSheet
                 Caption = 'Dados Fiscais'
                 ImageIndex = 6
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object GroupBox51: TGroupBox
                   Left = 0
                   Top = 0
@@ -10004,10 +9966,6 @@ inherited FrmCadClientes: TFrmCadClientes
               object tsVeiculos: TTabSheet
                 Caption = 'Veiculos'
                 ImageIndex = 7
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object Panel49: TPanel
                   Left = 0
                   Top = 0
@@ -10213,10 +10171,6 @@ inherited FrmCadClientes: TFrmCadClientes
               object tsECommerce: TTabSheet
                 Caption = 'E-Commerce'
                 ImageIndex = 8
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object ScrollBox13: TScrollBox
                   Left = 0
                   Top = 0
@@ -10922,6 +10876,8 @@ inherited FrmCadClientes: TFrmCadClientes
         end
         inherited TabSheet2: TTabSheet
           OnShow = TabSheet2Show
+          ExplicitLeft = 4
+          ExplicitTop = 27
           ExplicitWidth = 888
           ExplicitHeight = 577
           object Panel7: TPanel [0]
@@ -11391,7 +11347,7 @@ inherited FrmCadClientes: TFrmCadClientes
                 Width = 205
                 Height = 21
                 Hint = 'Campo filtro da pesquisa adicional. Informe o campo desejado'
-                ItemHeight = 0
+                ItemHeight = 13
                 TabOrder = 0
                 Text = 'ComboBox11'
                 OnExit = ComboBox11Exit
@@ -11502,7 +11458,7 @@ inherited FrmCadClientes: TFrmCadClientes
                 Width = 205
                 Height = 21
                 Hint = 'Status Contrato'
-                ItemHeight = 0
+                ItemHeight = 13
                 TabOrder = 0
                 Text = 'ComboBox14'
                 OnExit = ComboBox14Exit
@@ -13321,10 +13277,6 @@ inherited FrmCadClientes: TFrmCadClientes
         object tsCadastroSimples: TTabSheet [2]
           Caption = 'tsCadastroSimples'
           ImageIndex = 12
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object Panel36: TPanel
             Left = 0
             Top = 536
@@ -13607,10 +13559,6 @@ inherited FrmCadClientes: TFrmCadClientes
             OnChange = pageCadSimplesChange
             object tsSDadosPessoais: TTabSheet
               Caption = 'Dados Pessoais'
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object ScrollBox9: TScrollBox
                 Left = 0
                 Top = 0
@@ -15011,10 +14959,6 @@ inherited FrmCadClientes: TFrmCadClientes
             object tsSDadosAdicionais: TTabSheet
               Caption = 'Dados Adicionais'
               ImageIndex = 2
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnSDadosAdicionais: TPanel
                 Left = 0
                 Top = 0
@@ -16280,10 +16224,6 @@ inherited FrmCadClientes: TFrmCadClientes
             object tsSReferenciasSPC: TTabSheet
               Caption = 'Referencias / SPC'
               ImageIndex = 3
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnSReferenciasSPC: TPanel
                 Left = 0
                 Top = 0
@@ -17038,10 +16978,6 @@ inherited FrmCadClientes: TFrmCadClientes
             object tsSImagens: TTabSheet
               Caption = 'Imagens'
               ImageIndex = 4
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnSImagens: TPanel
                 Left = 0
                 Top = 0
@@ -17055,10 +16991,6 @@ inherited FrmCadClientes: TFrmCadClientes
             object tsSAtributosSimples: TTabSheet
               Caption = 'Atributos'
               ImageIndex = 5
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnSAtributos: TPanel
                 Left = 0
                 Top = 0
@@ -17072,10 +17004,6 @@ inherited FrmCadClientes: TFrmCadClientes
             object tsSFormasDePagamento: TTabSheet
               Caption = 'Formas de Pagamento'
               ImageIndex = 6
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnSFormasPagamento: TPanel
                 Left = 0
                 Top = 0
@@ -17089,10 +17017,6 @@ inherited FrmCadClientes: TFrmCadClientes
             object tsSCRM: TTabSheet
               Caption = 'CRM'
               ImageIndex = 7
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnSCRM: TPanel
                 Left = 0
                 Top = 0
@@ -17386,20 +17310,15 @@ inherited FrmCadClientes: TFrmCadClientes
               Caption = 'Modais'
               Enabled = False
               ImageIndex = 9
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object ScrollBox150: TScrollBox
                 Left = 0
                 Top = 0
                 Width = 828
                 Height = 505
-                VertScrollBar.Position = 1002
                 TabOrder = 0
                 object pnDadosPessoais_DadosPessoais: TPanel
                   Left = 0
-                  Top = -1002
+                  Top = 0
                   Width = 807
                   Height = 220
                   Align = alTop
@@ -17627,7 +17546,7 @@ inherited FrmCadClientes: TFrmCadClientes
                 end
                 object pnDadosPessoais_ContatosTelefone: TPanel
                   Left = 0
-                  Top = -297
+                  Top = 705
                   Width = 807
                   Height = 483
                   Align = alTop
@@ -18202,7 +18121,7 @@ inherited FrmCadClientes: TFrmCadClientes
                 end
                 object pnDadosPessoais_Endereco: TPanel
                   Left = 0
-                  Top = -782
+                  Top = 220
                   Width = 807
                   Height = 485
                   Align = alTop
@@ -18259,10 +18178,6 @@ inherited FrmCadClientes: TFrmCadClientes
                     TabOrder = 1
                     object tsEndCombrancaSimples: TTabSheet
                       Caption = 'Cobran'#231'a'
-                      ExplicitLeft = 0
-                      ExplicitTop = 0
-                      ExplicitWidth = 0
-                      ExplicitHeight = 0
                       object GroupBox54: TGroupBox
                         Left = 0
                         Top = 0
@@ -18483,16 +18398,12 @@ inherited FrmCadClientes: TFrmCadClientes
                     object tsEndDocAdicionaisSimples: TTabSheet
                       Caption = 'Adicionais(Entrega, NF-e, etc)'
                       ImageIndex = 1
-                      ExplicitLeft = 0
-                      ExplicitTop = 0
-                      ExplicitWidth = 0
-                      ExplicitHeight = 0
                     end
                   end
                 end
                 object pnDadosPessoais_Documentos: TPanel
                   Left = 0
-                  Top = 473
+                  Top = 1475
                   Width = 807
                   Height = 136
                   Align = alTop
@@ -18659,7 +18570,7 @@ inherited FrmCadClientes: TFrmCadClientes
                 end
                 object pnDadosPessoais_Outros: TPanel
                   Left = 0
-                  Top = 609
+                  Top = 1611
                   Width = 807
                   Height = 460
                   Align = alTop
@@ -18971,7 +18882,7 @@ inherited FrmCadClientes: TFrmCadClientes
                 end
                 object pnObsMaxmized: TPanel
                   Left = 0
-                  Top = 1069
+                  Top = 2071
                   Width = 807
                   Height = 400
                   Align = alBottom
@@ -18981,10 +18892,11 @@ inherited FrmCadClientes: TFrmCadClientes
                   object Label337: TLabel
                     Left = 6
                     Top = 6
-                    Width = 63
+                    Width = 795
                     Height = 13
                     Align = alTop
                     Caption = 'Observa'#231#245'es'
+                    ExplicitWidth = 63
                   end
                   object Panel50: TPanel
                     Left = 6
@@ -19049,7 +18961,7 @@ inherited FrmCadClientes: TFrmCadClientes
                 end
                 object pnObsMaxmized2: TPanel
                   Left = 0
-                  Top = 1469
+                  Top = 2471
                   Width = 807
                   Height = 400
                   Align = alBottom
@@ -19059,10 +18971,11 @@ inherited FrmCadClientes: TFrmCadClientes
                   object Label396: TLabel
                     Left = 6
                     Top = 6
-                    Width = 63
+                    Width = 795
                     Height = 13
                     Align = alTop
                     Caption = 'Observa'#231#245'es'
+                    ExplicitWidth = 63
                   end
                   object Panel90: TPanel
                     Left = 6
@@ -19127,7 +19040,7 @@ inherited FrmCadClientes: TFrmCadClientes
                 end
                 object pnDadosPessoais_ContatosPlataforma: TPanel
                   Left = 0
-                  Top = 186
+                  Top = 1188
                   Width = 807
                   Height = 287
                   Align = alTop
@@ -19226,6 +19139,59 @@ inherited FrmCadClientes: TFrmCadClientes
                         Caption = '...'
                         Flat = True
                         OnClick = bt_contato_pla_tipoClick
+                      end
+                      object bt_contatos_pla_sel_all: TSpeedButton
+                        Left = 629
+                        Top = 0
+                        Width = 23
+                        Height = 17
+                        Hint = 'Selecionar todos'
+                        Flat = True
+                        Glyph.Data = {
+                          CE010000424DCE01000000000000CE0000002800000010000000100000000100
+                          08000000000000010000120B0000120B0000260000002600000000000000FFFF
+                          FF00FF00FF00A4262600BA414100BB444400BD4A4A00BD4B4B00BF4E4E00C050
+                          5000C0515100C1535300C1545400C55C5C00CB6C6C00CF777700D17D7D00D483
+                          8300004B0000098611000C9C19000A8615000C9518000D931A000F9E1C000F99
+                          1C000E9D1D000F9D1E0011A4220011A02100139224001CB135001CA1340024BC
+                          430029B548002EC6520035CA5E0039D465000202020202020202020202020202
+                          0202020202020202020202020202020202020202020202021212020202020202
+                          0202020202020212181B120202020202020202020202121F1C141D1202020202
+                          02020202021223211E12171A1202020202020202122425201202121519120202
+                          02020202021222120A03020212161202020202020203120C080B030202121312
+                          02020202030F0E0803070903020202121202020310110D030203050803020202
+                          12120202030E0302020202030603020202020202020302020202020203040302
+                          0202020202020202020202020202030302020202020202020202020202020203
+                          030202020202020202020202020202020202}
+                        ParentShowHint = False
+                        ShowHint = True
+                        OnClick = bt_contatos_pla_sel_allClick
+                      end
+                      object bt_contatos_pla_unsel_all: TSpeedButton
+                        Left = 658
+                        Top = 0
+                        Width = 23
+                        Height = 17
+                        Hint = 'Desfazer sele'#231#227'o'
+                        Flat = True
+                        Glyph.Data = {
+                          AA010000424DAA01000000000000AA0000002800000010000000100000000100
+                          08000000000000010000120B0000120B00001D0000001D00000000000000FFFF
+                          FF00FF00FF00CACACA00C4C4C400BFBFBF00BCBCBC00B8B8B800B5B5B500AEAE
+                          AE00ABABAB00A5A5A500A4A4A4009F9F9F009E9E9E009D9D9D009C9C9C009B9B
+                          9B009A9A9A009999990098989800979797009494940093939300929292008C8C
+                          8C008A8A8A007A7A7A0065656500020202020202020202020202020202020202
+                          02020202020202020202020202020202020202021C1C02020202020202020202
+                          0202021C12121C02020202020202020202021C0A0E15101C0202020202020202
+                          021C0508141C16131C020202020202021C04030B1C021C19141C020202020202
+                          021C081C0F1B02021C171C0202020202021B1C0D110E1B02021C1A1C02020202
+                          1B0809111B13101B0202021C1C02021B07060C1B021B16111B0202021C1C0202
+                          1B091B020202021B141B020202020202021B0202020202021B181B0202020202
+                          020202020202020202021B1B0202020202020202020202020202021B1B020202
+                          0202020202020202020202020202}
+                        ParentShowHint = False
+                        ShowHint = True
+                        OnClick = bt_contatos_pla_unsel_allClick
                       end
                       object Panel95: TPanel
                         Left = 764
@@ -19569,10 +19535,6 @@ inherited FrmCadClientes: TFrmCadClientes
             object tsECommerce2: TTabSheet
               Caption = 'E-Commerce'
               ImageIndex = 8
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object pnEC2: TPanel
                 Left = 0
                 Top = 0
@@ -19650,6 +19612,8 @@ inherited FrmCadClientes: TFrmCadClientes
           end
         end
         inherited tsMemo: TTabSheet
+          ExplicitLeft = 4
+          ExplicitTop = 27
           ExplicitWidth = 888
           ExplicitHeight = 577
         end
@@ -19657,10 +19621,6 @@ inherited FrmCadClientes: TFrmCadClientes
           Caption = 'Cadastro de Adicionais por Cliente'
           ImageIndex = 2
           OnShow = TabSheet6Show
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object PageControl2: TPageControl
             Left = 0
             Top = 0
@@ -19672,10 +19632,6 @@ inherited FrmCadClientes: TFrmCadClientes
             object TabSheet7: TTabSheet
               Caption = 'TabSheet7'
               OnShow = TabSheet1Show
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object GroupBox4: TGroupBox
                 Left = 0
                 Top = 0
@@ -20063,10 +20019,6 @@ inherited FrmCadClientes: TFrmCadClientes
               Caption = 'TabSheet8'
               ImageIndex = 1
               OnShow = TabSheet8Show
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 0
-              ExplicitHeight = 0
               object GroupBox15: TGroupBox
                 Left = 0
                 Top = 0
@@ -20791,10 +20743,6 @@ inherited FrmCadClientes: TFrmCadClientes
         object tsRelCliFornec: TTabSheet
           Caption = 'Relat'#243'rios de Clientes / Fornecedores'
           ImageIndex = 3
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object qrpClienteFornec: TQuickRep
             Left = 0
             Top = 17
@@ -22818,10 +22766,6 @@ inherited FrmCadClientes: TFrmCadClientes
         object tsProdutosFornec: TTabSheet
           Caption = 'Produtos do Fornecedor'
           ImageIndex = 4
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object GroupBox26: TGroupBox
             Left = 0
             Top = 0
@@ -22974,10 +22918,6 @@ inherited FrmCadClientes: TFrmCadClientes
         object tsFichaFin: TTabSheet
           Caption = 'tsFichaFin'
           ImageIndex = 5
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object GroupBox27: TGroupBox
             Left = 0
             Top = 0
@@ -23202,10 +23142,6 @@ inherited FrmCadClientes: TFrmCadClientes
         object tsCodigoFornecedor: TTabSheet
           Caption = 'tsCodigoFornecedor'
           ImageIndex = 7
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnCodigoFornecedor: TPanel
             Left = 3
             Top = 3
@@ -23684,10 +23620,6 @@ inherited FrmCadClientes: TFrmCadClientes
         object tsContratos: TTabSheet
           Caption = 'tsContratos'
           ImageIndex = 8
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object Panel14: TPanel
             Left = 31
             Top = 104
@@ -25466,10 +25398,6 @@ inherited FrmCadClientes: TFrmCadClientes
               TabOrder = 0
               object TabSheet9: TTabSheet
                 Caption = 'Relat'#243'rio Contratos'
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object BitBtn29: TBitBtn
                   Left = 20
                   Top = 22
@@ -25698,10 +25626,6 @@ inherited FrmCadClientes: TFrmCadClientes
               object TabSheet10: TTabSheet
                 Caption = 'Relat'#243'rio Gerador OS'
                 ImageIndex = 1
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object Label159: TLabel
                   Left = 26
                   Top = 5
@@ -26967,7 +26891,7 @@ inherited FrmCadClientes: TFrmCadClientes
               Top = 123
               Width = 377
               Height = 21
-              ItemHeight = 0
+              ItemHeight = 13
               TabOrder = 8
               Text = 'ComboBox13'
             end
@@ -27020,10 +26944,6 @@ inherited FrmCadClientes: TFrmCadClientes
         object tsEmailCliente: TTabSheet
           Caption = 'tsEmailCliente'
           ImageIndex = 9
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnEnviarCartaViaEmail: TPanel
             Left = 0
             Top = 0
@@ -27500,10 +27420,6 @@ inherited FrmCadClientes: TFrmCadClientes
                 TabOrder = 14
                 object tsMsgEmail1: TTabSheet
                   Caption = 'Corpo do E-mail'
-                  ExplicitLeft = 0
-                  ExplicitTop = 0
-                  ExplicitWidth = 0
-                  ExplicitHeight = 0
                   object RichEditMsg: TRichEdit
                     Left = 0
                     Top = -4
@@ -27519,10 +27435,6 @@ inherited FrmCadClientes: TFrmCadClientes
                 object tsMsgEmail2: TTabSheet
                   Caption = 'C'#243'digo fonte HTML'
                   ImageIndex = 1
-                  ExplicitLeft = 0
-                  ExplicitTop = 0
-                  ExplicitWidth = 0
-                  ExplicitHeight = 0
                   object RichEditMsg2: TRichEdit
                     Left = 0
                     Top = -4
@@ -27538,10 +27450,6 @@ inherited FrmCadClientes: TFrmCadClientes
                 object tsMsgModeloCarta: TTabSheet
                   Caption = 'Modelo de Carta Configurado'
                   ImageIndex = 2
-                  ExplicitLeft = 0
-                  ExplicitTop = 0
-                  ExplicitWidth = 0
-                  ExplicitHeight = 0
                   object RichEditMsg3: TRichEdit
                     Left = 0
                     Top = -4
@@ -27632,10 +27540,6 @@ inherited FrmCadClientes: TFrmCadClientes
         object tsCarteiras: TTabSheet
           Caption = 'tsCarteiras'
           ImageIndex = 10
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnCarteiras: TPanel
             Left = 0
             Top = 0
@@ -28346,10 +28250,6 @@ inherited FrmCadClientes: TFrmCadClientes
         object tsModeloCartas: TTabSheet
           Caption = 'tsModeloCartas'
           ImageIndex = 11
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnModeloCartas: TPanel
             Left = 8
             Top = 2
@@ -28465,10 +28365,6 @@ inherited FrmCadClientes: TFrmCadClientes
         object tsEscolherPossivelCliente: TTabSheet
           Caption = 'tsEscolherPossivelCliente'
           ImageIndex = 13
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnEscolherPossivelCliente: TPanel
             Left = 3
             Top = 0
@@ -28636,10 +28532,6 @@ inherited FrmCadClientes: TFrmCadClientes
         object tsContaCorrente: TTabSheet
           Caption = 'tsContaCorrente'
           ImageIndex = 14
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnContaCorrente: TPanel
             Left = 0
             Top = 0
@@ -29012,10 +28904,6 @@ inherited FrmCadClientes: TFrmCadClientes
               TabOrder = 1
               object tsConsContaCorrente: TTabSheet
                 Caption = 'tsConsContaCorrente'
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object Panel54: TPanel
                   Left = 0
                   Top = 0
@@ -29986,10 +29874,6 @@ inherited FrmCadClientes: TFrmCadClientes
               object tsIncluirContaCorrente: TTabSheet
                 Caption = 'tsIncluirContaCorrente'
                 ImageIndex = 1
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object Panel57: TPanel
                   Left = 0
                   Top = 418
@@ -30260,10 +30144,6 @@ inherited FrmCadClientes: TFrmCadClientes
         object tsValeTroca: TTabSheet
           Caption = 'tsValeTroca'
           ImageIndex = 15
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnValeTroca: TPanel
             Left = 3
             Top = 3
@@ -30281,10 +30161,6 @@ inherited FrmCadClientes: TFrmCadClientes
               TabOrder = 1
               object tsOpcaoValeCompra: TTabSheet
                 Caption = 'Vale Resgate'
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object DBGridValeCompraProgFid: TDBGrid
                   Left = 0
                   Top = 66
@@ -30417,10 +30293,6 @@ inherited FrmCadClientes: TFrmCadClientes
               object tsOpcaoValeTroca: TTabSheet
                 Caption = 'Vale Troca'
                 ImageIndex = 1
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitWidth = 0
-                ExplicitHeight = 0
                 object Panel64: TPanel
                   Left = 0
                   Top = 0
@@ -30907,10 +30779,6 @@ inherited FrmCadClientes: TFrmCadClientes
         object tsTransSaldo: TTabSheet
           Caption = 'tsTransSaldo'
           ImageIndex = 16
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnTranfSaldo: TPanel
             Left = 3
             Top = 3
@@ -31276,10 +31144,6 @@ inherited FrmCadClientes: TFrmCadClientes
         object tsDocProgFid: TTabSheet
           Caption = 'tsDocProgFid'
           ImageIndex = 17
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnDocProgFid: TPanel
             Left = 3
             Top = 3
@@ -31613,10 +31477,6 @@ inherited FrmCadClientes: TFrmCadClientes
         object tsResgatarVale: TTabSheet
           Caption = 'tsResgatarVale'
           ImageIndex = 18
-          ExplicitLeft = 0
-          ExplicitTop = 0
-          ExplicitWidth = 0
-          ExplicitHeight = 0
           object pnResgatarVale: TPanel
             Left = 3
             Top = 3
@@ -31935,6 +31795,10 @@ inherited FrmCadClientes: TFrmCadClientes
     Top = 470
     ExplicitLeft = 824
     ExplicitTop = 470
+    inherited lbTextoProcessamento: TLabel
+      Width = 477
+      Height = 21
+    end
   end
   inherited PopupMenu1: TPopupMenu
     Left = 692

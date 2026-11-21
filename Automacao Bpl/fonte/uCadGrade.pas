@@ -84,6 +84,8 @@ type
     cbTipo2: TComboBox;
     ckTipo2: TCheckBox;
     Label473: TLabel;
+    SpeedButton68: TSpeedButton;
+    procedure SpeedButton68Click(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure btSincronizarServicosClick(Sender: TObject);
     procedure SpeedBDesmarcarTodosClick(Sender: TObject);
@@ -1253,6 +1255,8 @@ begin
       if not obGrade.AbrirLixeira then
       begin
         SpeedButton2.Hint := 'Enviar para Lixeira - [PRO099]';
+        btExcluirRegistro.Hint := 'Enviar para Lixeira - [PRO099]';
+
         SpeedButton1.Visible := true;
         SpeedButton5.Visible := false;
         SpeedButton6.Visible := vDadosIni.vEcommerce.vHabilitarEcommerce;
@@ -1269,6 +1273,8 @@ begin
       else
       begin
         SpeedButton2.Hint := 'Excluir registro permanentemente - [PRO098]';
+        btExcluirRegistro.Hint := 'Excluir registro permanentemente - [PRO098]';
+
         SpeedButton1.Visible := false;
         SpeedButton5.Visible := true;
         SpeedButton6.Visible := false;
@@ -1328,6 +1334,12 @@ begin
   vStatusLixeira := obGrade.StatusLixeira;
   btLixeiraCheia.Visible := vStatusLixeira;
   lixeiraVazia(not vStatusLixeira);
+end;
+
+procedure TfrmCadGrade.SpeedButton68Click(Sender: TObject);
+begin
+  inherited;
+  vDadosIni.configurarSistema('grade_alt_lote_reg', obGrade.buscas);
 end;
 
 procedure TfrmCadGrade.SpeedButton6Click(Sender: TObject);
@@ -1407,7 +1419,7 @@ begin
 
     if obGrade.dataSet.IsEmpty then
     begin
-      Application.MessageBox('Nenhum contrato selecionado.', 'Atenção',
+      Application.MessageBox('Nenhum grade selecionado.', 'Atenção',
         MB_OK + MB_ICONERROR + MB_DEFBUTTON1);
       obGrade.dataSet.Refresh;
       exit;

@@ -113,7 +113,7 @@ begin
         item.valor_doc := StrToFloat(getCampoPipe(pArquivos[I], 3));
         item.data_documento := FormatDateTime('yyyy-mm-dd', Date);
         item.data_vencimento := FormatDateTime('yyyy-mm-dd', Date);
-        item.conteudo_base64 := TNetEncoding.Base64.Encode(arquivo);
+        item.conteudo_base64 := Base64Helper.EncodeFile(arquivo);
 
         cadMensageria.itens := cadMensageria.itens + [item];
       end;
@@ -124,7 +124,7 @@ begin
         cadMensageria.tipo_envio := 'AVL';
 
       for I := 0 to Length(pVariaveisTemplate) - 1 do
-        cadMensageria.variaveis_template.Add(getCampoPipe(pVariaveisTemplate[I], 1), getCampoPipe(pVariaveisTemplate[I], 2));
+        cadMensageria.variaveis_template.Add(getCampoPipe(pVariaveisTemplate[I], 1, '¶'), getCampoPipe(pVariaveisTemplate[I], 2, '¶'));
 
       var useCase := api.CadMensageriaComTemplateComAnexo(cadMensageria);
 

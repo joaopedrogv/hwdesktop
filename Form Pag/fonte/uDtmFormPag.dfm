@@ -309,7 +309,14 @@ object dtmFP: TdtmFP
     BeforeOpen = cdsBuscasBeforeOpen
     Left = 104
     Top = 168
+    object cdsReciboSEL: TStringField
+      DisplayLabel = 'Sel'
+      FieldKind = fkInternalCalc
+      FieldName = 'SEL'
+      Size = 1
+    end
     object cdsReciboSELEC: TStringField
+      Tag = 1
       DisplayLabel = 'Sel'
       FieldName = 'SELEC'
       FixedChar = True

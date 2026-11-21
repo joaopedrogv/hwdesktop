@@ -360,6 +360,8 @@ type
     tab_ci: TMenuItem;
     DBComboBoxUsarAPIPedidoHwCloudIA: TDBComboBox;
     Label100: TLabel;
+    procedure SpeedButton11Click(Sender: TObject);
+    procedure SpeedButton12Click(Sender: TObject);
     procedure DBComboBoxUsarAPIPedidoHwCloudIAExit(Sender: TObject);
     procedure tab_ciClick(Sender: TObject);
     procedure tab_ceClick(Sender: TObject);
@@ -603,6 +605,8 @@ begin
   SpeedButton6.Visible := vDadosIni.retornaDadosHwCloudIA(vConfigAPI.buscas) <> '';
   SpeedButton8.Visible := vDadosIni.retornaDadosHwCloudIA(vConfigAPI.buscas) <> '';
   SpeedButton7.Visible := vDadosIni.retornaDadosHwCloudIA(vConfigAPI.buscas) <> '';
+  SpeedButton11.Visible := vDadosIni.retornaDadosHwCloudIA(vConfigAPI.buscas) <> '';
+  SpeedButton12.Visible := vDadosIni.retornaDadosHwCloudIA(vConfigAPI.buscas) <> '';
 
   if (Self.Enabled) and (Self.Visible) and (DBGrid1.CanFocus) then
   	DBGrid1.SetFocus;
@@ -2079,6 +2083,34 @@ end;
 procedure TfrmCadConfigAPI.spAPIcomercioabertoClick(Sender: TObject);
 begin
   vDadosIni.configurarSistema('comercio_aberto%', vConfigAPI.buscas);
+end;
+
+procedure TfrmCadConfigAPI.SpeedButton11Click(Sender: TObject);
+var
+  vMsgTipoTarefa: TMsgTipoTarefa;
+begin
+  try
+    Screen.Cursor := crHourGlass;
+    if vDadosIni.vConfig.AHandle = 0 then
+      carregaPacote('pkConfig', vDadosIni.vConfig.AHandle);
+    vMsgTipoTarefa.cadMsgTipoTarefa(0);
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TfrmCadConfigAPI.SpeedButton12Click(Sender: TObject);
+var
+  vMsgTipoTarefaOrigem: TMsgTipoTarefaOrigem;
+begin
+  try
+    Screen.Cursor := crHourGlass;
+    if vDadosIni.vConfig.AHandle = 0 then
+      carregaPacote('pkConfig', vDadosIni.vConfig.AHandle);
+    vMsgTipoTarefaOrigem.cadMsgTipoTarefaOrigem(0);
+  finally
+    Screen.Cursor := crDefault;
+  end;
 end;
 
 procedure TfrmCadConfigAPI.SpeedButton13Click(Sender: TObject);

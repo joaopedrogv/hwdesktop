@@ -379,9 +379,9 @@ type
     fMODO: string;
     fTIPO_OS: string;
     fGerarNFS: string;
-  	fGerarNF: string;
-  	fGerarRecLoc: string;
-  	fGerarBoleto: string;
+  	 fGerarNF: string;
+  	 fGerarRecLoc: string;
+  	 fGerarBoleto: string;
 
     fSqlAdcional: string;
 
@@ -489,9 +489,9 @@ type
     property vMODO: string read fMODO write fMODO;
     property vTIPO_OS: string read fTIPO_OS write fTIPO_OS;
     property vGerarNFS: string read fGerarNFS write fGerarNFS;
-  	property vGerarNF: string read fGerarNF write fGerarNF;
-  	property vGerarRecLoc: string read fGerarRecLoc write fGerarRecLoc;
-  	property vGerarBoleto: string read fGerarBoleto write fGerarBoleto;
+  	 property vGerarNF: string read fGerarNF write fGerarNF;
+  	 property vGerarRecLoc: string read fGerarRecLoc write fGerarRecLoc;
+  	 property vGerarBoleto: string read fGerarBoleto write fGerarBoleto;
 
     property vHAB_COD_SERVICO: boolean read fHAB_COD_SERVICO write fHAB_COD_SERVICO;
     property vHAB_COD_COLABORADOR: boolean read fHAB_COD_COLABORADOR write fHAB_COD_COLABORADOR;
@@ -1066,10 +1066,10 @@ type
     FContatoMsgTipoContrato: TCadClientesContatoMsgTipoContato;
     procedure DataSetGetTextAplicativo(Sender: TField; var Text: string; DisplayText: Boolean);
   public
-  	constructor Create(AOwer: TCadClientes);
+  	 constructor Create(AOwer: TCadClientes);
     destructor Destroy; override;
     function Apply: Boolean; override;
-		function Post(pCk_contrato_pla_tipos_contato: TCheckListBox): Boolean; //override;
+	 function Post(pCk_contrato_pla_tipos_contato: TCheckListBox): Boolean; //override;
     function Delete: Boolean; override;
 
     function Abrir: TCadClientesContatoMsg;
@@ -3899,26 +3899,29 @@ begin
         	 try
             vDadosIni.abreStatusProcessamento('', pHint + ' - ' + IntToStr(pIncReg) + '/' + IntToStr(pTotReg) + ' (Enviando Mensagem)');
 
-            vArrayContato := vDadosIni.retornaArrayContato(pCodCliente, cContrato);
-            for K := 0 to Length(vArrayContato) - 1 do
+            for vAplicativo in pArrayAplicativo do
             begin
-              vDadosIni.retornaMensagemEnv(cContrato, vArrayContato[K].Aplicativo, vAssunto, vMensagem);
+              vArrayContato := vDadosIni.retornaArrayContato(pCodCliente, vAplicativo, cContrato, False);
+              for K := 0 to Length(vArrayContato) - 1 do
+              begin
+                vDadosIni.retornaMensagemEnv(cContrato, vArrayContato[K].Aplicativo, vAssunto, vMensagem);
 
-              if not vDadosIni.EnvEmail(
-                  vAssunto,
-                  vMensagem,
-                pCodCliente,
-                  vArrayContato[K].Aplicativo,
-                '',
+                if not vDadosIni.EnvEmail(
+                    vAssunto,
+                    vMensagem,
+                  pCodCliente,
+                    vArrayContato[K].Aplicativo,
                   '',
-                  cContrato,
-                vStringListAnexos.Text,
-                vStringListAnexos.Count,
-                  false,
-                  vArrayContato[K].Identificacao,
-                  vArrayContato[K].Contato,
-                  vArrayContato[K].Avulso) then
-                  Exit;
+                    '',
+                    cContrato,
+                  vStringListAnexos.Text,
+                  vStringListAnexos.Count,
+                    false,
+                    vArrayContato[K].Identificacao,
+                    vArrayContato[K].Contato,
+                    vArrayContato[K].Avulso) then
+                    Exit;
+              end;
             end;
           finally
             vDadosIni.fechaStatusProcessamento;
@@ -23004,13 +23007,15 @@ end;
 
 function TContratosComClientes.atualizarContratosEmLote: boolean;
 var
-	vIndexFieldNames: string;
-	vIndexName: string;
+  vIndexFieldNames: string;
+  vIndexName: string;
   vRecNo: Integer;
-	vCodigo: Integer;
+  vCodigo: Integer;
   vSQL: string;
   fTempListaContratos: TClientDataSet;
   vUSAR_BOLETO: string;
+  vinc_a_cada_reg: Integer;
+  vsalvar_a_cada_reg: Integer;
 begin
 	vSQL := '';
   
@@ -23069,6 +23074,8 @@ begin
       finally
         dataSet.Filtered := False;
       end;
+
+      vsalvar_a_cada_reg := vDadosIni.getConfSisInt('contratos_clientes_alt_lote_reg', buscas);
 
       if vHAB_COD_CONTROLE then
       begin
@@ -23214,6 +23221,8 @@ begin
       and (not vHAB_GERAR_BOLETO) then
       	raiseExceptionCreate('Nenhum opção selecionada!', '');
 
+      vinc_a_cada_reg := 0;
+      
       try
         fTempListaContratos.DisableControls;
         fTempListaContratos.First;
@@ -23352,6 +23361,19 @@ begin
               end;
 
               vDadosIni.GravaAuditoria('CLI263', 'ATUALIZAR', '', 'CLIENTES_COM_CONTRATO', IntToStr(vCodigo), buscas);
+
+              Inc(vinc_a_cada_reg);
+
+              if (vsalvar_a_cada_reg > 0) and (vinc_a_cada_reg >= vsalvar_a_cada_reg) then
+              begin
+                Application.ProcessMessages;
+                vDadosIni.abreStatusProcessamento('', 'Salvando dados contratos (' +
+                  IntToStr(fTempListaContratos.RecNo) + '/' + IntToStr(fTempListaContratos.RecordCount) + ')');
+
+                vinc_a_cada_reg := 0;
+
+                CommitaTransacao;
+              end;
             end;
           end;
 
@@ -23361,19 +23383,22 @@ begin
         fTempListaContratos.EnableControls;
       end;
 
-      Result := True;
+      Application.ProcessMessages;
+      vDadosIni.abreStatusProcessamento('', 'Atualizando dados contratos (' +
+        IntToStr(fTempListaContratos.RecordCount) + '/' + IntToStr(fTempListaContratos.RecordCount) + ')');
 
       CommitaTransacao;
-
-      if Result then
-      	vDadosIni.GravaAuditoria('CLI263', 'ATUALIZAR',	'SUCESSO', 'CLIENTES_COM_CONTRATO', '', buscas);
 
       dataSet.Close;
       dataSet.CommandText := vSQL;
       dataSet.Open;
+      
+      vDadosIni.GravaAuditoria('CLI263', 'ATUALIZAR',	'SUCESSO', 'CLIENTES_COM_CONTRATO', '', buscas);
+
+      Result := true;
 
       if Result then
-      	dataSet.Refresh;
+        dataSet.Refresh;
     finally
     	dataSet.Filtered        := false;
       dataSet.IndexName       := vIndexName;
@@ -32310,7 +32335,9 @@ function TCadClientesContatoMsg.Apply: Boolean;
 var
 	vId: Integer;
 begin
-	prepare_loop();
+  Result := True;
+
+  prepare_loop();
   try
     while not dataSet.Eof do
     begin
@@ -32574,6 +32601,24 @@ begin
 
     if not buscas.IsEmpty then
     	raiseExceptionCreate('Identificação já existe registro para essa Cliente e Aplicativo:' + #13 + #13 +
+        'Aplicativo: ' + trim(Aplicativo.fstr('aplicativo')) + #13 +
+        'Identificação: ' + trim(fstr('identificador')), 'ed_contato_pla_identificacao');
+
+    SqlOpen(' select msg_contato.id, clientes.nome_cliente, clientes.razao, clientes.cpfcgc from msg_contato ' +
+            ' inner join clientes on clientes.cod_cliente = msg_contato.cod_cliente and clientes.cod_empresa = msg_contato.cod_empresa ' +
+            ' where msg_contato.cod_empresa = %d ' +
+            ' and msg_contato.id_msg_aplicativo = %d ' +
+            ' and msg_contato.identificador = %s ' +
+            ' and msg_contato.ativo = %d ' +
+            ' and msg_contato.id <> %d ' +
+            ' and msg_contato.cod_cliente > 0 ',
+            [vDadosIni.cod_empresa, fint('id_msg_aplicativo'), trim(fstrq('identificador')), 1, fint('id')], buscas);
+
+    if not buscas.IsEmpty then
+    	raiseExceptionCreate('Identificação e Aplicativo já existe para outro Cliente:' + #13 + #13 +
+        'Nome Fantasia: ' + trim(buscas.FieldByName('nome_cliente').AsString) + #13 +
+        'Razão Social: ' + trim(buscas.FieldByName('razao').AsString) + #13 +
+        'CNPJ/CPF: ' + trim(buscas.FieldByName('cpfcgc').AsString) + #13 +
         'Aplicativo: ' + trim(Aplicativo.fstr('aplicativo')) + #13 +
         'Identificação: ' + trim(fstr('identificador')), 'ed_contato_pla_identificacao');
 

@@ -7745,6 +7745,7 @@ object DtmCadBasicos: TDtmCadBasicos
     Top = 792
   end
   object IBTRegrasVND: TIBTransaction
+    Active = True
     DefaultDatabase = dtmAtivo.bancoHw
     Params.Strings = (
       'read_committed'
@@ -11193,6 +11194,59 @@ object DtmCadBasicos: TDtmCadBasicos
   object dsConsultaSql: TDataSource
     DataSet = cdsConsultaSql
     Left = 1474
+    Top = 792
+  end
+  object dspModCartasCampoDig: TDataSetProvider
+    DataSet = qrModCartasCampoDig
+    Options = [poAllowCommandText, poUseQuoteChar]
+    UpdateMode = upWhereChanged
+    Left = 1593
+    Top = 703
+  end
+  object qrModCartasCampoDig: TIBQuery
+    Database = dtmAtivo.bancoHw
+    Transaction = IBTRegrasVND
+    SQL.Strings = (
+      'select * from modcartas_tags_adc')
+    Left = 1593
+    Top = 658
+  end
+  object cdsModCartasCampoDig: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    ProviderName = 'dspModCartasCampoDig'
+    BeforeOpen = cdsFeriadoBeforeOpen
+    Left = 1593
+    Top = 745
+    object cdsModCartasCampoDigCOD_CARTA: TIntegerField
+      Tag = 1
+      DisplayLabel = 'Cod Carta'
+      FieldName = 'COD_CARTA'
+      Required = True
+    end
+    object cdsModCartasCampoDigCOD_EMPRESA: TIntegerField
+      Tag = 1
+      DisplayLabel = 'Cod Empresa'
+      FieldName = 'COD_EMPRESA'
+      Required = True
+    end
+    object cdsModCartasCampoDigTAG: TStringField
+      DisplayLabel = 'Tag'
+      FieldName = 'TAG'
+      Required = True
+      Size = 50
+    end
+    object cdsModCartasCampoDigTEXTO: TMemoField
+      DisplayLabel = 'Texto'
+      FieldName = 'TEXTO'
+      OnGetText = cdsModCartasCampoDigTEXTOGetText
+      BlobType = ftMemo
+      Size = 8
+    end
+  end
+  object dsModCartasCampoDig: TDataSource
+    DataSet = cdsModCartasCampoDig
+    Left = 1594
     Top = 792
   end
 end

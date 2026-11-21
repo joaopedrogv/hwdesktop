@@ -1786,7 +1786,7 @@ end;
 procedure TfrmFormPag2.gridRecibosCellClick(Column: TColumn);
 begin
   inherited;
-	if Column.FieldName = 'SELEC' then
+	if Column.FieldName = 'SEL' then
     obFormPag2.vRecibo.marcaRecibo;
 end;
 
@@ -1827,20 +1827,8 @@ begin
 
   if Column.FieldName = 'SELEC' then
   begin
-    if Column.Index <> 0 then
-      Column.Index := 0;
-    if Column.Width <> 18 then
-      Column.Width := 18;
-
-    TDBGrid(Sender).Canvas.FillRect(Rect);
-    Check := 0;
-    if Column.Field.AsString = 'S' then
-      Check := DFCS_CHECKED
-    else
-      Check := 0;
-    R := Rect;
-    InflateRect(R, 2, 0); //Diminue o tamanho do CheckBox
-    DrawFrameControl(TDBGrid(Sender).Canvas.Handle, R, DFC_BUTTON, DFCS_BUTTONCHECK or Check);
+    if Column.Visible then
+      Column.Visible := False;
   end
   else if Column.FieldName = 'SEL' then
   begin

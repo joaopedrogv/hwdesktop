@@ -366,6 +366,12 @@ type
     btnOKAlteracaoEmLote: TBitBtn;
     btnCancelarAlteracaoEmLote: TBitBtn;
     btSairServLote: TBitBtn;
+    SpeedButton68: TSpeedButton;
+    SpeedBSelTodos: TSpeedButton;
+    SpeedBDesmarcarTodos: TSpeedButton;
+    procedure SpeedBDesmarcarTodosClick(Sender: TObject);
+    procedure SpeedBSelTodosClick(Sender: TObject);
+    procedure SpeedButton68Click(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure EditHw9Change(Sender: TObject);
     procedure SpeedButton13Click(Sender: TObject);
@@ -1996,9 +2002,11 @@ procedure TfrmCadContratosClientes.btSelectAllClick(Sender: TObject);
 begin
   try
     Screen.Cursor := crHourGlass;
+    DBGrid1.Visible := false;
     Contratos._marcarTodos(Contratos.dataSet);
   finally
     Screen.Cursor := crDefault;
+    DBGrid1.Visible := true;
   end;
 end;
 
@@ -2006,9 +2014,11 @@ procedure TfrmCadContratosClientes.btUnSelectAllClick(Sender: TObject);
 begin
   try
     Screen.Cursor := crHourGlass;
+    DBGrid1.Visible := false;
     Contratos._desmarcarTodos(Contratos.dataSet);
   finally
     Screen.Cursor := crDefault;
+    DBGrid1.Visible := true;
   end;
 end;
 
@@ -3920,6 +3930,32 @@ begin
   _GravaConfiguracoesInteger(RadioGroup2.Name, RadioGroup2.ItemIndex);
 end;
 
+procedure TfrmCadContratosClientes.SpeedBDesmarcarTodosClick(Sender: TObject);
+begin
+  inherited;
+  try
+    Screen.Cursor := crHourGlass;
+    DBGrid1.Visible := false;
+    Contratos._desmarcarTodos(Contratos.dataSet);
+  finally
+    Screen.Cursor := crDefault;
+    DBGrid1.Visible := true;
+  end;
+end;
+
+procedure TfrmCadContratosClientes.SpeedBSelTodosClick(Sender: TObject);
+begin
+  inherited;
+  try
+    Screen.Cursor := crHourGlass;
+    DBGrid1.Visible := false;
+    Contratos._marcarTodos(Contratos.dataSet);
+  finally
+    Screen.Cursor := crDefault;
+    DBGrid1.Visible := true;
+  end;
+end;
+
 procedure TfrmCadContratosClientes.SpeedButton10Click(Sender: TObject);
 var
   novoPedido: NovoPedidoDados;
@@ -4147,6 +4183,12 @@ begin
     if Assigned(vLista2) then
       FreeAndNil(vLista2);
   end;
+end;
+
+procedure TfrmCadContratosClientes.SpeedButton68Click(Sender: TObject);
+begin
+  inherited;
+  vDadosIni.configurarSistema('contratos_clientes_alt_lote_reg', Contratos.buscas);
 end;
 
 procedure TfrmCadContratosClientes.SpeedButton6Click(Sender: TObject);

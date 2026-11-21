@@ -353,6 +353,15 @@ object dtmMobile: TdtmMobile
       DisplayLabel = 'Cod Tarefa'
       FieldName = 'COD_TAREFA'
     end
+    object cdsMensMobileTIPO_TAREFA: TStringField
+      DisplayLabel = 'Tipo Tarefa'
+      FieldName = 'TIPO_TAREFA'
+      Size = 60
+    end
+    object cdsMensMobileDATA_TAREFA: TDateTimeField
+      DisplayLabel = 'Data Tarefa'
+      FieldName = 'DATA_TAREFA'
+    end
     object cdsMensMobileEXEC_AUTO: TStringField
       DisplayLabel = 'Exec Auto'
       FieldName = 'EXEC_AUTO'

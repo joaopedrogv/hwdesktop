@@ -292,6 +292,12 @@ type
     Label111: TLabel;
     Label112: TLabel;
     DBEdit56: TDBEdit;
+    Label113: TLabel;
+    DBComboBox19: TDBComboBox;
+    Label114: TLabel;
+    DBEdit57: TDBEdit;
+    procedure DBComboBox19KeyPress(Sender: TObject; var Key: Char);
+    procedure DBComboBox19Exit(Sender: TObject);
     procedure SpeedButton16Click(Sender: TObject);
     procedure DBComboBox18KeyPress(Sender: TObject; var Key: Char);
     procedure DBComboBox7Exit(Sender: TObject);
@@ -491,7 +497,8 @@ begin
     DBLookupComboBox2.Enabled := (obCobrebem.dataSet.State = dsInsert);
 
     DBComboBox17.Enabled := trim(obCobrebem.dataSet.FieldByName('PERMITE_PROTESTO').AsString) = 'S';
-  	DBEdit46.Enabled := trim(obCobrebem.dataSet.FieldByName('PERMITE_PROTESTO').AsString) = 'S';
+  	 DBEdit46.Enabled := trim(obCobrebem.dataSet.FieldByName('PERMITE_PROTESTO').AsString) = 'S';
+    DBEdit57.Enabled := trim(obCobrebem.dataSet.FieldByName('AC_TIT_APOS_VENC').AsString) = 'S';
 
     bnExportarLicenca.Enabled := false;
     bnExportarLogo.Enabled := false;
@@ -623,6 +630,19 @@ begin
     key:=#0;
 end;
 
+procedure TfrmCadCobreBem.DBComboBox19Exit(Sender: TObject);
+begin
+  inherited;
+  DBEdit57.Enabled := trim(obCobrebem.dataSet.FieldByName('AC_TIT_APOS_VENC').AsString) = 'S';
+end;
+
+procedure TfrmCadCobreBem.DBComboBox19KeyPress(Sender: TObject; var Key: Char);
+begin
+  inherited;
+  if not( key in['0'..'9',#08] ) then
+    key:=#0;
+end;
+
 procedure TfrmCadCobreBem.DBComboBox2Exit(Sender: TObject);
 begin
   inherited;
@@ -632,14 +652,14 @@ end;
 procedure TfrmCadCobreBem.DBComboBox7Exit(Sender: TObject);
 begin
   inherited;
-	DBComboBox17.Enabled := trim(obCobrebem.dataSet.FieldByName('PERMITE_PROTESTO').AsString) = 'S';
+  DBComboBox17.Enabled := trim(obCobrebem.dataSet.FieldByName('PERMITE_PROTESTO').AsString) = 'S';
   DBEdit46.Enabled := trim(obCobrebem.dataSet.FieldByName('PERMITE_PROTESTO').AsString) = 'S';
 end;
 
 procedure TfrmCadCobreBem.DBComboBox7KeyPress(Sender: TObject; var Key: Char);
 begin
   inherited;
-	if not( key in['0'..'9',#08] ) then
+  if not( key in['0'..'9',#08] ) then
     key:=#0;
 end;
 
@@ -1082,7 +1102,8 @@ begin
     DBLookupComboBox2.Enabled := (obCobrebem.dataSet.State = dsInsert);
 
     DBComboBox17.Enabled := trim(obCobrebem.dataSet.FieldByName('PERMITE_PROTESTO').AsString) = 'S';
-  	DBEdit46.Enabled := trim(obCobrebem.dataSet.FieldByName('PERMITE_PROTESTO').AsString) = 'S';
+  	 DBEdit46.Enabled := trim(obCobrebem.dataSet.FieldByName('PERMITE_PROTESTO').AsString) = 'S';
+    DBEdit57.Enabled := trim(obCobrebem.dataSet.FieldByName('AC_TIT_APOS_VENC').AsString) = 'S';
 
     bnExportarLicenca.Enabled := trim(obCobrebem.dataSet.FieldByName('LICENCA').asString) <> '';
     bnExportarLogo.Enabled := trim(obCobrebem.dataSet.FieldByName('LOGOTIPO').asString) <> '';

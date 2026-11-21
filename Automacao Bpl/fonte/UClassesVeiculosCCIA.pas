@@ -9393,7 +9393,7 @@ var
   nf_verificar_suzuki: Tnf_verificar_suzuki;
 	vDataBanco: TDateTime;
 begin
-	if vDadosIni.retornaDadosSuzuki(buscas) = '' then
+	if vDadosIni.retornaDadosSuzuki(buscas, False) = '' then
   	Exit;
 
   if vDadosIni.vSuzuki.vVerificarNotasFiscais <> 'S' then

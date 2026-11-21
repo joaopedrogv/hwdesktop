@@ -3103,6 +3103,24 @@ inherited frmCadCobreBem: TfrmCadCobreBem
                     Caption = 'Data Vencimento Certificado:'
                     FocusControl = DBEdit37
                   end
+                  object Label113: TLabel
+                    Left = 19
+                    Top = 453
+                    Width = 94
+                    Height = 13
+                    Alignment = taRightJustify
+                    Caption = 'Aceitar Ap'#243's Venc: '
+                    FocusControl = DBComboBox19
+                  end
+                  object Label114: TLabel
+                    Left = 210
+                    Top = 453
+                    Width = 77
+                    Height = 13
+                    Alignment = taRightJustify
+                    Caption = 'Dias Ap'#243's Venc:'
+                    FocusControl = DBEdit57
+                  end
                   object DBMemo7: TDBMemo
                     Left = 114
                     Top = 27
@@ -3187,8 +3205,6 @@ inherited frmCadCobreBem: TfrmCadCobreBem
                     DataSource = DtmBoletos.dsCobreBem
                     MaxLength = 4
                     TabOrder = 11
-                    OnEnter = DBEdit5Enter
-                    OnExit = DBEdit5Exit
                   end
                   object DBComboBox13: TDBComboBox
                     Left = 114
@@ -3352,6 +3368,33 @@ inherited frmCadCobreBem: TfrmCadCobreBem
                     DataSource = DtmBoletos.dsCobreBem
                     Enabled = False
                     TabOrder = 16
+                  end
+                  object DBComboBox19: TDBComboBox
+                    Left = 114
+                    Top = 450
+                    Width = 57
+                    Height = 21
+                    Hint = 'Aceitar Receber Ap'#243's Vencimento'
+                    DataField = 'AC_TIT_APOS_VENC'
+                    DataSource = DtmBoletos.dsCobreBem
+                    ItemHeight = 13
+                    Items.Strings = (
+                      'SIM'
+                      'N'#195'O')
+                    TabOrder = 19
+                    OnExit = DBComboBox19Exit
+                    OnKeyPress = DBComboBox19KeyPress
+                  end
+                  object DBEdit57: TDBEdit
+                    Left = 288
+                    Top = 450
+                    Width = 110
+                    Height = 21
+                    Hint = 'Aceitar x dias ap'#243's vencimento'
+                    DataField = 'DIAS_AC_TIT_APOS_VENC'
+                    DataSource = DtmBoletos.dsCobreBem
+                    MaxLength = 4
+                    TabOrder = 20
                   end
                 end
               end

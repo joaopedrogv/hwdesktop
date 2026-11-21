@@ -11,11 +11,12 @@ uses
   UseCaseCadUsuarioSenha,
   UseCaseCadContato,
   UseCaseCadMensageria,
-  UseCaseUpdateMensageria,
+  UseCaseUpdateMensageriaStatus,
   UseCaseLerMensageria,
   UseCaseEnvMensageria,
   UseCaseBuscarConfig,
   UseCaseBuscarCustos,
+  UseCaseCadAtribuicaoProf,
   System.SysUtils;
 
 function hwc_cad_empresa(
@@ -154,19 +155,19 @@ end;
 
 function hwc_update_mensageria(
   AparamsList: WideString;
-  AcodMensagem: Integer;
+  Acod_mens: Integer;
+  Auuid: WideString;
   Aorigem: WideString;
-  Astatus: WideString;
-  Auuid: WideString): Boolean; stdcall;
+  Astatus: WideString): Boolean; stdcall;
 begin
-  var useCase := TUseCaseUpdateMensageria.Create(AparamsList);
+  var useCase := TUseCaseUpdateMensageriaStatus.Create(AparamsList);
   try
     Result :=
       useCase.Run(
-        AcodMensagem,
+        Acod_mens,
+        Auuid,
         Aorigem,
-        Astatus,
-        Auuid);
+        Astatus);
   finally
     useCase.Free;
   end;
@@ -237,7 +238,7 @@ function hwc_buscar_config(
 begin
   var useCase := TUseCaseBuscarConfig.Create(AparamsList);
   try
-    useCase.Run;
+    Result := useCase.Run;
   finally
     useCase.Free;
   end;
@@ -248,7 +249,29 @@ function hwc_consultar_custo(
 begin
   var useCase := TUseCaseConsCustos.Create(AparamsList);
   try
-    useCase.Run;
+    Result := useCase.Run;
+  finally
+    useCase.Free;
+  end;
+end;
+
+function hwc_atribuir_prof(
+  AparamsList: WideString;
+  Acod_mens: Integer;
+  Auuid: WideString;
+  Aorigem: WideString;
+  Acod_tarefa: Integer;
+  Atipo_tarefa: WideString): Boolean; stdcall;
+begin
+  var useCase := TUseCaseCadAtribuicaoProf.Create(AparamsList);
+  try
+    Result := useCase.Run(
+      AparamsList,
+      Acod_mens,
+      Auuid,
+      Aorigem,
+      Acod_tarefa,
+      Atipo_tarefa);
   finally
     useCase.Free;
   end;
@@ -264,6 +287,7 @@ exports
   hwc_ler_mensageria,
   hwc_env_mensageria,
   hwc_buscar_config,
-  hwc_consultar_custo;
+  hwc_consultar_custo,
+  hwc_atribuir_prof;
 
 end.

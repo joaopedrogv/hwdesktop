@@ -23289,7 +23289,7 @@ end;
 function TKitsProdutos.abreKitsProd(abrirvazio: boolean): Boolean;
 begin
   if abrirvazio then
-    result := montaSelect(' SELECT KITS_PROD.*, ' +
+    result := montaSelect(' SELECT KITS_PROD.*, CAST(0 AS FLOAT) EST_F, CAST(0 AS FLOAT) ESTOQUE, ' +
      ' KITS_PROD_TOT.REGRA_PESO_DIM, KITS_PROD_TOT.QUANT_PROD_KIT, KITS_PROD_TOT.PREC_CUS_PROD, KITS_PROD_TOT.PREC_CUSM_PROD, ' +
      ' KITS_PROD_TOT.PREC_TAB_PROD, KITS_PROD_TOT.PREC_PUBLICO, ' +
      ' KITS_PROD_TOT.PREC_30_PROD, KITS_PROD_TOT.PREC_60_PROD, KITS_PROD_TOT.PREC_90_PROD, ' +
@@ -23297,11 +23297,11 @@ begin
      ' KITS_PROD_TOT.LARGURA_PROD, KITS_PROD_TOT.ALTURA_PROD, ' +
      ' KITS_PROD_TOT.EST_F, KITS_PROD_TOT.VALOR_TAB_PROKIT, ' +
      ' KITS_PROD_TOT.DESCONTO_VALOR, KITS_PROD_TOT.DESCONTO_PERC, KITS_PROD_TOT.VALOR_DESC_TAB_PROKIT ' +
-     '  FROM KITS_PROD ' +
+     ' FROM KITS_PROD ' +
      ' LEFT JOIN KITS_PROD_TOT ON KITS_PROD_TOT.CODIGO_KIT = KITS_PROD.CODIGO_KIT AND KITS_PROD_TOT.COD_EMPRESA = KITS_PROD.COD_EMPRESA ' +
      ' WHERE 1 = 0 ')
   else
-    result := montaSelect(' SELECT KITS_PROD.*, ' +
+    result := montaSelect(' SELECT KITS_PROD.*, CAST(0 AS FLOAT) EST_F, CAST(0 AS FLOAT) ESTOQUE, ' +
      ' KITS_PROD_TOT.REGRA_PESO_DIM, KITS_PROD_TOT.QUANT_PROD_KIT, KITS_PROD_TOT.PREC_CUS_PROD, KITS_PROD_TOT.PREC_CUSM_PROD, ' +
      ' KITS_PROD_TOT.PREC_TAB_PROD, KITS_PROD_TOT.PREC_PUBLICO, ' +
      ' KITS_PROD_TOT.PREC_30_PROD, KITS_PROD_TOT.PREC_60_PROD, KITS_PROD_TOT.PREC_90_PROD, ' +
@@ -23317,8 +23317,8 @@ end;
 
 function TKitsProdutos.abreKitsProd(pDateSet: TDataSet): Boolean;
 begin
-  result := montaSelect(' SELECT KITS_PROD.*, ' +
-   	 ' COALESCE(KITS_PROD_TOT.REGRA_PESO_DIM, '''') REGRA_PESO_DIM, ' +
+  result := montaSelect(' SELECT KITS_PROD.*, CAST(0 AS FLOAT) EST_F, CAST(0 AS FLOAT) ESTOQUE, ' +
+     ' COALESCE(KITS_PROD_TOT.REGRA_PESO_DIM, '''') REGRA_PESO_DIM, ' +
      ' COALESCE(KITS_PROD_TOT.QUANT_PROD_KIT, 0) QUANT_PROD_KIT, ' +
      ' COALESCE(KITS_PROD_TOT.PREC_CUS_PROD, 0) PREC_CUS_PROD, ' +
      ' COALESCE(KITS_PROD_TOT.PREC_CUSM_PROD, 0) PREC_CUSM_PROD, ' +
@@ -23353,7 +23353,7 @@ begin
     result := false;
   end
   else
-    result := montaSelect(' SELECT KITS_PROD.*, ' +
+    result := montaSelect(' SELECT KITS_PROD.*, CAST(0 AS FLOAT) EST_F, CAST(0 AS FLOAT) ESTOQUE, ' +
      ' COALESCE(KITS_PROD_TOT.REGRA_PESO_DIM, '''') REGRA_PESO_DIM, ' +
      ' COALESCE(KITS_PROD_TOT.QUANT_PROD_KIT, 0) QUANT_PROD_KIT, ' +
      ' COALESCE(KITS_PROD_TOT.PREC_CUS_PROD, 0) PREC_CUS_PROD, ' +
@@ -24156,16 +24156,20 @@ begin
 
           if rKit.vCondicaoAd <> 'Começa' then
           begin
-            if ((rKit.vCampoAd = 'PREC_CUS_PROD') or (rKit.vCampoAd = 'PREC_CUSM_PROD') or (rKit.vCampoAd = 'PREC_TAB_PROD')
+            if (rKit.vCampoAd = 'EST_F') or (rKit.vCampoAd = 'ESTOQUE') then
+              rKit.vsqlAdicional := 'EST.' + rKit.vCampoAd + ' ' + rKit.vCondicaoAd + ' ' + QuotedStr(rKit.vValorAd)
+            else if ((rKit.vCampoAd = 'PREC_CUS_PROD') or (rKit.vCampoAd = 'PREC_CUSM_PROD') or (rKit.vCampoAd = 'PREC_TAB_PROD')
               or (rKit.vCampoAd = 'PREC_PUBLICO') or (rKit.vCampoAd = 'PREC_30_PROD') or (rKit.vCampoAd = 'PREC_60_PROD')
-              or (rKit.vCampoAd = 'PREC_90_PROD') or (rKit.vCampoAd = 'EST_F') or (rKit.vCampoAd = 'QUANT_PROD_KIT')) then
+              or (rKit.vCampoAd = 'PREC_90_PROD') or (rKit.vCampoAd = 'QUANT_PROD_KIT')) then
               rKit.vsqlAdicional := 'COALESCE(KITS_PROD_TOT.' + rKit.vCampoAd + ', 0) ' + rKit.vCondicaoAd + ' ' + QuotedStr(rKit.vValorAd)
             else
               rKit.vsqlAdicional := 'KITS_PROD.' + rKit.vCampoAd + ' ' + rKit.vCondicaoAd + ' ' + QuotedStr(rKit.vValorAd);
           end
           else
           begin
-            if ((rKit.vCampoAd = 'PREC_CUS_PROD') or (rKit.vCampoAd = 'PREC_CUSM_PROD') or (rKit.vCampoAd = 'PREC_TAB_PROD')
+            if (rKit.vCampoAd = 'EST_F') or (rKit.vCampoAd = 'ESTOQUE') then
+              rKit.vsqlAdicional := 'EST.' + rKit.vCampoAd + ' LIKE' + QuotedStr(rKit.vValorAd + '%')
+            else if ((rKit.vCampoAd = 'PREC_CUS_PROD') or (rKit.vCampoAd = 'PREC_CUSM_PROD') or (rKit.vCampoAd = 'PREC_TAB_PROD')
               or (rKit.vCampoAd = 'PREC_PUBLICO') or (rKit.vCampoAd = 'PREC_30_PROD') or (rKit.vCampoAd = 'PREC_60_PROD')
               or (rKit.vCampoAd = 'PREC_90_PROD') or (rKit.vCampoAd = 'EST_F') or (rKit.vCampoAd = 'QUANT_PROD_KIT')) then
               rKit.vsqlAdicional := 'COALESCE(KITS_PROD_TOT.' + rKit.vCampoAd + ', 0) LIKE ' + QuotedStr(rKit.vValorAd + '%')

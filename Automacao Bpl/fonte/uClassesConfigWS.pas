@@ -208,25 +208,25 @@ type
 
   TMsgOrigem = class(TDataSet_OOP)
   public
-  	constructor create;
+  	 constructor create;
     function abreOrigem: boolean;
   end;
 
   TModCartas = class(TDataSet_OOP)
   public
-  	constructor create;
+  	 constructor create;
     function abreModCartas(pCodCarta: Integer): boolean;
   end;
 
   TAbreMsgPlataforma = class(TDataSet_OOP)
   public
-  	constructor create;
+  	 constructor create;
     function abreMsgPlataforma: boolean; overload;
   end;
 
   TAbreMsgTipoContatoOrigem = class(TDataSet_OOP)
   public
-  	constructor create;
+  	 constructor create;
     function AbreMsgTipoContatoOrigem: boolean; overload;
   end;
 
@@ -250,7 +250,7 @@ type
     procedure _desmarcarTodos;
     procedure _marcaDesmarcaLinha;
   var
-  	rCons: RConsulta;
+  	 rCons: RConsulta;
     TipoContato: TTipoContato;
     Origem: TMsgOrigem;
   end;
@@ -270,15 +270,58 @@ type
     function abreFormMsgTipoContatoOrigemPlataformaLote: boolean;
     function PostMsgTipoContatoOrigemPlataformaLote: boolean;
     procedure cadMsgTipoContatoOrigemPlataforma(Tipoform: Integer);
-    function MsgTipoContatoOrigemPlataforma: boolean;
     function _defineSqlAdicional: boolean;
     procedure _marcarTodos;
     procedure _desmarcarTodos;
     procedure _marcaDesmarcaLinha;
   var
-  	rCons: RConsulta;
+  	 rCons: RConsulta;
     Plataforma: TAbreMsgPlataforma;
     TipoContatoOrigem: TAbreMsgTipoContatoOrigem;
+  end;
+
+  TMsgTipoTarefa = class(TDataSet_OOP)
+  public
+  	 constructor create;
+    function post: boolean; override;
+    function Insert: boolean; override;
+    function edit: boolean; override;
+    function Delete(pPerguntar: Boolean = True): boolean;
+    function abreMsgTipoTarefa: boolean; overload;
+    procedure cadMsgTipoTarefa(Tipoform: Integer);
+  var
+    rCons: RConsulta;
+  end;
+
+  TAbreMsgTipoTarefa = class(TDataSet_OOP)
+  public
+  	 constructor create;
+    function AbreMsgTipoTarefa: boolean; overload;
+  end;
+
+  TMsgTipoTarefaOrigem = class(TDataSet_OOP)
+  public
+  	 constructor create;
+    destructor destroy; override;
+    function post: boolean; override;
+    function Insert: boolean; override;
+    function edit: boolean; override;
+    function Delete(pPerguntar: Boolean = True): boolean;
+    function abreMsgTipoTarefaOrigem: boolean; overload;
+    function abreMsgTipoTarefaOrigem(pIdTipoTarefa: Integer; pOrigem: Integer): boolean; overload;
+    procedure InserirTipoTarefa(pCheckListBoxTipoTarefa: TCheckListBox);
+    procedure InserirOrigem(pCheckListBoxOrigem: TCheckListBox);
+    function abreFormMsgTipoTarefaLote: boolean;
+    function PostMsgTipoTarefaOrigemLote: boolean;
+    procedure cadMsgTipoTarefaOrigem(Tipoform: Integer);
+    function _defineSqlAdicional: boolean;
+    procedure _marcarTodos;
+    procedure _desmarcarTodos;
+    procedure _marcaDesmarcaLinha;
+  var
+    rCons: RConsulta;
+    TipoTarefa: TAbreMsgTipoTarefa;
+    Origem: TMsgOrigem;
   end;
 
   TMsgOrigemModCartas = class(TDataSet_OOP)
@@ -399,7 +442,8 @@ var
 implementation
 
 uses uCadConfigWS, uDadosIni, uPadrao, uVisualizarWS, uCadConfigAPI, hw_utils, StrUtils, Variants, 
-  uTipoContatoOrigem, uTipoContatoOrigemPlataforma, uModeloCartasOrigem;
+  uTipoContatoOrigem, uTipoContatoOrigemPlataforma, uModeloCartasOrigem,
+  uTipoTarefaOrigem, uTipoTarefa;
 
 procedure plugboleto_cedente(paramsList: WideString); stdcall; external 'hw.utils.dx.dll';
 procedure suzuki_autenticacao(paramsList: WideString); stdcall; external 'hw.utils.dx.dll';
@@ -5856,9 +5900,9 @@ end;
 
 function TMsgTipoContatoOrigem.abreMsgTipoContatoOrigem: boolean;
 begin
-	Result := montaSelect(' select ' +
-  	' msg_tipo_contato_origem.*,  ' +
-  	' msg_origem.descricao, tipo_contato.tipo from msg_tipo_contato_origem ' +
+  Result := montaSelect(' select ' +
+  	 ' msg_tipo_contato_origem.*,  ' +
+  	 ' msg_origem.descricao, tipo_contato.tipo from msg_tipo_contato_origem ' +
     ' left join tipo_contato on ' +
     '     tipo_contato.id = msg_tipo_contato_origem.id_tipo_contato ' +
     '     and tipo_contato.cod_empresa = msg_tipo_contato_origem.cod_empresa ' +
@@ -5872,7 +5916,7 @@ begin
   InserirTipoContrato(frmTipoContatoOrigem.CheckListBoxTipoContrato);
   InserirOrigem(frmTipoContatoOrigem.CheckListBoxOrigem);
 
-	Result := vDadosIni.abreForm('Origem por Tipo de Contato (Lote)', frmTipoContatoOrigem.pnOrigemTipoContato, frmTipoContatoOrigem.tsOrigemTipoContrato);
+	Result := vDadosIni.abreForm('Origem por Tipo de Contato (Lote)', frmTipoContatoOrigem.pnOrigemTipoContato, frmTipoContatoOrigem.tsOrigemTipoContato);
 
   if Result then
   begin
@@ -5988,7 +6032,7 @@ begin
 
     dataSet.First;
     while not dataSet.Eof do
-  	begin
+  	 begin
       SqlExec(' delete from msg_tipo_contato_origem ' +
         ' where id = %d ' +
         ' and cod_empresa = %d ',
@@ -6017,7 +6061,7 @@ end;
 
 destructor TMsgTipoContatoOrigem.destroy;
 begin
-	TipoContato.Free;
+  TipoContato.Free;
   TipoContato := nil;
 
   Origem.Free;
@@ -6034,7 +6078,7 @@ var
   vSel: boolean;
 	vSql: string;
 begin
-	Result := False;
+  Result := False;
   vSel := False;
 
   vSql := dataSet.CommandText;
@@ -6103,7 +6147,7 @@ end;
 procedure TMsgTipoContatoOrigem.InserirTipoContrato(
   pCheckListBoxTipoContrato: TCheckListBox);
 begin
-	pCheckListBoxTipoContrato.Clear;
+  pCheckListBoxTipoContrato.Clear;
 
   buscas.Close;
   buscas.SQL.Text := ' select id, cod_empresa, tipo from tipo_contato ' +
@@ -6556,7 +6600,7 @@ end;
 
 constructor TMsgOrigem.create;
 begin
-	dataset := TClientDataSet(dtmConfig.cdsMsgOrigem);
+  dataset := TClientDataSet(dtmConfig.cdsMsgOrigem);
   transacao := TIBTransaction(dtmConfig.ibTransConfig);
   buscas := TIBQuery(dtmConfig.qrBuscas);
 end;
@@ -6625,7 +6669,7 @@ end;
 procedure TMsgTipoContatoOrigemPlataforma.cadMsgTipoContatoOrigemPlataforma(
   Tipoform: Integer);
 begin
-	try
+  try
     vDadosIni.abreStatusProcessamento('','Abrindo Origem por Tipo de Contato e Plataforma');
 
     vDadosIni.vTipoForm := 0;
@@ -6653,7 +6697,7 @@ end;
 
 constructor TMsgTipoContatoOrigemPlataforma.create;
 begin
-	dataset := TClientDataSet(dtmConfig.cdsMsgTipoContatoOrigemPlataforma);
+  dataset := TClientDataSet(dtmConfig.cdsMsgTipoContatoOrigemPlataforma);
   transacao := TIBTransaction(dtmConfig.ibTransConfig);
   buscas := TIBQuery(dtmConfig.qrBuscas);
 
@@ -6766,7 +6810,7 @@ end;
 
 function TMsgTipoContatoOrigemPlataforma.edit: boolean;
 begin
-	Result := False;
+  Result := False;
   if not vDadosIni.PesqPros('CFG073', 'ALTERAR', '', 'MSG_TIPO_CONTATO_ORIGEM_PLAT',
     '', buscas, false) then
     Exit;
@@ -6841,7 +6885,7 @@ end;
 
 function TMsgTipoContatoOrigemPlataforma.Insert: boolean;
 begin
-	if not vDadosIni.PesqPros('CFG072', 'INCLUIR', '', 'MSG_TIPO_CONTATO_ORIGEM_PLAT',
+  if not vDadosIni.PesqPros('CFG072', 'INCLUIR', '', 'MSG_TIPO_CONTATO_ORIGEM_PLAT',
     '', buscas, True) then
     Exit;
 
@@ -6875,59 +6919,6 @@ begin
     Plataforma.abreMsgPlataforma;
     TipoContatoOrigem.AbreMsgTipoContatoOrigem;
   end;
-end;
-
-function TMsgTipoContatoOrigemPlataforma.MsgTipoContatoOrigemPlataforma: boolean;
-var
-	I, J: Integer;
-  vCodPlataforma: Integer;
-  vCodOrigemTipoContrato: Integer;
-  vSel: boolean;
-	vSql: string;
-begin
-	Result := False;
-  vSel := False;
-
-  vSql := dataSet.CommandText;
-
-  for I := 0 to frmTipoContatoOrigemPlataforma.CheckListBoxPlataforma.Count - 1 do
-  begin
-    if frmTipoContatoOrigemPlataforma.CheckListBoxPlataforma.Checked[I] then
-    begin
-    	vCodPlataforma := StrToInt(Copy(frmTipoContatoOrigemPlataforma.CheckListBoxPlataforma.Items[i], 1, Pos(' | ', frmTipoContatoOrigemPlataforma.CheckListBoxPlataforma.Items[i]) - 1));
-
-      for J := 0 to frmTipoContatoOrigemPlataforma.CheckListBoxOrigemTipoContrato.Count - 1 do
-      begin
-        vCodOrigemTipoContrato := StrToInt(Copy(frmTipoContatoOrigemPlataforma.CheckListBoxOrigemTipoContrato.Items[j], 1, Pos(' | ', frmTipoContatoOrigemPlataforma.CheckListBoxOrigemTipoContrato.Items[j]) - 1));
-
-        if frmTipoContatoOrigemPlataforma.CheckListBoxOrigemTipoContrato.Checked[J] then
-        begin
-        	vSel := True;
-
-          abreMsgTipoContatoOrigemPlataforma(
-            vCodPlataforma,
-            vCodOrigemTipoContrato);
-
-          if dataSet.IsEmpty then
-          begin
-            if not Insert then
-              Exit;
-
-            dataSet.FieldByName('ID_MSG_PLATAFORMA').AsInteger := vCodPlataforma;
-            dataSet.FieldByName('ID_MSG_ORIGEM').AsInteger     := vCodOrigemTipoContrato;
-
-            if not Post then
-              Exit;
-          end;
-        end;
-      end;
-    end;
-  end;
-
-  Result := vSel;
-
-  if (Result) and (trim(vSql) <> '') then
-  	montaSelect(vSql);
 end;
 
 function TMsgTipoContatoOrigemPlataforma.post: boolean;
@@ -7338,7 +7329,7 @@ end;
 
 procedure TMsgTipoContatoOrigemPlataforma._desmarcarTodos;
 begin
-	try
+  try
     vDadosIni.abreStatusProcessamento('', 'Aguarde. Desfazendo a seleção de todos os registros');
 
     if not dataSet.Active then
@@ -7363,7 +7354,7 @@ end;
 
 procedure TMsgTipoContatoOrigemPlataforma._marcaDesmarcaLinha;
 begin
-	if dataSet.IsEmpty then
+  if dataSet.IsEmpty then
     exit;
 
   dataSet.Edit;
@@ -7376,7 +7367,7 @@ end;
 
 procedure TMsgTipoContatoOrigemPlataforma._marcarTodos;
 begin
-	try
+  try
     vDadosIni.abreStatusProcessamento('', 'Aguarde. Selecionando todos os registros');
 
     if not dataSet.Active then
@@ -7472,6 +7463,7 @@ begin
 	Result := montaSelect(' select msg_origem_modcartas.*, ' +
     	' msg_origem.descricao, ' +
       ' modcartas.descricao as modcarta, ' +
+      ' modcartas.doc, ' +
       ' msg_aplicativo.aplicativo from msg_origem_modcartas ' +
       ' left join modcartas on ' +
       '     modcartas.cod_carta = msg_origem_modcartas.cod_carta ' +
@@ -7490,6 +7482,7 @@ begin
 	Result := montaSelect(' select msg_origem_modcartas.*, ' +
     	' msg_origem.descricao, ' +
       ' modcartas.descricao as modcarta, ' +
+      ' modcartas.doc, ' +
       ' msg_aplicativo.aplicativo from msg_origem_modcartas ' +
       ' left join modcartas on ' +
       '     modcartas.cod_carta = msg_origem_modcartas.cod_carta ' +
@@ -7599,7 +7592,7 @@ begin
 
     dataSet.First;
     while not dataSet.Eof do
-  	begin
+  	 begin
       SqlExec(' delete from msg_origem_modcartas ' +
         ' where id_msg_origem = %d ' +
         ' and cod_carta = %d ' +
@@ -7660,20 +7653,20 @@ begin
 
   buscas.Close;
   buscas.SQL.Text :=
-  	 ' select modcartas.cod_carta, modcartas.cod_empresa, modcartas.tipo, modcartas.descricao, msg_aplicativo.aplicativo from modcartas ' +
-  	 ' left join msg_aplicativo on ' +
-    '		msg_aplicativo.id = modcartas.id_msg_aplicativo ' +
-  	 ' where modcartas.cod_empresa = ' + vDadosIni.codEmpresa +
+  	 ' select modcartas.cod_carta, modcartas.cod_empresa, modcartas.descricao, modcartas.tipo, coalesce(modcartas.doc, '''') doc, msg_aplicativo.aplicativo from modcartas ' +
+  	 ' left join msg_aplicativo on msg_aplicativo.id = modcartas.id_msg_aplicativo ' +
+    ' where modcartas.cod_empresa = ' + vDadosIni.codEmpresa +
     ' and modcartas.tipo = ''NOT'' ' +
     ' and modcartas.ativo = 1 ' +
     ' and modcartas.tipo_contrato in (''AVISO DE VENCIMENTO'', ''CREDITOS EM ATRASO'', ''AGRADECIMENTO'') ' +
     ' union ' +
-    ' select modcartas.cod_carta, modcartas.cod_empresa, modcartas.tipo, modcartas.descricao, msg_aplicativo.aplicativo from modcartas ' +
+    ' select modcartas.cod_carta, modcartas.cod_empresa, modcartas.descricao, modcartas.tipo, coalesce(modcartas.doc, '''') doc, msg_aplicativo.aplicativo from modcartas ' +
   	 ' left join msg_aplicativo on ' +
     '		msg_aplicativo.id = modcartas.id_msg_aplicativo ' +
   	 ' where modcartas.cod_empresa = ' + vDadosIni.codEmpresa +
     ' and modcartas.tipo = ''DOC'' ' +
-    ' and modcartas.ativo = 1 ' ;
+    ' and modcartas.ativo = 1 ' +
+    ' order by 5, 6 ';
   buscas.Open;
 
   buscas.First;
@@ -7683,7 +7676,8 @@ begin
     	vDadosIni.StrZero(buscas.FieldByName('cod_carta').AsInteger, 3) + ' | ' +
       trim(buscas.FieldByName('tipo').AsString) + ' | ' +
       trim(buscas.FieldByName('descricao').AsString) + ' | ' +
-      trim(buscas.FieldByName('aplicativo').AsString)
+      trim(buscas.FieldByName('aplicativo').AsString) + ' | ' +
+      trim(buscas.FieldByName('doc').AsString)                         
     );
 
     buscas.Next;
@@ -7720,6 +7714,7 @@ begin
     montaSelect(' select msg_origem_modcartas.*, ' +
     	' msg_origem.descricao, ' +
       ' modcartas.descricao as modcarta, ' +
+      ' modcartas.doc, ' +
       ' msg_aplicativo.aplicativo from msg_origem_modcartas ' +
       ' left join modcartas on ' +
       '     modcartas.cod_carta = msg_origem_modcartas.cod_carta ' +
@@ -7749,8 +7744,11 @@ var
   codigo: integer;
   vOrigem: string;
   vCodCarta: Integer;
+  vIdAplicativo: Integer;
   vCarta: string;
   vTipo: string;
+  vDoc: string;
+  vTemp: string;
 begin
   try
     Result := false;
@@ -7777,7 +7775,7 @@ begin
 
     vOrigem := trim(buscas.FieldByName('descricao').AsString);
 
-    SqlOpen(' select modcartas.cod_carta, modcartas.descricao, modcartas.tipo from modcartas ' +
+    SqlOpen(' select modcartas.cod_carta, modcartas.descricao, modcartas.tipo, coalesce(modcartas.doc, '''') doc, modcartas.id_msg_aplicativo from modcartas ' +
     	' where modcartas.cod_carta = %d ' +
       ' and modcartas.cod_empresa = %d ',
       [fint('cod_carta'), vDadosIni.cod_empresa], buscas);
@@ -7785,6 +7783,8 @@ begin
     vCodCarta := buscas.FieldByName('cod_carta').AsInteger;
     vCarta := trim(buscas.FieldByName('descricao').AsString);
     vTipo := trim(buscas.FieldByName('tipo').AsString);
+    vDoc := trim(buscas.FieldByName('doc').AsString);
+    vIdAplicativo := buscas.FieldByName('id_msg_aplicativo').AsInteger;
 
     if ((trim(vTipo) = 'NOT') and (trim(vOrigem) <> 'NOTIFICACAO FINANCEIRO')) then
       raiseExceptionCreate('Modelo de carta informada do tipo NOT e origem informada deve ser do tipo "NOTIFICACAO FINANCEIRO": ' + #13 + #13 +
@@ -7810,12 +7810,13 @@ begin
       SqlOpen(' select msg_origem_modcartas.*, ' +
         ' msg_origem.descricao, ' +
         ' modcartas.descricao as modcarta, ' +
+        ' modcartas.doc, ' +
         ' msg_aplicativo.aplicativo from msg_origem_modcartas ' +
         ' inner join modcartas on ' +
         '     modcartas.cod_carta = msg_origem_modcartas.cod_carta ' +
         '     and modcartas.cod_empresa = msg_origem_modcartas.cod_empresa ' +
-      	'	inner join msg_aplicativo on ' +
-        '		msg_aplicativo.id = modcartas.id_msg_aplicativo ' +
+        ' inner join msg_aplicativo on ' +
+        '	  msg_aplicativo.id = modcartas.id_msg_aplicativo ' +
         ' inner join msg_origem on ' +
         '     msg_origem.id = msg_origem_modcartas.id_msg_origem ' +
         ' where msg_origem_modcartas.id_msg_origem = %d ' +
@@ -7829,9 +7830,14 @@ begin
           'Modelo de Carta: ' + trim(buscas.FieldByName('modcarta').AsString) + #13 +
           'Origem: ' + trim(buscas.FieldByName('descricao').AsString), 'DBLookupComboBox1');
 
+      vTemp := QuotedStr(vDoc);
+      if (trim(vDoc) <> 'Q') and (trim(vDoc) <> 'B') then
+        vTemp := vTemp + ',' + QuotedStr('Q');
+
       SqlOpen(' select msg_origem_modcartas.*, ' +
-      	' msg_origem.descricao, ' +
+        ' msg_origem.descricao, ' +
         ' modcartas.descricao as modcarta, ' +
+        ' modcartas.doc, ' +
         ' msg_aplicativo.aplicativo from msg_origem_modcartas ' +
         ' inner join modcartas on ' +
         '     modcartas.cod_carta = msg_origem_modcartas.cod_carta ' +
@@ -7843,17 +7849,9 @@ begin
         ' where msg_origem_modcartas.id_msg_origem = %d ' +
         ' and msg_origem_modcartas.cod_carta <> %d ' +
         ' and msg_origem_modcartas.cod_empresa = %d ' +
-        ' and modcartas.id_msg_aplicativo in (select modcartas.id_msg_aplicativo from modcartas ' +
-        '                                     where modcartas.cod_carta = %d ' +
-        '                                     and modcartas.cod_empresa = %d) ' +
-        ' and modcartas.doc in (select ''Q'' from rdb$database ' +
-        '												union all ' +
-        '                       select modcartas.doc from modcartas ' +
-        '                       where modcartas.cod_carta = %d ' +
-        '                       and modcartas.cod_empresa = %d) ',
-        [fint('id_msg_origem'), fint('cod_carta'), fint('cod_empresa'),
-         fint('cod_carta'), fint('cod_empresa'),
-         fint('cod_carta'), fint('cod_empresa')], buscas);
+        ' and modcartas.id_msg_aplicativo = %d ' +
+        ' and modcartas.doc in (' + vTemp + ') ',
+        [fint('id_msg_origem'), fint('cod_carta'), fint('cod_empresa'), vIdAplicativo], buscas);
 
       if not buscas.IsEmpty then
         raiseExceptionCreate('Já existe registro para essa Origem e Aplicativo:' + #13 + #13 +
@@ -8091,6 +8089,8 @@ begin
               rCons.vsqlAdicional := ' MSG_ORIGEM.DESCRICAO ' + rCons.vCondicaoAd + ' ' + QuotedStr(rCons.vValorAd)
             else if rCons.vCampoAd = 'MODCARTA' then
               rCons.vsqlAdicional := 'MODCARTAS.DESCRICAO ' + rCons.vCondicaoAd + ' ' + QuotedStr(rCons.vValorAd)
+            else if rCons.vCampoAd = 'DOC' then
+              rCons.vsqlAdicional := 'MODCARTAS.DOC ' + rCons.vCondicaoAd + ' ' + QuotedStr(rCons.vValorAd)
             else if rCons.vCampoAd = 'APLICATIVO' then
               rCons.vsqlAdicional := 'MSG_APLICATIVO.APLICATIVO ' + rCons.vCondicaoAd + ' ' + QuotedStr(rCons.vValorAd)
             else
@@ -8102,6 +8102,8 @@ begin
               rCons.vsqlAdicional := ' MSG_ORIGEM.DESCRICAO LIKE ' + QuotedStr(rCons.vValorAd + '%')
             else if rCons.vCampoAd = 'MODCARTA' then
               rCons.vsqlAdicional := 'MODCARTAS.DESCRICAO LIKE' + QuotedStr(rCons.vValorAd + '%')
+            else if rCons.vCampoAd = 'DOC' then
+              rCons.vsqlAdicional := 'MODCARTAS.DOC LIKE' + QuotedStr(rCons.vValorAd + '%')
             else if rCons.vCampoAd = 'APLICATIVO' then
               rCons.vsqlAdicional := 'MSG_APLICATIVO.APLICATIVO LIKE' + QuotedStr(rCons.vValorAd + '%')
             else
@@ -8129,6 +8131,8 @@ begin
     tempSql := ' MSG_ORIGEM.DESCRICAO '
   else if rCons.vCampo = 'Modcarta' then
     tempSql := ' MODCARTAS.DESCRICAO '
+  else if rCons.vCampo = 'Doc' then
+    tempSql := ' MODCARTAS.DOC '
   else if rCons.vCampo = 'Aplicativo' then
   	tempSql := ' MSG_APLICATIVO.APLICATIVO ';
   if tempSql  <> '' then
@@ -8236,8 +8240,15 @@ begin
   Result := montaSelect(
   	 ' select ' +
   	 ' modcartas.cod_carta, ' +
+    ' modcartas.cod_empresa, ' +
     ' modcartas.descricao, ' +
-    ' ((select result from strzero(coalesce(modcartas.cod_carta, 0), 3)) || '' | '' || trim(coalesce(modcartas.descricao, '''')) || '' | '' || trim(coalesce(msg_aplicativo.aplicativo, ''''))) modcartas from modcartas ' +
+    ' modcartas.tipo, ' +
+    ' coalesce(modcartas.doc, '''') doc, ' +
+    ' msg_aplicativo.aplicativo, ' +
+    ' ((select result from strzero(coalesce(modcartas.cod_carta, 0), 3)) || '' | '' || ' +
+    '	 trim(coalesce(modcartas.descricao, '''')) || '' | '' || ' +
+    '	 trim(coalesce(msg_aplicativo.aplicativo, '''')) || '' | '' || ' +
+    '	 trim(coalesce(modcartas.descricao, ''''))) modcartas from modcartas ' +
     ' left join msg_aplicativo on ' +
     '		msg_aplicativo.id = modcartas.id_msg_aplicativo ' +
   	 ' where modcartas.cod_empresa = ' + vDadosIni.codEmpresa +
@@ -8247,8 +8258,15 @@ begin
     ' union ' +
     ' select ' +
   	 ' modcartas.cod_carta, ' +
+    ' modcartas.cod_empresa, ' +
     ' modcartas.descricao, ' +
-    ' ((select result from strzero(coalesce(modcartas.cod_carta, 0), 3)) || '' | '' || trim(coalesce(modcartas.descricao, '''')) || '' | '' || trim(coalesce(msg_aplicativo.aplicativo, ''''))) modcartas from modcartas ' +
+    ' modcartas.tipo, ' +
+    ' coalesce(modcartas.doc, '''') doc, ' +
+    ' msg_aplicativo.aplicativo, ' +
+    ' ((select result from strzero(coalesce(modcartas.cod_carta, 0), 3)) || '' | '' || ' +
+    '	 trim(coalesce(modcartas.descricao, '''')) || '' | '' || ' +
+    '	 trim(coalesce(msg_aplicativo.aplicativo, '''')) || '' | '' || ' +
+    '	 trim(coalesce(modcartas.descricao, ''''))) modcartas from modcartas ' +
     ' left join msg_aplicativo on ' +
     '		msg_aplicativo.id = modcartas.id_msg_aplicativo ' +
   	 ' where modcartas.cod_empresa = ' + vDadosIni.codEmpresa +
@@ -8258,13 +8276,20 @@ begin
       ' union ' +
       ' select ' +
       ' modcartas.cod_carta, ' +
+      ' modcartas.cod_empresa, ' +
       ' modcartas.descricao, ' +
-      ' ((select result from strzero(coalesce(modcartas.cod_carta, 0), 3)) || '' | '' || trim(coalesce(modcartas.descricao, '''')) || '' | '' || trim(coalesce(msg_aplicativo.aplicativo, ''''))) modcartas from modcartas ' +
+      ' modcartas.tipo, ' +
+      ' coalesce(modcartas.doc, '''') doc, ' +
+      ' msg_aplicativo.aplicativo, ' +
+      ' ((select result from strzero(coalesce(modcartas.cod_carta, 0), 3)) || '' | '' || ' +
+      '	trim(coalesce(modcartas.descricao, '''')) || '' | '' || ' +
+      '	trim(coalesce(msg_aplicativo.aplicativo, '''')) || '' | '' || ' +
+      '	trim(coalesce(modcartas.descricao, ''''))) modcartas from modcartas ' +
       ' left join msg_aplicativo on ' +
       '		msg_aplicativo.id = modcartas.id_msg_aplicativo ' +
       ' where modcartas.cod_empresa = ' + vDadosIni.codEmpresa +
       ' and modcartas.cod_carta = ' + IntToStr(pCodCarta), '') +
-    ' order by 2 ');
+    ' order by 5, 6 ');
 end;
 
 constructor TModCartas.create;
@@ -8359,6 +8384,882 @@ begin
     begin
       Result := False;
        Application.MessageBox(PChar(e.Message), 'Erro', MB_OK + MB_ICONASTERISK);
+      registraErro(e.Message);
+    end;
+  end;
+end;
+
+{ TMsgTipoTarefaOrigem }
+
+function TMsgTipoTarefaOrigem.abreMsgTipoTarefaOrigem: boolean;
+begin
+  Result := montaSelect(' select ' +
+  	 ' msg_tipo_tarefa_origem.*, ' +
+    ' msg_origem.descricao, ' +
+    ' msg_tipo_tarefa.tipo, ' +
+    ' msg_tipo_tarefa.descricao_reduzida from msg_tipo_tarefa_origem ' +
+    ' left join msg_tipo_tarefa on ' +
+    '     msg_tipo_tarefa.id = msg_tipo_tarefa_origem.id_msg_tipo_tarefa ' +
+    ' left join msg_origem on ' +
+    '     msg_origem.id = msg_tipo_tarefa_origem.id_msg_origem ');
+end;
+
+function TMsgTipoTarefaOrigem.abreFormMsgTipoTarefaLote: boolean;
+begin
+  InserirTipoTarefa(frmTipoTarefaOrigem.CheckListBoxTipoTarefa);
+  InserirOrigem(frmTipoTarefaOrigem.CheckListBoxOrigem);
+
+	Result := vDadosIni.abreForm('Origem por Tipo de Tarefa (Lote)', frmTipoTarefaOrigem.pnOrigemTipoTarefa, frmTipoTarefaOrigem.tsOrigemTipoTarefa);
+
+  if Result then
+  begin
+    if not PostMsgTipoTarefaOrigemLote then
+    	Exit;
+  end;
+end;
+
+function TMsgTipoTarefaOrigem.abreMsgTipoTarefaOrigem(pIdTipoTarefa,
+  pOrigem: Integer): boolean;
+begin
+  Result := montaSelect(' select ' +
+  	 ' msg_tipo_tarefa_origem.*, ' +
+    ' msg_origem.descricao, ' +
+    ' msg_tipo_tarefa.tipo, ' +
+    ' msg_tipo_tarefa.descricao_reduzida from msg_tipo_tarefa_origem ' +
+    ' left join msg_tipo_tarefa on ' +
+    '     msg_tipo_tarefa.id = msg_tipo_tarefa_origem.id_msg_tipo_tarefa ' +
+    ' left join msg_origem on ' +
+    '     msg_origem.id = msg_tipo_tarefa_origem.id_msg_origem ' +
+    ' where msg_tipo_tarefa_origem.id_msg_tipo_tarefa = ' + IntToStr(pIdTipoTarefa) +
+    ' and msg_tipo_tarefa_origem.id_msg_origem = ' + IntToStr(pOrigem));
+end;
+
+procedure TMsgTipoTarefaOrigem.cadMsgTipoTarefaOrigem(
+  Tipoform: Integer);
+begin
+  try
+    vDadosIni.abreStatusProcessamento('','Abrindo Origem por Tipo de Tarefa');
+
+    vDadosIni.vTipoForm := 0;
+    if dtmConfig = nil then
+      dtmConfig := TdtmConfig.Create(dtmConfig);
+
+    if not vDadosIni.PesqPros('CFG082', 'CONSULTA', '', 'MSG_TIPO_TAREFA_ORIGEM', '', dtmConfig.qrBuscas, False) then
+      Exit;
+
+    if frmTipoTarefaOrigem = nil then
+      Application.CreateForm(TfrmTipoTarefaOrigem, frmTipoTarefaOrigem);
+
+    if (TipoForm > 0) and (not frmTipoTarefaOrigem.Visible) then
+      frmTipoTarefaOrigem.ShowModal
+    else if (not frmTipoTarefaOrigem.Visible) then
+      frmTipoTarefaOrigem.Show
+    else if frmTipoTarefaOrigem.FormStyle = fsMDIChild then
+      frmTipoTarefaOrigem.Show
+    else
+      frmTipoTarefaOrigem.ShowModal;
+  finally
+  	vDadosIni.fechaStatusProcessamento;
+  end;
+end;
+
+constructor TMsgTipoTarefaOrigem.create;
+begin
+  dataset := TClientDataSet(dtmConfig.cdsMsgTipoTarefaOrigem);
+  transacao := TIBTransaction(dtmConfig.ibTransConfig);
+  buscas := TIBQuery(dtmConfig.qrBuscas);
+
+  TipoTarefa  := TAbreMsgTipoTarefa.create;
+  Origem      := TMsgOrigem.create;
+end;
+
+function TMsgTipoTarefaOrigem.Delete(pPerguntar: Boolean): boolean;
+var
+  vIdTipoTarefa: string;
+  vIdOrigem: string;
+  vDescricaoTipoTarefa: string;
+  vDescricaoOrigem: string;
+  vTipoTarefa: string;
+  vtemp: string;
+begin
+  Result := False;
+  if dataSet.IsEmpty then
+    exit;
+
+  try
+    vIdTipoTarefa        := trim(dataSet.FieldByName('ID_MSG_TIPO_TAREFA').AsString);
+    vIdOrigem            := trim(dataSet.FieldByName('ID_MSG_ORIGEM').AsString);
+    vDescricaoTipoTarefa := trim(dataSet.FieldByName('DESCRICAO_REDUZIDA').AsString);
+    vDescricaoOrigem     := trim(dataSet.FieldByName('DESCRICAO').AsString);
+    vTipoTarefa          := trim(dataSet.FieldByName('TIPO').AsString);
+
+    prepare_loop('SEL = ''S''');
+
+    if not dataset.IsEmpty then
+    begin
+      vIdTipoTarefa        := '';
+      vIdOrigem            := '';
+      vDescricaoTipoTarefa := '';
+      vDescricaoOrigem     := '';
+      vTipoTarefa          := '';
+    end;
+  finally
+  	prepare_loop_done;
+  end;
+
+  try
+  	if (trim(vIdTipoTarefa) <> '') and (trim(vIdOrigem) <> '') then
+      prepare_loop('ID_MSG_TIPO_TAREFA = ' + vIdTipoTarefa + ' AND ID_MSG_ORIGEM = ' + vIdOrigem)
+    else
+    	prepare_loop('SEL = ''S''');
+
+    vtemp := 'Tem certeza que deseja excluir este registro permanentemente?' + #13 + #13 +
+      'ORIGEM POR TIPO DE TAREFA' + #13 +
+      'Tipo de Tarefa: ' + vTipoTarefa + ' - ' + vDescricaoTipoTarefa + #13 +
+      'Origem: ' + vDescricaoOrigem;
+
+    if (trim(vIdTipoTarefa) = '') and (trim(vIdOrigem) = '') then
+    	vtemp := 'Tem certeza que deseja excluir os ' + IntToStr(dataSet.RecordCount) + ' registros selecionados permanentemente?';
+
+    if not vDadosIni.PesqPros('CFG086', 'EXCLUIR', '', 'MSG_TIPO_TAREFA_ORIGEM',
+      vDadosIni.IfThen((trim(vIdTipoTarefa) <> '') and (trim(vIdOrigem) <> ''), vIdTipoTarefa + '-' + vIdOrigem, ''), buscas, false) then
+      Exit;
+
+    if pPerguntar then
+      if Application.MessageBox(PChar(vtemp),
+        'Excluir Registro', MB_YESNO + MB_ICONQUESTION + MB_DEFBUTTON1) <> mrYES then
+        	exit;
+
+    dataSet.First;
+    while not dataSet.Eof do
+  	 begin
+      SqlExec(' delete from msg_tipo_tarefa_origem ' +
+        ' where id_msg_tipo_tarefa = %d ' +
+        ' and id_msg_origem = %d ',
+        [fint('id_msg_tipo_tarefa'), fint('id_msg_origem')], buscas);
+
+      vDadosIni.GravaAuditoria('CFG086', 'EXCLUIR', '', 'MSG_TIPO_TAREFA_ORIGEM',
+      	IntToStr(fint('id_msg_tipo_tarefa')) + '-' + IntToStr(fint('id_msg_origem')), buscas);
+
+      dataSet.Next;
+    end;
+  finally
+    vDadosIni.fechaStatusProcessamento;
+    prepare_loop_done;
+  end;
+
+  Result := CommitaTransacao;
+
+  if Result then
+    vDadosIni.GravaAuditoria('CFG086', 'EXCLUIR', 'SUCESSO', 'MSG_TIPO_TAREFA_ORIGEM', '', buscas)
+  else
+    vDadosIni.GravaAuditoria('CFG086', 'EXCLUIR', 'FALHA', 'MSG_TIPO_TAREFA_ORIGEM', '', buscas);
+
+  Result := true;
+  Refresh;
+end;
+
+destructor TMsgTipoTarefaOrigem.destroy;
+begin
+  TipoTarefa.Free;
+  TipoTarefa := nil;
+
+  Origem.Free;
+  Origem := nil;
+
+  inherited;
+end;
+
+function TMsgTipoTarefaOrigem.edit: boolean;
+begin
+  Result := False;
+  if not vDadosIni.PesqPros('CFG085', 'ALTERAR', '', 'MSG_TIPO_TAREFA_ORIGEM',
+    '', buscas, false) then
+    Exit;
+
+  if inherited Edit then
+  begin
+    Result := True;
+
+    TipoTarefa.AbreMsgTipoTarefa;
+    Origem.abreOrigem;
+  end;
+end;
+
+procedure TMsgTipoTarefaOrigem.InserirOrigem(
+  pCheckListBoxOrigem: TCheckListBox);
+begin
+  pCheckListBoxOrigem.Clear;
+
+  buscas.Close;
+  buscas.SQL.Text := ' select id, descricao from msg_origem ';
+  buscas.Open;
+
+  buscas.First;
+  while not buscas.Eof do
+  begin
+		pCheckListBoxOrigem.Items.Add(
+    	vDadosIni.StrZero(buscas.FieldByName('id').AsInteger, 3) + ' | ' +
+      trim(buscas.FieldByName('descricao').AsString)
+    );
+
+    buscas.Next;
+  end;
+end;
+
+procedure TMsgTipoTarefaOrigem.InserirTipoTarefa(
+  pCheckListBoxTipoTarefa: TCheckListBox);
+begin
+  pCheckListBoxTipoTarefa.Clear;
+
+  buscas.Close;
+  buscas.SQL.Text := ' select id, tipo, descricao_reduzida from msg_tipo_tarefa ';
+  buscas.Open;
+
+  buscas.First;
+  while not buscas.Eof do
+  begin
+  	pCheckListBoxTipoTarefa.Items.Add(
+    	vDadosIni.StrZero(buscas.FieldByName('id').AsInteger, 3) + ' | ' +
+      trim(buscas.FieldByName('tipo').AsString) + '|' +
+      trim(buscas.FieldByName('descricao_reduzida').AsString)
+    );
+
+    buscas.Next;
+  end;
+end;
+
+function TMsgTipoTarefaOrigem.Insert: boolean;
+begin
+  if not vDadosIni.PesqPros('CFG084', 'INCLUIR', '', 'MSG_TIPO_TAREFA_ORIGEM',
+    '', buscas, True) then
+    Exit;
+
+  if not dataSet.Active then
+    montaSelect(' select ' +
+      ' msg_tipo_tarefa_origem.*, ' +
+      ' msg_origem.descricao, ' +
+      ' msg_tipo_tarefa.tipo, ' +
+      ' msg_tipo_tarefa.descricao_reduzida from msg_tipo_tarefa_origem ' +
+      ' left join msg_tipo_tarefa on ' +
+      '     msg_tipo_tarefa.id = msg_tipo_tarefa_origem.id_msg_tipo_tarefa ' +
+      ' left join msg_origem on ' +
+      '     msg_origem.id = msg_tipo_tarefa_origem.id_msg_origem ' +
+      ' where msg_tipo_tarefa_origem.id_msg_tipo_tarefa = 0 ' +
+      ' and msg_tipo_tarefa_origem.id_msg_origem = 0 ');
+
+  Result := False;
+  if inherited Insert then
+  begin
+    Result := True;
+
+    TipoTarefa.AbreMsgTipoTarefa;
+    Origem.abreOrigem;
+  end;
+end;
+
+function TMsgTipoTarefaOrigem.post: boolean;
+var
+  acao: string;
+  codigo: integer;
+begin
+  try
+    Result := false;
+
+    if not vDadosIni.PesqPros('CFG087', 'SALVAR', '', 'MSG_TIPO_TAREFA_ORIGEM',
+      dataSet.FieldByName('ID_MSG_TIPO_TAREFA').AsString + ' - ' + dataSet.FieldByName('ID_MSG_ORIGEM').AsString, buscas, true) then
+      Exit;
+
+    if dataSet.State = dsEdit then
+      acao := 'EDITAR'
+    else
+      acao := 'INSERIR';
+
+    if dataSet.FieldByName('ID_MSG_TIPO_TAREFA').AsInteger <= 0 then
+      raiseExceptionCreate('Tipo da Tarefa deve ser informado', 'DBLookupComboBox1');
+
+    if dataSet.FieldByName('ID_MSG_ORIGEM').AsInteger <= 0 then
+      raiseExceptionCreate('Origem deve ser informado', 'DBLookupComboBox2');
+
+    Result := inherited post;
+
+    if (DataSet.ChangeCount = 0) then
+      Result := True
+    else
+      Result := Apply;
+
+    if result then
+      result := CommitaTransacao;
+
+    if Result then
+      vDadosIni.GravaAuditoria('CFG087', acao, 'SUCESSO', 'MSG_TIPO_TAREFA_ORIGEM',
+        dataSet.FieldByName('ID_MSG_TIPO_TAREFA').AsString + ' - ' + dataSet.FieldByName('ID_MSG_ORIGEM').AsString, buscas)
+    else
+      vDadosIni.GravaAuditoria('CFG087', acao, 'FALHA', 'MSG_TIPO_TAREFA_ORIGEM',
+        dataSet.FieldByName('ID_MSG_TIPO_TAREFA').AsString + ' - ' + dataSet.FieldByName('ID_MSG_ORIGEM').AsString, buscas);
+
+    if Result then
+      Refresh;
+  except
+    on e: exception do
+    begin
+      Result := false;
+      if dataSet.State = dsBrowse then
+        dataSet.Edit;
+      Application.MessageBox(pchar('Erro: ' + e.Message), 'Atenção', MB_ICONERROR + MB_OK);
+      registraErro(e.Message);
+    end;
+  end;
+end;
+
+function TMsgTipoTarefaOrigem.PostMsgTipoTarefaOrigemLote: boolean;
+var
+  I, J: Integer;
+  vCodTipoTarefa: Integer;
+  vCodOrigem: Integer;
+  vSel: boolean;
+	vSql: string;
+begin
+  Result := False;
+  vSel := False;
+
+  vSql := dataSet.CommandText;
+
+  for I := 0 to frmTipoTarefaOrigem.CheckListBoxTipoTarefa.Count - 1 do
+  begin
+    if frmTipoTarefaOrigem.CheckListBoxTipoTarefa.Checked[I] then
+    begin
+    	vCodTipoTarefa := StrToInt(Copy(frmTipoTarefaOrigem.CheckListBoxTipoTarefa.Items[i], 1, Pos(' | ', frmTipoTarefaOrigem.CheckListBoxTipoTarefa.Items[i]) - 1));
+
+      for J := 0 to frmTipoTarefaOrigem.CheckListBoxOrigem.Count - 1 do
+      begin
+        if frmTipoTarefaOrigem.CheckListBoxOrigem.Checked[J] then
+        begin
+        	vCodOrigem  := StrToInt(Copy(frmTipoTarefaOrigem.CheckListBoxOrigem.Items[j], 1, Pos(' | ', frmTipoTarefaOrigem.CheckListBoxOrigem.Items[j]) - 1));
+
+        	vSel := True;
+
+          abreMsgTipoTarefaOrigem(
+            vCodTipoTarefa,
+            vCodOrigem);
+
+          if dataSet.IsEmpty then
+          begin
+            if not Insert then
+              Exit;
+
+            dataSet.FieldByName('ID_MSG_TIPO_TAREFA').AsInteger := vCodTipoTarefa;
+            dataSet.FieldByName('ID_MSG_ORIGEM').AsInteger      := vCodOrigem;
+
+            if not Post then
+              Exit;
+          end;
+        end;
+      end;
+    end;
+  end;
+
+  Result := vSel;
+
+  if (Result) and (trim(vSql) <> '') then
+  	montaSelect(vSql);
+end;
+
+function TMsgTipoTarefaOrigem._defineSqlAdicional: Boolean;
+var
+  I, erro: Integer;
+  //  vsqlAdicional: string;
+  formatodata: string;
+  tempTipo: string;
+  tempSql: string;
+begin
+  result := true;
+  rCons.vSqlAdicional := '';
+  rCons.vValor   := Trim(rCons.vValor);
+  rCons.vValorAd := Trim(rCons.vValorAd);
+
+  if rCons.vAdicional then
+  begin
+    if rCons.vPorDataAd then
+    begin
+      try
+        erro := 0;
+        StrToDate(rCons.vDataIniAd);
+      except
+        rCons.vDataIniAd := '';
+        erro := erro + 1;
+      end;
+      try
+        StrToDate(rCons.vDataFimAd);
+      except
+        rCons.vDataFimAd := '';
+        erro := erro + 1;
+      end;
+      if erro = 2 then
+      begin
+        Application.MessageBox('Data adicional Inválida. Informe no mínimo uma data correta',
+          'Atenção', MB_OK + MB_ICONINFORMATION);
+      end
+      else
+      begin
+        if (pos('/', ShortDateFormat) <> 0) or (pos('-', ShortDateFormat) <> 0) then
+          formatodata := 'mm/dd/yyyy'
+        else if pos('.', ShortDateFormat) <> 0 then
+          formatodata := 'dd.mm.yyyy';
+        if rCons.vDataIniAd <> '' then
+          rCons.vDataIniAd := QuotedStr(FormatDateTime(formatodata, strtodate(rCons.vDataIniAd)));
+        if rCons.vDataFimAd <> '' then
+          rCons.vDataFimAd := QuotedStr(FormatDateTime(formatodata, strtodate(rCons.vDataFimAd)));
+      end;
+    end
+    else if rCons.vValorAd = '' then
+      exit;
+    if rCons.vCondicaoAd = 'Igual' then
+      rCons.vCondicaoAd := '='
+    else if rCons.vCondicaoAd = 'Maior' then
+      rCons.vCondicaoAd := '>'
+    else if rCons.vCondicaoAd = 'Maior ou Igual' then
+      rCons.vCondicaoAd := '>='
+    else if rCons.vCondicaoAd = 'Menor' then
+      rCons.vCondicaoAd := '<'
+    else if rCons.vCondicaoAd = 'Menor ou Igual' then
+      rCons.vCondicaoAd := '<='
+    else if rCons.vCondicaoAd = 'Diferente' then
+      rCons.vCondicaoAd := '<>'
+    else if (rCons.vCondicaoAd = 'Esta contido') then
+      rCons.vCondicaoAd := 'like'
+    else if (rCons.vCondicaoAd = 'Começa') then
+      rCons.vCondicaoAd := 'Começa'
+    else
+      rCons.vCondicaoAd := '=';
+    for I := 0 to dataSet.FieldCount - 1 do
+    begin
+      if Dataset.Fields[I].FieldKind = fkData then
+      begin
+        if UpperCase(dataset.Fields[I].DisplayName) = UpperCase(rCons.vCampoAd) then
+        begin
+          rCons.vValorAd := ajustar_consulta_incasesensitive(DataSet.Fields[I], '', rCons.vValorAd);
+//          if rCons.vCampo = rCons.vCampoAd then
+//          begin
+//            rCons.vsqlAdicional := '';
+//            exit;
+//          end;
+          rCons.vCampoAd := DataSet.Fields[I].FieldName;
+          if ((Dataset.Fields[I] is TIntegerField) or (Dataset.Fields[I] is TFloatField) or
+            (Dataset.Fields[I] is TCurrencyField) or (DataSet.Fields[I] is TSmallintField)) and
+            ((rCons.vCondicaoAd = 'Começa') or (rCons.vCondicaoAd = 'Começa')) then
+          begin
+            if ((Dataset.Fields[I] is TIntegerField) or (DataSet.Fields[I] is TSmallintField)) then
+            try
+              strtoint(rCons.vValorAd);
+            except
+              Application.MessageBox(PChar('Valor para consulta adicional inválido.' + chr(13) +
+                'Verifique os dados de sua pesquisa e tente novamente.' + chr(13) +
+                'Informe um valor inteiro.'), 'Atenção', MB_ICONEXCLAMATION + MB_OK);
+              result := false;
+              exit;
+            end
+            else if ((Dataset.Fields[I] is TFloatField) or (DataSet.Fields[I] is TCurrencyField))
+              then
+            try
+              strtofloat(rCons.vValorAd);
+            except
+              Application.MessageBox(PChar('Valor para consulta adicional inválido.' + chr(13) +
+                'Verifique os dados de sua pesquisa e tente novamente.' + chr(13) +
+                'Não digite pontos e utilize como separador de decimais a vígula.'), 'Atenção',
+                MB_ICONEXCLAMATION + MB_OK);
+              result := false;
+              exit;
+            end;
+            rCons.vCondicaoAd := '=';
+            rCons.vValorAd := vDadosIni.trocaVirgulaPorPonto(rCons.vValorAd);
+          end
+          else if (DataSet.Fields[i] is TDateField) or (DataSet.Fields[i] is TDateTimeField) then
+          begin
+            if (rCons.vDataIniAd <> '') and (rCons.vDataFimAd <> '') then
+              rCons.vSqlAdicional := rCons.vsqlAdicional + rCons.vCampoAd +
+                ' >= ' + rCons.vDataIniAd + ' and ' + rCons.vCampoAd + ' <= ' + rCons.vDataFimAd
+            else if (rCons.vDataFimAd <> '') then
+              rCons.vsqlAdicional := rCons.vsqlAdicional + rCons.vCampoAd +
+                ' <= ' + rCons.vDataIniAd
+            else if (rCons.vDataIniAd <> '') and (rCons.vDataFimAd <> '') then
+              rCons.vsqlAdicional := rCons.vsqlAdicional + rCons.vCampoAd +
+                ' >= ' + rCons.vDataIniAd;
+            Break;
+          end;
+          if rCons.vCondicaoAd = 'like' then
+            rCons.vsqlAdicional := rCons.vsqlAdicional + rCons.vCampoAd +
+              ' like ' + QuotedStr('%' +
+              rCons.vValorAd +
+              '%')
+          else if rCons.vCondicaoAd = 'Começa' then
+            rCons.vsqlAdicional := rCons.vsqlAdicional + rCons.vCampoAd +
+              ' like ' +
+              QuotedStr(rCons.vValorAd + '%')
+          else
+            rCons.vsqlAdicional := rCons.vsqlAdicional + rCons.vCampoAd + ' '
+              + rCons.vCondicaoAd + ' ' +
+              QuotedStr(rCons.vValorAd);
+
+          if rCons.vCondicaoAd <> 'Começa' then
+          begin
+            if rCons.vCampoAd = 'DESCRICAO' then
+              rCons.vsqlAdicional := ' MSG_ORIGEM.DESCRICAO ' + rCons.vCondicaoAd + ' ' + QuotedStr(rCons.vValorAd)
+            else if rCons.vCampoAd = 'TIPO' then
+              rCons.vsqlAdicional := 'MSG_TIPO_TAREFA.TIPO ' + rCons.vCondicaoAd + ' ' + QuotedStr(rCons.vValorAd)
+            else if rCons.vCampoAd = 'DESCRICAO_REDUZIDA' then
+              rCons.vsqlAdicional := 'MSG_TIPO_TAREFA.DESCRICAO_REDUZIDA ' + rCons.vCondicaoAd + ' ' + QuotedStr(rCons.vValorAd)
+            else
+              rCons.vsqlAdicional := 'MSG_TIPO_TAREFA_ORIGEM.' + rCons.vCampoAd + ' ' + rCons.vCondicaoAd + ' ' + QuotedStr(rCons.vValorAd);
+          end
+          else
+          begin
+            if rCons.vCampoAd = 'DESCRICAO' then
+              rCons.vsqlAdicional := ' MSG_ORIGEM.DESCRICAO LIKE ' + QuotedStr(rCons.vValorAd + '%')
+            else if rCons.vCampoAd = 'TIPO' then
+              rCons.vsqlAdicional := 'TIPO_TAREFA.TIPO LIKE' + QuotedStr(rCons.vValorAd + '%')
+            else if rCons.vCampoAd = 'DESCRICAO_REDUZIDA' then
+              rCons.vsqlAdicional := 'TIPO_TAREFA.DESCRICAO_REDUZIDA LIKE' + QuotedStr(rCons.vValorAd + '%')
+            else
+              rCons.vsqlAdicional := 'MSG_TIPO_TAREFA_ORIGEM.' + rCons.vCampoAd + ' LIKE' + QuotedStr(rCons.vValorAd + '%');
+          end;
+
+          Break;
+        end;
+      end;
+    end;
+  end;
+
+  tempSql := '';
+
+  if Trim(rCons.vValor) <> '' then
+    for I := 0 to dataSet.FieldCount - 1 do
+      if Dataset.Fields[I].FieldKind = fkData then
+        if ContainsText(dataset.Fields[I].DisplayName, rCons.vCampo) then
+        begin
+          rCons.vValor := ajustar_consulta_incasesensitive(DataSet.Fields[I], '', rCons.vValor);
+          Break;
+        end;
+
+  if rCons.vCampo = 'Origem' then
+    tempSql := ' MSG_ORIGEM.DESCRICAO '
+  else if rCons.vCampo = 'Tipo Tarefa' then
+    tempSql := ' MSG_TIPO_TAREFA.TIPO '
+  else if rCons.vCampo = 'Descricao Tipo Tarefa' then
+    tempSql := ' MSG_TIPO_TAREFA.TIPO ';
+  if tempSql  <> '' then
+  begin
+    if rCons.vCondicao = 'Igual' then
+      tempTipo := '= '
+    else if rCons.vCondicao = 'Maior' then
+      tempTipo := '> '
+    else if rCons.vCondicao = 'Maior ou Igual' then
+      tempTipo := '>= '
+    else if rCons.vCondicao = 'Menor' then
+      tempTipo := '< '
+    else if rCons.vCondicao = 'Menor ou Igual' then
+      tempTipo := '<= '
+    else if rCons.vCondicao = 'Diferente' then
+      tempTipo := '<> '
+    else if (rCons.vCondicao = 'Esta contido') then
+      tempTipo := 'like'
+    else if (rCons.vCondicao = 'Começa') then
+      tempTipo := 'Começa'
+    else
+      tempTipo := '= ';
+
+    if tempTipo = 'like' then
+      tempSql := tempSql + tempTipo + QuotedStr('%' + rCons.vValor + '%')
+    else if tempTipo = 'Começa' then
+      tempSql := tempSql + 'like' + QuotedStr(rCons.vValor + '%')
+    else
+      tempSql := tempSql + tempTipo + QuotedStr(rCons.vValor);
+    rCons.vValor := '';
+    if Trim(rCons.vSqlAdicional) <> '' then
+      rCons.vSqlAdicional := rCons.vSqlAdicional + ' and ' + tempSql
+    else
+      rCons.vSqlAdicional := tempSql;
+  end;
+end;
+
+procedure TMsgTipoTarefaOrigem._desmarcarTodos;
+begin
+  try
+    vDadosIni.abreStatusProcessamento('', 'Aguarde. Desfazendo a seleção de todos os registros');
+
+    if not dataSet.Active then
+      Exit;
+
+    dataSet.DisableControls;
+    dataSet.First;
+    while not dataSet.Eof do
+    begin
+      dataSet.Edit;
+      dataSet.FieldByName('sel').AsString := '';
+      dataSet.Post;
+      dataSet.Next;
+    end;
+    dataSet.First;
+
+  finally
+    dataSet.EnableControls;
+    vDadosIni.fechaStatusProcessamento;
+  end;
+end;
+
+procedure TMsgTipoTarefaOrigem._marcaDesmarcaLinha;
+begin
+  if dataSet.IsEmpty then
+    exit;
+
+  dataSet.Edit;
+  if dataSet.FieldByName('SEL').AsString = 'S' then
+    dataSet.FieldByName('SEL').AsString := ''
+  else
+    dataSet.FieldByName('SEL').AsString := 'S';
+  dataSet.Post;
+end;
+
+procedure TMsgTipoTarefaOrigem._marcarTodos;
+begin
+  try
+    vDadosIni.abreStatusProcessamento('', 'Aguarde. Selecionando todos os registros');
+
+    if not dataSet.Active then
+      Exit;
+
+    dataSet.DisableControls;
+    dataSet.First;
+    while not dataSet.Eof do
+    begin
+      dataSet.Edit;
+      dataSet.FieldByName('sel').AsString := 'S';
+      dataSet.Post;
+      dataSet.Next;
+    end;
+    dataSet.First;
+
+  finally
+  	dataSet.EnableControls;
+    vDadosIni.fechaStatusProcessamento;
+  end;
+end;
+
+{ TAbreMsgTipoTarefa }
+
+function TAbreMsgTipoTarefa.AbreMsgTipoTarefa: boolean;
+begin
+  Result := montaSelect(' select msg_tipo_tarefa.id, msg_tipo_tarefa.tipo, msg_tipo_tarefa.descricao_reduzida, ' +
+  	 ' ((select result from strzero(coalesce(msg_tipo_tarefa.id, 0), 3)) || '' | '' || ' +
+    '   trim(coalesce(tipo, '''')) || '' | '' || ' +
+    '   trim(coalesce(descricao_reduzida, '''')) ' +
+    ' ) tipo_tarefa from msg_tipo_tarefa ');
+end;
+
+constructor TAbreMsgTipoTarefa.create;
+begin
+  dataset := TClientDataSet(dtmConfig.cdsAbreMsgTipoTarefa);
+  transacao := TIBTransaction(dtmConfig.ibTransConfig);
+  buscas := TIBQuery(dtmConfig.qrBuscas);
+end;
+
+{ TMsgTipoTarefa }
+
+function TMsgTipoTarefa.abreMsgTipoTarefa: boolean;
+begin
+  Result := montaSelect(' select msg_tipo_tarefa.* from msg_tipo_tarefa ');
+end;
+
+procedure TMsgTipoTarefa.cadMsgTipoTarefa(Tipoform: Integer);
+begin
+  try
+    vDadosIni.abreStatusProcessamento('','Abrindo Tipo de Tarefa');
+
+    vDadosIni.vTipoForm := 0;
+    if dtmConfig = nil then
+      dtmConfig := TdtmConfig.Create(dtmConfig);
+
+    if not vDadosIni.PesqPros('CFG088', 'CONSULTA', '', 'MSG_TIPO_TAREFA_ORIGEM', '', dtmConfig.qrBuscas, False) then
+      Exit;
+
+    if frmTipoTarefa = nil then
+      Application.CreateForm(TfrmTipoTarefa, frmTipoTarefa);
+
+    if (TipoForm > 0) and (not frmTipoTarefa.Visible) then
+      frmTipoTarefa.ShowModal
+    else if (not frmTipoTarefa.Visible) then
+      frmTipoTarefa.Show
+    else if frmTipoTarefa.FormStyle = fsMDIChild then
+      frmTipoTarefa.Show
+    else
+      frmTipoTarefa.ShowModal;
+  finally
+  	vDadosIni.fechaStatusProcessamento;
+  end;
+end;
+
+constructor TMsgTipoTarefa.create;
+begin
+  dataset := TClientDataSet(dtmConfig.cdsMsgTipoTarefa);
+  transacao := TIBTransaction(dtmConfig.ibTransConfig);
+  buscas := TIBQuery(dtmConfig.qrBuscas);
+end;
+
+function TMsgTipoTarefa.Delete(pPerguntar: Boolean): boolean;
+var
+  vId: string;
+  vTipo: string;
+  vDescricao: string;
+  vtemp: string;
+begin
+  Result := False;
+  if dataSet.IsEmpty then
+    exit;
+
+  vId  := trim(dataSet.FieldByName('ID').AsString);
+  vTipo := trim(dataSet.FieldByName('TIPO').AsString);
+  vDescricao := trim(dataSet.FieldByName('DESCRICAO_REDUZIDA').AsString);
+
+  if not vDadosIni.PesqPros('CFG092', 'EXCLUIR', '', 'MSG_TIPO_TAREFA',
+     vDadosIni.IfThen(trim(vId) <> '', vId, ''), buscas, false) then
+     Exit;
+
+  vtemp := 'Tem certeza que deseja excluir este registro permanentemente?' + #13 + #13 +
+    'TIPO DE TAREFA' + #13 +
+    'Tipo: ' + vTipo + #13 +
+    'Descricao: ' + vDescricao;
+
+  if pPerguntar then
+    if Application.MessageBox(PChar(vtemp),
+      'Excluir Registro', MB_YESNO + MB_ICONQUESTION + MB_DEFBUTTON1) <> mrYES then
+       exit;
+
+  SqlExec(' delete from msg_tipo_tarefa ' +
+          ' where id = %d ',
+          [fint('id')], buscas);
+
+  vDadosIni.GravaAuditoria('CFG092', 'EXCLUIR', '', 'MSG_TIPO_TAREFA',
+     IntToStr(fint('id')), buscas);
+
+  Result := CommitaTransacao;
+
+  if Result then
+    vDadosIni.GravaAuditoria('CFG092', 'EXCLUIR', 'SUCESSO', 'MSG_TIPO_TAREFA', '', buscas)
+  else
+    vDadosIni.GravaAuditoria('CFG092', 'EXCLUIR', 'FALHA', 'MSG_TIPO_TAREFA', '', buscas);
+
+  Result := true;
+  Refresh;
+end;
+
+function TMsgTipoTarefa.edit: boolean;
+begin
+  Result := False;
+  if not vDadosIni.PesqPros('CFG091', 'ALTERAR', '', 'MSG_TIPO_TAREFA',
+    '', buscas, false) then
+    Exit;
+
+  if inherited Edit then
+  begin
+    Result := True;
+  end;
+end;
+
+function TMsgTipoTarefa.Insert: boolean;
+begin
+  if not vDadosIni.PesqPros('CFG090', 'INCLUIR', '', 'MSG_TIPO_TAREFA',
+    '', buscas, True) then
+    Exit;
+
+  if not dataSet.Active then
+    montaSelect(' select msg_tipo_tarefa.* from msg_tipo_tarefa ');
+
+  Result := False;
+  if inherited Insert then
+  begin
+    Result := True;
+  end;
+end;
+
+function TMsgTipoTarefa.post: boolean;
+var
+  acao: string;
+  codigo: integer;
+begin
+  try
+    Result := false;
+
+    if not vDadosIni.PesqPros('CFG093', 'SALVAR', '', 'MSG_TIPO_TAREFA',
+      dataSet.FieldByName('ID').AsString, buscas, true) then
+      Exit;
+
+    if dataSet.State = dsEdit then
+      acao := 'EDITAR'
+    else
+      acao := 'INSERIR';
+
+    if trim(dataSet.FieldByName('TIPO').AsString) = '' then
+      raiseExceptionCreate('Tipo da Tarefa deve ser informado', 'DBEdit1');
+
+    if trim(dataSet.FieldByName('DESCRICAO_REDUZIDA').AsString) = '' then
+      raiseExceptionCreate('Descrição Reduzida deve ser informado', 'DBEdit2');
+
+    if trim(dataSet.FieldByName('DESCRICAO_COMPLETA').AsString) = '' then
+      raiseExceptionCreate('Descrição Completa deve ser informado', 'DBMemo1');
+
+    if dataSet.FieldByName('SLA_SEG_TAREFA').AsInteger <= 0 then
+      raiseExceptionCreate('Sla Segundos Tarefa deve ser informado', 'DBEdit3');
+
+    if dataSet.FieldByName('TEMPO_ADIAMENTO').AsInteger <= 0 then
+      raiseExceptionCreate('Sla Segundos Tarefa deve ser informado', 'DBEdit4');
+
+    if dataSet.FieldByName('QTDE_MAX_ADIAMENTO').AsInteger <= 0 then
+      raiseExceptionCreate('Qtde Máxima de Adiamento deve ser informado', 'DBEdit5');
+
+    if trim(dataSet.FieldByName('EXEC_AUTO').AsString) = '' then
+      raiseExceptionCreate('Execução Automática deve ser informado', 'DBComboBox1');
+
+    if dataSet.FieldByName('PERC_TOLERANCIA').AsInteger <= 0 then
+      raiseExceptionCreate('Percentual Tolerância deve ser informado', 'DBEdit6');
+
+    if not SqlOpen(' select id from msg_tipo_tarefa ' +
+    	' where tipo = %s and id <> %d ', [fstrq('tipo'), fint('id')], buscas).IsEmpty then
+        raiseExceptionCreate('Já existe um tipo da tarefa cadastrada com esse tipo', 'DBEdit1');
+
+    if acao = 'INSERIR' then
+    begin
+      buscas.close;
+      buscas.SQL.Text := 'select GEN_ID(INC_TIPO_TAREFA,1) from rdb$database';
+      buscas.Open;
+      dataSet.FieldByName('ID').AsInteger := buscas.FieldByName('GEN_ID').asinteger;
+    end;
+
+    Result := inherited post;
+
+    if (DataSet.ChangeCount = 0) then
+      Result := True
+    else
+      Result := Apply;
+
+    if result then
+      result := CommitaTransacao;
+
+    if Result then
+      vDadosIni.GravaAuditoria('CFG093', acao, 'SUCESSO', 'MSG_TIPO_TAREFA',
+        dataSet.FieldByName('ID').AsString, buscas)
+    else
+      vDadosIni.GravaAuditoria('CFG093', acao, 'FALHA', 'MSG_TIPO_TAREFA',
+        dataSet.FieldByName('ID').AsString, buscas);
+
+    if Result then
+      Refresh;
+  except
+    on e: exception do
+    begin
+      Result := false;
+      if dataSet.State = dsBrowse then
+        dataSet.Edit;
+      Application.MessageBox(pchar('Erro: ' + e.Message), 'Atenção', MB_ICONERROR + MB_OK);
       registraErro(e.Message);
     end;
   end;

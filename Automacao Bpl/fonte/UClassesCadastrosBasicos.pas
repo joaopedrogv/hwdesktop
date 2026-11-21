@@ -1851,6 +1851,19 @@ type
     function abreAplicativo: boolean;
   end;
 
+  TModeloCartasCampoDig = class(TGenerico)
+  private
+    FOwner: TModeloCartas;
+  public
+    constructor create(AOwner: TModeloCartas);
+    function Insert: boolean; override;
+    function edit: boolean; override;
+    function Delete: boolean; override;
+    function post: boolean; override;
+    function Apply: Boolean; override;
+    function abreModeloCartasCampoDig: boolean;
+  end;
+
   TModeloCartas = class(TGenerico)
   private
   public
@@ -1868,9 +1881,11 @@ type
     function _ManterRegrasCartasCobranca: boolean;
     function _defineSqlAdicional: boolean;
     function abreFormOpcoes: boolean;
+    function abreFormCampoDigitavel: boolean;
   var
     ultimasql: string;
     obRegrasCCobranca: TRegrasCartas;
+    obCampoDig: TModeloCartasCampoDig;
     obAplicativo: TAplicativo;
     rModCartas: RModCartas;
     vProcesso: string;
@@ -17466,6 +17481,17 @@ end;
 
 { TModeloCartas }
 
+function TModeloCartas.abreFormCampoDigitavel: boolean;
+begin
+  frmCadModeloCartas.PageControl5.ActivePage := frmCadModeloCartas.TabSheet7;
+  Result := vDadosIni.abreForm('Campos digitáveis' +
+  	vDadosIni.IfThen(trim(obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) <> 'WHATSAPP',
+   	' - duplo clique para utilizar o campo desejado', ''), frmCadModeloCartas.pnCampos, [ofEscapeExit, ofAlignAllClientWinCtrl]);
+
+  if not Result then
+    obCampoDig.Cancel;
+end;
+
 function TModeloCartas.abreFormOpcoes: boolean;
 var
   formulario: TfrmPadrao;
@@ -17509,6 +17535,7 @@ begin
     ' AND MODCARTAS.COD_EMPRESA = -1');
 
   obAplicativo := TAplicativo.create;
+  obCampoDig := TModeloCartasCampoDig.create(Self);
 end;
 
 function TModeloCartas.Delete: boolean;
@@ -17594,6 +17621,9 @@ begin
   obAplicativo.free;
   obAplicativo := nil;
 
+  obCampoDig.free;
+  obCampoDig := nil;
+
   inherited;
 end;
 
@@ -17631,6 +17661,7 @@ begin
     end;
 
     obAplicativo.abreAplicativo;
+	 obCampoDig.abreModeloCartasCampoDig;
   end;
 end;
 
@@ -17666,6 +17697,7 @@ begin
     dataSet.FieldByName('USAR_SERVICO').AsString := 'N';
 
     obAplicativo.abreAplicativo;
+    obCampoDig.abreModeloCartasCampoDig;
 
     if (vSing.vTipoContrato <> 'NOT') and  (vSing.vTipoContrato <> 'DOC') then
     	dataSet.FieldByName('ID_MSG_APLICATIVO').AsInteger := 0
@@ -17783,6 +17815,14 @@ begin
       Result := True
     else
       Result := Apply;
+
+    if Result then
+    begin
+      if (obCampoDig.DataSet.ChangeCount = 0) then
+         Result := True
+      else
+      	Result := obCampoDig.Apply;
+    end;
 
     if result then
       result := CommitaTransacao
@@ -29977,6 +30017,118 @@ begin
     FTempDatasetCamposConsultasSQL.free;
     FTempDatasetCamposConsultasSQL := nil;
   end;
+end;
+
+{ TModeloCartasCampoDig }
+
+function TModeloCartasCampoDig.Apply: Boolean;
+begin
+  Result := True;
+  
+  prepare_loop();
+  try
+    while not dataSet.Eof do
+    begin
+      if dataSet.FieldByName('cod_carta').AsInteger <= 0 then
+      begin
+        dataSet.Edit;
+        dataSet.FieldByName('cod_carta').AsInteger := FOwner.dataSet.FieldByName('cod_carta').AsInteger;
+        dataSet.Post;
+      end;
+
+      if dataSet.ChangeCount > 0 then
+        Result := inherited Apply
+      else
+        Result := True;
+
+      dataSet.Next;
+    end;
+  finally
+    prepare_loop_done();
+  end;
+end;
+
+constructor TModeloCartasCampoDig.create(AOwner: TModeloCartas);
+begin
+  FOwner := AOwner;
+
+  DataSet := TClientDataSet(DtmCadBasicos.cdsModCartasCampoDig);
+  transacao := TIBTransaction(DtmCadBasicos.IBTransModCartas);
+  buscas := TIBQuery(DtmCadBasicos.qrBuscas);
+end;
+
+function TModeloCartasCampoDig.Delete: boolean;
+begin
+  Result := False;
+  if dataSet.IsEmpty then
+    exit;
+
+  if Application.MessageBox('Tem certeza que deseja excluir este registro?',
+    'Excluir Registro', MB_YESNO + MB_ICONQUESTION + MB_DEFBUTTON1) <> IDYES then
+    Exit;                                                                
+
+  result := inherited Delete;
+  
+  if Result then
+    result := Apply;
+
+  if Result then
+    Refresh;
+end;
+
+function TModeloCartasCampoDig.edit: boolean;
+begin
+  Result := inherited Edit;
+end;
+
+function TModeloCartasCampoDig.Insert: boolean;
+begin
+  Result := inherited Insert;
+  if Result then
+  begin
+  	 dataSet.FieldByName('COD_CARTA').AsInteger := FOwner.dataSet.FieldByName('COD_CARTA').AsInteger;
+    dataSet.FieldByName('COD_EMPRESA').AsString := vDadosIni.codEmpresa;
+  end;
+end;
+
+function TModeloCartasCampoDig.post: boolean;
+begin
+  try
+    Result := false;
+
+    if trim(dataSet.FieldByName('TAG').AsString) = '' then
+      raiseExceptionCreate('Tag deve ser informado', 'DBEdit7');
+
+    if trim(dataSet.FieldByName('TEXTO').AsString) = '' then
+      raiseExceptionCreate('Texto deve ser informado', 'DBMemo3');
+
+    Result := inherited post;
+
+    if (DataSet.ChangeCount = 0) then
+      Result := True
+    else
+      Result := Apply;
+      
+  	 if Result then
+      Refresh;
+
+  except
+    on e: exception do
+    begin
+      Result := false;
+      if dataSet.State = dsBrowse then
+        dataSet.Edit;
+      Application.MessageBox(pchar('Erro: ' + e.Message), 'Atenção', MB_ICONERROR + MB_OK);
+      registraErro(e.Message);
+    end;
+  end;
+end;
+
+function TModeloCartasCampoDig.abreModeloCartasCampoDig: boolean;
+begin
+  Result := montaSelect(' select * from modcartas_tags_adc ' +
+  	' where cod_carta = ' + IntToStr(FOwner.dataset.FieldByName('COD_CARTA').AsInteger) +
+   ' and cod_empresa = ' + vDadosIni.codEmpresa);
 end;
 
 end.

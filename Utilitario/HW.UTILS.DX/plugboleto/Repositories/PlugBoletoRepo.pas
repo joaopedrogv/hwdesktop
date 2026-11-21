@@ -196,6 +196,8 @@ begin
               ' c.titulocodigoprotesto, ' +
               ' c.outrodadoconfiguracao1, ' +
               ' c.outrodadoconfiguracao2, ' +
+              ' c.ac_tit_apos_venc, ' +
+              ' c.dias_ac_tit_apos_venc, ' +
               ' cl.nome_cliente, cl.razao, cl.cpfcgc, cl.end_cobranca, cl.bairro_cobranca, cl.cida_cobranca, cl.cep_cobranca, ' +
               ' cl.email, cl.email, cl.fone_cliente, cl.fone_celular, e.sigla_uf, p.nome_pais ' +
               ' from boletas b ' +
@@ -241,6 +243,8 @@ begin
               ' c.titulocodigoprotesto, ' +
               ' c.outrodadoconfiguracao1, ' +
               ' c.outrodadoconfiguracao2, ' +
+              ' c.ac_tit_apos_venc, ' +
+              ' c.dias_ac_tit_apos_venc, ' +
               ' cl.nome_cliente, cl.razao, cl.cpfcgc, cl.end_cobranca, cl.bairro_cobranca, cl.cida_cobranca, cl.cep_cobranca, ' +
               ' cl.email, cl.email, cl.fone_cliente, cl.fone_celular, e.sigla_uf, p.nome_pais ' +
               ' from boletas b ' +
@@ -290,6 +294,8 @@ begin
               ' c.titulocodigoprotesto, ' +
               ' c.outrodadoconfiguracao1, ' +
               ' c.outrodadoconfiguracao2, ' +
+              ' c.ac_tit_apos_venc, ' +
+              ' c.dias_ac_tit_apos_venc, ' +
               ' cl.nome_cliente, cl.razao, cl.cpfcgc, cl.end_cobranca, cl.bairro_cobranca, cl.cida_cobranca, cl.cep_cobranca, ' +
               ' cl.email, cl.email, cl.fone_cliente, cl.fone_celular, e.sigla_uf, p.nome_pais ' +
               ' from boletas b ' +
@@ -339,6 +345,8 @@ begin
               ' c.titulocodigoprotesto, ' +
               ' c.outrodadoconfiguracao1, ' +
               ' c.outrodadoconfiguracao2, ' +
+              ' c.ac_tit_apos_venc, ' +
+              ' c.dias_ac_tit_apos_venc, ' +
               ' cl.nome_cliente, cl.razao, cl.cpfcgc, cl.end_cobranca, cl.bairro_cobranca, cl.cida_cobranca, cl.cep_cobranca, ' +
               ' cl.email, cl.email, cl.fone_cliente, cl.fone_celular, e.sigla_uf, p.nome_pais ' +
               ' from boletas b ' +

@@ -159,6 +159,43 @@ type
     DBComboBox8: TDBComboBox;
     DBComboBox9: TDBComboBox;
     DBComboBox7: TDBComboBox;
+    BitBtn16: TBitBtn;
+    tsCampos: TTabSheet;
+    pnCampos: TPanel;
+    PageControl5: TPageControl;
+    TabSheet7: TTabSheet;
+    TabSheet8: TTabSheet;
+    Panel15: TPanel;
+    BitBtn_Novo_Campo_Adc: TBitBtn;
+    BitBtn_Alterar_Campo_Adc: TBitBtn;
+    BitBtn_Excluir_Campo_Adc: TBitBtn;
+    BitBtn_Sair_Campo_Adc: TBitBtn;
+    DBGrid3: TDBGrid;
+    Panel27: TPanel;
+    BitBtn_OK_Campo_Adc: TBitBtn;
+    BitBtn_Canc_Campo_Adc: TBitBtn;
+    Panel28: TPanel;
+    Label24: TLabel;
+    BitBtn21: TBitBtn;
+    BitBtn_Sair2_Campo_Adc: TBitBtn;
+    Panel29: TPanel;
+    Panel30: TPanel;
+    DBMemo3: TDBMemo;
+    Label25: TLabel;
+    DBEdit7: TDBEdit;
+    Panel31: TPanel;
+    procedure DBGrid3DblClick(Sender: TObject);
+    procedure BitBtn12Click(Sender: TObject);
+    procedure BitBtn_Canc_Campo_AdcClick(Sender: TObject);
+    procedure BitBtn11Click(Sender: TObject);
+    procedure BitBtn_OK_Campo_AdcClick(Sender: TObject);
+    procedure BitBtn_Excluir_Campo_AdcClick(Sender: TObject);
+    procedure BitBtn_Alterar_Campo_AdcClick(Sender: TObject);
+    procedure BitBtn_Novo_Campo_AdcClick(Sender: TObject);
+    procedure BitBtn_Sair_Campo_AdcClick(Sender: TObject);
+    procedure BitBtn_Sair2_Campo_AdcClick(Sender: TObject);
+    procedure BitBtn16Click(Sender: TObject);
+    procedure BitBtn21Click(Sender: TObject);
     procedure DBComboBox9Exit(Sender: TObject);
     procedure DBComboBox7Exit(Sender: TObject);
     procedure SpeedButton18Click(Sender: TObject);
@@ -177,8 +214,6 @@ type
     procedure DBGrid2DblClick(Sender: TObject);
     procedure BitBtn14Click(Sender: TObject);
     procedure BitBtn13Click(Sender: TObject);
-    procedure BitBtn12Click(Sender: TObject);
-    procedure BitBtn11Click(Sender: TObject);
     procedure SpeedButton59Click(Sender: TObject);
     procedure SpeedButton15Click(Sender: TObject);
     procedure btNaoEnviarNotClick(Sender: TObject);
@@ -294,7 +329,7 @@ end;
 procedure TfrmCadModeloCartas.BitBtn11Click(Sender: TObject);
 begin
   inherited;
-	TForm(pnPlataforma.Parent).ModalResult := IDOK;
+  TForm(pnPlataforma.Parent).ModalResult := IDOK;
 end;
 
 procedure TfrmCadModeloCartas.BitBtn12Click(Sender: TObject);
@@ -349,6 +384,12 @@ begin
       true));
 end;
 
+procedure TfrmCadModeloCartas.BitBtn16Click(Sender: TObject);
+begin
+  inherited;
+  obModCarta.abreFormCampoDigitavel;
+end;
+
 procedure TfrmCadModeloCartas.BitBtn17Click(Sender: TObject);
 begin
   try
@@ -366,86 +407,121 @@ begin
   end;
 end;
 
+procedure TfrmCadModeloCartas.BitBtn_Sair_Campo_AdcClick(Sender: TObject);
+begin
+  inherited;
+  TForm(pnCampos.Parent).ModalResult := IDCLOSE;	
+end;
+
 procedure TfrmCadModeloCartas.BitBtn1Click(Sender: TObject);
 var
  I: Integer;
 begin
-	obModCarta.vProcesso := 'BAS285';
-  if obModCarta.getTipoContrato = 'MOT' then
-  	obModCarta.vProcesso := 'BAS176'
-  else if obModCarta.getTipoContrato = 'NOT' then
-  	obModCarta.vProcesso := 'BAS418'
-  else if obModCarta.getTipoContrato = 'DOC' then
-  	obModCarta.vProcesso := 'BAS552';
+  try
+    obModCarta.vProcesso := 'BAS285';
+    if obModCarta.getTipoContrato = 'MOT' then
+     obModCarta.vProcesso := 'BAS176'
+    else if obModCarta.getTipoContrato = 'NOT' then
+     obModCarta.vProcesso := 'BAS418'
+    else if obModCarta.getTipoContrato = 'DOC' then
+     obModCarta.vProcesso := 'BAS552';
 
-  if not vDadosIni.PesqPros(obModCarta.vProcesso, 'PESQUISAR', '', 'MODCARTAS', '', obModCarta.buscas, true) then
-    exit;
+    if not vDadosIni.PesqPros(obModCarta.vProcesso, 'PESQUISAR', '', 'MODCARTAS', '', obModCarta.buscas, true) then
+      exit;
 
-  inherited;
+    inherited;
 
-  SpeedButton2.Hint := 'Enviar para Lixeira -  [' + obModCarta.vProcesso + ']';
+    SpeedButton2.Hint := 'Enviar para Lixeira -  [' + obModCarta.vProcesso + ']';
 
-  obModCarta.rModCartas.vCampo := ComboBox1.Text;
-  obModCarta.rModCartas.vCondicao := ComboBox3.Text;
-  obModCarta.rModCartas.vDataIni := trim(MaskEdit1.Text);
-  obModCarta.rModCartas.vDataFim := trim(MaskEdit2.Text);
-  obModCarta.rModCartas.vValor := trim(MaskEdit3.Text);
-  obModCarta.rModCartas.vAdicional := CheckBox1.Checked;
-  obModCarta.rModCartas.avancada := CheckBox3.Checked;
+    obModCarta.rModCartas.vCampo := ComboBox1.Text;
+    obModCarta.rModCartas.vCondicao := ComboBox3.Text;
+    obModCarta.rModCartas.vDataIni := trim(MaskEdit1.Text);
+    obModCarta.rModCartas.vDataFim := trim(MaskEdit2.Text);
+    obModCarta.rModCartas.vValor := trim(MaskEdit3.Text);
+    obModCarta.rModCartas.vAdicional := CheckBox1.Checked;
+    obModCarta.rModCartas.avancada := CheckBox3.Checked;
 
-  obModCarta._defineSqlAdicional;
+    obModCarta._defineSqlAdicional;
 
-  if MaskEdit2.Visible then
-  begin
-    if not obModCarta.ConsultaCampos('MODCARTAS',
-    	obModCarta.rModCartas.vCampo,
-      'MODCARTAS.COD_CARTA',
-      obModCarta.rModCartas.vDataIni,
-      obModCarta.rModCartas.vDataFim,
-      vDadosIni.codEmpresa, 1,
+    Screen.Cursor := crHourGlass;
+    if MaskEdit2.Visible then
+    begin
+      if not obModCarta.ConsultaCampos('MODCARTAS',
+        obModCarta.rModCartas.vCampo,
+        'MODCARTAS.COD_CARTA',
+        obModCarta.rModCartas.vDataIni,
+        obModCarta.rModCartas.vDataFim,
+        vDadosIni.codEmpresa, 1,
+        'MODCARTAS.*, MSG_APLICATIVO.APLICATIVO ',
+        'LEFT JOIN MSG_APLICATIVO ON MSG_APLICATIVO.ID = MODCARTAS.ID_MSG_APLICATIVO',
+        obModCarta.rModCartas.vSqlAdicional) then
+           if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
+              combobox1.setfocus;
+    end
+    else if not obModCarta.ConsultaCampos('MODCARTAS',
+     obModCarta.rModCartas.vValor,
+      obModCarta.rModCartas.vCampo,
+      obModCarta.rModCartas.vCondicao,
+     'MODCARTAS.COD_CARTA', True, vDadosIni.codEmpresa,
       'MODCARTAS.*, MSG_APLICATIVO.APLICATIVO ',
       'LEFT JOIN MSG_APLICATIVO ON MSG_APLICATIVO.ID = MODCARTAS.ID_MSG_APLICATIVO',
       obModCarta.rModCartas.vSqlAdicional) then
-      	if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
-      		combobox1.setfocus;
-  end
-  else if not obModCarta.ConsultaCampos('MODCARTAS',
-  	obModCarta.rModCartas.vValor,
-    obModCarta.rModCartas.vCampo,
-    obModCarta.rModCartas.vCondicao,
-  	'MODCARTAS.COD_CARTA', True, vDadosIni.codEmpresa,
-    'MODCARTAS.*, MSG_APLICATIVO.APLICATIVO ',
-    'LEFT JOIN MSG_APLICATIVO ON MSG_APLICATIVO.ID = MODCARTAS.ID_MSG_APLICATIVO',
-    obModCarta.rModCartas.vSqlAdicional) then
-    	if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
-    		ComboBox1.SetFocus;
-        
-  SpeedButton1.Visible := true;
-  SpeedButton5.Visible := false;
-  if obModCarta._lixeiraCheia then
-    SpeedButton25.Visible := true
-  else
-    SpeedButton25.Visible := false;
-  obModCarta.ultimasql := obModCarta.dataset.CommandText;
-  if (Self.Enabled) and (Self.Visible) and (DBGrid1.CanFocus) then
-  	DBGrid1.SetFocus;
+        if (Self.Enabled) and (Self.Visible) and (combobox1.CanFocus) then
+           ComboBox1.SetFocus;
 
-  if obModCarta.dataSet.Active then
-     for I := 0 to DBGrid1.Columns.Count - 1 do
-       if DBGrid1.Columns[i].FieldName = 'DADOS_CARTA' then
-         DBGrid1.Columns[i].ButtonStyle := cbsEllipsis;
+    SpeedButton1.Visible := true;
+    SpeedButton5.Visible := false;
+    if obModCarta._lixeiraCheia then
+      SpeedButton25.Visible := true
+    else
+      SpeedButton25.Visible := false;
+    obModCarta.ultimasql := obModCarta.dataset.CommandText;
+    if (Self.Enabled) and (Self.Visible) and (DBGrid1.CanFocus) then
+     DBGrid1.SetFocus;
 
-  if vDadosIni.GetIni('MD', 'MHTT', 'N') <> 'S' then
-    if obModCarta.getTipoContrato = 'DOC' then
-    	if vDadosIni.retornaDadosHwCloudIA(obModCarta.buscas, False) <> '' then
-        if vDadosIni.vHwCloudIA.vUsarServMensageria = 'S' then
-          vDadosIni.buscarConfigHwCloud;
+    if obModCarta.dataSet.Active then
+       for I := 0 to DBGrid1.Columns.Count - 1 do
+         if DBGrid1.Columns[i].FieldName = 'DADOS_CARTA' then
+           DBGrid1.Columns[i].ButtonStyle := cbsEllipsis;
 
-  _GravaConfiguracoesBoolean(MenuCartasCobranca.Name, MenuCartasCobranca.Checked);
-  _GravaConfiguracoesBoolean(MenuCartasClientes.Name, MenuCartasClientes.Checked);
-  _GravaConfiguracoesBoolean(MenuCartasVeiculos.Name, MenuCartasVeiculos.Checked);
-  _GravaConfiguracoesBoolean(MenuNotFinanceiros.Name, MenuNotFinanceiros.Checked);
-  _GravaConfiguracoesBoolean(MenuTiposDocumento.Name, MenuTiposDocumento.Checked);
+    if vDadosIni.GetIni('MD', 'MHTT', 'N') <> 'S' then
+      if obModCarta.getTipoContrato = 'DOC' then
+        if vDadosIni.retornaDadosHwCloudIA(obModCarta.buscas, False) <> '' then
+          if vDadosIni.vHwCloudIA.vUsarServMensageria = 'S' then
+            vDadosIni.buscarConfigHwCloud;
+
+    _GravaConfiguracoesBoolean(MenuCartasCobranca.Name, MenuCartasCobranca.Checked);
+    _GravaConfiguracoesBoolean(MenuCartasClientes.Name, MenuCartasClientes.Checked);
+    _GravaConfiguracoesBoolean(MenuCartasVeiculos.Name, MenuCartasVeiculos.Checked);
+    _GravaConfiguracoesBoolean(MenuNotFinanceiros.Name, MenuNotFinanceiros.Checked);
+    _GravaConfiguracoesBoolean(MenuTiposDocumento.Name, MenuTiposDocumento.Checked);
+  finally
+    Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TfrmCadModeloCartas.BitBtn21Click(Sender: TObject);
+begin
+  inherited;
+  try
+    try
+      Application.CreateForm(TfrmListarCamposSql, frmListarCamposSql);
+      frmListarCamposSql._Id_ := obModCarta.dataSet.FieldByName('ID_CONSULTAS_SQL').AsString;
+      frmListarCamposSql.ShowModal;
+      if frmListarCamposSql._Registro <> '' then
+      	if DBMemo3.Enabled then
+        	DBMemo3.SelText := '{{' + frmListarCamposSql._Registro + '}}';
+    except
+    end;
+  finally
+    frmListarCamposSql.Free;
+  end;
+end;
+
+procedure TfrmCadModeloCartas.BitBtn_Sair2_Campo_AdcClick(Sender: TObject);
+begin
+  inherited;
+  TForm(pnCampos.Parent).ModalResult := IDCLOSE;	
 end;
 
 procedure TfrmCadModeloCartas.BitBtn3Click(Sender: TObject);
@@ -512,8 +588,13 @@ begin
     BitBtn14.Visible      := False;
     SpeedButton16.Visible := False;
 
-  	Panel8.Visible := (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'WHATSAPP');
+  	 Panel8.Visible := (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'WHATSAPP');
     Panel17.Visible := (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'WHATSAPP');
+
+    DBMemo1.DataSource := nil;
+    DBMemo2.DataSource := nil;
+    Panel31.Visible := (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'WHATSAPP')
+    	or (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'TELEGRAM');
 
     if trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'E-MAIL' then
     begin
@@ -536,20 +617,51 @@ begin
     begin
       if obModCarta.getTipoContrato = 'DOC' then
       begin
-      	PageControl4.ActivePage := tsMarkdown2;
+        if (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'WHATSAPP') then
+        	 Panel24.Caption := 'Informar template utilizado, e inserir as tags do ERP'
+        else
+        	 Panel24.Caption := 'Inserir texto em formato markdown, e inserir as tags do ERP';
+
+        if (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'WHATSAPP') then
+          Panel31.Caption := 'WhatsApp - Aceita enviar anexos somente por link'
+        else if (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'TELEGRAM') then
+          Panel31.Caption := 'Telegram - Antes de enviar a primeira mensagens é necessário iniciar a conversa pelo aplicativo'
+        else
+          Panel31.Caption := '';
+        Panel31.Top := 0;
+
+        DBMemo2.DataSource := DtmCadBasicos.dsModCartas;
+        
+        PageControl4.ActivePage := tsMarkdown2;
         tsMarkdown2.Show;
       end
       else
       begin
+        if (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'WHATSAPP') then
+          Panel12.Caption := 'Informar template utilizado, e inserir as tags do ERP'
+        else
+        	 Panel12.Caption := 'Inserir texto em formato markdown, e inserir as tags do ERP';
+
+        DBMemo1.DataSource := DtmCadBasicos.dsModCartas;
+
         PageControl2.ActivePage := tsMarkdown;
         tsMarkdown.Show;
       end;
     end;
 
     if obModCarta.getTipoContrato = 'DOC' then
-      TabSheet6.Show
+    begin
+      PageControl5.ActivePage := TabSheet7;
+      TabSheet7.Show;
+
+      PageControl3.ActivePage := TabSheet6;
+      TabSheet6.Show;
+    end
     else
-	    TabSheet5.Show;
+    begin
+	   PageControl3.ActivePage := TabSheet5;
+      TabSheet5.Show;
+    end;
   end
   else
   begin
@@ -593,10 +705,11 @@ begin
   if ((obModCarta.getTipoContrato = 'NOT') or (obModCarta.getTipoContrato = 'DOC'))
    and (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'E-MAIL') then
   begin
-    if obModCarta.getTipoContrato = 'DOC' then
+    if PageControl3.ActivePage = TabSheet6 then
       HTMLDocument := WebBrowser2.Document as IHTMLDocument2
     else
   		HTMLDocument := WebBrowser1.Document as IHTMLDocument2;
+      
     vDadosCarta := HTMLDocument.body.innerHTML;
     vDadosCarta := vDadosIni._converterTags(vDadosCarta, 'H');
     vDadosCarta := vDadosIni._converterTagsImage(vDadosCarta, obModCarta.buscas, false);
@@ -606,14 +719,14 @@ begin
   	and ((trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'WHATSAPP')
     	or (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'TELEGRAM')) then
   begin
-  	if obModCarta.getTipoContrato = 'DOC' then
+  	 if PageControl3.ActivePage = TabSheet6 then
     	obModCarta.dataSet.FieldByName('DADOS_CARTA').AsString := DBMemo2.Text
     else
   		obModCarta.dataSet.FieldByName('DADOS_CARTA').AsString := DBMemo1.Text;
   end
   else
-  	obModCarta.dataSet.FieldByName('DADOS_CARTA').AsString :=
-    	vDadosIni._converterTags(obModCarta.dataSet.FieldByName('DADOS_CARTA').AsString, 'R');
+  	 obModCarta.dataSet.FieldByName('DADOS_CARTA').AsString := vDadosIni._converterTags(obModCarta.dataSet.FieldByName('DADOS_CARTA').AsString, 'R');
+
   if not obModCarta.Post then
   begin
   	if ((obModCarta.getTipoContrato = 'NOT') or (obModCarta.getTipoContrato = 'DOC'))
@@ -674,6 +787,61 @@ procedure TfrmCadModeloCartas.BitBtn9Click(Sender: TObject);
 begin
   inherited;
   TabSheet2.show;
+end;
+
+procedure TfrmCadModeloCartas.BitBtn_Alterar_Campo_AdcClick(Sender: TObject);
+begin
+  inherited;
+  if not obModCarta.obCampoDig.Edit then
+    Exit;
+
+  PageControl5.ActivePage := TabSheet8;
+  TabSheet8.Show;
+
+  if (Self.Enabled) and (Self.Visible) and (DBEdit7.CanFocus) then
+    DBEdit7.SetFocus;
+end;
+
+procedure TfrmCadModeloCartas.BitBtn_Canc_Campo_AdcClick(Sender: TObject);
+begin
+  inherited;
+  obModCarta.obCampoDig.Cancel;
+  
+  PageControl5.ActivePage := TabSheet7;
+  TabSheet7.Show;
+end;
+
+procedure TfrmCadModeloCartas.BitBtn_Excluir_Campo_AdcClick(Sender: TObject);
+begin
+  inherited;
+  if not obModCarta.obCampoDig.Delete then
+    Exit;
+end;
+
+procedure TfrmCadModeloCartas.BitBtn_Novo_Campo_AdcClick(Sender: TObject);
+begin
+  inherited;
+  if not obModCarta.obCampoDig.Insert then
+    Exit;
+
+  PageControl5.ActivePage := TabSheet8;
+  TabSheet8.Show;
+
+  if (Self.Enabled) and (Self.Visible) and (DBEdit7.CanFocus) then
+    DBEdit7.SetFocus;
+end;
+
+procedure TfrmCadModeloCartas.BitBtn_OK_Campo_AdcClick(Sender: TObject);
+begin
+  inherited;
+  if not obModCarta.obCampoDig.Post then
+  begin
+    setFocusCampoErro(obModCarta.obCampoDig.vNomeCampoErro, obModCarta.obCampoDig.vMensagemErro);
+    Exit;
+  end;
+
+  PageControl5.ActivePage := TabSheet7;
+  TabSheet7.Show;
 end;
 
 procedure TfrmCadModeloCartas.btSelectAllClick(Sender: TObject);
@@ -886,6 +1054,23 @@ begin
   	TForm(pnPlataforma.Parent).ModalResult := IDOK;
 end;
 
+procedure TfrmCadModeloCartas.DBGrid3DblClick(Sender: TObject);
+begin
+  inherited;
+  if DBGrid3.DataSource.DataSet.IsEmpty then
+    Exit;
+
+  if (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'WHATSAPP') then
+    Exit;
+
+  if obModCarta.getTipoContrato = 'DOC' then
+  	 DBMemo2.SelText := '{{' + DBGrid3.DataSource.DataSet.FieldByName('TAG').AsString + '}}'
+  else
+  	 DBMemo1.SelText := '{{' + DBGrid3.DataSource.DataSet.FieldByName('TAG').AsString + '}}';
+
+  TForm(pnCampos.Parent).ModalResult := IDOK;	
+end;
+
 procedure TfrmCadModeloCartas.DBGridControlesNotCellClick(Column: TColumn);
 begin
   inherited;
@@ -955,17 +1140,34 @@ begin
     PageControl2.Pages[i].TabVisible := false;
   for I := 0 to PageControl4.PageCount - 1 do
   	PageControl4.Pages[i].TabVisible := false;
+  for I := 0 to PageControl5.PageCount - 1 do
+  	PageControl5.Pages[i].TabVisible := false;
   inherited;
 
   TabSheet3.TabVisible := false;
   TabSheet5.TabVisible := false;
-  TabSheet6.TabVisible := false;              
+  TabSheet6.TabVisible := false;
+
+  DBComboBox6.Items.Clear;
+  DBComboBox6.Items.Add('');
+//  DBComboBox6.Items.Add('U - Enviar único documento por mensagem - ERP');
+//  DBComboBox6.Items.Add('D- Enviar dois ou mais documentos por mensagem - ERP');
+  DBComboBox6.Items.Add('Q - Enviar qualquer quantidade de documentos - ERP');
+  DBComboBox6.Items.Add('B - Bot responde tarefas e envia documentos');
 
   MenuCartasCobranca.Checked := _LerConfiguracoesRegistroBoolean(MenuCartasCobranca.Name);
-  MenuCartasClientes.Checked := _LerConfiguracoesRegistroBoolean(MenuCartasClientes.Name);
-  MenuCartasVeiculos.Checked := _LerConfiguracoesRegistroBoolean(MenuCartasVeiculos.Name);
-  MenuNotFinanceiros.Checked := _LerConfiguracoesRegistroBoolean(MenuNotFinanceiros.Name);
-  MenuTiposDocumento.Checked := _LerConfiguracoesRegistroBoolean(MenuTiposDocumento.Name);
+
+  if (not MenuCartasCobranca.Checked) then
+  	 MenuCartasClientes.Checked := _LerConfiguracoesRegistroBoolean(MenuCartasClientes.Name);
+
+  if (not MenuCartasCobranca.Checked) and (not MenuCartasClientes.Checked) then
+  	 MenuCartasVeiculos.Checked := _LerConfiguracoesRegistroBoolean(MenuCartasVeiculos.Name);
+
+  if (not MenuCartasCobranca.Checked) and (not MenuCartasClientes.Checked) and (not MenuCartasVeiculos.Checked) then
+    MenuNotFinanceiros.Checked := _LerConfiguracoesRegistroBoolean(MenuNotFinanceiros.Name);
+
+  if (not MenuCartasCobranca.Checked) and (not MenuCartasClientes.Checked) and (not MenuCartasVeiculos.Checked) and (not MenuNotFinanceiros.Checked) then
+    MenuTiposDocumento.Checked := _LerConfiguracoesRegistroBoolean(MenuTiposDocumento.Name);
 
   if (not MenuCartasClientes.Checked)
   	and (not MenuCartasClientes.Checked)
@@ -1285,6 +1487,11 @@ begin
     	Panel8.Visible := (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'WHATSAPP');
       Panel17.Visible := (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'WHATSAPP');
 
+      DBMemo1.DataSource := nil;
+	   DBMemo2.DataSource := nil;
+      Panel31.Visible := (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'WHATSAPP')
+	    	or (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'TELEGRAM');
+
     	if trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'E-MAIL' then
       begin
         if obModCarta.getTipoContrato = 'DOC' then
@@ -1304,22 +1511,53 @@ begin
       end
       else
       begin
-       	if obModCarta.getTipoContrato = 'DOC' then
+        if obModCarta.getTipoContrato = 'DOC' then
         begin
+          if (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'WHATSAPP') then
+            Panel24.Caption := 'Informar template utilizado, e inserir as tags do ERP'
+          else
+            Panel24.Caption := 'Inserir texto em formato markdown, e inserir as tags do ERP';
+
+          if (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'WHATSAPP') then
+            Panel31.Caption := 'WhatsApp - Aceita enviar anexos somente por link'
+          else if (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'TELEGRAM') then
+            Panel31.Caption := 'Telegram - Antes de enviar a primeira mensagens é necessário iniciar a conversa pelo aplicativo'
+          else
+            Panel31.Caption := '';
+          Panel31.Top := 0;
+
+          DBMemo2.DataSource := DtmCadBasicos.dsModCartas;
+
           PageControl4.ActivePage := tsMarkdown2;
           tsMarkdown2.Show;
         end
         else
         begin
+          if (trim(obModCarta.obAplicativo.dataSet.FieldByName('APLICATIVO').AsString) = 'WHATSAPP') then
+            Panel12.Caption := 'Informar template utilizado, e inserir as tags do ERP'
+          else
+            Panel12.Caption := 'Inserir texto em formato markdown, e inserir as tags do ERP';
+
+          DBMemo1.DataSource := DtmCadBasicos.dsModCartas;
+          
           PageControl2.ActivePage := tsMarkdown;
           tsMarkdown.Show;
         end;
       end;
 
       if obModCarta.getTipoContrato = 'DOC' then
-        TabSheet6.Show
+      begin
+        PageControl5.ActivePage := TabSheet7;
+        TabSheet7.Show;
+
+        PageControl3.ActivePage := TabSheet6;
+        TabSheet6.Show;
+      end
       else
+      begin
+        PageControl3.ActivePage := TabSheet5;
         TabSheet5.Show;
+      end;
     end
     else
     begin
