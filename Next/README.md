@@ -54,11 +54,13 @@ perguntas individuais.
 
 ## Compilar a DLL e o host
 
-A [ABI 11](Interop/Contracts/HwNextViewApi.pas) separa a sessão da inicialização:
+A [ABI 12](Interop/Contracts/HwNextViewApi.pas) separa a sessão da inicialização:
 `HwNextSetSession` publica empresa e login, `HwNextInitialize` monta a
 infraestrutura com os dados do banco e prepara a empresa atual, e
 `HwNextIsAvailable` informa se ela está pronta. O login usa `SetNextHostSession` e
 `InicializarNext`, nessa ordem, antes de abrir telas. Compile a DLL Rio Win32 e os
 pacotes Delphi 2006 `pkAtivos` e `pkAutomacao` da mesma revisão. A saída do projeto
 Next é `bpl/hw.next.dll` na raiz do clone. Confira se o ERP carrega esse binário ao
-validar.
+validar. O host exige a versão exata e resolve
+`HwNextSetAuthorizationCallbackV2`, que recebe a chave de negócio do registro; como
+não há compatibilidade com a ABI 11, host e DLL são entregues juntos.
