@@ -322,7 +322,6 @@ type
     function proximaNF: boolean; virtual; abstract;
     function pesquisaNF(vnum: integer;codempresa: integer;vsub: string): boolean; virtual; abstract;
     function obtemdadostotaisnf: boolean; virtual; abstract;
-    function inutilizaNFe(vnumnfini: integer;vnumnffin: integer;codempresa: integer;nsubserie: string): boolean;virtual;abstract;
     function mudarNFSCANouSVC(pTipo:string): boolean;virtual;abstract;
     function marcaSel: boolean; virtual; abstract;
     function obtemlote: integer;
@@ -593,7 +592,6 @@ type
     function obtemdadostotaisnf: boolean; override;
     function mudarNFSCANouSVC(pTipo:string): boolean;override;
     function marcaSel: boolean; override;
-    function inutilizaNFe(vnumnfini: integer;vnumnffin: integer;codempresa: integer;nsubserie: string): boolean;override;
     function obtemnumeroNF: boolean;override;
     function verificabol: boolean; override;
     function getArquivosBoletoParaAnexos(AidDoc: Integer = 0): TStrings; override;
@@ -6771,31 +6769,6 @@ end;
 //function TClassNfVenda.GravaRetNFE(vAcbrNFE: TACBrNFe;vtipo: smallint): boolean;
 //begin
 //end;
-
-function TClassNfVenda.inutilizaNFe(vnumnfini: integer;vnumnffin: integer;codempresa: integer;nsubserie: string): boolean;
-begin
- montaSelect('SELECT * FROM NOTAFISCAL WHERE NUM_NF >= '+inttostr(vnumnfini)+
- ' AND NUM_NF <= '+inttostr(vnumnffin)+' AND COD_EMPRESA = '+inttostr(codempresa)+' AND SERIE = '''+nsubserie+''' AND ((NATUREZA_NF = ''S'') OR ((EMISSAO_PROPRIA = ''S'') AND (NUM_GERADO = ''S'')))');
- try
-  IniciaTransacao;
-  while not dataSet.eof do
-  begin
-   dataSet.edit;
-   dataSet.fieldbyname('SITUACAO_NFE').AsString:='Inutilizada';
-   dataSet.Post;
-   Apply;
-   dataSet.next;
-  end;
-  CommitaTransacao;
- except
-  on e: exception do
-  begin
-   RollBackTransacao;
-   if application.messagebox('Erro ao gravar Situação Inutilizada das NF-e. Mostrar Erro?', 'Confirmação', mb_yesno + MB_DEFBUTTON2) = IDYES then
-    Application.MessageBox(PWideChar(E.Message),PWideChar('Error'), MB_OK);
-  end;
- end;
-end;
 
 function TClassNfVenda.limpadadosnfe: boolean;
 begin

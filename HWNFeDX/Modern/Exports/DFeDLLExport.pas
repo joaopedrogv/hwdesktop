@@ -207,23 +207,6 @@ begin
   end;
 end;
 
-function NFSeCallCriarAnexosCSharp(NFSeID: WideString; EmpresaId: Integer; var AResultado: WideString): Integer; stdcall;
-var
-  Input: NFSeCallCriarAnexoslInput;
-begin
-  Input.NFSeIDs := NFSeID;
-  Input.EmpresaId := EmpresaId;
-  Input.Silent := True;
-  Input.AnexarPDF := True;
-
-  AResultado := NFSeCallCriarAnexos(Input);
-
-  if (string(AResultado).Substring(0,6) = 'ERROR|') then
-    Result := 0
-  else
-    Result := 1;
-end;
-
 function NFSeCallCriarAnexosCSharpBuffer(NFSeID: WideString; EmpresaId: Integer; var AResultado: PAnsiChar; var AResultadoSize: Integer): Integer; stdcall;
 var
   Input: NFSeCallCriarAnexoslInput;
@@ -274,7 +257,6 @@ exports
   NFSeCallEmitirLote,
   NFSeCallEnviarEmail,
   NFSeCallCriarAnexos,
-  NFSeCallCriarAnexosCSharp,
   NFSeCallCriarAnexosCSharpBuffer,
   EncryptTextTwofish,
   DecryptTextTwofish;

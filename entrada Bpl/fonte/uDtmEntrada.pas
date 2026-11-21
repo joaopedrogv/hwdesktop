@@ -244,20 +244,36 @@ end;
 procedure TdtmEnt.verificaEstruturaBancoDeDados;
 begin
   try
-    if vDadosIni.vSistema = 'Fiscal' then
-    begin
-      if vDadosIni.vTipoConexao <> 'off' then
-        verificaEstruturaHwfdb;
-      verificaEstruturaHwFfdb;
-      verificaEstruturaFiscalfdb;
-    end
-    else
-    begin
-      verificaEstruturaHwfdb;
-      if vDadosIni.vTerminalFiscal = 'S' then
+    try
+      if vDadosIni.vSistema = 'Fiscal' then
+      begin
+        if vDadosIni.vTipoConexao <> 'off' then
+          verificaEstruturaHwfdb;
+        verificaEstruturaHwFfdb;
         verificaEstruturaFiscalfdb;
+      end
+      else
+      begin
+        verificaEstruturaHwfdb;
+        if vDadosIni.vTerminalFiscal = 'S' then
+          verificaEstruturaFiscalfdb;
+      end;
+    except
     end;
-  except
+  finally
+    try
+      qrTemp.Close;
+    except
+    end;
+    try
+      if transacaoTemp.InTransaction then
+        transacaoTemp.Rollback;
+    except
+    end;
+    try
+      bancoTemp.Connected := False;
+    except
+    end;
   end;
 end;
 

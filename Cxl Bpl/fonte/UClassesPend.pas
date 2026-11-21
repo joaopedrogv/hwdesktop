@@ -120,7 +120,6 @@ type
     function BaixarVeiculosCCIA(vtp: integer;vmtus: integer): boolean;
     function gerarnfVenda: boolean;
     function verificardiferenca: boolean;
-    function tentarSCAN: boolean;
     function InserirHistEstMoto: boolean;
     function AbrirComFat: boolean; overload;
     function AbrirComFat(pCodigo: Integer): boolean; overload;
@@ -2679,18 +2678,6 @@ begin
   Edit;
   if (dataSet.fieldbyname('num_nota_v').IsNull) then
   begin
-    if tentarSCAN then
-    begin
-     dataset.fieldbyname('NUM_NOTA_V').AsInteger := Gencodigo('NF_VENDASCAN', DtmBalcao.SpIncCodigoCxl, vDadosIni.codEmpresa);
-     dataset.FieldByName('SERIE').AsString := IntToStr(vDadosIni.vEmp.vNfe.serieScan);
-     dataset.FieldByName('SUB_SERIE').AsInteger := StrToIntDef(dataset.FieldByName('SERIE').AsString, 0);
-     dataset.FieldByName('MODELO_NF').AsString := vDadosIni.vEmp.vNfe.modeloNF;
-     dataSet.FieldByName('TIPONFE').AsString := 'SCAN';
-     if vDadosIni.vEmp.vVersaoVeiculos = '4' then
-      dataSet.FieldByName('EMISSAO_PROPRIA').AsString := 'S';
-    end
-    else
-    begin
      dataset.fieldbyname('NUM_NOTA_V').AsInteger := Gencodigo('NF_VENDA' + IfThen(vDadosIni.vEmp.vNfe.webServiceAmbiente <> 'Produção', '_HOM'),
                                                               DtmBalcao.SpIncCodigoCxl, vDadosIni.codEmpresa);
      vDadosIni.hw_registra_estatistica('NOTAFISCAL');
@@ -2699,7 +2686,6 @@ begin
      dataset.FieldByName('MODELO_NF').AsString := vDadosIni.vEmp.vNfe.modeloNF;
      if vDadosIni.vEmp.vVersaoVeiculos = '4' then
       dataSet.FieldByName('EMISSAO_PROPRIA').AsString := 'S';
-    end;
   end;
   post;
   apply;
@@ -2887,34 +2873,6 @@ begin
     '(op_cxl is null or op_cxl = 0 or op_cxl = ' + inttostr(vDadosIni.vcodopcxl) +
       ') and COD_EMPRESA = ' +
     vDadosIni.codEmpresa + ' AND ATIVO = 1 ');
-end;
-
-function TPendVeic.tentarSCAN: boolean;
-begin
-  Result := False;
-  Exit;
-  {
-  vDadosIni.atualizarVariaveisEmpresa(buscas);
-  if dataSet.FieldByName('num_nota_v').AsInteger = 0 then
-  begin
-//    if (dataSet.FieldByName('modelo_nf').AsString = '55') and
-    if (vDadosIni.vEmp.vNfe.modeloNF = '55') and
-       (vDadosIni.vEmp.vNfe.danfeFormaEmissao = 'SCAN') then
-    begin
-      Application.ProcessMessages;
-      Application.MessageBox(pchar('Configuração do SCAN ativada.'+#13+
-        'O Sistema irá verificar o Status do servidor SCAN na RFB'),
-        'Atenção',0+64);
-      //Usar metodo da dll para verificar o Status do servidor SCAN
-      if VerificaSCAN(StrToInt(vDadosIni.codEmpresa), pchar(vDadosIni.vBancoHW) ) = 107 then
-      begin
-        Application.ProcessMessages;
-        Result :=  Application.MessageBox(pchar('SCAN ativado pela SEFAZ de Origem'+#13+
-          'Deseja enviar nota fiscal pelo servidor SCAN na RFB?'),'Confirmação',MB_ICONQUESTION+MB_YESNO) = IDYES;
-      end;
-    end;
-  end;
-  }
 end;
 
 function TPendVeic.verificaEnvioNFVeic: boolean;

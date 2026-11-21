@@ -594,7 +594,6 @@ type
     function getAliqICMSST(vCst: string): Double;
     procedure verificaCodigosFornecedor;
     procedure abrirFormPagamento;
-    function tentarSCAN:boolean;
     function validarItensDevolvidos: boolean;
     function verificarPrecoCustoItens: Boolean;
     function validarConferenciaCompra: Boolean;
@@ -633,7 +632,6 @@ type
     constructor create; overload;
     constructor create(nPedVenda: integer; tipoPedVenda: string); overload;
     procedure cadNF(tipoForm: integer);
-    procedure cadNfpeloComando(nComando: integer);
     procedure cadNfpeloComandoAbreTela(nComando: integer;tipo:string);
     procedure cadNfpeloContratoAbreTela(nComando: integer; tipo: string);
     procedure cadNfpeloPedVenda(nPedVenda: integer; tipoPedVenda: string; abrirTela: boolean);
@@ -12760,82 +12758,6 @@ begin
   end;
 end;
 
-procedure TNFCab.cadNfpeloComando(nComando: integer);
-var
-  AsendMail, AcomBol: Boolean;
-begin
-  vDadosIni.vTipoForm := 2;
-  if dtmNF = nil then
-    dtmNF := TdtmNF.Create(dtmNF);
-  montaSelect('select * from notafiscal where n_comando = ' + IntToStr(nComando) +
-    ' and cod_empresa = ' + vDadosIni.CodEmpresa +
-    ' and natureza_nf = ''S'' and status <> ' + QuotedStr(stsCancelada) + ' and ativo = 1');
-  vsqlTemp := dataSet.CommandText;
-  try
-    if not dataSet.IsEmpty then
-    begin
-      if get_status = stsAberta then
-      begin
-        Edit;
-        //        vItem.selecionaItens(dataSet.FieldByName('cod_nf').AsInteger);
-        vItem.Edit;
-        salvaDadosVeiculo;
-        somaTotaisNF;
-        if not validaCabecalho then
-          exit;
-        salvaDadosDetalhesVeiculo;
-        if not Post then
-          Exit;
-        if not confirmaNF then
-          exit;
-        Application.MessageBox(pchar('Nota Fiscal Nº ' + dataSet.FieldByName('num_nf').AsString +
-          ' gerada com sucesso!'), 'Atenção', 0 + 64);
-      end
-      else
-      begin
-        if (get_situacao_nfe = sitAutorizada) then
-        begin
-          if GetVersaoNFe = vnf400 then
-            dllNFe.AutorizarNFe([get_cod_nf])
-          else
-            EnviarNFeHW('N', Pchar(vDadosIni.vBancoHW), strtoint(vDadosIni.CodEmpresa), '4.0',
-              dataSet.FieldByName('num_nf').AsInteger, 'NOTAFISCAL', '2',
-              Pchar(dataSet.FieldByName('SERIE').asstring), PCHAR(vDadosIni.vNomeUsuario));
-          Exit;
-        end;
-        AsendMail := True;
-        AcomBol := True;
-        enviarNotaFiscalEletronica(AsendMail, AcomBol);
-      end;
-      Exit;
-    end;
-    if not incluirNf( tnfVeiculos, 'V', 'S') then
-      exit;
-    vComFat.pesquisaComandoFaturamento(0, IntToStr(nComando), '  /  /    ', '  /  /    ');
-    if vComFat.dataSet.IsEmpty then
-      raise exception.create('Comando Nº ' + IntToStr(nComando) + ' não encontrado');
-    if vComFat.vItem.dataSet.IsEmpty then
-      raise exception.create('Não encontrado veículo para o Comando Nº ' + IntToStr(nComando));
-    if not adicionaVeiculoAnotaFiscal then
-      exit;
-    vItem.Edit;
-    salvaDadosVeiculo;
-    somaTotaisNF;
-    if not validaCabecalho then
-      exit;
-    salvaDadosDetalhesVeiculo;
-    if Post then
-      if confirmaNF then
-        Application.MessageBox(pchar('Nota Fiscal Nº ' + dataSet.FieldByName('num_nf').AsString +
-          ' gerada com sucesso!'), 'Atenção', 0 + 64);
-  except
-    on e: exception do begin
-      Application.MessageBox(pchar(e.Message), 'Atenção', 0 + 64);
-      registraErro('procedure cadNfpeloComando Erro: ' + e.Message);
-    end;
-  end;
-end;
-
 procedure TNFCab.cadNfpeloComandoAbreTela(nComando: integer;tipo:string);
 var
   vTempBoolean: Boolean;
@@ -14131,7 +14053,6 @@ end;
 
 function TNFCab.cancelarNotaFiscal(origem: TOrigemCancelamento): boolean;
 var
-  vTemp: string;
   buscas2: TIBQuery;
   vPrecCusProd: Currency;
   vPrecCusMProd: Currency;
@@ -14235,17 +14156,8 @@ begin
     (get_situacao_nfe <> sitCancelada) and
     (get_status <> stsCancelada) then
   begin
-    vTemp := 'N';
-    if dataSet.FieldByName('tipo_nf').AsString = 'V' then
-      vTemp := 'S';
-    if not EnviarNFeHW(PCHAR(vTemp), Pchar(vDadosIni.vBancoHW), strtoint(vDadosIni.CodEmpresa),
-      '4.0',
-      dataSet.FieldByName('num_nf').AsInteger, 'NOTAFISCAL', '3',
-      Pchar(dataSet.FieldByName('SERIE').AsString), PCHAR(vDadosIni.vNomeUsuario)) then
-    begin
-      ShowAtencao('Nota Fiscal não cancelada no Web Service');
-      exit;
-    end;
+    ShowAtencao('Nota Fiscal não cancelada no Web Service');
+    exit;
   end;
   try
     vListaAtualizarValorPedVenda := TStringList.Create;
@@ -15191,42 +15103,6 @@ begin
             buscas.Prepare;
             buscas.ExecSQL;
 
-            if vDadosIni.vDpto = 'ESTOQUE' then
-              vTemp := 'E'
-            else if vDadosIni.vDpto = 'OFICINA' then
-              vTemp := 'O'
-            else
-              vTemp := 'V';
-
-            {buscas.close;
-            buscas.SQL.Text := 'select nrecibo from recibos where ndocant = '+
-              dataSet.FieldByName('n_comando').AsString+
-              ' and deprec = '+QuotedStr(vTemp)+' and cod_empresa = '+vDadosIni.codEmpresa+
-              ' and ativo = 1 ';
-            buscas.Open;
-
-            buscas.First;
-            while not buscas.Eof do
-            begin
-              buscas2.close;
-              buscas2.SQL.Text := 'delete from hist_rec where nrecibo = ' +buscas.FieldByName('nrecibo').AsString+
-                ' and ndocant = ' + dataSet.FieldByName('n_comando').AsString+
-                ' and cod_empresa = '+vDadosIni.codEmpresa+' and ativo = 1 ';
-              buscas2.Prepare;
-              buscas2.ExecSQL;
-
-              buscas.Next;
-            end;
-
-            buscas2.close;
-            buscas2.SQL.Text := 'update recibos set STATUS_REC = '''','+
-              ' NDOCANT = 0, DATA_BAIXA = null where ndocant = '+
-              dataSet.FieldByName('n_comando').AsString+
-              ' and deprec = '+QuotedStr(vTemp)+' and cod_empresa = '+vDadosIni.codEmpresa+
-              ' and ativo = 1 ';
-            buscas2.Prepare;
-            buscas2.ExecSQL;   }
-
             if (vDadosIni.vEmp.vVersaoVeiculos <> '4') then
             begin
               buscas2.close;
@@ -15943,44 +15819,13 @@ begin
       vNumNFZero := True;
       if (dataSet.FieldByName('natureza_nf').AsString = 'S') then
       begin
-        {vTentarNoSCAN := tentarSCAN;
-        if (dataSet.FieldByName('modelo_nf').AsString = '55') and
-          (vDadosIni.vEmp.vNfe.danfeFormaEmissao = 'SCAN') then
-        begin
-          Application.ProcessMessages;
-          Application.MessageBox(pchar('Configuração do SCAN ativada.'+sLineBreak+
-            'O Sistema irá verificar o Status do servidor SCAN na RFB'),
-            'Atenção',0+64);
-
-          if 107 = 107 then
-          begin
-            Application.ProcessMessages;
-            Application.MessageBox(pchar('SCAN ativado pela SEFAZ de Origem'+sLineBreak+
-              'Deseja verificar servidor SCAN na RFB'
-
-              if not True then //Testar se o webserver esta ativo
-                vTentarNoSCAN := True;
-          end;
-        end;}
-        //        vTentarNoSCAN := True; //remover isso daqui, coloquei somente pra testar;
-        if tentarSCAN then
-        begin
-          dataSet.FieldByName('num_nf').AsInteger := Gencodigo('NF_VENDASCAN' + IfThen(vDadosIni.vEmp.vNfe.webServiceAmbiente <> 'Produção', '_HOM'),
-                                                               buscas, vDadosIni.codEmpresa);
-          vDadosIni.hw_registra_estatistica('NOTAFISCAL');
-          dataSet.FieldByName('serie').AsString := IntToStr(vDadosIni.vEmp.vNfe.serieScan);
-          dataSet.FieldByName('tiponfe').AsString := 'SCAN';
-        end
+        if dataSet.FieldByName('modelo_nf').AsString = vDadosIni.vEmp.vNfe.modeloNF then
+          dataSet.FieldByName('num_nf').AsInteger := Gencodigo('NF_VENDA' + IfThen(vDadosIni.vEmp.vNfe.webServiceAmbiente <> 'Produção', '_HOM'),
+                                                                buscas, vDadosIni.codEmpresa)
         else
-        begin
-          if dataSet.FieldByName('modelo_nf').AsString = vDadosIni.vEmp.vNfe.modeloNF then
-            dataSet.FieldByName('num_nf').AsInteger := Gencodigo('NF_VENDA' + IfThen(vDadosIni.vEmp.vNfe.webServiceAmbiente <> 'Produção', '_HOM'),
-                                                                 buscas, vDadosIni.codEmpresa)
-          else
-            dataSet.FieldByName('num_nf').AsInteger := Gencodigo('NF_VENDA_SERV' + IfThen(vDadosIni.vEmp.vNfe.webServiceAmbiente <> 'Produção', '_HOM'),
-                                                                 buscas, vDadosIni.codEmpresa);
-          vDadosIni.hw_registra_estatistica('NOTAFISCAL');
-        end;
+          dataSet.FieldByName('num_nf').AsInteger := Gencodigo('NF_VENDA_SERV' + IfThen(vDadosIni.vEmp.vNfe.webServiceAmbiente <> 'Produção', '_HOM'),
+                                                                buscas, vDadosIni.codEmpresa);
+        vDadosIni.hw_registra_estatistica('NOTAFISCAL');
       end;
     end;
 
@@ -16095,24 +15940,14 @@ begin
             begin
               dataSet.FieldByName('serie').AsString     := IntToStr(vDadosIni.vEmp.vSubSerieNotaFiscal);
               dataSet.FieldByName('modelo_nf').AsString := vDadosIni.vEmp.vNfe.modeloNF;
-              if tentarSCAN then
-              begin
-                dataSet.FieldByName('num_nf').AsInteger := Gencodigo('NF_VENDASCAN' + IfThen(vDadosIni.vEmp.vNfe.webServiceAmbiente <> 'Produção', '_HOM'),
-                                                                     buscas, vDadosIni.codEmpresa);
-                vDadosIni.hw_registra_estatistica('NOTAFISCAL');
-                dataSet.FieldByName('serie').AsString := IntToStr(vDadosIni.vEmp.vNfe.serieScan);
-                dataSet.FieldByName('tiponfe').AsString := 'SCAN';
-              end
+              
+              if dataSet.FieldByName('modelo_nf').AsString = vDadosIni.vEmp.vNfe.modeloNF then
+                dataSet.FieldByName('num_nf').AsInteger := Gencodigo('NF_VENDA' + IfThen(vDadosIni.vEmp.vNfe.webServiceAmbiente <> 'Produção', '_HOM'),
+                                                                      buscas, vDadosIni.codEmpresa)
               else
-              begin
-                if dataSet.FieldByName('modelo_nf').AsString = vDadosIni.vEmp.vNfe.modeloNF then
-                  dataSet.FieldByName('num_nf').AsInteger := Gencodigo('NF_VENDA' + IfThen(vDadosIni.vEmp.vNfe.webServiceAmbiente <> 'Produção', '_HOM'),
-                                                                       buscas, vDadosIni.codEmpresa)
-                else
-                  dataSet.FieldByName('num_nf').AsInteger := Gencodigo('NF_VENDA_SERV' + IfThen(vDadosIni.vEmp.vNfe.webServiceAmbiente <> 'Produção', '_HOM'),
-                                                                       buscas, vDadosIni.codEmpresa);
-                vDadosIni.hw_registra_estatistica('NOTAFISCAL');
-              end;
+                dataSet.FieldByName('num_nf').AsInteger := Gencodigo('NF_VENDA_SERV' + IfThen(vDadosIni.vEmp.vNfe.webServiceAmbiente <> 'Produção', '_HOM'),
+                                                                      buscas, vDadosIni.codEmpresa);
+              vDadosIni.hw_registra_estatistica('NOTAFISCAL');
 
               dataSet.FieldByName('data_contabil').AsDateTime := FDataDoDia;
               dataSet.FieldByName('hora_emissao').AsString := FormatDateTime('HH:MM:SS', Time);
@@ -22339,9 +22174,9 @@ begin
       Result := dllNFe.nfe_imprimir([get_cod_nf], True, False, '', '')
     else
     begin
-      EnviarNFeHW('N', Pchar(vDadosIni.vBancoHW), strtoint(vDadosIni.CodEmpresa), '4.0',
-        dataSet.FieldByName('num_nf').AsInteger, 'NOTAFISCAL', '2',
-        Pchar(dataSet.FieldByName('SERIE').asstring), PCHAR(vDadosIni.vNomeUsuario));
+      ShowAtencao('Nota fiscal muito antiga, utilize o módulo 3.1');
+      Result := False;
+      exit;
     end;
     _atualizarSituacaoPedidos('Finalizado', False, True);
     Exit;
@@ -28440,30 +28275,24 @@ begin
     (buscas.FieldByName('SITUACAO_NFE').AsString = sitCancelada) then
     Exit;
 
-  if GetVersaoNFe = vnf400 then
+  if GetVersaoNFe <> vnf400 then
   begin
-    AEnviarEPEC := (dataSet.FieldByName('nfe_tpemis').AsString = '4') and //epec
-                   (Trim(dataSet.FieldByName('nfe_dpec_nregdpec').AsString) = ''); // sem protocolo de autorizacao epec
-    if AEnviarEPEC then
-      if vDadosIni.ShowConfirmacao('Contingência DPEC/EPEC selecionada' + sLineBreak + sLineBreak +
-        'Evento EPEC será enviado' + sLineBreak +
-        'Após regularização da situação você deverá enviar a NFe para a SEFAZ Origem' + sLineBreak + sLineBreak +
-        'Confirma envio do envento?') <> ID_YES then
-      begin
-        Result := False;
-        Exit;
-      end;
-  end
-  else
-  begin
-    AEnviarEPEC := (vDadosIni.strIn(Trim(buscas.FieldByName('tiponfe').AsString), ['', 'DPEC'])) and
-                   (Trim(buscas.FieldByName('nfe_danfe_foremiss').AsString) = 'DPEC');
-
-    if AEnviarEPEC then
-      AEnviarEPEC := vDadosIni.ShowConfirmacao('Contingência DPEC/EPEC ativada' + sLineBreak + sLineBreak +
-        'Enviar Evento EPEC?' + sLineBreak +
-        'Após regularização da situação você deverá enviar a NFe para a SEFAZ Origem') = IDYES;
+    ShowAtencao('Nota fiscal muito antiga');
+    Result := False;
+    exit;
   end;
+
+  AEnviarEPEC := (dataSet.FieldByName('nfe_tpemis').AsString = '4') and //epec
+                  (Trim(dataSet.FieldByName('nfe_dpec_nregdpec').AsString) = ''); // sem protocolo de autorizacao epec
+  if AEnviarEPEC then
+    if vDadosIni.ShowConfirmacao('Contingência DPEC/EPEC selecionada' + sLineBreak + sLineBreak +
+      'Evento EPEC será enviado' + sLineBreak +
+      'Após regularização da situação você deverá enviar a NFe para a SEFAZ Origem' + sLineBreak + sLineBreak +
+      'Confirma envio do envento?') <> ID_YES then
+    begin
+      Result := False;
+      Exit;
+    end;
 
   if buscas.FieldByName('cnfe').AsInteger = 0 then
   begin
@@ -28499,31 +28328,20 @@ begin
       SetLength(FarrayOfcod_nf, 1);
       FarrayOfcod_nf[High(FarrayOfcod_nf)] := get_cod_nf;
 
-      if GetVersaoNFe = vnf400 then
+      if dllNFe.AutorizarNFe([get_cod_nf]) then
       begin
-        if dllNFe.AutorizarNFe([get_cod_nf]) then
-        begin
-          Result := True;
-          dupNFe.gerarBoletosPendentes(get_cod_nf);
-          if Aprint then
-            if not dllNFe.nfe_imprimir([get_cod_nf], Aprint, False, '', tipoDANFe) then
-              vDadosIni.ShowErro(dllNFe.retornoStr.Text);
-        end
-        else
-        begin
-          Result := False;
-          vDadosIni.ShowErro(dllNFe.retornoStr.Text);
-        end;
+        Result := True;
+        dupNFe.gerarBoletosPendentes(get_cod_nf);
+        if Aprint then
+          if not dllNFe.nfe_imprimir([get_cod_nf], Aprint, False, '', tipoDANFe) then
+            vDadosIni.ShowErro(dllNFe.retornoStr.Text);
       end
       else
       begin
-        vTemp := 'N';
-        if dataSet.FieldByName('tipo_nf').AsString = 'V' then
-          vTemp := 'S';
-        result := EnviarNFeHW(pchar(vTemp), Pchar(vDadosIni.vBancoHW), strtoint(vDadosIni.codEmpresa),
-          '4.0', dataSet.FieldByName('num_nf').AsInteger, 'NOTAFISCAL', '1',
-          Pchar(dataSet.FieldByName('SERIE').asstring), PCHAR(vDadosIni.vNomeUsuario));
+        Result := False;
+        vDadosIni.ShowErro(dllNFe.retornoStr.Text);
       end;
+
       buscas.Close;
       buscas.SQL.Text := 'select situacao_nfe, chave_nfe from notafiscal' +
         ' where cod_nf = ' + IntToStr(dataSet.FieldByName('cod_nf').AsInteger) +
@@ -32021,37 +31839,6 @@ begin
   end;
 end;
 
-function TNFCab.tentarSCAN: boolean;
-begin
-  Result := False;
-  Exit;
-  {
-  if ((dataSet.FieldByName('num_nf').AsInteger = 0) and (dataSet.FieldByName('natureza_nf').AsString = 'S')) or
-  ((dataSet.FieldByName('natureza_nf').AsString = 'E') and (dataSet.FieldByName('NUM_GERADO').AsString <> 'S')) then
-  begin
-    if (dataSet.FieldByName('emissao_propria').AsString = 'S') then
-    begin
-      vDadosIni.atualizarVariaveisEmpresa(buscas);
-      if (dataSet.FieldByName('modelo_nf').AsString = '55') and
-        (vDadosIni.vEmp.vNfe.danfeFormaEmissao = 'SCAN') then
-      begin
-        Application.ProcessMessages;
-        Application.MessageBox(pchar('Configuração do SCAN ativada.'+sLineBreak+
-          'O Sistema irá verificar o Status do servidor SCAN na RFB'),
-          'Atenção',0+64);
-        //Usar metodo da dll para verificar o Status do servidor SCAN
-        if VerificaSCAN(StrToInt(vDadosIni.codEmpresa), pchar(vDadosIni.vBancoHW) ) = 107 then
-        begin
-          Application.ProcessMessages;
-          Result :=  Application.MessageBox(pchar('SCAN ativado pela SEFAZ de Origem'+sLineBreak+
-            'Deseja enviar nota fiscal pelo servidor SCAN na RFB?'),'Confirmação',MB_ICONQUESTION+MB_YESNO) = IDYES;
-        end;
-      end;
-    end;
-  end;
-  }
-end;
-
 function TNFCab.TestarCSTPISCOFINS(vcst: string): boolean;
 begin
   Result := True;
@@ -35001,7 +34788,7 @@ begin
     on e: exception do begin
       Result := False;
       Application.MessageBox(pchar(e.Message), 'Atenção', 0 + 64);
-      registraErro('procedure cadNfpeloComando Erro: ' + e.Message);
+      registraErro('procedure verificaComandoIntegracao Erro: ' + e.Message);
     end;
   end;
 end;

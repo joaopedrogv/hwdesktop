@@ -2409,15 +2409,6 @@ object FrmAdmNfe: TFrmAdmNfe
     TabOrder = 10
     object TabSheet1: TTabSheet
       Caption = 'Opera'#231#245'es NF-e'
-      object btnStatusServ: TButton
-        Left = 3
-        Top = 46
-        Width = 132
-        Height = 28
-        Caption = '(F3) Status Servi'#231'o'
-        TabOrder = 0
-        OnClick = btnStatusServClick
-      end
       object btnConsultar: TButton
         Left = 147
         Top = 46
@@ -2432,25 +2423,14 @@ object FrmAdmNfe: TFrmAdmNfe
         TabOrder = 1
         OnClick = btnConsultarClick
       end
-      object btnInutilizar: TButton
-        Left = 285
-        Top = 44
-        Width = 132
-        Height = 28
-        Caption = '(F5) Inutilizar NFe'
-        Enabled = False
-        TabOrder = 2
-        Visible = False
-        OnClick = btnInutilizarClick
-      end
-      object btnCancNF: TButton
+      object btnContingenciaNF: TButton
         Left = 423
         Top = 44
         Width = 132
         Height = 28
         Caption = '(F6) Config. Conting'#234'ncia'
         TabOrder = 3
-        OnClick = btnCancNFClick
+        OnClick = btnContingenciaNFClick
       end
       object btnConsCad: TButton
         Left = 561
@@ -2461,24 +2441,6 @@ object FrmAdmNfe: TFrmAdmNfe
         TabOrder = 4
         OnClick = btnConsCadClick
       end
-      object btnImprimir: TButton
-        Left = 423
-        Top = 10
-        Width = 132
-        Height = 28
-        Caption = '(F8) Imprimir DANFE'
-        TabOrder = 5
-        OnClick = btnImprimirClick
-      end
-      object btnCriarEnviar: TButton
-        Left = 3
-        Top = 10
-        Width = 132
-        Height = 28
-        Caption = '(F2) Enviar NFe'
-        TabOrder = 6
-        OnClick = btnCriarEnviarClick
-      end
       object Button1: TButton
         Left = 147
         Top = 10
@@ -2487,15 +2449,6 @@ object FrmAdmNfe: TFrmAdmNfe
         Caption = '(F9)Consulta DPEC'
         TabOrder = 7
         OnClick = Button1Click
-      end
-      object Button3: TButton
-        Left = 285
-        Top = 10
-        Width = 132
-        Height = 28
-        Caption = '(F10)Cons. Recibo de Lote'
-        TabOrder = 8
-        OnClick = Button3Click
       end
     end
     object TabSheet2: TTabSheet

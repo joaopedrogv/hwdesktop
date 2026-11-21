@@ -8,7 +8,6 @@ uses
   System.Net.HttpClient, System.Net.HttpClientComponent, DFeDLLHeader{, EnterantHw};
 
 type
-  ArrayBi = array of array of shortstring;
   TfrmTestes_DFe = class(TForm)
     OpenDialog1: TOpenDialog;
     PageControl1: TPageControl;
@@ -52,7 +51,6 @@ type
     Button12: TButton;
     Button13: TButton;
     BitBtn3: TBitBtn;
-    BitBtn5: TBitBtn;
     Button4: TButton;
     BitBtn2: TBitBtn;
     Button6: TButton;
@@ -109,7 +107,6 @@ type
     Label8: TLabel;
     edEmpConf: TSpinEdit;
     edBancoConf: TComboBox;
-    BitBtn39: TBitBtn;
     edLogNFSeConfig: TMemo;
     TabSheet10: TTabSheet;
     BitBtn40: TBitBtn;
@@ -159,7 +156,6 @@ type
     procedure BitBtn8Click(Sender: TObject);
     procedure BitBtn7Click(Sender: TObject);
     procedure BitBtn6Click(Sender: TObject);
-    procedure BitBtn5Click(Sender: TObject);
     procedure BitBtn4Click(Sender: TObject);
     procedure BitBtn3Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -194,7 +190,6 @@ type
     procedure BitBtn36Click(Sender: TObject);
     procedure BitBtn37Click(Sender: TObject);
     procedure edBancoConfChange(Sender: TObject);
-    procedure BitBtn39Click(Sender: TObject);
     procedure BitBtn40Click(Sender: TObject);
     procedure BitBtn41Click(Sender: TObject);
     procedure BitBtn42Click(Sender: TObject);
@@ -224,33 +219,20 @@ type
     procedure DownloadProgress(Percent: Integer);
   end;
 
-//  function LerConfiguracao(certif, geral, webservice: array of shortstring;vescolhacert: Pchar): Pchar; stdcall; external 'HWNFe.dll';
 //
-//  function leCertificadoNFe: Pchar; stdcall; external 'HWNFe.dll';
 //
-//  function GeraNFe(hide, hemit, hDest, temVeic, veiculo, htotal: array of shortstring; detProd: ArrayBi; tipoOP: pchar; vnLote: Integer; tipoI_F: Integer;var resposta: Pchar;Ddup: ArrayBi;DTransp:array of shortstring): Pchar; stdcall; external 'HWNFe.dll';
 //
-//  function Status: Pchar; stdcall; external 'HWNFe.dll';
 //
 //  procedure StatusChange; external 'HWNFe.dll';
 //
-//  function ExecutarDLL(ttipo: pchar; Aux: Pchar; Just: Pchar;var resposta:Pchar;sisint: Pchar;NFTP: Pchar;codempresa: Pchar;vtipocons: Pchar;statusNFE: Pchar): Pchar; stdcall; external 'HWNFe.dll';
 //
-//  function InutilizarNFe(justificativa, cnpjemit, modelo, serie, ano, numeroinicial, numerofinal: pchar): Pchar; stdcall; external 'HWNFe.dll';
 //
 //  function VisualizaNFe(comveic,vendBanco: PChar;codempresa: integer;vversao: Pchar): longbool; stdcall; external 'HWNFe.dll';
 //
-//  function verificarStatusWeb: PChar;  stdcall; external 'HWNFe.dll';
 //
-//  function TerminaNFE: LongBool;stdcall;external 'HWNFe.dll';
 //
-//  function EnviarNFeHW(comveic,vendBanco: PChar;codempresa: integer;vversao: Pchar;vnumnf: integer;tipoNF: Pchar;tpop: Pchar;vsubserie:Pchar): longbool; stdcall;external 'HWNFe.dll';
-//function EnviarNFeHW(comveic: Pchar;vendBanco: PChar;codempresa: integer;vversao: Pchar;vnumnf: integer;tipoNF: Pchar;tpop: Pchar;vsubserie:Pchar;vusuario: Pchar): longbool; stdcall; external 'HWNFe.dll';
 // function ConsultaRFB(vChave: PChar;vusuario: Pchar): Pchar; stdcall;external 'hw.nfe.dx.dll';
  function ValidaChaveNFe(vchave: Pchar): longbool; stdcall;external 'hw.nfe.dx.dll';
- function GeraChaveNFe(codigo_uf: integer;cnf: integer;modelo: integer;
- serie: integer;nnf: integer;tpemi: integer;vdata: Pchar;cnpj: Pchar): Pchar; stdcall; external 'hw.nfe.dx.dll';
- function EnviarEvento(vendBanco: PChar; codempresa, idLote: integer; vusuario: Pchar;tpop: Pchar): longbool; stdcall; external 'hw.nfe.dx.dll';
  procedure closeallAuditoria ;stdcall; external 'auditoria.dll';
  function NFDestinadas(vendBanco: WideString; codempresa:integer; vusuario: WideString;indNFe,indemi: WideString;vtpultnsu: integer;vtpcons: integer;nsuespec: string): longbool; stdcall; external 'hw.nfe.dx.dll';
  function NFDownload(vendBanco: PChar; codempresa:integer; vusuario: Pchar;vchave: pchar): longbool; stdcall;external 'hw.nfe.dx.dll';
@@ -261,7 +243,6 @@ type
  function ImprimirEventoMDFE(vnmdfe: integer;codempresa: integer;vendBanco: PChar;vusuario: Pchar):LongBool;stdcall;external 'hw.nfe.dx.dll';
  function EnviarEmailMDFE(vnmdfe: integer;codempresa,vtpop: integer;vendBanco: PChar;vusuario: Pchar):LongBool;stdcall;external 'hw.nfe.dx.dll';
  function hw_LerXMLNFe(AListParams: WideString): WideString; stdcall; external 'hw.nfe.dx.dll';
- function EnviarEmailNFSe(vendBanco: WideString;codempresa: integer;vusuario: WideString; vos: integer; var AEnviarEmail, AEnviarBoleto, AImprimir: Boolean): LongBool; stdcall;external 'hw.nfe.dx.dll';
 // vtpop = 2 Email MDFe vtpop = 3 Email do Evento Anexado ao MDFe
 
   function EnviaOSNFSe_Silent(vendBanco: WideString;codempresa: integer;vusuario: WideString; vos: integer; var AEnviarEmail, AEnviarBoleto, AImprimir: Boolean): LongBool; stdcall; external 'hw.nfe.dx.dll';
@@ -435,20 +416,7 @@ begin
 end;
 
 procedure TfrmTestes_DFe.BitBtn1Click(Sender: TObject);
-var
- vnf: string;
 begin
-//VisualizaNFe('N','127.0.0.1:c:\clientes\motomol\Hwauto.gdb',1,'4.0');
-EnviarNFeHW('N','127.0.0.1:D:\Hw\Bases\precoce\Hwauto.fdb', 1, '4.0', 272, 'NOTAFISCAL','1','1','HW');
-//if (InputQuery('Enviar NF', 'N. NF', vnf)) then
-//  EnviarNFeHW('N','127.0.0.1:D:\Hw\Bases\producao\Hwauto.fdb', 1, '4.0', strtoint(vnf), 'NOTAFISCAL','1','20','HW');
-//  EnviarNFeHW('N','192.168.254.5:C:\BasesAuto\design\Hwauto.fdb', 1, '4.0', strtoint(vnf), 'NOTAFISCAL','1','1','HW');
-//  EnviarNFeHW('N','192.168.254.5:C:\BasesAuto\producao\Hwauto.fdb', 1, '4.0', strtoint(vnf), 'NOTAFISCAL','1','20','HW');
-//  EnviarNFeHW('N','192.168.254.11:d:\clientes\exemplo\novo\Hwauto.fdb',1,'4.0',strtoint(vnf),'NOTAFISCAL','1','2','HW');
-//  EnviarNFeHW('N','192.168.1.100:/bases/Hwauto.fdb',1,'4.0',strtoint(vnf),'NOTAFISCAL','1','3','HW');
-//EnviarNFeHW('N','192.168.254.11:d:\clientes\exemplo\Hwauto.fdb',1,'4.0',18390,'NOTAFISCAL','3','2','HW');
-//EnviarNFeHW('N','127.0.0.1:d:\clientes\motomol\Hwauto.fdb',1,'4.0',18234,'NF_VENDA','1','2');
-//EnviarNFeHW('N','linux:/bases/Hwauto.gdb',1,'4.0',495,'OUTRAS_NF','1','3');
 end;
 
 procedure TfrmTestes_DFe.BitBtn20Click(Sender: TObject);
@@ -725,12 +693,7 @@ begin
 end;
 
 procedure TfrmTestes_DFe.BitBtn2Click(Sender: TObject);
-var
- vchaveNF: string;
- vnf: string;
 begin
- if (InputQuery('Cancelar NF', 'N. NF', vnf)) then
-  EnviarNFeHW('N','127.0.0.1:D:\Hw\bases\producao\Hwauto.fdb',1,'4.0',strtoint(vnf),'NOTAFISCAL','3','20','HW');
 {   OpenDialog1.Title := 'Selecione a NFE';
    OpenDialog1.DefaultExt := '*-nfe.XML';
    OpenDialog1.Filter := 'Arquivos NFE (*-nfe.XML)|*-nfe.XML|Arquivos XML (*.XML)|*.XML|Todos os Arquivos (*.*)|*.*';
@@ -738,7 +701,6 @@ begin
    if OpenDialog1.Execute then
    vChaveNF:=extractfilename(opendialog1.filename);
 //   ConfiguracoesDLL;
-//   verificarStatusWeb;
    ACBrNFe1.NotasFiscais.Clear;
 //      try
 //       StrToInt('A');
@@ -754,7 +716,6 @@ begin
 //            Pchar(vcaminho + '\Validado\'+vAux), true);
    ACBrNFe1.NotasFiscais.clear;
 
-//   ExecutarDLL('Validar', pchar(vChaveNF),'',vresposta,'1','NF_VENDA','1','NORMAL','Autorizada');
  }
 end;
 
@@ -856,30 +817,6 @@ begin
 
   for var str in valores do
     memoNFe400.Lines.Add(str);
-end;
-
-procedure TfrmTestes_DFe.BitBtn39Click(Sender: TObject);
-var
-  db: WideString;
-begin
-  db := edBancoConf.Text;
-
-  var envEmail := false;
-  var impBol := false;
-  var imprimir := True;
-
-  try
-    var foi := EnviarEmailNFSe(db, edEmpConf.Value, 'HW', 2430, envEmail, impBol, imprimir);
-
-    edLogNFSeConfig.Lines.Add(IfThen(foi, 'Retorno True', 'Retorno False'));
-    edLogNFSeConfig.Lines.Add(IfThen(imprimir, 'Var Imprimir True', 'Var Imprimir False'));
-
-  except on E: Exception do
-    begin
-      edLogNFSeConfig.Lines.Add('-- Erro: ' + e.Message);
-      edLogNFSeConfig.Lines.Add('');
-    end;
-  end;
 end;
 
 procedure TfrmTestes_DFe.BitBtn3Click(Sender: TObject);
@@ -1071,11 +1008,6 @@ begin
 // if (InputQuery('Chave NFe', 'Entre com a Chave', vchave)) then
 //  vresp:=ConsultaRFB(Pchar(vchave),'HW');
  ShowMessage(vresp);
-end;
-
-procedure TfrmTestes_DFe.BitBtn5Click(Sender: TObject);
-begin
-  VerificaSCAN(1,'192.168.254.11:d:\clientes\exemplo\Hwauto.fdb');
 end;
 
 procedure TfrmTestes_DFe.BitBtn6Click(Sender: TObject);
@@ -1275,31 +1207,15 @@ end;
 
 
 procedure TfrmTestes_DFe.Button3Click(Sender: TObject);
-var
- vlote: string;
 begin
- if (InputQuery('Enviar Evento', 'N. LOTE', vlote)) then
- // QUANDO O ULTIMO PARAMETRO FOR 4 É PARA ENVIO DE ENVENTO DE MANIFESTACAO            
-//  EnviarEvento('127.0.0.1:C:\BasesAuto\fabvelas\Hwauto.fdb',1,strtoint(vlote),'HW','1');
-  EnviarEvento('127.0.0.1:D:\HW\bases\producao\Hwauto.fdb',1,strtoint(vlote),'HW','1');
- //   EnviarEvento('192.168.254.5:D:\Hw\bases\producao\Hwauto.fdb',1,strtoint(vlote),'HW','1');
- //  EnviarEvento('127.0.0.1:d:\clientes\exemplo\Hwauto.fdb',1,strtoint(vlote),'HW','1');
 end;
 
 procedure TfrmTestes_DFe.Button4Click(Sender: TObject);
-var
- vlote: string;
 begin
- if (InputQuery('Imprimir Evento', 'N. LOTE', vlote)) then
-  EnviarEvento('127.0.0.1:D:\Hw\bases\producao\Hwauto.fdb',1,strtoint(vlote),'HW','2');
 end;
 
 procedure TfrmTestes_DFe.Button5Click(Sender: TObject);
-var
- vlote: string;
 begin
- if (InputQuery('Enviar Evento por Email', 'N. LOTE', vlote)) then
-  EnviarEvento('127.0.0.1:D:\Hw\bases\producao\Hwauto.fdb',1,strtoint(vlote),'HW','3');
 end;
 
 procedure TfrmTestes_DFe.Button6Click(Sender: TObject);
@@ -1404,7 +1320,6 @@ end;
 
 procedure TfrmTestes_DFe.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-//destroyDLLNfe;
 
   RegistroWin.Write(Self.ClassName, 'edEmpresaNFSeX', edEmpresaNFSeX.Value);
 end;

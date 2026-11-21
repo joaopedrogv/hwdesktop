@@ -348,20 +348,6 @@ begin
   end;
 end;
 
-function nfe_anexos_csharp(CodigoNF: Integer; Params: WideString; var AResultado: WideString): Integer; stdcall;
-var
-  CodigosNF: array of Integer;
-begin
-  CodigosNF := [ CodigoNF ];
-
-  AResultado := nfe_anexos(CodigosNF, Params);
-
-  if string(AResultado).Substring(0,6) = 'ERROR|' then
-    Result := 0
-  else
-    Result := 1;
-end;
-
 function nfe_anexos_csharp_buffer(CodigoNF: Integer; Params: WideString; var AResultado: PAnsiChar; var AResultadoSize: Integer): Integer; stdcall;
 var
   CodigosNF: array of Integer;
@@ -456,7 +442,6 @@ exports
   nfe_evento_email,
   nfe_atualizar_valores_xml,
   nfe_anexos,
-  nfe_anexos_csharp,
   nfe_anexos_csharp_buffer,
   nfe_converter_em_contingencia,
   nfe_resolver_pendencia_sefaz,

@@ -416,20 +416,6 @@ begin
   end;
 end;
 
-function nfce_anexos_csharp(CodigoNF: Integer; Params: WideString; var AResultado: WideString): Integer; stdcall;
-var
-  CodigosNF: array of Integer;
-begin
-  CodigosNF := [ CodigoNF ];
-
-  AResultado := nfce_anexos(CodigosNF, params);
-
-  if string(AResultado).Substring(0,6) = 'ERROR|' then
-    Result := 0
-  else
-    Result := 1;
-end;
-
 function nfce_anexos_csharp_buffer(CodigoNF: Integer; Params: WideString; var AResultado: PAnsiChar; var AResultadoSize: Integer): Integer; stdcall;
 var
   CodigosNF: array of Integer;
@@ -480,7 +466,6 @@ exports
   nfce_print_list,
   nfce_abrir_gaveta,
   nfce_anexos,
-  nfce_anexos_csharp,
   nfce_anexos_csharp_buffer;
 
 begin

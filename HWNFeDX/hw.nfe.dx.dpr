@@ -35,7 +35,6 @@ uses
   ufrmStatus in 'ufrmStatus.pas' {frmStatus},
   uDataSet_OOP_DX in 'ArqsHw\uDataSet_OOP_DX.pas',
   UFuncoesDll in 'UFuncoesDll.pas',
-  UInutilizarNFE in 'ArqsHw\UInutilizarNFE.pas' {FrmInutilizarNFes},
   UPesPros in 'ArqsHw\UPesPros.pas' {FrmPesqPros},
   UConfcontingencia in 'ArqsHw\UConfcontingencia.pas' {FrmConfContingencia},
   UFormconsCad in 'ArqsHw\UFormconsCad.pas' {FrmConsCad},
@@ -476,10 +475,6 @@ uses
   LocalIncidenciaEnumUnit in '..\Modern\Fiscal.Calculos\Core\Domain\Entities\LocalIncidenciaEnumUnit.pas',
   IndicadorOpNbsClassificacaoEtdUnit in '..\Modern\Fiscal.Calculos\Core\Domain\Entities\IndicadorOpNbsClassificacaoEtdUnit.pas';
 
-type
-
-   ArrayBi = array of array of shortstring;
-
 {$R *.res}
 
 procedure CreateFormAdmNFe;
@@ -520,83 +515,6 @@ begin
     FrmAdmNfe.CadNfeVenda.CadEmpresa.dadosGNfe;
 
     FrmAdmNfe.ShowModal;
-
-  finally
-    ReleaseFormAdmNFe;
-  end;
-end;
-
-
-function EnviarNFeHW(comveic: WideString;vendBanco: WideString;codempresa: integer;vversao: WideString;vnumnf: integer;tipoNF: WideString;tpop: WideString;vsubserie:WideString;vusuario: WideString): longbool; stdcall;
-var
-  AAnexos: TStrings;
-  I: Integer;
-begin
-  Result := True;
-
-  CreateFormAdmNFe();
-  try
-    SetAttrFormAdmNFe(comveic, vendBanco, codempresa, vversao, vusuario);
-
-    if not FrmAdmNfe.CadNfeVenda.conectaBanco then
-      Exit;
-
-    FrmAdmNfe.CadNfeVenda.CadEmpresa.dadosGNfe;
-
-    with FrmAdmNfe do
-    begin
-      FrmAdmNfe.DBText2.DataField := 'CIDADE';
-      FrmAdmNfe.DBText1.DataField := 'NOME_CLIENTE';
-
-      CadNfevenda.pesquisaNF(vnumnf,codempresa,vsubserie);
-      CadNfevenda.marcaSel;
-
-      case StrToIntDef(tpop, -1) of
-        1 :
-          begin
-            CadNfeVenda.Imprimir := False;
-            CadNfeVenda.SendMail := False;
-            Result := enviaNFe;
-            if Result then
-            begin
-              CadNfeVenda.Imprimir := True;
-              Result := ImprimirNFe;
-            end;
-            {
-            if Result then
-            begin
-              if UFuncoesDll.ACBrNFe1.NotasFiscais.Count > 0 then
-              begin
-                CadNfeVenda.SendMail := True;
-
-                Aanexos := CadNfeVenda.getArquivosBoletoParaAnexos;
-
-                CadNfeVenda.enviaEmail(UFuncoesDll.ACBrNFe1, 1, 0, '0', AAnexos );
-
-                if Assigned(Aanexos) then
-                  for I := 0 to Aanexos.Count - 1  do
-                    DeleteFile(PWideChar(Aanexos[I]));
-              end;
-            end;
-            }
-          end;
-        2 :
-          begin
-            if (Trim(CadNfevenda.dataSet.FieldByName('situacao_nfe').AsString) = '') and
-               (Trim(CadNfevenda.dataSet.FieldByName('nfe_dpec_nregdpec').AsString) <> '') then
-            begin
-               leconfigNFE(CadNfevenda);
-               Result := CadNfevenda.cadCCe.ImprimirEventoEPEC(CadNfevenda.dataSet.FieldByName('cod_nf').AsInteger, codempresa, ACBrNFe1);
-            end
-            else
-              Result := ImprimirNFe;
-          end;
-        3 :
-          begin
-            Result := CancelarNFE;
-          end;
-      end;
-    end;
 
   finally
     ReleaseFormAdmNFe;
@@ -878,92 +796,6 @@ begin
 end;
 
 
-function EnviarEmailNFSe(vendBanco: WideString;codempresa: integer;vusuario: WideString; vos: integer; var AEnviarEmail, AEnviarBoleto, AImprimir: Boolean): LongBool; stdcall;
-var
-  Aret_SendMail: Boolean;
-  Aanexos: TStrings;
-  I: Integer;
-begin
-  Result := True;
-
-  CreateFormAdmNFSe();
-  try
-    SetAttrFormAdmNFSe(vendBanco, codempresa, vusuario);
-
-    if not FrmAdmNFSe.CadNFSe.conectaBanco then
-      Exit;
-
-    with FrmAdmNFSe.CadNFSe do
-    begin
-      SilentMode := True;
-      SendMail   := False;
-      SendBoleto := False;
-
-      CadEmpresa.dadosGNfe;
-      vercidadeNFSe;
-      vospesq := IntToStr(vos);
-
-      if pesqOsNFSe(vos) then
-      begin
-        iniciaNFSE;
-        nomecliente := dataSet.FieldByName('NOME_CLIENTE').AsString;
-//        Result := montarRPSEnv(dataSet.FieldByName('NPED').AsInteger, dataSet.FieldByName('ALIQ_ISS').AsInteger, '', 0);
-//        if not Result then
-//          Exit;
-      end
-      else
-        Exit(False);
-
-      Aret_SendMail := True;//controla se o email foi enviado com sucesso
-      SendMail   := AEnviarEmail;
-      SendBoleto := AEnviarBoleto;
-      Imprimir   := AImprimir;
-
-      if SendMail or SendBoleto or Imprimir then
-        dataSet.Refresh
-      else
-        Exit;
-
-      dataSet.First;
-      while not dataSet.Eof do
-      begin
-        var iRPS := dataSet.FieldByName('COD_RPS').AsInteger;
-        var iNF := dataSet.FieldByName('N_NF').AsLargeInt;
-        if (iRPS > 0)and (iNF > 0) then
-        begin
-          iniciaNFSE;
-          abrirRPSDireto;
-          nomecliente := dataSet.FieldByName('NOME_CLIENTE').AsString;
-
-          if AEnviarEmail then
-          begin
-            Aanexos := getArquivosBoletoParaAnexos;
-            enviaemailNFSe(3, AAnexos);
-            if Aret_SendMail then
-              Aret_SendMail := not ErrorSendEmail;
-
-            if Assigned(Aanexos) then
-              for I := 0 to Aanexos.Count - 1  do
-                DeleteFile(PWideChar(Aanexos[I]));
-          end;
-
-          if AImprimir then
-            imprimedireto(2);
-        end;
-
-        dataSet.Next;
-      end;
-
-      AEnviarEmail  := SendMail and Aret_SendMail;
-      AEnviarBoleto := SendBoleto;
-      AImprimir     := Imprimir;
-    end;
-
-  finally
-    ReleaseFormAdmNFSe;
-  end;
-end;
-
 function GerarPdfNFSe(parametros: WideString): WideString; stdcall;
 var
   Aanexos: TStrings;
@@ -1097,46 +929,31 @@ begin
     FrmAdmNfe.CadNfeVenda.CadEmpresa.dadosGNfe;
 
     case StrToIntDef(tpop, -1) of
-      1 : // Enviar Evento
-        begin
-          Result := FrmAdmNfe.enviaEvento(idlote);
-        end;
-      2 : // Imprimir Evento
-        begin
-          with FrmAdmNfe do
-          begin
-            CadNfevenda.cadCCe.buscaEvento(idLote,codempresa);
-            CadNfevenda.pesquisaNF(strtoint(CadNfevenda.cadCCe.vnumnf),codempresa,CadNfevenda.cadCCe.vserie);
-
-             if (Trim(CadNfevenda.cadCCe.dataSet.FieldByName('tipo_evento').AsString) = 'EPE') then
-             begin
-               leconfigNFE(CadNfevenda);
-               Result := CadNfevenda.cadCCe.ImprimirEventoEPEC(CadNfevenda.dataSet.FieldByName('cod_nf').AsInteger, codempresa, ACBrNFe1);
-             end
-             else
-               Result := ImprimirEvento(CadNfevenda.cadCCe.codigoEvento);
-          end;
-        end;
-      3 : // Enviar email para o cliente do evento...
-        begin
-          with FrmAdmNfe do
-          begin
-            CadNfevenda.cadCCe.buscaEvento(idLote,codempresa);
-            CadNfevenda.pesquisaNF(strtoint(CadNfevenda.cadCCe.vnumnf),codempresa,CadNfevenda.cadCCe.vserie);
-            enviaEventoEmail(CadNfevenda.cadCCe.codigoEvento);
-          end;
-        end;
       4 : // Quando for 4 será envio de evento para nfdestinadas
         begin
           with FrmAdmNfe do
           begin
-            if CadNfevenda.buscaNFDestinada(idLote, codempresa, '') then
-              Result := enviaeventoNFeDestinadas(idLote)
-            else
-              Result := false;
-            CadNfevenda.datasetnfdest.Close;
+            try try
+              if CadNfevenda.buscaNFDestinada(idLote, codempresa, '') then
+                Result := enviaeventoNFeDestinadas(idLote)
+              else
+                Result := false;              
+            except
+              on E: Exception do
+              begin
+                Result := False;
+                Application.MessageBox(
+                    PWideChar(Format('Erro de evento manifestação: %s', [E.Message])), 'Erro', MB_ICONERROR or MB_OK
+                );
+              end;
+            end;
+            finally
+              CadNfevenda.datasetnfdest.Close;
+            end;
           end;
         end;
+      else
+        Result := False;
     end;
   finally
     ReleaseFormAdmNFe;
@@ -1360,20 +1177,6 @@ begin
   end;
 end;
 
-function hw_LerXMLNFeSaida(AListParams: WideString): WideString; stdcall;
-var
-  ANFe: TClassNfVenda;
-begin
-  DtmNFEHW := TDtmNFEHW.create(nil);
-  ANFe := TClassNfVenda.create;
-  try
-    Result := ANFe.AddNFeInDBFromXMLSaida(AListParams);
-  finally
-    FreeAndNil(ANFe);
-    FreeAndNil(DtmNFEHW);
-  end;
-end;
-
 function nfse_get_regime_especial_trib(vendBanco: WideString; codempresa: integer): WideString; stdcall;
 begin
   DtmNFEHW := TDtmNFEHW.create(nil);
@@ -1416,14 +1219,12 @@ end;
 
 exports
    VisualizaNFe,
-   EnviarNFeHW,
    ConsultaSefazOr,
    ConsNFEDLL,
    EnviarEmailNFe,
    VisualizaNFSe,
    EnviaOSNFSe,
    EnviaOSNFSe_Silent,
-   EnviarEmailNFSe,
    GerarPdfNFSe,
    ValidaChaveNFe,
    EnviarEvento,
@@ -1431,7 +1232,6 @@ exports
    NFDownload,
    SendMailByACBr,
    hw_LerXMLNFe,
-   hw_LerXMLNFeSaida,
    nfse_get_regime_especial_trib,
    ConsisteInscricaoEstadual;
 

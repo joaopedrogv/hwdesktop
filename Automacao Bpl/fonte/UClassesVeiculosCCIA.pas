@@ -673,7 +673,6 @@ type
     function MontarNFe(pNumComando: Integer; pTipo, pNatureza: string): boolean;
     function vervalorminimo: boolean;
     function checarCombinacaoCFOPCST: boolean;
-    function tentarSCAN: boolean;
     function testarCNPJ(var pMensagem: string): boolean;
     procedure AtualizarVeiculos(buscas2: TIBQuery);
     function abreTipoVendas(vcomb: TDbCombobox): boolean;
@@ -7650,26 +7649,10 @@ begin
           end;
         end;
      end;
-
-  //  if (trim(dataSet.FieldByName('MODELO_NF').AsString) = '55') and (trim(dataSet.FieldByName('SITUACAO_NFE').AsString) <> 'Inutilizada') and
-  //    (trim(dataSet.FieldByName('SITUACAO_NFE').AsString) <> 'Cancelada') then
-  //  begin
-  //    if not ((dataSet.FieldByName('CONFUS').AsString = 'S') and (dataSet.FieldByName('NUM_NOTA_V').IsNull)) then
-  //    begin
-  //      if not EnviarNFeHW('N', Pchar(vDadosIni.vBancoHW),strtoint(vDadosIni.CodEmpresa),'4.0', dataSet.FieldByName('NUM_NOTA_V').AsInteger,'COM_FAT','3',
-  //       Pchar(dataSet.FieldByName('SUB_SERIE').AsString), Pchar(vDadosIni.vNomeUsuario)) then
-  //      begin
-  //        Application.MessageBox('Nota Fiscal não cancelada no Web Service', 'Informação', MB_OK + MB_ICONINFORMATION +
-  //          MB_DEFBUTTON1);
-  //        exit;
-  //        end;
-  //    end;
-  //  end;
   finally
      if (dataSet.State in [dsInsert, dsEdit]) then
        dataSet.Cancel;
   end;
-
 end;
 
 function TComFat.ExisteEquipamento: Integer;
@@ -7815,17 +7798,6 @@ begin
     and (trim(dataset.FieldByName('NATUREZA').AsString) = 'S')
     and (dataSet.fieldbyname('NUM_NOTA_V').IsNull) then
   begin
-    if tentarSCAN then
-    begin
-      dataset.fieldbyname('NUM_NOTA_V').AsInteger := Gencodigo('NF_VENDASCAN', DtmVeiculosCCIA.SpIncCodigoV, vDadosIni.codEmpresa);
-      dataset.FieldByName('SERIE').AsString := IntToStr(vDadosIni.vEmp.vNfe.serieScan);
-      dataset.FieldByName('SUB_SERIE').AsInteger := StrToIntDef(dataset.FieldByName('SERIE').AsString, 0);
-      dataset.FieldByName('MODELO_NF').AsString := vDadosIni.vEmp.vNfe.modeloNF;
-      dataSet.FieldByName('TIPONFE').AsString := 'SCAN';
-      dataSet.FieldByName('EMISSAO_PROPRIA').AsString := 'S';
-    end
-    else
-    begin
      dataset.fieldbyname('NUM_NOTA_V').AsInteger := Gencodigo('NF_VENDA' + IfThen(vDadosIni.vEmp.vNfe.webServiceAmbiente <> 'Produção', '_HOM'),
                                                               DtmVeiculosCCIA.SpIncCodigoV, vDadosIni.codEmpresa);
      vDadosIni.hw_registra_estatistica('NOTAFISCAL');
@@ -7833,7 +7805,6 @@ begin
      dataset.FieldByName('SUB_SERIE').AsInteger := StrToIntDef(dataset.FieldByName('SERIE').AsString, 0);
      dataset.FieldByName('MODELO_NF').AsString := vDadosIni.vEmp.vNfe.modeloNF;
      dataSet.FieldByName('EMISSAO_PROPRIA').AsString := 'S';
-    end;
   end;
   dataSet.post;
 
@@ -8901,34 +8872,6 @@ begin
   if (Trim(vDadosIni.vEmp.vMensagem) <> '')
   	and (pos(Trim(vDadosIni.vEmp.vMensagem),Trim(frmMovVeiculosCCIA.DBMemo7.Lines.Text)) = 0) then
        frmMovVeiculosCCIA.DBMemo7.Lines.Text := trim(vDadosIni.vEmp.vMensagem) + #13 + frmMovVeiculosCCIA.DBMemo7.Lines.Text;
-end;
-
-function TComFat.tentarSCAN: boolean;
-begin
- Result := False;
- Exit;
- {
- if dataSet.FieldByName('NUM_NOTA_V').AsInteger = 0 then
- begin
-//    if (dataSet.FieldByName('MODELO_NF').AsString = '55') and
-   if (vDadosIni.vEmp.vNfe.modeloNF = '55') and
-     (vDadosIni.vEmp.vNfe.danfeFormaEmissao = 'SCAN') then
-   begin
-     Application.ProcessMessages;
-     Application.MessageBox(pchar('Configuração do SCAN ativada.'+#13+
-       'O Sistema irá verificar o Status do servidor SCAN na RFB'),
-       'Atenção',0+64);
-     //Usar metodo da dll para verificar o Status do servidor SCAN
-     if VerificaSCAN(strtoint(vDadosIni.codEmpresa), pchar(vDadosIni.vBancoHW)) = 107 then
-//      if VerificaSCAN(strtoint(FRMprincipal.CodEmpresa), Pchar(trim(AliasAutom)) = 107 then
-     begin
-       Application.ProcessMessages;
-       Result :=  Application.MessageBox(pchar('SCAN ativado pela SEFAZ de Origem'+#13+
-         'Deseja enviar nota fiscal pelo servidor SCAN na RFB?'),'Confirmação',MB_ICONQUESTION+MB_YESNO) = IDYES;
-     end;
-   end;
- end;
- }
 end;
 
 function TComFat.testarCNPJ(var pMensagem: string): boolean;
