@@ -46,6 +46,7 @@ uses
   Test_ResolverRegraFiscalIbsCbsService in 'Domain\Services\Test_ResolverRegraFiscalIbsCbsService.pas',
   Test_SalvarOperacaoFiscalIbsCbsUseCase in 'Application\UseCases\Test_SalvarOperacaoFiscalIbsCbsUseCase.pas',
   Test_CalcularTributosNFSeService in 'Application\Services\Test_CalcularTributosNFSeService.pas',
+  Test_ValidadorItemEventoDFe211130 in 'Application\Services\Test_ValidadorItemEventoDFe211130.pas',
   ObterProximoSeqIdEventoDFeUseCaseUnit in '..\..\ERP.Features\Core\Application\UseCases\EventosDFe\ObterProximoSeqIdEventoDFeUseCaseUnit.pas',
   SalvarEventoDFe112150UseCaseUnit in '..\..\ERP.Features\Core\Application\UseCases\EventosDFe\SalvarEventoDFe112150UseCaseUnit.pas',
   ObterEventoDFe112150PorIdUseCaseUnit in '..\..\ERP.Features\Core\Application\UseCases\EventosDFe\ObterEventoDFe112150PorIdUseCaseUnit.pas',

@@ -46,7 +46,13 @@ type
     procedure DeveNormalizarOrdemETrimSemRemoverItens;
 
     [Test]
+    procedure DevePreservarIdNaNormalizacao;
+
+    [Test]
     procedure DeveCompararItensNormalizados;
+
+    [Test]
+    procedure DeveRejeitarItensComMesmoConteudoEIdDiferente;
 
     [Test]
     procedure DeveIdentificarNItemNaMensagem;
@@ -57,11 +63,16 @@ implementation
 uses
   SysUtils;
 
+function IdDoItem(ANItem: Integer): string;
+begin
+  Result := Format('ITEM-%d', [ANItem]);
+end;
+
 function Item(ANItem: Integer; const AVIbs, AVCbs, AQImobilizado: Currency;
   const AUImobilizado: string): EventoDFe211130ItemEtd;
 begin
   Result := EventoDFe211130ItemEtd.Create(
-    ANItem, AVIbs, AVCbs, AQImobilizado, AUImobilizado);
+    IdDoItem(ANItem), ANItem, AVIbs, AVCbs, AQImobilizado, AUImobilizado);
 end;
 
 function ItemValido(ANItem: Integer): EventoDFe211130ItemEtd;
@@ -203,6 +214,19 @@ begin
   Assert.AreEqual('CX', Normalizado[1].UImobilizado);
 end;
 
+procedure TTestEventoDFe211130Itens.DevePreservarIdNaNormalizacao;
+var
+  Normalizado: EventoDFe211130ItemEtdArray;
+begin
+  Normalizado := EventoDFe211130Itens.Normalizar(Itens([
+    Item(2, 1, 2, 10, 'CX'),
+    Item(1, 3, 4, 5, 'UN')
+  ]));
+
+  Assert.AreEqual(IdDoItem(1), Normalizado[0].Id);
+  Assert.AreEqual(IdDoItem(2), Normalizado[1].Id);
+end;
+
 procedure TTestEventoDFe211130Itens.DeveCompararItensNormalizados;
 begin
   Assert.IsTrue(EventoDFe211130Itens.Iguais(
@@ -212,6 +236,13 @@ begin
   Assert.IsFalse(EventoDFe211130Itens.Iguais(
     Itens([ItemValido(1)]),
     Itens([ItemValido(2)])));
+end;
+
+procedure TTestEventoDFe211130Itens.DeveRejeitarItensComMesmoConteudoEIdDiferente;
+begin
+  Assert.IsFalse(EventoDFe211130Itens.Iguais(
+    Itens([EventoDFe211130ItemEtd.Create('ITEM-A', 1, 1, 2, 10, 'UN')]),
+    Itens([EventoDFe211130ItemEtd.Create('ITEM-B', 1, 1, 2, 10, 'UN')])));
 end;
 
 procedure TTestEventoDFe211130Itens.DeveIdentificarNItemNaMensagem;

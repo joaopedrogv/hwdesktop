@@ -21,6 +21,7 @@ type
     FCriarEditorAba: TCriarEditorCadastroComandos;
     procedure ConfigurarCriacaoEditor(const ACriarEditor: TCriarEditorCadastroComandos);
     function EditorDisponivel(ATipo: TipoEventoDFe): Boolean;
+    function PrepararRestauracao(const AEditor: TWinControl; const AId: string): Boolean;
   protected
     procedure ApresentadorAssociado(APresenter: TPresenterConsultaBase;
       const ADefinition: INextQueryDefinitionBase); override;
@@ -45,17 +46,11 @@ implementation
 {$R *.dfm}
 
 uses
-  EventoDFe112150CadastroFrame, SelecaoEventoDFeForm, StatusRegistroEnumUnit;
+  CadastroEditorFrame, EventoDFeCadastroRestauracao, SelecaoEventoDFeForm,
+  StatusRegistroEnumUnit;
 
 const
   MissingEditorFactoryMessage = 'A criação do editor de Eventos DF-e não foi informada.';
-
-// Somente os tipos com editor implementado entram na inclusão; a consulta continua apresentando os demais.
-function TiposDisponiveis: TipoEventoDFeArray;
-begin
-  SetLength(Result, 1);
-  Result[0] := teAtualizacaoPrevisaoEntrega;
-end;
 
 procedure TfrmEventosDFe.ConfigurarTela(const ADefinition: INextQueryDefinition<TEventoDFeSelecionado>;
   const APresenter: TEventosDFePresenter; const APreferences: ILocalPreferences;
@@ -146,10 +141,19 @@ end;
 
 function TfrmEventosDFe.EditorDisponivel(ATipo: TipoEventoDFe): Boolean;
 begin
-  Result := ATipo = teAtualizacaoPrevisaoEntrega;
+  Result := TipoEventoDFeSuportado(TipoEventoDFeCodigo(ATipo));
   if not Result then
     ShowWarning(Format('O editor do evento %d ainda não está disponível.',
       [TipoEventoDFeCodigo(ATipo)]));
+end;
+
+function TfrmEventosDFe.PrepararRestauracao(const AEditor: TWinControl;
+  const AId: string): Boolean;
+var
+  Restauracao: IEventoDFeCadastroRestauracao;
+begin
+  Result := Supports(AEditor, IEventoDFeCadastroRestauracao, Restauracao) and
+    Restauracao.PrepararAbaRestauracao(AId);
 end;
 
 function TfrmEventosDFe.SelecionarTipoEvento(out ATipo: TipoEventoDFe): Boolean;
@@ -160,7 +164,7 @@ begin
 
   Modal := TfrmSelecaoEventoDFe.Create(Self);
   try
-    Modal.Configurar(TiposDisponiveis);
+    Modal.Configurar(TipoEventoDFeOpcoes);
     if Modal.ShowModal <> mrOk then
       Exit;
 
@@ -188,7 +192,7 @@ begin
   Result := AbrirAba(AChave, ATitulo,
     procedure(AEditor: TWinControl)
     begin
-      if TfrmEventoDFe112150CadastroFrame(AEditor).PrepararAbaInclusao then
+      if TfrmCadastroEditor(AEditor).PrepararAbaInclusao then
         Exit;
       PreparacaoFalhou := True;
       // Abort interrompe a montagem; a base descarta a aba parcial sem mensagem.
@@ -227,10 +231,10 @@ begin
     begin
       if AModo = meRestauracao then
       begin
-        if TfrmEventoDFe112150CadastroFrame(AEditor).PrepararAbaRestauracao(ASelecao.Id) then
+        if PrepararRestauracao(AEditor, ASelecao.Id) then
           Exit;
       end
-      else if TfrmEventoDFe112150CadastroFrame(AEditor).PrepararAbaAlteracao(ASelecao.Id) then
+      else if TfrmCadastroEditor(AEditor).PrepararAbaAlteracao(ASelecao.Id) then
         Exit;
 
       PreparacaoFalhou := True;

@@ -36,7 +36,8 @@ uses
   IEventoDFe211130RepositoryUnit, EventoDFe211130RepositoryUnit,
   SalvarEventoDFe112150UseCaseUnit, ObterEventoDFe112150PorIdUseCaseUnit,
   SalvarEventoDFe211130UseCaseUnit, ObterEventoDFe211130PorIdUseCaseUnit,
-  RemoverEventoDFeUseCaseUnit, ObterProximoSeqIdEventoDFeUseCaseUnit;
+  RemoverEventoDFeUseCaseUnit, ObterProximoSeqIdEventoDFeUseCaseUnit,
+  ValidadorItemEventoDFe211130Unit;
 
 procedure RegisterNextFeatures(const AContainer: TContainer);
 begin
@@ -101,6 +102,9 @@ begin
   AContainer.RegisterType<ObterEventoDFe211130PorIdUseCase>.AsSingleton;
   AContainer.RegisterType<IRemoverEventoDFeUseCase, RemoverEventoDFeUseCase>.AsTransient;
   AContainer.RegisterType<IObterProximoSeqIdEventoDFeUseCase, ObterProximoSeqIdEventoDFeUseCase>.AsTransient;
+
+  // A validacao do item nao guarda estado; a instancia transiente e entregue a fabrica do editor.
+  AContainer.RegisterType<IValidadorItemEventoDFe211130, ValidadorItemEventoDFe211130>.AsTransient;
 end;
 
 end.

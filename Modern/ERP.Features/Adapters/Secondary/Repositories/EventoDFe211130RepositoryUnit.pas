@@ -48,7 +48,8 @@ begin
   SetLength(Parametros, Length(AItens));
 
   for I := 0 to High(AItens) do
-    Parametros[I] := ParametersBuilder.Create(6)
+    Parametros[I] := ParametersBuilder.Create(7)
+      .ByName('ID', AItens[I].Id)
       .ByName('EVENTO_DFE_ID', AEventoId)
       .ByName('NITEM', AItens[I].NItem)
       .ByNameC('VIBS', AItens[I].VIbs)
@@ -59,9 +60,9 @@ begin
 
   FConnection.ExecuteBatch(
     'INSERT INTO EVENTOS_DFE_211130_ITEM ' +
-    ' (EVENTO_DFE_ID, NITEM, VIBS, VCBS, QIMOBILIZADO, UIMOBILIZADO) ' +
+    ' (ID, EVENTO_DFE_ID, NITEM, VIBS, VCBS, QIMOBILIZADO, UIMOBILIZADO) ' +
     ' VALUES ' +
-    ' (:EVENTO_DFE_ID, :NITEM, :VIBS, :VCBS, :QIMOBILIZADO, :UIMOBILIZADO)',
+    ' (:ID, :EVENTO_DFE_ID, :NITEM, :VIBS, :VCBS, :QIMOBILIZADO, :UIMOBILIZADO)',
     Parametros
   );
 end;
@@ -75,7 +76,7 @@ begin
   SetLength(Result, 0);
 
   Q := FConnection.CreateQuery(
-    'SELECT NITEM, VIBS, VCBS, QIMOBILIZADO, UIMOBILIZADO ' +
+    'SELECT ID, NITEM, VIBS, VCBS, QIMOBILIZADO, UIMOBILIZADO ' +
     ' FROM EVENTOS_DFE_211130_ITEM ' +
     ' WHERE EVENTO_DFE_ID = :EVENTO_DFE_ID ' +
     ' ORDER BY NITEM',
@@ -90,6 +91,7 @@ begin
     begin
       SetLength(Result, Quantidade + 1);
       Result[Quantidade] := EventoDFe211130ItemEtd.Create(
+        Q.FieldAsString('ID'),
         Q.FieldAsInteger('NITEM'),
         Q.FieldAsCurrency('VIBS'),
         Q.FieldAsCurrency('VCBS'),

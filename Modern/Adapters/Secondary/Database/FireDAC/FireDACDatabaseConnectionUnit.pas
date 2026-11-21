@@ -65,7 +65,7 @@ type
 implementation
 
 uses
-  SysUtils, StrUtils, DB, Variants,
+  SysUtils, StrUtils, DB, Variants, Data.FmtBcd,
   FireDACTransactionUnit,
   FireDAC.Stan.Param,
   FireDAC.Stan.Option,
@@ -267,7 +267,14 @@ begin
       ptInt64:
         qParam.AsLargeInt := Params[I].AsInt64;
       ptCurrency:
-        qParam.AsCurrency := Params[I].AsCurrency;
+        case qParam.DataType of
+          ftFMTBcd:
+            qParam.AsFMTBCD := CurrencyToBcd(Params[I].AsCurrency);
+          ftBCD:
+            qParam.AsBCD := Params[I].AsCurrency;
+        else
+          qParam.AsCurrency := Params[I].AsCurrency;
+        end;
       ptDouble:
         qParam.AsFloat := Params[I].AsDouble;
       ptString:

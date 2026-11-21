@@ -83,10 +83,15 @@ uses
 const
   CHAVE_INTEGRACAO = '11111111111111111111111111111111111111111111';
   DATA_PREVISAO = 45000;
+  ID_ITEM_1 = '00000000-0000-0000-0000-000000000001';
+  ID_ITEM_2 = '00000000-0000-0000-0000-000000000002';
+  ID_ITEM_5 = '00000000-0000-0000-0000-000000000005';
+  ID_ITEM_INVALIDO = '00000000-0000-0000-0000-000000000000';
 
-function Item(ANItem: Integer; const AUImobilizado: string): EventoDFe211130ItemEtd;
+function Item(const AId: string; ANItem: Integer;
+  const AUImobilizado: string): EventoDFe211130ItemEtd;
 begin
-  Result := EventoDFe211130ItemEtd.Create(ANItem, 1, 2, 10, AUImobilizado);
+  Result := EventoDFe211130ItemEtd.Create(AId, ANItem, 1, 2, 10, AUImobilizado);
 end;
 
 function Itens(const AItens: array of EventoDFe211130ItemEtd):
@@ -329,12 +334,14 @@ var
   Criado: EventoDFeEtd;
   ItensLidos: EventoDFe211130ItemEtdArray;
 begin
-  Criado := CriarEvento211130(Itens([Item(2, 'CX'), Item(1, 'UN')]));
+  Criado := CriarEvento211130(Itens([Item(ID_ITEM_2, 2, 'CX'), Item(ID_ITEM_1, 1, 'UN')]));
   try
     ItensLidos := FRepo211130.ObterItens(Criado.Id);
 
     Assert.AreEqual(2, Length(ItensLidos));
+    Assert.AreEqual(ID_ITEM_1, ItensLidos[0].Id);
     Assert.AreEqual(1, ItensLidos[0].NItem);
+    Assert.AreEqual(ID_ITEM_2, ItensLidos[1].Id);
     Assert.AreEqual(2, ItensLidos[1].NItem);
     Assert.AreEqual(2, ContarItens(Criado.Id));
   finally
@@ -348,12 +355,12 @@ var
   Transacao: ITransaction;
   ItensLidos: EventoDFe211130ItemEtdArray;
 begin
-  Criado := CriarEvento211130(Itens([Item(1, 'UN'), Item(2, 'CX')]));
+  Criado := CriarEvento211130(Itens([Item(ID_ITEM_1, 1, 'UN'), Item(ID_ITEM_2, 2, 'CX')]));
   try
     Transacao := FConnection.BeginTransaction();
     try
       try
-        FRepo211130.SubstituirItens(Criado.Id, Itens([Item(5, 'KG')]));
+        FRepo211130.SubstituirItens(Criado.Id, Itens([Item(ID_ITEM_5, 5, 'KG')]));
         Transacao.Commit();
       except
         Transacao.Rollback();
@@ -366,6 +373,7 @@ begin
     ItensLidos := FRepo211130.ObterItens(Criado.Id);
 
     Assert.AreEqual(1, Length(ItensLidos));
+    Assert.AreEqual(ID_ITEM_5, ItensLidos[0].Id);
     Assert.AreEqual(5, ItensLidos[0].NItem);
     Assert.AreEqual('KG', ItensLidos[0].UImobilizado);
     Assert.AreEqual(1, ContarItens(Criado.Id));
@@ -497,7 +505,7 @@ begin
       Header := InserirBase(teImobilizacaoItem);
       try
         Id := Header.Id;
-        FRepo211130.SubstituirItens(Id, Itens([Item(0, 'UN')]));
+        FRepo211130.SubstituirItens(Id, Itens([Item(ID_ITEM_INVALIDO, 0, 'UN')]));
       finally
         Header.Free;
       end;
@@ -529,7 +537,7 @@ var
   Transacao: ITransaction;
   DataPrevisao: TDate;
 begin
-  Criado := CriarEvento211130(Itens([Item(1, 'UN'), Item(2, 'CX')]));
+  Criado := CriarEvento211130(Itens([Item(ID_ITEM_1, 1, 'UN'), Item(ID_ITEM_2, 2, 'CX')]));
   try
     Assert.AreEqual(2, ContarItens(Criado.Id));
 

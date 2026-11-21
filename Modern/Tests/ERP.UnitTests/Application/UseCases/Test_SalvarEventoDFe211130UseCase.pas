@@ -110,11 +110,16 @@ const
   ID_EVENTO = 'EVENTO-211130-EXISTENTE';
   CHAVE_VALIDA = '11111111111111111111111111111111111111111111';
 
+function IdDoItem(ANItem: Integer): string;
+begin
+  Result := Format('ITEM-%d', [ANItem]);
+end;
+
 function Item(ANItem: Integer; const AVIbs, AVCbs, AQImobilizado: Currency;
   const AUImobilizado: string): EventoDFe211130ItemEtd;
 begin
   Result := EventoDFe211130ItemEtd.Create(
-    ANItem, AVIbs, AVCbs, AQImobilizado, AUImobilizado);
+    IdDoItem(ANItem), ANItem, AVIbs, AVCbs, AQImobilizado, AUImobilizado);
 end;
 
 function Itens(const AItens: array of EventoDFe211130ItemEtd):
@@ -477,6 +482,8 @@ begin
 
       Assert.AreEqual(1, FRepo211130.ItensSalvos[0].NItem);
       Assert.AreEqual('UN', FRepo211130.ItensSalvos[1].UImobilizado);
+      Assert.AreEqual(IdDoItem(1), FRepo211130.ItensSalvos[0].Id);
+      Assert.AreEqual(IdDoItem(2), FRepo211130.ItensSalvos[1].Id);
     finally
       Saida.Free;
     end;

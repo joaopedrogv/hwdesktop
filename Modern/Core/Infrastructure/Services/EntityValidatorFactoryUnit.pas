@@ -125,7 +125,7 @@ type
     FValue: Int64Nullable;
     FOwner: EntityValidator;
   public
-    constructor Create(Owner: EntityValidator; const Field: string; Value: SmallInt); overload;
+    constructor Create(Owner: EntityValidator; const Field: string; Value: Integer); overload;
     constructor Create(Owner: EntityValidator; const Field: string; const Value: IntegerNullable); overload;
     constructor Create(Owner: EntityValidator; const Field: string; const Value: Int64Nullable); overload;
 
@@ -381,7 +381,7 @@ end;
 { IntegerOrEnumFieldValidator }
 
 constructor IntegerOrEnumFieldValidator.Create(Owner: EntityValidator;
-  const Field: string; Value: SmallInt);
+  const Field: string; Value: Integer);
 begin
   Create( Owner, Field, Int64Nullable.CreateOrNull( Value ) );
 end;

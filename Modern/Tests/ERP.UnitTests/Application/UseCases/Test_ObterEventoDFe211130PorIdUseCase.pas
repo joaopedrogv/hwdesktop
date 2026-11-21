@@ -72,7 +72,8 @@ const
 
 function Item(ANItem: Integer; const AUImobilizado: string): EventoDFe211130ItemEtd;
 begin
-  Result := EventoDFe211130ItemEtd.Create(ANItem, 0, 0, 1, AUImobilizado);
+  Result := EventoDFe211130ItemEtd.Create(
+    Format('ITEM-%d', [ANItem]), ANItem, 0, 0, 1, AUImobilizado);
 end;
 
 function Itens(const AItens: array of EventoDFe211130ItemEtd):
@@ -171,8 +172,10 @@ begin
   try
     Assert.IsNotNull(Evento);
     Assert.AreEqual(2, Length(Evento.Itens));
+    Assert.AreEqual('ITEM-1', Evento.Itens[0].Id);
     Assert.AreEqual(1, Evento.Itens[0].NItem);
     Assert.AreEqual('UN', Evento.Itens[0].UImobilizado);
+    Assert.AreEqual('ITEM-2', Evento.Itens[1].Id);
     Assert.AreEqual(2, Evento.Itens[1].NItem);
     Assert.AreEqual('CX', Evento.Itens[1].UImobilizado);
     Assert.IsFalse(Evento.Restaurar);

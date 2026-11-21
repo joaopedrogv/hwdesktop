@@ -4,6 +4,8 @@ description: Shared Delphi naming, language, formatting, visibility and ownershi
 applies_to:
   - "Modern/**/*.pas"
   - "Next/**/*.pas"
+  - "Modern/**/*.dfm"
+  - "Next/**/*.dfm"
 ---
 
 # Shared Delphi Coding Standards
@@ -42,6 +44,26 @@ remain in .ai/rules/repository-safety.md.
   improves readability or preserves an established construct.
 - Use the narrowest visibility required. Expose private/protected members only
   when required by an actual contract.
+
+## VCL component names and DFM consistency
+
+- Before adding components to forms or frames with inherited or inline frames,
+  inspect the affected PAS/DFM pairs, including ancestor and embedded frames.
+  Prefer names describing the local responsibility, such as pnAcoesItens, over
+  repeating a generic pnComandos already used by an embedded grid.
+- Keep new design-time components declared as object/inline in the DFM aligned
+  with matching field names and types in their form/frame class. Ancestor fields
+  remain declared in the ancestor; an inline frame's internal controls remain in
+  that frame, not redeclared in its host. Do not leave new DFM controls without
+  their corresponding PAS fields.
+- Check component Name collisions and field bindings at composition boundaries.
+  Names are scoped by Owner, not visual Parent; independent Owners do not require
+  globally unique names. When renaming, update PAS, DFM and affected references
+  together, preserving bindings and inherited components.
+- Compilation and absence of warnings in the Rio IDE do not prove correct VCL
+  streaming or field binding. Check PAS/DFM consistency explicitly and, when
+  runtime execution is authorized, open the composed screen and exercise its
+  embedded controls. Record an unperformed runtime check as pending.
 
 ## Ownership and dependencies
 

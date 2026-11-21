@@ -4,12 +4,12 @@ interface
 
 uses
   System.SysUtils, System.Classes, Vcl.StdCtrls, Vcl.Mask, CadastroEditorFrame,
-  EditorCadastro, EventoDFe112150CadastroView, EventoDFe112150CadastroPresenter,
-  EventoDFe112150EtdUnit, TipoEventoDFeUnit;
+  EditorCadastro, EventoDFeCadastroRestauracao, EventoDFe112150CadastroView,
+  EventoDFe112150CadastroPresenter, EventoDFe112150EtdUnit, TipoEventoDFeUnit;
 
 type
   TfrmEventoDFe112150CadastroFrame = class(TfrmCadastroEditor,
-    IEventoDFe112150CadastroView)
+    IEventoDFe112150CadastroView, IEventoDFeCadastroRestauracao)
     lblChaveDocumento: TLabel;
     edChaveDocumento: TEdit;
     lblDataPrevisao: TLabel;
