@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Classes, Vcl.Controls, Vcl.ExtCtrls, Vcl.StdCtrls,
   Vcl.Forms, EditorCadastro, CadastroEditorView, ValidationPanelFrame,
-  ValidationEntityOutputUnit, PresenterCadastroBase;
+  ValidationEntityOutputUnit, PresenterCadastroBase, System.ImageList, Vcl.ImgList;
 
 type
   TfrmCadastroEditor = class(TFrame, ICadastroEditorView, IEditorCadastro)
@@ -15,6 +15,7 @@ type
     pnRodape: TPanel;
     btnSalvar: TButton;
     btnCancelar: TButton;
+    imgListCadastro: TImageList;
     procedure btnSalvarClick(Sender: TObject);
     procedure btnCancelarClick(Sender: TObject);
   private

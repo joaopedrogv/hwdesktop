@@ -29,8 +29,10 @@ const
 
 type
   THwNextApiVersion = function: Integer; stdcall;
+  // A area cliente do proprio formulario; os dois valores so sao preenchidos quando a abertura conclui.
   THwNextOpenView = function(AIdentifier: PWideChar; AParent, ACloseTarget,
-    AApplication: HWND; AOptions: Cardinal; AInstanceNumber: Integer): HWND; stdcall;
+    AApplication: HWND; AOptions: Cardinal; AInstanceNumber: Integer;
+    AInitialWidth, AInitialHeight: PInteger): HWND; stdcall;
   THwNextResizeView = function(AView: HWND; AWidth, AHeight: Integer): LongBool; stdcall;
   THwNextFocusView = function(AView: HWND): LongBool; stdcall;
   THwNextDestroyView = function(AView: HWND): LongBool; stdcall;

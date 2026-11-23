@@ -13,13 +13,13 @@ type
   TFrameFeedbackEvent = procedure(Sender: TObject; const AMensagem: string) of object;
 
   TfrmFilterFrame = class(TFrame)
-    pnCampo: TPanel;
+    pnFilterCampo: TPanel;
     lbCampo: TLabel;
     cbCampo: TComboBox;
-    pnCondicao: TPanel;
+    pnFilterCondicao: TPanel;
     lbCondicao: TLabel;
     cbCondicao: TComboBox;
-    pnValores: TPanel;
+    pnFilterBottom: TPanel;
     lbValor1: TLabel;
     edValor1: TMaskEdit;
     lbValor2: TLabel;
@@ -32,6 +32,7 @@ type
     pnConteudo1: TPanel;
     pnConteudo2: TPanel;
     spliterBtn: TSplitter;
+    pnFilterTop: TPanel;
   private
     FDefinition: TFilterDefinition;
     FPreferences: ILocalPreferences;

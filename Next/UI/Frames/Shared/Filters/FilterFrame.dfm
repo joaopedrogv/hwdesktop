@@ -12,90 +12,14 @@ object frmFilterFrame: TfrmFilterFrame
   ParentColor = False
   ParentFont = False
   TabOrder = 0
-  object SplitterCampo: TSplitter
-    Left = 207
-    Top = 0
-    Height = 33
-    ExplicitHeight = 27
-  end
-  object pnCampo: TPanel
-    Left = 0
-    Top = 0
-    Width = 207
-    Height = 33
-    Align = alLeft
-    BevelOuter = bvNone
-    TabOrder = 0
-    object lbCampo: TLabel
-      AlignWithMargins = True
-      Left = 3
-      Top = 3
-      Width = 55
-      Height = 27
-      Align = alLeft
-      Alignment = taRightJustify
-      AutoSize = False
-      Caption = 'Campo'
-      Layout = tlCenter
-      ExplicitLeft = 4
-      ExplicitTop = 7
-      ExplicitHeight = 13
-    end
-    object cbCampo: TComboBox
-      AlignWithMargins = True
-      Left = 64
-      Top = 3
-      Width = 140
-      Height = 21
-      Align = alClient
-      Style = csDropDownList
-      TabOrder = 0
-      OnChange = CampoChange
-    end
-  end
-  object pnCondicao: TPanel
-    Left = 210
-    Top = 0
-    Width = 210
-    Height = 33
-    Align = alClient
-    BevelOuter = bvNone
-    TabOrder = 1
-    ExplicitWidth = 390
-    object lbCondicao: TLabel
-      AlignWithMargins = True
-      Left = 3
-      Top = 3
-      Width = 55
-      Height = 27
-      Align = alLeft
-      Alignment = taRightJustify
-      AutoSize = False
-      Caption = 'Condi'#231#227'o'
-      Layout = tlCenter
-    end
-    object cbCondicao: TComboBox
-      AlignWithMargins = True
-      Left = 64
-      Top = 3
-      Width = 143
-      Height = 21
-      Align = alClient
-      Style = csDropDownList
-      TabOrder = 0
-      OnChange = CondicaoChange
-      ExplicitWidth = 323
-    end
-  end
-  object pnValores: TPanel
+  object pnFilterBottom: TPanel
     Left = 0
     Top = 33
     Width = 420
     Height = 27
-    Align = alBottom
+    Align = alTop
     BevelOuter = bvNone
-    TabOrder = 2
-    ExplicitWidth = 600
+    TabOrder = 0
     object SplitterConteudo: TSplitter
       Left = 207
       Top = 0
@@ -105,7 +29,7 @@ object frmFilterFrame: TfrmFilterFrame
       ExplicitHeight = 29
     end
     object spliterBtn: TSplitter
-      Left = 362
+      Left = 378
       Top = 0
       Height = 27
       Align = alRight
@@ -146,13 +70,13 @@ object frmFilterFrame: TfrmFilterFrame
     object pnConteudo2: TPanel
       Left = 210
       Top = 0
-      Width = 152
+      Width = 168
       Height = 27
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
       Visible = False
-      ExplicitWidth = 336
+      ExplicitWidth = 152
       object lbValor2: TLabel
         AlignWithMargins = True
         Left = 3
@@ -170,29 +94,30 @@ object frmFilterFrame: TfrmFilterFrame
         AlignWithMargins = True
         Left = 64
         Top = 3
-        Width = 85
+        Width = 101
         Height = 21
         Align = alClient
         TabOrder = 0
         Text = ''
         OnExit = ValorExit
-        ExplicitWidth = 323
+        ExplicitWidth = 85
       end
     end
     object pnBotoes: TPanel
-      Left = 365
+      Left = 381
       Top = 0
-      Width = 55
+      Width = 39
       Height = 27
       Align = alRight
+      AutoSize = True
       BevelOuter = bvNone
       TabOrder = 2
-      ExplicitLeft = 617
+      ExplicitLeft = 364
       object btnAdicionar: TSpeedButton
         AlignWithMargins = True
-        Left = 24
+        Left = 12
         Top = 3
-        Width = 28
+        Width = 24
         Height = 21
         Align = alRight
         Flat = True
@@ -230,20 +155,16 @@ object frmFilterFrame: TfrmFilterFrame
           FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
         ParentFont = False
         OnClick = AdicionarClick
-        ExplicitLeft = 0
-        ExplicitTop = 2
-        ExplicitHeight = 25
       end
       object lblContador: TLabel
         AlignWithMargins = True
-        Left = -2
+        Left = 3
         Top = 3
-        Width = 20
+        Width = 3
         Height = 21
         Cursor = crHandPoint
         Align = alRight
-        Alignment = taCenter
-        Caption = '+23'
+        Alignment = taRightJustify
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clNavy
         Font.Height = -11
@@ -252,8 +173,88 @@ object frmFilterFrame: TfrmFilterFrame
         ParentFont = False
         Layout = tlCenter
         OnClick = ContadorClick
-        ExplicitLeft = 65
+      end
+    end
+  end
+  object pnFilterTop: TPanel
+    Left = 0
+    Top = 0
+    Width = 420
+    Height = 33
+    Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 1
+    object SplitterCampo: TSplitter
+      Left = 207
+      Top = 0
+      Height = 33
+      ExplicitLeft = 90
+    end
+    object pnFilterCampo: TPanel
+      Left = 0
+      Top = 0
+      Width = 207
+      Height = 33
+      Align = alLeft
+      BevelOuter = bvNone
+      TabOrder = 0
+      object lbCampo: TLabel
+        AlignWithMargins = True
+        Left = 3
+        Top = 3
+        Width = 55
+        Height = 27
+        Align = alLeft
+        Alignment = taRightJustify
+        AutoSize = False
+        Caption = 'Campo'
+        Layout = tlCenter
+        ExplicitLeft = 4
+        ExplicitTop = 7
         ExplicitHeight = 13
+      end
+      object cbCampo: TComboBox
+        AlignWithMargins = True
+        Left = 64
+        Top = 3
+        Width = 140
+        Height = 21
+        Align = alClient
+        Style = csDropDownList
+        TabOrder = 0
+        OnChange = CampoChange
+      end
+    end
+    object pnFilterCondicao: TPanel
+      Left = 210
+      Top = 0
+      Width = 210
+      Height = 33
+      Align = alClient
+      BevelOuter = bvNone
+      TabOrder = 1
+      object lbCondicao: TLabel
+        AlignWithMargins = True
+        Left = 3
+        Top = 3
+        Width = 55
+        Height = 27
+        Align = alLeft
+        Alignment = taRightJustify
+        AutoSize = False
+        Caption = 'Condi'#231#227'o'
+        Layout = tlCenter
+      end
+      object cbCondicao: TComboBox
+        AlignWithMargins = True
+        Left = 64
+        Top = 3
+        Width = 143
+        Height = 21
+        Align = alClient
+        Style = csDropDownList
+        TabOrder = 0
+        OnChange = CondicaoChange
       end
     end
   end

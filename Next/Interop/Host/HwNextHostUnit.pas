@@ -110,7 +110,8 @@ type
     function OpenView(AOwner: TForm; const AIdentifier: string; const AOptions: THwNextOpenOptions): Boolean;
     procedure ApplicationMessage(var Msg: TMsg; var Handled: Boolean);
     function CreateView(AParent, ACloseTarget, AApplication: HWND;
-      const AIdentifier: string; const AOptions: THwNextOpenOptions; AInstanceNumber: Integer): HWND;
+      const AIdentifier: string; const AOptions: THwNextOpenOptions; AInstanceNumber: Integer;
+      out AInitialWidth, AInitialHeight: Integer): HWND;
     function ResizeView(AView: HWND; AWidth, AHeight: Integer): Boolean;
     function FocusView(AView: HWND): Boolean;
     function DestroyView(AView: HWND): Boolean;
@@ -143,6 +144,7 @@ type
     procedure HostCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure HostClose(Sender: TObject; var Action: TCloseAction);
     function GetIsModal: Boolean;
+    procedure CenterInHostArea(AOwnerForm: TForm);
   public
     constructor CreateHosted(AOwner: TForm; ABridge: THwNextHostBridge;
       const AIdentifier: string; const AOptions: THwNextOpenOptions; AInstanceNumber: Integer);
@@ -642,19 +644,23 @@ begin
 end;
 
 function THwNextHostBridge.CreateView(AParent, ACloseTarget, AApplication: HWND; const AIdentifier: string;
-  const AOptions: THwNextOpenOptions; AInstanceNumber: Integer): HWND;
+  const AOptions: THwNextOpenOptions; AInstanceNumber: Integer;
+  out AInitialWidth, AInitialHeight: Integer): HWND;
 var
   Bits: Cardinal;
   IdentifierText: WideString;
 begin
   Result := 0;
+  AInitialWidth := 0;
+  AInitialHeight := 0;
   if not Assigned(FApi.OpenView) then
     raise Exception.Create('A interface de hw.next.dll não foi inicializada.');
   Bits := EncodeOptions(AOptions);
   // OpenView ja validou a string; o buffer UTF-16 terminado em nulo abaixo carrega os mesmos caracteres usados na busca
   // por reuso.
   IdentifierText := AIdentifier;
-  Result := FApi.OpenView(PWideChar(IdentifierText), AParent, ACloseTarget, AApplication, Bits, AInstanceNumber);
+  Result := FApi.OpenView(PWideChar(IdentifierText), AParent, ACloseTarget, AApplication, Bits, AInstanceNumber,
+    @AInitialWidth, @AInitialHeight);
   if Result = 0 then
     raise Exception.Create(LastErrorDetail);
 end;
@@ -992,6 +998,8 @@ end;
 
 constructor TfrmHwNextHost.CreateHosted(AOwner: TForm; ABridge: THwNextHostBridge; const AIdentifier: string;
   const AOptions: THwNextOpenOptions; AInstanceNumber: Integer);
+var
+  InitialWidth, InitialHeight: Integer;
 begin
   inherited CreateNew(AOwner);
   FBridge := ABridge;
@@ -1001,13 +1009,20 @@ begin
     Caption := AOptions.DisplayTitle
   else
     Caption := Format('%s - Next %d', [AIdentifier, AInstanceNumber]);
-  Width := 680;
-  Height := 470;
-  Constraints.MinWidth := 440;
-  Constraints.MinHeight := 350;
+  Width := 400;
+  Height := 70;
+  Constraints.MinWidth := 100;
+  Constraints.MinHeight := 100;
   OnActivate := HostActivate;
   OnCloseQuery := HostCloseQuery;
   OnClose := HostClose;
+
+  FSurface := TPanel.Create(Self);
+  FSurface.Parent := Self;
+  FSurface.Align := alClient;
+  FSurface.BevelOuter := bvNone;
+  FSurface.Caption := Format('Carregando... %s', [Caption]);
+  FSurface.OnResize := SurfaceResize;
 
   if AOptions.Presentation = npModal then
   begin
@@ -1015,24 +1030,53 @@ begin
     FormStyle := fsNormal;
     BorderStyle := bsSizeable;
     BorderIcons := [biSystemMenu];
-    Position := poMainFormCenter;
   end
   else
-  begin
     FormStyle := fsMDIChild;
-    Position := poDefault;
-  end;
 
-  FSurface := TPanel.Create(Self);
-  FSurface.Parent := Self;
-  FSurface.Align := alClient;
-  FSurface.BevelOuter := bvNone;
-  FSurface.Caption := '';
-  FSurface.OnResize := SurfaceResize;
-
+  // O VCL reposiciona poMainFormCenter/poScreenCenter ao exibir; a posicao definitiva e calculada apos o tamanho final.
+  // Position := poDesigned; // já é default, nao precisa atribuir, previne chamdas no Form.
+  
   // Se a criacao da view falhar, o construtor propaga e o destructor libera a view ja criada antes de remover o wrapper
   // do registro do bridge.
-  FView := FBridge.CreateView(FSurface.Handle, Handle, Application.Handle, FIdentifier, FOptions, AInstanceNumber);
+  FView := FBridge.CreateView(FSurface.Handle, Handle, Application.Handle, FIdentifier, FOptions, AInstanceNumber,
+    InitialWidth, InitialHeight);
+  // A area cliente do formulario Next substitui o tamanho provisorio usado ate a view existir.
+  if (InitialWidth > 0) and (InitialHeight > 0) then
+  begin
+    ClientWidth := InitialWidth;
+    ClientHeight := InitialHeight;
+  end;
+
+  FSurface.Caption := '';
+
+  if AOptions.InstancePolicy = nipSingle then
+    CenterInHostArea(AOwner);
+end;
+
+procedure TfrmHwNextHost.CenterInHostArea(AOwnerForm: TForm);
+var
+  Area: TRect;
+  CenterForm: TForm;
+  ClientWindow: HWND;
+begin
+  if WindowState <> wsNormal then
+    Exit;
+  if IsModal then
+  begin
+    CenterForm := Application.MainForm;
+    if CenterForm = nil then
+      CenterForm := AOwnerForm;
+    Left := CenterForm.Left + (CenterForm.Width - Width) div 2;
+    Top := CenterForm.Top + (CenterForm.Height - Height) div 2;
+    Exit;
+  end;
+  // Filho MDI usa como referencia a area cliente da janela MDI, que exclui paineis laterais do formulario principal.
+  ClientWindow := GetParent(Handle);
+  if (ClientWindow = 0) or not Windows.GetClientRect(ClientWindow, Area) then
+    Exit;
+  Left := (Area.Right - Area.Left - Width) div 2;
+  Top := (Area.Bottom - Area.Top - Height) div 2;
 end;
 
 destructor TfrmHwNextHost.Destroy;
