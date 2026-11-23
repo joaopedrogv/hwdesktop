@@ -5,7 +5,8 @@ interface
 uses
   System.SysUtils, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, ConsultaBaseForm,
   PresenterConsultaBase, NextQueryDefinition, LocalPreferences, EventosDFeView,
-  EventosDFePresenter, EventosDFeQueryDefinition, TipoEventoDFeUnit, EditorCadastro;
+  EventosDFePresenter, EventosDFeQueryDefinition, TipoEventoDFeUnit, EditorCadastro, System.ImageList, Vcl.ImgList,
+  Data.DB, DataGridFrame, Vcl.Buttons, FilterFrame, Vcl.ExtCtrls, Vcl.ComCtrls, System.Classes;
 
 type
   // Cada inclusão e cada registro alterado ocupam uma aba própria, cujo editor é dono do rascunho e do apresentador do

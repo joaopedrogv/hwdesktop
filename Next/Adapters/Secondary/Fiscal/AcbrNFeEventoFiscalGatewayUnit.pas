@@ -4,14 +4,15 @@ interface
 
 uses
   IConfiguracoesRepositoryUnit, IEventoDFeFiscalGatewayUnit,
-  EventoDFeTransmissaoTypesUnit, TipoEventoDFeUnit;
+  EventoDFeTransmissaoTypesUnit, TipoEventoDFeUnit, IConfigReaderAndWriterUnit;
 
 type
   TAcbrNFeEventoFiscalGateway = class(TInterfacedObject, IEventoDFeFiscalGateway)
   private
     FConfiguracoes: IConfiguracoesRepository;
+    FConfigReader: IConfigReader;
   public
-    constructor Create(const AConfiguracoes: IConfiguracoesRepository);
+    constructor Create(const AConfiguracoes: IConfiguracoesRepository; const AConfigReader: IConfigReader);
     function Preparar(const ARequisicao: TEventoDFeRequisicaoPreparo):
       TEventoDFePreparacao;
     function Transmitir(const APreparado: IEventoDFeEnvioPreparado):
@@ -24,8 +25,8 @@ type
 implementation
 
 uses
-  System.SysUtils,
-  ACBrDFe.Conversao, ACBrDFeConfiguracoes, ACBrNFe, ACBrNFeConfiguracoes,
+  System.SysUtils, System.StrUtils,
+  ACBrDFe.Conversao, ACBrDFeConfiguracoes, ACBrNFe, ACBrNFeConfiguracoes, ACBrDFeSSL,
   ACBrNFe.EventoClass, ACBrNFe.EnvEvento, ACBrNFe.RetConsSit, ACBrNFe.RetEnvEvento,
   ACBrNFeWebServices, pcnConversaoNFe,
   ConfigLegacyTypes;
@@ -40,6 +41,10 @@ type
     NumeroSerie: string;
     PathSalvar: string;
     Ambiente: Integer;
+    LibDFe: Integer;
+    SSLCryptLib: Integer;
+    SSLHttpLib: Integer;
+    SSLXmlSignLib: Integer;
   end;
 
   TAcbrEnvioPreparado = class(TInterfacedObject, IEventoDFeEnvioPreparado)
@@ -51,7 +56,7 @@ type
     function GetAmbiente: Integer;
   public
     constructor Create(const ARequisicao: TEventoDFeRequisicaoPreparo;
-      const AConfiguracoes: IConfiguracoesRepository);
+      const AConfiguracoes: IConfiguracoesRepository; const AConfigReader: IConfigReader);
     destructor Destroy; override;
     function Enviar: TEventoDFeResultadoTransmissao;
   end;
@@ -145,9 +150,10 @@ begin
 end;
 
 function LerConfiguracaoFiscal(
-  const AConfiguracoes: IConfiguracoesRepository): TConfiguracaoFiscalAcbr;
+  const AConfiguracoes: IConfiguracoesRepository; const AConfigReader: IConfigReader): TConfiguracaoFiscalAcbr;
 var
   LDados: ConfigLegacyData;
+  section: string;
 begin
   LDados := AConfiguracoes.GetLegacy(
     [ceCertDigCaminho, ceCertDigSenha, ceCertDigNumSerie, ceWSAmbiente, ceWSArquivos]);
@@ -165,20 +171,56 @@ begin
     Result.Ambiente := 1
   else
     Result.Ambiente := 2;
+
+  section := 'NFe_SSLib';
+  if AConfigReader.ReadString(section, 'Ativo') <> 'S' then
+    section := 'SSLib';
+
+  Result.LibDFe := AConfigReader.ReadInteger(
+    IfThen(section = 'SSLib', 'Sistema', section), 'libNFe', Ord(libCapicom));
+  if not (TSSLLib(Result.LibDFe) in [libOpenSSL, libCapicom, libWinCrypt]) then
+    Result.LibDFe := Ord(libOpenSSL);
+
+  Result.SSLCryptLib := AConfigReader.ReadInteger(section, 'SSLCryptLib', -1);
+  Result.SSLHttpLib := AConfigReader.ReadInteger(section, 'SSLHttpLib', -1);
+  Result.SSLXmlSignLib := AConfigReader.ReadInteger(section, 'SSLXmlSignLib', -1);
 end;
 
 procedure AplicarConfiguracaoFiscal(const ANFe: TACBrNFe;
   const AConfiguracao: TConfiguracaoFiscalAcbr; const AUf: string);
+var
+  sslLib: TSSLLib;
 begin
-  ANFe.Configuracoes.Certificados.ArquivoPFX := AConfiguracao.ArquivoPFX;
-  ANFe.Configuracoes.Certificados.Senha := AConfiguracao.Senha;
-  ANFe.Configuracoes.Certificados.NumeroSerie := AConfiguracao.NumeroSerie;
+  sslLib := TSSLLib(AConfiguracao.LibDFe);
+
+  ANFe.SSL.DescarregarCertificado;
+
+  ANFe.Configuracoes.Certificados.NumeroSerie := '';
+  ANFe.Configuracoes.Certificados.ArquivoPFX  := '';
+  ANFe.Configuracoes.Certificados.Senha       := '';
+
+  ANFe.Configuracoes.Certificados.ArquivoPFX  := IfThen(sslLib <> libCapicom, AConfiguracao.ArquivoPFX);
+  ANFe.Configuracoes.Certificados.NumeroSerie := IfThen(sslLib <> libOpenSSL, AConfiguracao.NumeroSerie);
+  ANFe.Configuracoes.Certificados.Senha       := AnsiString(AConfiguracao.Senha);
+
   ANFe.Configuracoes.Arquivos.PathSalvar := AConfiguracao.PathSalvar;
   ANFe.Configuracoes.WebServices.UF := AUf;
   if AConfiguracao.Ambiente = 1 then
     ANFe.Configuracoes.WebServices.Ambiente := taProducao
   else
     ANFe.Configuracoes.WebServices.Ambiente := taHomologacao;
+
+  ANFe.Configuracoes.Geral.SSLLib := sslLib;
+
+  // Valor ausente no INI (-1) preserva o padrão do ACBr.
+  if AConfiguracao.SSLCryptLib >= 0 then
+    ANFe.Configuracoes.Geral.SSLCryptLib := TSSLCryptLib(AConfiguracao.SSLCryptLib);
+
+  if AConfiguracao.SSLHttpLib >= 0 then
+    ANFe.Configuracoes.Geral.SSLHttpLib := TSSLHttpLib(AConfiguracao.SSLHttpLib);
+
+  if AConfiguracao.SSLXmlSignLib >= 0 then
+    ANFe.Configuracoes.Geral.SSLXmlSignLib := TSSLXmlSignLib(AConfiguracao.SSLXmlSignLib);
 end;
 
 procedure ValidarEnvelopeDoEvento(const ARequisicao: TEventoDFeRequisicaoPreparo);
@@ -216,7 +258,7 @@ end;
 
 constructor TAcbrEnvioPreparado.Create(
   const ARequisicao: TEventoDFeRequisicaoPreparo;
-  const AConfiguracoes: IConfiguracoesRepository);
+  const AConfiguracoes: IConfiguracoesRepository; const AConfigReader: IConfigReader);
 var
   LConfiguracao: TConfiguracaoFiscalAcbr;
   LNFe: TACBrNFe;
@@ -227,7 +269,7 @@ begin
   inherited Create;
 
   ValidarEnvelopeDoEvento(ARequisicao);
-  LConfiguracao := LerConfiguracaoFiscal(AConfiguracoes);
+  LConfiguracao := LerConfiguracaoFiscal(AConfiguracoes, AConfigReader);
   FAmbiente := LConfiguracao.Ambiente;
 
   LNFe := nil;
@@ -405,10 +447,12 @@ end;
 { TAcbrNFeEventoFiscalGateway }
 
 constructor TAcbrNFeEventoFiscalGateway.Create(
-  const AConfiguracoes: IConfiguracoesRepository);
+  const AConfiguracoes: IConfiguracoesRepository;
+  const AConfigReader: IConfigReader);
 begin
   inherited Create;
   FConfiguracoes := AConfiguracoes;
+  FConfigReader := AConfigReader;
 end;
 
 function TAcbrNFeEventoFiscalGateway.Preparar(
@@ -416,7 +460,7 @@ function TAcbrNFeEventoFiscalGateway.Preparar(
 begin
   Result := PreparacaoVazia;
   try
-    Result.Preparado := TAcbrEnvioPreparado.Create(ARequisicao, FConfiguracoes);
+    Result.Preparado := TAcbrEnvioPreparado.Create(ARequisicao, FConfiguracoes, FConfigReader);
     Result.XmlEnvio := Result.Preparado.XmlEnvio;
     Result.Ambiente := Result.Preparado.Ambiente;
   except
@@ -473,7 +517,7 @@ begin
   try
     try
       LTipoEvento := TipoEventoAcbr(ATipoEvento);
-      LConfiguracao := LerConfiguracaoFiscal(FConfiguracoes);
+      LConfiguracao := LerConfiguracaoFiscal(FConfiguracoes, FConfigReader);
 
       LNFe := TACBrNFe.Create(nil);
       AplicarConfiguracaoFiscal(LNFe, LConfiguracao, AUf);

@@ -71,6 +71,8 @@ uses
   FireDAC.Stan.Option,
   FireDAC.Stan.Def,
   FireDAC.Stan.Async,
+  FireDAC.DApt,
+  FireDAC.Phys.FB,
   ISqlLoggerUnit;
 
 const

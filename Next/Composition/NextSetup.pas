@@ -45,8 +45,9 @@ implementation
 uses
   // FireDAC.Phys.FB registra o driver Firebird usado na primeira conexao; FireDAC.DApt fornece TFDQuery/TFDTransaction.
   // System.Hash identifica o banco sem reter usuario ou senha.
-  System.Hash, FireDAC.DApt, FireDAC.Phys.FB, NextFeaturesComposition,
-  RegistrarProcessosUseCaseUnit, FireDACDataSetSorterUnit, QueryResultOperations;
+  System.Hash, NextFeaturesComposition,
+  RegistrarProcessosUseCaseUnit, FireDACDataSetSorterUnit, QueryResultOperations,
+  IConfigReaderAndWriterUnit, IniConfigReaderAndWriterUnit, FileConfigUnit;
 
 const
   InvalidSessionMessage = 'O contexto da empresa nao foi aceito.';
@@ -150,6 +151,8 @@ procedure TNextSetup.Initialize(const ADatabaseName, ADatabaseUserName, ADatabas
 var
   ConnectionString: string;
   DatabaseFingerprint: string;
+  ConfigFile: FileConfig;
+  ConfigReaderWriter: IniConfigReaderAndWriter;
 begin
   if not FSessionSet then
     raise Exception.Create(SessionRequiredMessage);
@@ -190,6 +193,14 @@ begin
       FContainer.RegisterInstance<ISessionContext>(FSessionContext);
       FContainer.RegisterInstance<IDataBaseConnection>(FAdapter);
       FContainer.RegisterInstance<ISqlDataSetReaderFactory>(FReaderFactory);
+
+      // Sem Config.ini ao lado do executavel, o leitor entrega os valores padrao.
+      ConfigFile := FileConfig.Create(ExtractFilePath(ParamStr(0)), 'Config.ini');
+      if FileExists(ConfigFile.FullFileName) then
+        ConfigReaderWriter := IniConfigReaderAndWriter.Create(ConfigFile)
+      else
+        ConfigReaderWriter := IniConfigReaderAndWriter.Create(nil);
+      FContainer.RegisterInstance<IConfigReader>(ConfigReaderWriter);
 
       FContainer.RegisterType<IDataSetSorter, TFireDACDataSetSorter>().AsSingleton;
       FContainer.RegisterType<IQueryResultOperations, TQueryResultOperations>().AsTransient;

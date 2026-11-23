@@ -1,8 +1,22 @@
 inherited frmEventosDFe: TfrmEventosDFe
   PixelsPerInch = 96
-  TextHeight = 16
+  TextHeight = 13
   inherited pcAbas: TPageControl
     inherited tsConsulta: TTabSheet
+      ExplicitWidth = 752
+      ExplicitHeight = 412
+      inherited pnFiltros: TPanel
+        ExplicitWidth = 752
+        inherited fraFiltros: TfrmFilterFrame
+          inherited pnValores: TPanel
+            inherited pnBotoes: TPanel
+              inherited lblContador: TLabel
+                Height = 21
+              end
+            end
+          end
+        end
+      end
       inherited pnAcoesConsulta: TPanel
         object ckLixeira: TCheckBox
           Left = 660
@@ -43,6 +57,14 @@ inherited frmEventosDFe: TfrmEventosDFe
           Caption = 'Consultar situa'#231#227'o'
           TabOrder = 3
           OnClick = btnConsultarSituacaoClick
+        end
+      end
+      inherited fraGrid: TfrmDataGridFrame
+        inherited pnComandos: TPanel
+          ExplicitWidth = 740
+          inherited pnCriterios: TPanel
+            Width = 653
+          end
         end
       end
     end
