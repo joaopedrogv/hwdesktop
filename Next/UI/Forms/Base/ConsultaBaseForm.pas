@@ -8,7 +8,7 @@ uses
   Data.DB,  NextBaseForm, DataGridFrame, FilterDefinition, FilterCriterion, FilterFrame,
   QueryResultOperations, NextQueryDefinition,
   LocalPreferences, PresenterConsultaBase,
-  EditorCadastro, ConsultaBaseView;
+  EditorCadastro, ConsultaBaseView, System.ImageList, Vcl.Menus;
 
 type
   // Configura o editor recem-criado antes de a aba ser ativada: e o ponto em que o rascunho da funcionalidade nasce.
@@ -40,7 +40,7 @@ type
   // Comando da consulta cujo Enabled acompanha a associacao do apresentador e a linha corrente. O controle pertence ao
   // formulario; a base apenas o atualiza.
   TComandoConsulta = record
-    Controle: TControl;
+    Controle: TComponent;
     ExigeSelecao: Boolean;
   end;
 
@@ -54,12 +54,19 @@ type
     tsConsulta: TTabSheet;
     pnFiltros: TPanel;
     fraFiltros: TfrmFilterFrame;
+    pnBotoes: TPanel;
     btnPesquisar: TBitBtn;
     btnSair: TBitBtn;
+    btnNovoAcoes: TButton;
+    btnAlterar: TSpeedButton;
+    btnExcluir: TSpeedButton;
     pnAcoesConsulta: TPanel;
     fraGrid: TfrmDataGridFrame;
     dsConsulta: TDataSource;
     imgListConsulta: TImageList;
+    splFiltros: TSplitter;
+    pmAcoes: TPopupMenu;
+    btnRestore: TSpeedButton;
     procedure btnSairClick(Sender: TObject);
   private
     FFiltersConfigured: Boolean;
@@ -83,9 +90,9 @@ type
     FBtnAlterar: TButton;
     FBtnExcluir: TButton;
     // Metodos do apresentador acionados por cada botao: sem o metodo a acao permanece oculta e a faixa e reorganizada.
-    FAcaoNovo: TAcaoConsulta;
-    FAcaoAlterar: TAcaoConsulta;
-    FAcaoExcluir: TAcaoConsulta;
+    FAcaoNovo: TAcaoConsulta;     // Vou excluir isso, deixar a acaor direto no filho
+    FAcaoAlterar: TAcaoConsulta;  // Vou excluir isso, deixar a acaor direto no filho
+    FAcaoExcluir: TAcaoConsulta;  // Vou excluir isso, deixar a acaor direto no filho
     procedure ClearResult;
     procedure DoPesquisar(Sender: TObject);
     procedure dsConsultaDataChange(Sender: TObject; Field: TField);
@@ -93,13 +100,12 @@ type
     function HasActiveReader: Boolean;
     procedure GridTitleCtrlClick(Sender: TObject; const AFieldName: string);
     procedure FrameFeedback(Sender: TObject; const AMensagem: string);
-    procedure PosicionarBotoesPesquisa;
     function ListaAbasCadastro: TObjectList<TAbaCadastro>;
     function IndiceAbaCadastro(const AChave: string): Integer;
     function AbaCadastroPorToken(AToken: Integer): TAbaCadastro;
     function AbaDoControle(AControle: TControl): TTabSheet;
     function AbaCadastroDoControle(AOrigem: TObject): TAbaCadastro;
-
+    //
     procedure EditorSalvo(const AEditor: TWinControl);
     procedure EditorCancelado(const AEditor: TWinControl);
     procedure FinalizarEditor(const AEditor: TWinControl; AIntencao: TIntencaoFechamentoAba);
@@ -108,28 +114,34 @@ type
     procedure WMCmdAba(var AMessage: TMessage);
       message WM_COMANDO_ABA;
     procedure AtualizarAposSalvar;
-    function CriarBotaoAcao(var ABotao: TButton; ALargura: Integer; AOnClick: TNotifyEvent): TButton;
+    function CriarBotaoAcao(var ABotao: TButton; ALargura: Integer; AOnClick: TNotifyEvent): TButton; // Vou excluir isso
     procedure AjustarAcoesConsulta;
     procedure btnNovoClick(Sender: TObject);
     procedure btnAlterarClick(Sender: TObject);
     procedure btnExcluirClick(Sender: TObject);
   protected
+    // Funcao que cria o editor na chamada da nova aba. O filho decide se usa o padrão ou ele mesmo implementa
+    FCriarEditorAba: TCriarEditorCadastroComandos;
+    procedure ConfigurarCriacaoEditorAba(const ACriarEditor: TCriarEditorCadastroComandos); virtual;
     // Operacoes da configuracao inicial, expostas pela ConfigurarTela da tela concreta. A definicao e associada
     // primeiro; os filtros e o editor de cadastro vem em seguida; a posse do apresentador e sempre a ultima etapa.
-    procedure Attach(const ADefinition: INextQueryDefinitionBase;
-      const ATitle: string; AQuickFilterEnabled: Boolean = False); overload;
-    procedure ConfigureFilters(const ADefinition: TFilterDefinition;
-      const APreferences: ILocalPreferences; const AIdentity: string);
+    procedure Attach(
+        const ADefinition: INextQueryDefinitionBase; const ATitle: string; AQuickFilterEnabled: Boolean = False
+    ); overload;
+    procedure ConfigureFilters(
+      const ADefinition: TFilterDefinition; const APreferences: ILocalPreferences; const AIdentity: string
+    );
     procedure AssociarPresenter(APresenter: TPresenterConsultaBase);
     function CanPesquisar: Boolean; virtual;
     // Gancho executado depois de Attach e antes da posse do apresentador: a tela registra os comandos, os contratos e
     // as acoes que dependem da definicao e do proprio apresentador, que ainda pertence a composicao.
-    procedure ApresentadorAssociado(APresenter: TPresenterConsultaBase;
-      const ADefinition: INextQueryDefinitionBase); virtual;
-    procedure RegistrarComando(AControl: TControl; AExigeSelecao: Boolean = False);
-    procedure AssociarAcaoInclusao(const AMetodo: TAcaoConsulta; const ACaption: string = 'Novo');
-    procedure AssociarAcaoAlteracao(const AMetodo: TAcaoConsulta; const ACaption: string = 'Alterar');
-    procedure AssociarAcaoExclusao(const AMetodo: TAcaoConsulta; const ACaption: string = 'Excluir');
+    procedure ApresentadorAssociado(APresenter: TPresenterConsultaBase; const ADefinition: INextQueryDefinitionBase); virtual; // Vou excluir isso
+    procedure RegistrarComando(AControl: TComponent; AExigeSelecao: Boolean); // Vou excluir isso
+    procedure RegistrarAcao(AControl: TComponent; AExigeSelecao: Boolean = False);
+    procedure CriarAcaoSplittButtom(const ATitulo: string; AOnClick: TNotifyEvent; AExigeSelecao: Boolean = False; AImageIndex: Integer = -1);
+    procedure AssociarAcaoInclusao(const AMetodo: TAcaoConsulta; const ACaption: string = 'Novo'); // Vou excluir isso, deixar a acaor direto no filho
+    procedure AssociarAcaoAlteracao(const AMetodo: TAcaoConsulta; const ACaption: string = 'Alterar'); // Vou excluir isso, deixar a acaor direto no filho
+    procedure AssociarAcaoExclusao(const AMetodo: TAcaoConsulta; const ACaption: string = 'Excluir'); // Vou excluir isso, deixar a acaor direto no filho
     // Os botoes da propria consulta, como Pesquisar e Sair, nao sao registrados.
     procedure AtualizarComandos; virtual;
     // A base verifica apenas o conjunto; a funcionalidade decide o que identifica o registro.
@@ -153,12 +165,11 @@ type
     // Cria o editor com Owner = AParent; a base define Parent e Align e a area de rolagem o libera, nunca o
     // descendente.
     function CriarEditor(const AChave: string; AParent: TWinControl): TWinControl; virtual;
-
     // Aviso de gravacao confirmada cuja reconsulta falhou: o descendente fornece a mensagem de negocio e a base chama
     // depois de fechar a aba.
-    procedure AvisarSalvamentoSemAtualizacao; virtual;
+    procedure AvisarSalvamentoSemAtualizacao; virtual; // Vou excluir isso
     // Aviso de exclusao confirmada cuja reconsulta falhou: o descendente fornece a mensagem de negocio.
-    procedure AvisarExclusaoSemAtualizacao; virtual;
+    procedure AvisarExclusaoSemAtualizacao; virtual; // Vou excluir isso,
 
     // Sem o tipo da funcionalidade; a tela usa o proprio getter tipado.
     property PresenterConsulta: TPresenterConsultaBase read FPresenterConsulta;
@@ -179,7 +190,13 @@ implementation
 
 const
   MissingDefinitionMessage = 'A definicao da consulta nao foi informada.';
-  EditorNaoInformadoMessage = 'A aba de cadastro não recebeu seu editor.';
+
+procedure TfrmConsultaBase.ConfigurarCriacaoEditorAba(const ACriarEditor: TCriarEditorCadastroComandos);
+begin
+  if not Assigned(ACriarEditor) then
+    raise Exception.CreateFmt('Não é possível criar editor para %, não há atribuição', [Self.Name]);
+  FCriarEditorAba := ACriarEditor;
+end;
 
 procedure TfrmConsultaBase.ConfigureFilters(const ADefinition: TFilterDefinition;
   const APreferences: ILocalPreferences; const AIdentity: string);
@@ -363,33 +380,19 @@ begin
   FTitle := ATitle;
   FOperations := ADefinition.GetResultOperation();
   FQuickFilterEnabled := AQuickFilterEnabled;
+  Caption := FTitle;
 
   fraGrid.Configure(FOperations, FQuickFilterEnabled);
   fraGrid.AttachColumnLayoutSource(ADefinition);
-end;
 
-procedure TfrmConsultaBase.PosicionarBotoesPesquisa;
-begin
-  // Sair ocupa a borda direita e Pesquisar fica imediatamente a esquerda, com intervalo fixo. As ancoras preservam as
-  // duas distancias no redimensionamento posterior, quando o frame de filtros ja nao e tocado.
-
-  btnPesquisar.Align := alNone;
-  btnPesquisar.Anchors := [akTop, akLeft];
-  btnPesquisar.Left := btnSair.Left - btnPesquisar.Width - 8;
-
-  btnSair.Align := alNone;
-  btnSair.Anchors := [akTop, akRight];
-  btnSair.Left := pnFiltros.ClientWidth - btnSair.Width - 16;
-
-  // A largura minima impede que os botoes invadam os filtros a esquerda.
-  Constraints.MinWidth := btnPesquisar.Left + btnPesquisar.Width + 8 + btnSair.Width + 16;
+  tsConsulta.TabVisible := False;
+  pcAbas.ActivePage := tsConsulta;
 end;
 
 procedure TfrmConsultaBase.DoInitializeView;
 begin
   inherited;
 
-  Caption := Format('Consulta - Next %d', [InstanceNumber]);
   fraGrid.DataSource := dsConsulta;
   fraGrid.OnTitleCtrlClick := GridTitleCtrlClick;
   fraGrid.OnFeedback := FrameFeedback;
@@ -399,13 +402,11 @@ begin
   if FDefinition = nil then
     raise Exception.Create(MissingDefinitionMessage);
 
-  PosicionarBotoesPesquisa;
   AjustarAcoesConsulta;
   fraFiltros.Visible := FFiltersConfigured;
   btnPesquisar.Enabled := True;
   btnPesquisar.OnClick := DoPesquisar;
-  if FTitle <> '' then
-    Caption := FTitle;
+
   fraGrid.ConfigureColumns;
 
   dsConsulta.OnDataChange := dsConsultaDataChange;
@@ -445,7 +446,7 @@ begin
   // Padrao sem comandos: o gancho roda depois de Attach e antes da posse.
 end;
 
-procedure TfrmConsultaBase.RegistrarComando(AControl: TControl; AExigeSelecao: Boolean);
+procedure TfrmConsultaBase.RegistrarComando(AControl: TComponent; AExigeSelecao: Boolean);
 var
   Indice: Integer;
   Comando: TComandoConsulta;
@@ -466,6 +467,37 @@ begin
   Comando.Controle := AControl;
   Comando.ExigeSelecao := AExigeSelecao;
   FComandosConsulta := FComandosConsulta + [Comando];
+
+  AtualizarComandos;
+end;
+
+procedure TfrmConsultaBase.RegistrarAcao(AControl: TComponent; AExigeSelecao: Boolean);
+var
+  Indice: Integer;
+  Comando: TComandoConsulta;
+begin
+  if AControl = nil then
+    raise Exception.Create('O controle da ação da consulta nao foi informado.');
+
+  // Cada controle tem um unico papel: registrar de novo substitui a exigencia anterior em vez de manter dois estados
+  // para o mesmo botao.
+  for Indice := 0 to High(FComandosConsulta) do
+    if FComandosConsulta[Indice].Controle = AControl then
+    begin
+      FComandosConsulta[Indice].ExigeSelecao := AExigeSelecao;
+      AtualizarComandos;
+      Exit;
+    end;
+
+  if AControl is TControl then
+    (AControl as TControl).Visible := True
+  else if AControl is TMenuItem then
+    (AControl as TMenuItem).Visible := True;
+
+  Comando.Controle := AControl;
+  Comando.ExigeSelecao := AExigeSelecao;
+  FComandosConsulta := FComandosConsulta + [Comando];
+
   AtualizarComandos;
 end;
 
@@ -486,6 +518,24 @@ begin
   Result := ABotao;
 end;
 
+procedure TfrmConsultaBase.CriarAcaoSplittButtom(
+  const ATitulo: string; AOnClick: TNotifyEvent; AExigeSelecao: Boolean; AImageIndex: Integer
+);
+var
+  menuItem: TMenuItem;
+begin
+  menuItem := TMenuItem.Create(pmAcoes);
+  menuItem.Caption := ATitulo;
+  menuItem.OnClick := AOnClick;
+  if AImageIndex >-1 then
+    menuItem.ImageIndex := AImageIndex;
+  pmAcoes.Items.Add(menuItem);
+
+  RegistrarAcao(menuItem, AExigeSelecao);
+
+  btnNovoAcoes.Style := bsSplitButton;
+end;
+
 procedure TfrmConsultaBase.AjustarAcoesConsulta;
 var
   Botoes: array[0..2] of TButton;
@@ -493,6 +543,7 @@ var
   Esquerda: Integer;
   HaVisivel: Boolean;
 begin
+  Exit;
   Botoes[0] := FBtnNovo;
   Botoes[1] := FBtnAlterar;
   Botoes[2] := FBtnExcluir;
@@ -519,16 +570,21 @@ begin
 
   if Assigned(AMetodo) then
   begin
-    FBtnNovo := CriarBotaoAcao(FBtnNovo, 100, btnNovoClick);
-    FBtnNovo.Caption := ACaption;
+//    FBtnNovo := CriarBotaoAcao(FBtnNovo, 100, btnNovoClick);
+    //FBtnNovo.Caption := ACaption;
+    btnNovoAcoes.OnClick := btnNovoClick;
     // A inclusao nao parte da linha corrente: depende do apresentador associado.
-    RegistrarComando(FBtnNovo, False);
+    RegistrarComando(btnNovoAcoes, False);
+    // pnAcoesConsulta.Visible := True;
   end;
 
-  if FBtnNovo <> nil then
-    FBtnNovo.Visible := Assigned(AMetodo);
+  if btnNovoAcoes <> nil then
+    btnNovoAcoes.Visible := Assigned(AMetodo);
 
-  AjustarAcoesConsulta;
+//  if FBtnNovo <> nil then
+//    FBtnNovo.Visible := Assigned(AMetodo);
+
+//  AjustarAcoesConsulta;
 end;
 
 procedure TfrmConsultaBase.AssociarAcaoAlteracao(const AMetodo: TAcaoConsulta; const ACaption: string);
@@ -537,15 +593,21 @@ begin
 
   if Assigned(AMetodo) then
   begin
-    FBtnAlterar := CriarBotaoAcao(FBtnAlterar, 100, btnAlterarClick);
-    FBtnAlterar.Caption := ACaption;
-    RegistrarComando(FBtnAlterar, True);
+//    FBtnAlterar := CriarBotaoAcao(FBtnAlterar, 100, btnAlterarClick);
+//    FBtnAlterar.Caption := ACaption;
+    //RegistrarComando(FBtnAlterar, True);
+    btnAlterar.OnClick := btnAlterarClick;
+    RegistrarComando(btnAlterar, True);
+    // pnAcoesConsulta.Visible := True;
   end;
 
-  if FBtnAlterar <> nil then
-    FBtnAlterar.Visible := Assigned(AMetodo);
+  if btnAlterar <> nil then
+    btnAlterar.Visible := Assigned(AMetodo);
 
-  AjustarAcoesConsulta;
+//  if FBtnAlterar <> nil then
+//    FBtnAlterar.Visible := Assigned(AMetodo);
+//
+//  AjustarAcoesConsulta;
 end;
 
 procedure TfrmConsultaBase.AssociarAcaoExclusao(const AMetodo: TAcaoConsulta; const ACaption: string);
@@ -554,16 +616,22 @@ begin
 
   if Assigned(AMetodo) then
   begin
-    // A exclusao recebe mais largura para as legendas de negocio.
-    FBtnExcluir := CriarBotaoAcao(FBtnExcluir, 150, btnExcluirClick);
-    FBtnExcluir.Caption := ACaption;
-    RegistrarComando(FBtnExcluir, True);
+//    // A exclusao recebe mais largura para as legendas de negocio.
+//    FBtnExcluir := CriarBotaoAcao(FBtnExcluir, 150, btnExcluirClick);
+//    FBtnExcluir.Caption := ACaption;
+//    RegistrarComando(FBtnExcluir, True);
+    btnExcluir.OnClick := btnExcluirClick;
+    RegistrarComando(btnExcluir, True);
+    // pnAcoesConsulta.Visible := True;
   end;
 
-  if FBtnExcluir <> nil then
-    FBtnExcluir.Visible := Assigned(AMetodo);
+  if btnExcluir <> nil then
+    btnExcluir.Visible := Assigned(AMetodo);
 
-  AjustarAcoesConsulta;
+//  if FBtnExcluir <> nil then
+//    FBtnExcluir.Visible := Assigned(AMetodo);
+//
+//  AjustarAcoesConsulta;
 end;
 
 procedure TfrmConsultaBase.AtualizarComandos;
@@ -571,6 +639,7 @@ var
   Indice: Integer;
   ExigeSelecao: Boolean;
   SelecaoValida: Boolean;
+  AlgumClicavel: Boolean;
 begin
   // A linha corrente e verificada uma unica vez por atualizacao, e somente quando algum comando registrado depende
   // dela.
@@ -582,14 +651,31 @@ begin
       Break;
     end;
 
-  SelecaoValida := False;
-  if ExigeSelecao then
-    SelecaoValida := TemRegistroCorrente;
+  AlgumClicavel := False;
+  try
+    SelecaoValida := False;
+    if ExigeSelecao then
+      SelecaoValida := TemRegistroCorrente;
 
-  for Indice := 0 to High(FComandosConsulta) do
-    if FComandosConsulta[Indice].Controle <> nil then
-      FComandosConsulta[Indice].Controle.Enabled := (FPresenterConsulta <> nil) and
-        ((not FComandosConsulta[Indice].ExigeSelecao) or SelecaoValida);
+    for Indice := 0 to High(FComandosConsulta) do
+      if FComandosConsulta[Indice].Controle <> nil then
+      begin
+        if FComandosConsulta[Indice].Controle is TControl then
+        begin
+          TControl(FComandosConsulta[Indice].Controle).Enabled := (FPresenterConsulta <> nil) and
+            ((not FComandosConsulta[Indice].ExigeSelecao) or SelecaoValida);
+
+          if TControl(FComandosConsulta[Indice].Controle).Parent = pnAcoesConsulta then
+            AlgumClicavel := TControl(FComandosConsulta[Indice].Controle).Enabled
+              and TControl(FComandosConsulta[Indice].Controle).Visible;
+        end
+        else if FComandosConsulta[Indice].Controle is TMenuItem then
+          TMenuItem(FComandosConsulta[Indice].Controle).Enabled := (FPresenterConsulta <> nil) and
+          ((not FComandosConsulta[Indice].ExigeSelecao) or SelecaoValida);
+      end;
+  finally
+    pnAcoesConsulta.Visible := AlgumClicavel;
+  end;
 end;
 
 function TfrmConsultaBase.TemRegistroCorrente: Boolean;
@@ -717,7 +803,9 @@ end;
 
 function TfrmConsultaBase.CriarEditor(const AChave: string; AParent: TWinControl): TWinControl;
 begin
-  raise Exception.Create(EditorNaoInformadoMessage);
+  if not Assigned(FCriarEditorAba) then
+    raise Exception.CreateFmt('Não há editor para %s, não há atribuição', [Self.Name]);
+  Result := FCriarEditorAba(AChave, AParent, Self);
 end;
 
 procedure TfrmConsultaBase.AvisarSalvamentoSemAtualizacao;
@@ -910,6 +998,8 @@ begin
   Descritor := TAbaCadastro.Create;
   Tela := nil;
   try
+    tsConsulta.TabVisible := True;
+    
     Tela := TTabSheet.Create(pcAbas);
     Tela.PageControl := pcAbas;
     Tela.Caption := ATitulo;
@@ -925,7 +1015,7 @@ begin
 
     Editor := CriarEditor(Chave, Area);
     if Editor = nil then
-      raise Exception.Create(EditorNaoInformadoMessage);
+      raise Exception.CreateFmt('Abertura da aba: Não há editor para %s, não há atribuição', [Self.Name]);
     Editor.Parent := Area;
     Descritor.Editor := Editor;
 
@@ -994,6 +1084,12 @@ begin
   // rodape, area, editor e rascunho.
   FAbasCadastro.Delete(Indice);
   Tela.Free;
+
+  if pcAbas.PageCount = 1 then
+    tsConsulta.TabVisible := False;
+
+  if pcAbas.ActivePage = nil then
+    pcAbas.ActivePage := tsConsulta;
 end;
 
 procedure TfrmConsultaBase.FecharAbas;

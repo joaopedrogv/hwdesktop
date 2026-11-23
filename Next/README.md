@@ -54,7 +54,7 @@ perguntas individuais.
 
 ## Compilar a DLL e o host
 
-A [ABI 12](Interop/Contracts/HwNextViewApi.pas) separa a sessão da inicialização:
+A [ABI](Interop/Contracts/HwNextViewApi.pas) separa a sessão da inicialização:
 `HwNextSetSession` publica empresa e login, `HwNextInitialize` monta a
 infraestrutura com os dados do banco e prepara a empresa atual, e
 `HwNextIsAvailable` informa se ela está pronta. O login usa `SetNextHostSession` e

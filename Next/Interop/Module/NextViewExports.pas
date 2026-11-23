@@ -229,11 +229,13 @@ begin
 end;
 
 function HwNextOpenView(AIdentifier: PWideChar; AParent, ACloseTarget,
-  AApplication: HWND; AOptions: Cardinal; AInstanceNumber: Integer): HWND; stdcall;
+  AApplication: HWND; AOptions: Cardinal; AInstanceNumber: Integer;
+  AInitialWidth, AInitialHeight: PInteger): HWND; stdcall;
 var
   Identifier: string;
   View: TfrmNextBase;
   ClientRect: TRect;
+  InitialWidth, InitialHeight: Integer;
   InitialBinding: Boolean;
   OriginalError: string;
 begin
@@ -272,11 +274,17 @@ begin
 
     View := NextViewCreate(Identifier, AParent);
     View.InitializeNextView(Identifier, AInstanceNumber, ACloseTarget, (AOptions and HW_NEXT_OPT_DESTROY) <> 0);
+    InitialWidth := View.ClientWidth;
+    InitialHeight := View.ClientHeight;
     GetClientRect(AParent, ClientRect);
     View.SetBounds(0, 0, ClientRect.Right, ClientRect.Bottom);
     Views.Add(View);
     View.Show;
     Result := View.Handle;
+    if AInitialWidth <> nil then
+      AInitialWidth^ := InitialWidth;
+    if AInitialHeight <> nil then
+      AInitialHeight^ := InitialHeight;
   except
     on E: Exception do
     begin

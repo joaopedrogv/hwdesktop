@@ -7,28 +7,18 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, ConsultaBaseForm, PresenterConsultaBase,
   GruposFiscaisPresenter, GruposFiscaisView, NextQueryDefinition,
   LocalPreferences,
-  GruposFiscaisQueryDefinition, GrupoFiscalCadastroFrame, EditorCadastro;
+  GruposFiscaisQueryDefinition, GrupoFiscalCadastroFrame, EditorCadastro, System.ImageList, Vcl.ImgList, Data.DB,
+  DataGridFrame, Vcl.Buttons, FilterFrame, Vcl.ExtCtrls, Vcl.ComCtrls, System.Classes;
 
 type
-  // Cada inclusao e cada registro alterado ocupam uma aba propria, cujo editor e dono do rascunho, da lista de empresas
-  // e do apresentador do cadastro.
   TfrmGruposFiscais = class(TfrmConsultaBase, IGruposFiscaisView)
-  private
-    FDefinicaoSelecao: INextQueryDefinition<TGrupoSelecionado>;
-    // A tela nao conhece as dependencias do editor e nao guarda aba, frame nem rascunho.
-    FCriarEditorAba: TCriarEditorCadastroComandos;
-    procedure ConfigurarCriacaoEditor(const ACriarEditor: TCriarEditorCadastroComandos);
-  protected
-    procedure ApresentadorAssociado(APresenter: TPresenterConsultaBase;
-      const ADefinition: INextQueryDefinitionBase); override;
-    function TemRegistroCorrente: Boolean; override;
-    function CriarEditor(const AChave: string; AParent: TWinControl): TWinControl; override;
-    procedure AvisarSalvamentoSemAtualizacao; override;
-    procedure AvisarExclusaoSemAtualizacao; override;
+    procedure btnNovoAcoesClick(Sender: TObject);
+    procedure btnAlterarClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);    
   public
     function AbrirEdicao(const ASelecao: TGrupoSelecionado): Boolean;
     function AbrirInclusao: Boolean;
-    procedure ConfigurarTela(const ADefinition: INextQueryDefinition<TGrupoSelecionado>;
+    procedure ConfigurarTela(const ADefinition: INextQueryDefinitionBase;
       const APresenter: TGruposFiscaisPresenter; const APreferences: ILocalPreferences;
       const ACriarEditor: TCriarEditorCadastroComandos);
   end;
@@ -37,10 +27,7 @@ implementation
 
 {$R *.dfm}
 
-const
-  MissingEditorFactoryMessage = 'A criacao do editor de Grupos Fiscais nao foi informada.';
-
-procedure TfrmGruposFiscais.ConfigurarTela(const ADefinition: INextQueryDefinition<TGrupoSelecionado>;
+procedure TfrmGruposFiscais.ConfigurarTela(const ADefinition: INextQueryDefinitionBase;
   const APresenter: TGruposFiscaisPresenter; const APreferences: ILocalPreferences;
   const ACriarEditor: TCriarEditorCadastroComandos);
 begin
@@ -49,56 +36,37 @@ begin
   if ADefinition = nil then
     raise Exception.Create('A definicao da consulta nao foi informada.');
 
-  // A definicao, a fabrica do editor e os filtros precisam existir antes da posse: a primeira abertura de aba ja usa a
-  // fabrica configurada e o apresentador so passa a pertencer a tela em AssociarPresenter.
+  // As validacoes precisam acontecer antes da posse. a sequencia preserva o resultado esperado
   Attach(ADefinition, 'Grupos Fiscais');
-  ConfigurarCriacaoEditor(ACriarEditor);
+  ConfigurarCriacaoEditorAba(ACriarEditor);
   ConfigureFilters(ADefinition.FiltersDef, APreferences, ADefinition.QueryId);
   AssociarPresenter(APresenter);
+   
+  RegistrarAcao(btnNovoAcoes);
+  RegistrarAcao(btnAlterar, True);
+  RegistrarAcao(btnExcluir, True);
 end;
 
-procedure TfrmGruposFiscais.ApresentadorAssociado(
-  APresenter: TPresenterConsultaBase; const ADefinition: INextQueryDefinitionBase);
-var
-  GrupoPresenter: TGruposFiscaisPresenter;
+procedure TfrmGruposFiscais.btnAlterarClick(Sender: TObject);
 begin
-  // Sem esse contrato a tela abre, mas Alterar e Excluir permanecem desabilitados.
-  if not Supports(ADefinition, INextQueryDefinition<TGrupoSelecionado>, FDefinicaoSelecao) then
-    FDefinicaoSelecao := nil;
-
-  // A instancia recebida ainda pertence a composicao.
-  GrupoPresenter := TGruposFiscaisPresenter(APresenter);
-  AssociarAcaoInclusao(GrupoPresenter.SolicitarInclusao);
-  AssociarAcaoAlteracao(GrupoPresenter.SolicitarEdicao);
-  AssociarAcaoExclusao(GrupoPresenter.EnviarParaLixeira, 'Enviar para a lixeira');
+  TGruposFiscaisPresenter(PresenterConsulta).SolicitarEdicao;
 end;
 
-function TfrmGruposFiscais.TemRegistroCorrente: Boolean;
-var
-  Selecionado: TGrupoSelecionado;
+procedure TfrmGruposFiscais.btnExcluirClick(Sender: TObject);
 begin
-  Result := inherited TemRegistroCorrente;
-  if not Result then
+  if not TGruposFiscaisPresenter(PresenterConsulta).EnviarParaLixeira then
     Exit;
 
-  // A chave vazia nao identifica registro e nao habilita as operacoes.
-  Result := (FDefinicaoSelecao <> nil) and
-    FDefinicaoSelecao.TryGetSelected(Selecionado) and (Trim(Selecionado.Id) <> '');
+  try
+    RefreshResult();
+  except
+    btnPesquisar.Click;
+  end;
 end;
 
-procedure TfrmGruposFiscais.ConfigurarCriacaoEditor(const ACriarEditor: TCriarEditorCadastroComandos);
+procedure TfrmGruposFiscais.btnNovoAcoesClick(Sender: TObject);
 begin
-  if not Assigned(ACriarEditor) then
-    raise Exception.Create(MissingEditorFactoryMessage);
-  FCriarEditorAba := ACriarEditor;
-end;
-
-function TfrmGruposFiscais.CriarEditor(const AChave: string; AParent: TWinControl): TWinControl;
-begin
-  // Cada aba recebe o proprio frame, dono do rascunho, da lista de empresas e do apresentador do cadastro.
-  if not Assigned(FCriarEditorAba) then
-    raise Exception.Create(MissingEditorFactoryMessage);
-  Result := FCriarEditorAba(AChave, AParent, Self);
+  TGruposFiscaisPresenter(PresenterConsulta).SolicitarInclusao;
 end;
 
 function TfrmGruposFiscais.AbrirEdicao(const ASelecao: TGrupoSelecionado): Boolean;
@@ -147,17 +115,6 @@ begin
     Exit;
 
   ShowError('Não foi possível iniciar a inclusão do grupo fiscal.');
-end;
-
-procedure TfrmGruposFiscais.AvisarSalvamentoSemAtualizacao;
-begin
-  // A base ja fechou a aba e descartou o rascunho.
-  ShowWarning('O grupo fiscal foi salvo. Refaça a pesquisa para atualizar a consulta.');
-end;
-
-procedure TfrmGruposFiscais.AvisarExclusaoSemAtualizacao;
-begin
-  ShowWarning('O grupo fiscal já foi enviado para a lixeira. Refaça a pesquisa para atualizar a consulta.');
 end;
 
 end.
