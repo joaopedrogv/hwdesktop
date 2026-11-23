@@ -4,6 +4,7 @@ interface
 
 uses
   TipoEventoDFeUnit,
+  EventoDFeStatusUnit,
   StatusRegistroEnumUnit;
 
 type
@@ -19,6 +20,8 @@ type
     FDataCadastro: TDateTime;
     FDataAlteracao: TDateTime;
     FRestaurar: Boolean;
+    FStatus: TStatusEventoDFe;
+    FNseqEvento: Integer;
   protected
     constructor CreateRascunho(AFamiliaDocumento: TFamiliaDocumentoDFe;
       ATipoEvento: TipoEventoDFe);
@@ -40,6 +43,8 @@ type
     property Ativo: StatusRegistroEnum read FAtivo write FAtivo;
     property DataCadastro: TDateTime read FDataCadastro;
     property DataAlteracao: TDateTime read FDataAlteracao;
+    property Status: TStatusEventoDFe read FStatus write FStatus;
+    property NseqEvento: Integer read FNseqEvento write FNseqEvento;
     // Intenção de aplicação; não é persistida.
     property Restaurar: Boolean read FRestaurar write FRestaurar;
 
@@ -72,6 +77,8 @@ begin
   FDataCadastro := 0;
   FDataAlteracao := 0;
   FRestaurar := False;
+  FStatus := sePendente;
+  FNseqEvento := 0;
 end;
 
 constructor EventoDFeEtd.Create(const AId: string; ASeqId: Integer;
@@ -90,6 +97,8 @@ begin
   FDataCadastro := ADataCadastro;
   FDataAlteracao := ADataAlteracao;
   FRestaurar := ARestaurar;
+  FStatus := sePendente;
+  FNseqEvento := 0;
 end;
 
 procedure EventoDFeEtd.DefinirSeqIdInclusao(ASeqId: Integer);

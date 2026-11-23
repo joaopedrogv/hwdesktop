@@ -99,7 +99,18 @@ uses
   EventoDFe211130ItemFrame in '..\UI\Frames\Features\EventosDFe\EventoDFe211130ItemFrame.pas' {frmEventoDFe211130ItemFrame: TFrame},
   EventoDFe211130ItensFrame in '..\UI\Frames\Features\EventosDFe\EventoDFe211130ItensFrame.pas' {frmEventoDFe211130ItensFrame: TFrame},
   EventosDFeItemEditorFactory in '..\Composition\Features\EventosDFeItemEditorFactory.pas',
-  EventosDFeComposition in '..\Composition\Features\EventosDFeComposition.pas';
+  AcbrNFeEventoFiscalGatewayUnit in '..\Adapters\Secondary\Fiscal\AcbrNFeEventoFiscalGatewayUnit.pas',
+  EventosDFeComposition in '..\Composition\Features\EventosDFeComposition.pas',
+  ACBrDFe.Conversao,
+  ACBrDFeConfiguracoes,
+  ACBrNFe,
+  ACBrNFeConfiguracoes,
+  ACBrNFe.EventoClass,
+  ACBrNFe.EnvEvento,
+  ACBrNFe.RetConsSit,
+  ACBrNFe.RetEnvEvento,
+  ACBrNFeWebServices,
+  pcnConversaoNFe;
 
 {$R *.res}
 

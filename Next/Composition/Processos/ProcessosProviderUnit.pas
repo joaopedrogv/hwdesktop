@@ -131,6 +131,16 @@ begin
       Add('EVT007', 'EXCLUIR EVENTO DFE 211130', 10, True),
       Add('EVT008', 'RESTAURAR EVENTO DFE', 10, True)
     ]);
+
+  if VersaoAtualMenor(4) then
+    AdicionarLote([
+      Add('EVT009', 'TRANSMITIR EVENTO DFE', 5)
+    ]);
+
+  if VersaoAtualMenor(5) then
+    AdicionarLote([
+      Add('EVT010', 'CONSULTAR SITUACAO EVENTO DFE', 5)
+    ]);
 end;
 
 end.

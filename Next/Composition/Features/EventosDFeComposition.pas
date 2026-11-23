@@ -3,7 +3,7 @@ unit EventosDFeComposition;
 interface
 
 uses
-  Winapi.Windows, Vcl.Controls, NextBaseForm, EditorCadastro;
+  Winapi.Windows, Vcl.Controls, NextBaseForm, EditorCadastro, Spring.Container;
 
 type
   TEventosDFeComposition = class
@@ -13,6 +13,7 @@ type
     class function CriarEditor211130(AParent: TWinControl;
       const AHost: IEditorCadastroHost): TWinControl; static;
   public
+    class procedure Registrar(const AContainer: TContainer); static;
     class function CriarConsulta(AParent: HWND): TfrmNextBase; static;
     class function CriarEditor(const AChave: string; AParent: TWinControl;
       const AHost: IEditorCadastroHost): TWinControl; static;
@@ -24,8 +25,11 @@ uses
   System.SysUtils, EventosDFeForm, LocalPreferences, EventosDFeQueryDefinition,
   NextQueryDefinition, EventosDFePresenter, AuthorizationService, NextSetup,
   IDataSetReaderUnit, QueryResultOperations, ColumnLayoutPreferences,
-  RemoverEventoDFeUseCaseUnit, TipoEventoDFeUnit, EventoDFe112150CadastroFrame,
-  EventoDFe112150CadastroPresenter, ObterEventoDFe112150PorIdUseCaseUnit,
+  IEventoDFeFiscalGatewayUnit, AcbrNFeEventoFiscalGatewayUnit,
+  RemoverEventoDFeUseCaseUnit, TransmitirEventoDFeUseCaseUnit,
+  ConsultarSituacaoEventoDFeUseCaseUnit, TipoEventoDFeUnit,
+  EventoDFe112150CadastroFrame, EventoDFe112150CadastroPresenter,
+  ObterEventoDFe112150PorIdUseCaseUnit,
   SalvarEventoDFe112150UseCaseUnit, ObterProximoSeqIdEventoDFeUseCaseUnit,
   EventoDFe211130CadastroFrame, EventoDFe211130CadastroPresenter,
   ObterEventoDFe211130PorIdUseCaseUnit, SalvarEventoDFe211130UseCaseUnit,
@@ -33,6 +37,11 @@ uses
   EventoDFe211130ItemEditorFactory, EventosDFeItemEditorFactory,
   NextMemoryQueryDefinition, FireDACMemoryDataSetReaderUnit,
   ValidadorItemEventoDFe211130Unit;
+
+class procedure TEventosDFeComposition.Registrar(const AContainer: TContainer);
+begin
+  AContainer.RegisterType<IEventoDFeFiscalGateway, TAcbrNFeEventoFiscalGateway>.AsSingleton;
+end;
 
 // A chave de inclusão é o código do tipo; a de registro acrescenta o Id após os dois pontos.
 function TipoDaChave(const AChave: string): TipoEventoDFe;
@@ -70,7 +79,9 @@ begin
       NextSetupInstance.SessionContext, View.IsLixeiraSearch);
 
     Presenter := TEventosDFePresenter.Create(View, Definition, NextSetupInstance.Resolve<IAuthorizationService>,
-      NextSetupInstance.Resolve<IRemoverEventoDFeUseCase>);
+      NextSetupInstance.Resolve<IRemoverEventoDFeUseCase>,
+      NextSetupInstance.Resolve<TransmitirEventoDFeUseCase>,
+      NextSetupInstance.Resolve<ConsultarSituacaoEventoDFeUseCase>);
     try
       // A tela só assume a posse do apresentador no fim de ConfigurarTela; uma falha anterior mantém a posse aqui.
       View.ConfigurarTela(Definition, Presenter, Preferences, TEventosDFeComposition.CriarEditor);

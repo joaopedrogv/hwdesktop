@@ -58,6 +58,8 @@ Execute o comando abaixo na raiz do clone. Ele compila somente `Next/Projects/hw
 
 Use `-DelphiBin` para indicar outra instalação do Delphi Rio e `SPRING4D_ROOT` para indicar outra pasta do Spring4D já compilado para Rio/Win32. O build usa a biblioteca padrão do Rio para evitar o limite de tamanho do comando do compilador. A compilação deixa o ERP disponível para validação manual com a DLL gerada.
 
+O projeto `Next/Projects/hw.next.dproj` declara as dependências do ACBr NFe: a biblioteca compilada em `D:\Hw\pac\acbrnfe_dx\Lib\Delphi\LibD26\Win32\Debug` entra no caminho de unidades e a pasta de recursos `D:\Hw\pac\acbrnfe_dx\Fontes\ACBrDFe\ACBrNFe` entra no caminho de recursos. Em uma estação sem essas pastas, a compilação ou o carregamento da DLL falha; instale o ACBr nesses caminhos ou ajuste o `.dproj`.
+
 No submenu **Build / Deploy**, escolha **7 · Compilar Next** para gerar a DLL ou **8 · Publicar Next** para copiar a DLL já compilada do clone. A publicação usa o mesmo destino configurado para **Publicar BPLs** e copia apenas `hw.next.dll`. Pela linha de comando, `deploy-next.ps1` também aceita `-Destination` e `-WhatIf`.
 
 ## Compatibilidade com a implementação existente

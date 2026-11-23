@@ -6,6 +6,7 @@ uses
   DUnitX.TestFramework,
   ISessionContextUnit,
   StatusRegistroEnumUnit,
+  EventoDFeStatusUnit,
   CreateEntityUseCaseOutputUnit,
   EventoDFeEtdUnit,
   EventoDFe211130EtdUnit,
@@ -29,6 +30,7 @@ type
     FUseCase: SalvarEventoDFe211130UseCase;
     procedure SemearEvento(const AId: string; ASeqId: Integer;
       AAtivo: StatusRegistroEnum; ACodEmpresa: Integer);
+    function RejeitarAoExecutar(AEvento: EventoDFe211130Etd): string;
   public
     [Setup]
     procedure Setup;
@@ -92,6 +94,12 @@ type
 
     [Test]
     procedure DeveDesfazerTransacaoQuandoAtualizacaoFalhar;
+
+    [Test]
+    procedure DeveRejeitarSegundoEventoNaoAutorizadoParaAMesmaChaveETipo;
+
+    [Test]
+    procedure NaoDeveEditarEventoEnviando;
 
     [Test]
     procedure DeveConfirmarEAliberarTransacaoAoIncluir;
@@ -214,6 +222,18 @@ begin
   end;
 
   FRepo211130.AdicionarItens(AId, Itens([Item(9, 1, 2, 10, 'UN')]));
+end;
+
+function TTestSalvarEventoDFe211130UseCase.RejeitarAoExecutar(
+  AEvento: EventoDFe211130Etd): string;
+begin
+  Result := '';
+  try
+    FUseCase.Executar(AEvento);
+  except
+    on E: EValidacaoNegocio do
+      Result := E.Message;
+  end;
 end;
 
 procedure TTestSalvarEventoDFe211130UseCase.DeveInserirComItensESeqIdDoRascunho;
@@ -696,6 +716,56 @@ begin
   Assert.IsTrue(FEventosRepo.AtualizarChamado);
   Assert.IsTrue(FTransactionState.RollbackCalled);
   Assert.IsTrue(FTransactionState.FreeTransactionCalled);
+end;
+
+procedure TTestSalvarEventoDFe211130UseCase.DeveRejeitarSegundoEventoNaoAutorizadoParaAMesmaChaveETipo;
+var
+  Rascunho: EventoDFe211130Etd;
+  Mensagem: string;
+begin
+  SemearEvento(ID_EVENTO, 4711, saAtivo, EMPRESA_ID);
+
+  Rascunho := CriarRascunho(4712, Itens([ItemValido(1)]), CHAVE_VALIDA);
+  try
+    Mensagem := RejeitarAoExecutar(Rascunho);
+  finally
+    Rascunho.Free;
+  end;
+
+  Assert.IsTrue(Pos('4711', Mensagem) > 0,
+    'A mensagem deve citar o SEQID do evento existente.');
+  Assert.IsFalse(FRepo211130.SubstituirChamado);
+  Assert.IsTrue(FTransactionState.RollbackCalled);
+end;
+
+procedure TTestSalvarEventoDFe211130UseCase.NaoDeveEditarEventoEnviando;
+var
+  Header: EventoDFeEtd;
+  Evento: EventoDFe211130Etd;
+  Mensagem: string;
+begin
+  Header := CriarHeader(ID_EVENTO, 4, saAtivo, EMPRESA_ID);
+  try
+    FEventosRepo.AdicionarEventoExistente(Header, seEnviando, 1);
+  finally
+    Header.Free;
+  end;
+
+  FRepo211130.AdicionarItens(ID_EVENTO, Itens([ItemValido(1)]));
+
+  Evento := EventoDFe211130Etd.Create(
+    ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo,
+    Itens([ItemValido(1)]),
+    0, 0, False);
+  try
+    Mensagem := RejeitarAoExecutar(Evento);
+  finally
+    Evento.Free;
+  end;
+
+  Assert.IsTrue(Mensagem <> '');
+  Assert.IsFalse(FRepo211130.SubstituirChamado);
+  Assert.IsTrue(FTransactionState.RollbackCalled);
 end;
 
 procedure TTestSalvarEventoDFe211130UseCase.DeveConfirmarEAliberarTransacaoAoIncluir;

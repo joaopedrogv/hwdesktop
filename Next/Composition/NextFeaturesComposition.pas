@@ -34,9 +34,13 @@ uses
   IEventosDFeRepositoryUnit, EventosDFeRepositoryUnit,
   IEventoDFe112150RepositoryUnit, EventoDFe112150RepositoryUnit,
   IEventoDFe211130RepositoryUnit, EventoDFe211130RepositoryUnit,
+  IEventoDFeTransmissaoRepositoryUnit, EventoDFeTransmissaoRepositoryUnit,
   SalvarEventoDFe112150UseCaseUnit, ObterEventoDFe112150PorIdUseCaseUnit,
   SalvarEventoDFe211130UseCaseUnit, ObterEventoDFe211130PorIdUseCaseUnit,
   RemoverEventoDFeUseCaseUnit, ObterProximoSeqIdEventoDFeUseCaseUnit,
+  EventoDFeEnvelopeResolverUnit, TransmitirEventoDFeUseCaseUnit,
+  ConsultarSituacaoEventoDFeUseCaseUnit,
+  EventosDFeComposition,
   ValidadorItemEventoDFe211130Unit;
 
 procedure RegisterNextFeatures(const AContainer: TContainer);
@@ -96,12 +100,20 @@ begin
   AContainer.RegisterType<IEventosDFeRepository, EventosDFeRepository>.AsSingleton;
   AContainer.RegisterType<IEventoDFe112150Repository, EventoDFe112150Repository>.AsSingleton;
   AContainer.RegisterType<IEventoDFe211130Repository, EventoDFe211130Repository>.AsSingleton;
+  // O contrato fiscal e compilado com o DLL; a implementacao ACBr e criada e registrada pela composicao da feature.
+  AContainer.RegisterType<IEventoDFeTransmissaoRepository, EventoDFeTransmissaoRepository>.AsSingleton;
   AContainer.RegisterType<ISalvarEventoDFe112150UseCase, SalvarEventoDFe112150UseCase>.AsTransient;
   AContainer.RegisterType<ObterEventoDFe112150PorIdUseCase>.AsSingleton;
   AContainer.RegisterType<ISalvarEventoDFe211130UseCase, SalvarEventoDFe211130UseCase>.AsTransient;
   AContainer.RegisterType<ObterEventoDFe211130PorIdUseCase>.AsSingleton;
   AContainer.RegisterType<IRemoverEventoDFeUseCase, RemoverEventoDFeUseCase>.AsTransient;
   AContainer.RegisterType<IObterProximoSeqIdEventoDFeUseCase, ObterProximoSeqIdEventoDFeUseCase>.AsTransient;
+  // A resolucao do envelope usa a empresa da sessao; a transmissao usa a conexao e os repositorios do Setup.
+  AContainer.RegisterType<IEventoDFeEnvelopeResolver, EventoDFeEnvelopeResolver>.AsSingleton;
+  AContainer.RegisterType<TransmitirEventoDFeUseCase>.AsSingleton;
+  AContainer.RegisterType<ConsultarSituacaoEventoDFeUseCase>.AsSingleton;
+
+  TEventosDFeComposition.Registrar(AContainer);
 
   // A validacao do item nao guarda estado; a instancia transiente e entregue a fabrica do editor.
   AContainer.RegisterType<IValidadorItemEventoDFe211130, ValidadorItemEventoDFe211130>.AsTransient;

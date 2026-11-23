@@ -13,13 +13,22 @@ type
   TfrmEventosDFe = class(TfrmConsultaBase, IEventosDFeView)
     ckLixeira: TCheckBox;
     btnRestaurar: TButton;
+    btnTransmitir: TButton;
+    btnConsultarSituacao: TButton;
     procedure ckLixeiraClick(Sender: TObject);
     procedure btnRestaurarClick(Sender: TObject);
+    procedure btnTransmitirClick(Sender: TObject);
+    procedure btnConsultarSituacaoClick(Sender: TObject);
   private
     FDefinicaoSelecao: INextQueryDefinition<TEventoDFeSelecionado>;
+    FOperacaoEmAndamento: Boolean;
     // A tela não conhece as dependências do editor e não guarda aba, frame nem rascunho.
     FCriarEditorAba: TCriarEditorCadastroComandos;
+    procedure AtualizarAposOperacao;
     procedure ConfigurarCriacaoEditor(const ACriarEditor: TCriarEditorCadastroComandos);
+    procedure DesabilitarComandos;
+    procedure IniciarEspera(const AComando: TButton; const ARotulo: string);
+    procedure EncerrarEspera;
     function EditorDisponivel(ATipo: TipoEventoDFe): Boolean;
     function PrepararRestauracao(const AEditor: TWinControl; const AId: string): Boolean;
   protected
@@ -36,6 +45,10 @@ type
     function IsLixeiraSearch: Boolean;
     function AbrirInclusao(const AChave, ATitulo: string): Boolean;
     function AbrirEdicao(const ASelecao: TEventoDFeSelecionado; AModo: TModoEventoDFe): Boolean;
+    procedure IniciarTransmissao;
+    procedure EncerrarTransmissao;
+    procedure IniciarConsultaSituacao;
+    procedure EncerrarConsultaSituacao;
     procedure ConfigurarTela(const ADefinition: INextQueryDefinition<TEventoDFeSelecionado>;
       const APresenter: TEventosDFePresenter; const APreferences: ILocalPreferences;
       const ACriarEditor: TCriarEditorCadastroComandos);
@@ -51,6 +64,8 @@ uses
 
 const
   MissingEditorFactoryMessage = 'A criação do editor de Eventos DF-e não foi informada.';
+  AtualizacaoPendenteMessage =
+    'A consulta não pôde ser atualizada. Refaça a pesquisa para ver a situação atual do evento.';
 
 procedure TfrmEventosDFe.ConfigurarTela(const ADefinition: INextQueryDefinition<TEventoDFeSelecionado>;
   const APresenter: TEventosDFePresenter; const APreferences: ILocalPreferences;
@@ -84,6 +99,8 @@ begin
   AssociarAcaoAlteracao(EventosPresenter.SolicitarEdicao);
   AssociarAcaoExclusao(EventosPresenter.EnviarParaLixeira, 'Enviar para a lixeira');
   RegistrarComando(btnRestaurar, True);
+  RegistrarComando(btnTransmitir, True);
+  RegistrarComando(btnConsultarSituacao, True);
 end;
 
 function TfrmEventosDFe.TemRegistroCorrente: Boolean;
@@ -102,13 +119,45 @@ end;
 procedure TfrmEventosDFe.AtualizarComandos;
 var
   Selecionado: TEventoDFeSelecionado;
+  EventosPresenter: TEventosDFePresenter;
 begin
   inherited;
 
+  EventosPresenter := nil;
+  if PresenterConsulta <> nil then
+    EventosPresenter := TEventosDFePresenter(PresenterConsulta);
+
+  // Enquanto a operação corre na thread da interface, nenhum comando aceita um novo clique.
+  if FOperacaoEmAndamento then
+  begin
+    DesabilitarComandos;
+    Exit;
+  end;
+
   // A restauração só existe na visão da lixeira e sobre o registro escolhido.
-  btnRestaurar.Enabled := (PresenterConsulta <> nil) and ckLixeira.Checked and
+  btnRestaurar.Enabled := (EventosPresenter <> nil) and ckLixeira.Checked and
     (FDefinicaoSelecao <> nil) and FDefinicaoSelecao.TryGetSelected(Selecionado) and
     (Selecionado.Ativo = saLixeira);
+
+  // A habilitação apenas reflete a decisão do apresentador; a autoridade continua no caso de uso.
+  btnTransmitir.Enabled := (EventosPresenter <> nil) and EventosPresenter.PodeTransmitir;
+  btnConsultarSituacao.Enabled := (EventosPresenter <> nil) and
+    EventosPresenter.PodeConsultarSituacao;
+end;
+
+procedure TfrmEventosDFe.DesabilitarComandos;
+var
+  Indice: Integer;
+  Controle: TControl;
+begin
+  // A opção da lixeira não é comando: permanece como estava e não precisa ser restaurada.
+  for Indice := 0 to pnAcoesConsulta.ControlCount - 1 do
+  begin
+    Controle := pnAcoesConsulta.Controls[Indice];
+    if Controle <> ckLixeira then
+      Controle.Enabled := False;
+  end;
+  btnPesquisar.Enabled := False;
 end;
 
 procedure TfrmEventosDFe.ConfigurarCriacaoEditor(
@@ -137,6 +186,43 @@ procedure TfrmEventosDFe.btnRestaurarClick(Sender: TObject);
 begin
   if PresenterConsulta <> nil then
     TEventosDFePresenter(PresenterConsulta).SolicitarRestauracao;
+end;
+
+procedure TfrmEventosDFe.AtualizarAposOperacao;
+var
+  FalhaApresentada: Boolean;
+begin
+  // A linha é recarregada mesmo com falha, mas o aviso de atualização não repete um erro já apresentado.
+  FalhaApresentada := TEventosDFePresenter(PresenterConsulta).FalhaApresentada;
+  try
+    if (not FalhaApresentada) and (not RefreshResult) then
+      ShowWarning(AtualizacaoPendenteMessage);
+  except
+    if not FalhaApresentada then
+      ShowWarning(AtualizacaoPendenteMessage);
+  end;
+end;
+
+procedure TfrmEventosDFe.btnTransmitirClick(Sender: TObject);
+begin
+  if PresenterConsulta = nil then
+    Exit;
+
+  if not TEventosDFePresenter(PresenterConsulta).SolicitarTransmissao then
+    Exit;
+
+  AtualizarAposOperacao;
+end;
+
+procedure TfrmEventosDFe.btnConsultarSituacaoClick(Sender: TObject);
+begin
+  if PresenterConsulta = nil then
+    Exit;
+
+  if not TEventosDFePresenter(PresenterConsulta).SolicitarConsultaSituacao then
+    Exit;
+
+  AtualizarAposOperacao;
 end;
 
 function TfrmEventosDFe.EditorDisponivel(ATipo: TipoEventoDFe): Boolean;
@@ -178,6 +264,46 @@ end;
 function TfrmEventosDFe.IsLixeiraSearch: Boolean;
 begin
   Result := ckLixeira.Checked;
+end;
+
+procedure TfrmEventosDFe.IniciarEspera(const AComando: TButton; const ARotulo: string);
+begin
+  FOperacaoEmAndamento := True;
+  Screen.Cursor := crHourGlass;
+  DesabilitarComandos;
+  AComando.Caption := ARotulo;
+  // Publica o estado de espera antes da chamada síncrona ao ACBr.
+  Update;
+end;
+
+procedure TfrmEventosDFe.EncerrarEspera;
+begin
+  FOperacaoEmAndamento := False;
+  btnTransmitir.Caption := 'Transmitir';
+  btnConsultarSituacao.Caption := 'Consultar situação';
+  btnPesquisar.Enabled := True;
+  Screen.Cursor := crDefault;
+  AtualizarComandos;
+end;
+
+procedure TfrmEventosDFe.IniciarTransmissao;
+begin
+  IniciarEspera(btnTransmitir, 'Transmitindo...');
+end;
+
+procedure TfrmEventosDFe.EncerrarTransmissao;
+begin
+  EncerrarEspera;
+end;
+
+procedure TfrmEventosDFe.IniciarConsultaSituacao;
+begin
+  IniciarEspera(btnConsultarSituacao, 'Consultando...');
+end;
+
+procedure TfrmEventosDFe.EncerrarConsultaSituacao;
+begin
+  EncerrarEspera;
 end;
 
 function TfrmEventosDFe.AbrirInclusao(const AChave, ATitulo: string): Boolean;

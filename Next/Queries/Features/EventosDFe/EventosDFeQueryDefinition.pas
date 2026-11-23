@@ -6,7 +6,8 @@ uses
   Data.DB, FilterCriterion, NextQueryDefinition, NextSqlQueryDefinition,
   QueryColumnDefinition, GridColumnDefinition, FilterDefinition,
   IDataSetReaderUnit, QueryResultOperations, ColumnLayoutPreferences,
-  ISessionContextUnit, TipoEventoDFeUnit, StatusRegistroEnumUnit;
+  ISessionContextUnit, TipoEventoDFeUnit, StatusRegistroEnumUnit,
+  EventoDFeStatusUnit;
 
 type
   // Opção da tela lida a cada pesquisa: a marcação da lixeira pertence à view e pode mudar enquanto a janela permanece
@@ -18,10 +19,12 @@ type
   TEventoDFeSelecionado = record
     Id: string;
     SeqId: Integer;
+    NSeqEvento: Integer;
     FamiliaDocumento: TFamiliaDocumentoDFe;
     TipoEvento: TipoEventoDFe;
     ChaveDocumento: string;
     Ativo: StatusRegistroEnum;
+    Status: TStatusEventoDFe;
   end;
 
   TEventosDFeQueryDefinition = class(TNextSqlQueryDefinitionBase,
@@ -82,14 +85,14 @@ end;
 function EventosDFeSql: string;
 begin
   Result := 'select SEQID, ID, FAMILIA_DOCUMENTO, FAMILIA_DOCUMENTO_DESCRICAO,' + sLineBreak +
-    '       TIPO_EVENTO, TIPO_EVENTO_DESCRICAO, CHAVE_DOCUMENTO, ATIVO,' + sLineBreak +
+    '       TIPO_EVENTO, TIPO_EVENTO_DESCRICAO, CHAVE_DOCUMENTO, ATIVO, STATUS, NSEQ_EVENTO,' + sLineBreak +
     '       DATA_CADASTRO, DATA_ALTERACAO' + sLineBreak +
     'from (' + sLineBreak +
     '  select e.SEQID, e.ID, e.FAMILIA_DOCUMENTO,' + sLineBreak +
     '         ' + FamiliaDocumentoDisplaySql + ' as FAMILIA_DOCUMENTO_DESCRICAO,' + sLineBreak +
     '         e.TIPO_EVENTO,' + sLineBreak +
     '         ' + TipoEventoDisplaySql + ' as TIPO_EVENTO_DESCRICAO,' + sLineBreak +
-    '         e.CHAVE_DOCUMENTO, e.ATIVO, e.DATA_CADASTRO, e.DATA_ALTERACAO' + sLineBreak +
+    '         e.CHAVE_DOCUMENTO, e.ATIVO, e.STATUS, e.NSEQ_EVENTO, e.DATA_CADASTRO, e.DATA_ALTERACAO' + sLineBreak +
     '  from EVENTOS_DFE e' + sLineBreak +
     '  where e.COD_EMPRESA = :' + EmpresaParameterName + sLineBreak +
     '    and e.ATIVO = :' + AtivoParameterName + sLineBreak +
@@ -124,10 +127,13 @@ begin
     QueryColumn('CHAVE_DOCUMENTO', 'Chave da NF-e', fftString, 330),
     QueryColumn('DATA_CADASTRO', 'Data de cadastro', fftDateTime, 130),
     QueryColumn('DATA_ALTERACAO', 'Data de alteração', fftDateTime, 130),
+    // Situação exibe o texto gravado por StatusEventoDFeParaTexto; sem filtro nesta entrega.
+    QueryColumn('STATUS', 'Situação', fftString, 110, qcaDefault, gcbConfigurableVisible, '', False),
     QueryColumn('ID', 'ID', fftString, 0, qcaDefault, gcbAlwaysHidden, '', False),
     QueryColumn('FAMILIA_DOCUMENTO', 'Documento', fftInteger, 0, qcaDefault, gcbAlwaysHidden, '', False),
     QueryColumn('TIPO_EVENTO', 'Tipo de Evento', fftInteger, 0, qcaDefault, gcbAlwaysHidden, '', False),
-    QueryColumn('ATIVO', 'Situação', fftInteger, 0, qcaDefault, gcbAlwaysHidden, '', False)
+    QueryColumn('ATIVO', 'Situação', fftInteger, 0, qcaDefault, gcbAlwaysHidden, '', False),
+    QueryColumn('NSEQ_EVENTO', 'Sequência do evento', fftInteger, 0, qcaDefault, gcbAlwaysHidden, '', False)
   ]);
 end;
 
@@ -191,10 +197,14 @@ begin
 
     ASelected.Id := Consulta.FieldAsString('ID');
     ASelected.SeqId := Consulta.FieldAsInteger('SEQID');
+    ASelected.NSeqEvento := Consulta.FieldAsInteger('NSEQ_EVENTO');
     ASelected.FamiliaDocumento := fdNFe;
     ASelected.TipoEvento := TipoEventoDFeFromCodigo(CodigoTipo);
     ASelected.ChaveDocumento := Consulta.FieldAsString('CHAVE_DOCUMENTO');
     ASelected.Ativo := StatusRegistroUtils.FromInt(Consulta.FieldAsInteger('ATIVO'));
+    if not TryTextoParaStatusEventoDFe(Consulta.FieldAsString('STATUS'), ASelected.Status) then
+      Exit;
+
     Result := True;
   finally
     Consulta.Free;

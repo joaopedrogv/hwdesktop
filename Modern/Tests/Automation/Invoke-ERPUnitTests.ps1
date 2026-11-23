@@ -1,7 +1,10 @@
 [CmdletBinding()]
 param(
   [switch]$BuildOnly,
-  [string]$DelphiBin
+  [string]$DelphiBin,
+  [string]$DelphiLibPath,
+  [string]$DUnitXPath,
+  [string]$FastMM5Path
 )
 
 Set-StrictMode -Version Latest
@@ -54,15 +57,21 @@ function Resolve-DelphiBin {
 function Invoke-DelphiBuild {
   param(
     [string]$RsVarsPath,
-    [string]$ProjectPath
+    [string]$ProjectPath,
+    [string[]]$Properties
   )
 
   # Sanitiza os caminhos removendo qualquer aspa existente
   $cleanRsVars = $RsVarsPath -replace '"', ''
   $cleanProject = $ProjectPath -replace '"', ''
 
+  $propertyArguments = ''
+  foreach ($property in $Properties) {
+    $propertyArguments += " /p:$property"
+  }
+
   # Monta o comando encadeado (executa o msbuild apenas se o rsvars carregar com sucesso)
-  $cmdArguments = "/c `"call `"$cleanRsVars`" && msbuild.exe `"$cleanProject`" /t:Build /p:Config=CI /p:Platform=Win32 /nologo /v:minimal`""
+  $cmdArguments = "/c `"call `"$cleanRsVars`" && msbuild.exe `"$cleanProject`" /t:Build /p:Config=CI /p:Platform=Win32$propertyArguments /nologo /v:minimal`""
 
   $process = Start-Process -FilePath $env:ComSpec -ArgumentList $cmdArguments -Wait -NoNewWindow -PassThru
   return $process.ExitCode
@@ -85,7 +94,12 @@ $rsVarsPath = Join-Path $resolvedDelphiBin 'rsvars.bat'
 
 Write-Host 'Compilando ERP.UnitTests (CI/Win32)...'
 
-$buildExitCode = Invoke-DelphiBuild -RsVarsPath $rsVarsPath -ProjectPath $projectPath
+$projectProperties = @()
+if ($DelphiLibPath) { $projectProperties += 'ERPUNITTESTS_DELPHI_LIB="' + ($DelphiLibPath -replace '"', '') + '"' }
+if ($DUnitXPath) { $projectProperties += 'ERPUNITTESTS_DUNITX="' + ($DUnitXPath -replace '"', '') + '"' }
+if ($FastMM5Path) { $projectProperties += 'ERPUNITTESTS_FASTMM5="' + ($FastMM5Path -replace '"', '') + '"' }
+
+$buildExitCode = Invoke-DelphiBuild -RsVarsPath $rsVarsPath -ProjectPath $projectPath -Properties $projectProperties
 if ($buildExitCode -ne 0) {
   Write-Error "A compilação falhou com exit code $buildExitCode."
   exit $buildExitCode

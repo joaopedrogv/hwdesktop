@@ -45,7 +45,9 @@ uses
   StatusRegistroEnumUnit,
   TipoEventoDFeUnit,
   EventoDFeEtdUnit,
-  EventoDFe112150MetadataUnit;
+  EventoDFe112150MetadataUnit,
+  EventoDFeStatusUnit,
+  EventoDFeDuplicidadeValidatorUnit;
 
 const
   TAMANHO_CHAVE_DOCUMENTO = 44;
@@ -76,6 +78,9 @@ var
   Existente: EventoDFeEtd;
   Resultado: EventoDFe112150Etd;
   Saida: CreateEntityUseCaseOutPut;
+  StatusAtual: TStatusEventoDFe;
+  NseqAtual: Integer;
+  ChaveAtual: string;
 begin
   Result := nil;
 
@@ -118,6 +123,9 @@ begin
     Transacao := FConnection.BeginTransaction();
     try
       try
+        ValidarDuplicidadeEventoDFe(FEventosRepo, AEvento.CodEmpresa,
+          AEvento.ChaveDocumento, AEvento.TipoEvento, '');
+
         Header := FEventosRepo.Inserir(AEvento);
         try
           FRepo112150.Inserir(Header.Id, AEvento.DataPrevisaoEntrega);
@@ -165,6 +173,9 @@ begin
     end
     else if Existente.Ativo <> saAtivo then
       raise EValidacaoNegocio.Create('O evento está na lixeira; use Restaurar.');
+    StatusAtual := Existente.Status;
+    NseqAtual := Existente.NseqEvento;
+    ChaveAtual := Existente.ChaveDocumento;
   finally
     Existente.Free;
   end;
@@ -175,6 +186,24 @@ begin
   Transacao := FConnection.BeginTransaction();
   try
     try
+      if not AEvento.Restaurar then
+      begin
+        if StatusAtual = seAutorizado then
+          raise EValidacaoNegocio.Create(
+            'O evento autorizado não pode ser alterado.');
+
+        if StatusAtual = seEnviando then
+          raise EValidacaoNegocio.Create(
+            'O evento em transmissão não pode ser alterado. Consulte a situação do evento.');
+      end;
+
+      if (NseqAtual > 0) and (AEvento.ChaveDocumento <> ChaveAtual) then
+        raise EValidacaoNegocio.Create(
+          'A chave do documento não pode ser alterada depois que o evento recebeu número de sequência.');
+
+      ValidarDuplicidadeEventoDFe(FEventosRepo, AEvento.CodEmpresa,
+        AEvento.ChaveDocumento, AEvento.TipoEvento, AEvento.Id);
+
       Header := FEventosRepo.Atualizar(AEvento);
       try
         FRepo112150.Atualizar(AEvento.Id, AEvento.DataPrevisaoEntrega);

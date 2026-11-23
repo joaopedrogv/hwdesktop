@@ -6,6 +6,7 @@ uses
   DUnitX.TestFramework,
   ISessionContextUnit,
   StatusRegistroEnumUnit,
+  EventoDFeStatusUnit,
   CreateEntityUseCaseOutputUnit,
   EventoDFeEtdUnit,
   EventoDFe112150EtdUnit,
@@ -28,6 +29,11 @@ type
     FUseCase: SalvarEventoDFe112150UseCase;
     procedure SemearEvento(const AId: string; ASeqId: Integer;
       AAtivo: StatusRegistroEnum; ACodEmpresa: Integer);
+    procedure SemearEventoComEstado(const AId: string; ASeqId: Integer;
+      AAtivo: StatusRegistroEnum; ACodEmpresa: Integer;
+      AStatus: TStatusEventoDFe; ANseqEvento: Integer;
+      const AChave: string = '');
+    function RejeitarAoExecutar(AEvento: EventoDFe112150Etd): string;
   public
     [Setup]
     procedure Setup;
@@ -87,7 +93,34 @@ type
     procedure DeveDesfazerTransacaoQuandoAtualizacaoFalhar;
 
     [Test]
-    procedure DevePermitirEventosRepetidosParaAMesmaChave;
+    procedure DeveRejeitarSegundoEventoNaoAutorizadoParaAMesmaChaveETipo;
+
+    [Test]
+    procedure DeveIgnorarOProprioRegistroNaChecagemDeDuplicidade;
+
+    [Test]
+    procedure DeveRejeitarRestauracaoQueColideComRegistroAberto;
+
+    [Test]
+    procedure NaoDeveEditarEventoAutorizado;
+
+    [Test]
+    procedure NaoDeveEditarEventoEnviando;
+
+    [Test]
+    procedure NaoDeveAlterarChaveAposNseqAlocado;
+
+    [Test]
+    procedure DevePermitirCorrigirChaveAntesDaAlocacao;
+
+    [Test]
+    procedure DevePermitirEventoQuandoOAnteriorEstaAutorizado;
+
+    [Test]
+    procedure DevePermitirTiposDiferentesParaAMesmaChave;
+
+    [Test]
+    procedure DevePermitirEventosDeEmpresasDiferentes;
 
     [Test]
     procedure DeveConfirmarEAliberarTransacaoAoAlterar;
@@ -120,14 +153,16 @@ begin
 end;
 
 function CriarHeader(const AId: string; ASeqId: Integer;
-  AAtivo: StatusRegistroEnum; ACodEmpresa: Integer): EventoDFeEtd;
+  AAtivo: StatusRegistroEnum; ACodEmpresa: Integer;
+  const AChave: string = CHAVE_VALIDA;
+  ATipoEvento: TipoEventoDFe = teAtualizacaoPrevisaoEntrega): EventoDFeEtd;
 begin
   Result := EventoDFeEtd.Create(
     AId,
     ASeqId,
     fdNFe,
-    teAtualizacaoPrevisaoEntrega,
-    CHAVE_VALIDA,
+    ATipoEvento,
+    AChave,
     ACodEmpresa,
     AAtivo,
     EncodeDate(2026, 1, 1),
@@ -183,6 +218,40 @@ begin
   end;
 
   FRepo112150.AdicionarDataPrevisao(AId, EncodeDate(2026, 1, 10));
+end;
+
+procedure TTestSalvarEventoDFe112150UseCase.SemearEventoComEstado(const AId: string;
+  ASeqId: Integer; AAtivo: StatusRegistroEnum; ACodEmpresa: Integer;
+  AStatus: TStatusEventoDFe; ANseqEvento: Integer; const AChave: string);
+var
+  Header: EventoDFeEtd;
+  ChaveDoEvento: string;
+begin
+  if AChave = '' then
+    ChaveDoEvento := CHAVE_VALIDA
+  else
+    ChaveDoEvento := AChave;
+
+  Header := CriarHeader(AId, ASeqId, AAtivo, ACodEmpresa, ChaveDoEvento);
+  try
+    FEventosRepo.AdicionarEventoExistente(Header, AStatus, ANseqEvento);
+  finally
+    Header.Free;
+  end;
+
+  FRepo112150.AdicionarDataPrevisao(AId, EncodeDate(2026, 1, 10));
+end;
+
+function TTestSalvarEventoDFe112150UseCase.RejeitarAoExecutar(
+  AEvento: EventoDFe112150Etd): string;
+begin
+  Result := '';
+  try
+    FUseCase.Executar(AEvento);
+  except
+    on E: EValidacaoNegocio do
+      Result := E.Message;
+  end;
 end;
 
 procedure TTestSalvarEventoDFe112150UseCase.DeveInserirComSeqIdDoRascunhoSemRecalcular;
@@ -573,36 +642,253 @@ begin
   Assert.IsTrue(FTransactionState.FreeTransactionCalled);
 end;
 
-procedure TTestSalvarEventoDFe112150UseCase.DevePermitirEventosRepetidosParaAMesmaChave;
+procedure TTestSalvarEventoDFe112150UseCase.DeveRejeitarSegundoEventoNaoAutorizadoParaAMesmaChaveETipo;
 var
+  Rascunho: EventoDFe112150Etd;
+  Mensagem: string;
+begin
+  SemearEventoComEstado('EVENTO-EXISTENTE', 4711, saAtivo, EMPRESA_ID,
+    sePendente, 0);
+
+  Rascunho := CriarRascunho(4712, Date, CHAVE_VALIDA);
+  try
+    Mensagem := RejeitarAoExecutar(Rascunho);
+  finally
+    Rascunho.Free;
+  end;
+
+  Assert.IsTrue(Pos('4711', Mensagem) > 0,
+    'A mensagem deve citar o SEQID do evento existente.');
+  Assert.IsFalse(FEventosRepo.InserirChamado);
+  Assert.IsTrue(FTransactionState.RollbackCalled);
+end;
+
+procedure TTestSalvarEventoDFe112150UseCase.DeveIgnorarOProprioRegistroNaChecagemDeDuplicidade;
+var
+  Evento: EventoDFe112150Etd;
+  Saida: CreateEntityUseCaseOutPut;
+begin
+  SemearEventoComEstado(ID_EVENTO, 4, saAtivo, EMPRESA_ID, sePendente, 0);
+
+  Evento := EventoDFe112150Etd.Create(
+    ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo, Date + 1, 0, 0, False);
+  try
+    Saida := FUseCase.Executar(Evento);
+    try
+      Assert.IsNotNull(Saida.OutputObj);
+      Assert.IsTrue(FEventosRepo.AtualizarChamado);
+      Assert.IsTrue(FTransactionState.CommitCalled);
+      Assert.IsFalse(FTransactionState.RollbackCalled);
+    finally
+      Saida.Free;
+    end;
+  finally
+    Evento.Free;
+  end;
+end;
+
+procedure TTestSalvarEventoDFe112150UseCase.DeveRejeitarRestauracaoQueColideComRegistroAberto;
+var
+  Evento: EventoDFe112150Etd;
+  Mensagem: string;
+begin
+  SemearEventoComEstado(ID_EVENTO, 5, saLixeira, EMPRESA_ID, sePendente, 0);
+  SemearEventoComEstado('EVENTO-ABERTO', 4713, saAtivo, EMPRESA_ID,
+    sePendente, 0);
+
+  Evento := EventoDFe112150Etd.Create(
+    ID_EVENTO, 5, CHAVE_VALIDA, EMPRESA_ID, saLixeira, Date, 0, 0, True);
+  try
+    Mensagem := RejeitarAoExecutar(Evento);
+  finally
+    Evento.Free;
+  end;
+
+  Assert.IsTrue(Pos('4713', Mensagem) > 0,
+    'A restauracao deve citar o SEQID do registro aberto.');
+  Assert.IsFalse(FEventosRepo.AtualizarChamado);
+  Assert.IsTrue(FTransactionState.RollbackCalled);
+end;
+
+procedure TTestSalvarEventoDFe112150UseCase.NaoDeveEditarEventoAutorizado;
+var
+  Evento: EventoDFe112150Etd;
+  Mensagem: string;
+begin
+  SemearEventoComEstado(ID_EVENTO, 4, saAtivo, EMPRESA_ID, seAutorizado, 1);
+
+  Evento := EventoDFe112150Etd.Create(
+    ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo, Date + 1, 0, 0, False);
+  try
+    Mensagem := RejeitarAoExecutar(Evento);
+  finally
+    Evento.Free;
+  end;
+
+  Assert.IsTrue(Mensagem <> '');
+  Assert.IsFalse(FEventosRepo.AtualizarChamado);
+  Assert.IsTrue(FTransactionState.RollbackCalled);
+end;
+
+procedure TTestSalvarEventoDFe112150UseCase.NaoDeveEditarEventoEnviando;
+var
+  Evento: EventoDFe112150Etd;
+  Mensagem: string;
+begin
+  SemearEventoComEstado(ID_EVENTO, 4, saAtivo, EMPRESA_ID, seEnviando, 1);
+
+  Evento := EventoDFe112150Etd.Create(
+    ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo, Date + 1, 0, 0, False);
+  try
+    Mensagem := RejeitarAoExecutar(Evento);
+  finally
+    Evento.Free;
+  end;
+
+  Assert.IsTrue(Mensagem <> '');
+  Assert.IsFalse(FEventosRepo.AtualizarChamado);
+  Assert.IsTrue(FTransactionState.RollbackCalled);
+end;
+
+procedure TTestSalvarEventoDFe112150UseCase.NaoDeveAlterarChaveAposNseqAlocado;
+var
+  Evento: EventoDFe112150Etd;
+  Mensagem: string;
+begin
+  SemearEventoComEstado(ID_EVENTO, 4, saAtivo, EMPRESA_ID, sePendente, 2);
+
+  Evento := EventoDFe112150Etd.Create(
+    ID_EVENTO, 4, CHAVE_OUTRA, EMPRESA_ID, saAtivo, Date + 1, 0, 0, False);
+  try
+    Mensagem := RejeitarAoExecutar(Evento);
+  finally
+    Evento.Free;
+  end;
+
+  Assert.IsTrue(Mensagem <> '');
+  Assert.IsFalse(FEventosRepo.AtualizarChamado);
+  Assert.IsTrue(FTransactionState.RollbackCalled);
+end;
+
+procedure TTestSalvarEventoDFe112150UseCase.DevePermitirCorrigirChaveAntesDaAlocacao;
+var
+  Evento: EventoDFe112150Etd;
+  Saida: CreateEntityUseCaseOutPut;
+begin
+  SemearEventoComEstado(ID_EVENTO, 4, saAtivo, EMPRESA_ID, sePendente, 0);
+
+  Evento := EventoDFe112150Etd.Create(
+    ID_EVENTO, 4, CHAVE_OUTRA, EMPRESA_ID, saAtivo, Date + 1, 0, 0, False);
+  try
+    Saida := FUseCase.Executar(Evento);
+    try
+      Assert.IsNotNull(Saida.OutputObj);
+      Assert.AreEqual(CHAVE_OUTRA,
+        EventoDFe112150Etd(Saida.OutputObj).ChaveDocumento);
+      Assert.IsTrue(FEventosRepo.AtualizarChamado);
+      Assert.IsTrue(FTransactionState.CommitCalled);
+    finally
+      Saida.Free;
+    end;
+  finally
+    Evento.Free;
+  end;
+end;
+
+procedure TTestSalvarEventoDFe112150UseCase.DevePermitirEventoQuandoOAnteriorEstaAutorizado;
+var
+  Autorizado: EventoDFeEtd;
+  Rascunho: EventoDFe112150Etd;
+  Saida: CreateEntityUseCaseOutPut;
+begin
+  Autorizado := CriarHeader('EVENTO-AUTORIZADO', 1, saAtivo, EMPRESA_ID);
+  try
+    FEventosRepo.AdicionarEventoExistente(Autorizado, seAutorizado, 1);
+  finally
+    Autorizado.Free;
+  end;
+
+  Rascunho := CriarRascunho(2, Date, CHAVE_VALIDA);
+  try
+    Saida := FUseCase.Executar(Rascunho);
+    try
+      Assert.IsNotNull(Saida.OutputObj);
+      Assert.AreEqual(1, FEventosRepo.InserirChamadas);
+    finally
+      Saida.Free;
+    end;
+  finally
+    Rascunho.Free;
+  end;
+end;
+
+procedure TTestSalvarEventoDFe112150UseCase.DevePermitirTiposDiferentesParaAMesmaChave;
+var
+  OutroTipo: EventoDFeEtd;
+  Rascunho: EventoDFe112150Etd;
+  Saida: CreateEntityUseCaseOutPut;
+begin
+  OutroTipo := CriarHeader('EVENTO-211130', 1, saAtivo, EMPRESA_ID,
+    CHAVE_VALIDA, teImobilizacaoItem);
+  try
+    FEventosRepo.AdicionarEventoExistente(OutroTipo);
+  finally
+    OutroTipo.Free;
+  end;
+
+  Rascunho := CriarRascunho(2, Date, CHAVE_VALIDA);
+  try
+    Saida := FUseCase.Executar(Rascunho);
+    try
+      Assert.IsNotNull(Saida.OutputObj);
+      Assert.AreEqual(1, FEventosRepo.InserirChamadas);
+    finally
+      Saida.Free;
+    end;
+  finally
+    Rascunho.Free;
+  end;
+end;
+
+procedure TTestSalvarEventoDFe112150UseCase.DevePermitirEventosDeEmpresasDiferentes;
+var
+  OutraSession: ISessionContext;
+  OutroRepo: TEventoDFe112150RepositoryStub;
+  OutroUseCase: SalvarEventoDFe112150UseCase;
   Primeiro: EventoDFe112150Etd;
   Segundo: EventoDFe112150Etd;
-  SaidaPrimeiro: CreateEntityUseCaseOutPut;
-  SaidaSegundo: CreateEntityUseCaseOutPut;
+  Saida: CreateEntityUseCaseOutPut;
 begin
   Primeiro := CriarRascunho(1, Date, CHAVE_VALIDA);
   try
-    SaidaPrimeiro := FUseCase.Executar(Primeiro);
+    Saida := FUseCase.Executar(Primeiro);
     try
-      Assert.IsNotNull(SaidaPrimeiro.OutputObj);
+      Assert.IsNotNull(Saida.OutputObj);
+    finally
+      Saida.Free;
+    end;
 
+    OutraSession := TSessionContextStub.Create(OUTRA_EMPRESA_ID);
+    OutroRepo := TEventoDFe112150RepositoryStub.Create;
+    OutroUseCase := SalvarEventoDFe112150UseCase.Create(
+      FConnection, OutraSession, FEventosRepo, OutroRepo);
+    try
       Segundo := CriarRascunho(2, Date, CHAVE_VALIDA);
       try
-        SaidaSegundo := FUseCase.Executar(Segundo);
+        Saida := OutroUseCase.Executar(Segundo);
         try
-          Assert.IsNotNull(SaidaSegundo.OutputObj);
+          Assert.IsNotNull(Saida.OutputObj);
           Assert.AreEqual(2, FEventosRepo.InserirChamadas);
-          Assert.AreEqual(
-            EventoDFe112150Etd(SaidaPrimeiro.OutputObj).ChaveDocumento,
-            EventoDFe112150Etd(SaidaSegundo.OutputObj).ChaveDocumento);
         finally
-          SaidaSegundo.Free;
+          Saida.Free;
         end;
       finally
         Segundo.Free;
       end;
     finally
-      SaidaPrimeiro.Free;
+      OutroUseCase.Free;
+      OutroRepo.Free;
+      OutraSession := nil;
     end;
   finally
     Primeiro.Free;

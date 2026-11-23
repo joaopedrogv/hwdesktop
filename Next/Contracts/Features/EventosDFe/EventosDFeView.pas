@@ -14,6 +14,11 @@ type
     function AbrirInclusao(const AChave, ATitulo: string): Boolean;
     // A mesma aba atende alteração e restauração; a intenção vem do modo recebido.
     function AbrirEdicao(const ASelecao: TEventoDFeSelecionado; AModo: TModoEventoDFe): Boolean;
+    // A operação é síncrona na thread da interface: a espera desabilita os comandos e termina mesmo com erro.
+    procedure IniciarTransmissao;
+    procedure EncerrarTransmissao;
+    procedure IniciarConsultaSituacao;
+    procedure EncerrarConsultaSituacao;
   end;
 
 implementation

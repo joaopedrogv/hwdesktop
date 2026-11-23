@@ -32,6 +32,7 @@ uses
   SysUtils,
   ITransactionUnit,
   EValidacaoNegocioUnit,
+  EventoDFeStatusUnit,
   StatusRegistroEnumUnit;
 
 { RemoverEventoDFeUseCase }
@@ -57,6 +58,13 @@ begin
   try
     if Header.Ativo = saLixeira then
       raise EValidacaoNegocio.Create('O evento já está na lixeira.');
+
+    if Header.Status = seEnviando then
+      raise EValidacaoNegocio.Create(
+        'O evento está Enviando; aguarde a conclusão da transmissão antes de excluí-lo.');
+
+    if Header.Status = seAutorizado then
+      raise EValidacaoNegocio.Create('Evento autorizado não pode ser excluído.');
   finally
     Header.Free;
   end;
