@@ -30,7 +30,7 @@ implementation
 uses
   SysUtils,
   StatusRegistroEnumUnit,
-  ParameterValueUnit, QueryResultUnit, ITransactionUnit,
+  ParameterValueUnit, QueryResultUnit,
   IDataBaseConnectionUnit,
   StringServiceUnit,
   Classes, Contnrs, ArrayServiceUnit,
@@ -356,7 +356,6 @@ end;
 function OperacoesFiscaisIbsCbsRepository.Post(Input: OperacaoFiscalIbsCbsEtd): OperacaoFiscalIbsCbsEtd;
 var
   Params: ParametersValues;
-  transacao: ITransaction;
   registroId: string;
 begin
   registroId := GenerateNewUUID();
@@ -370,41 +369,30 @@ begin
       .ByName('DATA_FIM_VIGENCIA', Input.FimVigencia )
       .Build();
 
-  transacao := FConnection.BeginTransaction();
-  try
+  // A transacao pertence ao caso de uso; aqui apenas executamos as gravacoes
+  // e a releitura do agregado na conexao recebida.
+  FConnection.ExecuteCommand(
+    'INSERT INTO OP_FISCAIS_IBSCBS ' +
+    ' (ID, OP_INTERNA_ID, REGRA_FISCAL_ID, GRUPO_FISCAL_ID, ' +
+    '    DATA_INI_VIGENCIA, DATA_FIM_VIGENCIA) ' +
+    ' VALUES ' +
+    '(:ID, :OP_INTERNA_ID, :REGRA_FISCAL_ID, :GRUPO_FISCAL_ID, ' +
+    '    :DATA_INI_VIGENCIA, :DATA_FIM_VIGENCIA)',
+    Params
+  );
+
+  if Length(Input.EmpresasId) > 0 then
     FConnection.ExecuteCommand(
-      'INSERT INTO OP_FISCAIS_IBSCBS ' +
-      ' (ID, OP_INTERNA_ID, REGRA_FISCAL_ID, GRUPO_FISCAL_ID, ' +
-      '    DATA_INI_VIGENCIA, DATA_FIM_VIGENCIA) ' +
-      ' VALUES ' +
-      '(:ID, :OP_INTERNA_ID, :REGRA_FISCAL_ID, :GRUPO_FISCAL_ID, ' +
-      '    :DATA_INI_VIGENCIA, :DATA_FIM_VIGENCIA)',
-      Params
+      Format(
+        'INSERT INTO OP_FISCAIS_IBSCBS_EMP ' +
+        '  (OP_FISCAIS_ID, COD_EMPRESA) ' +
+        'SELECT CAST(:P_0 AS CHAR(36)), E.COD_EMPRESA FROM EMPRESA E ' +
+        'WHERE E.COD_EMPRESA IN (%s) ', [ StringService.Join(',', ArrayService.IntArrayToStringArray(Input.EmpresasId)) ]
+      ),
+      ParametersBuilder.Create(1).Add( registroId ).Build()
     );
 
-    if Length(Input.EmpresasId) > 0 then
-      FConnection.ExecuteCommand(
-        Format(
-          'INSERT INTO OP_FISCAIS_IBSCBS_EMP ' +
-          '  (OP_FISCAIS_ID, COD_EMPRESA) ' +
-          'SELECT CAST(:P_0 AS CHAR(36)), E.COD_EMPRESA FROM EMPRESA E ' +
-          'WHERE E.COD_EMPRESA IN (%s) ', [ StringService.Join(',', ArrayService.IntArrayToStringArray(Input.EmpresasId)) ]
-        ),
-        ParametersBuilder.Create(1).Add( registroId ).Build()
-      );
-
-    InserirCondicoes(FConnection, registroId, Input.Condicoes);
-
-    transacao.Commit();
-    {$IFNDEF INTF_ON} transacao.Free(); {$ENDIF}
-
-  except on E: Exception do
-    begin
-      transacao.Rollback();
-      {$IFNDEF INTF_ON} transacao.Free(); {$ENDIF}
-      raise;
-    end;
-  end;
+  InserirCondicoes(FConnection, registroId, Input.Condicoes);
 
   Result := GetById( registroId );
 
@@ -413,7 +401,6 @@ end;
 function OperacoesFiscaisIbsCbsRepository.Put(Input: OperacaoFiscalIbsCbsEtd): OperacaoFiscalIbsCbsEtd;
 var
   Params: ParametersValues;
-  transacao: ITransaction;
 begin
   Params := ParametersBuilder.Create(13)
       .ByName('ID', Input.Id )
@@ -425,62 +412,50 @@ begin
       .ByName('ATIVO', Ord(Input.Ativo) )
       .Build();
 
-  transacao := FConnection.BeginTransaction();
+  // A transacao pertence ao caso de uso; a substituicao de condicoes e a
+  // releitura do agregado participam da mesma transacao da conexao.
+  FConnection.ExecuteCommand(
+    'UPDATE OP_FISCAIS_IBSCBS ' +
+    ' SET OP_INTERNA_ID = :OP_INTERNA_ID, REGRA_FISCAL_ID = :REGRA_FISCAL_ID, ' +
+    ' GRUPO_FISCAL_ID = :GRUPO_FISCAL_ID, ' +
+    ' DATA_INI_VIGENCIA = :DATA_INI_VIGENCIA, DATA_FIM_VIGENCIA = :DATA_FIM_VIGENCIA, ' +
+    ' ATIVO = :ATIVO, DATA_ALTERACAO = CURRENT_TIMESTAMP ' +
+    'WHERE ID = :ID',
+    Params
+  );
 
-  try
+  if Length(Input.EmpresasId) = 0 then
     FConnection.ExecuteCommand(
-      'UPDATE OP_FISCAIS_IBSCBS ' +
-      ' SET OP_INTERNA_ID = :OP_INTERNA_ID, REGRA_FISCAL_ID = :REGRA_FISCAL_ID, ' +
-      ' GRUPO_FISCAL_ID = :GRUPO_FISCAL_ID, ' +
-      ' DATA_INI_VIGENCIA = :DATA_INI_VIGENCIA, DATA_FIM_VIGENCIA = :DATA_FIM_VIGENCIA, ' +
-      ' ATIVO = :ATIVO, DATA_ALTERACAO = CURRENT_TIMESTAMP ' +
-      'WHERE ID = :ID',
-      Params
-    );
-
-    if Length(Input.EmpresasId) = 0 then
-      FConnection.ExecuteCommand(
+      'DELETE FROM OP_FISCAIS_IBSCBS_EMP ' +
+      'WHERE OP_FISCAIS_ID = :ID ',
+      ParametersBuilder.Create(1).Add( Input.Id ).Build()
+    )
+  else
+  begin
+    FConnection.ExecuteCommand(
+      Format(
         'DELETE FROM OP_FISCAIS_IBSCBS_EMP ' +
-        'WHERE OP_FISCAIS_ID = :ID ',
-        ParametersBuilder.Create(1).Add( Input.Id ).Build()
-      )
-    else
-    begin
-      FConnection.ExecuteCommand(
-        Format(
-          'DELETE FROM OP_FISCAIS_IBSCBS_EMP ' +
-          'WHERE OP_FISCAIS_ID = :ID ' +
-          'AND COD_EMPRESA NOT IN (%s)', [ StringService.Join(',', ArrayService.IntArrayToStringArray(Input.EmpresasId)) ]
-        ),
-        ParametersBuilder.Create(1).Add( Input.Id ).Build()
-      );
-      FConnection.ExecuteCommand(
-        Format(
-          'INSERT INTO OP_FISCAIS_IBSCBS_EMP ' +
-          '  (OP_FISCAIS_ID, COD_EMPRESA) ' +
-          'SELECT CAST(:ID AS CHAR(36)), E.COD_EMPRESA FROM EMPRESA E ' +
-          '  LEFT JOIN OP_FISCAIS_IBSCBS_EMP R ON ' +
-          '    R.COD_EMPRESA = E.COD_EMPRESA AND' +
-          '    R.OP_FISCAIS_ID = :ID ' +
-          'WHERE E.COD_EMPRESA IN (%s) ' +
-          'AND R.OP_FISCAIS_ID IS NULL ', [ StringService.Join(',', ArrayService.IntArrayToStringArray(Input.EmpresasId)) ]
-        ),
-        ParametersBuilder.Create(1).ByName('ID', Input.Id ).Build()
-      );
-    end;
-
-    SubstituirCondicoes(FConnection, Input.Id, Input.Condicoes);
-
-    transacao.Commit();
-    {$IFNDEF INTF_ON} transacao.Free(); {$ENDIF}
-
-  except on E: Exception do
-    begin
-      transacao.Rollback();
-      {$IFNDEF INTF_ON} transacao.Free(); {$ENDIF}
-      raise;
-    end;
+        'WHERE OP_FISCAIS_ID = :ID ' +
+        'AND COD_EMPRESA NOT IN (%s)', [ StringService.Join(',', ArrayService.IntArrayToStringArray(Input.EmpresasId)) ]
+      ),
+      ParametersBuilder.Create(1).Add( Input.Id ).Build()
+    );
+    FConnection.ExecuteCommand(
+      Format(
+        'INSERT INTO OP_FISCAIS_IBSCBS_EMP ' +
+        '  (OP_FISCAIS_ID, COD_EMPRESA) ' +
+        'SELECT CAST(:ID AS CHAR(36)), E.COD_EMPRESA FROM EMPRESA E ' +
+        '  LEFT JOIN OP_FISCAIS_IBSCBS_EMP R ON ' +
+        '    R.COD_EMPRESA = E.COD_EMPRESA AND' +
+        '    R.OP_FISCAIS_ID = :ID ' +
+        'WHERE E.COD_EMPRESA IN (%s) ' +
+        'AND R.OP_FISCAIS_ID IS NULL ', [ StringService.Join(',', ArrayService.IntArrayToStringArray(Input.EmpresasId)) ]
+      ),
+      ParametersBuilder.Create(1).ByName('ID', Input.Id ).Build()
+    );
   end;
+
+  SubstituirCondicoes(FConnection, Input.Id, Input.Condicoes);
 
   Result := GetById( Input.Id );
 end;

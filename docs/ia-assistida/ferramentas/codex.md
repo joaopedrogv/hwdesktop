@@ -87,8 +87,7 @@ O Orchestrator usa somente os estados definidos pelo protocolo ou por uma extens
 explícita do Workflow. Uma aprovação pendente fica em `pending_gate`, sem criar um
 novo nome de estado específico do adapter.
 
-Kilo Code e AiderDesk também usam o agente principal como orquestrador, selecionando
-seu perfil local `modern-workflow-orchestrator` na conversa.
+Kilo Code e OpenCode usam o perfil local `coordinator` como agente principal.
 
 Exemplo:
 

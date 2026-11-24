@@ -360,6 +360,7 @@ uses
   TributoDFeImpostoSeletivoEtdUnit in '..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeImpostoSeletivoEtdUnit.pas',
   TributoDFeMonofasiaIbsCbsEtdUnit in '..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeMonofasiaIbsCbsEtdUnit.pas',
   TributoDFeTransfCredIbsCbsEtdUnit in '..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeTransfCredIbsCbsEtdUnit.pas',
+  GrupoFiscalMetadataUnit in '..\ERP.Features\Core\Domain\Metadata\GrupoFiscalMetadataUnit.pas',
   DFeAlertaMetadataUnit in '..\ERP.Features\Core\Domain\Metadata\DFeAlertaMetadataUnit.pas',
   NFSeMetadataUnit in '..\ERP.Features\Core\Domain\Metadata\NFSeMetadataUnit.pas',
   NFSeOSMetadataUnit in '..\ERP.Features\Core\Domain\Metadata\NFSeOSMetadataUnit.pas',
@@ -727,7 +728,9 @@ uses
   LocalIncidenciaEnumUnit in '..\Fiscal.Calculos\Core\Domain\Entities\LocalIncidenciaEnumUnit.pas',
   LocalFornecimentoEnumUnit in '..\Fiscal.Calculos\Core\Domain\Entities\LocalFornecimentoEnumUnit.pas',
   ConsultarLocaisFornecimentoUseCaseUnit in '..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocaisFornecimentoUseCaseUnit.pas',
-  ConsultarLocaisIncidenciaUseCaseUnit in '..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocaisIncidenciaUseCaseUnit.pas';
+  ConsultarLocaisIncidenciaUseCaseUnit in '..\Fiscal.Calculos\Core\Application\UseCases\Nfse\ConsultarLocaisIncidenciaUseCaseUnit.pas',
+  FireDACTransactionUnit in '..\Adapters\Secondary\Database\FireDAC\FireDACTransactionUnit.pas',
+  FireDACDatabaseConnectionUnit in '..\Adapters\Secondary\Database\FireDAC\FireDACDatabaseConnectionUnit.pas';
 
 var
   observer: IProgressObserver;

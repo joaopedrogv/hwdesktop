@@ -197,6 +197,7 @@
     ..\Core\Infrastructure\Data\ScalarResultUnit.pas;
     ..\Core\Infrastructure\Interfaces\IDatabaseConnectionFactoryUnit.pas;
     ..\Core\Infrastructure\Interfaces\IDataBaseConnectionUnit.pas;
+    ..\Core\Infrastructure\Interfaces\IDataSetReaderUnit.pas;
     ..\Core\Infrastructure\Interfaces\IObjectCacheUnit.pas;
     ..\Core\Infrastructure\Interfaces\IProgressObserverUnit.pas;
     ..\Core\Infrastructure\Interfaces\IRecordCacheUnit.pas;
@@ -389,6 +390,7 @@
     ..\Core\Infrastructure\Exceptions\EValidacaoNegocioUnit.pas;
     ..\ERP.Features\Core\Domain\Entities\OperacaoInternaEtdUnit.pas;
     ..\ERP.Features\Core\Domain\Metadata\OperacaoInternaMetadataUnit.pas;
+    ..\ERP.Features\Core\Domain\Metadata\GrupoFiscalMetadataUnit.pas;
     ..\ERP.Features\Core\Domain\Ports\IOperacoesInternasRepositoryUnit.pas;
     ..\ERP.Features\Adapters\Secondary\Repositories\OperacoesInternasRepositoryUnit.pas;
     ..\ERP.Features\Core\Application\UseCases\OperacoesInternas\ObterOperacaoInternaPorIdUseCaseUnit.pas;

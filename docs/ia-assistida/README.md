@@ -276,7 +276,7 @@ O setup de uma ferramenta também pode ser solicitado diretamente:
 
 ```text
 Configure o setup do Kilo.
-Mude para o AiderDesk.
+Mude para o Codex.
 Adicione o Codex.
 Remova o setup do Kilo.
 ```
@@ -334,7 +334,7 @@ canônica é
 Para entender a seleção de capacidade, raciocínio, latência e custo, consulte
 [Perfis de execução](perfis-de-execucao.md).
 
-Para os caminhos, comandos e perfis específicos de AiderDesk, OpenCode, Codex,
+Para os caminhos, comandos e perfis específicos de OpenCode, Codex,
 Antigravity IDE e Kilo Code, consulte
 [Adapters de ferramentas](adapters-de-ferramentas.md).
 

@@ -1830,9 +1830,9 @@ function Test-AISetup {
         [void][IO.Directory]::CreateDirectory((Split-Path -Parent $path))
         [IO.File]::WriteAllText($path, $Content, [Text.UTF8Encoding]::new($false))
     }
-    function InvokeSetup([string[]]$Parameters) {
+    function InvokeSetup([string[]]$Parameters, [string]$Tool = 'Kilo') {
         $scriptPath = Join-Path $project '_automation/ai/Sync-AIProfiles.ps1'
-        $output = @(& $engine -NoLogo -NoProfile -File $scriptPath -Tool Kilo @Parameters 2>&1)
+        $output = @(& $engine -NoLogo -NoProfile -File $scriptPath -Tool $Tool @Parameters 2>&1)
         [pscustomobject]@{ Code=$LASTEXITCODE; Output=($output -join [Environment]::NewLine) }
     }
     function InstalledHashes {
@@ -1946,6 +1946,29 @@ function Test-AISetup {
             $result=InvokeSetup @('-Action','Check')
             Assert-Check ($result.Code -eq 2 -and (InstalledHashes) -ceq $hashes) 'Check identifica drift e retorna 2 sem corrigir ou alterar arquivos'
 
+            $result = InvokeSetup @('-Action','Plan') OpenCode
+            Assert-Check ($result.Code -eq 0 -and -not (Test-Path -LiteralPath (Join-Path $project '.opencode'))) 'Plano do OpenCode é somente leitura'
+            WriteFixture '.opencode/agents/reviewer.md' ([IO.File]::ReadAllText((Join-Path $project '.kilo/agents/reviewer.md')))
+            WriteFixture '.opencode/opencode.jsonc' '{ "local": "preservar" }'
+            $localReview = Join-Path $project '.opencode/agents/reviewer.md'
+            $reviewHash = (Get-FileHash -LiteralPath $localReview).Hash
+            $result = InvokeSetup @('-Action','Apply') OpenCode
+            if ($result.Code -ne 0) { throw $result.Output }
+            $opencodeAgents = @(Get-ChildItem -LiteralPath (Join-Path $project '.opencode/agents') -Filter '*.md' | ForEach-Object BaseName | Sort-Object)
+            $opencodeCommands = @(Get-ChildItem -LiteralPath (Join-Path $project '.opencode/commands') -Filter '*.md')
+            Assert-Check (($opencodeAgents -join '|') -ceq ($expected -join '|') -and $opencodeCommands.Count -eq 3 -and (Get-FileHash -LiteralPath $localReview).Hash -eq $reviewHash) 'OpenCode instala os mesmos perfis e comandos e adota arquivo equivalente'
+            $result = InvokeSetup @('-Action','Check') OpenCode
+            Assert-Check ($result.Code -eq 0) 'Check confirma o OpenCode e Shared'
+            $modelConfig = @{schemaVersion=1;opencodeAgents=@{implementer=@{model='fake/opencode-model#high'}}}
+            WriteFixture '_automation/config/ai-models.local.json' ($modelConfig | ConvertTo-Json -Depth 6)
+            $kiloHash = (Get-FileHash -LiteralPath (Join-Path $project '.kilo/agents/implementer.md')).Hash
+            $result = InvokeSetup @('-Action','Apply') OpenCode
+            $opencodeImplementer = [IO.File]::ReadAllText((Join-Path $project '.opencode/agents/implementer.md'))
+            Assert-Check ($result.Code -eq 0 -and $opencodeImplementer.Contains('model: fake/opencode-model#high') -and (Get-FileHash -LiteralPath (Join-Path $project '.kilo/agents/implementer.md')).Hash -eq $kiloHash) 'Modelo do OpenCode pode ser definido independentemente do Kilo'
+            [IO.File]::Delete((Join-Path $project '_automation/config/ai-models.local.json'))
+            $result = InvokeSetup @('-Action','Remove') OpenCode
+            Assert-Check ($result.Code -eq 0 -and -not (Test-Path -LiteralPath $localReview) -and (Test-Path -LiteralPath (Join-Path $project '.opencode/opencode.jsonc')) -and (Test-Path -LiteralPath (Join-Path $project '.kilo/.modern-ai-setup.json')) -and (Test-Path -LiteralPath (Join-Path $project '.agents/.modern-ai-setup.json'))) 'Remove OpenCode preserva a configuração pessoal, Kilo e Shared'
+
             $statePath=Join-Path $project '.kilo/.modern-ai-setup.json'
             $state=Get-Content -LiteralPath $statePath -Raw | ConvertFrom-Json
             $state.files=@([pscustomobject]@{path='../fora-do-projeto.txt';sha256='invalido'})
@@ -1956,7 +1979,8 @@ function Test-AISetup {
 
             $menu=Join-Path $automationRoot 'menu.ps1'
             $output=@(& $engine -NoLogo -NoProfile -File $menu -Section AI -Preview -NoColor 2>&1)
-            Assert-Check ($LASTEXITCODE -eq 0 -and ($output -join '|').Contains('Aplicar / atualizar Kilo')) 'Submenu de IA pode ser visualizado sem executar setup'
+            $menuText = $output -join '|'
+            Assert-Check ($LASTEXITCODE -eq 0 -and $menuText.Contains('Aplicar / atualizar Kilo') -and $menuText.Contains('Aplicar / atualizar OpenCode')) 'Submenu de IA mostra Kilo e OpenCode sem executar setup'
         }
         finally {Pop-Location}
     }

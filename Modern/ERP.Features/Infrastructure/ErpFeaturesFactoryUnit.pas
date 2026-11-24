@@ -1,6 +1,6 @@
 unit ErpFeaturesFactoryUnit;
 
-interface     
+interface
 
 uses
   ErpFeaturesFactoryBaseUnit,
@@ -85,8 +85,6 @@ type
   IListarTodasEmpresasUseCase = ListarEmpresasUseCase;
   IListarEmpresasPermitidasUseCase = ListarEmpresasUseCase;
   IObterGrupoFiscalPorIdUseCase = ObterGrupoFiscalPorIdUseCase;
-  ISalvarGrupoFiscalUseCase = SalvarGrupoFiscalUseCase;
-  IRemoverGrupoFiscalUseCase = RemoverGrupoFiscalUseCase;
   IObterOperacaoInternaPorIdUseCase = ObterOperacaoInternaPorIdUseCase;
   ISalvarOperacaoInternaUseCase = SalvarOperacaoInternaUseCase;
   IRemoverOperacaoInternaUseCase = RemoverOperacaoInternaUseCase;
@@ -549,6 +547,7 @@ end;
 function ErpFeaturesFactory.CreateCriarGruposFiscaisDeAnexosUseCase: ICriarGruposFiscaisDeAnexosUseCase;
 begin
   Result := CriarGruposFiscaisDeAnexosUseCase.Create(
+    FDatabaseConnection,
     ErpFeaturesRepoContainer.GetInstance().GruposFiscaisRepo,
     SharedRepoContainer.GetInstance().AnexosRepo,
     ErpFeaturesRepoContainer.GetInstance().EmpresasRepo
@@ -783,7 +782,7 @@ function ErpFeaturesFactory.CreateListarTributosNFePorIdUseCase(): IListarTribut
 begin
   Result := ListarTributosNFe.Create(
     ErpFeaturesRepoContainer.GetInstance().TributosDFeRepo
-  );          
+  );
 end;
 
 function ErpFeaturesFactory.CreateListarTributosNFePorItemUseCase: IListarTributosNFePorItemUseCase;
@@ -1020,6 +1019,7 @@ end;
 function ErpFeaturesFactory.CreateRemoverGruposFiscaisUseCase: IRemoverGrupoFiscalUseCase;
 begin
   Result := RemoverGrupoFiscalUseCase.Create(
+    FDatabaseConnection,
     ErpFeaturesRepoContainer.GetInstance().GruposFiscaisRepo
   );
 end;
@@ -1046,6 +1046,7 @@ end;
 function ErpFeaturesFactory.CreateRemoverOperacaoFiscalIbsCbsUseCase: IRemoverOperacaoFiscalIbsCbsUseCase;
 begin
   Result := RemoverOperacaoFiscalIbsCbsUseCase.Create(
+    FDatabaseConnection,
     ErpFeaturesRepoContainer.GetInstance().OperacoesFiscaisIbsCbsRepo
   );
 end;
@@ -1146,6 +1147,7 @@ end;
 function ErpFeaturesFactory.CreateSalvarGruposFiscaisUseCase: ISalvarGrupoFiscalUseCase;
 begin
   Result := SalvarGrupoFiscalUseCase.Create(
+    FDatabaseConnection,
     ErpFeaturesRepoContainer.GetInstance().GruposFiscaisRepo
   );
 end;
@@ -1153,6 +1155,7 @@ end;
 function ErpFeaturesFactory.CreateSalvarOperacaoFiscalIbsCbsUseCase: ISalvarOperacaoFiscalIbsCbsUseCase;
 begin
   Result := SalvarOperacaoFiscalIbsCbsUseCase.Create(
+    FDatabaseConnection,
     ErpFeaturesRepoContainer.GetInstance().OperacoesFiscaisIbsCbsRepo
   );
 end;

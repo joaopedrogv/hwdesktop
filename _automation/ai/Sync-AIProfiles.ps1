@@ -1,6 +1,6 @@
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
 param(
-    [ValidateSet('Kilo', 'AiderDesk', 'Codex', 'Shared', 'All')]
+    [ValidateSet('Kilo', 'OpenCode', 'Codex', 'Shared', 'All')]
     [string]$Tool = 'All',
 
     [ValidateSet('Plan', 'Apply', 'Check', 'Remove', 'Switch')]
@@ -115,7 +115,7 @@ function Get-ToolSetupPath {
 
     switch ($ToolName) {
         'Kilo' { return 'tools/kilo/setup.json' }
-        'AiderDesk' { return 'tools/aider-desk/setup.json' }
+        'OpenCode' { return 'tools/opencode/setup.json' }
         'Codex' { return 'tools/codex/setup.json' }
         'Shared' { return 'shared/setup.json' }
         default { throw "Unsupported setup tool: $ToolName" }
@@ -126,8 +126,8 @@ function Get-ToolPackageRelativeRoot {
     param([Parameter(Mandatory = $true)][string]$ToolName)
 
     switch ($ToolName) {
-        'Kilo' { return 'tools/kilo' }
-        'AiderDesk' { return 'tools/aider-desk' }
+        'Kilo' { return 'shared/markdown' }
+        'OpenCode' { return 'shared/markdown' }
         'Codex' { return 'tools/codex' }
         'Shared' { return 'shared' }
         default { throw "Unsupported setup tool: $ToolName" }
@@ -288,23 +288,6 @@ function Get-AgentsConfiguration {
         if (-not (Test-Path -LiteralPath (Join-Path $script:RepositoryRoot ".ai\agents\$($agent.canonicalRole).md") -PathType Leaf)) {
             throw "Canonical Agent role not found: '$($agent.canonicalRole)'"
         }
-        $parsedId = [guid]::Empty
-        if (-not [guid]::TryParse([string]$agent.aiderDesk.id, [ref]$parsedId)) {
-            throw "Invalid AiderDesk Agent ID: '$($agent.aiderDesk.id)'"
-        }
-    }
-
-    $ids = @($configuration.agents | ForEach-Object { $_.aiderDesk.id })
-    if (($ids | Sort-Object -Unique).Count -ne $ids.Count) {
-        throw 'agents.json contains duplicate AiderDesk IDs.'
-    }
-
-    $orders = @($configuration.agents | ForEach-Object { [int]$_.aiderDesk.order })
-    if (($orders | Sort-Object -Unique).Count -ne $orders.Count) {
-        throw 'agents.json contains duplicate AiderDesk order positions.'
-    }
-    if ((($orders | Sort-Object) -join ',') -cne ((0..($orders.Count - 1)) -join ',')) {
-        throw 'AiderDesk order positions must be contiguous and start at zero.'
     }
 
     return $configuration
@@ -332,15 +315,20 @@ function Get-ExecutionProfileMapping {
     return $toolMapping.Value
 }
 
-function Set-KiloModel {
-    param([Parameter(Mandatory = $true)][string]$Content, [AllowNull()][AllowEmptyString()][string]$Model)
+function Set-MarkdownAgentModel {
+    param(
+        [Parameter(Mandatory = $true)][string]$Content,
+        [AllowNull()][AllowEmptyString()][string]$Model,
+        [switch]$AllowVariant
+    )
 
-    # No model field means the user's Kilo configuration or primary model applies.
+    # An omitted model field leaves selection to the client.
     $contentWithoutModel = [regex]::Replace($Content, '(?m)^model:[^\r\n]*(?:\r?\n|$)', '')
     if ([string]::IsNullOrWhiteSpace($Model)) { return $contentWithoutModel }
-    if ($Model -notmatch '^[A-Za-z0-9._:/@+-]+$') { throw 'Invalid personal Kilo model identifier.' }
+    $pattern = if ($AllowVariant) { '^[A-Za-z0-9._:/@+-]+(#[A-Za-z0-9._+-]+)?$' } else { '^[A-Za-z0-9._:/@+-]+$' }
+    if ($Model -notmatch $pattern) { throw 'Invalid personal Markdown Agent model identifier.' }
     $front = [regex]::Match($contentWithoutModel, '\A---\r?\n')
-    if (-not $front.Success) { throw 'Kilo Agent template has no frontmatter.' }
+    if (-not $front.Success) { throw 'Markdown Agent template has no frontmatter.' }
     return $contentWithoutModel.Insert($front.Length, ('model: ' + $Model + [Environment]::NewLine))
 }
 
@@ -446,7 +434,7 @@ function Add-CommandSkillWrappers {
     }
 }
 
-function Add-KiloAgents {
+function Add-MarkdownAgents {
     param(
         [Parameter(Mandatory = $true)]$Definition,
         [Parameter(Mandatory = $true)]$Agents,
@@ -454,41 +442,52 @@ function Add-KiloAgents {
         [Parameter(Mandatory = $true)][hashtable]$Files
     )
 
+    $isKilo = $Definition.tool -eq 'Kilo'
+    $settingsKey = if ($isKilo) { 'kiloAgents' } else { 'opencodeAgents' }
+    $toolLabel = if ($isKilo) { 'Kilo Code' } else { 'OpenCode' }
+    $taskHint = if ($isKilo) { "`nUse a ferramenta Task disponível no perfil atual." } else { '' }
+    $localAgents = $Models.PSObject.Properties[$settingsKey]
+
+    if ($null -ne $localAgents) {
+        if ($localAgents.Value -isnot [PSCustomObject]) {
+            throw "$settingsKey must be an object indexed by Agent name."
+        }
+        $validNames = @($Agents.agents | Where-Object { $isKilo -or $_.PSObject.Properties['markdownTemplate'] } |
+            ForEach-Object { $_.name })
+        foreach ($entry in $localAgents.Value.PSObject.Properties) {
+            if ($entry.Name -notin $validNames) {
+                throw "Unknown local $($Definition.tool) Agent: '$($entry.Name)'"
+            }
+        }
+    }
+
     foreach ($agent in @($Agents.agents)) {
-        $templateProperty = $agent.PSObject.Properties['kiloTemplate']
+        $templateProperty = $agent.PSObject.Properties['markdownTemplate']
         if ($null -eq $templateProperty -or [string]::IsNullOrWhiteSpace($templateProperty.Value)) { continue }
         $templatePath = Resolve-SafeSourcePath $templateProperty.Value
         if (-not (Test-Path -LiteralPath $templatePath -PathType Leaf)) {
-            throw "Kilo Agent template not found: $($agent.kiloTemplate)"
+            throw "Markdown Agent template not found: $($templateProperty.Value)"
         }
 
-        $profileProperty = $agent.PSObject.Properties['kiloExecutionProfile']
-        $profile = if ($null -ne $profileProperty) { [string]$profileProperty.Value } else { [string]$agent.executionProfile }
-        $mapping = Get-ExecutionProfileMapping -Models $Models -ExecutionProfile $profile -ToolProperty 'kilo' -Optional
-        $content = Get-Content -LiteralPath $templatePath -Raw
-        if ($null -ne $mapping) { $content = Set-KiloModel -Content $content -Model $mapping.model }
-        # Preserve explicitly declared local per-Agent choices independently of
-        # canonical role/permission changes in the templates.
-        $localAgents = $Models.PSObject.Properties['kiloAgents']
+        $content = (Get-Content -LiteralPath $templatePath -Raw).Replace('{{markdownToolName}}', $toolLabel).Replace('{{markdownTaskHint}}', $taskHint)
+        if ($isKilo) {
+            $profileProperty = $agent.PSObject.Properties['markdownExecutionProfile']
+            $profile = if ($null -ne $profileProperty) { [string]$profileProperty.Value } else { [string]$agent.executionProfile }
+            $mapping = Get-ExecutionProfileMapping -Models $Models -ExecutionProfile $profile -ToolProperty 'kilo' -Optional
+            if ($null -ne $mapping) { $content = Set-MarkdownAgentModel -Content $content -Model $mapping.model }
+        }
+
         if ($null -ne $localAgents) {
-            if ($localAgents.Value -isnot [PSCustomObject]) {
-                throw 'kiloAgents must be an object indexed by Agent name.'
-            }
-            foreach ($entry in $localAgents.Value.PSObject.Properties) {
-                if ($entry.Name -notin @($Agents.agents | ForEach-Object { $_.name })) {
-                    throw "Unknown local Kilo Agent: '$($entry.Name)'"
-                }
-            }
             $localAgent = $localAgents.Value.PSObject.Properties[[string]$agent.name]
             if ($null -ne $localAgent) {
                 if ($localAgent.Value -isnot [PSCustomObject]) {
-                    throw "Local Kilo settings must be an object: '$($agent.name)'"
+                    throw "Local $($Definition.tool) settings must be an object: '$($agent.name)'."
                 }
                 foreach ($setting in $localAgent.Value.PSObject.Properties) {
                     if ($setting.Name -eq 'model') {
-                        $content = Set-KiloModel -Content $content -Model $setting.Value
+                        $content = Set-MarkdownAgentModel -Content $content -Model $setting.Value -AllowVariant:(-not $isKilo)
                     }
-                    elseif ($setting.Name -eq 'steps') {
+                    elseif ($isKilo -and $setting.Name -eq 'steps') {
                         if ([string]$setting.Value -notmatch '^[1-9][0-9]*$' -or
                             [long]$setting.Value -gt [int]::MaxValue) {
                             throw "Invalid local Kilo steps for '$($agent.name)'."
@@ -496,7 +495,7 @@ function Add-KiloAgents {
                         $content = [regex]::Replace($content, '(?m)^steps: [0-9]+',
                             ('steps: ' + [string]$setting.Value))
                     }
-                    elseif ($setting.Name -eq 'permissions') {
+                    elseif ($isKilo -and $setting.Name -eq 'permissions') {
                         if ($setting.Value -isnot [PSCustomObject]) {
                             throw "Local Kilo permissions must be an object: '$($agent.name)'"
                         }
@@ -514,120 +513,19 @@ function Add-KiloAgents {
                         }
                     }
                     else {
-                        throw "Unsupported local Kilo Agent setting: '$($setting.Name)'"
+                        throw "Unsupported local $($Definition.tool) Agent setting: '$($setting.Name)'."
                     }
                 }
             }
         }
         if ($content -match '{{[^}]+}}') {
-            throw "Unresolved Kilo template token for '$($agent.name)'."
+            throw "Unresolved Markdown Agent template token for '$($agent.name)'."
         }
 
         Add-ExpectedFile -Files $Files `
             -Destination "$($Definition.agentDestination)/$($agent.name).md" `
             -Content $content
     }
-}
-
-function ConvertTo-OrderedCopy {
-    param($InputObject)
-
-    if ($null -eq $InputObject) {
-        return $null
-    }
-    if ($InputObject -is [PSCustomObject]) {
-        $copy = [ordered]@{}
-        foreach ($property in $InputObject.PSObject.Properties) {
-            $copy[$property.Name] = ConvertTo-OrderedCopy $property.Value
-        }
-        return $copy
-    }
-    if ($InputObject -is [Collections.IEnumerable] -and $InputObject -isnot [string]) {
-        return @($InputObject | ForEach-Object { ConvertTo-OrderedCopy $_ })
-    }
-    return $InputObject
-}
-
-function Add-AiderDeskAgents {
-    param(
-        [Parameter(Mandatory = $true)]$Definition,
-        [Parameter(Mandatory = $true)]$Agents,
-        [Parameter(Mandatory = $true)]$Models,
-        [Parameter(Mandatory = $true)][hashtable]$Files
-    )
-
-    $packageRoot = Get-ToolPackageRelativeRoot 'AiderDesk'
-    $presetPath = Resolve-SafeSourcePath "$packageRoot/$($Definition.presetFile)"
-    $presetConfiguration = Read-JsonFile $presetPath
-    $workerIds = @($Agents.agents | Where-Object { -not $_.aiderDesk.primary } |
-        Sort-Object { [int]$_.aiderDesk.order } | ForEach-Object { $_.aiderDesk.id })
-
-    foreach ($agent in @($Agents.agents | Sort-Object { [int]$_.aiderDesk.order })) {
-        $presetProperty = $presetConfiguration.presets.PSObject.Properties[$agent.aiderDesk.preset]
-        if ($null -eq $presetProperty) {
-            throw "Unknown AiderDesk preset '$($agent.aiderDesk.preset)'."
-        }
-        $preset = $presetProperty.Value
-        $mapping = Get-ExecutionProfileMapping -Models $Models `
-            -ExecutionProfile $agent.executionProfile -ToolProperty 'aiderDesk'
-        if ([string]::IsNullOrWhiteSpace($mapping.provider)) {
-            throw "AiderDesk provider is missing for '$($agent.executionProfile)'."
-        }
-        if ([string]$mapping.provider -notmatch '^[A-Za-z0-9._:/@+-]+$') {
-            throw "Unsafe or invalid AiderDesk provider for '$($agent.executionProfile)'."
-        }
-
-        $promptPath = Resolve-SafeSourcePath $agent.aiderDesk.promptFile
-        $prompt = (Normalize-Content (Get-Content -LiteralPath $promptPath -Raw)).Trim()
-        $isPrimary = [bool]$agent.aiderDesk.primary
-
-        $profile = [ordered]@{
-            id = [string]$agent.aiderDesk.id
-            name = [string]$agent.name
-            provider = [string]$mapping.provider
-            model = [string]$mapping.model
-            maxIterations = [int]$agent.aiderDesk.maxIterations
-            minTimeBetweenToolCalls = 0
-            toolApprovals = ConvertTo-OrderedCopy $preset.toolApprovals
-            toolSettings = ConvertTo-OrderedCopy $preset.toolSettings
-            includeContextFiles = $false
-            includeRepoMap = $false
-            usePowerTools = $true
-            useAiderTools = $false
-            useTodoTools = [bool]$preset.useTodoTools
-            useSubagents = [bool]$preset.useSubagents
-            useTaskTools = $false
-            useMemoryTools = $false
-            useSkillsTools = [bool]$preset.useSkillsTools
-            useExtensionTools = $true
-            disabledExtensionTools = @()
-            customInstructions = $(if ($isPrimary) { $prompt } else { '' })
-            enabledServers = @()
-            subagent = [ordered]@{
-                enabled = (-not $isPrimary)
-                systemPrompt = $(if ($isPrimary) { '' } else { $prompt })
-                invocationMode = 'on-demand'
-                color = '#3368a8'
-                description = ''
-                contextMemory = 'off'
-            }
-            enabledSubagentIds = $(if ($isPrimary) { $workerIds } else { @() })
-            projectDir = $script:RepositoryRoot
-        }
-
-        $json = $profile | ConvertTo-Json -Depth 30
-        Add-ExpectedFile -Files $Files `
-            -Destination "$($Definition.agentDestination)/$($agent.name)/config.json" `
-            -Content $json
-    }
-
-    $order = [ordered]@{}
-    foreach ($agent in @($Agents.agents | Sort-Object { [int]$_.aiderDesk.order })) {
-        $order[[string]$agent.aiderDesk.id] = [int]$agent.aiderDesk.order
-    }
-    Add-ExpectedFile -Files $Files `
-        -Destination "$($Definition.agentDestination)/order.json" `
-        -Content ($order | ConvertTo-Json -Depth 5)
 }
 
 function ConvertTo-TomlBasicString {
@@ -694,11 +592,8 @@ function Get-ExpectedSetup {
     Add-StaticFiles -Definition $definition -ToolName $ToolName -Files $files
 
     switch ([string]$definition.renderer) {
-        'kilo-agents' {
-            Add-KiloAgents -Definition $definition -Agents $Agents -Models $Models -Files $files
-        }
-        'aider-desk-agents' {
-            Add-AiderDeskAgents -Definition $definition -Agents $Agents -Models $Models -Files $files
+        'markdown-agents' {
+            Add-MarkdownAgents -Definition $definition -Agents $Agents -Models $Models -Files $files
         }
         'codex-agents' {
             Add-CodexAgents -Definition $definition -Agents $Agents -Models $Models -Files $files
@@ -933,7 +828,7 @@ function Get-OtherOwners {
     )
 
     $owners = New-Object Collections.Generic.List[string]
-    foreach ($candidate in @('Kilo', 'AiderDesk', 'Codex', 'Shared')) {
+    foreach ($candidate in @('Kilo', 'OpenCode', 'Codex', 'Shared')) {
         if ($candidate -eq $ExcludingTool) { continue }
         $state = Get-InstalledState $candidate
         if ($null -ne $state -and (Get-StatePaths $state) -contains $RelativePath) {
@@ -1087,7 +982,7 @@ function Remove-Setup {
     param([Parameter(Mandatory = $true)][string]$ToolName)
 
     if ($ToolName -eq 'Shared') {
-        $dependents = @(@('Kilo', 'AiderDesk', 'Codex') | Where-Object {
+        $dependents = @(@('Kilo', 'OpenCode', 'Codex') | Where-Object {
             $null -ne (Get-InstalledState $_)
         })
         if ($dependents.Count -gt 0) {
@@ -1137,9 +1032,9 @@ function Get-RequestedTools {
     param([Parameter(Mandatory = $true)][string]$RequestedTool)
 
     if ($RequestedTool -eq 'All') {
-        return @('Shared', 'Kilo', 'AiderDesk', 'Codex')
+        return @('Shared', 'Kilo', 'OpenCode', 'Codex')
     }
-    if ($RequestedTool -in @('Kilo', 'AiderDesk', 'Codex')) {
+    if ($RequestedTool -in @('Kilo', 'OpenCode', 'Codex')) {
         return @('Shared', $RequestedTool)
     }
     return @('Shared')
@@ -1153,8 +1048,8 @@ if (-not (Test-Path -LiteralPath (Join-Path $script:RepositoryRoot 'AGENTS.md') 
 $agents = Get-AgentsConfiguration
 $models = Get-ModelConfiguration
 
-if ($Action -eq 'Switch' -and $Tool -notin @('Kilo', 'AiderDesk', 'Codex')) {
-    throw 'Switch requires -Tool Kilo, AiderDesk, or Codex.'
+if ($Action -eq 'Switch' -and $Tool -notin @('Kilo', 'OpenCode', 'Codex')) {
+    throw 'Switch requires -Tool Kilo, OpenCode, or Codex.'
 }
 
 switch ($Action) {
@@ -1192,7 +1087,7 @@ switch ($Action) {
     }
     'Remove' {
         if ($Tool -eq 'All') {
-            foreach ($toolName in @('Kilo', 'AiderDesk', 'Codex', 'Shared')) {
+            foreach ($toolName in @('Kilo', 'OpenCode', 'Codex', 'Shared')) {
                 Remove-Setup $toolName
             }
         }
@@ -1205,7 +1100,7 @@ switch ($Action) {
             $expected = Get-ExpectedSetup -ToolName $toolName -Agents $agents -Models $models
             Apply-Setup $expected
         }
-        foreach ($otherTool in @('Kilo', 'AiderDesk', 'Codex')) {
+        foreach ($otherTool in @('Kilo', 'OpenCode', 'Codex')) {
             if ($otherTool -ne $Tool -and $null -ne (Get-InstalledState $otherTool)) {
                 Remove-Setup $otherTool
             }

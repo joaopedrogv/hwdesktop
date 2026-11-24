@@ -1,0 +1,13 @@
+
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Next — anexar ao ERP",
+      "type": "delphi",
+      "request": "launch",
+      "program": "${workspaceFolder}/bpl/HwSistemas.exe",
+      "sourceRoot": "${workspaceFolder}"
+    }
+  ]
+}

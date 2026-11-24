@@ -17,6 +17,8 @@ type
     FGetByOpInternaGrupoFiscalChamado: Boolean;
     FPostChamado: Boolean;
     FPutChamado: Boolean;
+    FFalharNoPost: Boolean;
+    FFalharNoPut: Boolean;
     FUltimoGetById: string;
     FUltimaOperacaoInternaId: string;
     FUltimoGrupoFiscalId: string;
@@ -46,6 +48,8 @@ type
       read FGetByOpInternaGrupoFiscalChamado;
     property PostChamado: Boolean read FPostChamado;
     property PutChamado: Boolean read FPutChamado;
+    property FalharNoPost: Boolean read FFalharNoPost write FFalharNoPost;
+    property FalharNoPut: Boolean read FFalharNoPut write FFalharNoPut;
     property UltimoGetById: string read FUltimoGetById;
     property UltimaOperacaoInternaId: string read FUltimaOperacaoInternaId;
     property UltimoGrupoFiscalId: string read FUltimoGrupoFiscalId;
@@ -106,6 +110,10 @@ function TOperacoesFiscaisIbsCbsRepositoryStub.Post(
   Input: OperacaoFiscalIbsCbsEtd): OperacaoFiscalIbsCbsEtd;
 begin
   FPostChamado := True;
+
+  if FFalharNoPost then
+    raise Exception.Create('Falha simulada no Post do repositorio');
+
   Result := Input;
 end;
 
@@ -113,6 +121,10 @@ function TOperacoesFiscaisIbsCbsRepositoryStub.Put(
   Input: OperacaoFiscalIbsCbsEtd): OperacaoFiscalIbsCbsEtd;
 begin
   FPutChamado := True;
+
+  if FFalharNoPut then
+    raise Exception.Create('Falha simulada no Put do repositorio');
+
   Result := Input;
 end;
 

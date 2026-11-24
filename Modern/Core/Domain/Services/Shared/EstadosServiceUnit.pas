@@ -40,8 +40,15 @@ begin
 end;
 
 class function EstadosService.UfToCodigoIBGE(const UF: string): Integer;
+var
+  Indice: Integer;
 begin
-  Result := IndexText(UF, SIGLAS_UF);
+  Indice := IndexText(UF, SIGLAS_UF);
+
+  if Indice < 0 then
+    Result := -1
+  else
+    Result := IBGE_UF[Indice + 1];
 end;
 
 end.

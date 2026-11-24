@@ -1,0 +1,84 @@
+object frmColumnSelection: TfrmColumnSelection
+  Left = 0
+  Top = 0
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsDialog
+  Caption = 'Configura'#231#227'o de Colunas'
+  ClientHeight = 400
+  ClientWidth = 600
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poMainFormCenter
+  Scaled = False
+  PixelsPerInch = 96
+  TextHeight = 13
+  object pnConteudo: TPanel
+    Left = 0
+    Top = 0
+    Width = 600
+    Height = 358
+    Align = alClient
+    BevelOuter = bvNone
+    BorderWidth = 6
+    Caption = ''
+    TabOrder = 0
+    inline fraColunas: TfrmColumnSelectionFrame
+      Left = 6
+      Top = 6
+      Width = 588
+      Height = 346
+      Align = alClient
+      TabOrder = 0
+      ExplicitLeft = 6
+      ExplicitTop = 6
+      ExplicitWidth = 588
+      ExplicitHeight = 346
+    end
+  end
+  object pnRodape: TPanel
+    Left = 0
+    Top = 358
+    Width = 600
+    Height = 42
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 1
+    object btnAplicar: TButton
+      AlignWithMargins = True
+      Left = 402
+      Top = 3
+      Width = 84
+      Height = 36
+      Margins.Left = 0
+      Margins.Top = 3
+      Margins.Right = 6
+      Margins.Bottom = 3
+      Align = alRight
+      Caption = 'Aplicar'
+      Default = True
+      ModalResult = 1
+      TabOrder = 0
+    end
+    object btnSair: TButton
+      AlignWithMargins = True
+      Left = 498
+      Top = 3
+      Width = 84
+      Height = 36
+      Margins.Left = 6
+      Margins.Top = 3
+      Margins.Right = 12
+      Margins.Bottom = 3
+      Align = alRight
+      Cancel = True
+      Caption = 'Sair'
+      ModalResult = 2
+      TabOrder = 1
+    end
+  end
+end

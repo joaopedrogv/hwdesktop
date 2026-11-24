@@ -13,7 +13,7 @@ operacionais usadas pelas IAs permanecem em:
 
 O modelo combina práticas consolidadas de desenvolvimento dirigido por
 especificação, manager/workers, estado persistente e avaliação independente. Ele não
-depende de Codex, Kilo Code, AiderDesk, OpenCode ou qualquer fornecedor específico.
+depende de um fornecedor específico.
 
 ## Princípio central
 
@@ -195,8 +195,7 @@ orquestrador precisa chamar explicitamente, uma única vez, o Agent configurado 
 o papel por meio do mecanismo nativo da ferramenta e aguardar aquele resultado.
 
 Por exemplo, no Kilo Code essa ação é uma chamada ao Agent nomeado pela ferramenta
-Task. No AiderDesk é uma chamada ao Subagent habilitado. A sintaxe pertence ao
-adapter, mas o comportamento é sempre o mesmo.
+Task. A sintaxe pertence ao adapter da ferramenta.
 
 Não contam como delegação:
 

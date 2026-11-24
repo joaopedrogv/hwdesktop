@@ -51,10 +51,11 @@ Examples:
 - `DPS` → `TDPSEtd`
 - `PRODUTOS` → `TProdutoEtd`
 
-The unit/file name uses the type name without the leading `T`:
+Use the type name without the leading `T` for the unit and file by default.
+Apply the exceptions in `.ai/rules/coding-standards.md` when relevant.
 
-- `TDPSEtd` → `DPSEtdUnit.pas`
-- `TProdutoEtd` → `ProdutoEtdUnit.pas`
+- `TDPSEtd` → `DPSEtd.pas`
+- `TProdutoEtd` → `ProdutoEtd.pas`
 
 ### `--className=<Name>`
 
@@ -64,7 +65,7 @@ Treat the directive value as the requested base class name, then apply the proje
 
 Examples:
 
-- `--className=ClienteModel` → `ClienteModel`
+- `--className=ClienteModel` → `TClienteModel`
 - `--className=TClienteModel` → `TClienteModel`
 
 Use this directive only when the generated type must intentionally differ from the table-derived default.
@@ -95,7 +96,7 @@ If the table contains `ATIVO SMALLINT`, use `StatusRegistroEnum` regardless of n
 
 When a column line ends with `--Tipo=<TypeName>`, use `<TypeName>` as the Delphi property type.
 
-Add `<TypeName>Unit` to `uses`, except for:
+Resolve the unit that declares `<TypeName>` and add its actual name to `uses`, except for:
 
 - `TArrayString`
 - `TArrayInteger`

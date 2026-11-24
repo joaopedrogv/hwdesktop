@@ -6,6 +6,9 @@ always_apply: true
 
 # Architecture Rules
 
+Modern follows Hexagonal Architecture (Ports and Adapters). Apply SOLID to
+keep responsibilities focused and direct dependencies toward contracts.
+
 ## Business Logic and Responsibilities
 
 - Business rules, calculations, validations, and domain decisions MUST NOT reside in UI components or event handlers.
@@ -17,8 +20,10 @@ always_apply: true
 ## Dependency Boundaries
 
 - Domain and application code MUST NOT depend on UI or presentation components.
-- Business and application code MUST NOT depend on concrete infrastructure implementations when an established abstraction exists.
+- Domain and application code MUST depend on Ports for persistence and external
+  integrations. Prefer an existing contract when it meets the required behavior.
 - Infrastructure implementations MAY depend on the abstractions they implement.
+  Composition selects and supplies the concrete adapters to their consumers.
 - UI and external entry points MAY depend on application-level components required to execute use cases.
 - Do not bypass an existing abstraction merely to simplify an implementation.
 

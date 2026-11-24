@@ -37,25 +37,16 @@ Retomar esta seção depois da entrega do Caso Gold.
   oficial, orquestrador no agente principal, gravação direta dos planos pelo planner,
   invocação Task explícita do Agent nomeado, estado em `.ai-runs/`, gates humanos,
   retorno estruturado e ausência de delegação aninhada.
-- [ ] Validar no AiderDesk os oito perfis locais e verificar se a invocação nativa
-  explícita executa o Subagent nomeado com suas próprias permissões, sem continuar
-  a responsabilidade no contexto do orquestrador.
-- [ ] Manter o AiderDesk em modo manual supervisionado para o Workflow de feature
-  enquanto o contrato de delegação segura não estiver comprovado.
-- [ ] Comparar Kilo Code e AiderDesk em uma tarefa representativa do Workflow
-  completo quanto a correção, completude, latência, consumo e custo.
 - [ ] Consolidar, após o piloto, os mapeamentos concretos de `fast-routine`,
   `balanced-work` e `quality-critical`, registrando somente os modelos e níveis de
   deliberação comprovados.
 - [ ] Avaliar se o setup deve persistir opções locais de roteamento do OpenRouter,
   como `options.provider.only`; hoje o override local preserva o ID do modelo, mas
   não essas preferências opcionais de provider.
-- [ ] Criar ou reconciliar os adapters de `workflow-orchestrator` e
-  `feature-planner` e os contratos atualizados dos papéis existentes em OpenCode e
-  Antigravity IDE.
-- [ ] Incorporar futuramente os adapters específicos de OpenCode e Antigravity à
-  automação `Sync-AIProfiles.ps1`, depois de suas configurações serem reconciliadas
-  com os cinco papéis canônicos.
+- [x] Integrar o OpenCode a `Sync-AIProfiles.ps1`, compartilhando os sete perfis
+  e os três comandos do Kilo.
+- [ ] Reconciliar os adapters do Antigravity IDE com os papéis canônicos e avaliar
+  sua incorporação a `Sync-AIProfiles.ps1`.
 - [ ] Executar no Codex um piloto controlado de um Workflow completo, confirmando a
   descoberta das Commands como Skills, a invocação explícita de cada Custom Agent,
   a herança do sandbox da sessão principal, o ownership dos perfis, a gravação pelo

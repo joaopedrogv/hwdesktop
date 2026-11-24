@@ -43,10 +43,11 @@ Examples:
 - `TNFSeEtd` → `TNFSeMetadata`
 - `TProdutoEtd` → `TProdutoMetadata`
 
-The unit/file name omits the leading `T`:
+Use the type name without the leading `T` for the unit and file by default.
+Apply the exceptions in `.ai/rules/coding-standards.md` when relevant.
 
-- `TNFSeMetadata` → `NFSeMetadataUnit.pas`
-- `TProdutoMetadata` → `ProdutoMetadataUnit.pas`
+- `TNFSeMetadata` → `NFSeMetadata.pas`
+- `TProdutoMetadata` → `ProdutoMetadata.pas`
 
 ## Required Dependency
 
@@ -136,10 +137,10 @@ Do not invent unsupported business semantics.
 
 ## Unit Structure
 
-Generate:
+Use the name selected under Metadata Naming as `<MetadataUnitName>`.
 
 ```delphi
-unit <MetadataBaseName>Unit;
+unit <MetadataUnitName>;
 
 interface
 

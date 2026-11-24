@@ -27,6 +27,7 @@ type
     function CriarGrupo(const Anexo: string; TipoTribFiscal: TipoTributoFiscalEnum; EmpresasIds: TArrayInteger): GrupoFiscalEtd;
   public
     constructor Create(
+      AConnection: IDataBaseConnection;
       const GrupoFiscalRepo: IGruposFiscaisRepository;
       const AnexosRepo: IAnexosRepository;
       const EmpresasRepo: IEmpresasRepository
@@ -51,11 +52,13 @@ uses
 { CriarGruposFiscaisDeAnexosUseCase }
 
 constructor CriarGruposFiscaisDeAnexosUseCase.Create(
+  AConnection: IDataBaseConnection;
   const GrupoFiscalRepo: IGruposFiscaisRepository;
   const AnexosRepo: IAnexosRepository;
   const EmpresasRepo: IEmpresasRepository
 );
 begin
+  FConnection := AConnection;
   FGrupoFiscalRepo := GrupoFiscalRepo;
   FAnexosRepo := AnexosRepo;
   FEmpresasRepo := EmpresasRepo;
@@ -87,6 +90,7 @@ var
   I, Count: Integer;
   Existe: Boolean;
   EmpresasIds: TArrayInteger;
+  transaction: ITransaction;
 begin
 
   SetLength(anexos, 0);
@@ -137,11 +141,11 @@ begin
 //        FAnexosRepo.ListarAnexosImpostoSeletivoCompativeisComEstoque()
 //      );
 //  end;
-  
+
   {$ENDREGION}
 
   {$REGION 'Obtendo todas empresa'}
-  
+
   with FEmpresasRepo.ListarTodas() do
   try
     SetLength(EmpresasIds, Count);
@@ -150,7 +154,7 @@ begin
   finally
     Free();
   end;
-  
+
   {$ENDREGION}
 
   grupos := FGrupoFiscalRepo.ListarComAnexoVinculado();
@@ -158,30 +162,46 @@ begin
 
     {$REGION 'Trantando Anexos'}
 
-    for Anexo in anexos do
-    begin
-      Existe := False;
-      for I := 0 to grupos.Count - 1 do
+    transaction := FConnection.BeginTransaction();
+    try try
+
+      for Anexo in anexos do
       begin
-        G := (grupos.Items[I] as GrupoFiscalEtd);
-        if not G.Anexo.IsNull and (g.Anexo.Value = Anexo) and (g.TipoTributo = Input.TipoTributo) then
+        Existe := False;
+        for I := 0 to grupos.Count - 1 do
         begin
-          Existe := True;
-          Break;
+          G := (grupos.Items[I] as GrupoFiscalEtd);
+          if not G.Anexo.IsNull and (g.Anexo.Value = Anexo) and (g.TipoTributo = Input.TipoTributo) then
+          begin
+            Existe := True;
+            Break;
+          end;
+        end;
+
+        if not Existe then
+        begin
+          G := CriarGrupo( Anexo, tfIBSCBS, EmpresasIds );
+          try
+            with FGrupoFiscalRepo.Post( G ) do
+              Free();
+          finally
+            G.Free();
+          end;
         end;
       end;
 
-      if not Existe then
-      begin
-        G := CriarGrupo( Anexo, tfIBSCBS, EmpresasIds );
-        try
-           with FGrupoFiscalRepo.Post( G ) do
-             Free();
-        finally
-          G.Free();
+      transaction.Commit();
+    except
+      on E: Exception do
+        begin
+          transaction.Rollback();
+          raise;
         end;
-      end;
     end;
+    finally
+      transaction.FreeTransaction();
+    end;
+
     {$ENDREGION}
 
   finally

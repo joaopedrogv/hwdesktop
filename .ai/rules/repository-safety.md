@@ -11,9 +11,13 @@ always_apply: true
 - Preserve the developer's task scope, approved behavior and existing contracts.
 - Preserve unrelated changes, personal configuration, ignored dependencies, file
   encoding and line endings. Do not perform incidental cleanup or normalization.
+- Apply coding, comment and encoding standards within the assigned change.
+  Do not use them as a standing assignment to clean up existing code.
+  Report broader cleanup or refactoring as a separate demand.
 - Planning, implementation, test creation, build/test execution, SQL execution,
   setup changes and publication have distinct authorization boundaries. The
-  standing ERP.UnitTests validation grant below is the explicit limited exception.
+  standing validation grants below cover isolated ERP.UnitTests and the local
+  Next DLL build.
 - Preserve existing authentication, authorization, company isolation and audit.
   Never weaken a control to simplify a task or bypass an error.
 - Do not infer a uniform architecture or stack from this checkout's directory tree.
@@ -28,54 +32,26 @@ always_apply: true
   reusable mechanisms. Do not propagate unjustified duplication, swallowed errors
   or other demonstrated defects merely to resemble existing code. Distinguish
   such risks from personal style preferences.
-- Write clear, maintainable code within the assigned change. Local improvements
-  that preserve approved behavior and contracts do not require a separate gate.
-  Preserve the area's architecture; do not introduce Modern infrastructure or
-  perform unrelated cleanup or broad refactoring under this rule.
+- Write clear, maintainable code within the assigned change. Preserve the area's
+  architecture; do not introduce Modern infrastructure or perform unrelated
+  cleanup or broad refactoring under this rule.
 - Report relevant existing defects and bounded alternatives in the existing
   assignment/result artifacts when needed. Ask for a decision only when a needed
   correction changes approved behavior, contracts or scope, or leaves a material
   ambiguity. Do not silently change business behavior or expand the demand.
 
-## Local Implementation Quality
-
-- Prefer existing mechanisms and the simplest correct representation within the
-  assigned scope. Before adding persistent fields, check which values can be
-  derived from existing data or held locally for the current operation.
-- Retain cross-call state only when its lifetime is needed. For new caches or
-  recalculation flags, establish their identity, invalidation and update points,
-  including failure and retry behavior. Use a cohesive representation for fields
-  that describe one concept when it improves clarity. Review state necessity as
-  well as field count, preserving compiler compatibility and existing contracts.
-- Write source comments that remain understandable without the current Workflow
-  run. Explain a business rule, ownership, compatibility constraint or a
-  non-obvious reason. Keep run-local decision IDs, increment IDs, approval
-  narratives and review history in run artifacts. Stable domain codes and
-  specification references can remain when they explain the source contract.
-- When a user must locate a record, use its recognizable business labels. Compose
-  enough identifying data to distinguish the records involved. Keep internal
-  identifiers in diagnostic evidence when needed for traceability.
-- State a finding's practical consequence and appropriate action in the user's
-  vocabulary. Describe the data actually checked, including current edits versus
-  saved data, company and date when relevant. Match severity and success claims to
-  the evidence. Respect valid precedence and intentional broad conditions when
-  describing overlaps or observations.
-
 ## Source Encoding Verification
 
-- Establish the expected encoding and line endings before editing or creating a
-  source file, using the target area's compiler, explicit configuration and actual
-  neighboring files. Apply the area's compatibility Rules where present.
-- Configure the writer explicitly. Use strict encoding that reports characters
-  which cannot be represented. Preserve unrelated bytes and existing file format.
-- Before handing off created or modified Delphi 2006 sources, verify their bytes
-  against the intended single-byte encoding, including accented literals,
-  messages, captions and metadata. Include affected PAS, DFM, DPR, DPK and INC files.
-- Record the expected encoding and the byte-level check in validation evidence.
-  ASCII-only content does not establish a code page, and successful UTF-8 decoding
-  or correct display in an editor does not establish Delphi 2006 compatibility.
-- When application validation is authorized, also inspect affected rendered text.
-  Limit encoding checks and corrections to the assigned changes.
+- Use ISO-8859-1 (Latin-1), without a BOM, as the default encoding for `.pas`,
+  `.dpr`, `.dpk`, `.dfm` and `.inc` files in both Delphi 2006 and Delphi Rio.
+- Read and write explicitly in the file's encoding from the first edit, preserving
+  existing line endings and format.
+- In `.pas` files, write accented messages and labels as readable literals, such
+  as `'Autorização'`; reserve numeric escapes such as `#231` for technical needs.
+  In textual `.dfm` files, preserve the Delphi designer's serialized form.
+- Review changed text as part of normal diff review. Investigate encoding
+  separately only when corruption, incompatibility or a concrete doubt appears;
+  routine changes do not require byte-level evidence or encoding reports.
 
 ## Run Context and Repository Searches
 
@@ -131,12 +107,31 @@ always_apply: true
   writes that share the test sources or output locations, and reuse valid results
   until a change or failure justifies another run.
 - Research, planning, standalone review and documentation requests use their own
-  stated authority. Other builds, ERP.IntegrationTests, Fiscal.Calculos.Tests,
-  database operations, infrastructure setup and publication retain their separate
-  authorization requirements.
+  stated authority. Builds outside the standing grants, ERP.IntegrationTests,
+  Fiscal.Calculos.Tests, database operations, infrastructure setup and publication
+  retain their separate authorization requirements.
 - Report the actual invocation, build/test outcome and available result artifacts.
   Preserve runner or environment failure evidence and route technical diagnosis
   within the authorized scope. A successful compile alone is build evidence.
+
+## Standing Next DLL Build Validation
+
+- During authorized implementation that affects hw.next.dll, compile it with
+  Delphi Rio/Win32 from the working clone using
+  `pwsh -NoProfile -File ./_automation/build/build-next.ps1`. This includes changes
+  to shared Modern sources used by that DLL. The script writes compiler outputs
+  in the working clone.
+- Run the build before handing off the affected implementation. Intermediate
+  builds and reruns are authorized. Fix compiler errors caused by the assignment
+  and rerun on the corrected sources. Reuse a successful build while the relevant
+  inputs are unchanged.
+- The implementer or the Orchestrator may run the script. In a Workflow, record
+  the scope in the assignment and serialize builds with other builds and writes
+  that share the DLL's sources or outputs. Report the command, result and any
+  concrete blocker.
+- A narrower developer instruction takes precedence. Legacy BPL builds, ERP
+  execution, database operations, deployment and publication require their own
+  authorization. A successful DLL build is compilation evidence.
 
 ## Validation and local tooling
 

@@ -3,7 +3,7 @@
   "tool": "Kilo",
   "toolRoot": ".kilo",
   "stateFile": ".kilo/.modern-ai-setup.json",
-  "renderer": "kilo-agents",
+  "renderer": "markdown-agents",
   "agentDestination": ".kilo/agents",
   "staticFiles": [
     {

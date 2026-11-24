@@ -10,7 +10,12 @@ description: Understand Modern's hexagonal boundaries, adapter classification, c
 `Modern` is the modern and decoupled ecosystem of the legacy ERP.
 
 The codebase primarily follows Hexagonal Architecture (Ports and Adapters),
-with principles from Clean Architecture and Domain-Driven Design (DDD).
+with principles from Clean Architecture. The [architecture rules](../rules/architecture.md)
+define how SOLID and dependency boundaries apply in Modern.
+
+Domain-Driven Design (DDD) is a modeling reference for contexts with substantial
+business rules. Use it when a shared domain language, explicit model boundaries,
+or rules that must always hold benefit from being expressed in the model.
 
 The architectural goal is to isolate business rules from external libraries,
 infrastructure concerns, UI components, and the legacy ERP.

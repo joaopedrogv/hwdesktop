@@ -8,12 +8,16 @@ uses
   OperacaoFiscalIbsCbsCondicaoEtdUnit,
   CreateEntityUseCaseOutputUnit,
   SalvarOperacaoFiscalIbsCbsUseCaseUnit,
+  FakeTransactionUnit,
+  FakeDatabaseConnectionUnit,
   StubOperacoesFiscaisIbsCbsRepositoryUnit;
 
 type
   [TestFixture]
   TTestSalvarOperacaoFiscalIbsCbsUseCase = class
   private
+    FTransactionState: TTransactionSpyState;
+    FConnection: TFakeDatabaseConnection;
     FRepo: TOperacoesFiscaisIbsCbsRepositoryStub;
     FUseCase: SalvarOperacaoFiscalIbsCbsUseCase;
     function Executar(const AId: string;
@@ -48,6 +52,15 @@ type
 
     [Test]
     procedure DeveRegistrarAtributoCondicoesNoMetadata;
+
+    [Test]
+    procedure DeveConfirmarTransacaoAoSalvar;
+
+    [Test]
+    procedure DeveDesfazerTransacaoQuandoPostFalhar;
+
+    [Test]
+    procedure DeveDesfazerTransacaoQuandoPutFalhar;
   end;
 
 implementation
@@ -131,14 +144,18 @@ end;
 
 procedure TTestSalvarOperacaoFiscalIbsCbsUseCase.Setup;
 begin
+  FTransactionState := TTransactionSpyState.Create;
+  FConnection := TFakeDatabaseConnection.Create(FTransactionState);
   FRepo := TOperacoesFiscaisIbsCbsRepositoryStub.Create;
-  FUseCase := SalvarOperacaoFiscalIbsCbsUseCase.Create(FRepo);
+  FUseCase := SalvarOperacaoFiscalIbsCbsUseCase.Create(FConnection, FRepo);
 end;
 
 procedure TTestSalvarOperacaoFiscalIbsCbsUseCase.TearDown;
 begin
   FUseCase.Free;
   FRepo.Free;
+  FConnection.Free;
+  FTransactionState.Free;
 end;
 
 function TTestSalvarOperacaoFiscalIbsCbsUseCase.Executar(const AId: string;
@@ -217,6 +234,8 @@ begin
     Assert.IsTrue(PossuiErroCondicoes(Saida));
     Assert.IsFalse(FRepo.PostChamado);
     Assert.IsFalse(FRepo.PutChamado);
+    Assert.IsFalse(FConnection.BeginTransactionCalled);
+    Assert.IsFalse(FTransactionState.FreeTransactionCalled);
   finally
     Saida.Free;
   end;
@@ -302,6 +321,86 @@ begin
   // Texto com acentos montado por codigo para preservar a codificacao do fonte.
   DisplayEsperado := 'Condi' + #231 + #245 + 'es de aplicabilidade';
   Assert.AreEqual(DisplayEsperado, Display);
+end;
+
+procedure TTestSalvarOperacaoFiscalIbsCbsUseCase.DeveConfirmarTransacaoAoSalvar;
+var
+  Saida: CreateEntityUseCaseOutPut;
+begin
+  Saida := Executar('', Condicoes([
+    Condicao(ocaTipoEmissao, [1])
+  ]));
+  try
+    Assert.IsNotNull(Saida.OutputObj);
+    Assert.IsTrue(FConnection.BeginTransactionCalled);
+    Assert.IsTrue(FTransactionState.CommitCalled);
+    Assert.IsFalse(FTransactionState.RollbackCalled);
+    Assert.IsTrue(FTransactionState.FreeTransactionCalled);
+  finally
+    Saida.Free;
+  end;
+end;
+
+procedure TTestSalvarOperacaoFiscalIbsCbsUseCase.DeveDesfazerTransacaoQuandoPostFalhar;
+var
+  Entidade: OperacaoFiscalIbsCbsEtd;
+begin
+  FRepo.FalharNoPost := True;
+
+  Entidade := CriarEntidade('');
+  Entidade.Condicoes := Condicoes([
+    Condicao(ocaTipoEmissao, [1])
+  ]);
+
+  try
+    Assert.WillRaise(
+      procedure
+      begin
+        FUseCase.Executar(Entidade);
+      end,
+      Exception
+    );
+  finally
+    Entidade.Free;
+  end;
+
+  // A excecao sobe sem saida confirmada: a transacao desfaz e e liberada.
+  Assert.IsTrue(FRepo.PostChamado);
+  Assert.IsFalse(FRepo.PutChamado);
+  Assert.IsTrue(FTransactionState.RollbackCalled);
+  Assert.IsFalse(FTransactionState.CommitCalled);
+  Assert.IsTrue(FTransactionState.FreeTransactionCalled);
+end;
+
+procedure TTestSalvarOperacaoFiscalIbsCbsUseCase.DeveDesfazerTransacaoQuandoPutFalhar;
+var
+  Entidade: OperacaoFiscalIbsCbsEtd;
+begin
+  FRepo.FalharNoPut := True;
+
+  Entidade := CriarEntidade('ID-EXISTENTE');
+  Entidade.Condicoes := Condicoes([
+    Condicao(ocaTipoEmissao, [1])
+  ]);
+
+  try
+    Assert.WillRaise(
+      procedure
+      begin
+        FUseCase.Executar(Entidade);
+      end,
+      Exception
+    );
+  finally
+    Entidade.Free;
+  end;
+
+  // A excecao sobe sem saida confirmada: a transacao desfaz e e liberada.
+  Assert.IsTrue(FRepo.PutChamado);
+  Assert.IsFalse(FRepo.PostChamado);
+  Assert.IsTrue(FTransactionState.RollbackCalled);
+  Assert.IsFalse(FTransactionState.CommitCalled);
+  Assert.IsTrue(FTransactionState.FreeTransactionCalled);
 end;
 
 initialization

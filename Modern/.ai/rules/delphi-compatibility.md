@@ -11,24 +11,44 @@ applies_to:
 
 ## Compatibility Target
 
-**Delphi 2006 is the default compatibility target.**
+**Within Modern/, Delphi 2006 is the default compatibility target.**
 
-A source file is Delphi Rio 10.3.3 code only when:
+The following single first-line headers declare exceptions:
 
-- its first line is `// Delphi Rio`; or
-- it is located inside `Tests/`.
+| First line | Compatibility |
+| --- | --- |
+| `// Delphi Rio` | Rio-only source |
+| `// Next` | Next development context, Rio-only |
+| `// Next - Delphi 2006 e Delphi Rio` | Next context with explicit compatibility for both compilers |
 
-If neither condition applies, the file MUST remain compatible with Delphi 2006.
+The explicit dual-target header requires both compilers, including dependencies.
+Use it when a Next-context source also needs a real Delphi 2006 consumer.
+The earlier `// Next - Delphi Rio` header retains its Rio-only meaning; do not
+rewrite existing headers in bulk. Files inside `Tests/` retain their existing
+Rio target. Without a recognized Rio-only header or that test exception, a Modern
+source MUST remain compatible with Delphi 2006.
 
-When compatibility is uncertain, assume Delphi 2006.
+A marker occupies only the first line. Next identifies development context, not
+a new location or permission to bypass the owning area's rules. These Modern
+defaults do not override Next/AGENTS.md: Next/ has a Rio default and marks its
+Delphi 2006 compatibility exceptions. When a Modern source's target is uncertain,
+assume Delphi 2006.
 
 ## Compatibility Boundaries
 
-- Determine compatibility at the source-file level, not from its module, architectural layer, directory, or consuming project.
+- Determine each source's target from its owning area's default, explicit first-line marker and actual consumers; an architectural layer or a Rio consumer does not make a shared source Rio-only.
 - A directory MAY contain both Delphi 2006-compatible and Delphi Rio-only files.
 - Delphi 2006-compatible units MAY be consumed by both Delphi 2006 and Delphi Rio projects.
 - Do not introduce Delphi Rio-only language features, APIs, libraries, components, or dependencies into Delphi 2006-compatible files.
 - Do not migrate a Delphi 2006-compatible file to Delphi Rio unless explicitly required by the task.
+
+When a demand introduces a real Delphi 2006 consumer for a Rio-only source,
+check syntax, APIs, transitive dependencies, encoding and behavior before widening
+its target. Make the necessary adaptation within the requested scope, preserving
+results and contracts. Record compatibility evidence and unperformed compiler
+checks; a Rio build alone does not prove Delphi 2006 compatibility. Surface
+material behavioral or dependency changes instead of forcing the adaptation.
+Do not change existing headers or migrate sources in bulk.
 
 ## Project Compatibility
 
@@ -38,26 +58,8 @@ When compatibility is uncertain, assume Delphi 2006.
 
 ## Source Encoding
 
-For Delphi production sources, preserve the area's established ANSI /
-single-byte encoding and line endings, including when adding a new unit. Do not
-accept UTF-8 or UTF-8 BOM merely because an editing tool uses it by default.
+Follow ../.ai/rules/repository-safety.md for source encoding, format preservation
+and normal diff review.
 
-Use the target area's actual production files and explicit source-encoding
-configuration when present. The validated checkout's VS Code settings associate
-Delphi files with language ID `delphi` or `pascal` and set `files.encoding` to `iso88591` under `[delphi]` or `[pascal]`. Language-specific settings must use the active
-extension's language ID.
-This is a concrete workspace setting, not permission to convert every module.
-ANSI is not ASCII, and ISO-8859-1 is not a synonym for Windows-1252. If required
-characters are outside the selected encoding or local evidence conflicts, resolve
-that mismatch before writing; do not silently change the file format.
-
-Follow ../.ai/rules/repository-safety.md's Source Encoding Verification for the
-write operation and review. Verify the actual bytes of created and modified
-Delphi 2006 sources using the identified encoding, including accented literals,
-captions and metadata labels. Record the chosen encoding and check result.
-UTF-8 validity or correct display in the IDE alone cannot establish compatibility.
-Preserve verified Rio-only files and UTF-8 documentation under their own formats.
-
-Apply the same preservation to supporting DFM, DPR, DPK and INC text touched by
-the change. Source editing does not authorize compilation; when build/manual
-validation is not authorized, report that validation as pending.
+Source editing does not authorize compilation; when build/manual validation is
+not authorized, report that validation as pending.

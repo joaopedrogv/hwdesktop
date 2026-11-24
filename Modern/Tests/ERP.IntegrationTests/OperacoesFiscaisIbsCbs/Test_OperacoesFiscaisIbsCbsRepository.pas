@@ -328,10 +328,23 @@ function TTestOperacoesFiscaisIbsCbsRepository.CriarVinculo(
   ADataInicio: TDate): OperacaoFiscalIbsCbsEtd;
 var
   Entidade: OperacaoFiscalIbsCbsEtd;
+  Transacao: ITransaction;
 begin
   Entidade := CriarEntidade(AGrupoFiscalId, AEmpresas, ACondicoes, ADataInicio);
   try
-    Result := FRepo.Post(Entidade);
+    // O repositorio nao abre mais transacao: o chamador confirma a gravacao.
+    Transacao := FConnection.BeginTransaction();
+    try
+      try
+        Result := FRepo.Post(Entidade);
+        Transacao.Commit();
+      except
+        Transacao.Rollback();
+        raise;
+      end;
+    finally
+      Transacao.Free;
+    end;
   finally
     Entidade.Free;
   end;
@@ -418,6 +431,7 @@ var
   Criado: OperacaoFiscalIbsCbsEtd;
   Carregado: OperacaoFiscalIbsCbsEtd;
   Salvo: OperacaoFiscalIbsCbsEtd;
+  Transacao: ITransaction;
 begin
   Criado := CriarVinculo('', [FEmpresaId], Condicoes([
     Condicao(ocaTipoEmissao, [1]),
@@ -429,7 +443,19 @@ begin
       Carregado.Condicoes := Condicoes([
         Condicao(ocaTipoEmissao, [2])
       ]);
-      Salvo := FRepo.Put(Carregado);
+      // O repositorio nao abre mais transacao: o chamador confirma o Put.
+      Transacao := FConnection.BeginTransaction();
+      try
+        try
+          Salvo := FRepo.Put(Carregado);
+          Transacao.Commit();
+        except
+          Transacao.Rollback();
+          raise;
+        end;
+      finally
+        Transacao.Free;
+      end;
     finally
       Carregado.Free;
     end;
@@ -455,6 +481,7 @@ var
   Criado: OperacaoFiscalIbsCbsEtd;
   Carregado: OperacaoFiscalIbsCbsEtd;
   Salvo: OperacaoFiscalIbsCbsEtd;
+  Transacao: ITransaction;
 begin
   Criado := CriarVinculo('', [FEmpresaId], Condicoes([
     Condicao(ocaTipoEmissao, [1])
@@ -463,7 +490,19 @@ begin
     Carregado := FRepo.GetById(Criado.Id);
     try
       Carregado.Condicoes := Condicoes([]);
-      Salvo := FRepo.Put(Carregado);
+      // O repositorio nao abre mais transacao: o chamador confirma o Put.
+      Transacao := FConnection.BeginTransaction();
+      try
+        try
+          Salvo := FRepo.Put(Carregado);
+          Transacao.Commit();
+        except
+          Transacao.Rollback();
+          raise;
+        end;
+      finally
+        Transacao.Free;
+      end;
     finally
       Carregado.Free;
     end;
@@ -535,6 +574,8 @@ end;
 procedure TTestOperacoesFiscaisIbsCbsRepository.DeveDesfazerTransacaoQuandoCondicaoViolarCheck;
 var
   Entidade: OperacaoFiscalIbsCbsEtd;
+  Transacao: ITransaction;
+  Falhou: Boolean;
   VinculosAntes: Integer;
   VinculosDepois: Integer;
   CondicoesAntes: Integer;
@@ -547,13 +588,28 @@ begin
     VinculosAntes := ContarVinculos(FRegraFiscalId, EncodeDate(2026, 1, 1));
     CondicoesAntes := ContarCondicoesDoContexto(EncodeDate(2026, 1, 1));
 
-    Assert.WillRaise(
-      procedure
-      begin
+    // O repositorio nao abre mais transacao: o teste abre e desfaz para
+    // verificar que a insercao parcial nao permanece gravada.
+    Falhou := False;
+    Transacao := FConnection.BeginTransaction();
+    try
+      try
         FRepo.Post(Entidade);
-      end,
-      Exception
-    );
+      except
+        on E: Exception do
+          Falhou := True;
+      end;
+
+      if Falhou then
+        Transacao.Rollback()
+      else
+        Transacao.Commit();
+    finally
+      Transacao.Free;
+    end;
+
+    Assert.IsTrue(Falhou,
+      'a violacao do CHECK deve falhar e desfazer a transacao');
 
     VinculosDepois := ContarVinculos(FRegraFiscalId, EncodeDate(2026, 1, 1));
     CondicoesDepois := ContarCondicoesDoContexto(EncodeDate(2026, 1, 1));
@@ -571,6 +627,7 @@ var
   Carregado: OperacaoFiscalIbsCbsEtd;
   Salvo: OperacaoFiscalIbsCbsEtd;
   Verificado: OperacaoFiscalIbsCbsEtd;
+  Transacao: ITransaction;
   Falhou: Boolean;
 begin
   Criado := CriarVinculo('', [FEmpresaId], Condicoes([
@@ -588,12 +645,26 @@ begin
 
       Salvo := nil;
       Falhou := False;
+
+      // O repositorio nao abre mais transacao: o teste abre, desfaz na falha
+      // e confirma no sucesso.
+      Transacao := FConnection.BeginTransaction();
       try
-        Salvo := FRepo.Put(Carregado);
-      except
-        on E: Exception do
-          Falhou := True;
+        try
+          Salvo := FRepo.Put(Carregado);
+        except
+          on E: Exception do
+            Falhou := True;
+        end;
+
+        if Falhou then
+          Transacao.Rollback()
+        else
+          Transacao.Commit();
+      finally
+        Transacao.Free;
       end;
+
       // Se o Put nao falhar, o retorno nao pode vazar nem servir de base para
       // as verificacoes seguintes.
       Salvo.Free;
@@ -645,6 +716,7 @@ var
   Criado: OperacaoFiscalIbsCbsEtd;
   Carregado: OperacaoFiscalIbsCbsEtd;
   Salvo: OperacaoFiscalIbsCbsEtd;
+  Transacao: ITransaction;
 begin
   Criado := CriarVinculo('', [FEmpresaId], Condicoes([
     Condicao(ocaTipoEmissao, [2])
@@ -653,7 +725,19 @@ begin
     Carregado := FRepo.GetById(Criado.Id);
     try
       Carregado.Ativo := saLixeira;
-      Salvo := FRepo.Put(Carregado);
+      // O repositorio nao abre mais transacao: o chamador confirma o Put.
+      Transacao := FConnection.BeginTransaction();
+      try
+        try
+          Salvo := FRepo.Put(Carregado);
+          Transacao.Commit();
+        except
+          Transacao.Rollback();
+          raise;
+        end;
+      finally
+        Transacao.Free;
+      end;
     finally
       Carregado.Free;
     end;

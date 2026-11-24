@@ -1,7 +1,7 @@
 # Setup de ferramentas de IA
 
-O menu oferece **9 — Ferramentas de IA**, com visualização, aplicação e verificação
-do Kilo. O gerador canônico é Sync-AIProfiles.ps1 neste diretório.
+O menu **9 — Ferramentas de IA** oferece visualização, aplicação e verificação do
+Kilo e do OpenCode pelo script Sync-AIProfiles.ps1.
 
 ## Uso direto pela raiz
 
@@ -9,6 +9,9 @@ do Kilo. O gerador canônico é Sync-AIProfiles.ps1 neste diretório.
 ./_automation/ai/Sync-AIProfiles.ps1 -Tool Kilo -Action Plan
 ./_automation/ai/Sync-AIProfiles.ps1 -Tool Kilo -Action Apply
 ./_automation/ai/Sync-AIProfiles.ps1 -Tool Kilo -Action Check
+./_automation/ai/Sync-AIProfiles.ps1 -Tool OpenCode -Action Plan
+./_automation/ai/Sync-AIProfiles.ps1 -Tool OpenCode -Action Apply
+./_automation/ai/Sync-AIProfiles.ps1 -Tool OpenCode -Action Check
 ```
 
 PowerShell 7 ou superior; o menu mantém o requisito já definido de 7.5.
@@ -38,7 +41,9 @@ modelos adequados a esses requisitos, sem uma tabela de compatibilidade mantida 
 Se o arquivo novo não existir, o gerador consulta _automation/ai/tool-setup/models.local.json
 e depois Modern/docs/ia-assistida/setups-de-ferramentas/models.local.json.
 Ele não move nem regrava arquivos pessoais. -ModelConfig explícito tem prioridade.
-Outros clientes exigem seus próprios mapeamentos e parâmetros individuais quando solicitados.
+O OpenCode usa `opencodeAgents` para escolhas opcionais por agente, incluindo
+`provider/model#variant` no OpenCode V2. O Codex usa os próprios mapeamentos em
+`executionProfiles`.
 
 ## Fontes e perfis
 
@@ -59,7 +64,7 @@ recusa nomes duplicados. A raiz deriva da localização do script.
 
 coordinator evita a colisão com o Orchestrator nativo depreciado do Kilo.
 O papel canônico continua sendo workflow-orchestrator.
--Tool Kilo instala somente Kilo e Shared; os demais clientes não são alterados.
+`Apply` instala Shared e a ferramenta selecionada. Kilo e OpenCode podem coexistir.
 
 ## Limites de passos
 
@@ -96,7 +101,9 @@ um por vez e preservando as atribuições ainda ativas.
 
 ## Preservação e validação
 
-Os destinos .kilo/ e .agents/ e os novos runs .ai-runs/ ficam na raiz, ignorados.
+Os destinos .kilo/, .opencode/ e .agents/ e os novos runs .ai-runs/ ficam na raiz,
+ignorados. O setup adota arquivos existentes com conteúdo idêntico. Diferenças em
+arquivos ainda não gerenciados aparecem como conflitos no plano.
 O state conserva .modern-ai-setup.json para reconhecer instalações anteriores.
 Adapters obsoletos registrados podem ser removidos; arquivos desconhecidos e
 kilo.jsonc são preservados. Nomes antigos nas configurações são aceitos como aliases;

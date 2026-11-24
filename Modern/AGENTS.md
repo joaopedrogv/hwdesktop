@@ -8,8 +8,9 @@ remains the canonical source of module-specific constraints and knowledge.
 
 Follow the developer's requested phase, scope and authorization. Planning and
 documentation requests authorize their stated scope.
-During authorized implementation, the standing ERP.UnitTests validation grant in
-../.ai/rules/repository-safety.md applies. Other builds, test projects, SQL
+During authorized implementation, follow the standing validation grants in
+../.ai/rules/repository-safety.md for isolated ERP.UnitTests and, when a change
+affects hw.next.dll, the local Next DLL build. Other builds, test projects, SQL
 execution, setup application and publication require their own authorization.
 
 Start with the root routing. Use ../.ai/metadata.md when routing or maintaining
@@ -23,10 +24,12 @@ Rules without those fields are selected by relevance. Load only the Context and
 Skills needed by the affected flow. Do not broaden their scope to legacy files
 merely because a Modern feature calls the legacy ERP.
 
-Architecture and security Rules apply to every Modern task. Delphi compatibility,
-coding standards, database and testing Rules apply according to their scope.
-Fiscal.Calculos has an explicit architectural and naming exception; load its
-specialized guidance when that module is affected.
+Architecture and security Rules apply to every Modern task. For Delphi sources,
+read ../.ai/rules/delphi-coding-standards.md and .ai/rules/coding-standards.md.
+Shared implementation quality is loaded by the root entry. Delphi compatibility,
+database and testing Rules apply according to their scope. Fiscal.Calculos has an
+explicit architectural and naming exception; load its specialized guidance when
+that module is affected.
 
 ## Paths
 

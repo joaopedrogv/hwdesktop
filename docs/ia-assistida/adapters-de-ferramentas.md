@@ -10,7 +10,6 @@ formatos e pontos de entrada.
 Detalhes de instalação, configuração local, limitações e exemplos ficam em um guia
 separado por ferramenta:
 
-- [AiderDesk](ferramentas/aider-desk.md)
 - [OpenCode](ferramentas/opencode.md)
 - [Codex](ferramentas/codex.md)
 - [Antigravity IDE](ferramentas/antigravity.md)
@@ -27,8 +26,7 @@ Modern ao legado automaticamente.
 
 | Ferramenta | Entrada do projeto | Skills | Command de feature | Agents |
 |---|---|---|---|---|
-| AiderDesk | ponte gerada em `.agents/rules/` | wrappers gerados em `.aider-desk/skills/` | `.aider-desk/commands/` gerado | oito perfis gerados em `.aider-desk/agents/` |
-| OpenCode | `AGENTS.md` | wrappers em `.agents/skills/` | pendente | pendente |
+| OpenCode | `AGENTS.md` | wrappers em `.agents/skills/` | `.opencode/commands/` gerado | `.opencode/agents/` gerado |
 | Codex | `AGENTS.md` | wrappers gerados em `.agents/skills/` | Skill de despacho ou linguagem natural | agente principal como Orchestrator e sete Specialists em `.codex/agents/` |
 | Antigravity IDE | ponte em `.agents/rules/` | wrappers em `.agents/skills/` | `.agents/workflows/` | configuração da ferramenta |
 | Kilo Code | `AGENTS.md` | wrappers gerados em `.agents/skills/` | `.kilo/commands/` gerado | sete adapters gerados em `.kilo/agents/` |
@@ -37,20 +35,13 @@ Esse quadro indica integração, não autoridade. Um adapter deve sempre encamin
 artefato canônico correspondente e nunca manter uma cópia independente de regras,
 conhecimento ou procedimentos.
 
-Os cinco papéis canônicos são compartilhados. O Kilo possui sete perfis locais,
-com somente dois implementadores. AiderDesk conserva oito perfis e o Codex sete
-Specialists; essas outras ferramentas não foram instaladas nesta manutenção. Em todas as ferramentas
-o agente principal assume o Orchestrator; o Codex gera sete Custom Agents
-especialistas, sem um intermediário de orquestração. O Kilo usa delegação nativa
-sem o campo específico do fork. A orquestração do AiderDesk ainda precisa ser
-validada em execução. O Codex já possui integração gerada e aguarda apenas um piloto
-operacional do Workflow completo. OpenCode e Antigravity permanecem como integrações
-não impeditivas a serem reconciliadas. Seus diretórios de ferramenta na raiz são
-locais e ignorados.
+Os cinco papéis canônicos são compartilhados. Kilo e OpenCode usam o perfil
+`coordinator` como agente principal, com delegação nativa. O Codex usa o agente
+principal como orquestrador e gera sete Custom Agents especialistas.
 
-As fontes dos adapters de Kilo, AiderDesk e Codex ficam em
-`_automation/ai/tool-setup/`. A automação
-`_automation/ai/Sync-AIProfiles.ps1` renderiza e instala os destinos da tabela. O
+As fontes dos adapters de Kilo, OpenCode e Codex ficam em
+`_automation/ai/tool-setup/`. A automação `_automation/ai/Sync-AIProfiles.ps1`
+instala esses adapters. O
 componente Shared mantém `.agents/` separado porque também atende outras
 ferramentas. Os diretórios gerados não são fontes de manutenção manual.
 
@@ -58,7 +49,7 @@ Delegar exige uma chamada observável ao mecanismo nativo da ferramenta. Para ca
 tentativa de atribuição, o orquestrador invoca exatamente uma vez o Agent nomeado e
 aguarda o resultado; instruir o próprio orquestrador a “agir como” o worker ou
 apenas carregar sua Skill não satisfaz o protocolo. No Codex, o orquestrador é o
-agente principal; Kilo e AiderDesk selecionam o perfil de orquestração como principal
+agente principal. Kilo e OpenCode selecionam o perfil de orquestração como principal
 na conversa. As operações determinísticas prescritas são executadas diretamente.
 
 ## Uso portátil
@@ -83,7 +74,7 @@ O próprio setup pode ser gerenciado por linguagem natural:
 
 ```text
 Configure o setup do Kilo.
-Mude para o AiderDesk.
+Mude para o Codex.
 Adicione o Codex.
 Remova o setup do Kilo.
 ```

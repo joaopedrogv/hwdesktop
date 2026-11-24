@@ -7,7 +7,7 @@ uses
   Dialogs, ComCtrls, ExtCtrls, Menus, Buttons, XPMan, DBClient, Provider, DB,
   IBCustomDataSet, IBQuery, IBDatabase, StdCtrls, Grids, DBGrids,
   CategoryButtons, ImgList, EnterantHw, FileCtrl, uClassesPedVenda, ExtDlgs,
-  OleCtrls, SHDocVw, funcoes, uProcessamentosEmSegundoPlano, Query_OOP, 
+  OleCtrls, SHDocVw, funcoes, uProcessamentosEmSegundoPlano, Query_OOP,
   uDtmPedVenda;
 
 const
@@ -262,7 +262,7 @@ type
     Definirplanodefundo011: TMenuItem;
     DefinirPlanodeFundo021: TMenuItem;
     OpenPictureDialog1: TOpenPictureDialog;
-    Timer1: TTimer;                            
+    Timer1: TTimer;
     N11: TMenuItem;
     PISCOFINS: TMenuItem;
     DemaisReceitaseouCreditos: TMenuItem;
@@ -492,7 +492,7 @@ type
     RTC_OperaccoesInternas1: TMenuItem;
     RTC_GruposFiscais1: TMenuItem;
     RTC_RegrasFiscaisdoIBSeCBS1: TMenuItem;
-    RTC_OperacoesFiscaisdoIBSeCBS1: TMenuItem; 
+    RTC_OperacoesFiscaisdoIBSeCBS1: TMenuItem;
     NFSeDPS1: TMenuItem;
     GruposResumoFinanceiro: TMenuItem;
     btOpcoes: TSpeedButton;
@@ -509,6 +509,8 @@ type
     Suzuki: TMenuItem;
     NotasfiscaisSuzuki: TMenuItem;
     Timer9: TTimer;
+    EventosDFe1: TMenuItem;
+    procedure EventosDFe1Click(Sender: TObject);
     procedure Timer9Timer(Sender: TObject);
     procedure NotasfiscaisSuzukiClick(Sender: TObject);
     procedure RTC_AjustesReduoBenefcioPISCOFINSLC22420251Click(Sender: TObject);
@@ -855,6 +857,7 @@ type
     procedure UsarPlanilhaParaInserirAlterar(ParamsAdicionais: string);
     procedure SetupModern();
     procedure SetupModernShutdown();
+    procedure ShutDownApp();
   private
     { Private declarations }
 
@@ -902,7 +905,7 @@ type
     MySubItemsVeic: array[0..99] of TMenuItem; // Odilon
 
     DtmPedVenda: TDtmPedVenda;
-    
+
     vVerificarMensagens: Boolean;
     vProcessamentos: TProcessamentosEmSegundoPlano;
     FtimerChavePeriodica: TTimer;
@@ -1002,7 +1005,8 @@ uses uDtmAtivo, uDadosIni, uDtmEntrada, {UdtmTerminalF, UTerminalF,}
   uClasseConferenciaCega, uClassesConfigWS, DateUtils, uClassesSpedFBlocoE,
   uClassesSpedFBlocoH, TlHelp32, StrUtils, Math, config_sistema_class, hw_utils, hw_win_utils,
   uCadEmpresa_RepInterna, uClassesNotasFiscais_ServTransporte, hw_Confirmacao, //UclassesintegraFab;
-  hw_const_types, hw_grid_utils, uCadPadraoModal, uCadPadrao, uPadrao;
+  hw_const_types, hw_grid_utils, uCadPadraoModal, uCadPadrao, uPadrao,
+  HwNextHostUnit;
 
 function sintegra2009(comveic, vendBanco: PChar; codempresa: integer; vversao: Pchar; vdtini,
   vdtfinal: Pchar): longbool; stdcall; external 'CompativelHW.dll';
@@ -1078,7 +1082,7 @@ begin
 
   if vDadosIni.vMensagemConsorcio <> 'S' then
     Exit;
-  
+
   if (vDadosIni.VerificarDataAssembleia(cQuery))then
     exit;
 
@@ -1706,7 +1710,7 @@ begin
 end;
 
 procedure TfrmPrincipalS.CadastrosevinculosTray1Click(Sender: TObject);
-begin                   
+begin
   if not vDadosIni.PesqPros('PRO382', 'ABRIR', '', '', '', cQuery, False) then
     Exit;
 
@@ -2364,7 +2368,7 @@ begin
   begin
     MenusReset;
     MenusConfigurarDefaults;
-    MenusDesabilitarQuandoNFCeOffline;; 
+    MenusDesabilitarQuandoNFCeOffline;;
     CategoryButtonsConfigurar;
     MenuConfiguracoes.Visible := False;
   end;
@@ -3414,7 +3418,7 @@ begin
     if Pos('{' + trim(pForm.Name) + '}', trim(cbMenusAbertos.Categories[0].Items[I].Hint)) > 0 then
     begin
       vExisteMenu := True;
-      Break;                                       
+      Break;
     end;
 
   if not vExisteMenu then
@@ -3673,7 +3677,7 @@ begin
         //    i * 10;
   //      MainMenu1.Items[3].Add(MySubItems[2]);
         vsubitem := MySubItems[2];
-      end;  
+      end;
 
       for i := 0 to FileListBox1.Items.Count - 1 do
       begin
@@ -3738,7 +3742,7 @@ begin
       FileListBox1.Directory := ExtractFilePath(Application.Exename);
       FileListBox1.Refresh;
     end;
-    
+
     if DirectoryExists(vDadosIni.VpastaRel+ '\Veic4') then
     begin
       // Relatorios do Veículos
@@ -3996,6 +4000,15 @@ begin
   finally
     Screen.Cursor := crDefault;
   end;
+end;
+
+procedure TfrmPrincipalS.EventosDFe1Click(Sender: TObject);
+var
+  Options: THwNextOpenOptions;
+begin
+  Options := NextQueryOptions();
+  Options.DisplayTitle := 'Eventos DFe';
+  OpenNextView(Self, 'eventos.dfe', Options);
 end;
 
 procedure TfrmPrincipalS.ExibirMensagemChavePeriodica;
@@ -4571,6 +4584,7 @@ begin
                                        MB_YESNO + MB_ICONQUESTION) = IDYES;
   if CanClose then
   begin
+    ShutdownNextHost;
   	if MDIChildCount > 0 then
       for X := Pred(MDIChildCount) Downto 0 do
       begin
@@ -4647,7 +4661,8 @@ begin
   if Assigned(vProcessamentos) then
     FreeAndNil(vProcessamentos);
 
-  SetupModernShutdown();
+  ShutDownApp();
+
 
 //  LiberarDtmsAndUnloadPackage(hdConfig);
 //
@@ -4798,6 +4813,7 @@ begin
 
     if not dtmEnt.verificaEntrada then
     begin
+      ShutDownApp();
       Exit;
       Abort;
     end;
@@ -5118,7 +5134,7 @@ begin
     end;
     }
 
-    if IniConf.ReadStr('MD', 'Nws', '') <> 'N' then    
+    if IniConf.ReadStr('MD', 'Nws', '') <> 'N' then
     if _exiteNews(pchar(vDadosIni.vNomeUsuario), pchar(vDadosIni.vBancoHW)) then
       if vDadosIni.vAbrirNews <> 'N' then
         NoticiasHW.Click
@@ -6991,7 +7007,7 @@ begin
     Outros.Visible := False;
     RelatoriosEstoque.Visible := False;
     MenuOficina.Visible := False;
-    
+
     MenuPAFECF.Visible := False;
     MenuECommerce.Visible := False;
     MenuComercioAberto.Visible := False;
@@ -7180,14 +7196,20 @@ begin
     with vDadosIni do if GetIni('MD', 'SLA', 'N') = 'S' then //SALVAR LOGIN AUTOMATICAMENTE
       _GravaConfiguracoesString('LA', 'N');
 
+    InvalidateNextViews;
     FechaJanelasMDI(0);
 
     MenusReset;
 
-    dtmEnt.verificaEntrada;
+    if not dtmEnt.verificaEntrada then
+    begin
+      ShutDownApp();
+      Application.Terminate();
+      exit;
+    end;
     vDadosIni.abreStatusProcessamento('','Configurando menus');
     vDadosIni.setSistemasRregistrados(sistemasRegistrados(vDadosIni.vEmp.vCNPJ));
-                     
+
     if not ChaveMensalValida() then
     begin
       //Application.Terminate;
@@ -7490,7 +7512,7 @@ end;
 procedure TfrmPrincipalS.NBackupExecutarClick(Sender: TObject);
 var
   str: string;
-begin                
+begin
   if not vDadosIni.PesqPros('CFG055', 'ABRIR', '', '', '', cQuery, False) then
     Exit;
 
@@ -8785,11 +8807,11 @@ end;
 
 procedure TfrmPrincipalS.RTC_GruposFiscais1Click(Sender: TObject);
 var
-  ShowModelExecute: TShowForm;
+  Options: THwNextOpenOptions;
 begin
-  @ShowModelExecute := GetProcAddress(vDadosIni.vModern.AHandle, 'ShowGruposFiscais');
-  if Assigned(ShowModelExecute) then
-    ShowModelExecute( False );
+  Options := NextQueryOptions();
+  Options.DisplayTitle := 'Grupos Fiscais';
+  OpenNextView(Self, 'grupos.fiscais', Options);
 end;
 
 procedure TfrmPrincipalS.RTC_OperaccoesInternas1Click(Sender: TObject);
@@ -8803,11 +8825,11 @@ end;
 
 procedure TfrmPrincipalS.RTC_OperacoesFiscaisdoIBSeCBS1Click(Sender: TObject);
 var
-  ShowModelExecute: TShowForm;
+  Options: THwNextOpenOptions;
 begin
-  @ShowModelExecute := GetProcAddress(vDadosIni.vModern.AHandle, 'ShowOperacoesFiscaisIbsCbs');
-  if Assigned(ShowModelExecute) then
-    ShowModelExecute( False );
+  Options := NextQueryOptions();
+  Options.DisplayTitle := 'Operações Fiscais IBS/CBS';
+  OpenNextView(Self, 'operacoes.fiscais.ibscbs', Options);
 end;
 
 procedure TfrmPrincipalS.RTC_RegrasFiscaisdoIBSeCBS1Click(Sender: TObject);
@@ -8876,6 +8898,12 @@ begin
   @ProcedureInitialize := GetProcAddress(vDadosIni.vModern.AHandle, 'ModernShutDown');
   if Assigned(ProcedureInitialize) then
     ProcedureInitialize();
+end;
+
+procedure TfrmPrincipalS.ShutDownApp();
+begin
+  ShutdownNextHost();
+  SetupModernShutdown();
 end;
 
 function TfrmPrincipalS.ShowFormMainForm(AFormName: string; AForm: string): Boolean;
@@ -9349,7 +9377,7 @@ begin
   end;
 end;
 
-procedure TfrmPrincipalS.VendaEstoqueASSOHONDA1Click(Sender: TObject);                                            
+procedure TfrmPrincipalS.VendaEstoqueASSOHONDA1Click(Sender: TObject);
 var
 // cadintegraFab: TIntegraFab;
   hdTemp: THandle;
@@ -9893,4 +9921,3 @@ finalization
 //  frmPrincipalS.Show;
 
 end.
-

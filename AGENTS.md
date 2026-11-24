@@ -14,20 +14,20 @@ a uniform architecture for the legacy ERP.
   and line endings. Do not normalize legacy directories as a side effect.
 - Keep investigation bounded to the affected flow. Consult the developer before
   starting or expanding extensive processing.
-- Read .ai/rules/repository-safety.md for every task. For database work, also read
-  .ai/rules/database-safety.md.
+- Read .ai/rules/repository-safety.md and .ai/rules/implementation-quality.md for
+  every task. For database work, also read .ai/rules/database-safety.md.
 
 ## Canonical guidance and routing
 
 The shared instruction system is under .ai/. Modern-specific guidance remains in
-Modern/.ai/. Metadata is defined once in .ai/metadata.md. Read each selected
-canonical artifact completely before applying it.
+Modern/.ai/. Metadata and Rule scope semantics are defined in .ai/metadata.md.
+Read each selected canonical artifact completely before applying it.
 
 - .ai/agents/ — shared roles, execution profiles and orchestration protocol.
-- .ai/commands/ and .ai/workflows/ — shared entry points and multi-step procedures.
+- .ai/commands/ and .ai/workflows/ — entry points and multi-step procedures.
 - .ai/skills/ — procedures shared by the ERP.
-- .ai/rules/ and .ai/context/ — shared constraints and execution knowledge.
-- Modern/.ai/ — additional Rules, Context, Skills, Commands and Workflows for Modern.
+- .ai/rules/ and .ai/context/ — constraints and execution knowledge.
+- Modern/.ai/ — additional guidance owned by Modern.
 
 Start from an explicitly invoked Command; otherwise select a matching Workflow or
 Skill. A bounded maintenance task does not automatically require a full feature
@@ -35,83 +35,61 @@ Workflow. Agents may handle explicit bounded assignments under their role contra
 When a Workflow requires role separation, follow .ai/agents/README.md and
 .ai/agents/orchestration-protocol.md; do not impersonate an unavailable Specialist.
 
-For any scope in Modern/, also read Modern/AGENTS.md. Load its applicable Rules and
-only the Context and Skills needed by that scope. Do not load Modern's architecture,
-naming, Use Case, persistence, UI or testing conventions for exclusively legacy work.
-For legacy work, inspect the existing implementation and nearby examples before
-proposing changes. Evaluate their quality under the Legacy References and Local
-Changes section of .ai/rules/repository-safety.md before reusing them. A cross-area
-task uses each area's guidance for its own files.
+For Modern/ work, read Modern/AGENTS.md. For Next/ work or a Modern source marked
+with a Next compatibility header, read Next/AGENTS.md. For Modern and Next Delphi
+sources, load .ai/rules/delphi-coding-standards.md according to its path scope.
+A Next header does not relocate a source or replace the owning area's guidance.
+
+For exclusively legacy work, inspect the implementation and nearby examples.
+Evaluate them under repository-safety.md's Legacy References and Local Changes
+and implementation-quality.md. Preserve local conventions; do not load Modern or
+Next architecture, naming, Use Case, UI or testing rules for unrelated legacy work.
+A cross-area task uses each area's guidance for its own files.
 
 Read the supplied functional design and relevant product context. Distinguish
 observed behavior, proposals, approved decisions and unverified assumptions.
 Context and reasons for decisions live in the separate Contexto e decisões
-repository; consult the relevant theme and demand through the supplied references.
+repository; consult the relevant theme and demand through supplied references.
 
 ## Paths and Rule scope
 
-Paths in shared .ai/ documents are relative to this checkout root. Paths in
-Modern/.ai/ documents remain relative to Modern/ unless explicitly qualified.
-A path beginning Modern/ is checkout-relative. Paths beginning .ai-runs/ always
-refer to the checkout-root operational area, including in Modern documents.
+Paths in shared .ai/ documents are checkout-relative. Paths in Modern/.ai/
+documents remain relative to Modern/ unless explicitly qualified. A path beginning
+Modern/ is checkout-relative. Paths beginning .ai-runs/ always refer to the
+checkout-root operational area, including in Modern documents.
 
 Run shell commands from the checkout root and qualify Modern scripts accordingly.
-Skill-local references resolve from their own Skill directory.
+Skill-local references resolve from their own Skill directory. Apply Rule globs
+relative to the owning instruction root; specialized constraints are cumulative
+and exceptions must be explicit. An always_apply Modern Rule stays within Modern.
 
-Apply Rule globs relative to the owning instruction root. An always_apply Rule
-applies within that root's scope: root Rules cover the checkout, while Modern
-Rules are loaded only for work involving Modern. Specialized constraints are
-cumulative; exceptions must be explicit.
+Tool directories (.kilo/, .opencode/, .agents/ and other generated adapters) are
+discovery bridges, not independent sources of project rules or procedures.
 
-Tool directories (.kilo/, .agents/ and other generated adapters) are discovery
-bridges, not independent sources of project rules or procedures.
+## Compatibility and operations
 
-## Compatibility and preservation
+Much of HWDESKTOP targets Delphi 2006/Win32; selected DLLs use Rio 10.3.3. Identify
+each affected project's compiler and source boundary. A Rio consumer does not make
+shared code Rio-only. Preserve existing UI, configuration, authorization, audit
+and database boundaries. Use .ai/context/hwdesktop-overview.md when the product
+boundary matters.
 
-Much of HWDESKTOP targets Delphi 2006/Win32; selected DLLs use Delphi Rio 10.3.3.
-Identify the compiler from the affected project and source boundary. A Rio consumer
-does not make shared code Rio-only. Modern has its own precise compatibility rule;
-do not assume its file-marker or Tests/ convention describes every legacy project.
-
-Preserve established UI, configuration, authorization, audit and database boundaries.
-Do not reorganize projects or introduce broad architecture changes incidentally.
-Do not infer that unrelated projects in this polluted checkout share the ERP stack.
-Use .ai/context/hwdesktop-overview.md when that product boundary matters.
-
-## Database work
-
-Identify the physical starting state. Read scripts/database/schema/README.md, then
-search only the required definitions in scripts/database/schema/schema.sql.
-Prepare general demand SQL in scripts/database/changes/<demand-id>/.
-Do not edit scripts/versoes implicitly; production incorporation is separately
-requested. Read .ai/skills/database-migration/SKILL.md when preparing or
-incorporating migration SQL. Incorporation uses the developer's preferred version
-file, verified dependencies and paired removal of fully incorporated demand scripts
-in the same commit. A separately requested incorporation is a bounded Skill task
-with its own inputs. An earlier Workflow's completion status is not a prerequisite.
-Schema extraction, SQL execution and integration tests require their own authority.
-
-## Human documentation and operations
-
-docs/ia-assistida/ and Modern/docs/ia-assistida/ are human documentation. Do not read,
-search or use them for ordinary coding, analysis or Workflow execution unless the
-developer explicitly requests documentation maintenance. Setup automation may read
-its technical sources in _automation/ai/tool-setup/ without loading human guides.
+For database work, read .ai/rules/database-safety.md and
+scripts/database/schema/README.md, then search only the required schema definitions.
+For migration preparation or requested production incorporation, also read
+.ai/skills/database-migration/SKILL.md. Incorporation and SQL execution retain
+their separate authorization boundaries.
 
 Automation starts at _automation/README.md. Setup entry point:
 _automation/ai/Sync-AIProfiles.ps1. Build parameters are in _automation/build/README.md;
 SVN/Git operations are in _automation/workflow/GUIA-OPERACIONAL.md.
+Follow the standing validation grants in repository-safety.md during authorized
+implementation; other execution and publication need their own authority.
 
-Use checks appropriate to the change. During authorized implementation, isolated
-ERP.UnitTests build and execution have standing authorization under
-.ai/rules/repository-safety.md#standing-erp-unit-test-validation.
-Other builds, test projects, SQL, deployment and publication require their own
-authorization. Keep feature work in the working clone.
-Do not reset, stash, discard work, rewrite history, switch branches or publish as an
-implicit investigation step.
+docs/ia-assistida/ and Modern/docs/ia-assistida/ are human documentation. Do not
+load them for ordinary tasks unless documentation maintenance is requested.
+Setup automation may read its technical sources in _automation/ai/tool-setup/.
 
 New Workflow runs use .ai-runs/<run-id>/ at the checkout root, ignored by Git.
-Preserve historical run directories and evidence. When resuming an older run,
-identify its actual path explicitly; do not relocate it or replace its history
-automatically. Follow the current-run isolation and search boundaries in
-.ai/rules/repository-safety.md; do not load other runs as default project context.
+For resumed work, use its explicitly identified path and preserve its history.
+Apply repository-safety.md's run isolation and search boundaries.

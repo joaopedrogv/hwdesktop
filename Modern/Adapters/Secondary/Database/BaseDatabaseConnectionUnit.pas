@@ -8,12 +8,8 @@ uses
 
 type
   CreateAndExecuteQueryCmd = (rcOpen, rcExec);
-                        
-  {$IFDEF INTF_ON}
-  BaseDatabaseConnection = class(TInterfacedObject)
-  {$ELSE}
+
   BaseDatabaseConnection = class(IDataBaseConnection)
-  {$ENDIF}
   protected
     FOwnsDatabase: Boolean;
     FConnectionString: string;
@@ -23,14 +19,9 @@ type
     procedure LogError(const Value: string);
     procedure SetCharSet(const Value: string);
     function GetScalarFromField(const Field: TField): ScalarResult; virtual;
-  public                                 
-  {$IFDEF INTF_ON}
-    procedure SetLogger(const SqlLogger: ISqlLogger); overload;
-    procedure SetLogger(const ErrorLogger: IErrorLogger); overload;
-  {$ELSE}
+  public
     procedure SetLogger(const SqlLogger: ISqlLogger); overload; override;
     procedure SetLogger(const ErrorLogger: IErrorLogger); overload; override;
-  {$ENDIF}
   end;
 
 implementation
@@ -87,4 +78,3 @@ begin
 end;
 
 end.
-

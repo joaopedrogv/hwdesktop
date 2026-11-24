@@ -4,6 +4,7 @@ interface
 
 uses
   BaseUseCaseUnit,
+  IDataBaseConnectionUnit,
   IOperacoesFiscaisIbsCbsRepositoryUnit,
   OperacaoFiscalIbsCbsEtdUnit,
   CreateEntityUseCaseOutputUnit;
@@ -22,9 +23,10 @@ type
   SalvarOperacaoFiscalIbsCbsUseCase = class(BaseUseCase)
   {$ENDIF}
   private
+    FConnection: IDataBaseConnection;
     FOperacoesFiscaisIbsCbsRepo: IOperacoesFiscaisIbsCbsRepository;
   public
-    constructor Create(const OperacoesFiscaisIbsCbsRepo: IOperacoesFiscaisIbsCbsRepository);
+    constructor Create(AConnection: IDataBaseConnection; AOperacoesFiscaisIbsCbsRepo: IOperacoesFiscaisIbsCbsRepository);
 
     function Executar(Input: OperacaoFiscalIbsCbsEtd): CreateEntityUseCaseOutPut;
   end;
@@ -32,15 +34,16 @@ type
 implementation
 
 uses
-  Sysutils, EntityValidatorFactoryUnit, IEntityValidatorUnit,
+  Sysutils, EntityValidatorFactoryUnit, IEntityValidatorUnit, ITransactionUnit,
   LimitesBasicosUnit, TipoComunsUnit,
   OperacaoFiscalIbsCbsCondicaoEtdUnit, OperacaoFiscalIbsCbsMetadataUnit;
 
 { SalvarOperacaoFiscalIbsCbsUseCase }
 
-constructor SalvarOperacaoFiscalIbsCbsUseCase.Create(const OperacoesFiscaisIbsCbsRepo: IOperacoesFiscaisIbsCbsRepository);
+constructor SalvarOperacaoFiscalIbsCbsUseCase.Create(AConnection: IDataBaseConnection; AOperacoesFiscaisIbsCbsRepo: IOperacoesFiscaisIbsCbsRepository);
 begin
-  FOperacoesFiscaisIbsCbsRepo := OperacoesFiscaisIbsCbsRepo;
+  FConnection := AConnection;
+  FOperacoesFiscaisIbsCbsRepo := AOperacoesFiscaisIbsCbsRepo;
 end;
 
 function SalvarOperacaoFiscalIbsCbsUseCase.Executar(Input: OperacaoFiscalIbsCbsEtd): CreateEntityUseCaseOutPut;
@@ -48,6 +51,8 @@ var
   validator: IEntityValidator;
   erros: TArrayString;
   i: Integer;
+  saida: CreateEntityUseCaseOutPut;
+  transacao: ITransaction;
 begin
   // Normaliza antes de validar: duplicatas de valor sao removidas e a ordem
   // passa a ser canonica; o conjunto universal e mantido.
@@ -74,14 +79,37 @@ begin
   if not validator.IsValid() then
     Result := CreateEntityUseCaseOutPut.Create( validator.Result() )
 
-  else if Input.Id = '' then
-    Result := CreateEntityUseCaseOutPut.Create(
-      FOperacoesFiscaisIbsCbsRepo.Post( input )
-    )
   else
-    Result := CreateEntityUseCaseOutPut.Create(
-      FOperacoesFiscaisIbsCbsRepo.Put( input )
-    );
+  begin
+    // A transacao cobre a gravacao e a releitura feita pelo repositorio; a
+    // saida so e confirmada depois de montada com a entidade devolvida.
+    saida := nil;
+    transacao := FConnection.BeginTransaction();
+    try
+      try
+        if Input.Id = '' then
+          saida := CreateEntityUseCaseOutPut.Create(
+            FOperacoesFiscaisIbsCbsRepo.Post( input )
+          )
+        else
+          saida := CreateEntityUseCaseOutPut.Create(
+            FOperacoesFiscaisIbsCbsRepo.Put( input )
+          );
+
+        transacao.Commit();
+        Result := saida;
+      except
+        on E: Exception do
+        begin
+          transacao.Rollback();
+          FreeAndNil(saida);
+          raise;
+        end;
+      end;
+    finally
+      transacao.FreeTransaction();
+    end;
+  end;
 end;
 
 end.
