@@ -58,14 +58,22 @@ checkout-relative.
 
 ## Reads and host boundary
 
-- Query definitions supply columns, filters, query identity and the result
-  lifecycle through their contracts. Use their existing reader/operations
-  coordination rather than introducing parallel state in the form.
+- Dataset definitions supply columns, filters, DatasetId and the result lifecycle
+  through TNextDatasetDefinitionBase and INextDatasetDefinitionBase /
+  INextDatasetDefinition<T>. Keep these contracts independent of the data source
+  and reuse their reader/operations coordination.
+- Query identifies the SQL specialization: TNextQueryDefinition owns SQL query
+  construction and ISqlDataSetReaderFactory. In-memory collections use
+  TNextMemoryDatasetDefinitionBase<T> and INextMemoryDefinition<T>, with typed
+  model/dataset mapping. Keep SQL dependencies out of the common dataset base.
+- IDataSetResultOperations and TDataSetResultOperations operate on the loaded
+  dataset: marking, quick filters, sorting and summaries are not SQL execution.
 - Forms request searches and present native TDataSet results. Reads use the
   driver-independent contract; the adapter executes them. Composition selects
   the adapter and owns the connection lifecycle.
-- Use QueryResult to map known result fields into records or objects. Use typed
-  accessors and nullable accessors when NULL differs from an empty/default value.
+- Use the existing QueryResult wrapper to map known result fields into records or
+  objects, including in-memory datasets. Preserve its current name and API. Use
+  typed and nullable accessors when NULL differs from an empty/default value.
   For a dataset supplied by IDataSetReader, pass OwnsDataSet = False and free the
   wrapper after copying the values.
 - Direct TDataSet/TField use belongs in VCL binding and generic grid operations
@@ -92,7 +100,7 @@ source files. Use the same feature name under queries, Presenters, forms and fra
 | Composition/Features/ | Feature view factories registered by NextViewCatalog |
 | Composition/Shared/Seletores/ | Factories creating selector loaders from injected Use Cases |
 | Infrastructure/ | Database, authorization, auditing and preferences integration |
-| Queries/Shared/ and Queries/Features/<Feature>/ | Query definitions, SQL filters and result operations |
+| Queries/Shared/ and Queries/Features/<Feature>/ | Dataset definitions, SQL queries/filters and dataset result operations |
 | UI/Presenters/Shared/ and UI/Presenters/Features/<Feature>/ | Presenter bases and feature Presenters |
 | UI/Forms/Base/ and UI/Forms/Features/<Feature>/ | Consultation base and concrete forms |
 | UI/Frames/Shared/ and UI/Frames/Features/<Feature>/ | Shared visual components and feature editors |
@@ -112,6 +120,6 @@ from default columns and persisted preferences. Its relocation does not require
 splitting its types and functions into additional units. Host ABI contracts stay
 under Interop/Contracts/; Modern business Ports stay in their owning contexts.
 
-Within shared queries, place filter definitions and criteria in Filters/.
+Within Queries/Shared/, place filter definitions and criteria in Filters/.
 Within shared frames, group filters, grids, selectors and companies by their
 responsibility. The host-integrated form base belongs in Interop/Module/.

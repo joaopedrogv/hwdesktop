@@ -1,6 +1,6 @@
 ---
 name: next-consulta-cadastro
-description: Create or refactor Next consultation screens and cadastro editors using the existing query, Presenter, View and visual-base contracts. Use for new Next screens or migration of existing screens to Next.
+description: Create or refactor Next consultation screens and cadastro editors using the existing dataset, Presenter, View and visual-base contracts. Use for new Next screens or migration of existing screens to Next.
 ---
 
 # Next Consultation and Cadastro
@@ -37,21 +37,25 @@ new registrations together with the protected actions.
 
 ## Assemble the consultation
 
-1. Implement the feature's query definition using TNextDatasetDefinitionBase and,
-   when actions need a current item, INextDatasetDefinition<T> with a copied,
-   feature-specific selection record. Map the row in TryGetSelected through
-   QueryResult, including nullable values; keep aliases in that mapping.
+1. Choose the dataset definition's base by its data source: TNextQueryDefinition
+   for SQL or TNextMemoryDatasetDefinitionBase<T> for in-memory collections. Both
+   reuse TNextDatasetDefinitionBase. When actions need a current item, use
+   INextDatasetDefinition<T> with a copied, feature-specific selection record. Map
+   the row in TryGetSelected through QueryResult, including nullable values; keep
+   aliases in that mapping.
 2. Define the stable DatasetId and default columns in Configure. Prefer
    DatasetColumnDefinition's BuildGridColumns and BuildFilterDefinition to derive
    grid and query filters from the same declaration; inspect its supported
-   overrides for actual field restrictions. Keep query-specific predicates and
-   parameters in CreateQueryDefinition. The definition coordinates the reader,
-   operations and column preferences through its existing base.
+   overrides for actual field restrictions. For SQL definitions, keep predicates
+   and parameters in CreateQueryDefinition, returning TNextSegmentQueryDefinition.
+   The dataset definition coordinates the reader, IDataSetResultOperations and
+   column preferences through its existing base.
 3. Inherit TfrmConsultaBase and the feature consultation View from
-   IConsultaBaseView. Expose ConfigurarTela as the composition entry point and
-   associate the required commands in ApresentadorAssociado. Use the selection
-   contract for row-dependent commands. Additional query controls belong in the
-   existing search area and supply values when a new search is requested.
+   IConsultaBaseView. Expose ConfigurarTela as the composition entry point, register
+   the required controls with RegistrarAcao there, and call AssociarPresenter last.
+   The inherited TemRegistroCorrente checks current-row availability; use
+   TryGetSelected to obtain typed action data. Additional search controls belong
+   in the existing search area and supply values when a new search is requested.
 4. Put consultation actions in a Presenter derived from TPresenterConsultaBase.
    Keep current-item confirmation and Use Case orchestration there, communicating
    through the injected View. Reuse RefreshResult after mutations: it refreshes

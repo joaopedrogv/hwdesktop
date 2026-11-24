@@ -18,13 +18,13 @@ wrappers in an example require their own assessment under the canonical Rules.
 - [Editor Presenter](../../../../Next/UI/Presenters/Features/GruposFiscais/GruposFiscaisCadastroPresenter.pas)
   and [View](../../../../Next/Contracts/Features/GruposFiscais/GruposFiscaisCadastroView.pas):
   preparation, typed save and validation through ICadastroEditorView.
-- [Query definition](../../../../Next/Queries/Features/GruposFiscais/GruposFiscaisQueryDefinition.pas):
+- [SQL dataset definition](../../../../Next/Queries/Features/GruposFiscais/GruposFiscaisQueryDefinition.pas):
   TGrupoSelecionado and QueryResult mapping. Its explicit equality-only filter
   declaration is feature-local; use the next example for deriving new filters.
 
 ## Operacoes Fiscais IBS/CBS: selectors and multiple pages
 
-- [Query definition](../../../../Next/Queries/Features/OperacoesFiscaisIbsCbs/OperacoesFiscaisIbsCbsQueryDefinition.pas):
+- [SQL dataset definition](../../../../Next/Queries/Features/OperacoesFiscaisIbsCbs/OperacoesFiscaisIbsCbsQueryDefinition.pas):
   BuildColumns, BuildGridColumns, BuildFilterDefinition, nullable row mapping and
   a checkbox read for a new search. Refresh keeps the last executed parameters.
 - [Composition](../../../../Next/Composition/Features/OperacoesFiscaisIbsCbsComposition.pas):
@@ -39,9 +39,22 @@ wrappers in an example require their own assessment under the canonical Rules.
 
 ## Shared mechanisms to inspect before adapting
 
-- [Query base](../../../../Next/Queries/Shared/NextDatasetDefinition.pas) and
-  [column/filter declaration](../../../../Next/Queries/Shared/DatasetColumnDefinition.pas):
-  result lifecycle, DatasetId, default/saved layout and filter generation.
+- [Dataset base](../../../../Next/Queries/Shared/NextDatasetDefinition.pas):
+  TNextDatasetDefinitionBase, common interfaces, reader lifecycle, DatasetId and
+  default/saved column layouts.
+- [SQL specialization](../../../../Next/Queries/Shared/NextQueryDefinition.pas):
+  TNextQueryDefinition, CreateQueryDefinition, TNextSegmentQueryDefinition and the
+  SQL reader factory.
+- [In-memory specialization](../../../../Next/Queries/Shared/NextMemoryDatasetDefinition.pas)
+  and [211130 item collection](../../../../Next/Queries/Features/EventosDFe/EventoDFe211130ColecaoDefinition.pas):
+  TNextMemoryDatasetDefinitionBase<T>, INextMemoryDefinition<T>, ModelToDataSet /
+  DataSetToModel and Load/Add/Update/Remove/SelectAll. Collection mapping stays
+  separate from business validation.
+- [Dataset operations](../../../../Next/Queries/Shared/DatasetResultOperations.pas):
+  IDataSetResultOperations / TDataSetResultOperations for marking, quick filters,
+  sorting and summaries over the current dataset.
+- [Column/filter declaration](../../../../Next/Queries/Shared/DatasetColumnDefinition.pas):
+  grid columns and filters derived from the same definitions.
 - [Consultation base](../../../../Next/UI/Forms/Base/ConsultaBaseForm.pas):
   command state, tabs, deferred close and RefreshResult.
 - [Editor base PAS](../../../../Next/UI/Frames/Shared/Cadastro/CadastroEditorFrame.pas)
