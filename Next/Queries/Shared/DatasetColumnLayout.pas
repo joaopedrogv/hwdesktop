@@ -1,4 +1,4 @@
-unit QueryColumnLayout;
+unit DatasetColumnLayout;
 
 interface
 
@@ -8,26 +8,26 @@ uses
 type
   // Coluna pronta para criacao na grade: metadados, largura ja resolvida (preferencia quando positiva) e visibilidade
   // efetiva da abertura.
-  TQueryColumnLayoutItem = record
+  TDatasetColumnLayoutItem = record
     Definition: TGridColumnDefinition;
     Visible: Boolean;
   end;
 
   // Plano na ordem visual final. A grade cria os TColumn nesta ordem, sem reordenar depois.
-  TQueryColumnLayout = TArray<TQueryColumnLayoutItem>;
+  TDatasetColumnLayout = TArray<TDatasetColumnLayoutItem>;
 
 // Verdadeiro para a coluna cuja ordem e largura participam da preferencia gravada: as configuraveis e as sempre
 // visiveis, que mantem a visibilidade forcada. A marcacao e as sempre ocultas nao participam.
-function QueryColumnPersistable(const AColumn: TGridColumnDefinition; const AMarkingFieldName: string): Boolean;
+function DatasetColumnPersistable(const AColumn: TGridColumnDefinition; const AMarkingFieldName: string): Boolean;
 
-function QueryColumnLayoutAvailable(const ADefinitions: TGridColumnDefinitions;
+function DatasetColumnLayoutAvailable(const ADefinitions: TGridColumnDefinitions;
   const AMarkingFieldName: string): Boolean;
 
 // Cruza as preferencias salvas com as colunas padrao. Entradas desconhecidas, duplicadas ou de colunas que nao
 // participam sao ignoradas. Colunas configuraveis ausentes entram ao final; a sempre visivel ausente mantem a posicao
 // da definicao para preservar layouts gravados antes de ela participar.
-function ResolveQueryColumnLayout(const ADefinitions: TGridColumnDefinitions; const AEntries: TColumnLayoutEntries;
-  const AMarkingFieldName: string): TQueryColumnLayout;
+function ResolveDatasetColumnLayout(const ADefinitions: TGridColumnDefinitions; const AEntries: TColumnLayoutEntries;
+  const AMarkingFieldName: string): TDatasetColumnLayout;
 
 implementation
 
@@ -81,11 +81,11 @@ end;
 function ColumnFollowsSavedOrder(const AColumn: TGridColumnDefinition;
   const AMarkingFieldName: string; const AHasSavedEntry: Boolean): Boolean;
 begin
-  Result := QueryColumnPersistable(AColumn, AMarkingFieldName) and
+  Result := DatasetColumnPersistable(AColumn, AMarkingFieldName) and
     (AHasSavedEntry or GridColumnConfigurable(AColumn.Behavior));
 end;
 
-function QueryColumnPersistable(const AColumn: TGridColumnDefinition; const AMarkingFieldName: string): Boolean;
+function DatasetColumnPersistable(const AColumn: TGridColumnDefinition; const AMarkingFieldName: string): Boolean;
 begin
   if (AMarkingFieldName <> '') and SameText(AColumn.FieldName, AMarkingFieldName) then
     Exit(False);
@@ -93,13 +93,13 @@ begin
   Result := GridColumnConfigurable(AColumn.Behavior) or (AColumn.Behavior = gcbAlwaysVisible);
 end;
 
-function QueryColumnLayoutAvailable(const ADefinitions: TGridColumnDefinitions;
+function DatasetColumnLayoutAvailable(const ADefinitions: TGridColumnDefinitions;
   const AMarkingFieldName: string): Boolean;
 var
   I: Integer;
 begin
   for I := 0 to High(ADefinitions) do
-    if QueryColumnPersistable(ADefinitions[I], AMarkingFieldName) then
+    if DatasetColumnPersistable(ADefinitions[I], AMarkingFieldName) then
       Exit(True);
   Result := False;
 end;
@@ -123,8 +123,8 @@ begin
     Result := AEntries[EntryIndex].Visible;
 end;
 
-function ResolveQueryColumnLayout(const ADefinitions: TGridColumnDefinitions; const AEntries: TColumnLayoutEntries;
-  const AMarkingFieldName: string): TQueryColumnLayout;
+function ResolveDatasetColumnLayout(const ADefinitions: TGridColumnDefinitions; const AEntries: TColumnLayoutEntries;
+  const AMarkingFieldName: string): TDatasetColumnLayout;
 var
   Sorted: TColumnLayoutEntries;
   HasEntry: TArray<Boolean>;
@@ -134,7 +134,7 @@ var
   DefinitionIndex: Integer;
   Count: Integer;
   I: Integer;
-  Item: TQueryColumnLayoutItem;
+  Item: TDatasetColumnLayoutItem;
 begin
   Sorted := SortColumnLayoutEntries(AEntries);
   SetLength(HasEntry, Length(ADefinitions));
@@ -148,7 +148,7 @@ begin
     DefinitionIndex := FindDefinitionIndex(ADefinitions, Sorted[I].FieldName);
     if DefinitionIndex < 0 then
       Continue;
-    if not QueryColumnPersistable(ADefinitions[DefinitionIndex], AMarkingFieldName) then
+    if not DatasetColumnPersistable(ADefinitions[DefinitionIndex], AMarkingFieldName) then
       Continue;
     if HasEntry[DefinitionIndex] then
       Continue;
@@ -193,7 +193,7 @@ begin
     Item.Visible := ResolveVisibility(Item.Definition, Sorted, AMarkingFieldName);
 
     EntryIndex := FindEntryIndex(Sorted, Item.Definition.FieldName);
-    if QueryColumnPersistable(Item.Definition, AMarkingFieldName) and
+    if DatasetColumnPersistable(Item.Definition, AMarkingFieldName) and
       (EntryIndex >= 0) and (Sorted[EntryIndex].Width > 0) then
       Item.Definition.Width := Sorted[EntryIndex].Width;
 

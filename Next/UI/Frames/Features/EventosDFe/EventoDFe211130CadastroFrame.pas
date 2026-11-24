@@ -7,7 +7,7 @@ uses
   EditorCadastro, EventoDFeCadastroRestauracao, EventoDFe211130CadastroView,
   EventoDFe211130CadastroPresenter, EventoDFe211130EtdUnit,
   EventoDFe211130ItemEtdUnit, EventoDFe211130ItemEditorFactory,
-  EventoDFe211130ItensFrame, NextMemoryQueryDefinition, TipoEventoDFeUnit;
+  EventoDFe211130ItensFrame, NextMemoryDatasetDefinition, TipoEventoDFeUnit;
 
 type
   TfrmEventoDFe211130CadastroFrame = class(TfrmCadastroEditor,

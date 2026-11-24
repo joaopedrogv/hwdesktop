@@ -3,9 +3,9 @@ unit EventosDFeQueryDefinition;
 interface
 
 uses
-  Data.DB, FilterCriterion, NextQueryDefinition, NextSqlQueryDefinition,
-  QueryColumnDefinition, GridColumnDefinition, FilterDefinition,
-  IDataSetReaderUnit, QueryResultOperations, ColumnLayoutPreferences,
+  Data.DB, FilterCriterion, NextDatasetDefinition, NextSqlQueryDefinition,
+  DatasetColumnDefinition, GridColumnDefinition, FilterDefinition,
+  IDataSetReaderUnit, DatasetResultOperations, ColumnLayoutPreferences,
   ISessionContextUnit, TipoEventoDFeUnit, StatusRegistroEnumUnit,
   EventoDFeStatusUnit;
 
@@ -28,17 +28,17 @@ type
   end;
 
   TEventosDFeQueryDefinition = class(TNextSqlQueryDefinitionBase,
-    INextQueryDefinition<TEventoDFeSelecionado>)
+    INextDatasetDefinition<TEventoDFeSelecionado>)
   private
     FSession: ISessionContext;
     FLixeiraSearch: TEventosDFeLixeiraSearch;
-    function BuildColumns: TQueryColumnDefinitions;
+    function BuildColumns: TDatasetColumnDefinitions;
   protected
     procedure Configure(); override;
     function CreateQueryDefinition(const ACriteria: TFilterCriteria): TNextQueryDefinition; override;
   public
     // A empresa e a opção da lixeira são lidas a cada pesquisa, não na construção.
-    constructor Create(AReaderFactory: ISqlDataSetReaderFactory; AOperation: IQueryResultOperations;
+    constructor Create(AReaderFactory: ISqlDataSetReaderFactory; AOperation: IDataSetResultOperations;
       ALayoutPreferences: IColumnLayoutPreferences; ASession: ISessionContext;
       const ALixeiraSearch: TEventosDFeLixeiraSearch);
     function TryGetSelected(out ASelected: TEventoDFeSelecionado): Boolean;
@@ -50,7 +50,7 @@ uses
   System.SysUtils, QueryResultUnit, ParameterValueUnit, QueryFilterSqlBuilder;
 
 const
-  LayoutQueryId = 'eventos.dfe';
+  LayoutDatasetId = 'eventos.dfe';
   FilterMarker = '/*FILTROS*/';
   EmpresaParameterName = 'EMPRESA';
   AtivoParameterName = 'ATIVO';
@@ -102,7 +102,7 @@ begin
 end;
 
 constructor TEventosDFeQueryDefinition.Create(AReaderFactory: ISqlDataSetReaderFactory;
-  AOperation: IQueryResultOperations; ALayoutPreferences: IColumnLayoutPreferences;
+  AOperation: IDataSetResultOperations; ALayoutPreferences: IColumnLayoutPreferences;
   ASession: ISessionContext; const ALixeiraSearch: TEventosDFeLixeiraSearch);
 begin
   inherited Create(AReaderFactory, AOperation, ALayoutPreferences);
@@ -116,7 +116,7 @@ begin
   FLixeiraSearch := ALixeiraSearch;
 end;
 
-function TEventosDFeQueryDefinition.BuildColumns: TQueryColumnDefinitions;
+function TEventosDFeQueryDefinition.BuildColumns: TDatasetColumnDefinitions;
 begin
   // O tipo de evento permanece sempre visível; as chaves internas apenas alimentam a linha corrente da grade.
   Result := QueryColumns([
@@ -139,9 +139,9 @@ end;
 
 procedure TEventosDFeQueryDefinition.Configure();
 var
-  Columns: TQueryColumnDefinitions;
+  Columns: TDatasetColumnDefinitions;
 begin
-  FQueryId := LayoutQueryId;
+  FDatasetId := LayoutDatasetId;
 
   Columns := BuildColumns;
   FColumnsDef := BuildGridColumns(Columns);

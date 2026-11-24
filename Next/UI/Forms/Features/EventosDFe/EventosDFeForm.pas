@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, ConsultaBaseForm,
-  PresenterConsultaBase, NextQueryDefinition, LocalPreferences, EventosDFeView,
+  PresenterConsultaBase, NextDatasetDefinition, LocalPreferences, EventosDFeView,
   EventosDFePresenter, EventosDFeQueryDefinition, TipoEventoDFeUnit, EditorCadastro, System.ImageList, Vcl.ImgList,
   Data.DB, DataGridFrame, Vcl.Buttons, FilterFrame, Vcl.ExtCtrls, Vcl.ComCtrls, System.Classes, Vcl.Menus;
 
@@ -24,7 +24,7 @@ type
     procedure btnAlterarClick(Sender: TObject);
     procedure btnExcluirClick(Sender: TObject);
   private
-    FDefinicaoSelecao: INextQueryDefinition<TEventoDFeSelecionado>;
+    FDefinicaoSelecao: INextDatasetDefinition<TEventoDFeSelecionado>;
     function EditorDisponivel(ATipo: TipoEventoDFe): Boolean;
     function PrepararRestauracao(const AEditor: TWinControl; const AId: string): Boolean;
   public
@@ -33,7 +33,7 @@ type
     function IsLixeiraSearch: Boolean;
     function AbrirInclusao(const AChave, ATitulo: string): Boolean;
     function AbrirEdicao(const ASelecao: TEventoDFeSelecionado; AModo: TModoEventoDFe): Boolean;
-    procedure ConfigurarTela(const ADefinition: INextQueryDefinition<TEventoDFeSelecionado>;
+    procedure ConfigurarTela(const ADefinition: INextDatasetDefinition<TEventoDFeSelecionado>;
       const APresenter: TEventosDFePresenter; const APreferences: ILocalPreferences;
       const ACriarEditor: TCriarEditorCadastroComandos);
   end;
@@ -46,7 +46,7 @@ uses
   CadastroEditorFrame, EventoDFeCadastroRestauracao, SelecaoEventoDFeForm,
   StatusRegistroEnumUnit;
 
-procedure TfrmEventosDFe.ConfigurarTela(const ADefinition: INextQueryDefinition<TEventoDFeSelecionado>;
+procedure TfrmEventosDFe.ConfigurarTela(const ADefinition: INextDatasetDefinition<TEventoDFeSelecionado>;
   const APresenter: TEventosDFePresenter; const APreferences: ILocalPreferences;
   const ACriarEditor: TCriarEditorCadastroComandos);
 begin
@@ -59,7 +59,7 @@ begin
   // fábrica configurada e o apresentador só passa a pertencer à tela em AssociarPresenter.
   Attach(ADefinition, 'Eventos DFe');
   ConfigurarCriacaoEditorAba(ACriarEditor);
-  ConfigureFilters(ADefinition.FiltersDef, APreferences, ADefinition.QueryId);
+  ConfigureFilters(ADefinition.FiltersDef, APreferences, ADefinition.DatasetId);
   AssociarPresenter(APresenter);
 
   RegistrarAcao(btnNovoAcoes);

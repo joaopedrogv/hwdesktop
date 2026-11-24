@@ -3,8 +3,8 @@ unit OperacoesFiscaisIbsCbsQueryDefinition;
 interface
 
 uses
-  IDataSetReaderUnit, QueryResultOperations, FilterCriterion, NextQueryDefinition,
-  NextSqlQueryDefinition, QueryColumnDefinition, ColumnLayoutPreferences;
+  IDataSetReaderUnit, DatasetResultOperations, FilterCriterion, NextDatasetDefinition,
+  NextSqlQueryDefinition, DatasetColumnDefinition, ColumnLayoutPreferences;
 
 type
   // Opcao da tela consultada a cada pesquisa: a marcacao do checkbox pertence a view e pode mudar enquanto a janela
@@ -23,15 +23,15 @@ type
   // Definicao de leitura das Operacoes Fiscais IBS/CBS. A tabela nao possui empresa: o unico predicado fixo e o estado
   // do registro, informado pela tela em cada pesquisa.
   TOperacoesFiscaisIbsCbsQueryDefinition = class(TNextSqlQueryDefinitionBase,
-    INextQueryDefinition<TOperacaoFiscalSelecionada>)
+    INextDatasetDefinition<TOperacaoFiscalSelecionada>)
   private
     FLixeiraSearch: TLixeiraSearch;
-    function BuildColumns: TQueryColumnDefinitions;
+    function BuildColumns: TDatasetColumnDefinitions;
   protected
     procedure Configure(); override;
     function CreateQueryDefinition(const ACriteria: TFilterCriteria): TNextQueryDefinition; override;
   public
-    constructor Create(AReaderFactory: ISqlDataSetReaderFactory; AOperation: IQueryResultOperations;
+    constructor Create(AReaderFactory: ISqlDataSetReaderFactory; AOperation: IDataSetResultOperations;
       ALayoutPreferences: IColumnLayoutPreferences; const ALixeiraSearch: TLixeiraSearch);
     function TryGetSelected(out ASelected: TOperacaoFiscalSelecionada): Boolean;
   end;
@@ -44,7 +44,7 @@ uses
   StatusRegistroEnumUnit, TipoTributoFiscalEnumUnit;
 
 const
-  LayoutQueryId = 'operacoes.fiscais.ibscbs';
+  LayoutDatasetId = 'operacoes.fiscais.ibscbs';
   FilterMarker = '/*FILTROS*/';
   ActiveParameterName = 'ATIVO';
   // Percentuais do diferimento com quatro casas, como no cadastro Modern. Sem a formatacao o proprio campo decidiria as
@@ -100,7 +100,7 @@ begin
 end;
 
 constructor TOperacoesFiscaisIbsCbsQueryDefinition.Create(
-  AReaderFactory: ISqlDataSetReaderFactory; AOperation: IQueryResultOperations;
+  AReaderFactory: ISqlDataSetReaderFactory; AOperation: IDataSetResultOperations;
   ALayoutPreferences: IColumnLayoutPreferences;
   const ALixeiraSearch: TLixeiraSearch);
 begin
@@ -113,7 +113,7 @@ begin
 end;
 
 function TOperacoesFiscaisIbsCbsQueryDefinition.BuildColumns:
-  TQueryColumnDefinitions;
+  TDatasetColumnDefinitions;
 begin
   // Cada coluna e declarada uma vez, com o tipo do filtro e o comportamento da grade. As colunas sempre visiveis
   // continuam filtraveis.
@@ -140,9 +140,9 @@ end;
 
 procedure TOperacoesFiscaisIbsCbsQueryDefinition.Configure();
 var
-  Columns: TQueryColumnDefinitions;
+  Columns: TDatasetColumnDefinitions;
 begin
-  FQueryId := LayoutQueryId;
+  FDatasetId := LayoutDatasetId;
 
   Columns := BuildColumns;
   FColumnsDef := BuildGridColumns(Columns);

@@ -1,4 +1,4 @@
-unit QueryColumnDefinition;
+unit DatasetColumnDefinition;
 
 interface
 
@@ -7,7 +7,7 @@ uses
 
 type
   // Declaracao unica de uma coluna da consulta: a grade e os filtros saem desta mesma lista.
-  TQueryColumnDefinition = record
+  TDatasetColumnDefinition = record
     FieldName: string;
     Title: string;
     ValueType: TFilterFieldType;
@@ -19,27 +19,27 @@ type
     FilterOperators: TFilterOperatorSet;
   end;
 
-  TQueryColumnDefinitions = TArray<TQueryColumnDefinition>;
+  TDatasetColumnDefinitions = TArray<TDatasetColumnDefinition>;
 
 function QueryColumn(const AFieldName, ATitle: string; AValueType: TFilterFieldType; AWidth: Integer = 0;
   AAlignment: TGridColumnDefinitionAlignment = qcaDefault; ABehavior: TGridColumnBehavior = gcbConfigurableVisible;
   const ADisplayFormat: string = ''; AFilterEnabled: Boolean = True;
-  const AFilterOperators: TFilterOperatorSet = []): TQueryColumnDefinition;
-function QueryColumns(const AItems: array of TQueryColumnDefinition): TQueryColumnDefinitions;
+  const AFilterOperators: TFilterOperatorSet = []): TDatasetColumnDefinition;
+function QueryColumns(const AItems: array of TDatasetColumnDefinition): TDatasetColumnDefinitions;
 
 // Metadados de apresentacao da grade, na ordem das declaracoes recebidas.
-function BuildGridColumns(const AColumns: TQueryColumnDefinitions): TGridColumnDefinitions;
+function BuildGridColumns(const AColumns: TDatasetColumnDefinitions): TGridColumnDefinitions;
 
 // Campos de filtro das declaracoes elegiveis: ficam de fora o que o usuario nunca ve (gcbAlwaysHidden) e o que a
 // funcionalidade marca como nao filtravel.
-function BuildFilterDefinition(const AColumns: TQueryColumnDefinitions; AAllowAll: Boolean = True): TFilterDefinition;
+function BuildFilterDefinition(const AColumns: TDatasetColumnDefinitions; AAllowAll: Boolean = True): TFilterDefinition;
 
 implementation
 
 function QueryColumn(const AFieldName, ATitle: string; AValueType: TFilterFieldType; AWidth: Integer;
   AAlignment: TGridColumnDefinitionAlignment; ABehavior: TGridColumnBehavior;
   const ADisplayFormat: string; AFilterEnabled: Boolean;
-  const AFilterOperators: TFilterOperatorSet): TQueryColumnDefinition;
+  const AFilterOperators: TFilterOperatorSet): TDatasetColumnDefinition;
 begin
   Result.FieldName := AFieldName;
   Result.Title := ATitle;
@@ -52,7 +52,7 @@ begin
   Result.FilterOperators := AFilterOperators;
 end;
 
-function QueryColumns(const AItems: array of TQueryColumnDefinition): TQueryColumnDefinitions;
+function QueryColumns(const AItems: array of TDatasetColumnDefinition): TDatasetColumnDefinitions;
 var
   Index: Integer;
 begin
@@ -61,13 +61,13 @@ begin
     Result[Index] := AItems[Index];
 end;
 
-function FilterEligible(const AColumn: TQueryColumnDefinition): Boolean;
+function FilterEligible(const AColumn: TDatasetColumnDefinition): Boolean;
 begin
   Result := AColumn.FilterEnabled and (AColumn.Behavior in
     [gcbConfigurableVisible, gcbAlwaysVisible, gcbConfigurableHidden]);
 end;
 
-function BuildGridColumns(const AColumns: TQueryColumnDefinitions): TGridColumnDefinitions;
+function BuildGridColumns(const AColumns: TDatasetColumnDefinitions): TGridColumnDefinitions;
 var
   Index: Integer;
 begin
@@ -78,9 +78,9 @@ begin
       AColumns[Index].Behavior, AColumns[Index].DisplayFormat);
 end;
 
-function BuildFilterDefinition(const AColumns: TQueryColumnDefinitions; AAllowAll: Boolean): TFilterDefinition;
+function BuildFilterDefinition(const AColumns: TDatasetColumnDefinitions; AAllowAll: Boolean): TFilterDefinition;
 var
-  Column: TQueryColumnDefinition;
+  Column: TDatasetColumnDefinition;
   Fields: TFilterFieldDefinitions;
   FieldCount: Integer;
   Operators: TFilterOperatorSet;

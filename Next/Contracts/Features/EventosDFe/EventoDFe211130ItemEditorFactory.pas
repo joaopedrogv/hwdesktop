@@ -4,7 +4,7 @@ interface
 
 uses
   System.Classes, Vcl.Controls, EditorCadastro, EventoDFe211130ItemView,
-  EventoDFe211130ItemEtdUnit, NextMemoryQueryDefinition;
+  EventoDFe211130ItemEtdUnit, NextMemoryDatasetDefinition;
 
 type
   TEventoDFe211130ItemEditor = record

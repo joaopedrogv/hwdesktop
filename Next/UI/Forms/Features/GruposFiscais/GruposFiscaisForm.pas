@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils,
   Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, ConsultaBaseForm, PresenterConsultaBase,
-  GruposFiscaisPresenter, GruposFiscaisView, NextQueryDefinition,
+  GruposFiscaisPresenter, GruposFiscaisView, NextDatasetDefinition,
   LocalPreferences,
   GruposFiscaisQueryDefinition, GrupoFiscalCadastroFrame, EditorCadastro, System.ImageList, Vcl.ImgList, Data.DB,
   DataGridFrame, Vcl.Buttons, FilterFrame, Vcl.ExtCtrls, Vcl.ComCtrls, System.Classes;
@@ -14,11 +14,11 @@ type
   TfrmGruposFiscais = class(TfrmConsultaBase, IGruposFiscaisView)
     procedure btnNovoAcoesClick(Sender: TObject);
     procedure btnAlterarClick(Sender: TObject);
-    procedure btnExcluirClick(Sender: TObject);    
+    procedure btnExcluirClick(Sender: TObject);
   public
     function AbrirEdicao(const ASelecao: TGrupoSelecionado): Boolean;
     function AbrirInclusao: Boolean;
-    procedure ConfigurarTela(const ADefinition: INextQueryDefinitionBase;
+    procedure ConfigurarTela(const ADefinition: INextDatasetDefinitionBase;
       const APresenter: TGruposFiscaisPresenter; const APreferences: ILocalPreferences;
       const ACriarEditor: TCriarEditorCadastroComandos);
   end;
@@ -27,7 +27,7 @@ implementation
 
 {$R *.dfm}
 
-procedure TfrmGruposFiscais.ConfigurarTela(const ADefinition: INextQueryDefinitionBase;
+procedure TfrmGruposFiscais.ConfigurarTela(const ADefinition: INextDatasetDefinitionBase;
   const APresenter: TGruposFiscaisPresenter; const APreferences: ILocalPreferences;
   const ACriarEditor: TCriarEditorCadastroComandos);
 begin
@@ -39,9 +39,9 @@ begin
   // As validacoes precisam acontecer antes da posse. a sequencia preserva o resultado esperado
   Attach(ADefinition, 'Grupos Fiscais');
   ConfigurarCriacaoEditorAba(ACriarEditor);
-  ConfigureFilters(ADefinition.FiltersDef, APreferences, ADefinition.QueryId);
+  ConfigureFilters(ADefinition.FiltersDef, APreferences, ADefinition.DatasetId);
   AssociarPresenter(APresenter);
-   
+
   RegistrarAcao(btnNovoAcoes);
   RegistrarAcao(btnAlterar, True);
   RegistrarAcao(btnExcluir, True);

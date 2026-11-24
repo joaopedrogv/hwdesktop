@@ -23,8 +23,8 @@ implementation
 
 uses
   System.SysUtils, EventosDFeForm, LocalPreferences, EventosDFeQueryDefinition,
-  NextQueryDefinition, EventosDFePresenter, AuthorizationService, NextSetup,
-  IDataSetReaderUnit, QueryResultOperations, ColumnLayoutPreferences,
+  NextDatasetDefinition, EventosDFePresenter, AuthorizationService, NextSetup,
+  IDataSetReaderUnit, DatasetResultOperations, ColumnLayoutPreferences,
   IEventoDFeFiscalGatewayUnit, AcbrNFeEventoFiscalGatewayUnit,
   RemoverEventoDFeUseCaseUnit, TransmitirEventoDFeUseCaseUnit,
   ConsultarSituacaoEventoDFeUseCaseUnit, TipoEventoDFeUnit,
@@ -35,7 +35,7 @@ uses
   ObterEventoDFe211130PorIdUseCaseUnit, SalvarEventoDFe211130UseCaseUnit,
   EventoDFe211130ColecaoDefinition, EventoDFe211130ItemEtdUnit,
   EventoDFe211130ItemEditorFactory, EventosDFeItemEditorFactory,
-  NextMemoryQueryDefinition, FireDACMemoryDataSetReaderUnit,
+  NextMemoryDatasetDefinition, FireDACMemoryDataSetReaderUnit,
   ValidadorItemEventoDFe211130Unit;
 
 class procedure TEventosDFeComposition.Registrar(const AContainer: TContainer);
@@ -66,7 +66,7 @@ class function TEventosDFeComposition.CriarConsulta(AParent: HWND): TfrmNextBase
 var
   View: TfrmEventosDFe;
   Preferences: ILocalPreferences;
-  Definition: INextQueryDefinition<TEventoDFeSelecionado>;
+  Definition: INextDatasetDefinition<TEventoDFeSelecionado>;
   Presenter: TEventosDFePresenter;
 begin
   Preferences := NextSetupInstance.Resolve<ILocalPreferences>;
@@ -75,7 +75,7 @@ begin
   try
     // A definição pertence à tela; a empresa e a lixeira são lidas a cada pesquisa, não na abertura.
     Definition := TEventosDFeQueryDefinition.Create(NextSetupInstance.Resolve<ISqlDataSetReaderFactory>,
-      NextSetupInstance.Resolve<IQueryResultOperations>, NextSetupInstance.Resolve<IColumnLayoutPreferences>,
+      NextSetupInstance.Resolve<IDataSetResultOperations>, NextSetupInstance.Resolve<IColumnLayoutPreferences>,
       NextSetupInstance.SessionContext, View.IsLixeiraSearch);
 
     Presenter := TEventosDFePresenter.Create(View, Definition, NextSetupInstance.Resolve<IAuthorizationService>,
@@ -140,7 +140,7 @@ begin
   try
     Reader := TFireDACMemoryDataSetReader.Create(TEventoDFe211130ColecaoDefinition.Campos);
     Colecao := TEventoDFe211130ColecaoDefinition.Create(Reader,
-      NextSetupInstance.Resolve<IQueryResultOperations>,
+      NextSetupInstance.Resolve<IDataSetResultOperations>,
       NextSetupInstance.Resolve<IColumnLayoutPreferences>);
     EditorFactory := TEventoDFe211130ItemEditorFactory.Create(
       NextSetupInstance.Resolve<IAuthorizationService>,

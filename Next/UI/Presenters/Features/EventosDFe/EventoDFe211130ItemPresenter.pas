@@ -4,7 +4,7 @@ interface
 
 uses
   AuthorizationService, EventoDFe211130ItemView, EventoDFe211130ItemEtdUnit,
-  ValidadorItemEventoDFe211130Unit, NextMemoryQueryDefinition,
+  ValidadorItemEventoDFe211130Unit, NextMemoryDatasetDefinition,
   PresenterCadastroBase;
 
 type

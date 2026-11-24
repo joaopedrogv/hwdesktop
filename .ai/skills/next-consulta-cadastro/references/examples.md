@@ -39,9 +39,9 @@ wrappers in an example require their own assessment under the canonical Rules.
 
 ## Shared mechanisms to inspect before adapting
 
-- [Query base](../../../../Next/Queries/Shared/NextQueryDefinition.pas) and
-  [column/filter declaration](../../../../Next/Queries/Shared/QueryColumnDefinition.pas):
-  result lifecycle, QueryId, default/saved layout and filter generation.
+- [Query base](../../../../Next/Queries/Shared/NextDatasetDefinition.pas) and
+  [column/filter declaration](../../../../Next/Queries/Shared/DatasetColumnDefinition.pas):
+  result lifecycle, DatasetId, default/saved layout and filter generation.
 - [Consultation base](../../../../Next/UI/Forms/Base/ConsultaBaseForm.pas):
   command state, tabs, deferred close and RefreshResult.
 - [Editor base PAS](../../../../Next/UI/Frames/Shared/Cadastro/CadastroEditorFrame.pas)

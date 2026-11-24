@@ -3,8 +3,8 @@ unit NextSqlQueryDefinition;
 interface
 
 uses
-  IDataSetReaderUnit, FilterCriterion, QueryResultOperations,
-  ColumnLayoutPreferences, ParameterValueUnit, NextQueryDefinition;
+  IDataSetReaderUnit, FilterCriterion, DatasetResultOperations,
+  ColumnLayoutPreferences, ParameterValueUnit, NextDatasetDefinition;
 
 type
   // Definicao de leitura independente de driver. Contem apenas SQL, parametros e metadados de colunas; nao executa
@@ -14,13 +14,13 @@ type
     Parameters: ParametersValues;
   end;
 
-  TNextSqlQueryDefinitionBase = class(TNextQueryDefinitionBase)
+  TNextSqlQueryDefinitionBase = class(TNextDatasetDefinitionBase)
   protected
     FReaderFactory: ISqlDataSetReaderFactory;
     function CreateQueryDefinition(const ACriteria: TFilterCriteria): TNextQueryDefinition; virtual; abstract;
     function CreateReader(const ACriteria: TFilterCriteria): IDataSetReader; override;
   public
-    constructor Create(AReaderFactory: ISqlDataSetReaderFactory; AOperation: IQueryResultOperations;
+    constructor Create(AReaderFactory: ISqlDataSetReaderFactory; AOperation: IDataSetResultOperations;
       ALayoutPreferences: IColumnLayoutPreferences);
   end;
 
@@ -30,7 +30,7 @@ uses
   System.SysUtils;
 
 constructor TNextSqlQueryDefinitionBase.Create(AReaderFactory: ISqlDataSetReaderFactory;
-  AOperation: IQueryResultOperations; ALayoutPreferences: IColumnLayoutPreferences);
+  AOperation: IDataSetResultOperations; ALayoutPreferences: IColumnLayoutPreferences);
 begin
   inherited Create(AOperation, ALayoutPreferences);
   if AReaderFactory = nil then

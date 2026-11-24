@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, ConsultaBaseForm,
-  PresenterConsultaBase, NextQueryDefinition, LocalPreferences,
+  PresenterConsultaBase, NextDatasetDefinition, LocalPreferences,
   OperacoesFiscaisIbsCbsView, OperacoesFiscaisIbsCbsPresenter,
   OperacoesFiscaisIbsCbsQueryDefinition, EditorCadastro;
 
@@ -13,16 +13,16 @@ type
     chkLixeira: TCheckBox;
     procedure btnNovoAcoesClick(Sender: TObject);
     procedure btnAlterarClick(Sender: TObject);
-    procedure btnExcluirClick(Sender: TObject); 
+    procedure btnExcluirClick(Sender: TObject);
   private
     function TituloAlteracao(const ASelecao: TOperacaoFiscalSelecionada): string;
-  protected       
+  protected
   public
     function AbrirEdicao(const ASelecao: TOperacaoFiscalSelecionada): Boolean;
     function AbrirInclusao: Boolean;
     // Opcao lida pela definicao em cada pesquisa: vale para a proxima busca e nao altera o resultado ja apresentado.
     function IsLixeiraSearch: Boolean;
-    procedure ConfigurarTela(const ADefinition: INextQueryDefinition<TOperacaoFiscalSelecionada>;
+    procedure ConfigurarTela(const ADefinition: INextDatasetDefinition<TOperacaoFiscalSelecionada>;
       const APresenter: TOperacoesFiscaisIbsCbsPresenter; const APreferences: ILocalPreferences;
       const ACriarEditor: TCriarEditorCadastroComandos);
   end;
@@ -34,7 +34,7 @@ implementation
 uses
   OperacaoFiscalIbsCbsCadastroFrame;
 
-procedure TfrmOperacoesFiscaisIbsCbs.ConfigurarTela(const ADefinition: INextQueryDefinition<TOperacaoFiscalSelecionada>;
+procedure TfrmOperacoesFiscaisIbsCbs.ConfigurarTela(const ADefinition: INextDatasetDefinition<TOperacaoFiscalSelecionada>;
   const APresenter: TOperacoesFiscaisIbsCbsPresenter; const APreferences: ILocalPreferences;
   const ACriarEditor: TCriarEditorCadastroComandos);
 begin
@@ -46,7 +46,7 @@ begin
   // As validacoes precisam acontecer antes da posse. a sequencia preserva o resultado esperado
   Attach(ADefinition, 'Operações Fiscais IBS/CBS');
   ConfigurarCriacaoEditorAba(ACriarEditor);
-  ConfigureFilters(ADefinition.FiltersDef, APreferences, ADefinition.QueryId);
+  ConfigureFilters(ADefinition.FiltersDef, APreferences, ADefinition.DatasetId);
   AssociarPresenter(APresenter);
 
   RegistrarAcao(btnNovoAcoes);

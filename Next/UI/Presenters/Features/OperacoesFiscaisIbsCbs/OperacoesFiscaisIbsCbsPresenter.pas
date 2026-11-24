@@ -4,7 +4,7 @@ interface
 
 uses
   AuthorizationService, OperacoesFiscaisIbsCbsView,
-  RemoverOperacaoFiscalIbsCbsUseCaseUnit, NextQueryDefinition,
+  RemoverOperacaoFiscalIbsCbsUseCaseUnit, NextDatasetDefinition,
   OperacoesFiscaisIbsCbsQueryDefinition, PresenterConsultaBase;
 
 type
@@ -14,11 +14,11 @@ type
     // A view pertence a tela e as demais dependencias ao container de composicao: o apresentador apenas as utiliza e
     // nunca as libera.
     FView: IOperacoesFiscaisIbsCbsView;
-    FQueryDefinition: INextQueryDefinition<TOperacaoFiscalSelecionada>;
+    FQueryDefinition: INextDatasetDefinition<TOperacaoFiscalSelecionada>;
     FRemover: RemoverOperacaoFiscalIbsCbsUseCase;
   public
     constructor Create(const AView: IOperacoesFiscaisIbsCbsView;
-      const AQueryDefinition: INextQueryDefinition<TOperacaoFiscalSelecionada>;
+      const AQueryDefinition: INextDatasetDefinition<TOperacaoFiscalSelecionada>;
       const AAuthorization: IAuthorizationService; ARemover: RemoverOperacaoFiscalIbsCbsUseCase);
     function EnviarParaLixeira: Boolean;
     function SolicitarInclusao: Boolean;
@@ -40,7 +40,7 @@ const
 
 constructor TOperacoesFiscaisIbsCbsPresenter.Create(
   const AView: IOperacoesFiscaisIbsCbsView;
-  const AQueryDefinition: INextQueryDefinition<TOperacaoFiscalSelecionada>;
+  const AQueryDefinition: INextDatasetDefinition<TOperacaoFiscalSelecionada>;
   const AAuthorization: IAuthorizationService; ARemover: RemoverOperacaoFiscalIbsCbsUseCase);
 begin
   // O processo de pesquisa e a tabela padrao ficam na base, que tambem responde pela permissao da consulta.

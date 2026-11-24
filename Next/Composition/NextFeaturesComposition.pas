@@ -24,7 +24,7 @@ uses
   ResolverRegraFiscalIbsCbsUseCaseUnit, IResolverRegraFiscalIbsCbsServiceUnit,
   ResolverRegraFiscalIbsCbsServiceUnit,
   ListarOperacoesInternasUseCaseUnit, ListarRegrasFiscaisUseCaseUnit,
-  NextQueryDefinition, GruposFiscaisQueryDefinition,
+  NextDatasetDefinition, GruposFiscaisQueryDefinition,
   ColumnLayoutPreferences, ColumnLayoutPreferencesRepository,
   LocalPreferences, WindowsRegistryLocalPreferences,
   IConfiguracoesRepositoryUnit, ConfiguracoesRepositoryUnit,
@@ -49,7 +49,7 @@ begin
   AContainer.RegisterType<IAuthorizationComunicator, TNextAuthorizationComunicator>.AsTransient;
   AContainer.RegisterType<IAuthorizationService, TNextAuthorizationAdapter>.AsSingleton;
 
-  // Sem estado entre chamadas: QueryId e usuario sao lidos a cada operacao, por isso a instancia unica atende a troca
+  // Sem estado entre chamadas: DatasetId e usuario sao lidos a cada operacao, por isso a instancia unica atende a troca
   // de usuario.
   AContainer.RegisterType<IColumnLayoutPreferences, TColumnLayoutPreferencesRepository>.AsSingleton;
 
@@ -76,7 +76,7 @@ begin
 
   // Sem interface, a instancia nao e contada por referencia: o container a possui e o apresentador nao a libera.
   AContainer.RegisterType<ObterGrupoFiscalPorIdUseCase>.AsSingleton;
-  AContainer.RegisterType<INextQueryDefinition<TGrupoSelecionado>, TGruposFiscaisQueryDefinition>().AsTransient;
+  AContainer.RegisterType<INextDatasetDefinition<TGrupoSelecionado>, TGruposFiscaisQueryDefinition>().AsTransient;
 
   // Repositorios e casos de uso de leitura nao guardam estado e leem a conexao do Setup.
   AContainer.RegisterType<IOperacoesFiscaisIbsCbsRepository, OperacoesFiscaisIbsCbsRepository>.AsSingleton;

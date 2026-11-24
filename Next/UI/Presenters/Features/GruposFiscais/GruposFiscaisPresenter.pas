@@ -4,7 +4,7 @@ interface
 
 uses
   AuthorizationService, RemoverGrupoFiscalUseCaseUnit, GruposFiscaisView,
-  NextQueryDefinition, GruposFiscaisQueryDefinition, PresenterConsultaBase;
+  NextDatasetDefinition, GruposFiscaisQueryDefinition, PresenterConsultaBase;
 
 type
   // A preparacao, o carregamento e a gravacao do registro pertencem ao apresentador do cadastro.
@@ -13,10 +13,10 @@ type
     // A view pertence a tela e as demais dependencias ao container de composicao: o apresentador apenas as utiliza e
     // nunca as libera.
     FView: IGruposFiscaisView;
-    FQueryDefinition: INextQueryDefinition<TGrupoSelecionado>;
+    FQueryDefinition: INextDatasetDefinition<TGrupoSelecionado>;
     FRemoverGrupoFiscal: IRemoverGrupoFiscalUseCase;
   public
-    constructor Create(AView: IGruposFiscaisView; AQueryDefinition: INextQueryDefinition<TGrupoSelecionado>;
+    constructor Create(AView: IGruposFiscaisView; AQueryDefinition: INextDatasetDefinition<TGrupoSelecionado>;
       AAuthorization: IAuthorizationService; ARemoverGrupoFiscal: IRemoverGrupoFiscalUseCase);
     function EnviarParaLixeira(): Boolean;
     function SolicitarInclusao: Boolean;
@@ -40,7 +40,7 @@ const
   SelecaoObrigatoriaMessage = 'Selecione um grupo fiscal na grade.';
 
 constructor TGruposFiscaisPresenter.Create(AView: IGruposFiscaisView;
-  AQueryDefinition: INextQueryDefinition<TGrupoSelecionado>;
+  AQueryDefinition: INextDatasetDefinition<TGrupoSelecionado>;
   AAuthorization: IAuthorizationService; ARemoverGrupoFiscal: IRemoverGrupoFiscalUseCase);
 begin
   // O processo de pesquisa e a tabela padrao ficam na base, que tambem responde pela permissao da consulta.

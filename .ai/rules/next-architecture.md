@@ -107,7 +107,7 @@ remain shared when the component is reusable, including EmpresaOption,
 SelecaoEntidadeOption and RegraFiscalSelecaoOption.
 
 Keep implementation algorithms in the area that owns their behavior.
-QueryColumnLayout belongs under Queries/Shared/: it resolves the grid layout
+DatasetColumnLayout belongs under Queries/Shared/: it resolves the grid layout
 from default columns and persisted preferences. Its relocation does not require
 splitting its types and functions into additional units. Host ABI contracts stay
 under Interop/Contracts/; Modern business Ports stay in their owning contexts.

@@ -7,9 +7,9 @@ uses
   Vcl.StdCtrls, Vcl.ExtCtrls,
   Vcl.DBGrids, Vcl.Menus, System.Classes, System.SysUtils, System.Types,
   System.UITypes, System.Generics.Collections, Data.DB, FilterDefinition,
-  FilterCriterion, FilterFrame, QueryResultOperations, GridColumnDefinition,
-  ColumnSelectionFrame, ColumnLayoutPreferences, NextQueryDefinition,
-  QueryColumnLayout, IDataSetSorterUnit;
+  FilterCriterion, FilterFrame, DatasetResultOperations, GridColumnDefinition,
+  ColumnSelectionFrame, ColumnLayoutPreferences, NextDatasetDefinition,
+  DatasetColumnLayout, IDataSetSorterUnit;
 
 type
   // Controles de um criterio na faixa. Os slots sao reaproveitados na ordem dos criterios, evitando recriar a faixa
@@ -78,7 +78,7 @@ type
     procedure dbgDadosTitleClick(Column: TColumn);
   private
     FMarkingColumn: string;
-    FOperations: IQueryResultOperations;
+    FOperations: IDataSetResultOperations;
     FQuickFilterEnabled: Boolean;
     FQuickFilterColumnName: string;
     FContextColumnName: string;
@@ -92,7 +92,7 @@ type
     FOnFeedback: TFrameFeedbackEvent;
     // Alimentam a configuracao de colunas mesmo sem conjunto vinculado.
     FColumnDefinitions: TGridColumnDefinitions;
-    FColumnLayout: INextQueryDefinitionBase;
+    FColumnLayout: INextDatasetDefinitionBase;
 
     function GetDataSource: TDataSource;
     procedure SetDataSource(const Value: TDataSource);
@@ -134,7 +134,7 @@ type
     function ColumnLayoutAvailable: Boolean;
     function FindColumnDefinitionIndex(const AFieldName: string): Integer;
     function BuildColumnLayoutEntries: TColumnLayoutEntries;
-    procedure AddColumn(const AItem: TQueryColumnLayoutItem);
+    procedure AddColumn(const AItem: TDatasetColumnLayoutItem);
     procedure ReportarFeedback(const AMensagem: string);
     procedure ModalFeedback(Sender: TObject; const AMensagem: string);
   public
@@ -142,9 +142,9 @@ type
     destructor Destroy; override;
     // Marcacao, filtro rapido e ordenacao sao configuracoes independentes. A ordenacao e automatica para toda coluna
     // visivel cujo campo o conjunto aceita ordenar; a coluna SEL nunca participa.
-    procedure Configure(AOperations: IQueryResultOperations = nil; AQuickFilterEnabled: Boolean = False);
+    procedure Configure(AOperations: IDataSetResultOperations = nil; AQuickFilterEnabled: Boolean = False);
     // Define a fonte de colunas padrao e de layout; chamar antes de ConfigureColumns.
-    procedure AttachColumnLayoutSource(const ADefinition: INextQueryDefinitionBase);
+    procedure AttachColumnLayoutSource(const ADefinition: INextDatasetDefinitionBase);
     procedure ConfigureColumns;
     procedure ReloadColumnLayout;
     procedure SaveColumnLayout;
@@ -888,7 +888,7 @@ end;
 function TfrmDataGridFrame.ColumnLayoutAvailable: Boolean;
 begin
   // A marcacao e as colunas sempre ocultas nao geram persistencia.
-  Result := (FColumnLayout <> nil) and QueryColumnLayoutAvailable(FColumnDefinitions, FMarkingColumn);
+  Result := (FColumnLayout <> nil) and DatasetColumnLayoutAvailable(FColumnDefinitions, FMarkingColumn);
 end;
 
 function TfrmDataGridFrame.BuildColumnLayoutEntries: TColumnLayoutEntries;
@@ -908,7 +908,7 @@ begin
     DefinitionIndex := FindColumnDefinitionIndex(Column.FieldName);
     if DefinitionIndex < 0 then
       Continue;
-    if not QueryColumnPersistable(FColumnDefinitions[DefinitionIndex], FMarkingColumn) then
+    if not DatasetColumnPersistable(FColumnDefinitions[DefinitionIndex], FMarkingColumn) then
       Continue;
 
     SetLength(Result, Count + 1);
@@ -922,7 +922,7 @@ begin
   end;
 end;
 
-procedure TfrmDataGridFrame.AttachColumnLayoutSource(const ADefinition: INextQueryDefinitionBase);
+procedure TfrmDataGridFrame.AttachColumnLayoutSource(const ADefinition: INextDatasetDefinitionBase);
 begin
   if ADefinition = nil then
     raise Exception.Create(MissingColumnLayoutPreferencesMessage);
@@ -932,7 +932,7 @@ begin
   FColumnLayout := ADefinition;
 end;
 
-procedure TfrmDataGridFrame.AddColumn(const AItem: TQueryColumnLayoutItem);
+procedure TfrmDataGridFrame.AddColumn(const AItem: TDatasetColumnLayoutItem);
 var
   Column: TColumn;
 begin
@@ -1009,7 +1009,7 @@ begin
   DoMarkOperation(moMarkAll);
 end;
 
-procedure TfrmDataGridFrame.Configure(AOperations: IQueryResultOperations = nil; AQuickFilterEnabled: Boolean = False);
+procedure TfrmDataGridFrame.Configure(AOperations: IDataSetResultOperations = nil; AQuickFilterEnabled: Boolean = False);
 begin
   ResetSortState();
   FOperations := AOperations;
@@ -1053,7 +1053,7 @@ end;
 
 procedure TfrmDataGridFrame.ConfigureColumns;
 var
-  Layout: TQueryColumnLayout;
+  Layout: TDatasetColumnLayout;
   I: Integer;
 begin
   if FColumnLayout = nil then

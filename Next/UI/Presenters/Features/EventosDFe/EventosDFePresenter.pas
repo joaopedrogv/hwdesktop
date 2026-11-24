@@ -5,7 +5,7 @@ interface
 uses
   AuthorizationService, EventosDFeView, RemoverEventoDFeUseCaseUnit,
   TransmitirEventoDFeUseCaseUnit, ConsultarSituacaoEventoDFeUseCaseUnit,
-  EventoDFeTransmissaoTypesUnit, NextQueryDefinition,
+  EventoDFeTransmissaoTypesUnit, NextDatasetDefinition,
   EventosDFeQueryDefinition, PresenterConsultaBase;
 
 type
@@ -15,7 +15,7 @@ type
     // A view pertence à tela e as demais dependências ao container de composição: o apresentador apenas as utiliza e
     // nunca as libera.
     FView: IEventosDFeView;
-    FQueryDefinition: INextQueryDefinition<TEventoDFeSelecionado>;
+    FQueryDefinition: INextDatasetDefinition<TEventoDFeSelecionado>;
     FRemoverEvento: IRemoverEventoDFeUseCase;
     FTransmitirEvento: TransmitirEventoDFeUseCase;
     FConsultarSituacaoEvento: ConsultarSituacaoEventoDFeUseCase;
@@ -25,7 +25,7 @@ type
       const AResultado: TEventoDFeResultadoConsultarSituacao);
   public
     constructor Create(const AView: IEventosDFeView;
-      AQueryDefinition: INextQueryDefinition<TEventoDFeSelecionado>;
+      AQueryDefinition: INextDatasetDefinition<TEventoDFeSelecionado>;
       AAuthorization: IAuthorizationService; ARemoverEvento: IRemoverEventoDFeUseCase;
       ATransmitirEvento: TransmitirEventoDFeUseCase;
       AConsultarSituacaoEvento: ConsultarSituacaoEventoDFeUseCase);
@@ -73,7 +73,7 @@ begin
 end;
 
 constructor TEventosDFePresenter.Create(const AView: IEventosDFeView;
-  AQueryDefinition: INextQueryDefinition<TEventoDFeSelecionado>;
+  AQueryDefinition: INextDatasetDefinition<TEventoDFeSelecionado>;
   AAuthorization: IAuthorizationService; ARemoverEvento: IRemoverEventoDFeUseCase;
   ATransmitirEvento: TransmitirEventoDFeUseCase;
   AConsultarSituacaoEvento: ConsultarSituacaoEventoDFeUseCase);

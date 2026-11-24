@@ -9,7 +9,7 @@ uses
 type
   // Adaptador de CONFIG_COLUNAS para preferencias visuais de colunas. Nao
   // possui a conexao nem a sessao: a composicao cede ambas e continua
-  // responsavel pelo ciclo de vida delas. O QueryId e validado a cada operacao;
+  // responsavel pelo ciclo de vida delas. O DatasetId e validado a cada operacao;
   // o login continua sendo lido da sessao a cada operacao, portanto a troca de
   // usuario vale sem recriar o repositorio.
   TColumnLayoutPreferencesRepository = class(TInterfacedObject,
@@ -17,16 +17,16 @@ type
   private
     FConnection: IDataBaseConnection;
     FSession: ISessionContext;
-    function RequireComponent(const AQueryId: string): string;
+    function RequireComponent(const ADatasetId: string): string;
     function RequireLogin: string;
     procedure ValidateEntry(const AEntry: TColumnLayoutEntry);
   public
     constructor Create(const AConnection: IDataBaseConnection;
       const ASession: ISessionContext);
-    function Load(const AQueryId: string): TColumnLayoutEntries;
-    procedure Save(const AQueryId: string;
+    function Load(const ADatasetId: string): TColumnLayoutEntries;
+    procedure Save(const ADatasetId: string;
       const AEntries: TColumnLayoutEntries);
-    procedure Reset(const AQueryId: string);
+    procedure Reset(const ADatasetId: string);
   end;
 
 implementation
@@ -95,11 +95,11 @@ begin
 end;
 
 function TColumnLayoutPreferencesRepository.RequireComponent(
-  const AQueryId: string): string;
+  const ADatasetId: string): string;
 begin
-  // O QueryId identifica a consulta e nao pode ocupar o espaco de nomes dos
+  // O DatasetId identifica a consulta e nao pode ocupar o espaco de nomes dos
   // modelos de exportacao, que usam '@' para separar a consulta do codigo.
-  Result := Trim(AQueryId);
+  Result := Trim(ADatasetId);
   if Result = '' then
     raise EValidacaoNegocio.Create(
       'O componente das preferencias de colunas nao foi informado.');
@@ -137,7 +137,7 @@ begin
 end;
 
 function TColumnLayoutPreferencesRepository.Load(
-  const AQueryId: string): TColumnLayoutEntries;
+  const ADatasetId: string): TColumnLayoutEntries;
 var
   Component: string;
   Login: string;
@@ -150,7 +150,7 @@ var
 begin
   SetLength(Result, 0);
 
-  Component := RequireComponent(AQueryId);
+  Component := RequireComponent(ADatasetId);
 
   // Leitura nao abre transacao propria: CreateQuery usa a transacao corrente da
   // conexao e a libera junto com a consulta.
@@ -209,7 +209,7 @@ begin
     end;
 end;
 
-procedure TColumnLayoutPreferencesRepository.Save(const AQueryId: string;
+procedure TColumnLayoutPreferencesRepository.Save(const ADatasetId: string;
   const AEntries: TColumnLayoutEntries);
 var
   Component: string;
@@ -218,9 +218,9 @@ var
   Params: ParametersValues;
   I: Integer;
 begin
-  // A consulta e validada antes da saida da lista vazia: um QueryId invalido
+  // A consulta e validada antes da saida da lista vazia: um DatasetId invalido
   // nao pode passar como operacao bem-sucedida.
-  Component := RequireComponent(AQueryId);
+  Component := RequireComponent(ADatasetId);
 
   if Length(AEntries) = 0 then
     Exit;
@@ -278,14 +278,14 @@ begin
 end;
 
 procedure TColumnLayoutPreferencesRepository.Reset(
-  const AQueryId: string);
+  const ADatasetId: string);
 var
   Component: string;
   Login: string;
   Transaction: ITransaction;
   Params: ParametersValues;
 begin
-  Component := RequireComponent(AQueryId);
+  Component := RequireComponent(ADatasetId);
   Login := RequireLogin;
   Params := ParametersBuilder.Create(2)
     .ByName('USUARIO', Login)

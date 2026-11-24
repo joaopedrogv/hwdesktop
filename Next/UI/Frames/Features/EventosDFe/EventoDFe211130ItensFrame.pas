@@ -6,7 +6,7 @@ uses
   System.Classes, System.SysUtils, Data.DB, Vcl.Controls, Vcl.Forms,
   Vcl.StdCtrls, DataGridFrame, FilterFrame, EditorCadastro, CadastroEditorFrame,
   EventoDFe211130ItemView, EventoDFe211130ItemEditorFactory,
-  EventoDFe211130ItemEtdUnit, NextMemoryQueryDefinition, Vcl.ExtCtrls;
+  EventoDFe211130ItemEtdUnit, NextMemoryDatasetDefinition, Vcl.ExtCtrls;
 
 type
   TfrmEventoDFe211130ItensFrame = class(TFrame, IEditorCadastroHost)

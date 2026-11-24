@@ -1,15 +1,15 @@
-unit NextMemoryQueryDefinition;
+unit NextMemoryDatasetDefinition;
 
 interface
 
 uses
-  System.SysUtils, Data.DB, FilterCriterion, QueryResultOperations,
-  ColumnLayoutPreferences, IDataSetReaderUnit, NextQueryDefinition;
+  System.SysUtils, Data.DB, FilterCriterion, DatasetResultOperations,
+  ColumnLayoutPreferences, IDataSetReaderUnit, NextDatasetDefinition;
 
 type
-  // Colecao tipada em memoria: a leitura continua em INextQueryDefinition<T> e a edicao opera a linha corrente.
+  // Colecao tipada em memoria: a leitura continua em INextDatasetDefinition<T> e a edicao opera a linha corrente.
   // Load substitui o conteudo na preparacao da aba.
-  INextMemoryDefinition<T> = interface(INextQueryDefinition<T>)
+  INextMemoryDefinition<T> = interface(INextDatasetDefinition<T>)
     ['{3A7C1D24-5E6F-4A80-9B12-8C4D5E6F7A81}']
     procedure Load(const AModels: TArray<T>);
     procedure Add(const AModel: T);
@@ -18,7 +18,7 @@ type
     function SelectAll: TArray<T>;
   end;
 
-  TNextMemoryQueryDefinitionBase<T> = class(TNextQueryDefinitionBase,
+  TNextMemoryDatasetDefinitionBase<T> = class(TNextDatasetDefinitionBase,
     INextMemoryDefinition<T>)
   private
     FMemoryReader: IDataSetReader;
@@ -33,7 +33,7 @@ type
     function DataSetToModel: T; virtual; abstract;
   public
     constructor Create(const AReader: IDataSetReader;
-      AOperation: IQueryResultOperations;
+      AOperation: IDataSetResultOperations;
       ALayoutPreferences: IColumnLayoutPreferences);
     procedure Load(const AModels: TArray<T>);
     procedure Add(const AModel: T);
@@ -48,8 +48,8 @@ implementation
 uses
   EValidacaoNegocioUnit;
 
-constructor TNextMemoryQueryDefinitionBase<T>.Create(
-  const AReader: IDataSetReader; AOperation: IQueryResultOperations;
+constructor TNextMemoryDatasetDefinitionBase<T>.Create(
+  const AReader: IDataSetReader; AOperation: IDataSetResultOperations;
   ALayoutPreferences: IColumnLayoutPreferences);
 begin
   if AReader = nil then
@@ -61,34 +61,34 @@ begin
   FReader := AReader;
 end;
 
-function TNextMemoryQueryDefinitionBase<T>.RequireDataSet: TDataSet;
+function TNextMemoryDatasetDefinitionBase<T>.RequireDataSet: TDataSet;
 begin
   Result := GetDataSet;
   if (Result = nil) or (not Result.Active) then
     raise Exception.Create('A colecao em memoria nao esta aberta.');
 end;
 
-procedure TNextMemoryQueryDefinitionBase<T>.RequireCurrentRow(
+procedure TNextMemoryDatasetDefinitionBase<T>.RequireCurrentRow(
   const ADataSet: TDataSet);
 begin
   if ADataSet.IsEmpty then
     raise EValidacaoNegocio.Create('Selecione um item da colecao.');
 end;
 
-procedure TNextMemoryQueryDefinitionBase<T>.LimparLinhas(const ADataSet: TDataSet);
+procedure TNextMemoryDatasetDefinitionBase<T>.LimparLinhas(const ADataSet: TDataSet);
 begin
   ADataSet.First;
   while not ADataSet.Eof do
     ADataSet.Delete;
 end;
 
-function TNextMemoryQueryDefinitionBase<T>.CreateReader(
+function TNextMemoryDatasetDefinitionBase<T>.CreateReader(
   const ACriteria: TFilterCriteria): IDataSetReader;
 begin
   Result := FMemoryReader;
 end;
 
-procedure TNextMemoryQueryDefinitionBase<T>.Load(const AModels: TArray<T>);
+procedure TNextMemoryDatasetDefinitionBase<T>.Load(const AModels: TArray<T>);
 var
   DataSet: TDataSet;
   Model: T;
@@ -123,7 +123,7 @@ begin
   end;
 end;
 
-procedure TNextMemoryQueryDefinitionBase<T>.Add(const AModel: T);
+procedure TNextMemoryDatasetDefinitionBase<T>.Add(const AModel: T);
 var
   DataSet: TDataSet;
 begin
@@ -138,7 +138,7 @@ begin
   end;
 end;
 
-procedure TNextMemoryQueryDefinitionBase<T>.Update(const AModel: T);
+procedure TNextMemoryDatasetDefinitionBase<T>.Update(const AModel: T);
 var
   DataSet: TDataSet;
 begin
@@ -154,7 +154,7 @@ begin
   end;
 end;
 
-procedure TNextMemoryQueryDefinitionBase<T>.Remove;
+procedure TNextMemoryDatasetDefinitionBase<T>.Remove;
 var
   DataSet: TDataSet;
 begin
@@ -163,7 +163,7 @@ begin
   DataSet.Delete;
 end;
 
-function TNextMemoryQueryDefinitionBase<T>.SelectAll: TArray<T>;
+function TNextMemoryDatasetDefinitionBase<T>.SelectAll: TArray<T>;
 var
   DataSet: TDataSet;
   Filter: string;
@@ -223,7 +223,7 @@ begin
   end;
 end;
 
-function TNextMemoryQueryDefinitionBase<T>.TryGetSelected(
+function TNextMemoryDatasetDefinitionBase<T>.TryGetSelected(
   out ASelected: T): Boolean;
 var
   DataSet: TDataSet;

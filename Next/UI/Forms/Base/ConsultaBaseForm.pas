@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Controls, Vcl.ComCtrls,
   Vcl.ExtCtrls, Vcl.Forms, Vcl.StdCtrls, Vcl.Buttons, Vcl.ImgList, System.Generics.Collections,
   Data.DB,  NextBaseForm, DataGridFrame, FilterDefinition, FilterCriterion, FilterFrame,
-  QueryResultOperations, NextQueryDefinition,
+  DatasetResultOperations, NextDatasetDefinition,
   LocalPreferences, PresenterConsultaBase,
   EditorCadastro, ConsultaBaseView, System.ImageList, Vcl.Menus;
 
@@ -70,8 +70,8 @@ type
   private
     FFiltersConfigured: Boolean;
     FFilterDefinition: TFilterDefinition;
-    FDefinition: INextQueryDefinitionBase;
-    FOperations: IQueryResultOperations;
+    FDefinition: INextDatasetDefinitionBase;
+    FOperations: IDataSetResultOperations;
     FTitle: string;
     FQuickFilterEnabled: Boolean;
     FPesquisando: Boolean;
@@ -118,7 +118,7 @@ type
     // Operacoes da configuracao inicial, expostas pela ConfigurarTela da tela concreta. A definicao e associada
     // primeiro; os filtros e o editor de cadastro vem em seguida; a posse do apresentador e sempre a ultima etapa.
     procedure Attach(
-        const ADefinition: INextQueryDefinitionBase; const ATitle: string; AQuickFilterEnabled: Boolean = False
+        const ADefinition: INextDatasetDefinitionBase; const ATitle: string; AQuickFilterEnabled: Boolean = False
     ); overload;
     procedure ConfigureFilters(
       const ADefinition: TFilterDefinition; const APreferences: ILocalPreferences; const AIdentity: string
@@ -348,7 +348,7 @@ begin
   end;
 end;
 
-procedure TfrmConsultaBase.Attach(const ADefinition: INextQueryDefinitionBase;
+procedure TfrmConsultaBase.Attach(const ADefinition: INextDatasetDefinitionBase;
   const ATitle: string; AQuickFilterEnabled: Boolean = False);
 begin
   if ADefinition = nil then

@@ -173,9 +173,9 @@
         <DCCReference Include="..\Composition\NextFeaturesComposition.pas"/>
         <DCCReference Include="..\..\Modern\Core\Domain\Ports\Shared\ISessionContextUnit.pas"/>
         <DCCReference Include="..\..\Modern\Core\Application\Contexts\SessionContextUnit.pas"/>
-        <DCCReference Include="..\Queries\Shared\NextQueryDefinition.pas"/>
+        <DCCReference Include="..\Queries\Shared\NextDatasetDefinition.pas"/>
         <DCCReference Include="..\Queries\Shared\NextSqlQueryDefinition.pas"/>
-        <DCCReference Include="..\Queries\Shared\QueryColumnDefinition.pas"/>
+        <DCCReference Include="..\Queries\Shared\DatasetColumnDefinition.pas"/>
         <DCCReference Include="..\UI\Presenters\Shared\PresenterConsultaBase.pas"/>
         <DCCReference Include="..\UI\Presenters\Shared\PresenterCadastroBase.pas"/>
         <DCCReference Include="..\Queries\Features\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsQueryDefinition.pas"/>
@@ -187,7 +187,7 @@
         <DCCReference Include="..\Interop\Module\NextViewExports.pas"/>
         <DCCReference Include="..\Interop\Module\NextAuthorizationBridge.pas"/>
         <DCCReference Include="..\Infrastructure\Authorization\NextAuthorizationAdapter.pas"/>
-        <DCCReference Include="..\Queries\Shared\QueryResultOperations.pas"/>
+        <DCCReference Include="..\Queries\Shared\DatasetResultOperations.pas"/>
         <DCCReference Include="..\Composition\Shared\Seletores\EmpresaOptionsBuilder.pas"/>
         <DCCReference Include="..\..\Modern\Core\Infrastructure\Interfaces\IDataSetSorterUnit.pas"/>
         <DCCReference Include="..\..\Modern\Adapters\Secondary\Database\FireDAC\FireDACDataSetSorterUnit.pas"/>
@@ -195,7 +195,7 @@
         <DCCReference Include="..\..\Modern\Core\Domain\Types\Shared\TipoComunsUnit.pas"/>
         <DCCReference Include="..\..\Modern\Core\Domain\Types\Shared\StatusRegistroEnumUnit.pas"/>
         <DCCReference Include="..\Contracts\Shared\Grid\GridColumnDefinition.pas"/>
-        <DCCReference Include="..\Queries\Shared\QueryColumnLayout.pas"/>
+        <DCCReference Include="..\Queries\Shared\DatasetColumnLayout.pas"/>
         <DCCReference Include="..\Contracts\Shared\Seletores\EmpresaOption.pas"/>
         <DCCReference Include="..\Contracts\Shared\Views\ViewFeedback.pas"/>
         <DCCReference Include="..\Contracts\Shared\Views\ConsultaBaseView.pas"/>
@@ -210,7 +210,7 @@
         <DCCReference Include="..\Queries\Features\GruposFiscais\GruposFiscaisQueryDefinition.pas"/>
         <DCCReference Include="..\Composition\Features\OperacoesFiscaisIbsCbsComposition.pas"/>
         <DCCReference Include="..\Composition\Features\GruposFiscaisComposition.pas"/>
-        <DCCReference Include="..\Queries\Shared\NextMemoryQueryDefinition.pas"/>
+        <DCCReference Include="..\Queries\Shared\NextMemoryDatasetDefinition.pas"/>
         <DCCReference Include="..\Queries\Features\EventosDFe\EventoDFe211130ColecaoDefinition.pas"/>
         <DCCReference Include="..\..\Modern\Core\Infrastructure\Data\DataSetFieldDefinitionUnit.pas"/>
         <DCCReference Include="..\..\Modern\Adapters\Secondary\Database\FireDAC\FireDACMemoryDataSetReaderUnit.pas"/>

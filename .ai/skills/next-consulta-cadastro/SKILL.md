@@ -37,12 +37,12 @@ new registrations together with the protected actions.
 
 ## Assemble the consultation
 
-1. Implement the feature's query definition using TNextQueryDefinitionBase and,
-   when actions need a current item, INextQueryDefinition<T> with a copied,
+1. Implement the feature's query definition using TNextDatasetDefinitionBase and,
+   when actions need a current item, INextDatasetDefinition<T> with a copied,
    feature-specific selection record. Map the row in TryGetSelected through
    QueryResult, including nullable values; keep aliases in that mapping.
-2. Define the stable QueryId and default columns in Configure. Prefer
-   QueryColumnDefinition's BuildGridColumns and BuildFilterDefinition to derive
+2. Define the stable DatasetId and default columns in Configure. Prefer
+   DatasetColumnDefinition's BuildGridColumns and BuildFilterDefinition to derive
    grid and query filters from the same declaration; inspect its supported
    overrides for actual field restrictions. Keep query-specific predicates and
    parameters in CreateQueryDefinition. The definition coordinates the reader,

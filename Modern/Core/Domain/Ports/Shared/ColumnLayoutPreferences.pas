@@ -16,10 +16,10 @@ type
   TColumnLayoutEntries = TArray<TColumnLayoutEntry>;
 
   // Porta de preferencias de layout de colunas. O usuario e resolvido a cada
-  // operacao; o chamador informa a consulta (QueryId) e nao informa login nem SQL.
+  // operacao; o chamador informa a consulta (DatasetId) e nao informa login nem SQL.
   //
   // Regras do contrato:
-  // - QueryId identifica a consulta em COMPONENTE e e validado a cada chamada
+  // - DatasetId identifica a consulta em COMPONENTE e e validado a cada chamada
   //   (sem truncar: trim, ate 64 caracteres, sem '@').
   // - Load devolve somente os campos com preferencia visual, ordenados por
   //   Order e FieldName; lista vazia preserva a definicao da consulta.
@@ -31,10 +31,10 @@ type
   //   propagadas como excecao e o chamador decide a apresentacao.
   IColumnLayoutPreferences = interface
     ['{7C4E1B90-2D6A-4F38-A5C1-9B0E6D2F7A43}']
-    function Load(const AQueryId: string): TColumnLayoutEntries;
-    procedure Save(const AQueryId: string;
+    function Load(const ADatasetId: string): TColumnLayoutEntries;
+    procedure Save(const ADatasetId: string;
       const AEntries: TColumnLayoutEntries);
-    procedure Reset(const AQueryId: string);
+    procedure Reset(const ADatasetId: string);
   end;
 
 implementation

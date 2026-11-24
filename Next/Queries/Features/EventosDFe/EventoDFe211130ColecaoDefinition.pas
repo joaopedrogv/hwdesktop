@@ -3,14 +3,14 @@ unit EventoDFe211130ColecaoDefinition;
 interface
 
 uses
-  QueryColumnDefinition, NextMemoryQueryDefinition, EventoDFe211130ItemEtdUnit,
+  DatasetColumnDefinition, NextMemoryDatasetDefinition, EventoDFe211130ItemEtdUnit,
   DataSetFieldDefinitionUnit;
 
 type
   TEventoDFe211130ColecaoDefinition =
-    class(TNextMemoryQueryDefinitionBase<EventoDFe211130ItemEtd>)
+    class(TNextMemoryDatasetDefinitionBase<EventoDFe211130ItemEtd>)
   private
-    function BuildColumns: TQueryColumnDefinitions;
+    function BuildColumns: TDatasetColumnDefinitions;
   protected
     procedure Configure; override;
     procedure ModelToDataSet(const AModel: EventoDFe211130ItemEtd); override;
@@ -25,13 +25,13 @@ uses
   Data.DB, FilterDefinition, GridColumnDefinition, QueryResultUnit;
 
 const
-  LayoutQueryId = 'eventos.dfe.211130.itens';
+  LayoutDatasetId = 'eventos.dfe.211130.itens';
 
 procedure TEventoDFe211130ColecaoDefinition.Configure;
 var
-  Columns: TQueryColumnDefinitions;
+  Columns: TDatasetColumnDefinitions;
 begin
-  FQueryId := LayoutQueryId;
+  FDatasetId := LayoutDatasetId;
   FLiberarModelo := nil;
 
   Columns := BuildColumns;
@@ -39,7 +39,7 @@ begin
   FFiltersDef := BuildFilterDefinition(Columns, True);
 end;
 
-function TEventoDFe211130ColecaoDefinition.BuildColumns: TQueryColumnDefinitions;
+function TEventoDFe211130ColecaoDefinition.BuildColumns: TDatasetColumnDefinitions;
 begin
   Result := QueryColumns([
     QueryColumn('NITEM', 'nItem', fftInteger, 80),

@@ -17,7 +17,7 @@ implementation
 
 uses
   GruposFiscaisForm, LocalPreferences, GruposFiscaisQueryDefinition,
-  NextQueryDefinition, GruposFiscaisPresenter, GruposFiscaisCadastroPresenter,
+  NextDatasetDefinition, GruposFiscaisPresenter, GruposFiscaisCadastroPresenter,
   GrupoFiscalCadastroFrame, EmpresaOption, NextSetup, EmpresaOptionsBuilder,
   AuthorizationService, RemoverGrupoFiscalUseCaseUnit,
   SalvarGrupoFiscalUseCaseUnit, ObterGruposFiscaisUseCaseUnit,
@@ -27,14 +27,14 @@ class function TGruposFiscaisComposition.CriarConsulta(AParent: HWND): TfrmNextB
 var
   View: TfrmGruposFiscais;
   Preferences: ILocalPreferences;
-  Definition: INextQueryDefinition<TGrupoSelecionado>;
+  Definition: INextDatasetDefinition<TGrupoSelecionado>;
   Presenter: TGruposFiscaisPresenter;
 begin
   Preferences := NextSetupInstance.Resolve<ILocalPreferences>;
 
   View := TfrmGruposFiscais.CreateParented(AParent);
   try
-    Definition := NextSetupInstance.Resolve<INextQueryDefinition<TGrupoSelecionado>>;
+    Definition := NextSetupInstance.Resolve<INextDatasetDefinition<TGrupoSelecionado>>;
 
     Presenter := TGruposFiscaisPresenter.Create(View, Definition, NextSetupInstance.Resolve<IAuthorizationService>,
       NextSetupInstance.Resolve<IRemoverGrupoFiscalUseCase>);

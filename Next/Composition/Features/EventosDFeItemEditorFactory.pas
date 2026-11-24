@@ -5,7 +5,7 @@ interface
 uses
   System.Classes, Vcl.Controls, AuthorizationService, EditorCadastro,
   ValidadorItemEventoDFe211130Unit, EventoDFe211130ItemEditorFactory,
-  EventoDFe211130ItemEtdUnit, NextMemoryQueryDefinition;
+  EventoDFe211130ItemEtdUnit, NextMemoryDatasetDefinition;
 
 type
   TEventoDFe211130ItemEditorFactory = class(TInterfacedObject,

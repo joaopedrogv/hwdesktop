@@ -1,4 +1,4 @@
-unit QueryResultOperations;
+unit DatasetResultOperations;
 
 interface
 
@@ -30,7 +30,7 @@ type
     MarkedSum: Currency;
   end;
 
-  IQueryResultOperations = interface
+  IDataSetResultOperations = interface
     ['{76045AA4-FE97-4A2E-87CA-85077589168B}']
     procedure SetReader(const AReader: IDataSetReader);
     procedure SetMarkingColumn(const AMarkingColumn: string);
@@ -58,7 +58,7 @@ type
     function ApplySort(const ADataSet: TDataSet; const ASorts: TDataSetSortFields): Boolean;
   end;
 
-  TQueryResultOperations = class(TInterfacedObject, IQueryResultOperations)
+  TDataSetResultOperations = class(TInterfacedObject, IDataSetResultOperations)
   private
     FReader: IDataSetReader;
     FDataSetSorter: IDataSetSorter;
@@ -311,20 +311,20 @@ begin
   end;
 end;
 
-constructor TQueryResultOperations.Create(const ADataSetSorter: IDataSetSorter);
+constructor TDataSetResultOperations.Create(const ADataSetSorter: IDataSetSorter);
 begin
   FDataSetSorter := ADataSetSorter;
   FQuickFilters := TList<TQuickFilterCriterion>.Create;
   FNextQuickFilterId := 1;
 end;
 
-destructor TQueryResultOperations.Destroy;
+destructor TDataSetResultOperations.Destroy;
 begin
   FQuickFilters.Free;
   inherited;
 end;
 
-procedure TQueryResultOperations.DoMarkOperation(AOperation: TMarkOperation);
+procedure TDataSetResultOperations.DoMarkOperation(AOperation: TMarkOperation);
 var
   fdMark: TField;
   dts: TDataSet;
@@ -366,7 +366,7 @@ begin
   end;
 end;
 
-function TQueryResultOperations.BuildCombinedFilter(const ACriteria: TList<TQuickFilterCriterion>): string;
+function TDataSetResultOperations.BuildCombinedFilter(const ACriteria: TList<TQuickFilterCriterion>): string;
 var
   I: Integer;
 begin
@@ -381,7 +381,7 @@ begin
   end;
 end;
 
-function TQueryResultOperations.TryApplyFilter(const ADataSet: TDataSet; const AFilter: string): Boolean;
+function TDataSetResultOperations.TryApplyFilter(const ADataSet: TDataSet; const AFilter: string): Boolean;
 var
   PreviousFilter: string;
   PreviousFiltered: Boolean;
@@ -412,7 +412,7 @@ begin
   end;
 end;
 
-procedure TQueryResultOperations.SyncQuickFilterDataSet;
+procedure TDataSetResultOperations.SyncQuickFilterDataSet;
 var
   dts: TDataSet;
 begin
@@ -431,7 +431,7 @@ begin
   end;
 end;
 
-function TQueryResultOperations.FindQuickFilterIndex(AId: Integer): Integer;
+function TDataSetResultOperations.FindQuickFilterIndex(AId: Integer): Integer;
 var
   I: Integer;
 begin
@@ -441,7 +441,7 @@ begin
   Result := -1;
 end;
 
-function TQueryResultOperations.GetQuickFilter(const AId: Integer; out ACriterion: TQuickFilterCriterion): Boolean;
+function TDataSetResultOperations.GetQuickFilter(const AId: Integer; out ACriterion: TQuickFilterCriterion): Boolean;
 var
   Index: Integer;
 begin
@@ -453,7 +453,7 @@ begin
     ACriterion := Default(TQuickFilterCriterion);
 end;
 
-function TQueryResultOperations.TryValidateCriterion(const ACriterion: TFilterCriterion; out AField: TField;
+function TDataSetResultOperations.TryValidateCriterion(const ACriterion: TFilterCriterion; out AField: TField;
   out AValueType: TFilterFieldType; out AMessage: string): Boolean;
 var
   Definition: TFilterDefinition;
@@ -492,7 +492,7 @@ begin
   Result := ValidateFilterCriterion(ACriterion, Definition, fpLoadedDataSet, AMessage);
 end;
 
-function TQueryResultOperations.BuildCriterionExpression(const AField: TField;
+function TDataSetResultOperations.BuildCriterionExpression(const AField: TField;
   const ACriterion: TFilterCriterion): string;
 var
   ValidatedField: TField;
@@ -566,7 +566,7 @@ begin
   end;
 end;
 
-function TQueryResultOperations.BuildCriterionDescription(const AField: TField;
+function TDataSetResultOperations.BuildCriterionDescription(const AField: TField;
   const ACriterion: TFilterCriterion): string;
 var
   ValidatedField: TField;
@@ -601,7 +601,7 @@ begin
   end;
 end;
 
-function TQueryResultOperations.AddQuickFilterCriterionInternal(const ACriterion: TFilterCriterion; out AId: Integer;
+function TDataSetResultOperations.AddQuickFilterCriterionInternal(const ACriterion: TFilterCriterion; out AId: Integer;
   out AMessage: string): Boolean;
 var
   dts: TDataSet;
@@ -688,7 +688,7 @@ begin
   end;
 end;
 
-function TQueryResultOperations.AddQuickFilter(const AField: TField; out AId: Integer; out AMessage: string): Boolean;
+function TDataSetResultOperations.AddQuickFilter(const AField: TField; out AId: Integer; out AMessage: string): Boolean;
 var
   Criterion: TFilterCriterion;
 begin
@@ -703,7 +703,7 @@ begin
   Result := AddQuickFilterCriterionInternal(Criterion, AId, AMessage);
 end;
 
-function TQueryResultOperations.AddQuickFilterCriterion(
+function TDataSetResultOperations.AddQuickFilterCriterion(
   const ACriterion: TFilterCriterion; out AMessage: string): Boolean;
 var
   AId: Integer;
@@ -711,7 +711,7 @@ begin
   Result := AddQuickFilterCriterionInternal(ACriterion, AId, AMessage);
 end;
 
-function TQueryResultOperations.UpdateQuickFilter(AId: Integer;
+function TDataSetResultOperations.UpdateQuickFilter(AId: Integer;
   const ACriterion: TFilterCriterion; out AMessage: string): Boolean;
 var
   dts: TDataSet;
@@ -798,7 +798,7 @@ begin
   end;
 end;
 
-function TQueryResultOperations.GetQuickFilterCriterion(AId: Integer; out ACriterion: TFilterCriterion): Boolean;
+function TDataSetResultOperations.GetQuickFilterCriterion(AId: Integer; out ACriterion: TFilterCriterion): Boolean;
 var
   Index: Integer;
 begin
@@ -811,7 +811,7 @@ begin
     ACriterion := Default(TFilterCriterion);
 end;
 
-function TQueryResultOperations.RemoveQuickFilter(AId: Integer): Boolean;
+function TDataSetResultOperations.RemoveQuickFilter(AId: Integer): Boolean;
 var
   dts: TDataSet;
   Candidate: TList<TQuickFilterCriterion>;
@@ -851,7 +851,7 @@ begin
   end;
 end;
 
-procedure TQueryResultOperations.ClearQuickFilters;
+procedure TDataSetResultOperations.ClearQuickFilters;
 var
   dts: TDataSet;
 begin
@@ -872,13 +872,13 @@ begin
   FQuickFilterDataSet := dts;
 end;
 
-function TQueryResultOperations.QuickFilterCount(): Integer;
+function TDataSetResultOperations.QuickFilterCount(): Integer;
 begin
   SyncQuickFilterDataSet();
   Result := FQuickFilters.Count;
 end;
 
-function TQueryResultOperations.QuickFilterId(AIndex: Integer): Integer;
+function TDataSetResultOperations.QuickFilterId(AIndex: Integer): Integer;
 begin
   SyncQuickFilterDataSet();
   if (AIndex < 0) or (AIndex >= FQuickFilters.Count) then
@@ -886,7 +886,7 @@ begin
   Result := FQuickFilters[AIndex].Id;
 end;
 
-function TQueryResultOperations.QuickFilterDescription(AId: Integer): string;
+function TDataSetResultOperations.QuickFilterDescription(AId: Integer): string;
 var
   Criterion: TQuickFilterCriterion;
 begin
@@ -897,45 +897,45 @@ begin
     Result := '';
 end;
 
-function TQueryResultOperations.QuickFilterActive(): Boolean;
+function TDataSetResultOperations.QuickFilterActive(): Boolean;
 begin
   SyncQuickFilterDataSet();
   Result := (FQuickFilters.Count > 0) and (FQuickFilterDataSet <> nil);
 end;
 
-procedure TQueryResultOperations.ResetQuickFilterState;
+procedure TDataSetResultOperations.ResetQuickFilterState;
 begin
   FQuickFilters.Clear;
   FNextQuickFilterId := 1;
   FQuickFilterDataSet := nil;
 end;
 
-procedure TQueryResultOperations.SetReader(const AReader: IDataSetReader);
+procedure TDataSetResultOperations.SetReader(const AReader: IDataSetReader);
 begin
   FReader := AReader;
 end;
 
-procedure TQueryResultOperations.SetMarkingColumn(const AMarkingColumn: string);
+procedure TDataSetResultOperations.SetMarkingColumn(const AMarkingColumn: string);
 begin
   FMarkingColumn := AMarkingColumn;
 end;
 
-procedure TQueryResultOperations.InverterAllMarks;
+procedure TDataSetResultOperations.InverterAllMarks;
 begin
   DoMarkOperation(moInvertAll);
 end;
 
-procedure TQueryResultOperations.MarkAll;
+procedure TDataSetResultOperations.MarkAll;
 begin
   DoMarkOperation(moMarkAll);
 end;
 
-function TQueryResultOperations.MarkingColumnName: string;
+function TDataSetResultOperations.MarkingColumnName: string;
 begin
   Result := FMarkingColumn;
 end;
 
-function TQueryResultOperations.SummarizeColumn(const AField: TField): TColumnSummary;
+function TDataSetResultOperations.SummarizeColumn(const AField: TField): TColumnSummary;
 var
   dts: TDataSet;
   DataField: TField;
@@ -1003,7 +1003,7 @@ begin
   end;
 end;
 
-function TQueryResultOperations.CanSortField(const ADataSet: TDataSet; const AFieldName: string): Boolean;
+function TDataSetResultOperations.CanSortField(const ADataSet: TDataSet; const AFieldName: string): Boolean;
 begin
   // A coluna de marcacao controla apenas os comandos de selecao e nunca e elegivel para ordenacao, mesmo que o conjunto
   // aceitasse o campo.
@@ -1013,7 +1013,7 @@ begin
   Result := (FDataSetSorter <> nil) and FDataSetSorter.CanSort(ADataSet, AFieldName);
 end;
 
-function TQueryResultOperations.ApplySort(const ADataSet: TDataSet; const ASorts: TDataSetSortFields): Boolean;
+function TDataSetResultOperations.ApplySort(const ADataSet: TDataSet; const ASorts: TDataSetSortFields): Boolean;
 var
   I: Integer;
 begin
@@ -1027,12 +1027,12 @@ begin
   Result := FDataSetSorter.ApplySort(ADataSet, ASorts);
 end;
 
-procedure TQueryResultOperations.ToggleCurrentMark;
+procedure TDataSetResultOperations.ToggleCurrentMark;
 begin
   DoMarkOperation(moToggle);
 end;
 
-procedure TQueryResultOperations.UnmarkAll;
+procedure TDataSetResultOperations.UnmarkAll;
 begin
   DoMarkOperation(moUnmarkAll);
 end;

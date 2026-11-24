@@ -3,9 +3,9 @@ unit GruposFiscaisQueryDefinition;
 interface
 
 uses
-  Data.DB, FilterCriterion, NextQueryDefinition, NextSqlQueryDefinition,
+  Data.DB, FilterCriterion, NextDatasetDefinition, NextSqlQueryDefinition,
   GridColumnDefinition, FilterDefinition, IDataSetReaderUnit,
-  QueryResultOperations, ColumnLayoutPreferences;
+  DatasetResultOperations, ColumnLayoutPreferences;
 
 type
   // Identificacao do grupo escolhido na grade, copiada por valor: nenhum objeto precisa ser liberado pela tela ou pelo
@@ -15,9 +15,9 @@ type
     Descricao: string;
   end;
 
-  TGruposFiscaisQueryDefinition = class(TNextSqlQueryDefinitionBase, INextQueryDefinition<TGrupoSelecionado>)
+  TGruposFiscaisQueryDefinition = class(TNextSqlQueryDefinitionBase, INextDatasetDefinition<TGrupoSelecionado>)
   public
-    constructor Create(AReaderFactory: ISqlDataSetReaderFactory; AOperation: IQueryResultOperations;
+    constructor Create(AReaderFactory: ISqlDataSetReaderFactory; AOperation: IDataSetResultOperations;
       ALayoutPreferences: IColumnLayoutPreferences);
     function TryGetSelected(out ASelected: TGrupoSelecionado): Boolean;
   protected
@@ -33,7 +33,7 @@ uses
   EntityMetadataUnit, GrupoFiscalMetadataUnit;
 
 const
-  LayoutQueryId = 'grupos.fiscais';
+  LayoutDatasetId = 'grupos.fiscais';
   FilterMarker = '/*FILTROS*/';
   ActiveParameterName = 'ATIVO';
 
@@ -60,7 +60,7 @@ begin
 end;
 
 constructor TGruposFiscaisQueryDefinition.Create(
-  AReaderFactory: ISqlDataSetReaderFactory; AOperation: IQueryResultOperations;
+  AReaderFactory: ISqlDataSetReaderFactory; AOperation: IDataSetResultOperations;
   ALayoutPreferences: IColumnLayoutPreferences);
 begin
   inherited Create(AReaderFactory, AOperation, ALayoutPreferences);
@@ -70,7 +70,7 @@ procedure TGruposFiscaisQueryDefinition.Configure();
 var
   Metadata: EntityMetadata;
 begin
-  FQueryId := LayoutQueryId;
+  FDatasetId := LayoutDatasetId;
   // Os rotulos da grade e do filtro vem do metadata do grupo fiscal, o mesmo usado pelo validador na nomeacao dos
   // campos.
   Metadata := TGrupoFiscalMetadata.GetMetadata();

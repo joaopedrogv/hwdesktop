@@ -46,7 +46,7 @@ uses
   // FireDAC.Phys.FB registra o driver Firebird usado na primeira conexao; FireDAC.DApt fornece TFDQuery/TFDTransaction.
   // System.Hash identifica o banco sem reter usuario ou senha.
   System.Hash, NextFeaturesComposition,
-  RegistrarProcessosUseCaseUnit, FireDACDataSetSorterUnit, QueryResultOperations,
+  RegistrarProcessosUseCaseUnit, FireDACDataSetSorterUnit, DatasetResultOperations,
   IConfigReaderAndWriterUnit, IniConfigReaderAndWriterUnit, FileConfigUnit;
 
 const
@@ -203,7 +203,7 @@ begin
       FContainer.RegisterInstance<IConfigReader>(ConfigReaderWriter);
 
       FContainer.RegisterType<IDataSetSorter, TFireDACDataSetSorter>().AsSingleton;
-      FContainer.RegisterType<IQueryResultOperations, TQueryResultOperations>().AsTransient;
+      FContainer.RegisterType<IDataSetResultOperations, TDataSetResultOperations>().AsTransient;
 
       RegisterNextFeatures(FContainer);
       FContainer.Build;

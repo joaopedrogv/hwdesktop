@@ -17,11 +17,11 @@ implementation
 
 uses
   OperacoesFiscaisIbsCbsForm, LocalPreferences,
-  OperacoesFiscaisIbsCbsQueryDefinition, NextQueryDefinition,
+  OperacoesFiscaisIbsCbsQueryDefinition, NextDatasetDefinition,
   OperacoesFiscaisIbsCbsPresenter, OperacoesFiscaisSelecoesBuilder,
   OperacaoFiscalIbsCbsCadastroFrame, OperacoesFiscaisIbsCbsCadastroPresenter,
   SelecaoEntidadeOption, RegraFiscalSelecaoOption, EmpresaOption,
-  IDataSetReaderUnit, QueryResultOperations, ColumnLayoutPreferences,
+  IDataSetReaderUnit, DatasetResultOperations, ColumnLayoutPreferences,
   AuthorizationService, NextSetup, EmpresaOptionsBuilder,
   ListarOperacoesInternasUseCaseUnit, ListarGruposFiscaisUseCaseUnit,
   ListarRegrasFiscaisUseCaseUnit, ListarEmpresasUseCaseUnit,
@@ -33,7 +33,7 @@ class function TOperacoesFiscaisIbsCbsComposition.CriarConsulta(AParent: HWND): 
 var
   View: TfrmOperacoesFiscaisIbsCbs;
   Preferences: ILocalPreferences;
-  Definition: INextQueryDefinition<TOperacaoFiscalSelecionada>;
+  Definition: INextDatasetDefinition<TOperacaoFiscalSelecionada>;
   Presenter: TOperacoesFiscaisIbsCbsPresenter;
 begin
   Preferences := NextSetupInstance.Resolve<ILocalPreferences>;
@@ -42,7 +42,7 @@ begin
   try
     // A definicao pertence a tela; o estado do checkbox e lido a cada pesquisa, nao na abertura.
     Definition := TOperacoesFiscaisIbsCbsQueryDefinition.Create(NextSetupInstance.Resolve<ISqlDataSetReaderFactory>,
-      NextSetupInstance.Resolve<IQueryResultOperations>, NextSetupInstance.Resolve<IColumnLayoutPreferences>,
+      NextSetupInstance.Resolve<IDataSetResultOperations>, NextSetupInstance.Resolve<IColumnLayoutPreferences>,
       View.IsLixeiraSearch);
 
     Presenter := TOperacoesFiscaisIbsCbsPresenter.Create(View, Definition,
