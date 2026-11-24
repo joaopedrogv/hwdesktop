@@ -12,7 +12,6 @@ uses
 const
   KnownOptionsMask: Cardinal = HW_NEXT_OPT_KNOWN;
   SessionRejectedMessage = 'O contexto da empresa nao foi aceito.';
-  InitializationFailedMessage = 'Nao foi possivel inicializar o Next para a empresa atual.';
   AvailabilityMessage = 'O Next nao esta disponivel para a empresa atual.';
 
 var
@@ -193,8 +192,11 @@ begin
 
       NextSetupInstance.Initialize(DatabaseName, DatabaseUserName, DatabasePassword);
     except
-      RecordError(InitializationFailedMessage);
-      Exit;
+      on E: Exception do
+      begin
+        RecordError('Nao foi possivel inicializar o Next para a empresa atual. ' + E.Message);
+        Exit;
+      end;
     end;
 
     Result := True;

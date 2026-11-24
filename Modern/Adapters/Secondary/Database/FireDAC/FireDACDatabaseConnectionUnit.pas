@@ -78,8 +78,6 @@ uses
 const
   ReaderConnectionNotConfiguredMessage =
     'A conexao da leitura nao foi configurada.';
-  ReaderConnectionFailedMessage =
-    'Nao foi possivel conectar ao banco de dados da empresa.';
   ReaderNotActiveMessage =
     'A leitura da consulta nao esta aberta para atualizacao.';
 
@@ -700,14 +698,17 @@ begin
   try
     Connect(FConnectionString);
   except
-    try
-      if FDatabase.Connected then
-        FDatabase.Connected := False;
-    except
+    on E: Exception do
+    begin
+      try
+        if FDatabase.Connected then
+          FDatabase.Connected := False;
+      except
+      end;
+      // Nao propaga a mensagem original do FireDAC: ela pode conter caminho,
+      // usuario ou outros dados da conexao.
+      raise Exception.CreateFmt('Nao foi possivel conectar ao banco de dados da empresa. Erro: %s', [E.Message]);
     end;
-    // Nao propaga a mensagem original do FireDAC: ela pode conter caminho,
-    // usuario ou outros dados da conexao.
-    raise Exception.Create(ReaderConnectionFailedMessage);
   end;
 end;
 

@@ -40,7 +40,7 @@ function ShutdownNextHost: Boolean;
 implementation
 
 uses
-  SysUtils, Messages, ExtCtrls, Dialogs, Controls, HwNextAuthorizationUnit;
+  SysUtils, Messages, ExtCtrls, Dialogs, Controls, StrUtils, Registry, HwNextAuthorizationUnit;
 
 const
   HW_NEXT_DLL_NAME = 'hw.next.dll';
@@ -996,11 +996,77 @@ begin
   Result := True;
 end;
 
+procedure MDIChildStoreStateMaximized();
+var
+  Registro: TRegistry;
+  StoreValue: string;
+begin
+  if Application.MainForm.MDIChildCount <> 1 then
+    Exit;
+
+  StoreValue := IfThen(Application.MainForm.MDIChildren[0].WindowState = wsMaximized, 'S', 'N');
+
+  try
+    Registro := TRegistry.Create;
+    try
+      Registro.OpenKey('Software\Hw\Configuracao\Telas\TfrmPrincipalS', True);
+
+      if not Registro.ValueExists('JanelasMaximizadas')
+        or (Registro.ReadString('JanelasMaximizadas') <> StoreValue) then
+        Registro.WriteString('JanelasMaximizadas', StoreValue);
+
+      Registro.CloseKey;
+    finally
+      Registro.Free;
+    end;
+  except
+  end;
+end;
+
+function MDIChildMaximized(): Boolean;
+var
+  i: Integer;
+  Registro: TRegistry;
+begin
+  Result := False;
+
+  for i := 0 to Application.MainForm.MDIChildCount - 1 do
+  begin
+    if Application.MainForm.MDIChildren[i].WindowState = wsMaximized then
+    begin
+      Result := True;
+      Exit;
+    end;
+  end;
+
+  try
+    Registro := TRegistry.Create;
+    try
+      if not Registro.KeyExists('Software\Hw\Configuracao\Telas\TfrmPrincipalS') then
+        Exit;
+
+      Registro.OpenKey('Software\Hw\Configuracao\Telas\TfrmPrincipalS', False);
+
+      if Registro.ValueExists('JanelasMaximizadas') then
+        Result := Registro.ReadString('JanelasMaximizadas') = 'S';
+
+      Registro.CloseKey;
+    finally
+      Registro.Free;
+    end;
+  except
+  end;
+end;
+
 constructor TfrmHwNextHost.CreateHosted(AOwner: TForm; ABridge: THwNextHostBridge; const AIdentifier: string;
   const AOptions: THwNextOpenOptions; AInstanceNumber: Integer);
 var
   InitialWidth, InitialHeight: Integer;
+  IsMDIsMaximized: Boolean;
 begin
+  IsMDIsMaximized := (AOptions.InstancePolicy = nipSingle) and (AOptions.Presentation = npMdi)
+    and MDIChildMaximized();
+
   inherited CreateNew(AOwner);
   FBridge := ABridge;
   FIdentifier := AIdentifier;
@@ -1009,10 +1075,13 @@ begin
     Caption := AOptions.DisplayTitle
   else
     Caption := Format('%s - Next %d', [AIdentifier, AInstanceNumber]);
+
+  // Apresentacao inicial com o nome da tela até a mesma estar totalmente definida e ser apresentada em seu tamanho real
   Width := 400;
   Height := 70;
-  Constraints.MinWidth := 100;
-  Constraints.MinHeight := 100;
+  Constraints.MinWidth := 400;
+  Constraints.MinHeight := 70;
+
   OnActivate := HostActivate;
   OnCloseQuery := HostCloseQuery;
   OnClose := HostClose;
@@ -1032,11 +1101,15 @@ begin
     BorderIcons := [biSystemMenu];
   end
   else
+  begin
     FormStyle := fsMDIChild;
+    if IsMDIsMaximized and (Application.MainForm.MDIChildCount = 1) then
+      WindowState := wsMaximized;    
+  end;
 
   // O VCL reposiciona poMainFormCenter/poScreenCenter ao exibir; a posicao definitiva e calculada apos o tamanho final.
   // Position := poDesigned; // já é default, nao precisa atribuir, previne chamdas no Form.
-  
+
   // Se a criacao da view falhar, o construtor propaga e o destructor libera a view ja criada antes de remover o wrapper
   // do registro do bridge.
   FView := FBridge.CreateView(FSurface.Handle, Handle, Application.Handle, FIdentifier, FOptions, AInstanceNumber,
@@ -1044,13 +1117,18 @@ begin
   // A area cliente do formulario Next substitui o tamanho provisorio usado ate a view existir.
   if (InitialWidth > 0) and (InitialHeight > 0) then
   begin
-    ClientWidth := InitialWidth;
-    ClientHeight := InitialHeight;
+    if not IsMDIsMaximized then
+    begin
+      ClientWidth := InitialWidth;
+      ClientHeight := InitialHeight;
+    end;
+    Constraints.MinWidth := InitialWidth - 50;
+    Constraints.MinHeight := InitialHeight - 50;
   end;
 
   FSurface.Caption := '';
 
-  if AOptions.InstancePolicy = nipSingle then
+  if not IsMDIsMaximized and (AOptions.InstancePolicy = nipSingle) then
     CenterInHostArea(AOwner);
 end;
 
@@ -1084,6 +1162,8 @@ var
   Bridge: THwNextHostBridge;
 begin
   Bridge := FBridge;
+
+  MDIChildStoreStateMaximized();
 
   // O modulo possui o form Rio: destruir a view antes de remover o registro, porque chegar a zero instancias pode
   // descarregar a biblioteca.
