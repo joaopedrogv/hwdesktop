@@ -1,4 +1,4 @@
-unit NextSqlQueryDefinition;
+unit NextQueryDefinition;
 
 interface
 
@@ -9,15 +9,15 @@ uses
 type
   // Definicao de leitura independente de driver. Contem apenas SQL, parametros e metadados de colunas; nao executa
   // consulta nem conhece conexao.
-  TNextQueryDefinition = record
+  TNextSegmentQueryDefinition = record
     Sql: string;
     Parameters: ParametersValues;
   end;
 
-  TNextSqlQueryDefinitionBase = class(TNextDatasetDefinitionBase)
+  TNextQueryDefinition = class(TNextDatasetDefinitionBase)
   protected
     FReaderFactory: ISqlDataSetReaderFactory;
-    function CreateQueryDefinition(const ACriteria: TFilterCriteria): TNextQueryDefinition; virtual; abstract;
+    function CreateQueryDefinition(const ACriteria: TFilterCriteria): TNextSegmentQueryDefinition; virtual; abstract;
     function CreateReader(const ACriteria: TFilterCriteria): IDataSetReader; override;
   public
     constructor Create(AReaderFactory: ISqlDataSetReaderFactory; AOperation: IDataSetResultOperations;
@@ -29,7 +29,7 @@ implementation
 uses
   System.SysUtils;
 
-constructor TNextSqlQueryDefinitionBase.Create(AReaderFactory: ISqlDataSetReaderFactory;
+constructor TNextQueryDefinition.Create(AReaderFactory: ISqlDataSetReaderFactory;
   AOperation: IDataSetResultOperations; ALayoutPreferences: IColumnLayoutPreferences);
 begin
   inherited Create(AOperation, ALayoutPreferences);
@@ -39,9 +39,9 @@ begin
   FReaderFactory := AReaderFactory;
 end;
 
-function TNextSqlQueryDefinitionBase.CreateReader(const ACriteria: TFilterCriteria): IDataSetReader;
+function TNextQueryDefinition.CreateReader(const ACriteria: TFilterCriteria): IDataSetReader;
 var
-  QueryDefinition: TNextQueryDefinition;
+  QueryDefinition: TNextSegmentQueryDefinition;
 begin
   QueryDefinition := CreateQueryDefinition(ACriteria);
   Result := FReaderFactory.CreateReader(QueryDefinition.Sql, QueryDefinition.Parameters);

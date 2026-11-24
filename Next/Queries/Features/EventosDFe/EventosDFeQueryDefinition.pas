@@ -3,7 +3,7 @@ unit EventosDFeQueryDefinition;
 interface
 
 uses
-  Data.DB, FilterCriterion, NextDatasetDefinition, NextSqlQueryDefinition,
+  Data.DB, FilterCriterion, NextDatasetDefinition, NextQueryDefinition,
   DatasetColumnDefinition, GridColumnDefinition, FilterDefinition,
   IDataSetReaderUnit, DatasetResultOperations, ColumnLayoutPreferences,
   ISessionContextUnit, TipoEventoDFeUnit, StatusRegistroEnumUnit,
@@ -27,15 +27,14 @@ type
     Status: TStatusEventoDFe;
   end;
 
-  TEventosDFeQueryDefinition = class(TNextSqlQueryDefinitionBase,
-    INextDatasetDefinition<TEventoDFeSelecionado>)
+  TEventosDFeQueryDefinition = class(TNextQueryDefinition, INextDatasetDefinition<TEventoDFeSelecionado>)
   private
     FSession: ISessionContext;
     FLixeiraSearch: TEventosDFeLixeiraSearch;
     function BuildColumns: TDatasetColumnDefinitions;
   protected
     procedure Configure(); override;
-    function CreateQueryDefinition(const ACriteria: TFilterCriteria): TNextQueryDefinition; override;
+    function CreateQueryDefinition(const ACriteria: TFilterCriteria): TNextSegmentQueryDefinition; override;
   public
     // A empresa e a opção da lixeira são lidas a cada pesquisa, não na construção.
     constructor Create(AReaderFactory: ISqlDataSetReaderFactory; AOperation: IDataSetResultOperations;
@@ -151,7 +150,7 @@ begin
 end;
 
 function TEventosDFeQueryDefinition.CreateQueryDefinition(
-  const ACriteria: TFilterCriteria): TNextQueryDefinition;
+  const ACriteria: TFilterCriteria): TNextSegmentQueryDefinition;
 var
   Builder: IParametersBuilder;
   StatusPesquisa: StatusRegistroEnum;

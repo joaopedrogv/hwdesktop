@@ -4,7 +4,7 @@ interface
 
 uses
   IDataSetReaderUnit, DatasetResultOperations, FilterCriterion, NextDatasetDefinition,
-  NextSqlQueryDefinition, DatasetColumnDefinition, ColumnLayoutPreferences;
+  NextQueryDefinition, DatasetColumnDefinition, ColumnLayoutPreferences;
 
 type
   // Opcao da tela consultada a cada pesquisa: a marcacao do checkbox pertence a view e pode mudar enquanto a janela
@@ -22,14 +22,13 @@ type
 
   // Definicao de leitura das Operacoes Fiscais IBS/CBS. A tabela nao possui empresa: o unico predicado fixo e o estado
   // do registro, informado pela tela em cada pesquisa.
-  TOperacoesFiscaisIbsCbsQueryDefinition = class(TNextSqlQueryDefinitionBase,
-    INextDatasetDefinition<TOperacaoFiscalSelecionada>)
+  TOperacoesFiscaisIbsCbsQueryDefinition = class(TNextQueryDefinition, INextDatasetDefinition<TOperacaoFiscalSelecionada>)
   private
     FLixeiraSearch: TLixeiraSearch;
     function BuildColumns: TDatasetColumnDefinitions;
   protected
     procedure Configure(); override;
-    function CreateQueryDefinition(const ACriteria: TFilterCriteria): TNextQueryDefinition; override;
+    function CreateQueryDefinition(const ACriteria: TFilterCriteria): TNextSegmentQueryDefinition; override;
   public
     constructor Create(AReaderFactory: ISqlDataSetReaderFactory; AOperation: IDataSetResultOperations;
       ALayoutPreferences: IColumnLayoutPreferences; const ALixeiraSearch: TLixeiraSearch);
@@ -152,7 +151,7 @@ begin
 end;
 
 function TOperacoesFiscaisIbsCbsQueryDefinition.CreateQueryDefinition(
-  const ACriteria: TFilterCriteria): TNextQueryDefinition;
+  const ACriteria: TFilterCriteria): TNextSegmentQueryDefinition;
 var
   Builder: IParametersBuilder;
   StatusPesquisa: StatusRegistroEnum;

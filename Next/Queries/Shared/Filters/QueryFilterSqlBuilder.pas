@@ -3,7 +3,7 @@ unit QueryFilterSqlBuilder;
 interface
 
 uses
-  NextSqlQueryDefinition, FilterDefinition, FilterCriterion, ParameterValueUnit;
+  NextQueryDefinition, FilterDefinition, FilterCriterion, ParameterValueUnit;
 
 type
   // Traduz criterios tipados em condicoes parametrizadas: o SQL base informa o ponto de insercao e a definicao informa
@@ -11,7 +11,7 @@ type
   TQueryFilterSqlBuilder = class
   public
     class function Build(const ABaseSql, AInsertionPoint: string; const AParameters: ParametersValues;
-      const ADefinition: TFilterDefinition; const ACriteria: TFilterCriteria): TNextQueryDefinition; static;
+      const ADefinition: TFilterDefinition; const ACriteria: TFilterCriteria): TNextSegmentQueryDefinition; static;
   end;
 
 implementation
@@ -271,7 +271,7 @@ end;
 
 class function TQueryFilterSqlBuilder.Build(const ABaseSql,
   AInsertionPoint: string; const AParameters: ParametersValues;
-  const ADefinition: TFilterDefinition; const ACriteria: TFilterCriteria): TNextQueryDefinition;
+  const ADefinition: TFilterDefinition; const ACriteria: TFilterCriteria): TNextSegmentQueryDefinition;
 var
   Builder: IParametersBuilder;
   Conditions: string;

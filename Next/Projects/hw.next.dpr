@@ -32,7 +32,7 @@ uses
   ISessionContextUnit in '..\..\Modern\Core\Domain\Ports\Shared\ISessionContextUnit.pas',
   SessionContextUnit in '..\..\Modern\Core\Application\Contexts\SessionContextUnit.pas',
   NextDatasetDefinition in '..\Queries\Shared\NextDatasetDefinition.pas',
-  NextSqlQueryDefinition in '..\Queries\Shared\NextSqlQueryDefinition.pas',
+  NextQueryDefinition in '..\Queries\Shared\NextQueryDefinition.pas',
   NextMemoryDatasetDefinition in '..\Queries\Shared\NextMemoryDatasetDefinition.pas',
   DatasetColumnDefinition in '..\Queries\Shared\DatasetColumnDefinition.pas',
   PresenterConsultaBase in '..\UI\Presenters\Shared\PresenterConsultaBase.pas',

@@ -3,7 +3,7 @@ unit GruposFiscaisQueryDefinition;
 interface
 
 uses
-  Data.DB, FilterCriterion, NextDatasetDefinition, NextSqlQueryDefinition,
+  Data.DB, FilterCriterion, NextDatasetDefinition, NextQueryDefinition,
   GridColumnDefinition, FilterDefinition, IDataSetReaderUnit,
   DatasetResultOperations, ColumnLayoutPreferences;
 
@@ -15,13 +15,13 @@ type
     Descricao: string;
   end;
 
-  TGruposFiscaisQueryDefinition = class(TNextSqlQueryDefinitionBase, INextDatasetDefinition<TGrupoSelecionado>)
+  TGruposFiscaisQueryDefinition = class(TNextQueryDefinition, INextDatasetDefinition<TGrupoSelecionado>)
   public
     constructor Create(AReaderFactory: ISqlDataSetReaderFactory; AOperation: IDataSetResultOperations;
       ALayoutPreferences: IColumnLayoutPreferences);
     function TryGetSelected(out ASelected: TGrupoSelecionado): Boolean;
   protected
-    function CreateQueryDefinition(const ACriteria: TFilterCriteria): TNextQueryDefinition; override;
+    function CreateQueryDefinition(const ACriteria: TFilterCriteria): TNextSegmentQueryDefinition; override;
     procedure Configure(); override;
   end;
 
@@ -87,7 +87,7 @@ begin
   ], True);
 end;
 
-function TGruposFiscaisQueryDefinition.CreateQueryDefinition(const ACriteria: TFilterCriteria): TNextQueryDefinition;
+function TGruposFiscaisQueryDefinition.CreateQueryDefinition(const ACriteria: TFilterCriteria): TNextSegmentQueryDefinition;
 var
   Builder: IParametersBuilder;
   BaseSql: string;
