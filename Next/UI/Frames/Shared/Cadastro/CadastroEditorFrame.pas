@@ -21,11 +21,20 @@ type
   private
     FHost: IEditorCadastroHost;
     FPresenterCadastro: TPresenterCadastroBase;
+    FPnWaiting: TPanel;
+    FWaiting: Boolean;
+    FWaitingCursorAnterior: TCursor;
+    FWaitingCamposHabilitado: Boolean;
+    FWaitingRodapeHabilitado: Boolean;
   protected
     // Até a atribuição, a composição continua dona do apresentador e o libera se a associação falhar.
     procedure AssociarPresenter(APresenter: TPresenterCadastroBase);
     function Salvar: Boolean; virtual;
     property PresenterCadastro: TPresenterCadastroBase read FPresenterCadastro;
+    procedure CriarWaiting();
+    procedure StartWaiting(const AMensagem: string = '');
+    procedure LogWaiting(const AMensagem: string);
+    procedure EndWaiting;
   public
     constructor Create(AOwner: TComponent; const AHost: IEditorCadastroHost); reintroduce; virtual;
     destructor Destroy; override;
@@ -153,6 +162,70 @@ end;
 function TfrmCadastroEditor.PrepararAbaAlteracao(const AId: string): Boolean;
 begin
   Result := (FPresenterCadastro <> nil) and FPresenterCadastro.PrepararAlteracao(AId);
+end;
+
+procedure TfrmCadastroEditor.CriarWaiting();
+begin
+  if Assigned(FPnWaiting) then
+    Exit;
+
+  FPnWaiting := TPanel.Create(Self);
+  FPnWaiting.Height := 18;
+  FPnWaiting.Align := alBottom;
+  FPnWaiting.Alignment := taLeftJustify;
+  FPnWaiting.AlignWithMargins := True;
+  FPnWaiting.BevelOuter := bvNone;
+  FPnWaiting.Margins.Left := 18;
+  FPnWaiting.Parent := Self;
+end;
+
+procedure TfrmCadastroEditor.StartWaiting(const AMensagem: string);
+begin
+  if FWaiting then
+  begin
+    LogWaiting(AMensagem);
+    Exit;
+  end;
+
+  FWaitingCursorAnterior := Screen.Cursor;
+  FWaitingCamposHabilitado := sbCampos.Enabled;
+  FWaitingRodapeHabilitado := pnRodape.Enabled;
+  FWaiting := True;
+
+  sbCampos.Enabled := False;
+  pnRodape.Enabled := False;
+  Screen.Cursor := crHourGlass;
+
+  LogWaiting(AMensagem);
+  Update;
+end;
+
+procedure TfrmCadastroEditor.LogWaiting(const AMensagem: string);
+begin
+  if Trim(AMensagem) = '' then
+    Exit;
+
+  CriarWaiting();
+  FPnWaiting.Caption := AMensagem;
+  FPnWaiting.Visible := True;
+  FPnWaiting.Update;
+end;
+
+procedure TfrmCadastroEditor.EndWaiting;
+begin
+  if not FWaiting then
+    Exit;
+
+  FWaiting := False;
+  Screen.Cursor := FWaitingCursorAnterior;
+  sbCampos.Enabled := FWaitingCamposHabilitado;
+  pnRodape.Enabled := FWaitingRodapeHabilitado;
+
+  if Assigned(FPnWaiting) then
+  begin
+    FPnWaiting.Visible := False;
+    FreeAndNil(FPnWaiting);
+  end;
 end;
 
 end.

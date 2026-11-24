@@ -10,6 +10,9 @@ type
     procedure ShowError(const AMessage: string);
     function ShowDangerQuestion(const AMessage: string): Boolean;
     function ShowQuestion(const AMessage: string): Boolean;
+    procedure StartWaiting(const AMensagem: string = '');
+    procedure LogWaiting(const AMensagem: string);
+    procedure EndWaiting;
   end;
 
 implementation

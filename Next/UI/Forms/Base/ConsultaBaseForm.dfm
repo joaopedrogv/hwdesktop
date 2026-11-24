@@ -19,18 +19,18 @@ object frmConsultaBase: TfrmConsultaBase
   PixelsPerInch = 96
   TextHeight = 13
   object pcAbas: TPageControl
+    AlignWithMargins = True
     Left = 0
     Top = 0
     Width = 760
     Height = 440
     ActivePage = tsConsulta
     Align = alClient
+    Style = tsFlatButtons
     TabHeight = 25
     TabOrder = 0
     object tsConsulta: TTabSheet
       Caption = 'Consulta'
-      ExplicitWidth = 312
-      ExplicitHeight = 205
       object pnFiltros: TPanel
         AlignWithMargins = True
         Left = 3
@@ -40,7 +40,6 @@ object frmConsultaBase: TfrmConsultaBase
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 0
-        ExplicitWidth = 306
         object splFiltros: TSplitter
           Left = 426
           Top = 0
@@ -76,6 +75,9 @@ object frmConsultaBase: TfrmConsultaBase
             end
             inherited pnBotoes: TPanel
               ExplicitLeft = 381
+              inherited lblContador: TLabel
+                Height = 21
+              end
             end
           end
         end
@@ -301,7 +303,7 @@ object frmConsultaBase: TfrmConsultaBase
           Visible = False
           ExplicitTop = 8
         end
-        object btnRestore: TSpeedButton
+        object btnRestaurar: TSpeedButton
           AlignWithMargins = True
           Left = 94
           Top = 3
@@ -406,7 +408,7 @@ object frmConsultaBase: TfrmConsultaBase
         inherited pmCelula: TPopupMenu
           Images = imgListConsulta
           inherited miCopiar: TMenuItem
-            ImageIndex = 4
+            ImageIndex = 3
           end
           inherited miFiltrarQuando: TMenuItem
             ImageIndex = 1

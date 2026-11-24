@@ -4006,7 +4006,7 @@ procedure TfrmPrincipalS.EventosDFe1Click(Sender: TObject);
 var
   Options: THwNextOpenOptions;
 begin
-  Options := NextMultipleOptions(True);
+  Options := NextQueryOptions();
   Options.DisplayTitle := 'Eventos DFe';
   OpenNextView(Self, 'eventos.dfe', Options);
 end;

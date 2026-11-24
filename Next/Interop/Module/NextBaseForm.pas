@@ -15,6 +15,9 @@ type
     FCloseDiscardsEdits: Boolean;
   protected
     procedure DoInitializeView; virtual;
+    procedure StartWaiting(const AMensagem: string = ''); virtual; abstract;
+    procedure LogWaiting(const AMensagem: string); virtual; abstract;
+    procedure EndWaiting; virtual; abstract;
   public
     procedure InitializeNextView(const AIdentifier: string; AInstanceNumber: Integer; ACloseTarget: HWND;
       ACloseDiscardsEdits: Boolean);

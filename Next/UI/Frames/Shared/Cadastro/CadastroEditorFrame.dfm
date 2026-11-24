@@ -54,6 +54,8 @@ object frmCadastroEditor: TfrmCadastroEditor
     Width = 736
     Height = 44
     Align = alBottom
+    BevelEdges = [beTop]
+    BevelKind = bkTile
     BevelOuter = bvNone
     TabOrder = 1
     object btnSalvar: TButton

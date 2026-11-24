@@ -20,7 +20,6 @@ type
     FTransmitirEvento: TransmitirEventoDFeUseCase;
     FConsultarSituacaoEvento: ConsultarSituacaoEventoDFeUseCase;
     FOperacaoEmAndamento: Boolean;
-    FFalhaApresentada: Boolean;
     procedure ApresentarResultadoTransmissao(const AResultado: TEventoDFeResultadoTransmissao);
     procedure ApresentarResultadoConsultaSituacao(
       const AResultado: TEventoDFeResultadoConsultarSituacao);
@@ -38,7 +37,6 @@ type
     function SolicitarInclusao: Boolean;
     function SolicitarEdicao: Boolean;
     function SolicitarRestauracao: Boolean;
-    property FalhaApresentada: Boolean read FFalhaApresentada;
   end;
 
 implementation
@@ -122,12 +120,11 @@ var
   Resultado: TEventoDFeResultadoTransmissao;
 begin
   Result := False;
-  FFalhaApresentada := False;
 
   if FOperacaoEmAndamento then
     Exit;
 
-  if not FQueryDefinition.TryGetSelected(Selecao) or (Trim(Selecao.Id) = '') then
+  if not FQueryDefinition.TryGetSelected(Selecao) then
   begin
     FView.ShowError(SelecaoObrigatoriaMessage);
     Exit;
@@ -148,7 +145,7 @@ begin
   if not Autorizar(ProcessoTransmissao, aaAlterar, TabelaEventosDFe, IntToStr(Selecao.SeqId)) then
     Exit;
 
-  FView.IniciarTransmissao;
+  FView.StartWaiting('Iniciando transmissào');
   FOperacaoEmAndamento := True;
   try
     // A linha é recarregada mesmo quando o envio falha: o estado pode ter mudado antes do erro.
@@ -158,19 +155,12 @@ begin
       ApresentarResultadoTransmissao(Resultado);
     except
       on E: EValidacaoNegocio do
-        begin
-          FFalhaApresentada := True;
-          FView.ShowWarning(E.Message);
-        end;
+        FView.ShowWarning(E.Message);
       on E: Exception do
-        begin
-          FFalhaApresentada := True;
-          // O texto técnico do envio não deve chegar à interface.
-          FView.ShowError('Não foi possível transmitir o evento DF-e.');
-        end;
+        FView.ShowError('Não foi possível transmitir o evento DF-e.');
     end;
   finally
-    FView.EncerrarTransmissao;
+    FView.EndWaiting();
     FOperacaoEmAndamento := False;
   end;
 end;
@@ -221,7 +211,6 @@ var
   Resultado: TEventoDFeResultadoConsultarSituacao;
 begin
   Result := False;
-  FFalhaApresentada := False;
 
   if FOperacaoEmAndamento then
     Exit;
@@ -248,7 +237,7 @@ begin
     IntToStr(Selecao.SeqId)) then
     Exit;
 
-  FView.IniciarConsultaSituacao;
+  FView.StartWaiting('Iniciando consulta');
   FOperacaoEmAndamento := True;
   try
     // A linha é recarregada mesmo quando a consulta falha: o estado pode ter mudado antes do erro.
@@ -258,19 +247,13 @@ begin
       ApresentarResultadoConsultaSituacao(Resultado);
     except
       on E: EValidacaoNegocio do
-        begin
-          FFalhaApresentada := True;
-          FView.ShowWarning(E.Message);
-        end;
+        FView.ShowWarning(E.Message);
       on E: Exception do
-        begin
-          FFalhaApresentada := True;
-          // O texto técnico da consulta não deve chegar à interface.
-          FView.ShowError('Não foi possível consultar a situação do evento DF-e.');
-        end;
+        // O texto técnico da consulta não deve chegar à interface.
+        FView.ShowError('Não foi possível consultar a situação do evento DF-e.');
     end;
   finally
-    FView.EncerrarConsultaSituacao;
+    FView.EndWaiting();
     FOperacaoEmAndamento := False;
   end;
 end;
