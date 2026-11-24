@@ -18,8 +18,7 @@ type
       const AChaveDocumento: string; ACodEmpresa: Integer;
       AAtivo: StatusRegistroEnum;
       const AItens: EventoDFe211130ItemEtdArray;
-      ADataCadastro, ADataAlteracao: TDateTime;
-      ARestaurar: Boolean = False); overload;
+      ADataCadastro, ADataAlteracao: TDateTime); overload;
 
     property Itens: EventoDFe211130ItemEtdArray read FItens write FItens;
     function Clone: EventoDFeEtd; override;
@@ -39,11 +38,10 @@ end;
 constructor EventoDFe211130Etd.Create(const AId: string; ASeqId: Integer;
   const AChaveDocumento: string; ACodEmpresa: Integer;
   AAtivo: StatusRegistroEnum; const AItens: EventoDFe211130ItemEtdArray;
-  ADataCadastro, ADataAlteracao: TDateTime; ARestaurar: Boolean);
+  ADataCadastro, ADataAlteracao: TDateTime);
 begin
   inherited Create(AId, ASeqId, fdNFe, teImobilizacaoItem,
-    AChaveDocumento, ACodEmpresa, AAtivo, ADataCadastro, ADataAlteracao,
-    ARestaurar);
+    AChaveDocumento, ACodEmpresa, AAtivo, ADataCadastro, ADataAlteracao);
 
   FItens := Copy(AItens, 0, Length(AItens));
 end;
@@ -58,8 +56,7 @@ begin
     Ativo,
     FItens,
     DataCadastro,
-    DataAlteracao,
-    Restaurar
+    DataAlteracao
   );
 end;
 

@@ -19,7 +19,6 @@ type
     FAtivo: StatusRegistroEnum;
     FDataCadastro: TDateTime;
     FDataAlteracao: TDateTime;
-    FRestaurar: Boolean;
     FStatus: TStatusEventoDFe;
     FNseqEvento: Integer;
   protected
@@ -31,8 +30,7 @@ type
       AFamiliaDocumento: TFamiliaDocumentoDFe; ATipoEvento: TipoEventoDFe;
       const AChaveDocumento: string;
       ACodEmpresa: Integer; AAtivo: StatusRegistroEnum;
-      ADataCadastro, ADataAlteracao: TDateTime;
-      ARestaurar: Boolean = False); overload;
+      ADataCadastro, ADataAlteracao: TDateTime); overload;
 
     property Id: string read FId;
     property SeqId: Integer read FSeqId;
@@ -45,8 +43,6 @@ type
     property DataAlteracao: TDateTime read FDataAlteracao;
     property Status: TStatusEventoDFe read FStatus write FStatus;
     property NseqEvento: Integer read FNseqEvento write FNseqEvento;
-    // Intenção de aplicação; não é persistida.
-    property Restaurar: Boolean read FRestaurar write FRestaurar;
 
     procedure DefinirSeqIdInclusao(ASeqId: Integer);
     function Clone: EventoDFeEtd; virtual; abstract;
@@ -76,7 +72,6 @@ begin
   FAtivo := saAtivo;
   FDataCadastro := 0;
   FDataAlteracao := 0;
-  FRestaurar := False;
   FStatus := sePendente;
   FNseqEvento := 0;
 end;
@@ -85,7 +80,7 @@ constructor EventoDFeEtd.Create(const AId: string; ASeqId: Integer;
   AFamiliaDocumento: TFamiliaDocumentoDFe; ATipoEvento: TipoEventoDFe;
   const AChaveDocumento: string;
   ACodEmpresa: Integer; AAtivo: StatusRegistroEnum;
-  ADataCadastro, ADataAlteracao: TDateTime; ARestaurar: Boolean);
+  ADataCadastro, ADataAlteracao: TDateTime);
 begin
   FId := AId;
   FSeqId := ASeqId;
@@ -96,7 +91,6 @@ begin
   FAtivo := AAtivo;
   FDataCadastro := ADataCadastro;
   FDataAlteracao := ADataAlteracao;
-  FRestaurar := ARestaurar;
   FStatus := sePendente;
   FNseqEvento := 0;
 end;

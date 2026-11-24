@@ -66,13 +66,7 @@ type
     procedure DeveAplicarEmpresaDaSessao;
 
     [Test]
-    procedure DeveRejeitarAlteracaoDeRegistroNaLixeiraSemRestaurar;
-
-    [Test]
     procedure DeveRestaurarRegistroNaLixeira;
-
-    [Test]
-    procedure DeveRejeitarRestauracaoDeRegistroAtivo;
 
     [Test]
     procedure DeveRejeitarRegistroInexistente;
@@ -425,30 +419,6 @@ begin
   end;
 end;
 
-procedure TTestSalvarEventoDFe112150UseCase.DeveRejeitarAlteracaoDeRegistroNaLixeiraSemRestaurar;
-var
-  Evento: EventoDFe112150Etd;
-begin
-  SemearEvento(ID_EVENTO, 4, saLixeira, EMPRESA_ID);
-
-  Evento := EventoDFe112150Etd.Create(
-    ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saLixeira, Date, 0, 0, False);
-  try
-    Assert.WillRaise(
-      procedure
-      begin
-        FUseCase.Executar(Evento);
-      end,
-      EValidacaoNegocio
-    );
-  finally
-    Evento.Free;
-  end;
-
-  Assert.IsFalse(FConnection.BeginTransactionCalled);
-  Assert.IsFalse(FEventosRepo.AtualizarChamado);
-end;
-
 procedure TTestSalvarEventoDFe112150UseCase.DeveRestaurarRegistroNaLixeira;
 var
   Evento: EventoDFe112150Etd;
@@ -457,7 +427,7 @@ begin
   SemearEvento(ID_EVENTO, 4, saLixeira, EMPRESA_ID);
 
   Evento := EventoDFe112150Etd.Create(
-    ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saLixeira, Date, 0, 0, True);
+    ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saLixeira, Date, 0, 0);
   try
     Saida := FUseCase.Executar(Evento);
     try
@@ -474,35 +444,12 @@ begin
   end;
 end;
 
-procedure TTestSalvarEventoDFe112150UseCase.DeveRejeitarRestauracaoDeRegistroAtivo;
-var
-  Evento: EventoDFe112150Etd;
-begin
-  SemearEvento(ID_EVENTO, 4, saAtivo, EMPRESA_ID);
-
-  Evento := EventoDFe112150Etd.Create(
-    ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo, Date, 0, 0, True);
-  try
-    Assert.WillRaise(
-      procedure
-      begin
-        FUseCase.Executar(Evento);
-      end,
-      EValidacaoNegocio
-    );
-  finally
-    Evento.Free;
-  end;
-
-  Assert.IsFalse(FConnection.BeginTransactionCalled);
-end;
-
 procedure TTestSalvarEventoDFe112150UseCase.DeveRejeitarRegistroInexistente;
 var
   Evento: EventoDFe112150Etd;
 begin
   Evento := EventoDFe112150Etd.Create(
-    'INEXISTENTE', 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo, Date, 0, 0, False);
+    'INEXISTENTE', 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo, Date, 0, 0);
   try
     Assert.WillRaise(
       procedure
@@ -525,7 +472,7 @@ begin
   SemearEvento(ID_EVENTO, 4, saAtivo, OUTRA_EMPRESA_ID);
 
   Evento := EventoDFe112150Etd.Create(
-    ID_EVENTO, 4, CHAVE_VALIDA, OUTRA_EMPRESA_ID, saAtivo, Date, 0, 0, False);
+    ID_EVENTO, 4, CHAVE_VALIDA, OUTRA_EMPRESA_ID, saAtivo, Date, 0, 0);
   try
     Assert.WillRaise(
       procedure
@@ -624,7 +571,7 @@ begin
   FEventosRepo.FalharNoAtualizar := True;
 
   Evento := EventoDFe112150Etd.Create(
-    ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo, Date, 0, 0, False);
+    ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo, Date, 0, 0);
   try
     Assert.WillRaise(
       procedure
@@ -671,7 +618,7 @@ begin
   SemearEventoComEstado(ID_EVENTO, 4, saAtivo, EMPRESA_ID, sePendente, 0);
 
   Evento := EventoDFe112150Etd.Create(
-    ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo, Date + 1, 0, 0, False);
+    ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo, Date + 1, 0, 0);
   try
     Saida := FUseCase.Executar(Evento);
     try
@@ -697,7 +644,7 @@ begin
     sePendente, 0);
 
   Evento := EventoDFe112150Etd.Create(
-    ID_EVENTO, 5, CHAVE_VALIDA, EMPRESA_ID, saLixeira, Date, 0, 0, True);
+    ID_EVENTO, 5, CHAVE_VALIDA, EMPRESA_ID, saLixeira, Date, 0, 0);
   try
     Mensagem := RejeitarAoExecutar(Evento);
   finally
@@ -718,7 +665,7 @@ begin
   SemearEventoComEstado(ID_EVENTO, 4, saAtivo, EMPRESA_ID, seAutorizado, 1);
 
   Evento := EventoDFe112150Etd.Create(
-    ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo, Date + 1, 0, 0, False);
+    ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo, Date + 1, 0, 0);
   try
     Mensagem := RejeitarAoExecutar(Evento);
   finally
@@ -738,7 +685,7 @@ begin
   SemearEventoComEstado(ID_EVENTO, 4, saAtivo, EMPRESA_ID, seEnviando, 1);
 
   Evento := EventoDFe112150Etd.Create(
-    ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo, Date + 1, 0, 0, False);
+    ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo, Date + 1, 0, 0);
   try
     Mensagem := RejeitarAoExecutar(Evento);
   finally
@@ -758,7 +705,7 @@ begin
   SemearEventoComEstado(ID_EVENTO, 4, saAtivo, EMPRESA_ID, sePendente, 2);
 
   Evento := EventoDFe112150Etd.Create(
-    ID_EVENTO, 4, CHAVE_OUTRA, EMPRESA_ID, saAtivo, Date + 1, 0, 0, False);
+    ID_EVENTO, 4, CHAVE_OUTRA, EMPRESA_ID, saAtivo, Date + 1, 0, 0);
   try
     Mensagem := RejeitarAoExecutar(Evento);
   finally
@@ -778,7 +725,7 @@ begin
   SemearEventoComEstado(ID_EVENTO, 4, saAtivo, EMPRESA_ID, sePendente, 0);
 
   Evento := EventoDFe112150Etd.Create(
-    ID_EVENTO, 4, CHAVE_OUTRA, EMPRESA_ID, saAtivo, Date + 1, 0, 0, False);
+    ID_EVENTO, 4, CHAVE_OUTRA, EMPRESA_ID, saAtivo, Date + 1, 0, 0);
   try
     Saida := FUseCase.Executar(Evento);
     try
@@ -903,7 +850,7 @@ begin
   SemearEvento(ID_EVENTO, 4, saAtivo, EMPRESA_ID);
 
   Evento := EventoDFe112150Etd.Create(
-    ID_EVENTO, 4, CHAVE_OUTRA, EMPRESA_ID, saAtivo, Date + 1, 0, 0, False);
+    ID_EVENTO, 4, CHAVE_OUTRA, EMPRESA_ID, saAtivo, Date + 1, 0, 0);
   try
     Saida := FUseCase.Executar(Evento);
     try

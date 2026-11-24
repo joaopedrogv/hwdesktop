@@ -36,7 +36,7 @@ type
     procedure DeveRetornarAgregadoAtivoComItensOrdenados;
 
     [Test]
-    procedure DeveRetornarAgregadoNaLixeiraNoModoRestauracao;
+    procedure DeveCarregarAgregadoLixeiraComRestauracao;
 
     [Test]
     procedure DeveRetornarColecaoVaziaNaLeituraDefensiva;
@@ -49,12 +49,6 @@ type
 
     [Test]
     procedure DeveRejeitarTipoDivergente;
-
-    [Test]
-    procedure DeveRejeitarLixeiraNoModoAlteracao;
-
-    [Test]
-    procedure DeveRejeitarAtivoNoModoRestauracao;
   end;
 
 implementation
@@ -168,7 +162,7 @@ begin
     Item(1, 'UN')
   ]));
 
-  Evento := FUseCase.Executar(ID_EVENTO, meAlteracao);
+  Evento := FUseCase.Executar(ID_EVENTO);
   try
     Assert.IsNotNull(Evento);
     Assert.AreEqual(2, Length(Evento.Itens));
@@ -178,26 +172,26 @@ begin
     Assert.AreEqual('ITEM-2', Evento.Itens[1].Id);
     Assert.AreEqual(2, Evento.Itens[1].NItem);
     Assert.AreEqual('CX', Evento.Itens[1].UImobilizado);
-    Assert.IsFalse(Evento.Restaurar);
+    Assert.IsTrue(Evento.Ativo = saAtivo);
     Assert.AreEqual(EMPRESA_ID, FEventosRepo.UltimaEmpresaObterPorId);
   finally
     Evento.Free;
   end;
 end;
 
-procedure TTestObterEventoDFe211130PorIdUseCase.DeveRetornarAgregadoNaLixeiraNoModoRestauracao;
+procedure TTestObterEventoDFe211130PorIdUseCase.DeveCarregarAgregadoLixeiraComRestauracao;
 var
   Evento: EventoDFe211130Etd;
 begin
   SemearEvento(ID_EVENTO, 4, saLixeira, EMPRESA_ID);
   FRepo211130.AdicionarItens(ID_EVENTO, Itens([Item(1, 'UN')]));
 
-  Evento := FUseCase.Executar(ID_EVENTO, meRestauracao);
+  Evento := FUseCase.Executar(ID_EVENTO);
   try
     Assert.IsNotNull(Evento);
-    Assert.IsTrue(Evento.Restaurar);
     Assert.IsTrue(Evento.Ativo = saLixeira);
     Assert.AreEqual(1, Length(Evento.Itens));
+    Assert.AreEqual('ITEM-1', Evento.Itens[0].Id);
   finally
     Evento.Free;
   end;
@@ -210,7 +204,7 @@ begin
   // A leitura defensiva nao transforma colecao vazia em erro.
   SemearEvento(ID_EVENTO, 4, saAtivo, EMPRESA_ID);
 
-  Evento := FUseCase.Executar(ID_EVENTO, meAlteracao);
+  Evento := FUseCase.Executar(ID_EVENTO);
   try
     Assert.IsNotNull(Evento);
     Assert.AreEqual(0, Length(Evento.Itens));
@@ -221,14 +215,14 @@ end;
 
 procedure TTestObterEventoDFe211130PorIdUseCase.DeveRetornarNilQuandoRegistroNaoEncontrado;
 begin
-  Assert.IsNull(FUseCase.Executar('INEXISTENTE', meAlteracao));
+  Assert.IsNull(FUseCase.Executar('INEXISTENTE'));
 end;
 
 procedure TTestObterEventoDFe211130PorIdUseCase.DeveRetornarNilParaOutraEmpresa;
 begin
   SemearEvento(ID_EVENTO, 4, saAtivo, OUTRA_EMPRESA_ID);
 
-  Assert.IsNull(FUseCase.Executar(ID_EVENTO, meAlteracao));
+  Assert.IsNull(FUseCase.Executar(ID_EVENTO));
   Assert.AreEqual(EMPRESA_ID, FEventosRepo.UltimaEmpresaObterPorId);
 end;
 
@@ -239,33 +233,7 @@ begin
   Assert.WillRaise(
     procedure
     begin
-      FUseCase.Executar(ID_EVENTO, meAlteracao).Free;
-    end,
-    EValidacaoNegocio
-  );
-end;
-
-procedure TTestObterEventoDFe211130PorIdUseCase.DeveRejeitarLixeiraNoModoAlteracao;
-begin
-  SemearEvento(ID_EVENTO, 4, saLixeira, EMPRESA_ID);
-
-  Assert.WillRaise(
-    procedure
-    begin
-      FUseCase.Executar(ID_EVENTO, meAlteracao).Free;
-    end,
-    EValidacaoNegocio
-  );
-end;
-
-procedure TTestObterEventoDFe211130PorIdUseCase.DeveRejeitarAtivoNoModoRestauracao;
-begin
-  SemearEvento(ID_EVENTO, 4, saAtivo, EMPRESA_ID);
-
-  Assert.WillRaise(
-    procedure
-    begin
-      FUseCase.Executar(ID_EVENTO, meRestauracao).Free;
+      FUseCase.Executar(ID_EVENTO).Free;
     end,
     EValidacaoNegocio
   );

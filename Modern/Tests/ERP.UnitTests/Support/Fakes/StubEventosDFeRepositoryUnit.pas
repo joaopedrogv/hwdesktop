@@ -167,8 +167,7 @@ begin
     AOrigem.CodEmpresa,
     AOrigem.Ativo,
     AOrigem.DataCadastro,
-    AOrigem.DataAlteracao,
-    AOrigem.Restaurar
+    AOrigem.DataAlteracao
   );
 end;
 

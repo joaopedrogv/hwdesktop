@@ -78,12 +78,6 @@ type
     procedure DeveRestaurarEReativarRegistro;
 
     [Test]
-    procedure DeveRejeitarLixeiraSemRestaurar;
-
-    [Test]
-    procedure DeveRejeitarRestauracaoDeAtivo;
-
-    [Test]
     procedure DeveRejeitarChaveComCaracteresNaoNumericos;
 
     [Test]
@@ -521,8 +515,7 @@ begin
 
   Evento := EventoDFe211130Etd.Create(
     ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo,
-    Itens([Item(3, 1, 2, 10, 'UN'), Item(4, 3, 4, 5, 'CX')]),
-    0, 0, False);
+    Itens([Item(3, 1, 2, 10, 'UN'), Item(4, 3, 4, 5, 'CX')]), 0, 0);
   try
     Saida := FUseCase.Executar(Evento);
     try
@@ -551,8 +544,7 @@ begin
 
   Evento := EventoDFe211130Etd.Create(
     ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saLixeira,
-    Itens([ItemValido(1)]),
-    0, 0, True);
+    Itens([ItemValido(1)]), 0, 0);
   try
     Saida := FUseCase.Executar(Evento);
     try
@@ -567,56 +559,6 @@ begin
   finally
     Evento.Free;
   end;
-end;
-
-procedure TTestSalvarEventoDFe211130UseCase.DeveRejeitarLixeiraSemRestaurar;
-var
-  Evento: EventoDFe211130Etd;
-begin
-  SemearEvento(ID_EVENTO, 4, saLixeira, EMPRESA_ID);
-
-  Evento := EventoDFe211130Etd.Create(
-    ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saLixeira,
-    Itens([ItemValido(1)]),
-    0, 0, False);
-  try
-    Assert.WillRaise(
-      procedure
-      begin
-        FUseCase.Executar(Evento);
-      end,
-      EValidacaoNegocio
-    );
-  finally
-    Evento.Free;
-  end;
-
-  Assert.IsFalse(FConnection.BeginTransactionCalled);
-end;
-
-procedure TTestSalvarEventoDFe211130UseCase.DeveRejeitarRestauracaoDeAtivo;
-var
-  Evento: EventoDFe211130Etd;
-begin
-  SemearEvento(ID_EVENTO, 4, saAtivo, EMPRESA_ID);
-
-  Evento := EventoDFe211130Etd.Create(
-    ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo,
-    Itens([ItemValido(1)]),
-    0, 0, True);
-  try
-    Assert.WillRaise(
-      procedure
-      begin
-        FUseCase.Executar(Evento);
-      end,
-      EValidacaoNegocio
-    );
-  finally
-    Evento.Free;
-  end;
-
-  Assert.IsFalse(FConnection.BeginTransactionCalled);
 end;
 
 procedure TTestSalvarEventoDFe211130UseCase.DeveRejeitarChaveComCaracteresNaoNumericos;
@@ -699,8 +641,7 @@ begin
 
   Evento := EventoDFe211130Etd.Create(
     ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo,
-    Itens([ItemValido(1)]),
-    0, 0, False);
+    Itens([ItemValido(1)]), 0, 0);
   try
     Assert.WillRaise(
       procedure
@@ -755,8 +696,7 @@ begin
 
   Evento := EventoDFe211130Etd.Create(
     ID_EVENTO, 4, CHAVE_VALIDA, EMPRESA_ID, saAtivo,
-    Itens([ItemValido(1)]),
-    0, 0, False);
+    Itens([ItemValido(1)]), 0, 0);
   try
     Mensagem := RejeitarAoExecutar(Evento);
   finally

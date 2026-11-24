@@ -36,7 +36,6 @@ type
     function EnviarParaLixeira: Boolean;
     function SolicitarInclusao: Boolean;
     function SolicitarEdicao: Boolean;
-    function SolicitarRestauracao: Boolean;
   end;
 
 implementation
@@ -53,7 +52,6 @@ const
   ProcessoAlteracao = 'EVT003';
   ProcessoExclusao112150 = 'EVT006';
   ProcessoExclusao211130 = 'EVT007';
-  ProcessoRestauracao = 'EVT008';
   ProcessoTransmissao = 'EVT009';
   ProcessoConsultaSituacao = 'EVT010';
   TabelaEventosDFe = 'EVENTOS_DFE';
@@ -395,12 +393,6 @@ begin
     Exit;
   end;
 
-  if Selecao.Ativo <> saAtivo then
-  begin
-    FView.ShowWarning('O evento está na lixeira; use Restaurar.');
-    Exit;
-  end;
-
   Chave := IntToStr(TipoEventoDFeCodigo(Selecao.TipoEvento)) + ':' + Selecao.Id;
   if FView.AtivarEdicao(Chave) then
   begin
@@ -412,40 +404,7 @@ begin
   if not Autorizar(ProcessoAlteracao, aaAlterar, TabelaEventosDFe, IntToStr(Selecao.SeqId)) then
     Exit;
 
-  Result := FView.AbrirEdicao(Selecao, meAlteracao);
-end;
-
-function TEventosDFePresenter.SolicitarRestauracao: Boolean;
-var
-  Selecao: TEventoDFeSelecionado;
-  Chave: string;
-begin
-  Result := False;
-
-  if not FQueryDefinition.TryGetSelected(Selecao) then
-  begin
-    FView.ShowError(SelecaoObrigatoriaMessage);
-    Exit;
-  end;
-
-  if Selecao.Ativo <> saLixeira then
-  begin
-    FView.ShowWarning('O evento não está na lixeira.');
-    Exit;
-  end;
-
-  // A chave é a mesma da alteração: a aba já aberta é reativada e o modo é validado na gravação.
-  Chave := IntToStr(TipoEventoDFeCodigo(Selecao.TipoEvento)) + ':' + Selecao.Id;
-  if FView.AtivarEdicao(Chave) then
-  begin
-    Result := True;
-    Exit;
-  end;
-
-  if not Autorizar(ProcessoRestauracao, aaAlterar, TabelaEventosDFe, IntToStr(Selecao.SeqId)) then
-    Exit;
-
-  Result := FView.AbrirEdicao(Selecao, meRestauracao);
+  Result := FView.AbrirEdicao(Selecao);
 end;
 
 end.

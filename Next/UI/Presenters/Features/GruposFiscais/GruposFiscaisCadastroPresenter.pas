@@ -33,6 +33,7 @@ const
   // Codigo do cadastro legado usado por esta funcionalidade. O host recebe o processo, a acao e a tabela e nao os
   // conhece.
   ProcessoGravacao = 'MOD011';
+  ProcessoRestauracao = 'MOD013';
   TabelaGruposFiscais = 'GRUPOS_FISCAIS';
 
 constructor TGruposFiscaisCadastroPresenter.Create(const AView: IGruposFiscaisCadastroView;
@@ -77,11 +78,17 @@ begin
         Exit;
       end;
 
-      // A consulta apresenta apenas registros ativos.
       if Carregado.Ativo <> saAtivo then
       begin
-        FView.ShowError('O grupo fiscal selecionado está fora da consulta de ativos.');
-        Exit;
+        if not FView.ShowQuestion(Format('O grupo fiscal "%s" está na lixeira. Deseja restaurar o registro?',
+          [Trim(Carregado.Descricao)])) then
+          Exit;
+
+        if not Autorizar(ProcessoRestauracao, aaAlterar, TabelaGruposFiscais, IntToStr(Carregado.SeqId)) then
+          Exit;
+
+        // A restauracao e persistida somente pela gravacao.
+        Carregado.Ativo := saAtivo;
       end;
 
       if not FView.PrepararAlteracao(Carregado) then

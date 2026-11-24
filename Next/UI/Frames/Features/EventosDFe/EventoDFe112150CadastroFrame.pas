@@ -4,12 +4,12 @@ interface
 
 uses
   System.SysUtils, System.Classes, Vcl.StdCtrls, Vcl.Mask, CadastroEditorFrame,
-  EditorCadastro, EventoDFeCadastroRestauracao, EventoDFe112150CadastroView,
-  EventoDFe112150CadastroPresenter, EventoDFe112150EtdUnit, TipoEventoDFeUnit;
+  EditorCadastro, EventoDFe112150CadastroView, EventoDFe112150CadastroPresenter,
+  EventoDFe112150EtdUnit;
 
 type
   TfrmEventoDFe112150CadastroFrame = class(TfrmCadastroEditor,
-    IEventoDFe112150CadastroView, IEventoDFeCadastroRestauracao)
+    IEventoDFe112150CadastroView)
     lblChaveDocumento: TLabel;
     edChaveDocumento: TEdit;
     lblDataPrevisao: TLabel;
@@ -30,9 +30,7 @@ type
     procedure ConfigurarPresenter(APresenter: TEventoDFe112150CadastroPresenter);
     function PrepararInclusao: Boolean;
     // A entidade recebida não é assumida: o frame guarda um clone próprio.
-    function PrepararAlteracao(const AEvento: EventoDFe112150Etd;
-      AModo: TModoEventoDFe): Boolean;
-    function PrepararAbaRestauracao(const AId: string): Boolean;
+    function PrepararAlteracao(const AEvento: EventoDFe112150Etd): Boolean;
     function HasPendingChanges: Boolean; override;
     function TryFocus: Boolean; override;
   protected
@@ -44,7 +42,7 @@ implementation
 {$R *.dfm}
 
 uses
-  DateTimeServiceUnit;
+  DateTimeServiceUnit, StatusRegistroEnumUnit;
 
 constructor TfrmEventoDFe112150CadastroFrame.Create(AOwner: TComponent;
   const AHost: IEditorCadastroHost);
@@ -92,7 +90,7 @@ begin
 end;
 
 function TfrmEventoDFe112150CadastroFrame.PrepararAlteracao(
-  const AEvento: EventoDFe112150Etd; AModo: TModoEventoDFe): Boolean;
+  const AEvento: EventoDFe112150Etd): Boolean;
 begin
   Result := False;
   if AEvento = nil then
@@ -100,8 +98,8 @@ begin
 
   FreeAndNil(FRascunho);
   FRascunho := EventoDFe112150Etd(AEvento.Clone);
-  // A intenção de restauração pertence ao rascunho e somente a gravação a aplica.
-  FRascunho.Restaurar := AModo = meRestauracao;
+  // A restauração solicitada na abertura é aplicada somente pela gravação.
+  FRascunho.Ativo := saAtivo;
 
   LimparCampos;
   LimparValidacao;
@@ -110,17 +108,7 @@ begin
   if FRascunho.DataPrevisaoEntrega > 0 then
     edDataPrevisaoEntrega.Text := DateService.ParseLocal(FRascunho.DataPrevisaoEntrega);
 
-  if AModo = meRestauracao then
-    ShowWarning('Este evento está na lixeira. Salvar irá restaurá-lo.');
-
   Result := True;
-end;
-
-function TfrmEventoDFe112150CadastroFrame.PrepararAbaRestauracao(
-  const AId: string): Boolean;
-begin
-  Result := (PresenterCadastro <> nil) and
-    Presenter.PrepararAlteracao(AId, meRestauracao);
 end;
 
 function TfrmEventoDFe112150CadastroFrame.Salvar: Boolean;

@@ -89,7 +89,6 @@ uses
   EventoDFe112150CadastroView in '..\Contracts\Features\EventosDFe\EventoDFe112150CadastroView.pas',
   EventoDFe112150CadastroPresenter in '..\UI\Presenters\Features\EventosDFe\EventoDFe112150CadastroPresenter.pas',
   EventoDFe112150CadastroFrame in '..\UI\Frames\Features\EventosDFe\EventoDFe112150CadastroFrame.pas' {frmEventoDFe112150CadastroFrame: TFrame},
-  EventoDFeCadastroRestauracao in '..\Contracts\Features\EventosDFe\EventoDFeCadastroRestauracao.pas',
   EventoDFe211130CadastroView in '..\Contracts\Features\EventosDFe\EventoDFe211130CadastroView.pas',
   EventoDFe211130CadastroPresenter in '..\UI\Presenters\Features\EventosDFe\EventoDFe211130CadastroPresenter.pas',
   EventoDFe211130CadastroFrame in '..\UI\Frames\Features\EventosDFe\EventoDFe211130CadastroFrame.pas' {frmEventoDFe211130CadastroFrame: TFrame},

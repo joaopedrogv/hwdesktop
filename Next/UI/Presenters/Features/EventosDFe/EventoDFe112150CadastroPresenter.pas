@@ -5,7 +5,7 @@ interface
 uses
   AuthorizationService, EventoDFe112150CadastroView, ObterEventoDFe112150PorIdUseCaseUnit,
   SalvarEventoDFe112150UseCaseUnit, ObterProximoSeqIdEventoDFeUseCaseUnit,
-  EventoDFe112150EtdUnit, TipoEventoDFeUnit, PresenterCadastroBase;
+  EventoDFe112150EtdUnit, PresenterCadastroBase;
 
 type
   // Não conhece a consulta, a grade nem as abas.
@@ -23,20 +23,22 @@ type
       ASalvar: ISalvarEventoDFe112150UseCase;
       AProximoSeqId: IObterProximoSeqIdEventoDFeUseCase);
     function PrepararInclusao: Boolean; override;
-    function PrepararAlteracao(const AId: string): Boolean; overload; override;
-    function PrepararAlteracao(const AId: string; AModo: TModoEventoDFe): Boolean; overload;
+    function PrepararAlteracao(const AId: string): Boolean; override;
     function Salvar(const ARascunho: EventoDFe112150Etd): Boolean;
   end;
 
 implementation
 
 uses
-  System.SysUtils, EValidacaoNegocioUnit, CreateEntityUseCaseOutputUnit;
+  System.SysUtils, EValidacaoNegocioUnit, CreateEntityUseCaseOutputUnit,
+  StatusRegistroEnumUnit;
 
 const
   // Código do cadastro legado usado por esta funcionalidade. O host recebe o processo, a ação, a tabela e a chave.
   ProcessoGravacao = 'EVT004';
+  ProcessoRestauracao = 'EVT008';
   Tabela112150 = 'EVENTOS_DFE_112150';
+  TabelaEventosDFe = 'EVENTOS_DFE';
 
 constructor TEventoDFe112150CadastroPresenter.Create(const AView: IEventoDFe112150CadastroView;
   const AAuthorization: IAuthorizationService; AObter: ObterEventoDFe112150PorIdUseCase;
@@ -64,12 +66,6 @@ begin
 end;
 
 function TEventoDFe112150CadastroPresenter.PrepararAlteracao(const AId: string): Boolean;
-begin
-  Result := PrepararAlteracao(AId, meAlteracao);
-end;
-
-function TEventoDFe112150CadastroPresenter.PrepararAlteracao(const AId: string;
-  AModo: TModoEventoDFe): Boolean;
 var
   Carregado: EventoDFe112150Etd;
 begin
@@ -78,15 +74,28 @@ begin
   Carregado := nil;
   try
     try
-      Carregado := FObter.Executar(AId, AModo);
+      Carregado := FObter.Executar(AId);
       if Carregado = nil then
       begin
         FView.ShowError('O evento selecionado não foi encontrado.');
         Exit;
       end;
 
+      if Carregado.Ativo <> saAtivo then
+      begin
+        if not FView.ShowQuestion(Format('O evento de código %d está na lixeira. Deseja restaurar o registro?',
+          [Carregado.SeqId])) then
+          Exit;
+
+        if not Autorizar(ProcessoRestauracao, aaAlterar, TabelaEventosDFe, IntToStr(Carregado.SeqId)) then
+          Exit;
+
+        // A restauração é persistida somente pela gravação.
+        Carregado.Ativo := saAtivo;
+      end;
+
       // A view copia o evento para o rascunho do frame; a entidade continua pertencendo a este método.
-      Result := FView.PrepararAlteracao(Carregado, AModo);
+      Result := FView.PrepararAlteracao(Carregado);
     except
       on E: EValidacaoNegocio do
         FView.ShowError(E.Message);

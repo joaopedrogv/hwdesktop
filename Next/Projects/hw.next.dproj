@@ -214,7 +214,6 @@
         <DCCReference Include="..\Queries\Features\EventosDFe\EventoDFe211130ColecaoDefinition.pas"/>
         <DCCReference Include="..\..\Modern\Core\Infrastructure\Data\DataSetFieldDefinitionUnit.pas"/>
         <DCCReference Include="..\..\Modern\Adapters\Secondary\Database\FireDAC\FireDACMemoryDataSetReaderUnit.pas"/>
-        <DCCReference Include="..\Contracts\Features\EventosDFe\EventoDFeCadastroRestauracao.pas"/>
         <DCCReference Include="..\Contracts\Features\EventosDFe\EventoDFe211130CadastroView.pas"/>
         <DCCReference Include="..\UI\Presenters\Features\EventosDFe\EventoDFe211130CadastroPresenter.pas"/>
         <DCCReference Include="..\UI\Frames\Features\EventosDFe\EventoDFe211130CadastroFrame.pas">

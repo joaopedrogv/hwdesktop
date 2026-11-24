@@ -25,13 +25,12 @@ type
   private
     FDefinicaoSelecao: INextDatasetDefinition<TEventoDFeSelecionado>;
     function EditorDisponivel(ATipo: TipoEventoDFe): Boolean;
-    function PrepararRestauracao(const AEditor: TWinControl; const AId: string): Boolean;
   public
     function SelecionarTipoEvento(out ATipo: TipoEventoDFe): Boolean;
     // Opção lida pela definição em cada pesquisa: vale para a próxima busca e não altera o resultado já apresentado.
     function IsLixeiraSearch: Boolean;
     function AbrirInclusao(const AChave, ATitulo: string): Boolean;
-    function AbrirEdicao(const ASelecao: TEventoDFeSelecionado; AModo: TModoEventoDFe): Boolean;
+    function AbrirEdicao(const ASelecao: TEventoDFeSelecionado): Boolean;
     procedure ConfigurarTela(const ADefinition: INextDatasetDefinition<TEventoDFeSelecionado>;
       const APresenter: TEventosDFePresenter; const APreferences: ILocalPreferences;
       const ACriarEditor: TCriarEditorCadastroComandos);
@@ -42,8 +41,7 @@ implementation
 {$R *.dfm}
 
 uses
-  CadastroEditorFrame, EventoDFeCadastroRestauracao, SelecaoEventoDFeForm,
-  StatusRegistroEnumUnit;
+  CadastroEditorFrame, SelecaoEventoDFeForm;
 
 procedure TfrmEventosDFe.ConfigurarTela(const ADefinition: INextDatasetDefinition<TEventoDFeSelecionado>;
   const APresenter: TEventosDFePresenter; const APreferences: ILocalPreferences;
@@ -80,15 +78,6 @@ begin
   if not Result then
     ShowWarning(Format('O editor do evento %d ainda não está disponível.',
       [TipoEventoDFeCodigo(ATipo)]));
-end;
-
-function TfrmEventosDFe.PrepararRestauracao(const AEditor: TWinControl;
-  const AId: string): Boolean;
-var
-  Restauracao: IEventoDFeCadastroRestauracao;
-begin
-  Result := Supports(AEditor, IEventoDFeCadastroRestauracao, Restauracao) and
-    Restauracao.PrepararAbaRestauracao(AId);
 end;
 
 function TfrmEventosDFe.SelecionarTipoEvento(out ATipo: TipoEventoDFe): Boolean;
@@ -178,8 +167,7 @@ begin
   ShowError('Não foi possível iniciar a inclusão do evento DF-e.');
 end;
 
-function TfrmEventosDFe.AbrirEdicao(const ASelecao: TEventoDFeSelecionado;
-  AModo: TModoEventoDFe): Boolean;
+function TfrmEventosDFe.AbrirEdicao(const ASelecao: TEventoDFeSelecionado): Boolean;
 var
   Chave: string;
   Titulo: string;
@@ -193,21 +181,13 @@ begin
     Exit;
 
   Chave := IntToStr(TipoEventoDFeCodigo(ASelecao.TipoEvento)) + ':' + ASelecao.Id;
-  if AModo = meRestauracao then
-    Titulo := 'Restaurar - ' + TipoEventoDFeDisplay(ASelecao.TipoEvento)
-  else
-    Titulo := 'Alterar - ' + TipoEventoDFeDisplay(ASelecao.TipoEvento);
+  Titulo := 'Alterar - ' + TipoEventoDFeDisplay(ASelecao.TipoEvento);
 
   PreparacaoFalhou := False;
   Result := AbrirAba(Chave, Titulo,
     procedure(AEditor: TWinControl)
     begin
-      if AModo = meRestauracao then
-      begin
-        if PrepararRestauracao(AEditor, ASelecao.Id) then
-          Exit;
-      end
-      else if TfrmCadastroEditor(AEditor).PrepararAbaAlteracao(ASelecao.Id) then
+      if TfrmCadastroEditor(AEditor).PrepararAbaAlteracao(ASelecao.Id) then
         Exit;
 
       PreparacaoFalhou := True;
@@ -218,10 +198,7 @@ begin
   if Result or PreparacaoFalhou then
     Exit;
 
-  if AModo = meRestauracao then
-    ShowError('Não foi possível iniciar a restauração do evento DF-e.')
-  else
-    ShowError('Não foi possível iniciar a alteração do evento DF-e.');
+  ShowError('Não foi possível iniciar a alteração do evento DF-e.');
 end;
 
 end.

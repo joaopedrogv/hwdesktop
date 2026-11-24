@@ -12,8 +12,6 @@ type
 
   TipoEventoDFeArray = array of TipoEventoDFe;
 
-  TModoEventoDFe = (meAlteracao, meRestauracao);
-
 function FamiliaDocumentoDFeDisplay(const AFamilia: TFamiliaDocumentoDFe): string;
 function FamiliaDocumentoDFeCodigo(const AFamilia: TFamiliaDocumentoDFe): Integer;
 function FamiliaDocumentoDFeFromCodigo(ACodigo: Integer): TFamiliaDocumentoDFe;

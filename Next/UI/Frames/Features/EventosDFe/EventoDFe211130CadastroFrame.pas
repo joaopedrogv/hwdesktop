@@ -4,14 +4,13 @@ interface
 
 uses
   System.SysUtils, System.Classes, Vcl.StdCtrls, Vcl.ComCtrls, CadastroEditorFrame,
-  EditorCadastro, EventoDFeCadastroRestauracao, EventoDFe211130CadastroView,
-  EventoDFe211130CadastroPresenter, EventoDFe211130EtdUnit,
-  EventoDFe211130ItemEtdUnit, EventoDFe211130ItemEditorFactory,
-  EventoDFe211130ItensFrame, NextMemoryDatasetDefinition, TipoEventoDFeUnit;
+  EditorCadastro, EventoDFe211130CadastroView, EventoDFe211130CadastroPresenter,
+  EventoDFe211130EtdUnit, EventoDFe211130ItemEtdUnit, EventoDFe211130ItemEditorFactory,
+  EventoDFe211130ItensFrame, NextMemoryDatasetDefinition;
 
 type
   TfrmEventoDFe211130CadastroFrame = class(TfrmCadastroEditor,
-    IEventoDFe211130CadastroView, IEventoDFeCadastroRestauracao)
+    IEventoDFe211130CadastroView)
     pcSecoes: TPageControl;
     tsEvento: TTabSheet;
     lblChaveDocumento: TLabel;
@@ -38,9 +37,7 @@ type
     procedure ConfigurarPresenter(APresenter: TEventoDFe211130CadastroPresenter);
     function PrepararInclusao: Boolean;
     // A entidade recebida não é assumida: o frame guarda um clone próprio.
-    function PrepararAlteracao(const AEvento: EventoDFe211130Etd;
-      AModo: TModoEventoDFe): Boolean;
-    function PrepararAbaRestauracao(const AId: string): Boolean;
+    function PrepararAlteracao(const AEvento: EventoDFe211130Etd): Boolean;
     function HasPendingChanges: Boolean; override;
     function TryFocus: Boolean; override;
   protected
@@ -50,6 +47,9 @@ type
 implementation
 
 {$R *.dfm}
+
+uses
+  StatusRegistroEnumUnit;
 
 constructor TfrmEventoDFe211130CadastroFrame.Create(AOwner: TComponent;
   const AHost: IEditorCadastroHost);
@@ -118,7 +118,7 @@ begin
 end;
 
 function TfrmEventoDFe211130CadastroFrame.PrepararAlteracao(
-  const AEvento: EventoDFe211130Etd; AModo: TModoEventoDFe): Boolean;
+  const AEvento: EventoDFe211130Etd): Boolean;
 begin
   Result := False;
   if AEvento = nil then
@@ -126,8 +126,8 @@ begin
 
   FreeAndNil(FRascunho);
   FRascunho := EventoDFe211130Etd(AEvento.Clone);
-  // A intenção de restauração pertence ao rascunho e somente a gravação a aplica.
-  FRascunho.Restaurar := AModo = meRestauracao;
+  // A restauração solicitada na abertura é aplicada somente pela gravação.
+  FRascunho.Ativo := saAtivo;
 
   LimparCampos;
   LimparValidacao;
@@ -135,17 +135,7 @@ begin
   edChaveDocumento.Text := FRascunho.ChaveDocumento;
   fraItens.Carregar(FRascunho.Itens);
 
-  if AModo = meRestauracao then
-    ShowWarning('Este evento está na lixeira. Salvar irá restaurá-lo.');
-
   Result := True;
-end;
-
-function TfrmEventoDFe211130CadastroFrame.PrepararAbaRestauracao(
-  const AId: string): Boolean;
-begin
-  Result := (PresenterCadastro <> nil) and
-    Presenter.PrepararAlteracao(AId, meRestauracao);
 end;
 
 function TfrmEventoDFe211130CadastroFrame.Salvar: Boolean;

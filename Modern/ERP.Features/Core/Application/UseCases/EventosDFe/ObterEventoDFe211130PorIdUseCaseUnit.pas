@@ -20,8 +20,7 @@ type
     constructor Create(ASession: ISessionContext;
       AEventosRepo: IEventosDFeRepository;
       ARepo211130: IEventoDFe211130Repository);
-    function Executar(const AId: string;
-      AModo: TModoEventoDFe): EventoDFe211130Etd;
+    function Executar(const AId: string): EventoDFe211130Etd;
   end;
 
 implementation
@@ -29,7 +28,6 @@ implementation
 uses
   SysUtils,
   EValidacaoNegocioUnit,
-  StatusRegistroEnumUnit,
   EventoDFe211130ItemEtdUnit,
   EventoDFeEtdUnit;
 
@@ -44,8 +42,7 @@ begin
   FRepo211130 := ARepo211130;
 end;
 
-function ObterEventoDFe211130PorIdUseCase.Executar(const AId: string;
-  AModo: TModoEventoDFe): EventoDFe211130Etd;
+function ObterEventoDFe211130PorIdUseCase.Executar(const AId: string): EventoDFe211130Etd;
 var
   Header: EventoDFeEtd;
   Itens: EventoDFe211130ItemEtdArray;
@@ -62,19 +59,11 @@ begin
        (Header.TipoEvento <> teImobilizacaoItem) then
       raise EValidacaoNegocio.Create('Tipo de evento divergente.');
 
-    if AModo = meAlteracao then
-    begin
-      if Header.Ativo <> saAtivo then
-        raise EValidacaoNegocio.Create('O evento está na lixeira; use Restaurar.');
-    end
-    else if Header.Ativo <> saLixeira then
-      raise EValidacaoNegocio.Create('O evento não está na lixeira para restauração.');
-
     Itens := FRepo211130.ObterItens(AId);
 
     Result := EventoDFe211130Etd.Create(Header.Id, Header.SeqId,
       Header.ChaveDocumento, Header.CodEmpresa, Header.Ativo, Itens,
-      Header.DataCadastro, Header.DataAlteracao, AModo = meRestauracao);
+      Header.DataCadastro, Header.DataAlteracao);
   finally
     Header.Free;
   end;

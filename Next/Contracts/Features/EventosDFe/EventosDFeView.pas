@@ -12,8 +12,7 @@ type
     function SelecionarTipoEvento(out ATipo: TipoEventoDFe): Boolean;
     function IsLixeiraSearch: Boolean;
     function AbrirInclusao(const AChave, ATitulo: string): Boolean;
-    // A mesma aba atende alteração e restauração; a intenção vem do modo recebido.
-    function AbrirEdicao(const ASelecao: TEventoDFeSelecionado; AModo: TModoEventoDFe): Boolean;
+    function AbrirEdicao(const ASelecao: TEventoDFeSelecionado): Boolean;
   end;
 
 implementation

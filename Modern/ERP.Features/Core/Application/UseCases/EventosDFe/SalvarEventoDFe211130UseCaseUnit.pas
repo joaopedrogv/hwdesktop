@@ -86,6 +86,7 @@ var
   StatusAtual: TStatusEventoDFe;
   NseqAtual: Integer;
   ChaveAtual: string;
+  Restaurando: Boolean;
 begin
   Result := nil;
 
@@ -172,13 +173,7 @@ begin
        (Existente.TipoEvento <> teImobilizacaoItem) then
       raise EValidacaoNegocio.Create('Tipo de evento divergente.');
 
-    if AEvento.Restaurar then
-    begin
-      if Existente.Ativo <> saLixeira then
-        raise EValidacaoNegocio.Create('O evento não está na lixeira para restauração.');
-    end
-    else if Existente.Ativo <> saAtivo then
-      raise EValidacaoNegocio.Create('O evento está na lixeira; use Restaurar.');
+    Restaurando := Existente.Ativo = saLixeira;
     StatusAtual := Existente.Status;
     NseqAtual := Existente.NseqEvento;
     ChaveAtual := Existente.ChaveDocumento;
@@ -192,7 +187,7 @@ begin
   Transacao := FConnection.BeginTransaction();
   try
     try
-      if not AEvento.Restaurar then
+      if not Restaurando then
       begin
         if StatusAtual = seAutorizado then
           raise EValidacaoNegocio.Create(
@@ -252,7 +247,7 @@ begin
 
     Result := EventoDFe211130Etd.Create(Header.Id, Header.SeqId,
       Header.ChaveDocumento, Header.CodEmpresa, Header.Ativo, Itens,
-      Header.DataCadastro, Header.DataAlteracao, False);
+      Header.DataCadastro, Header.DataAlteracao);
   finally
     Header.Free;
   end;

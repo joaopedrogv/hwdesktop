@@ -16,8 +16,7 @@ type
     constructor Create(const AId: string; ASeqId: Integer;
       const AChaveDocumento: string; ACodEmpresa: Integer;
       AAtivo: StatusRegistroEnum; ADataPrevisaoEntrega: TDate;
-      ADataCadastro, ADataAlteracao: TDateTime;
-      ARestaurar: Boolean = False); overload;
+      ADataCadastro, ADataAlteracao: TDateTime); overload;
 
     property DataPrevisaoEntrega: TDate read FDataPrevisaoEntrega
       write FDataPrevisaoEntrega;
@@ -38,11 +37,10 @@ end;
 constructor EventoDFe112150Etd.Create(const AId: string; ASeqId: Integer;
   const AChaveDocumento: string; ACodEmpresa: Integer;
   AAtivo: StatusRegistroEnum; ADataPrevisaoEntrega: TDate;
-  ADataCadastro, ADataAlteracao: TDateTime; ARestaurar: Boolean);
+  ADataCadastro, ADataAlteracao: TDateTime);
 begin
   inherited Create(AId, ASeqId, fdNFe, teAtualizacaoPrevisaoEntrega,
-    AChaveDocumento, ACodEmpresa, AAtivo, ADataCadastro, ADataAlteracao,
-    ARestaurar);
+    AChaveDocumento, ACodEmpresa, AAtivo, ADataCadastro, ADataAlteracao);
 
   FDataPrevisaoEntrega := ADataPrevisaoEntrega;
 end;
@@ -57,8 +55,7 @@ begin
     Ativo,
     DataPrevisaoEntrega,
     DataCadastro,
-    DataAlteracao,
-    Restaurar
+    DataAlteracao
   );
 end;
 
