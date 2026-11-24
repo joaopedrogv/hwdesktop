@@ -6,7 +6,8 @@ uses
   System.SysUtils, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, ConsultaBaseForm,
   PresenterConsultaBase, NextDatasetDefinition, LocalPreferences,
   OperacoesFiscaisIbsCbsView, OperacoesFiscaisIbsCbsPresenter,
-  OperacoesFiscaisIbsCbsQueryDefinition, EditorCadastro;
+  OperacoesFiscaisIbsCbsQueryDefinition, EditorCadastro, Vcl.Menus, System.ImageList, Vcl.ImgList, Data.DB,
+  DataGridFrame, Vcl.Buttons, FilterFrame, Vcl.ExtCtrls, Vcl.ComCtrls, System.Classes;
 
 type
   TfrmOperacoesFiscaisIbsCbs = class(TfrmConsultaBase, IOperacoesFiscaisIbsCbsView)

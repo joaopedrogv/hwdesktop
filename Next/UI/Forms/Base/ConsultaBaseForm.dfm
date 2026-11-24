@@ -20,10 +20,10 @@ object frmConsultaBase: TfrmConsultaBase
   TextHeight = 13
   object pcAbas: TPageControl
     AlignWithMargins = True
-    Left = 0
-    Top = 0
-    Width = 760
-    Height = 440
+    Left = 3
+    Top = 3
+    Width = 754
+    Height = 434
     ActivePage = tsConsulta
     Align = alClient
     Style = tsFlatButtons
@@ -31,15 +31,30 @@ object frmConsultaBase: TfrmConsultaBase
     TabOrder = 0
     object tsConsulta: TTabSheet
       Caption = 'Consulta'
+      object lbConsulta: TLabel
+        AlignWithMargins = True
+        Left = 5
+        Top = 0
+        Width = 741
+        Height = 13
+        Margins.Left = 5
+        Margins.Top = 0
+        Margins.Right = 0
+        Align = alTop
+        Caption = 'Consulta'
+        ExplicitLeft = 0
+        ExplicitWidth = 42
+      end
       object pnFiltros: TPanel
         AlignWithMargins = True
         Left = 3
-        Top = 3
-        Width = 746
+        Top = 19
+        Width = 740
         Height = 66
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 0
+        ExplicitTop = 3
         object splFiltros: TSplitter
           Left = 426
           Top = 0
@@ -84,11 +99,13 @@ object frmConsultaBase: TfrmConsultaBase
         object pnBotoes: TPanel
           Left = 429
           Top = 0
-          Width = 317
+          Width = 311
           Height = 66
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 1
+          ExplicitLeft = 381
+          ExplicitTop = -33
           object btnPesquisar: TBitBtn
             Left = 6
             Top = 6
@@ -191,8 +208,8 @@ object frmConsultaBase: TfrmConsultaBase
       object pnAcoesConsulta: TPanel
         AlignWithMargins = True
         Left = 6
-        Top = 75
-        Width = 740
+        Top = 91
+        Width = 734
         Height = 44
         Margins.Left = 6
         Margins.Right = 6
@@ -200,6 +217,7 @@ object frmConsultaBase: TfrmConsultaBase
         BevelKind = bkTile
         BevelOuter = bvNone
         TabOrder = 1
+        ExplicitTop = 75
         object btnAlterar: TSpeedButton
           AlignWithMargins = True
           Left = 6
@@ -307,9 +325,9 @@ object frmConsultaBase: TfrmConsultaBase
       inline fraGrid: TfrmDataGridFrame
         AlignWithMargins = True
         Left = 6
-        Top = 128
-        Width = 740
-        Height = 271
+        Top = 144
+        Width = 734
+        Height = 249
         Margins.Left = 6
         Margins.Top = 6
         Margins.Right = 6
@@ -319,19 +337,19 @@ object frmConsultaBase: TfrmConsultaBase
         TabStop = True
         ExplicitLeft = 6
         ExplicitTop = 128
-        ExplicitWidth = 740
-        ExplicitHeight = 271
+        ExplicitWidth = 734
+        ExplicitHeight = 265
         inherited pnComandos: TPanel
-          Width = 740
-          ExplicitWidth = 740
+          Width = 734
+          ExplicitWidth = 734
           inherited pnCriterios: TPanel
-            Width = 653
-            ExplicitWidth = 653
+            Width = 647
+            ExplicitWidth = 647
           end
         end
         inherited dbgDados: TDBGrid
-          Width = 740
-          Height = 235
+          Width = 734
+          Height = 213
         end
         inherited pmCelula: TPopupMenu
           Images = imgListConsulta

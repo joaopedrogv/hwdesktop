@@ -65,6 +65,7 @@ type
     imgListConsulta: TImageList;
     splFiltros: TSplitter;
     pmAcoes: TPopupMenu;
+    lbConsulta: TLabel;
     procedure btnSairClick(Sender: TObject);
   private
     FFiltersConfigured: Boolean;
@@ -368,6 +369,7 @@ begin
   fraGrid.AttachColumnLayoutSource(ADefinition);
 
   tsConsulta.TabVisible := False;
+  lbConsulta.Visible := not tsConsulta.TabVisible;
   pcAbas.ActivePage := tsConsulta;
 end;
 
@@ -794,8 +796,6 @@ begin
   Descritor := TAbaCadastro.Create;
   Tela := nil;
   try
-    tsConsulta.TabVisible := True;
-
     Tela := TTabSheet.Create(pcAbas);
     Tela.PageControl := pcAbas;
     Tela.Caption := ATitulo;
@@ -827,6 +827,10 @@ begin
     ListaAbasCadastro.Add(Descritor);
 
     AtivarAba(Chave);
+
+    tsConsulta.TabVisible := True;
+    lbConsulta.Visible := not tsConsulta.TabVisible;
+
     Result := True;
   except
     // A aba parcial e liberada inteira: o editor e o rascunho morrem junto. O descritor e descartado antes da aba.
@@ -882,7 +886,10 @@ begin
   Tela.Free;
 
   if pcAbas.PageCount = 1 then
+  begin
+    lbConsulta.Visible := True;
     tsConsulta.TabVisible := False;
+  end;
 
   if pcAbas.ActivePage = nil then
     pcAbas.ActivePage := tsConsulta;

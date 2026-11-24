@@ -23,8 +23,7 @@ inherited frmEventosDFe: TfrmEventosDFe
           Top = 66
           Width = 80
           Height = 21
-          Anchors = [akTop, akRight]
-          Caption = 'Lixeira'
+          Caption = 'Pesquisa na Lixeira'
           TabOrder = 2
           OnClick = ckLixeiraClick
         end

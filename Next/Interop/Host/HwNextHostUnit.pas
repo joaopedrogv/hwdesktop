@@ -150,6 +150,7 @@ type
       const AIdentifier: string; const AOptions: THwNextOpenOptions; AInstanceNumber: Integer);
     destructor Destroy; override;
     procedure Represent;
+    procedure AjustarAreaDaView;
     procedure MarkCollectiveCloseRequested;
     function OwnsWindow(AWindow: HWND): Boolean;
     function ProcessKey(const AMsg: TMsg): Boolean;
@@ -569,6 +570,7 @@ begin
           if FInstances.Count = 1 then
             InstallMessageHook;
           Host.Show;
+          Host.AjustarAreaDaView;
           Result := True;
         except
           Host.Free;
@@ -1090,7 +1092,6 @@ begin
   FSurface.Parent := Self;
   FSurface.Align := alClient;
   FSurface.BevelOuter := bvNone;
-  FSurface.Caption := Format('Carregando... %s', [Caption]);
   FSurface.OnResize := SurfaceResize;
 
   if AOptions.Presentation = npModal then
@@ -1104,7 +1105,7 @@ begin
   begin
     FormStyle := fsMDIChild;
     if IsMDIsMaximized and (Application.MainForm.MDIChildCount = 1) then
-      WindowState := wsMaximized;    
+      WindowState := wsMaximized;
   end;
 
   // O VCL reposiciona poMainFormCenter/poScreenCenter ao exibir; a posicao definitiva e calculada apos o tamanho final.
@@ -1213,6 +1214,12 @@ begin
     SetFocus;
   if FView <> 0 then
     FBridge.FocusView(FView);
+end;
+
+procedure TfrmHwNextHost.AjustarAreaDaView;
+begin
+  if FView <> 0 then
+    FBridge.ResizeView(FView, FSurface.ClientWidth, FSurface.ClientHeight);
 end;
 
 procedure TfrmHwNextHost.MarkCollectiveCloseRequested;
