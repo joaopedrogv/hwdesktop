@@ -31,9 +31,6 @@ inherited frmEventosDFe: TfrmEventosDFe
       end
       inherited pnAcoesConsulta: TPanel
         Top = 95
-        inherited btnRestaurar: TSpeedButton
-          OnClick = btnRestaurarClick
-        end
         inherited btnAlterar: TSpeedButton
           OnClick = btnAlterarClick
         end

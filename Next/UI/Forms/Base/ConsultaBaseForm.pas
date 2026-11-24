@@ -65,7 +65,6 @@ type
     imgListConsulta: TImageList;
     splFiltros: TSplitter;
     pmAcoes: TPopupMenu;
-    btnRestaurar: TSpeedButton;
     procedure btnSairClick(Sender: TObject);
   private
     FFiltersConfigured: Boolean;
