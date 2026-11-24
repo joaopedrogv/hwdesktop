@@ -19,7 +19,6 @@ type
     procedure ckLixeiraClick(Sender: TObject);
     procedure btnConsultarSituacaoClick(Sender: TObject);
     procedure btnTransmitirClick(Sender: TObject);
-    procedure btnRestaurarClick(Sender: TObject);
     procedure btnNovoAcoesClick(Sender: TObject);
     procedure btnAlterarClick(Sender: TObject);
     procedure btnExcluirClick(Sender: TObject);
@@ -65,28 +64,14 @@ begin
   RegistrarAcao(btnNovoAcoes);
   RegistrarAcao(btnAlterar, True);
   RegistrarAcao(btnExcluir, True);
-  RegistrarAcao(btnRestaurar, True);
   RegistrarAcao(btnTransmitir, True);
   RegistrarAcao(btnConsultarSituacao, True);
-
-  btnRestaurar.Visible := False;
 end;
-
 
 procedure TfrmEventosDFe.ckLixeiraClick(Sender: TObject);
 begin
-  try
-    // A troca de visão vale para uma nova pesquisa; o resultado já apresentado permanece até lá.
-    btnPesquisar.Click;
-  finally
-    btnRestaurar.Enabled := ckLixeira.Checked;
-  end;
-end;
-
-procedure TfrmEventosDFe.btnRestaurarClick(Sender: TObject);
-begin
-  if PresenterConsulta <> nil then
-    TEventosDFePresenter(PresenterConsulta).SolicitarRestauracao;
+  // A troca de visão vale para uma nova pesquisa; o resultado já apresentado permanece até lá.
+  btnPesquisar.Click;
 end;
 
 function TfrmEventosDFe.EditorDisponivel(ATipo: TipoEventoDFe): Boolean;

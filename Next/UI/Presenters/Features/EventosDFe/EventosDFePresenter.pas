@@ -102,7 +102,7 @@ function TEventosDFePresenter.PodeTransmitir: Boolean;
 var
   Selecao: TEventoDFeSelecionado;
 begin
-  Result := FQueryDefinition.TryGetSelected(Selecao) and (Trim(Selecao.Id) <> '') and
+  Result := FQueryDefinition.TryGetSelected(Selecao) and
     (Selecao.Ativo = saAtivo) and StatusTransmitivel(Selecao.Status);
 end;
 
@@ -110,7 +110,7 @@ function TEventosDFePresenter.PodeConsultarSituacao: Boolean;
 var
   Selecao: TEventoDFeSelecionado;
 begin
-  Result := FQueryDefinition.TryGetSelected(Selecao) and (Trim(Selecao.Id) <> '') and
+  Result := FQueryDefinition.TryGetSelected(Selecao) and
     (Selecao.Ativo = saAtivo) and StatusConsultavel(Selecao.Status);
 end;
 
@@ -215,7 +215,7 @@ begin
   if FOperacaoEmAndamento then
     Exit;
 
-  if not FQueryDefinition.TryGetSelected(Selecao) or (Trim(Selecao.Id) = '') then
+  if not FQueryDefinition.TryGetSelected(Selecao) then
   begin
     FView.ShowError(SelecaoObrigatoriaMessage);
     Exit;
@@ -313,12 +313,6 @@ begin
     Exit;
   end;
 
-  if Trim(Selecao.Id) = '' then
-  begin
-    FView.ShowError(SelecaoObrigatoriaMessage);
-    Exit;
-  end;
-
   if Selecao.Ativo <> saAtivo then
   begin
     FView.ShowWarning('O evento já está na lixeira.');
@@ -401,12 +395,6 @@ begin
     Exit;
   end;
 
-  if Trim(Selecao.Id) = '' then
-  begin
-    FView.ShowError(SelecaoObrigatoriaMessage);
-    Exit;
-  end;
-
   if Selecao.Ativo <> saAtivo then
   begin
     FView.ShowWarning('O evento está na lixeira; use Restaurar.');
@@ -435,12 +423,6 @@ begin
   Result := False;
 
   if not FQueryDefinition.TryGetSelected(Selecao) then
-  begin
-    FView.ShowError(SelecaoObrigatoriaMessage);
-    Exit;
-  end;
-
-  if Trim(Selecao.Id) = '' then
   begin
     FView.ShowError(SelecaoObrigatoriaMessage);
     Exit;
