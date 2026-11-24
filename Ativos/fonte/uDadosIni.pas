@@ -1919,11 +1919,13 @@ var
       vMensEC: string; // Texto da Mensagem E-Commerce Consulta pelo sistema Retaguarda
       vMensFinanc: string; // Texto da Mensagem Financeiro Consulta pelo sistema Retaguarda
       vMensPagOnline: string; // Texto da Mensagem Pag Online Consulta pelo sistema Retaguarda
-      vQuantMensMob: Integer; // Variavel utilizada para armazenar a quantidade de mensagens enviadas ao sistema Retaguarda
+      vMensMensageria: string; // Texto da Mensagem Mensageria Consulta pelo sistema Retaguarda
+		vQuantMensMob: Integer; // Variavel utilizada para armazenar a quantidade de mensagens enviadas ao sistema Retaguarda
       vQuantMensEC: Integer; // Variavel utilizada para armazenar a quantidade de mensagens enviadas ao sistema Retaguarda
       vQuantMensFinanc: Integer; // Variavel utilizada para armazenar a quantidade de mensagens enviadas pelo serviço Notifações do Financeiro
       vQuantMensPagOnline: Integer; // Variavel utilizada para armazenar a quantidade de mensagens enviadas pelo serviço Pag Online
-
+      vQuantMensMensageria: Integer; // Variavel utilizada para armazenar a quantidade de mensagens enviadas pelo serviço Mensageria 
+      
       //Variaveis do Automacao
       vTipoForm: integer; //Variável para indicar se o formulario será Show(padrão) ou ShowModal(indicado para consulta ou inclusão a partir de um form já aberto)
       vTagCodNF: integer; //Variável temporária para passar para como parâmetro para o pacote de produtos o código da NF para impressão das etiquetas.
@@ -27474,17 +27476,20 @@ begin
     result := false;
 
     qrBusca.Close;
-    qrBusca.SQL.Text := ' select first :buffer mensagem_mob.idseqm, msg_plataforma.plataforma, mensagem_mob.uuid from mensagem_mob ' +
-    	' inner join msg_plataforma on ' +
-      '     msg_plataforma.id = mensagem_mob.id_msg_plataforma ' +
-      '     and msg_plataforma.cod_empresa = mensagem_mob.cod_empresa ' +
-      ' where mensagem_mob.cod_empresa = :cod_empresa ' +
-      ' and mensagem_mob.status_env <> ''PP'' ' +
+    qrBusca.SQL.Text := ' select mensagem_mob.*, ' +
+      ' m.descricao_mob, c.nome_vendedor as usuario_leu, f.nome_vendedor as usuario_envio from mensagem_mob ' +
+      ' left join mobile m on m.idmobile = mensagem_mob.idmobile and m.cod_empresa = mensagem_mob.cod_empresa ' +
+      ' left join colaborador c on c.cod_vendedor = mensagem_mob.cod_us_leu and c.cod_empresa = mensagem_mob.cod_empresa ' +
+      ' left join colaborador f on f.cod_vendedor = mensagem_mob.us_envio and f.cod_empresa = mensagem_mob.cod_empresa ' +
+      ' where mensagem_mob.data_recepcao is null ' +
+      ' and mensagem_mob.hora_recepcao is null ' +
+      ' and mensagem_mob.ativo = 1 ' +
+      ' and mensagem_mob.cod_prof_resp = :cod_prof_resp ' +
+      ' and mensagem_mob.cod_empresa = :cod_empresa ' +
       ' and mensagem_mob.data_envio >= :data_envio ' +
-      ' and mensagem_mob.id_msg_aplicativo > 0 ' +
-      ' and mensagem_mob.id_msg_plataforma > 0 ' +
-      ' and coalesce(mensagem_mob.uuid, '''') <> '''' ';
-    qrBusca.ParamByName('buffer').AsInteger := vHwCloudIA.vQtdeMensagensConsultadasPorVez;
+      ' and mensagem_mob.orig_mens = ''A'' ' +
+      ' order by mensagem_mob.idseqm desc ';
+    qrBusca.ParamByName('cod_prof_resp').AsInteger := vCodUsuario;
     qrBusca.ParamByName('cod_empresa').AsInteger := StrToInt(codEmpresa);
     qrBusca.ParamByName('data_envio').AsDateTime := Date - 30;
     qrBusca.open;
@@ -27492,24 +27497,36 @@ begin
 
     ultimasql := qrBusca.SQL.Text;
 
-    qrBusca.First;
-    while not qrBusca.Eof do
+    if not qrBusca.IsEmpty then
     begin
-    	if not ConsultarMensagemMensageria(
-      	qrBusca.FieldByName('idseqm').AsInteger,
-        qrBusca.FieldByName('plataforma').AsString,
-        qrBusca.FieldByName('uuid').AsString) then
-        	Exit;
-
-      qrBusca.Next;
+      if Length(trim(qrBusca.FieldByName('MENSAGEM').AsString)) >= 190 then
+        vMensMensageria := Copy(trim(qrBusca.FieldByName('MENSAGEM').AsString), 1, 190) + '...'
+      else
+        vMensMensageria := Copy(trim(qrBusca.FieldByName('MENSAGEM').AsString), 1, 190);
+      vMensMensageria := vMensMensageria + #13 + #13 + 'Para visualizar clique em notificações.';
+//      vMensPagOnline := vMensPagOnline + #13 + #13 + 'Para visualizar as mensagens clique duas vezes neste ícone.';
+      vQuantMensMensageria := qrBusca.RecordCount;
+      result := true;
     end;
+
+//    qrBusca.First;
+//    while not qrBusca.Eof do
+//    begin
+//    	if not ConsultarMensagemMensageria(
+//      	qrBusca.FieldByName('idseqm').AsInteger,
+//        qrBusca.FieldByName('plataforma').AsString,
+//        qrBusca.FieldByName('uuid').AsString) then
+//        	Exit;
+//
+//      qrBusca.Next;
+//    end;
 
     Result := True;
   except
     on e: exception do
     begin
       Result := False;
-      Application.MessageBox(pchar('Erro ao verificar Mensagens Mobile. Erro: ' +
+      Application.MessageBox(pchar('Erro ao verificar Mensagens Mensageria. Erro: ' +
         e.message), 'Atenção', 0 + 64);
       registraErro('function TSingleton.VerificarMensMensageria Erro: ' + e.Message);
     end;

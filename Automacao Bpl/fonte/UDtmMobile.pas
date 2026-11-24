@@ -94,6 +94,9 @@ type
     cdsMensMobilePLATAFORMA_RESP: TStringField;
     cdsMensMobileTIPO_TAREFA: TStringField;
     cdsMensMobileDATA_TAREFA: TDateTimeField;
+    cdsMensMobileSLA_SEG_TAREFA: TIntegerField;
+    cdsMensMobileDATA_AGENDAMENTO: TDateTimeField;
+    cdsMensMobileDATA_ULT_STATUS: TDateTimeField;
     procedure cdsMensMobileOBS_ENVGetText(Sender: TField; var Text: string;
       DisplayText: Boolean);
     procedure cdsMensMobileHTMLGetText(Sender: TField; var Text: string;

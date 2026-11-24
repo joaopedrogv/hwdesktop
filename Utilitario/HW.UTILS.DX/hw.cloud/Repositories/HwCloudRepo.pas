@@ -1437,11 +1437,15 @@ function THwCloudRepo.InserirMensagem(
   uuid: string): Boolean;
 var
   codigo, codmens: Integer;
+  data: TDateTime;
 begin
   try
     Result := False;
 
     var query := QueryHelper.CreateObj(QrAux);
+
+    query.Open(' select fh.current_ts from sp_current_ts(' + IntToStr(CodEmpresa) + ') fh ');
+    data := query.fdatet('current_ts');
 
     query.Open(' select cod from incrementa_codigo(' + IntToStr(CodEmpresa) + ', ''MENSAGEM_MOB'') ');
     codigo := query.fint('cod');
@@ -1458,14 +1462,16 @@ begin
     query.SQL(' insert into mensagem_mob ' +
       ' (idseqm, idmobile, cod_empresa, ' +
       ' tipo, natureza_mens, ' +
-      ' data_envio, hora_envio, assunto, html, ' +
-      ' ativo, cod_us_leu, us_envio, us_dest, orig_mens, ' +
+      ' data_envio, hora_envio, assunto, html, ativo, ' +
+      ' cod_us_leu, data_recepcao, hora_recepcao, ' +
+      ' us_envio, us_dest, orig_mens, ' +
       ' status_env, obs_env, origem, destino, uuid, ' +
       ' cod_carta, id_msg_aplicativo, id_msg_plataforma) ' +
       ' values (:idseqm, :idmobile, :cod_empresa, ' +
       ' :tipo, :natureza_mens, ' +
-      ' current_date, substring(current_time from 1 for 5), :assunto, :html, ' +
-      ' :ativo, :cod_us_leu, :us_envio, :us_dest, :orig_mens, ' +
+      ' current_date, substring(current_time from 1 for 5), :assunto, :html, :ativo, ' +
+      ' :cod_us_leu, :data_recepcao, :hora_recepcao, ' +
+      ' :us_envio, :us_dest, :orig_mens, ' +
       ' :status_env, :obs_env, :origem, :destino, :uuid, ' +
       ' :cod_carta, :id_msg_aplicativo, :id_msg_plataforma); ');
     query.ParamValue('idseqm', codigo);
@@ -1486,7 +1492,11 @@ begin
       query.ParamValue('destino', destino);
 
     query.ParamValue('uuid', uuid);
+
     query.ParamValue('cod_us_leu', codusuario);
+    query.ParamValue('data_recepcao', FormatDateTime('DD/MM/YYYY', data));
+    query.ParamValue('hora_recepcao', FormatDateTime('HH:MM', data));
+
     query.ParamValue('us_envio', codusuario);
     query.ParamValue('us_dest', Copy(trim(identificacao), 1, 60));
     query.ParamValue('cod_carta', codcarta);

@@ -1346,16 +1346,16 @@ begin
         FrmCadModVeiculos.TabSheet3.Show;
         raiseExceptionCreate('Peso liquido inválido.' + chr(13) + 'Valor deve ser maior que zero.', 'DBEDIT54');
       end;
-      if dataSet.FieldByName('VALOR_PIS').Asfloat <= 0 then
-      begin
-        FrmCadModVeiculos.TabSheet3.Show;
-        raiseExceptionCreate('Valor PIS inválido.' + chr(13) + 'Valor deve ser maior que zero.', 'DBEDIT28');
-      end;
-      if dataSet.FieldByName('VALOR_COFINS').AsFloat <= 0 then
-      begin
-        FrmCadModVeiculos.TabSheet3.Show;
-        raiseExceptionCreate('Valor COFINS inválido.' + chr(13) + 'Valor deve ser maior que zero.', 'DBEDIT29');
-      end;
+//      if dataSet.FieldByName('VALOR_PIS').Asfloat <= 0 then
+//      begin
+//        FrmCadModVeiculos.TabSheet3.Show;
+//        raiseExceptionCreate('Valor PIS inválido.' + chr(13) + 'Valor deve ser maior que zero.', 'DBEDIT28');
+//      end;
+//      if dataSet.FieldByName('VALOR_COFINS').AsFloat <= 0 then
+//      begin
+//        FrmCadModVeiculos.TabSheet3.Show;
+//        raiseExceptionCreate('Valor COFINS inválido.' + chr(13) + 'Valor deve ser maior que zero.', 'DBEDIT29');
+//      end;
       if vTabPreco.dataSet.State in [dsInsert, dsEdit] then
       begin
         FrmCadModVeiculos.TabSheet4.Show;

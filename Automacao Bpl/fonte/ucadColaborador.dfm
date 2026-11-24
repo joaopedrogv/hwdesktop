@@ -57,12 +57,12 @@ inherited frmCadcolaborador: TfrmCadcolaborador
                   ExplicitHeight = 457
                   inherited GroupBox1: TGroupBox
                     Width = 870
-                    Height = 465
+                    Height = 468
                     Caption = 'Dados do colaborador'
                     Font.Style = [fsBold]
                     ParentFont = False
                     ExplicitWidth = 870
-                    ExplicitHeight = 465
+                    ExplicitHeight = 468
                     object Label6: TLabel
                       Left = 90
                       Top = 16
@@ -369,12 +369,12 @@ inherited frmCadcolaborador: TfrmCadcolaborador
                       FocusControl = DBMemo1
                     end
                     object Label55: TLabel
-                      Left = 32
-                      Top = 445
-                      Width = 99
+                      Left = 16
+                      Top = 446
+                      Width = 115
                       Height = 13
                       Alignment = taRightJustify
-                      Caption = 'Executar Tarefas:'
+                      Caption = 'Tarefas Mensageria:'
                       FocusControl = DBMemo1
                     end
                     object DBEdit1: TDBEdit
@@ -954,7 +954,7 @@ inherited frmCadcolaborador: TfrmCadcolaborador
                     end
                     object DBComboBox2: TDBComboBox
                       Left = 137
-                      Top = 442
+                      Top = 443
                       Width = 55
                       Height = 21
                       DataField = 'EXEC_TAREFA'
@@ -1633,37 +1633,31 @@ inherited frmCadcolaborador: TfrmCadcolaborador
                       item
                         Expanded = False
                         FieldName = 'TIPO_PERFIL'
-                        Width = 64
                         Visible = True
                       end
                       item
                         Expanded = False
                         FieldName = 'ABRANG_PERFIL'
-                        Width = 64
                         Visible = True
                       end
                       item
                         Expanded = False
                         FieldName = 'EM_CIMA_PERFIL'
-                        Width = 64
                         Visible = True
                       end
                       item
                         Expanded = False
                         FieldName = 'TIPO_SERV_PROD'
-                        Width = 64
                         Visible = True
                       end
                       item
                         Expanded = False
                         FieldName = 'FLAG_SERV_PROD'
-                        Width = 64
                         Visible = True
                       end
                       item
                         Expanded = False
                         FieldName = 'CONTEUDO_FLAG'
-                        Width = 64
                         Visible = True
                       end
                       item
@@ -1674,7 +1668,6 @@ inherited frmCadcolaborador: TfrmCadcolaborador
                       item
                         Expanded = False
                         FieldName = 'DATA_CADASTRO'
-                        Width = 64
                         Visible = True
                       end
                       item
@@ -1726,13 +1719,11 @@ inherited frmCadcolaborador: TfrmCadcolaborador
                       item
                         Expanded = False
                         FieldName = 'COD_EMPRESA'
-                        Width = 64
                         Visible = True
                       end
                       item
                         Expanded = False
                         FieldName = 'DESCRICAO'
-                        Width = 64
                         Visible = True
                       end
                       item
@@ -1753,13 +1744,11 @@ inherited frmCadcolaborador: TfrmCadcolaborador
                       item
                         Expanded = False
                         FieldName = 'NATUREZA'
-                        Width = 64
                         Visible = True
                       end
                       item
                         Expanded = False
                         FieldName = 'COD_FUNCAO'
-                        Width = 64
                         Visible = True
                       end>
                   end
@@ -4960,10 +4949,10 @@ inherited frmCadcolaborador: TfrmCadcolaborador
               end
               object pnBairro: TPanel
                 Left = 1
-                Top = 25
+                Top = 53
                 Width = 656
                 Height = 28
-                TabOrder = 0
+                TabOrder = 1
                 object lbBairro: TLabel
                   Left = 154
                   Top = 7
@@ -5011,10 +5000,10 @@ inherited frmCadcolaborador: TfrmCadcolaborador
               end
               object pnCidade: TPanel
                 Left = 1
-                Top = 54
+                Top = 82
                 Width = 656
                 Height = 28
-                TabOrder = 1
+                TabOrder = 2
                 object lbCidade: TLabel
                   Left = 149
                   Top = 7
@@ -5062,10 +5051,10 @@ inherited frmCadcolaborador: TfrmCadcolaborador
               end
               object pnFuncao: TPanel
                 Left = 1
-                Top = 110
+                Top = 138
                 Width = 656
                 Height = 28
-                TabOrder = 3
+                TabOrder = 4
                 object lbFuncao: TLabel
                   Left = 147
                   Top = 8
@@ -5101,10 +5090,10 @@ inherited frmCadcolaborador: TfrmCadcolaborador
               end
               object pnGerente: TPanel
                 Left = 1
-                Top = 138
+                Top = 166
                 Width = 656
                 Height = 28
-                TabOrder = 4
+                TabOrder = 5
                 object lbGerente: TLabel
                   Left = 143
                   Top = 6
@@ -5152,10 +5141,10 @@ inherited frmCadcolaborador: TfrmCadcolaborador
               end
               object pnVendedorTelevendas: TPanel
                 Left = 1
-                Top = 167
+                Top = 195
                 Width = 280
                 Height = 28
-                TabOrder = 5
+                TabOrder = 6
                 object lbVendedorTelevendas: TLabel
                   Left = 78
                   Top = 7
@@ -5190,10 +5179,10 @@ inherited frmCadcolaborador: TfrmCadcolaborador
               end
               object pnJornadaTrabalho: TPanel
                 Left = 1
-                Top = 196
+                Top = 224
                 Width = 656
                 Height = 28
-                TabOrder = 6
+                TabOrder = 7
                 object lbJornadaTrabalho: TLabel
                   Left = 83
                   Top = 6
@@ -5247,10 +5236,10 @@ inherited frmCadcolaborador: TfrmCadcolaborador
               end
               object pnEscalaSemanal: TPanel
                 Left = 1
-                Top = 225
+                Top = 253
                 Width = 656
                 Height = 28
-                TabOrder = 7
+                TabOrder = 8
                 object lbEscalaSemanal: TLabel
                   Left = 109
                   Top = 6
@@ -5304,17 +5293,17 @@ inherited frmCadcolaborador: TfrmCadcolaborador
               end
               object pnExecutarTarefas: TPanel
                 Left = 1
-                Top = 254
+                Top = 282
                 Width = 280
                 Height = 28
-                TabOrder = 8
+                TabOrder = 9
                 object lbExecutarTarefas: TLabel
-                  Left = 99
+                  Left = 87
                   Top = 7
-                  Width = 83
+                  Width = 95
                   Height = 13
                   Alignment = taRightJustify
-                  Caption = 'Executar Tarefas'
+                  Caption = 'Tarefas Mensageria'
                 end
                 object ckExecutarTarefas: TCheckBox
                   Left = 21
@@ -5342,10 +5331,10 @@ inherited frmCadcolaborador: TfrmCadcolaborador
               end
               object pnEstado: TPanel
                 Left = 1
-                Top = 82
+                Top = 110
                 Width = 656
                 Height = 28
-                TabOrder = 2
+                TabOrder = 3
                 object lbEstado: TLabel
                   Left = 149
                   Top = 7
@@ -5376,6 +5365,44 @@ inherited frmCadcolaborador: TfrmCadcolaborador
                   KeyField = 'CODIGO_UF'
                   ListField = 'SIGLA_UF'
                   ListSource = dtmColaborador.dsUF
+                  TabOrder = 1
+                end
+              end
+              object pnCep: TPanel
+                Left = 1
+                Top = 25
+                Width = 656
+                Height = 28
+                TabOrder = 0
+                object lbCep: TLabel
+                  Left = 163
+                  Top = 7
+                  Width = 19
+                  Height = 13
+                  Alignment = taRightJustify
+                  Caption = 'Cep'
+                  Font.Charset = DEFAULT_CHARSET
+                  Font.Color = clWindowText
+                  Font.Height = -11
+                  Font.Name = 'Tahoma'
+                  Font.Style = []
+                  ParentFont = False
+                end
+                object ckCep: TCheckBox
+                  Left = 21
+                  Top = 6
+                  Width = 43
+                  Height = 17
+                  TabOrder = 0
+                  OnClick = ckCepClick
+                end
+                object mkCep: TMaskEdit
+                  Left = 188
+                  Top = 4
+                  Width = 80
+                  Height = 21
+                  EditMask = '00000\-999;0;'
+                  MaxLength = 9
                   TabOrder = 1
                 end
               end

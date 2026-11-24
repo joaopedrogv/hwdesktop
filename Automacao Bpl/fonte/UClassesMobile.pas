@@ -763,6 +763,12 @@ begin
       dataSet.FieldByName('data_recepcao').AsDateTime);
     dataSet.FieldByName('data_recepcao').AsString := FormatDateTime('DD/MM/YYYY',
       dataSet.FieldByName('data_recepcao').AsDateTime);
+    if dataSet.FieldByName('id_msg_aplicativo').IsNull then
+    	dataSet.FieldByName('id_msg_aplicativo').AsInteger := 0;
+    if dataSet.FieldByName('id_msg_plataforma').IsNull then
+    	dataSet.FieldByName('id_msg_plataforma').AsInteger := 0;
+    if dataSet.FieldByName('cod_carta').IsNull then
+    	dataSet.FieldByName('cod_carta').AsInteger := 0;
     vMobile._abreTodosMobile;
     vUsuario._abreTodosUsuarios;
     vSenhas._abreTodosSenhas;
@@ -783,6 +789,7 @@ begin
       ' f.nome_vendedor as usuario_envio, ' +
       ' a.aplicativo, ' +
       ' p.plataforma, ' +
+      ' tp.sla_seg_tarefa, ' +
       ' r.nome_vendedor as prof_resp, ' +
       ' ar.aplicativo as aplicativo_resp, ' +
       ' pr.plataforma as plataforma_resp ' +
@@ -795,6 +802,7 @@ begin
       ' left join msg_plataforma p on p.id = mb.id_msg_plataforma and p.cod_empresa = mb.cod_empresa ' +
       ' left join msg_aplicativo ar on ar.id = mb.id_msg_aplicativo_resp ' +
       ' left join msg_plataforma pr on pr.id = mb.id_msg_plataforma_resp and pr.cod_empresa = mb.cod_empresa ' +
+      ' left join msg_tipo_tarefa tp on tp.id = mb.id_msg_tipo_tarefa ' +
       ' where mb.idseqm = 0 and mb.cod_empresa = 0 and m.ativo = 0 and c.ativo = 0');
 
   if inherited insert then
@@ -811,6 +819,9 @@ begin
     dataSet.FieldByName('data_envio').AsString := FormatDateTime('DD/MM/YYYY',
       dataSet.FieldByName('data_envio').AsDateTime);
     dataSet.FieldByName('ativo').AsFloat := 1;
+    dataSet.FieldByName('id_msg_aplicativo').AsInteger := 0;
+    dataSet.FieldByName('id_msg_plataforma').AsInteger := 0;
+    dataSet.FieldByName('cod_carta').AsInteger := 0;
     vMobile._abreTodosMobile;
     vUsuario._abreTodosUsuarios;
     vSenhas._abreTodosSenhas;
@@ -1078,6 +1089,7 @@ begin
        ' f.nome_vendedor as usuario_envio, ' +
        ' a.aplicativo, ' +
        ' p.plataforma, ' +
+       ' tp.sla_seg_tarefa, ' +
        ' r.nome_vendedor as prof_resp, ' +
        ' ar.aplicativo as aplicativo_resp, ' +
        ' pr.plataforma as plataforma_resp ' +
@@ -1090,6 +1102,7 @@ begin
        ' left join msg_plataforma p on p.id = mb.id_msg_plataforma and p.cod_empresa = mb.cod_empresa ' +
        ' left join msg_aplicativo ar on ar.id = mb.id_msg_aplicativo_resp ' +
        ' left join msg_plataforma pr on pr.id = mb.id_msg_plataforma_resp and pr.cod_empresa = mb.cod_empresa ' +
+       ' left join msg_tipo_tarefa tp on tp.id = mb.id_msg_tipo_tarefa ' +
        ' where mb.ativo = 0 and mb.cod_empresa = ' + vDadosIni.codEmpresa);
 end;
 
@@ -1302,6 +1315,8 @@ begin
   	vSqlTemp := 'a.aplicativo '
   else if trim(vMensMob.vCampo) = 'Plataforma' then
   	vSqlTemp := 'p.plataforma '
+  else if trim(vMensMob.vCampo) = 'Sla Segundos Tarefa' then
+   vSqlTemp := 'tp.sla_seg_tarefa '
   else if trim(vMensMob.vCampo) = 'Prof Resp' then
     vSqlTemp := 'r.nome_vendedor'
   else if trim(vMensMob.vCampo) = 'Aplicativo Resp' then
@@ -1498,6 +1513,8 @@ begin
           	vMensMob.vCampoAd := 'a.aplicativo '
           else if trim(vMensMob.vCampoAd) = 'Plataforma' then
           	vMensMob.vCampoAd := 'p.plataforma '
+          else if trim(vMensMob.vCampoAd) = 'Sla Segundos Tarefa' then
+            vMensMob.vCampoAd := 'tp.sla_seg_tarefa '
           else if trim(vMensMob.vCampoAd) = 'Prof Resp' then
             vMensMob.vCampoAd := 'r.nome_vendedor '
           else if trim(vMensMob.vCampoAd) = 'Aplicativo Resp' then
@@ -1566,6 +1583,7 @@ begin
       ' f.nome_vendedor as usuario_envio, ' +
       ' a.aplicativo, ' +
       ' p.plataforma, ' +
+      ' tp.sla_seg_tarefa, ' +
       ' r.nome_vendedor as prof_resp, ' +
       ' ar.aplicativo as aplicativo_resp, ' +
       ' pr.plataforma as plataforma_resp ',
@@ -1576,7 +1594,8 @@ begin
       ' left join msg_aplicativo a on a.id = mensagem_mob.id_msg_aplicativo ' +
       ' left join msg_plataforma p on p.id = mensagem_mob.id_msg_plataforma and p.cod_empresa = mensagem_mob.cod_empresa ' +
       ' left join msg_aplicativo ar on ar.id = mensagem_mob.id_msg_aplicativo_resp ' +
-      ' left join msg_plataforma pr on pr.id = mensagem_mob.id_msg_plataforma_resp and pr.cod_empresa = mensagem_mob.cod_empresa ',
+      ' left join msg_plataforma pr on pr.id = mensagem_mob.id_msg_plataforma_resp and pr.cod_empresa = mensagem_mob.cod_empresa ' +
+      ' left join msg_tipo_tarefa tp on tp.id = mensagem_mob.id_msg_tipo_tarefa ',
       vSqlTemp);
   end
   else
@@ -1587,6 +1606,7 @@ begin
       ' f.nome_vendedor as usuario_envio, ' +
       ' a.aplicativo, ' +
       ' p.plataforma, ' +
+      ' tp.sla_seg_tarefa, ' +
       ' r.nome_vendedor as prof_resp, ' +
       ' ar.aplicativo as aplicativo_resp, ' +
       ' pr.plataforma as plataforma_resp ',
@@ -1597,7 +1617,8 @@ begin
       ' left join msg_aplicativo a on a.id = mensagem_mob.id_msg_aplicativo ' +
       ' left join msg_plataforma p on p.id = mensagem_mob.id_msg_plataforma and p.cod_empresa = mensagem_mob.cod_empresa ' +
       ' left join msg_aplicativo ar on ar.id = mensagem_mob.id_msg_aplicativo_resp ' +
-      ' left join msg_plataforma pr on pr.id = mensagem_mob.id_msg_plataforma_resp and pr.cod_empresa = mensagem_mob.cod_empresa ',
+      ' left join msg_plataforma pr on pr.id = mensagem_mob.id_msg_plataforma_resp and pr.cod_empresa = mensagem_mob.cod_empresa ' +
+      ' left join msg_tipo_tarefa tp on tp.id = mensagem_mob.id_msg_tipo_tarefa ',
       vSqlTemp);
 end;
 

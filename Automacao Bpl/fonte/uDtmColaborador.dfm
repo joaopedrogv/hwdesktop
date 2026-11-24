@@ -350,7 +350,7 @@ object dtmColaborador: TdtmColaborador
       FieldName = 'COD_ESCALA_SEMANAL'
     end
     object cdsColabEXEC_TAREFA: TStringField
-      DisplayLabel = 'Executar Tarefas'
+      DisplayLabel = 'Tarefas Mensageria'
       FieldName = 'EXEC_TAREFA'
       Size = 1
     end

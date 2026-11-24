@@ -271,6 +271,11 @@ type
     lbEstado: TLabel;
     ckEstado: TCheckBox;
     DBLEstado: TDBLookupComboBox;
+    pnCep: TPanel;
+    lbCep: TLabel;
+    ckCep: TCheckBox;
+    mkCep: TMaskEdit;
+    procedure ckCepClick(Sender: TObject);
     procedure SpeedButton68Click(Sender: TObject);
     procedure btSincronizarColaboradorClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -653,6 +658,7 @@ begin
     frmCadColaborador.Enabled := false;
     DBGrid1.Visible := false;
 
+    obColaborador.vAtualizarCol.vHabCep := ckCep.Checked;
     obColaborador.vAtualizarCol.vHabBairro := ckBairro.Checked;
     obColaborador.vAtualizarCol.vHabCidade := ckCidade.Checked;
     obColaborador.vAtualizarCol.vHabEstado := ckEstado.Checked;
@@ -663,6 +669,7 @@ begin
     obColaborador.vAtualizarCol.vHabEscalaSemanal := ckEscalaSemanal.Checked;
     obColaborador.vAtualizarCol.vHabExecutarTarefas := ckExecutarTarefas.Checked;
 
+    obColaborador.vAtualizarCol.vCep := Trim(mkCep.Text);
     obColaborador.vAtualizarCol.vCodBairro := Trunc(EdCodBairro.AsValue);
     obColaborador.vAtualizarCol.vCodCidade := Trunc(EdCodCidade.AsValue);
     obColaborador.vAtualizarCol.vCodEstado := vDadosIni.IfThen(DBLEstado.KeyValue = Null, 0, DBLEstado.KeyValue);
@@ -679,6 +686,7 @@ begin
       exit;
     end;
   finally
+    _GravaConfiguracoesString(mkCep.Name, mkCep.Text);
     _GravaConfiguracoesDouble(EdCodBairro.Name, EdCodBairro.AsValue);
     _GravaConfiguracoesDouble(EdCodCidade.Name, EdCodCidade.AsValue);
     _GravaConfiguracoesInteger(DBLEstado.Name, vDadosIni.IfThen(DBLEstado.KeyValue = Null, 0, DBLEstado.KeyValue));
@@ -689,6 +697,7 @@ begin
     _GravaConfiguracoesDouble(EdCodEscalaSemanal.Name, EdCodJornadaTrabalho.AsValue);
     _GravaConfiguracoesInteger(CbExecutarTarefas.Name, CbExecutarTarefas.ItemIndex);
 
+    _GravaConfiguracoesBoolean(ckCep.Name, ckCep.Checked);
     _GravaConfiguracoesBoolean(ckBairro.Name, ckBairro.Checked);
     _GravaConfiguracoesBoolean(ckCidade.Name, ckCidade.Checked);
     _GravaConfiguracoesBoolean(ckEstado.Name, ckEstado.Checked);
@@ -982,6 +991,25 @@ begin
 
   if (Self.Enabled) and (Self.Visible) and (EdCodBairro.CanFocus) then
   	EdCodBairro.SetFocus;
+end;
+
+procedure TfrmCadcolaborador.ckCepClick(Sender: TObject);
+begin
+  inherited;
+  mkCep.Enabled := ckCep.Checked;
+  if ckCep.Checked then
+  begin
+  	 pnCep.ParentBackground := False;
+	 pnCep.Color := clYellow;
+  end
+  else
+  begin
+  	 pnCep.ParentBackground := True;
+  	 pnCep.Color := clBtnFace;
+  end;
+
+  if (Self.Enabled) and (Self.Visible) and (mkCep.CanFocus) then
+  	mkCep.SetFocus;
 end;
 
 procedure TfrmCadcolaborador.ckCidadeClick(Sender: TObject);
@@ -2587,6 +2615,7 @@ begin
   pnEscalaSemanal.Visible := vDadosIni.vHwCloudIA.vUsarServMensageria = 'S';
   pnExecutarTarefas.Visible := vDadosIni.vHwCloudIA.vUsarServMensageria = 'S';
 
+  mkCep.Text := _LerConfiguracoesRegistroString(mkCep.Name);
   EdCodBairro.AsValue := _LerConfiguracoesRegistroDouble(EdCodBairro.Name);
   EdCodCidade.AsValue := _LerConfiguracoesRegistroDouble(EdCodCidade.Name);
   DBLEstado.KeyValue := _LerConfiguracoesRegistroInteger(DBLEstado.Name);
@@ -2596,6 +2625,12 @@ begin
   EdCodJornadaTrabalho.AsValue  := _LerConfiguracoesRegistroDouble(EdCodJornadaTrabalho.Name);
   EdCodEscalaSemanal.AsValue  := _LerConfiguracoesRegistroDouble(EdCodEscalaSemanal.Name);
   CbExecutarTarefas.ItemIndex := _LerConfiguracoesRegistroInteger(CbExecutarTarefas.Name);
+
+  if ckPermOpcaoMarcadas.Checked then
+	ckCep.Checked := _LerConfiguracoesRegistroBoolean(ckCep.Name)
+  else
+   ckCep.Checked := false;
+  ckCepClick(Sender);
 
   if ckPermOpcaoMarcadas.Checked then
 	ckBairro.Checked := _LerConfiguracoesRegistroBoolean(ckBairro.Name)

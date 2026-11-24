@@ -327,13 +327,11 @@ object dtmMobile: TdtmMobile
       Tag = 1
       DisplayLabel = 'Id Aplicativo'
       FieldName = 'ID_MSG_APLICATIVO'
-      Required = True
     end
     object cdsMensMobileID_MSG_PLATAFORMA: TIntegerField
       Tag = 1
       DisplayLabel = 'Id Plataforma'
       FieldName = 'ID_MSG_PLATAFORMA'
-      Required = True
     end
     object cdsMensMobileCOD_CARTA: TIntegerField
       DisplayLabel = 'Cod Carta'
@@ -362,10 +360,22 @@ object dtmMobile: TdtmMobile
       DisplayLabel = 'Data Tarefa'
       FieldName = 'DATA_TAREFA'
     end
+    object cdsMensMobileDATA_AGENDAMENTO: TDateTimeField
+      DisplayLabel = 'Data Agendamento'
+      FieldName = 'DATA_AGENDAMENTO'
+    end
+    object cdsMensMobileDATA_ULT_STATUS: TDateTimeField
+      DisplayLabel = 'Data Ultimo Status'
+      FieldName = 'DATA_ULT_STATUS'
+    end
     object cdsMensMobileEXEC_AUTO: TStringField
       DisplayLabel = 'Exec Auto'
       FieldName = 'EXEC_AUTO'
       Size = 1
+    end
+    object cdsMensMobileSLA_SEG_TAREFA: TIntegerField
+      DisplayLabel = 'Sla Segundos Tarefa'
+      FieldName = 'SLA_SEG_TAREFA'
     end
     object cdsMensMobileCOD_PROF_RESP: TIntegerField
       Tag = 1

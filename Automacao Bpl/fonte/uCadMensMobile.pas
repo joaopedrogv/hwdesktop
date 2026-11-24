@@ -533,6 +533,7 @@ procedure TfrmCadMensMob.DBGrid1DrawColumnCell(Sender: TObject;
 var
   Check: Integer;
   R: TRect;
+  vDataTarefa: TDateTime;
 begin
   if TDBGrid(sender).DataSource.dataSet.FieldByName('SEL').AsString = 'S' then
     if (gdFocused in State) then
@@ -547,41 +548,45 @@ begin
     end;
   TDBGrid(sender).DefaultDrawColumnCell(rect, DataCol, Column, State);
 
-//  if (trim(CadMensMobile.dataSet.FieldByName('ORIG_MENS').AsString) = 'A') then
-//  begin
-//    if ((trim(CadMensMobile.dataset.FieldByName('STATUS_ENV').AsString) = 'NO')
-//    		or (trim(CadMensMobile.dataset.FieldByName('STATUS_ENV').AsString) = 'EP'))
-//      and (CadMensMobile.dataset.FieldByName('COD_TAREFA').AsInteger > 0)
-//      and (not CadMensMobile.dataset.FieldByName('DATA_TAREFA').IsNull) then
-//    begin
-//      if (vDataHoraBanco > IncSecond(CadMensMobile.dataset.FieldByName('DATA_TAREFA').AsDateTime, vDadosIni.vHwCloudIA.vQtdeSegundosTarefaAtrasada)) then
-//      begin
-//        if (gdFocused in State) then
-//        begin
-//          TDBGrid(sender).canvas.brush.color := clWindow;
-//          TDBGrid(sender).canvas.Font.color := clWindowText;
-//        end
-//        else
-//        begin
-//          TDBGrid(sender).canvas.brush.color := pnTarefaAtrasada.Color;
-//          TDBGrid(sender).canvas.Font.color := clWindowText;
-//        end;
-//      end
-//      else if (gdFocused in State) then
-//      begin
-//        TDBGrid(sender).canvas.brush.color := clWindow;
-//        TDBGrid(sender).canvas.Font.color := clWindowText;
-//      end
-//      else
-//      begin
-//        TDBGrid(sender).canvas.brush.color := pnMensagemNaoLidas.Color;
-//        TDBGrid(sender).canvas.Font.color := clWindowText;
-//      end;
-//    end;
-//    TDBGrid(sender).DefaultDrawColumnCell(rect, DataCol, Column, State);
-//  end
-//  else
-  if (CadMensMobile.dataSet.FieldByName('IDSEQM').AsInteger > 0) then
+  if (trim(CadMensMobile.dataSet.FieldByName('ORIG_MENS').AsString) = 'A')
+  	 and ((trim(CadMensMobile.dataset.FieldByName('STATUS_ENV').AsString) = 'NO') or (trim(CadMensMobile.dataset.FieldByName('STATUS_ENV').AsString) = 'EP'))
+    and (CadMensMobile.dataset.FieldByName('COD_TAREFA').AsInteger > 0) then
+  begin
+    if not CadMensMobile.dataset.FieldByName('DATA_AGENDAMENTO').IsNull then
+      vDataTarefa := CadMensMobile.dataset.FieldByName('DATA_AGENDAMENTO').AsDateTime
+    else if not CadMensMobile.dataset.FieldByName('DATA_ULT_STATUS').IsNull then
+      vDataTarefa := CadMensMobile.dataset.FieldByName('DATA_ULT_STATUS').AsDateTime
+    else if not CadMensMobile.dataset.FieldByName('DATA_TAREFA').IsNull then
+      vDataTarefa := CadMensMobile.dataset.FieldByName('DATA_TAREFA').AsDateTime
+    else
+      vDataTarefa := vDataHoraBanco;
+
+    if (vDataHoraBanco > IncSecond(vDataTarefa, CadMensMobile.dataset.FieldByName('SLA_SEG_TAREFA').AsInteger)) then
+    begin
+      if (gdFocused in State) then
+      begin
+        TDBGrid(sender).canvas.brush.color := clWindow;
+        TDBGrid(sender).canvas.Font.color := clWindowText;
+      end
+      else
+      begin
+        TDBGrid(sender).canvas.brush.color := pnTarefaAtrasada.Color;
+        TDBGrid(sender).canvas.Font.color := clWindowText;
+      end;
+    end
+    else if (gdFocused in State) then
+    begin
+      TDBGrid(sender).canvas.brush.color := clWindow;
+      TDBGrid(sender).canvas.Font.color := clWindowText;
+    end
+    else
+    begin
+      TDBGrid(sender).canvas.brush.color := pnMensagemNaoLidas.Color;
+      TDBGrid(sender).canvas.Font.color := clWindowText;
+    end;
+    TDBGrid(sender).DefaultDrawColumnCell(rect, DataCol, Column, State);
+  end
+  else if (CadMensMobile.dataSet.FieldByName('IDSEQM').AsInteger > 0) then
   begin
     if ((CadMensMobile.dataSet.FieldByName('DATA_RECEPCAO').IsNull)
     	and (CadMensMobile.dataSet.FieldByName('HORA_RECEPCAO').IsNull)) then
@@ -1093,6 +1098,7 @@ end;
 procedure TfrmCadMensMob.SpeedButton1Click(Sender: TObject);
 var
 	vAssunto, vHtml: string;
+   vDataTarefa: TDateTime;
 begin
   try
     if CadMensMobile.dataSet.IsEmpty then
@@ -1103,15 +1109,26 @@ begin
       vDataHoraBanco := vDadosIni.getDataBanco(CadMensMobile.buscas);
       
       vHtml := CadMensMobile.dataset.FieldByName('HTML').AsString;
-//      vHtml := vDadosIni._converterTagsImage(vHtml, CadMensMobile.buscas, true);
       vAssunto := CadMensMobile.dataset.FieldByName('ASSUNTO').AsString + ' - ' +
          'Status: ' + vDadosIni.IfThen((trim(CadMensMobile.dataset.FieldByName('STATUS_ENV').AsString) = 'NO') or (trim(CadMensMobile.dataset.FieldByName('STATUS_ENV').AsString) = 'EP'),
-         	'Aberta', 'Fechada'); //+
-//         vDadosIni.IfThen((trim(CadMensMobile.dataset.FieldByName('STATUS_ENV').AsString) = 'NO') or (trim(CadMensMobile.dataset.FieldByName('STATUS_ENV').AsString) = 'EP'),
-//            vDadosIni.IfThen((CadMensMobile.dataset.FieldByName('COD_TAREFA').AsInteger > 0) and (not CadMensMobile.dataset.FieldByName('DATA_TAREFA').IsNull),
-//               ' - Prazo: ' + vDadosIni.IfThen(IncSecond(CadMensMobile.dataset.FieldByName('DATA_TAREFA').AsDateTime, vDadosIni.vHwCloudIA.vQtdeSegundosTarefaAtrasada) > vDataHoraBanco,
-//                  'No Prazo', 'Atrasada'), ''), '');
-//      vAssunto := vDadosIni._converterTagsImage(vAssunto, CadMensMobile.buscas, true);
+         	'Aberta', 'Fechada');
+
+      if ((trim(CadMensMobile.dataset.FieldByName('STATUS_ENV').AsString) = 'NO') or (trim(CadMensMobile.dataset.FieldByName('STATUS_ENV').AsString) = 'EP')) 
+        and (CadMensMobile.dataset.FieldByName('COD_TAREFA').AsInteger > 0) then
+      begin
+        if not CadMensMobile.dataset.FieldByName('DATA_AGENDAMENTO').IsNull then
+          vDataTarefa := CadMensMobile.dataset.FieldByName('DATA_AGENDAMENTO').AsDateTime
+        else if not CadMensMobile.dataset.FieldByName('DATA_ULT_STATUS').IsNull then
+          vDataTarefa := CadMensMobile.dataset.FieldByName('DATA_ULT_STATUS').AsDateTime
+        else if not CadMensMobile.dataset.FieldByName('DATA_TAREFA').IsNull then
+          vDataTarefa := CadMensMobile.dataset.FieldByName('DATA_TAREFA').AsDateTime
+        else
+          vDataTarefa := vDataHoraBanco;
+
+        vAssunto := vAssunto +
+           ' - Prazo: ' + vDadosIni.IfThen(IncSecond(vDataTarefa, CadMensMobile.dataset.FieldByName('SLA_SEG_TAREFA').AsInteger) > vDataHoraBanco, 'No Prazo', 'Atrasada');
+      end;
+
       if (CadMensMobile.dataset.FieldByName('APLICATIVO').AsString = 'WHATSAPP') or (CadMensMobile.dataset.FieldByName('APLICATIVO').AsString = 'TELEGRAM') then
          vHtml := _markdownToHtml(vHtml);
       vDadosIni.abreFormVisualizarHtml(vHtml, vAssunto);

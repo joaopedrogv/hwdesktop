@@ -7,6 +7,7 @@ uses
 
 type
   RAtualizarCol = record
+    vHabCep: boolean;
     vHabBairro: boolean;
     vHabCidade: boolean;
     vHabEstado: boolean;
@@ -17,6 +18,7 @@ type
     vHabEscalaSemanal: boolean;
     vHabExecutarTarefas: boolean;
 
+    vCep: string;
     vCodBairro: Integer; vNomeBairro: string;
     vCodCidade: Integer; vNomeCidade: string;
     vCodEstado: Integer;
@@ -2287,7 +2289,8 @@ begin
 
         with vAtualizarCol do
         begin
-          if (not vHabBairro)
+          if (not vHabCep)
+            and (not vHabBairro)
           	and (not vHabCidade)
             and (not vHabEstado)
             and (not vHabFuncao)
@@ -2347,6 +2350,12 @@ begin
 
       with vAtualizarCol do
       begin
+        if vHabCep then
+        begin
+          if (trim(vCep) = '') or (vCep = '     -   ') then
+            raiseExceptionCreate('Cep deve ser informado', 'mkCep');
+        end;
+
         if vHabBairro then
         begin
           if vCodBairro <= 0 then
@@ -2455,6 +2464,9 @@ begin
              oldCodCol := IntToStr(fTempListaCol.FieldByName('COD_VENDEDOR').AsInteger);
 
              AddCampoValue('DATA_MOD_COL', DateOf(vDadosIni.vDataHora));
+
+             if vHabCep then
+               AddCampoValue('CEP_VENDEDOR', vCep);
 
              if vHabBairro then
              begin

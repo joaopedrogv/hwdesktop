@@ -2718,17 +2718,17 @@ begin
           raiseExceptionCreate('Peso liquido inválido.' + chr(13) + 'Valor deve ser maior que zero.', 'DBEDIT42');
         end;
 
-      if dataSet.FieldByName('VALOR_PIS').Asfloat <= 0 then
-      begin
-        FrmCadModVeiculosCCIA.TabSheet4.Show;
-        raiseExceptionCreate('Valor PIS inválido.' + chr(13) + 'Valor deve ser maior que zero.', 'DBEDIT45');
-      end;
-
-      if dataSet.FieldByName('VALOR_COFINS').AsFloat <= 0 then
-      begin
-        FrmCadModVeiculosCCIA.TabSheet4.Show;
-        raiseExceptionCreate('Valor COFINS inválido.' + chr(13) + 'Valor deve ser maior que zero.', 'DBEDIT46');
-      end;
+//      if dataSet.FieldByName('VALOR_PIS').Asfloat <= 0 then
+//      begin
+//        FrmCadModVeiculosCCIA.TabSheet4.Show;
+//        raiseExceptionCreate('Valor PIS inválido.' + chr(13) + 'Valor deve ser maior que zero.', 'DBEDIT45');
+//      end;
+//
+//      if dataSet.FieldByName('VALOR_COFINS').AsFloat <= 0 then
+//      begin
+//        FrmCadModVeiculosCCIA.TabSheet4.Show;
+//        raiseExceptionCreate('Valor COFINS inválido.' + chr(13) + 'Valor deve ser maior que zero.', 'DBEDIT46');
+//      end;
 
       if (dataSet.FieldByName('PERC_RED').AsFloat > 0) and (trim(dataSet.FieldByName('RED_LUCRO').AsString) = '') then
       begin
