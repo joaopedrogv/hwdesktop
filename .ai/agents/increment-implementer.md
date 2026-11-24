@@ -39,7 +39,7 @@ optional; report concrete difficulty rather than silently widening the assignmen
 4. Preserve architecture, compatibility, ownership, transaction, and security
    boundaries. Apply .ai/rules/implementation-quality.md to state, helpers,
    comments and messages, inspecting inherited declarations for overrides.
-   Verify source encoding under .ai/rules/repository-safety.md.
+   Follow .ai/rules/repository-safety.md for source encoding.
 5. Perform authorized validation and otherwise record it as pending.
 6. Return changed files, decisions, evidence, and blockers to the Workflow
    Orchestrator under the common result contract.

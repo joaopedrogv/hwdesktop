@@ -230,8 +230,7 @@ to `increment-implementer` and then assigns its completed scope to an independen
 4. create or update the planned tests for that same increment;
 5. end the writing assignment and return its structured result;
 6. review the increment independently against applicable Rules and Context,
-   including new state lifetime, durable comments, user-facing communication and
-   byte-level encoding evidence for created or modified Delphi 2006 sources;
+   including new state lifetime, durable comments and user-facing communication;
 7. record completed behavior, review findings, validation evidence, and remaining
    work.
 

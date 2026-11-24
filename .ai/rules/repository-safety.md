@@ -42,26 +42,16 @@ always_apply: true
 
 ## Source Encoding Verification
 
-- Establish the expected encoding and line endings before editing or creating a
-  source file, using the target area's compiler, explicit configuration and actual
-  neighboring files. Apply the area's compatibility Rules where present.
-- Configure the writer explicitly. Use strict encoding that reports characters
-  which cannot be represented. Preserve unrelated bytes and existing file format.
-- For new or revised literals in Delphi 2006 and Rio `.pas` files, write
-  accented messages and labels as readable string literals, such as
-  `'Autorização'`, using the file's encoding.
-  Reserve numeric escapes such as `#231` for technical needs. In textual `.dfm`
-  files, preserve the Delphi designer's serialized form, including numeric
-  escapes. Check the readability of changed literals alongside the byte-level
-  verification.
-- Before handing off created or modified Delphi 2006 sources, verify their bytes
-  against the intended single-byte encoding, including accented literals,
-  messages, captions and metadata. Include affected PAS, DFM, DPR, DPK and INC files.
-- Record the expected encoding and the byte-level check in validation evidence.
-  ASCII-only content does not establish a code page, and successful UTF-8 decoding
-  or correct display in an editor does not establish Delphi 2006 compatibility.
-- When application validation is authorized, also inspect affected rendered text.
-  Limit encoding checks and corrections to the assigned changes.
+- Use ISO-8859-1 (Latin-1), without a BOM, as the default encoding for `.pas`,
+  `.dpr`, `.dpk`, `.dfm` and `.inc` files in both Delphi 2006 and Delphi Rio.
+- Read and write explicitly in the file's encoding from the first edit, preserving
+  existing line endings and format.
+- In `.pas` files, write accented messages and labels as readable literals, such
+  as `'Autorização'`; reserve numeric escapes such as `#231` for technical needs.
+  In textual `.dfm` files, preserve the Delphi designer's serialized form.
+- Review changed text as part of normal diff review. Investigate encoding
+  separately only when corruption, incompatibility or a concrete doubt appears;
+  routine changes do not require byte-level evidence or encoding reports.
 
 ## Run Context and Repository Searches
 

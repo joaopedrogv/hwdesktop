@@ -34,7 +34,7 @@ Follow `execution-profiles.md`.
    repository-safety.md's reference-quality criteria to the changed scope.
 4. Apply .ai/rules/implementation-quality.md to state, helpers, comments and messages.
    Inspect inherited contracts and reference code when assessing changed comments.
-   Verify byte-level encoding evidence under .ai/rules/repository-safety.md.
+   Follow .ai/rules/repository-safety.md for source encoding.
    Identify missing validation and use the applicable standing or explicit authority
    when requesting runtime evidence.
 5. Report actionable findings ordered by severity and supported by file evidence.
