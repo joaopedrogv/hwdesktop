@@ -33365,6 +33365,8 @@ end;
 { RHwCloudIA }
 
 procedure RHwCloudIA.Config(conf: TConfig_sistema_class);
+var
+  valor: Integer;
 begin
   try
     Self.vUsarServMensageria := trim(conf.ReadString('Configuracao', 'UsarServicoMensageria'));
@@ -33388,14 +33390,10 @@ begin
     Self.vUsarVendaOnline := 'N';;
   end;
 
-  try
-  	Self.vCodTipoContatoPadrao := StrToInt(conf.ReadString('Configuracao', 'CodTipoContatoPadrao'));
-
-    if (Self.vCodTipoContatoPadrao < 0) then
-    	Self.vCodTipoContatoPadrao := 0;
-  except
-  	Self.vCodTipoContatoPadrao := 0;
-  end;
+  if TryStrToInt(conf.ReadString('Configuracao', 'CodTipoContatoPadrao'), valor) then
+    Self.vCodTipoContatoPadrao := Min(valor, 0)
+  else
+    Self.vCodTipoContatoPadrao := 0;
 
   try
   	vSomenteContatosAceitos := trim(conf.ReadString('Configuracao', 'SomenteContatosAceitos'));
@@ -33408,32 +33406,29 @@ begin
   	vSomenteContatosAceitos := 'N';
   end;
 
-  try
-  	Self.vTimerConsultaMensagem := StrToInt(conf.ReadString('Configuracao', 'TimerConsultaMensagem'));
-
-  	if (Self.vTimerConsultaMensagem <= 0) then
-    	Self.vTimerConsultaMensagem := 15;
-  except
+  if TryStrToInt(conf.ReadString('Configuracao', 'TimerConsultaMensagem'), valor) then
+    Self.vTimerConsultaMensagem := valor
+  else
     Self.vTimerConsultaMensagem := 15;
-  end;
 
-  try
-  	Self.vQtdeMensagensConsultadasPorVez := StrToInt(conf.ReadString('Configuracao', 'QtdeMensagensConsultadasPorVez'));
+  if (Self.vTimerConsultaMensagem <= 0) then
+    Self.vTimerConsultaMensagem := 15;
 
-    if (Self.vQtdeMensagensConsultadasPorVez <= 0) then
-    	Self.vQtdeMensagensConsultadasPorVez := 50;
-  except
+  if TryStrToInt(conf.ReadString('Configuracao', 'QtdeMensagensConsultadasPorVez'), valor) then
+    Self.vQtdeMensagensConsultadasPorVez := valor
+  else
     Self.vQtdeMensagensConsultadasPorVez := 50;
-  end;
 
-  try
-    Self.vQtdeDiasConsMensagensEnviadas := StrToInt(conf.ReadString('Configuracao', 'QtdeDiasConsMensagensEnviadas'));
+  if (Self.vQtdeMensagensConsultadasPorVez <= 0) then
+    Self.vQtdeMensagensConsultadasPorVez := 50;
 
-    if (Self.vQtdeDiasConsMensagensEnviadas <= 0) then
-    	Self.vQtdeDiasConsMensagensEnviadas := 7;
-  except
-  	Self.vQtdeDiasConsMensagensEnviadas := 7;
-  end;
+  if TryStrToInt(conf.ReadString('Configuracao', 'QtdeDiasConsMensagensEnviadas'), valor) then
+    Self.vQtdeDiasConsMensagensEnviadas := valor
+  else
+    Self.vQtdeDiasConsMensagensEnviadas := 7;
+
+  if (Self.vQtdeDiasConsMensagensEnviadas <= 0) then
+    Self.vQtdeDiasConsMensagensEnviadas := 7;
 
   try
     Self.vUnicoArqCompactado := trim(conf.ReadString('Configuracao', 'UnicoArqCompactado'));
