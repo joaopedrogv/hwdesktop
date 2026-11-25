@@ -1,6 +1,6 @@
 # Referência do esquema do HWDESKTOP
 
-[Schema disponível](schema.sql). Última extração: 2026-10-29 09:12:45 -03:00.
+[Schema disponível](schema.sql). Última extração: 2026-11-25 08:27:30 -03:00.
 
 ## Origem
 
@@ -8,7 +8,7 @@
 - Cliente isql: WI-V2.5.9.27139.
 - Versão do ERP declarada na configuração: Não informada.
 - Extração: charset WIN1252, arquivo final UTF-8 sem BOM e LF.
-- Definições no arquivo: 816 tabelas e 129 views.
+- Definições no arquivo: 825 tabelas e 129 views.
 
 O responsável atualiza previamente essa base pelo ERP. Este comando não executa
 migrações, não verifica os logs dessa atualização e não consulta registros de clientes.
