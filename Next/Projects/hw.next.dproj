@@ -98,6 +98,7 @@
         </DelphiCompile>
         <DCCReference Include="..\Interop\Contracts\HwNextViewApi.pas"/>
         <DCCReference Include="..\Interop\Module\NextBaseForm.pas"/>
+        <DCCReference Include="..\UI\Components\NextDialogs.pas"/>
         <DCCReference Include="..\Interop\Module\NextViewRegistry.pas"/>
         <DCCReference Include="..\UI\Frames\Shared\Grid\DataGridFrame.pas">
             <Form>frmDataGridFrame</Form>
@@ -132,6 +133,11 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
+        <DCCReference Include="..\UI\Frames\Features\GruposFiscais\GrupoFiscalCadastroFrame.pas">
+            <Form>frmGrupoFiscalCadastroFrame</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <DCCReference Include="..\UI\Frames\Shared\Seletores\SeletorEntidadeFrame.pas">
             <Form>frmSeletorEntidadeFrame</Form>
             <FormType>dfm</FormType>
@@ -139,11 +145,6 @@
         </DCCReference>
         <DCCReference Include="..\UI\Frames\Shared\Seletores\RegraFiscalSelecaoFrame.pas">
             <Form>frmRegraFiscalSelecaoFrame</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TFrame</DesignClass>
-        </DCCReference>
-        <DCCReference Include="..\UI\Frames\Features\GruposFiscais\GrupoFiscalCadastroFrame.pas">
-            <Form>frmGrupoFiscalCadastroFrame</Form>
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
@@ -169,19 +170,28 @@
             <Form>frmOperacoesFiscaisIbsCbs</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\UI\Forms\Features\OperacoesFiscaisIbsCbs\AnaliseCondicoesForm.pas">
+            <Form>frmAnaliseCondicoes</Form>
+            <DesignClass>TForm</DesignClass>
+        </DCCReference>
         <DCCReference Include="..\Composition\NextSetup.pas"/>
         <DCCReference Include="..\Composition\NextFeaturesComposition.pas"/>
+        <DCCReference Include="..\Composition\Processos\ProcessosProviderUnit.pas"/>
         <DCCReference Include="..\..\Modern\Core\Domain\Ports\Shared\ISessionContextUnit.pas"/>
         <DCCReference Include="..\..\Modern\Core\Application\Contexts\SessionContextUnit.pas"/>
         <DCCReference Include="..\Queries\Shared\NextDatasetDefinition.pas"/>
         <DCCReference Include="..\Queries\Shared\NextQueryDefinition.pas"/>
+        <DCCReference Include="..\Queries\Shared\NextMemoryDatasetDefinition.pas"/>
         <DCCReference Include="..\Queries\Shared\DatasetColumnDefinition.pas"/>
         <DCCReference Include="..\UI\Presenters\Shared\PresenterConsultaBase.pas"/>
         <DCCReference Include="..\UI\Presenters\Shared\PresenterCadastroBase.pas"/>
+        <DCCReference Include="..\UI\Presenters\Shared\PresenterAutorizacao.pas"/>
         <DCCReference Include="..\Queries\Features\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsQueryDefinition.pas"/>
         <DCCReference Include="..\UI\Presenters\Features\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsPresenter.pas"/>
+        <DCCReference Include="..\UI\Presenters\Features\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsCadastroPresenter.pas"/>
         <DCCReference Include="..\Composition\Shared\Seletores\OperacoesFiscaisSelecoesBuilder.pas"/>
         <DCCReference Include="..\UI\Presenters\Features\GruposFiscais\GruposFiscaisPresenter.pas"/>
+        <DCCReference Include="..\UI\Presenters\Features\GruposFiscais\GruposFiscaisCadastroPresenter.pas"/>
         <DCCReference Include="..\Queries\Shared\Filters\StandardQueryFilterDefinition.pas"/>
         <DCCReference Include="..\Interop\Module\NextViewCatalog.pas"/>
         <DCCReference Include="..\Interop\Module\NextViewExports.pas"/>
@@ -191,6 +201,8 @@
         <DCCReference Include="..\Composition\Shared\Seletores\EmpresaOptionsBuilder.pas"/>
         <DCCReference Include="..\..\Modern\Core\Infrastructure\Interfaces\IDataSetSorterUnit.pas"/>
         <DCCReference Include="..\..\Modern\Adapters\Secondary\Database\FireDAC\FireDACDataSetSorterUnit.pas"/>
+        <DCCReference Include="..\..\Modern\Core\Infrastructure\Data\DataSetFieldDefinitionUnit.pas"/>
+        <DCCReference Include="..\..\Modern\Adapters\Secondary\Database\FireDAC\FireDACMemoryDataSetReaderUnit.pas"/>
         <DCCReference Include="..\..\Modern\Core\Domain\Types\Shared\TipoTributoFiscalEnumUnit.pas"/>
         <DCCReference Include="..\..\Modern\Core\Domain\Types\Shared\TipoComunsUnit.pas"/>
         <DCCReference Include="..\..\Modern\Core\Domain\Types\Shared\StatusRegistroEnumUnit.pas"/>
@@ -198,22 +210,40 @@
         <DCCReference Include="..\Queries\Shared\DatasetColumnLayout.pas"/>
         <DCCReference Include="..\Contracts\Shared\Seletores\EmpresaOption.pas"/>
         <DCCReference Include="..\Contracts\Shared\Views\ViewFeedback.pas"/>
+        <DCCReference Include="..\Contracts\Shared\Views\CadastroEditorView.pas"/>
         <DCCReference Include="..\Contracts\Shared\Views\ConsultaBaseView.pas"/>
         <DCCReference Include="..\Contracts\Features\GruposFiscais\GruposFiscaisView.pas"/>
+        <DCCReference Include="..\Contracts\Features\GruposFiscais\GruposFiscaisCadastroView.pas"/>
         <DCCReference Include="..\Contracts\Shared\Cadastro\EditorCadastro.pas"/>
         <DCCReference Include="..\Contracts\Shared\Seletores\SelecaoEntidadeOption.pas"/>
         <DCCReference Include="..\Contracts\Shared\Seletores\RegraFiscalSelecaoOption.pas"/>
         <DCCReference Include="..\Contracts\Features\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsView.pas"/>
+        <DCCReference Include="..\Contracts\Features\OperacoesFiscaisIbsCbs\OperacoesFiscaisIbsCbsCadastroView.pas"/>
         <DCCReference Include="..\Contracts\Shared\Authorization\AuthorizationService.pas"/>
         <DCCReference Include="..\..\Modern\Core\Domain\Ports\Shared\ColumnLayoutPreferences.pas"/>
         <DCCReference Include="..\..\Modern\Adapters\Secondary\Preferences\ColumnLayoutPreferencesRepository.pas"/>
+        <DCCReference Include="..\..\Modern\ERP.Features\Core\Application\InputPorts\ResolverRegraFiscalIbsCbsTypesUnit.pas"/>
+        <DCCReference Include="..\..\Modern\ERP.Features\Core\Domain\Services\RegrasFiscais\IResolverRegraFiscalIbsCbsServiceUnit.pas"/>
+        <DCCReference Include="..\..\Modern\ERP.Features\Core\Domain\Services\RegrasFiscais\ResolverRegraFiscalIbsCbsServiceUnit.pas"/>
         <DCCReference Include="..\Queries\Features\GruposFiscais\GruposFiscaisQueryDefinition.pas"/>
         <DCCReference Include="..\Composition\Features\OperacoesFiscaisIbsCbsComposition.pas"/>
         <DCCReference Include="..\Composition\Features\GruposFiscaisComposition.pas"/>
-        <DCCReference Include="..\Queries\Shared\NextMemoryDatasetDefinition.pas"/>
+        <DCCReference Include="..\Queries\Features\EventosDFe\EventosDFeQueryDefinition.pas"/>
         <DCCReference Include="..\Queries\Features\EventosDFe\EventoDFe211130ColecaoDefinition.pas"/>
-        <DCCReference Include="..\..\Modern\Core\Infrastructure\Data\DataSetFieldDefinitionUnit.pas"/>
-        <DCCReference Include="..\..\Modern\Adapters\Secondary\Database\FireDAC\FireDACMemoryDataSetReaderUnit.pas"/>
+        <DCCReference Include="..\Contracts\Features\EventosDFe\EventosDFeView.pas"/>
+        <DCCReference Include="..\UI\Presenters\Features\EventosDFe\EventosDFePresenter.pas"/>
+        <DCCReference Include="..\UI\Forms\Features\EventosDFe\EventosDFeForm.pas">
+            <Form>frmEventosDFe</Form>
+        </DCCReference>
+        <DCCReference Include="..\UI\Forms\Features\EventosDFe\SelecaoEventoDFeForm.pas">
+            <Form>frmSelecaoEventoDFe</Form>
+        </DCCReference>
+        <DCCReference Include="..\Contracts\Features\EventosDFe\EventoDFe112150CadastroView.pas"/>
+        <DCCReference Include="..\UI\Presenters\Features\EventosDFe\EventoDFe112150CadastroPresenter.pas"/>
+        <DCCReference Include="..\UI\Frames\Features\EventosDFe\EventoDFe112150CadastroFrame.pas">
+            <Form>frmEventoDFe112150CadastroFrame</Form>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <DCCReference Include="..\Contracts\Features\EventosDFe\EventoDFe211130CadastroView.pas"/>
         <DCCReference Include="..\UI\Presenters\Features\EventosDFe\EventoDFe211130CadastroPresenter.pas"/>
         <DCCReference Include="..\UI\Frames\Features\EventosDFe\EventoDFe211130CadastroFrame.pas">
@@ -235,6 +265,8 @@
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\Composition\Features\EventosDFeItemEditorFactory.pas"/>
+        <DCCReference Include="..\Adapters\Secondary\Fiscal\AcbrNFeEventoFiscalGatewayUnit.pas"/>
+        <DCCReference Include="..\Composition\Features\EventosDFeComposition.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

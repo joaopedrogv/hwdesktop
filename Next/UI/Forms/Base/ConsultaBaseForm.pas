@@ -776,7 +776,7 @@ function TfrmConsultaBase.AbrirAba(const AChave, ATitulo: string; AConfigurar: T
 var
   Chave: string;
   Descritor: TAbaCadastro;
-  Tela: TTabSheet;
+  Tela, AbaRecuperada: TTabSheet;
   Area: TScrollBox;
   Editor: TWinControl;
   Indice: Integer;
@@ -796,6 +796,8 @@ begin
   Descritor := TAbaCadastro.Create;
   Tela := nil;
   try
+    AbaRecuperada := pcAbas.ActivePage;
+
     Tela := TTabSheet.Create(pcAbas);
     Tela.PageControl := pcAbas;
     Tela.Caption := ATitulo;
@@ -840,6 +842,10 @@ begin
     else
       Descritor.Free;
     Tela.Free;
+
+    if (pcAbas.ActivePage = nil) and (AbaRecuperada <> nil) then
+      pcAbas.ActivePage := AbaRecuperada;
+      
     Result := False;
   end;
 end;

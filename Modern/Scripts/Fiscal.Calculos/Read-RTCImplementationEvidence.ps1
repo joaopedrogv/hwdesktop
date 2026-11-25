@@ -331,7 +331,7 @@ foreach ($change in $changes) {
     )) {
       Assert-Property -Object $test -Name $propertyName -Location "$($change.change_id).official_tests[]"
     }
-    if ([string]$test.test_status -notin @('added', 'modified', 'removed', 'unchanged')) {
+    if ([string]$test.test_status -notin @('added', 'modified', 'removed', 'renamed', 'unchanged')) {
       throw "Status de teste oficial inválido em $($change.change_id): $($test.test_status)"
     }
     if ([string]$change.change_id -notin @($test.change_ids)) {
