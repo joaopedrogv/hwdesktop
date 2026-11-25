@@ -12,6 +12,7 @@ Requerem PowerShell 7.5+. Abra `..\menu.bat` e escolha **Build / Deploy** ou exe
 | `build-and-deploy.ps1` | Executa compilação completa e publica somente após seu sucesso. |
 | `build-next.ps1` | Compila a DLL do Next em Delphi Rio/Win32. |
 | `deploy-next.ps1` | Copia apenas a DLL do Next para o destino indicado ou configurado. |
+| `build-nfe-dx.ps1` | Compila `hw.nfe.dx.dll` em Delphi Rio/Win32 com a revisão do ACBr selecionada. |
 
 ## Parâmetros opcionais para testes por linha de comando
 
@@ -47,20 +48,50 @@ Exemplos a partir da raiz do repositório:
 
 ## Compilar e publicar Next
 
-Execute o comando abaixo na raiz do clone. Ele compila somente `Next/Projects/hw.next.dproj` em Debug/Win32. As saídas ficam nestes caminhos, relativos à raiz do clone.
+Execute o comando abaixo na raiz do clone para compilar `hw.next.dll` em Delphi Rio/Win32. O padrão pela linha de comando é Debug.
 
-- DLL `bpl/hw.next.dll`
-- Unidades compiladas (`.dcu`) em `Next/Projects/output/dcu-rio/`
+| Configuração | DLL | DCUs |
+| --- | --- | --- |
+| Debug | `bpl/hw.next.dll` | `Next/Projects/output/dcu-rio/` |
+| Release | `bpl/hw.next.dll` | `Next/Projects/output/dcu-rio-release/` |
+
+Cada compilação atualiza a DLL do clone com a configuração escolhida.
 
 ```powershell
 .\_automation\build\build-next.ps1
+.\_automation\build\build-next.ps1 -Configuration Release
 ```
 
 Use `-DelphiBin` para indicar outra instalação do Delphi Rio e `SPRING4D_ROOT` para indicar outra pasta do Spring4D já compilado para Rio/Win32. O build usa a biblioteca padrão do Rio para evitar o limite de tamanho do comando do compilador. A compilação deixa o ERP disponível para validação manual com a DLL gerada.
 
 O projeto `Next/Projects/hw.next.dproj` declara as dependências do ACBr NFe: a biblioteca compilada em `D:\Hw\pac\acbrnfe_dx\Lib\Delphi\LibD26\Win32\Debug` entra no caminho de unidades e a pasta de recursos `D:\Hw\pac\acbrnfe_dx\Fontes\ACBrDFe\ACBrNFe` entra no caminho de recursos. Em uma estação sem essas pastas, a compilação ou o carregamento da DLL falha; instale o ACBr nesses caminhos ou ajuste o `.dproj`.
 
-No submenu **Build / Deploy**, escolha **7 · Compilar Next** para gerar a DLL ou **8 · Publicar Next** para copiar a DLL já compilada do clone. A publicação usa o mesmo destino configurado para **Publicar BPLs** e copia apenas `hw.next.dll`. Pela linha de comando, `deploy-next.ps1` também aceita `-Destination` e `-WhatIf`.
+No submenu **Build / Deploy**, escolha **7 · Compilar Next** e selecione **Debug** ou **Release**. A opção **8 · Publicar Next** usa a DLL de `bpl/hw.next.dll`. A publicação usa o mesmo destino configurado para **Publicar BPLs** e copia apenas `hw.next.dll`. Pela linha de comando, `deploy-next.ps1` também aceita `-Destination` e `-WhatIf`.
+
+## Compilar hw.nfe.dx.dll
+
+Copie `config/build.exemplo.psd1` para `config/build.local.psd1`. Ajuste
+`ACBrRoot` e `ACBrDcuPath` de cada perfil à instalação local. Um caminho
+relativo em `ACBrDcuPath` é resolvido a partir da raiz do ACBr. Os demais
+caminhos relativos usam a pasta do arquivo de configuração.
+
+No submenu **Build / Deploy**, a opção **9 · Compilar hw.nfe.dx.dll** oferece
+**Debug** e **Release**. Ambas usam `DefaultProfile`. Pela linha de comando,
+escolha o perfil para cada build:
+
+```powershell
+.\_automation\build\build-nfe-dx.ps1 -Profile anterior
+.\_automation\build\build-nfe-dx.ps1 -Profile nt009
+```
+
+O padrão é Release/Win32. Use `-Configuration Debug` para Debug,
+`-DelphiBin` para outra instalação do Rio ou `-ConfigPath` para outro
+arquivo de configuração. Por padrão, a DLL é gerada diretamente em
+`bpl/hw.nfe.dx.dll` para testar no ERP do clone. Cada compilação atualiza
+essa DLL com o perfil e a configuração escolhidos. Os DCUs ficam em
+`HWNFeDX/output/<perfil>/<configuração>/dcu/`.
+Para mudar o diretório da DLL, configure `OutputDirectory` em
+`build.local.psd1`. Esse caminho, quando relativo, usa a raiz do clone.
 
 ## Compatibilidade com a implementação existente
 

@@ -2,13 +2,75 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Compilar Next (Debug/Win32)",
+      "label": "Compilar Next - DEBUG",
       "type": "process",
       "command": "pwsh",
       "args": [
         "-NoProfile",
         "-File",
-        "${workspaceFolder}/_automation/build/build-next.ps1"
+        "${workspaceFolder}/_automation/build/build-next.ps1",
+        "-Configuration",
+        "Debug"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Compilar Next - RELEASE",
+      "type": "process",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-File",
+        "${workspaceFolder}/_automation/build/build-next.ps1",
+        "-Configuration",
+        "Release"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Compilar HW NFE - DEBUG",
+      "type": "process",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-File",
+        "${workspaceFolder}/_automation/build/build-nfe-dx.ps1",
+        "-Configuration",
+        "Debug"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Compilar HW NFE - RELEASE",
+      "type": "process",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-File",
+        "${workspaceFolder}/_automation/build/build-nfe-dx.ps1",
+        "-Configuration",
+        "Release"
       ],
       "options": {
         "cwd": "${workspaceFolder}"

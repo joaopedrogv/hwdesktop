@@ -98,6 +98,12 @@
         <Debugger_HostApplication>..\bpl\HwSistemas.exe</Debugger_HostApplication>
         <Debugger_RunParams>pkAutomacao TfrmPrincipalS modoNF</Debugger_RunParams>
     </PropertyGroup>
+    <PropertyGroup Condition="'$(HwNfeDxBuild)'=='true'">
+        <DCC_UnitSearchPath>..\Utils\src;$(HwNfeDxUnitPath)</DCC_UnitSearchPath>
+        <DCC_ResourcePath>$(HwNfeDxResourcePath)</DCC_ResourcePath>
+        <DCC_DcuOutput>$(HwNfeDxDcuOutput)</DCC_DcuOutput>
+        <DCC_ExeOutput>$(HwNfeDxExeOutput)</DCC_ExeOutput>
+    </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>

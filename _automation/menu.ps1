@@ -61,6 +61,7 @@ function Write-MenuScreen {
         [string] $ProjectRoot,
         [string[]] $Details = @(),
         [string] $DetailTitle,
+        [string] $MenuTitle,
         [switch] $Plain,
         [switch] $Refresh,
         [switch] $BuildSection,
@@ -117,6 +118,10 @@ function Write-MenuScreen {
         Write-Row 'Esc / Backspace: voltar    0 / Q: sair' $palette.Muted
     }
     else {
+        if ($MenuTitle) {
+            Write-Row $MenuTitle $palette.Title
+            Write-Row
+        }
         for ($i = 0; $i -lt $Items.Count; $i++) {
             $item = $Items[$i]
             $marker = if ($i -eq $SelectedIndex) { '>' } else { ' ' }
@@ -171,7 +176,12 @@ function Invoke-MenuScript {
 }
 
 function Invoke-MenuCommand {
-    param([Parameter(Mandatory)] $Item, [Parameter(Mandatory)] [string] $ProjectRoot, [switch] $Plain)
+    param(
+        [Parameter(Mandatory)] $Item,
+        [Parameter(Mandatory)] [string] $ProjectRoot,
+        [switch] $Plain,
+        [string] $BuildConfiguration
+    )
     [Console]::CursorVisible = $true
     [Console]::TreatControlCAsInput = $false
     $previousNativePreference = $PSNativeCommandUseErrorActionPreference
@@ -206,7 +216,13 @@ function Invoke-MenuCommand {
             $scriptPath = Join-Path $PSScriptRoot 'workflow\prepare-dependencies.ps1'
         }
         else {
-            $commandArguments = if ($Item.Id -ne 'next-build') { @('-ProjectRoot', $ProjectRoot) } else { @() }
+            $commandArguments = @()
+            if ($Item.Id -ne 'next-build') {
+                $commandArguments += @('-ProjectRoot', $ProjectRoot)
+            }
+            if ($BuildConfiguration) {
+                $commandArguments += @('-Configuration', $BuildConfiguration)
+            }
             $scriptPath = Join-Path $PSScriptRoot "build\$($Item.ScriptName)"
         }
         $engine = (Get-Process -Id $PID).Path
@@ -247,6 +263,11 @@ function Invoke-AutomationMenu {
         [pscustomobject]@{ Label = 'Compilar e publicar'; Description = 'Publicar após a compilação terminar com sucesso.'; Status = 'Disponível'; Id = 'combined'; ScriptName = 'build-and-deploy.ps1' }
         [pscustomobject]@{ Label = 'Compilar Next'; Description = 'Compilar hw.next.dll em Delphi Rio/Win32.'; Status = 'Disponível'; Id = 'next-build'; ScriptName = 'build-next.ps1' }
         [pscustomobject]@{ Label = 'Publicar Next'; Description = 'Copiar hw.next.dll para o destino configurado.'; Status = 'Disponível'; Id = 'next-deploy'; ScriptName = 'deploy-next.ps1' }
+        [pscustomobject]@{ Label = 'Compilar hw.nfe.dx.dll'; Description = 'Compilar a DLL fiscal com o perfil local do ACBr.'; Status = 'Disponível'; Id = 'nfe-dx-build'; ScriptName = 'build-nfe-dx.ps1' }
+    )
+    $configurationItems = @(
+        [pscustomobject]@{ Label = 'Debug'; Description = 'Compilar para depuração.'; Status = 'Disponível' }
+        [pscustomobject]@{ Label = 'Release'; Description = 'Compilar com as opções de Release do projeto.'; Status = 'Disponível' }
     )
     $databaseItems = @(
         [pscustomobject]@{ Label = 'Atualizar schema'; Description = 'Extrair metadados da base configurada, sem aplicar migrações.'; Status = 'Disponível'; Id = 'schema' }
@@ -277,6 +298,7 @@ function Invoke-AutomationMenu {
     $originalControlCAsInput = [Console]::TreatControlCAsInput
     $selectedIndex = -1
     $detailItem = $null
+    $buildTarget = $null
     try {
         [Console]::Title = 'HWDESKTOP | Automações'
         [Console]::CursorVisible = $false
@@ -303,7 +325,8 @@ function Invoke-AutomationMenu {
                 Write-MenuScreen -Items $items -SelectedIndex $selectedIndex -ProjectRoot $projectRoot -Plain:$plain -Refresh -DetailTitle $detailItem.Label -Details $details
             }
             else {
-                Write-MenuScreen -Items $items -SelectedIndex $selectedIndex -ProjectRoot $projectRoot -Plain:$plain -Refresh -BuildSection:($Section -eq 'Build') -DatabaseSection:($Section -eq 'Database') -AiSection:($Section -eq 'AI')
+                $menuTitle = if ($null -ne $buildTarget) { $buildTarget.Label }
+                Write-MenuScreen -Items $items -SelectedIndex $selectedIndex -ProjectRoot $projectRoot -Plain:$plain -Refresh -BuildSection:($Section -eq 'Build') -DatabaseSection:($Section -eq 'Database') -AiSection:($Section -eq 'AI') -MenuTitle $menuTitle
             }
 
             $key = [Console]::ReadKey($true)
@@ -318,14 +341,33 @@ function Invoke-AutomationMenu {
             }
 
             if ($Section -in @('Build', 'Database', 'AI') -and $key.Key -in @([ConsoleKey]::Escape, [ConsoleKey]::Backspace)) {
-                $Section = 'Main'; $items = $mainItems; $selectedIndex = -1
+                if ($null -ne $buildTarget) {
+                    $buildTarget = $null
+                    $items = $buildItems
+                }
+                else {
+                    $Section = 'Main'
+                    $items = $mainItems
+                }
+                $selectedIndex = -1
                 continue
             }
             $transition = Get-MenuTransition -SelectedIndex $selectedIndex -Key $key -ItemCount $items.Count
             $selectedIndex = $transition.SelectedIndex
             if ($transition.Action -eq 'Exit') { return 0 }
             if ($transition.Action -eq 'Open') {
-                if ($Section -in @('Build', 'Database', 'AI') -or $items[$selectedIndex].Id -in @('sync', 'start', 'dependencies', 'integrate', 'deliver')) {
+                if ($null -ne $buildTarget) {
+                    Invoke-MenuCommand -Item $buildTarget -ProjectRoot $projectRoot -Plain:$plain -BuildConfiguration $items[$selectedIndex].Label
+                    $buildTarget = $null
+                    $items = $buildItems
+                    $selectedIndex = -1
+                }
+                elseif ($Section -eq 'Build' -and $items[$selectedIndex].Id -in @('next-build', 'nfe-dx-build')) {
+                    $buildTarget = $items[$selectedIndex]
+                    $items = $configurationItems
+                    $selectedIndex = -1
+                }
+                elseif ($Section -in @('Build', 'Database', 'AI') -or $items[$selectedIndex].Id -in @('sync', 'start', 'dependencies', 'integrate', 'deliver')) {
                     Invoke-MenuCommand -Item $items[$selectedIndex] -ProjectRoot $projectRoot -Plain:$plain
                     $selectedIndex = -1
                 }

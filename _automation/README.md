@@ -15,7 +15,7 @@ O Windows PowerShell 5.1 (`powershell.exe`) não atende ao requisito. O lançado
 
 ## Navegação
 
-- **Setas para cima/baixo**, **Home/End** ou **1 a 9** selecionam uma opção no menu principal. O submenu Build / Deploy tem oito opções; Banco de dados reúne as operações de esquema; Ferramentas de IA reúne as ações do Kilo e do OpenCode.
+- **Setas para cima/baixo**, **Home/End** ou **1 a 9** selecionam uma opção no menu principal. O submenu Build / Deploy tem nove opções; Banco de dados reúne as operações de esquema; Ferramentas de IA reúne as ações do Kilo e do OpenCode.
 - **Enter** abre a opção selecionada. Ao abrir o menu, nenhuma opção está selecionada; Enter sozinho não inicia uma ação.
 - **Esc**, **0** ou **Q** encerram o menu na tela inicial.
 - Nos detalhes, **Esc/Backspace** retornam à tela inicial, novamente sem seleção; **0/Q** encerram.
@@ -42,7 +42,7 @@ O Windows PowerShell 5.1 (`powershell.exe`) não atende ao requisito. O lançado
 
 **Iniciar demanda**, terceiro item, abre uma janela para informar o nome completo da nova branch, atualiza a main e cria a branch no próprio clone Git. Não exige `IntegrationPath` ou `WorkPath` na configuração do clone. Pelo menu da integração SVN, abre primeiro uma janela para selecionar o clone daquela execução; não mantém lista de clones na configuração. Cancelar a seleção, cancelar a entrada ou deixar o nome vazio encerra antes de qualquer operação Git. O menu inicia essa ação em modo STA para as janelas, evitando depender da digitação no terminal integrado do VS Code ou Antigravity. A chamada direta com `-WorkPath` e `-Branch` continua disponível, sem janelas. A sincronização SVN anterior permanece separada; este comando não publica a branch nem obtém binários. Instruções em [workflow/README.md](workflow/README.md#iniciar-demanda).
 
-**Build / Deploy**, primeiro item do menu, abre oito comandos PS1 independentes em `build/`, incluindo **7 · Compilar Next** e **8 · Publicar Next**. Selecionar uma ação e pressionar Enter chama seu comando diretamente. Não há pergunta adicional de limpeza, destino ou escolha de modo. As interações próprias dos originais permanecem: seleção gráfica de pacotes e confirmação S/N de compilar/publicar. O destino vem de `config/deploy.psd1`. Exemplos e parâmetros estão em [build/README.md](build/README.md).
+**Build / Deploy**, primeiro item do menu, abre nove comandos PS1 independentes em `build/`, incluindo **7 · Compilar Next**, **8 · Publicar Next** e **9 · Compilar hw.nfe.dx.dll**. As opções 7 e 9 abrem a escolha entre **Debug** e **Release**. Nas demais opções, Enter chama o comando diretamente. As interações próprias dos originais permanecem: seleção gráfica de pacotes e confirmação S/N de compilar/publicar. O destino vem de `config/deploy.psd1`. Exemplos e parâmetros estão em [build/README.md](build/README.md).
 
 Os scripts antigos foram movidos pelo responsável para `legados`. Os comandos de compilação compartilham `core/Build.Automation.psm1`, e a compilação de cada pacote ainda usa `core/build-package.bat`, preservando a lógica especial `SQL_RES`. **Preparar dependências**, quinto item, baixa do Nextcloud os pacotes necessários e aplica build em `dcp` e runtime em `bpl`, sobrescrevendo arquivos diferentes sem confirmação. Usa a configuração individual `config/dependencies.local.psd1` e as chaves NEXTCLOUD_USER/NEXTCLOUD_PASS do arquivo de segredos. Instruções em [workflow/README.md](workflow/README.md#preparar-dependências). A proteção do menu não altera o comportamento dos BATs antigos abertos diretamente.
 

@@ -1,5 +1,6 @@
 # Ignorar as entradas da raiz
 /*
+/.temp/
 
 # Acompanhar o próprio filtro
 !/.gitignore
@@ -71,6 +72,7 @@ Utilitario/*
 # Remoções especificas
 Hw Gestor/Documentação/
 HWNFeDX/ERP-ACBr-*.groupproj
+/HWNFeDX/output/
 Automacao Bpl/ERP-*.bdsgroup
 Automacao Bpl/hwdesktop-*.bdsgroup
 Ativos/dpk/manifest_crc.txt
@@ -98,6 +100,7 @@ scripts/database/**/*.gbk
 _automation/config/ai-models.local.json
 _automation/config/config-paths.bat
 _automation/config/segredos.md
+_automation/config/build.local.psd1
 _automation/config/workflow.local.psd1
 _automation/config/database.local.psd1
 _automation/config/dependencies.local.psd1

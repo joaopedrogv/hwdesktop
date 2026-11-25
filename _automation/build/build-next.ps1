@@ -1,11 +1,13 @@
 #Requires -Version 7.5
 <#
 .SYNOPSIS
-Compila hw.next.dll com Delphi Rio, em Debug/Win32, no clone deste script.
+Compila hw.next.dll com Delphi Rio/Win32 no clone deste script.
 #>
 [CmdletBinding()]
 param(
-    [string] $DelphiBin = (Join-Path ${env:ProgramFiles(x86)} 'Embarcadero\Studio\20.0\bin')
+    [string] $DelphiBin = (Join-Path ${env:ProgramFiles(x86)} 'Embarcadero\Studio\20.0\bin'),
+    [ValidateSet('Debug', 'Release')]
+    [string] $Configuration = 'Debug'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -13,7 +15,8 @@ $ErrorActionPreference = 'Stop'
 try {
     $projectRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..\..')).ProviderPath
     $projectFile = Join-Path $projectRoot 'Next\Projects\hw.next.dproj'
-    $dllFile = Join-Path $projectRoot 'bpl\hw.next.dll'
+    $dllDirectory = Join-Path $projectRoot 'bpl'
+    $dllFile = Join-Path $dllDirectory 'hw.next.dll'
 
     if (-not (Test-Path -LiteralPath $projectFile -PathType Leaf)) {
         throw "Projeto do Next não encontrado: $projectFile"
@@ -47,16 +50,19 @@ try {
         throw "Spring4D compilado para Delphi Rio/Win32 não encontrado. Ajuste SPRING4D_ROOT. DCU esperado: $springDcu"
     }
 
+    [IO.Directory]::CreateDirectory($dllDirectory) | Out-Null
+
     # A biblioteca padrão evita incorporar os caminhos globais da IDE à linha de comando do DCC.
     $build = [Diagnostics.ProcessStartInfo]::new($env:ComSpec)
     $build.WorkingDirectory = $projectRoot
     $build.UseShellExecute = $false
     $build.Environment['HWDESKTOP_NEXT_RSVARS'] = $rsVarsFile
     $build.Environment['HWDESKTOP_NEXT_RIO_LIB'] = $libraryPath
+    $build.Environment['HWDESKTOP_NEXT_CONFIG'] = $Configuration
     $build.Environment['SPRING4D_ROOT'] = $springRoot
-    $build.Arguments = '/d /v:off /c call "%HWDESKTOP_NEXT_RSVARS%" && msbuild.exe Next\Projects\hw.next.dproj /t:Build /p:Config=Debug /p:Platform=Win32 /p:DCC_DebugDCUs=false "/p:DelphiLibraryPath=%HWDESKTOP_NEXT_RIO_LIB%" /nologo /v:minimal'
+    $build.Arguments = '/d /v:off /c call "%HWDESKTOP_NEXT_RSVARS%" && msbuild.exe Next\Projects\hw.next.dproj /t:Build /p:Config=%HWDESKTOP_NEXT_CONFIG% /p:Platform=Win32 /p:DCC_DebugDCUs=false "/p:DelphiLibraryPath=%HWDESKTOP_NEXT_RIO_LIB%" /nologo /v:minimal'
 
-    Write-Host "Compilando hw.next.dll (Debug/Win32) em $projectRoot"
+    Write-Host "Compilando hw.next.dll ($Configuration/Win32) em $projectRoot"
     $process = [Diagnostics.Process]::Start($build)
     try {
         $process.WaitForExit()

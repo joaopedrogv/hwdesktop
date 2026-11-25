@@ -6506,8 +6506,8 @@ begin
       CNPJ := Inut.cnpj;
       modelo := StrToIntDef(Inut.modelo, 55);
       serie := Inut.serie;
-      nNFIni := Inut.nnfini;
-      nNFFin := Inut.nnffin;
+      nNumIni := Inut.nnfini;
+      nNumFin := Inut.nnffin;
       xJust := Inut.xjust;
     end;
 
@@ -6732,8 +6732,8 @@ begin
         CNPJ   := Ainut.cnpj;
         modelo := StrToIntDef(Ainut.modelo, 55);
         serie  := Ainut.serie;
-        nNFIni := Ainut.nnfini;
-        nNFFin := Ainut.nnffin;
+        nNumIni := Ainut.nnfini;
+        nNumFin := Ainut.nnffin;
         xJust  := Ainut.xjust;
       end;
       Fnfe.InutNFe.GerarXML;//apenas para pergar o id e gravar
