@@ -31,6 +31,13 @@ database and testing Rules apply according to their scope. Fiscal.Calculos has a
 explicit architectural and naming exception; load its specialized guidance when
 that module is affected.
 
+Before asking the developer about Java-to-Delphi correspondence in Fiscal.Calculos,
+read .ai/rules/fiscal-calculos-conformance.md and the decision tables in
+.ai/context/fiscal-calculos-java-mapping.md, the recurring answers in
+.ai/context/fiscal-calculos-faq.md, and the dated decisions in
+.ai/context/fiscal-calculos-decisions.md. Ask only about gaps those artifacts do not
+cover, citing the specific item.
+
 ## Paths
 
 Paths in Modern/.ai/ are relative to Modern/ unless otherwise stated.
