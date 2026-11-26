@@ -1,3 +1,7 @@
+// Java: source/src/main/java/br/gov/serpro/rtc/api/model/output/CbsIbsOutput.java
+// Mapeamento: valores publicados em Currency/CurrencyNullable, sem Double
+// Decisao: DEC-05
+
 unit ResultadoCbsIbsUnit;
 
 interface
@@ -9,7 +13,7 @@ uses
   ResultadoGrupoMonofasiaUnit,
   TributacaoCompraGovernamentalModelUnit,
   TipoComunsUnit,
-  DoubleNullableUnit;
+  CurrencyNullableUnit;
 
 type
 
@@ -20,11 +24,11 @@ type
   ResultadoCbsIbs = record
   private
     FInstance: RecordInstance;
-    FAliquota: Double;
-    FBaseCalculo: DoubleNullable;
+    FAliquota: Currency;
+    FBaseCalculo: CurrencyNullable;
     FQuantidade: Currency;
-    FTributoCalculado: Double;
-    FTributoDevido: Double;
+    FTributoCalculado: Currency;
+    FTributoDevido: Currency;
     FGrupoReducao: ReducaoAliquotaModel;
     FTributacaoRegular: ResultadoTributacaoRegular;
     FCompraGovernamental: TributacaoCompraGovernamentalModel;
@@ -34,11 +38,11 @@ type
   public
     class function NullInstance(): ResultadoCbsIbs; static;
     class function Create(
-      Aliquota: Double;
-      const BaseCalculo: DoubleNullable;
+      Aliquota: Currency;
+      const BaseCalculo: CurrencyNullable;
       Quantidade: Currency;
-      TributoCalculado: Double;
-      TributoDevido: Double;
+      TributoCalculado: Currency;
+      TributoDevido: Currency;
       const GrupoReducao: ReducaoAliquotaModel;
       const TributacaoRegular: ResultadoTributacaoRegular;
       const CompraGovernamental: TributacaoCompraGovernamentalModel;
@@ -49,17 +53,17 @@ type
 
     procedure SetMemoriaCalculo(const Value: string);
     procedure SetGrupoReducao(const Value: ReducaoAliquotaModel);
-    procedure SetTributoDevido(const Value: Double);
+    procedure SetTributoDevido(const Value: Currency);
     procedure SetTributacaoRegular(const Value: ResultadoTributacaoRegular);
     function IsNull(): Boolean;
     /// <summary>Retorna true somente quando compraGovernamental nao e nulo.</summary>
     function PossuiCompraGov(): Boolean;
 
-    property Aliquota: Double read FAliquota;
-    property BaseCalculo: DoubleNullable read FBaseCalculo;
+    property Aliquota: Currency read FAliquota;
+    property BaseCalculo: CurrencyNullable read FBaseCalculo;
     property Quantidade: Currency read FQuantidade;
-    property TributoCalculado: Double read FTributoCalculado;
-    property TributoDevido: Double read FTributoDevido;
+    property TributoCalculado: Currency read FTributoCalculado;
+    property TributoDevido: Currency read FTributoDevido;
     property GrupoReducao: ReducaoAliquotaModel read FGrupoReducao;
     property TributacaoRegular: ResultadoTributacaoRegular read FTributacaoRegular;
     property CompraGovernamental: TributacaoCompraGovernamentalModel read FCompraGovernamental;
@@ -73,11 +77,11 @@ implementation
 { ResultadoCbsIbs }
 
 class function ResultadoCbsIbs.Create(
-  Aliquota: Double;
-  const BaseCalculo: DoubleNullable;
+  Aliquota: Currency;
+  const BaseCalculo: CurrencyNullable;
   Quantidade: Currency;
-  TributoCalculado: Double;
-  TributoDevido: Double;
+  TributoCalculado: Currency;
+  TributoDevido: Currency;
   const GrupoReducao: ReducaoAliquotaModel;
   const TributacaoRegular: ResultadoTributacaoRegular;
   const CompraGovernamental: TributacaoCompraGovernamentalModel;
@@ -126,7 +130,7 @@ begin
   FGrupoReducao := Value;
 end;
 
-procedure ResultadoCbsIbs.SetTributoDevido(const Value: Double);
+procedure ResultadoCbsIbs.SetTributoDevido(const Value: Currency);
 begin
   FTributoDevido := Value;
 end;

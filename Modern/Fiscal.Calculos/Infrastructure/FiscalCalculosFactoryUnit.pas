@@ -17,7 +17,8 @@ uses
   ValidarIndicadorOperacaoUseCaseUnit,
   ConsultarLocalOperacaoUseCaseUnit,
   ConsultarIndicadorOperacaoUseCaseUnit,
-  ConsultarSituacoesClassificacoesPorNbsUseCaseUnit, ISharedFactoryUnit;
+  ConsultarSituacoesClassificacoesPorNbsUseCaseUnit, ISharedFactoryUnit,
+  IBaseCalculoUnificadaServiceUnit;
 
 type       
   {$IFDEF INTF_ON}
@@ -65,6 +66,7 @@ type
     function CreateConsultarLocalOperacaoUseCase(): IConsultarLocalOperacaoUseCase;
     function CreateConsultarIndicadorOperacaoUseCase(): IConsultarIndicadorOperacaoUseCase;
     function CreateConsultarSituacoesClassificacoesPorNbsUseCase(): IConsultarSituacoesClassificacoesPorNbsUseCase;
+    class function CreateBaseCalculoUnificadaService: IBaseCalculoUnificadaService; static;
   end;
 
 implementation
@@ -81,7 +83,8 @@ uses
   CalculoBaseCalculoServiceUnit, ICalculoBaseCalculoServiceUnit,
   ITradutorErrosRtcUnit, TradutorErrosRtcUnit, IClassificacaoTributariaServiceUnit,
   IAvaliadorExpressaoAritmeticaServiceUnit, AvaliadorExpressaoAritmeticaServiceUnit, ClassificacaoTributariaServiceUnit,
-  PreparacaoCalculoServiceInterUnit, ProcessamentoItemServiceNovoUnit, ICalculadorROCServiceUnit;
+  PreparacaoCalculoServiceInterUnit, ProcessamentoItemServiceNovoUnit, ICalculadorROCServiceUnit,
+  BaseCalculoUnificadaServiceUnit;
 
 { FiscalCalculosFactory }
 
@@ -227,17 +230,24 @@ begin
   );
 end;
 
+class function FiscalCalculosFactory.CreateBaseCalculoUnificadaService: IBaseCalculoUnificadaService;
+begin
+  Result := BaseCalculoUnificadaService.Create();
+end;
+
 function FiscalCalculosFactory.CreatePreparacaoCalculoService: IPreparacaoCalculoServiceInter;
 var
   nbsAplService: INbsAplicavelService;
   ncmAplService: INcmAplicavelService;
   classTribService: IClassificacaoTributariaService;
+  baseCalculoUnificada: IBaseCalculoUnificadaService;
 begin
   ncmAplService := NcmAplicavelService.Create( FiscalRepoContainer.GetInstance().NcmAplicavelRepo );
   nbsAplService := NbsAplicavelService.Create( FiscalRepoContainer.GetInstance().NbsAplicavelRepo );
   classTribService := ClassificacaoTributariaService.Create(
     FiscalRepoContainer.GetInstance().ClassificacaoTributariaRepo
   );
+  baseCalculoUnificada := CreateBaseCalculoUnificadaService();
 
   Result := PreparacaoCalculoServiceInter.Create(
     FiscalRepoContainer.GetInstance().MunicipioRepo,
@@ -252,7 +262,8 @@ begin
     FiscalRepoContainer.GetInstance().AliquotaAdValoremServicoRepo,
     FiscalRepoContainer.GetInstance().AliquotaAdRemProdutoRepo,
     FiscalRepoContainer.GetInstance().RedutorCompraGovernamentalRepo,
-    classTribService
+    classTribService,
+    baseCalculoUnificada
   );
 end;
 

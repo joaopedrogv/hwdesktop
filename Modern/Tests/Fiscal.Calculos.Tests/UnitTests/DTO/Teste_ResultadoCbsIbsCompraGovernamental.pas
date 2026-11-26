@@ -11,7 +11,8 @@ uses
   ResultadoGrupoMonofasiaUnit,
   TributacaoCompraGovernamentalModelUnit,
   CompraGovernamentalModelUnit,
-  DoubleNullableUnit,
+  CurrencyNullableUnit,
+  DecimalCalculoUnit,
   TipoEnteGovernamentalEnumUnit,
   TipoOperacaoGovernamentalEnumUnit;
 
@@ -30,6 +31,12 @@ type
 
     [Test]
     procedure teste_CompraGovernamentalModel_NullInstance_Nula;
+
+    [Test]
+    procedure teste_BaseCalculoAusente_PreservaIsNull;
+
+    [Test]
+    procedure teste_ValoresPublicadosEmCurrency;
   end;
 
 implementation
@@ -40,7 +47,7 @@ function CriarResultado(const CompraGov: TributacaoCompraGovernamentalModel): Re
 begin
   Result := ResultadoCbsIbs.Create(
     0,
-    DoubleNullable.Create(0),
+    CurrencyNullable.Create(0),
     0,
     0,
     0,
@@ -90,6 +97,61 @@ begin
   m := CompraGovernamentalModel.NullInstance();
 
   Assert.IsTrue(m.IsNull(), 'NullInstance deve produzir modelo nulo');
+end;
+
+procedure TTest_ResultadoCbsIbsCompraGovernamental.teste_BaseCalculoAusente_PreservaIsNull;
+var
+  semBase, baseZero: ResultadoCbsIbs;
+begin
+  semBase := ResultadoCbsIbs.Create(
+    0,
+    CurrencyNullable.NullInstance(),
+    0, 0, 0,
+    ReducaoAliquotaModel.NullInstance(),
+    ResultadoTributacaoRegular.NullInstance(),
+    TributacaoCompraGovernamentalModel.NullInstance(),
+    DiferimentoModel.NullInstance(),
+    ResultadoGrupoMonofasia.NullInstance(),
+    ''
+  );
+
+  baseZero := ResultadoCbsIbs.Create(
+    0,
+    CurrencyNullable.Create(0),
+    0, 0, 0,
+    ReducaoAliquotaModel.NullInstance(),
+    ResultadoTributacaoRegular.NullInstance(),
+    TributacaoCompraGovernamentalModel.NullInstance(),
+    DiferimentoModel.NullInstance(),
+    ResultadoGrupoMonofasia.NullInstance(),
+    ''
+  );
+
+  Assert.IsTrue(semBase.BaseCalculo.IsNull, 'base ausente permanece nula');
+  Assert.IsFalse(baseZero.BaseCalculo.IsNull, 'base zero informada nao e ausencia');
+end;
+
+procedure TTest_ResultadoCbsIbsCompraGovernamental.teste_ValoresPublicadosEmCurrency;
+var
+  r: ResultadoCbsIbs;
+begin
+  r := ResultadoCbsIbs.Create(
+    DecimalCalculo.DeTexto('0.0352492').ParaCurrency,
+    CurrencyNullable.Create(1000000.00),
+    1,
+    DecimalCalculo.DeTexto('35249.00').ParaCurrency,
+    DecimalCalculo.DeTexto('35249.00').ParaCurrency,
+    ReducaoAliquotaModel.NullInstance(),
+    ResultadoTributacaoRegular.NullInstance(),
+    TributacaoCompraGovernamentalModel.NullInstance(),
+    DiferimentoModel.NullInstance(),
+    ResultadoGrupoMonofasia.NullInstance(),
+    ''
+  );
+
+  Assert.AreEqual(0.0352, r.Aliquota, 0.0000001, 'aliquota publicada em Currency (4 casas)');
+  Assert.AreEqual(35249.00, r.TributoCalculado, 0.0000001, 'tributo calculado em Currency');
+  Assert.AreEqual(35249.00, r.TributoDevido, 0.0000001, 'tributo devido em Currency');
 end;
 
 initialization

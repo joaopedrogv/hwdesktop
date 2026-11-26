@@ -14,7 +14,7 @@ uses
   IBSCBSModelUnit, MonofasiaModelUnit, ResultadoGrupoMonofasiaUnit, ResultadoGrupoEtapaMonofasiaUnit,
   GrupoIBSCBSModelUnit, IbsUfModelUnit, DevolucaoTributosModelUnit, IBSMunModelUnit, CBSModelUnit,
   TributacaoRegularModelUnit, TributacaoCompraGovernamentalModelUnit,
-  TransferenciaCreditoModelUnit, CreditoPresumidoIBSZFMModelUnit, DoubleNullableUnit, MonofasiaPadraoModelUnit,
+  TransferenciaCreditoModelUnit, CreditoPresumidoIBSZFMModelUnit, MonofasiaPadraoModelUnit,
   AjusteCompetenciaModelUnit, EstornoCreditoModelUnit, CreditoPresumidoOperacaoModelUnit,
   TipoEnteGovernamentalEnumUnit, CurrencyNullableUnit,
   TransferenciaCBSServiceUnit;
@@ -132,7 +132,7 @@ type
       DataFatoGerador: TDate
     ): IBSCBSModel;
 
-    function GetVBC(const c: ResultadoCbsIbs; const valor: DoubleNullable): DoubleNullable;
+    function GetVBC(const c: ResultadoCbsIbs; const valor: CurrencyNullable): CurrencyNullable;
 
     function GetVIbs( ibsUF: IBSUFModel; ibsMun: IBSMunModel): Currency;
 
@@ -351,15 +351,15 @@ begin
   Result := DevolucaoTributosModel.NullInstance();
 end;
 
-function CalculoTributoService.GetVBC(const c: ResultadoCbsIbs; const valor: DoubleNullable): DoubleNullable;
+function CalculoTributoService.GetVBC(const c: ResultadoCbsIbs; const valor: CurrencyNullable): CurrencyNullable;
 begin
   if not valor.IsNull then
     Result := valor
 
   else if not c.IsNull then
-    Result := DoubleNullable.Create( c.BaseCalculo.Value, c.BaseCalculo.IsNull )
+    Result := CurrencyNullable.Create( c.BaseCalculo.Value, c.BaseCalculo.IsNull )
   else
-    Result := DoubleNullable.NullInstance()
+    Result := CurrencyNullable.NullInstance()
 end;
 
 function CalculoTributoService.GetVIbs( ibsUF: IBSUFModel; ibsMun: IBSMunModel): Currency;
@@ -380,7 +380,7 @@ function CalculoTributoService.GetGIBSCBS(
   DataFatoGerador: TDatetime
 ): GrupoIBSCBSModel;
 var
-  vBC: DoubleNullable;
+  vBC: CurrencyNullable;
   ibsUF: IBSUFModel;
   ibsMun: IBSMunModel;
   vIBS: Currency;
@@ -419,7 +419,7 @@ begin
   TrataImpactoCompraGovIBSUF(ibsUfEfetivo, compraGovernamentalEfetiva);
   TrataImpactoCompraGovIBSMun(ibsMunEfetivo, compraGovernamentalEfetiva);
 
-  vBC := getVBC(ibsMunEfetivo, getVBC(ibsUfEfetivo, getVBC(cbsEfetivo, DoubleNullable.NullInstance())));
+  vBC := getVBC(ibsMunEfetivo, getVBC(ibsUfEfetivo, getVBC(cbsEfetivo, CurrencyNullable.NullInstance())));
   ibsUF := GetIBSUF( ibsUfEfetivo );
   ibsMun := GetIBSMun( ibsMunEfetivo );
   vIBS := GetVIbs( ibsUF, ibsMun );
@@ -434,7 +434,7 @@ begin
     compraGovernamental.NormalizarSaida();
 
   Result := GrupoIBSCBSModel.Create(
-    CurrencyNullable.Create(vBC.Value, vBC.IsNull),
+    vBC,
     ibsUF,
     ibsMun,
     vIBS,
@@ -727,7 +727,7 @@ begin
     if not cbs.IsNull() then
     begin
       memoriaCalculoCbs := FMemoriaCalculo.GerarMemoriaCalculoCbsIbs(
-        tratamentoClassificacao, cbs, item.Quantidade, item.Unidade, data);
+        tratamentoClassificacao, cbs, item.QuantidadeEfetiva, item.Unidade, data);
 
       cbs.SetMemoriaCalculo( memoriaCalculoCbs );
     end;
@@ -741,7 +741,7 @@ begin
       if not ibsEstadual.IsNull() then
       begin
         memoriaCalculoIbsEstadual := FMemoriaCalculo.GerarMemoriaCalculoCbsIbs(
-          tratamentoClassificacao, ibsEstadual, item.Quantidade, item.Unidade, data);
+          tratamentoClassificacao, ibsEstadual, item.QuantidadeEfetiva, item.Unidade, data);
 
         ibsEstadual.SetMemoriaCalculo( memoriaCalculoIbsEstadual );
       end;
@@ -753,7 +753,7 @@ begin
       if not ibsMunicipal.IsNull() then
       begin
         memoriaCalculoIbsMunicipal := FMemoriaCalculo.GerarMemoriaCalculoCbsIbs(
-          tratamentoClassificacao, ibsMunicipal, item.Quantidade, item.Unidade, data);
+          tratamentoClassificacao, ibsMunicipal, item.QuantidadeEfetiva, item.Unidade, data);
 
         ibsMunicipal.SetMemoriaCalculo( memoriaCalculoIbsMunicipal );
       end;
@@ -769,7 +769,7 @@ begin
     memoriaCalculoImpostoSeletivo := FMemoriaCalculo.GerarMemoriaCalculoImpostoSeletivo(
       tratamentoSeletivo,
       impostoSeletivo,
-      item.ImpostoSeletivo.Quantidade,
+      item.ImpostoSeletivo.Quantidade.Value,
       item.ImpostoSeletivo.Unidade,
       data
     );

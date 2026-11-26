@@ -37,7 +37,8 @@ uses
   TratamentoClassificacaoModelUnit,
   AliquotaAdRemModelUnit,
   CompraGovernamentalInputUnit,
-  CurrencyNullableUnit;
+  CurrencyNullableUnit,
+  BaseCalculoUnificadaServiceUnit;
 
 type
   TFakeMunicipiosRepository = class(IMunicipiosRepository)
@@ -130,7 +131,9 @@ type
     function ContarErrosCodigo(const V: ValidacaoOutput; Codigo: Integer): Integer;
     function CriarDocumento: CalcularTributoInput;
     function CriarItem(const &IS: ImpostoSeletivoInput; BaseCalculo, Quantidade: Single; const Unidade: string): ItemCalculoInput;
-    function CriarIS(BaseCalculo, Quantidade: Double; const Unidade: string; ImpostoInformado: Double): ImpostoSeletivoInput;
+    function CriarItemSemBase(const &IS: ImpostoSeletivoInput; Quantidade: Single; const Unidade: string): ItemCalculoInput;
+    function CriarIS(BaseCalculo: Double; const Quantidade: CurrencyNullable;
+      const Unidade: string; ImpostoInformado: Double): ImpostoSeletivoInput;
     procedure CriarService;
   public
     [Setup]
@@ -368,7 +371,8 @@ begin
     FAliqAdValoremServRepo,
     FAliqAdRemProdRepo,
     nil, // IRedutorCompraGovernamentalRepository so e consultado com GCompraGov
-    classTribService
+    classTribService,
+    BaseCalculoUnificadaService.Create()
   );
 end;
 
@@ -387,16 +391,36 @@ begin
     '000',
     &IS,
     TributacaoRegularInput.NullInstance(),
-    BaseCalculo,
-    Quantidade,
+    CurrencyNullable.Create(BaseCalculo),
+    CurrencyNullable.Create(Quantidade),
     Unidade
   );
 end;
 
-function TTest_PreparacaoCalculoService_ValidacaoDigitos.CriarIS(BaseCalculo, Quantidade: Double;
-  const Unidade: string; ImpostoInformado: Double): ImpostoSeletivoInput;
+function TTest_PreparacaoCalculoService_ValidacaoDigitos.CriarItemSemBase(const &IS: ImpostoSeletivoInput;
+  Quantidade: Single; const Unidade: string): ItemCalculoInput;
 begin
-  Result := ImpostoSeletivoInput.Create('000', '000000', BaseCalculo, Quantidade, Unidade, ImpostoInformado);
+  // Base ausente isola a validacao de digitos da consistencia legada de CBS e IBS.
+  Result := ItemCalculoInput.Create(
+    1,
+    '',
+    '000001',
+    '000',
+    &IS,
+    TributacaoRegularInput.NullInstance(),
+    CurrencyNullable.NullInstance(),
+    CurrencyNullable.Create(Quantidade),
+    Unidade
+  );
+end;
+
+function TTest_PreparacaoCalculoService_ValidacaoDigitos.CriarIS(BaseCalculo: Double;
+  const Quantidade: CurrencyNullable; const Unidade: string;
+  ImpostoInformado: Double): ImpostoSeletivoInput;
+begin
+  Result := ImpostoSeletivoInput.Create(
+    '000', '000000', CurrencyNullable.Create(BaseCalculo), Quantidade, Unidade,
+    CurrencyNullable.Create(ImpostoInformado));
 end;
 
 function TTest_PreparacaoCalculoService_ValidacaoDigitos.ContarErrosCodigo(const V: ValidacaoOutput; Codigo: Integer): Integer;
@@ -459,7 +483,7 @@ var
   resultado: PreparacaoResultado;
 begin
   documento := CriarDocumento;
-  item := CriarItem(CriarIS(12345678901234.0, 1.5, 'UN', 12.34), 200, 1, 'UN');
+  item := CriarItemSemBase(CriarIS(12345678901234.0, CurrencyNullable.Create(1.5), 'UN', 12.34), 1, 'UN');
   resultado := FService.Preparar(documento, item);
 
   Assert.IsTrue(ContarErrosCodigo(resultado.Validacoes, ECOD_VALIDACAO_DIGITOS) > 0,
@@ -473,7 +497,7 @@ var
   resultado: PreparacaoResultado;
 begin
   documento := CriarDocumento;
-  item := CriarItem(CriarIS(1.234, 1.5, 'UN', 12.34), 200, 1, 'UN');
+  item := CriarItemSemBase(CriarIS(1.234, CurrencyNullable.Create(1.5), 'UN', 12.34), 1, 'UN');
   resultado := FService.Preparar(documento, item);
 
   Assert.IsTrue(ContarErrosCodigo(resultado.Validacoes, ECOD_VALIDACAO_DIGITOS) > 0,
@@ -487,7 +511,7 @@ var
   resultado: PreparacaoResultado;
 begin
   documento := CriarDocumento;
-  item := CriarItem(CriarIS(12345.67, 1.5, 'UN', 12.34), 200, 1, 'UN');
+  item := CriarItemSemBase(CriarIS(12345.67, CurrencyNullable.Create(1.5), 'UN', 12.34), 1, 'UN');
   resultado := FService.Preparar(documento, item);
 
   Assert.AreEqual(0, ContarErrosCodigo(resultado.Validacoes, ECOD_VALIDACAO_DIGITOS),
@@ -501,7 +525,7 @@ var
   resultado: PreparacaoResultado;
 begin
   documento := CriarDocumento;
-  item := CriarItem(CriarIS(12345.67, 1.5, 'UN', 1.234), 200, 1, 'UN');
+  item := CriarItemSemBase(CriarIS(12345.67, CurrencyNullable.Create(1.5), 'UN', 1.234), 1, 'UN');
   resultado := FService.Preparar(documento, item);
 
   Assert.IsTrue(ContarErrosCodigo(resultado.Validacoes, ECOD_VALIDACAO_DIGITOS) > 0,
@@ -515,7 +539,7 @@ var
   resultado: PreparacaoResultado;
 begin
   documento := CriarDocumento;
-  item := CriarItem(CriarIS(12345.67, 1.5, 'UN', 12.34), 200, 1, 'UN');
+  item := CriarItemSemBase(CriarIS(12345.67, CurrencyNullable.Create(1.5), 'UN', 12.34), 1, 'UN');
   resultado := FService.Preparar(documento, item);
 
   Assert.AreEqual(0, ContarErrosCodigo(resultado.Validacoes, ECOD_VALIDACAO_DIGITOS),
@@ -529,7 +553,7 @@ var
   resultado: PreparacaoResultado;
 begin
   documento := CriarDocumento;
-  item := CriarItem(CriarIS(12345.67, 123456789012.0, 'UN', 12.34), 200, 1, 'UN');
+  item := CriarItemSemBase(CriarIS(12345.67, CurrencyNullable.Create(123456789012.0), 'UN', 12.34), 1, 'UN');
   resultado := FService.Preparar(documento, item);
 
   Assert.IsTrue(ContarErrosCodigo(resultado.Validacoes, ECOD_VALIDACAO_DIGITOS) > 0,
@@ -543,7 +567,7 @@ var
   resultado: PreparacaoResultado;
 begin
   documento := CriarDocumento;
-  item := CriarItem(CriarIS(12345.67, 12345.6789, 'UN', 12.34), 200, 1, 'UN');
+  item := CriarItemSemBase(CriarIS(12345.67, CurrencyNullable.Create(12345.6789), 'UN', 12.34), 1, 'UN');
   resultado := FService.Preparar(documento, item);
 
   Assert.AreEqual(0, ContarErrosCodigo(resultado.Validacoes, ECOD_VALIDACAO_DIGITOS),

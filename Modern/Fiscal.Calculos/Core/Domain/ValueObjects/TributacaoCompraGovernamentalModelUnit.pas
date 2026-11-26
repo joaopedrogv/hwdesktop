@@ -1,4 +1,4 @@
-ï»¿unit TributacaoCompraGovernamentalModelUnit;
+unit TributacaoCompraGovernamentalModelUnit;
 
 interface
 
@@ -64,7 +64,7 @@ implementation
 
 uses
   SysUtils,
-  ArredondamentoUtilsUnit, NumberServiceUnit;
+  DecimalCalculoUnit, ArredondamentoCalculoUnit, NumberServiceUnit;
 
 { TributacaoCompraGovernamentalModel }
 
@@ -124,6 +124,7 @@ function TributacaoCompraGovernamentalModel.GetValoresEfetivos(
 ): TributacaoCompraGovernamentalModel;
 var
   pTransferenciaCBSEmDecimal: Double;
+  fracaoTransferencia: DecimalCalculo;
   pAliqCBSTransferir: Double;
   vTribCBSTransferir: Double;
   pAliqCBSFinal: Double;
@@ -138,10 +139,10 @@ begin
   end;
 
   if DataFatoGerador <= 0 then
-    raise Exception.Create('Data do fato gerador obrigatÃ³ria');
+    raise Exception.Create('Data do fato gerador obrigatória');
 
   if PTransferenciaCBS.IsNull then
-    raise Exception.Create('Percentual de transferÃªncia da CBS obrigatÃ³ria');
+    raise Exception.Create('Percentual de transferência da CBS obrigatória');
 
   if DataFatoGerador < EncodeDate(2027, 1, 1) then
   begin
@@ -161,7 +162,8 @@ begin
   end
   else
   begin
-    pTransferenciaCBSEmDecimal := ArredondamentoUtils.DividirPorCem( PTransferenciaCBS.Value ); // dividido por 100
+    fracaoTransferencia := ArredondamentoCalculo.PercentualParaFracao(DecimalCalculo.DeCurrency(PTransferenciaCBS.Value));
+    pTransferenciaCBSEmDecimal := fracaoTransferencia.ParaDouble; // dividido por 100
     pAliqCBSTransferir := FPAliqCBS * pTransferenciaCBSEmDecimal; // percentual CBS a transferir
     vTribCBSTransferir := FVTribCBS * pTransferenciaCBSEmDecimal; // valor CBS a transferir
 

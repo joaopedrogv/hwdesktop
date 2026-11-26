@@ -58,6 +58,9 @@ type
 
     [Test]
     procedure teste_AliquotaAdValoremNula_NaoLanca;
+
+    [Test]
+    procedure teste_CadeiaDecimal_ValoresOficiais;
   end;
 
 implementation
@@ -125,7 +128,7 @@ var
   aliquota: AliquotaImpostoSeletivoModel;
   resultado: ImpostoSeletivoModel;
 begin
-  isInput := ImpostoSeletivoInput.Create('000', '000002', 200, 1, 'UN');
+  isInput := ImpostoSeletivoInput.Create('000', '000002', CurrencyNullable.Create(200), CurrencyNullable.Create(1), 'UN', CurrencyNullable.NullInstance());
   item := ItemCalculoInput.Create(1, '000000000', '000002', '000', isInput, TributacaoRegularInput.NullInstance());
   tratamento := TratamentoClassificacaoModel.Create(1, 1, False, False);
   aliquota := AliquotaImpostoSeletivoModel.Create(CurrencyNullable.Create(25), CurrencyNullable.Create(0), 'UN');
@@ -134,7 +137,7 @@ begin
 
   resultado := FService.Calcular(item, tratamento, aliquota, 0);
 
-  // 25 / 100 -> 0.25 -> movePointRight(2) = 25 (HALF_EVEN, 8 casas internas)
+  // 25 / 100 -> 0.25 -> movePointRight(2) = 25 (HALF_EVEN a 4 casas)
   Assert.AreEqual(25.0, resultado.PIS, 0.0001);
   Assert.AreEqual(200.0, resultado.VBCIS, 0.0001);
 end;
@@ -147,9 +150,10 @@ var
   aliquota: AliquotaImpostoSeletivoModel;
   resultado: ImpostoSeletivoModel;
 begin
-  // baseCalculoInformada com 3 casas: sao preservadas internamente (variavel unica),
-  // porem a saida (VBCIS) mantem 2 casas (HALF_UP legado).
-  isInput := ImpostoSeletivoInput.Create('000', '000002', 100.125, 1, 'UN');
+  // baseCalculoInformada com 3 casas: sao preservadas internamente (variavel unica);
+  // a saida (VBCIS) usa HALF_EVEN: 100.125 -> 100.12
+  // (Teste_ArredondamentoUtils / ArredondamentoUtils.java).
+  isInput := ImpostoSeletivoInput.Create('000', '000002', CurrencyNullable.Create(100.125), CurrencyNullable.Create(1), 'UN', CurrencyNullable.NullInstance());
   item := ItemCalculoInput.Create(1, '000000000', '000002', '000', isInput, TributacaoRegularInput.NullInstance());
   tratamento := TratamentoClassificacaoModel.Create(1, 1, False, False);
   aliquota := AliquotaImpostoSeletivoModel.Create(CurrencyNullable.Create(0), CurrencyNullable.Create(0), 'UN');
@@ -158,7 +162,7 @@ begin
 
   resultado := FService.Calcular(item, tratamento, aliquota, 0);
 
-  Assert.AreEqual(100.13, resultado.VBCIS, 0.0001);
+  Assert.AreEqual(100.12, resultado.VBCIS, 0.0001);
 end;
 
 procedure TTest_CalculoImpostoSeletivo_Precisao.teste_TributoCalculado_Composto_UsaPrecisaoInterna;
@@ -170,8 +174,8 @@ var
   resultado: ImpostoSeletivoModel;
 begin
   // baseCalculo*aliquotaAdValorem + quantidade*aliquotaAdRem
-  // = 200*0.25 + 1*0.5 = 50.5 (precisao interna 8/HALF_EVEN)
-  isInput := ImpostoSeletivoInput.Create('000', '000002', 200, 1, 'UN');
+  // = 200*0.25 + 1*0.5 = 50.5 (conta exata; saida HALF_EVEN)
+  isInput := ImpostoSeletivoInput.Create('000', '000002', CurrencyNullable.Create(200), CurrencyNullable.Create(1), 'UN', CurrencyNullable.NullInstance());
   item := ItemCalculoInput.Create(1, '000000000', '000002', '000', isInput, TributacaoRegularInput.NullInstance());
   tratamento := TratamentoClassificacaoModel.Create(1, 1, False, False);
   aliquota := AliquotaImpostoSeletivoModel.Create(CurrencyNullable.Create(25), CurrencyNullable.Create(0.5), 'UN');
@@ -200,7 +204,7 @@ var
   resultado: ImpostoSeletivoModel;
 begin
   // Aliquota ad valorem nula nao deve lancar excecao (null-safe) e resulta em PIS = 0
-  isInput := ImpostoSeletivoInput.Create('000', '000002', 100, 1, 'UN');
+  isInput := ImpostoSeletivoInput.Create('000', '000002', CurrencyNullable.Create(100), CurrencyNullable.Create(1), 'UN', CurrencyNullable.NullInstance());
   item := ItemCalculoInput.Create(1, '000000000', '000002', '000', isInput, TributacaoRegularInput.NullInstance());
   tratamento := TratamentoClassificacaoModel.Create(1, 1, False, False);
   aliquota := AliquotaImpostoSeletivoModel.Create(CurrencyNullable.NullInstance(), CurrencyNullable.NullInstance(), 'UN');
@@ -211,6 +215,36 @@ begin
 
   Assert.AreEqual(0.0, resultado.PIS, 0.0001);
   Assert.AreEqual(100.0, resultado.VBCIS, 0.0001);
+end;
+
+procedure TTest_CalculoImpostoSeletivo_Precisao.teste_CadeiaDecimal_ValoresOficiais;
+var
+  item: ItemCalculoInput;
+  isInput: ImpostoSeletivoInput;
+  tratamento: TratamentoClassificacaoModel;
+  aliquota: AliquotaImpostoSeletivoModel;
+  resultado: ImpostoSeletivoModel;
+begin
+  // v0073 (T01/T02 de 2027): BC 200, ad valorem 13 e ad rem 21,30 resultam em
+  // vBCIS 200,00, pIS 13,00, adRemIS 21,30 e vIS 47,30 = 200 * 0,13 + 1 * 21,30.
+  isInput := ImpostoSeletivoInput.Create('000', '000002', CurrencyNullable.Create(200), CurrencyNullable.Create(1), 'UN', CurrencyNullable.NullInstance());
+  item := ItemCalculoInput.Create(1, '000000000', '000002', '000', isInput, TributacaoRegularInput.NullInstance());
+  tratamento := TratamentoClassificacaoModel.Create(1, 1, False, False);
+  aliquota := AliquotaImpostoSeletivoModel.Create(
+    CurrencyNullable.Create(13), CurrencyNullable.Create(21.30), 'UN');
+
+  CriarService(CriarTratamento(
+    'baseCalculoInformada',
+    'baseCalculo*aliquotaAdValorem+quantidade*aliquotaAdRem',
+    'tributoCalculado'
+  ));
+
+  resultado := FService.Calcular(item, tratamento, aliquota, 0);
+
+  Assert.AreEqual(200.0, resultado.VBCIS, 0.0001);
+  Assert.AreEqual(13.0, resultado.PIS, 0.0001);
+  Assert.AreEqual(21.30, resultado.PISEspec, 0.0001);
+  Assert.AreEqual(47.30, resultado.VIS, 0.0001);
 end;
 
 initialization

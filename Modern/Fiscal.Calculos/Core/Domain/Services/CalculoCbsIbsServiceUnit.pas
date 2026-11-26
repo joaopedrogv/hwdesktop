@@ -63,19 +63,19 @@ type
     ): Double;
 
     function ObterGrupoReducao(
-      AliquotaEfetiva, PercentualReducao: DoubleNullable; AliquotaDivididaPorCem: Boolean
+      AliquotaEfetiva, PercentualReducao: CurrencyNullable; AliquotaDivididaPorCem: Boolean
     ): ReducaoAliquotaModel;
 
     function ObterGrupoCompraGov(
       TpEnteGov: TipoEnteGovernamental;
       TipoTributo: TipoTributoEnum;
-      Aliquota, Valor: Double
+      Aliquota, Valor: Currency
     ): TributacaoCompraGovernamentalModel;
 
     function ObterGrupoDesoneracao(
       const Cst, cClassTrib: string;
-      BaseCalculo, Aliquota: Double;
-      PercentualReducao: DoubleNullable;
+      BaseCalculo, Aliquota: Currency;
+      PercentualReducao: CurrencyNullable;
       AliquotaDivididaPorCem, PossuiPercentualReducao: Boolean
     ): ResultadoTributacaoRegular;
 
@@ -83,8 +83,8 @@ type
 
     function ObterGrupoMonofasia(
       const ClassificacaoTrib: ClassificacaoTributariaCalculoModel;
-      Quantidade: Currency; AliquotaAdRemPrincipal, AliquotaAdRemSecundaria, TributoCalculado, TributoDevido,
-      VariacaoPontoPercentual: DoubleNullable
+      Quantidade: Currency; AliquotaAdRemPrincipal, AliquotaAdRemSecundaria: DoubleNullable;
+      TributoCalculado, TributoDevido: Currency; VariacaoPontoPercentual: DoubleNullable
     ): ResultadoGrupoMonofasia;
 
     function ObterFatorBioCombustivel(): Double;
@@ -120,7 +120,8 @@ implementation
 
 uses
   SysUtils, StrUtils, Math,
-  TratamentoTributarioEtdUnit, DateTimeServiceUnit, NumberServiceUnit, ArredondamentoUtilsUnit,
+  TratamentoTributarioEtdUnit, DateTimeServiceUnit, NumberServiceUnit,
+  DecimalCalculoUnit, ArredondamentoCalculoUnit,
   ResultadoGrupoEtapaMonofasiaUnit, ResultadoGrupoDiferimentoMonofasiaUnit, TratamentoClassificacaoEtdUnit,
   ClassificacaoTributariaEtdUnit, SituacaoTributariaEtdUnit, StringNullableUnit, AliquotaResultadoModelUnit,
   IntegerNullableUnit;
@@ -134,6 +135,15 @@ const
   CONST_VARIACAO_EAC             = 5;
   CONST_ALIQUOTA_EAC             = 0.1922;
   CONST_ALIQUOTA_GASOLINA_TIPO_A = 0.7925;
+
+function PublicarAliquota(const AFracao: DecimalCalculo): DecimalCalculo;
+var
+  percentual: DecimalCalculo;
+begin
+  percentual := ArredondamentoCalculo.FracaoParaPercentual(AFracao);
+  percentual := ArredondamentoCalculo.AliquotaPublicada(percentual);
+  Result := ArredondamentoCalculo.PercentualParaFracao(percentual);
+end;
 
 { CalculoCbsIbsService }
 
@@ -161,37 +171,52 @@ begin
 end;
 
 function CalculoCbsIbsService.ObterFatorBioCombustivel: Double;
+var
+  fator: DecimalCalculo;
 begin
-  Result := ArredondamentoUtils.ArredondarInterno(
-    CONST_PBIO / (100 - CONST_PBIO)
-  );
+  fator := DecimalCalculo.DeInteiro(CONST_PBIO);
+  fator := fator.Dividir(DecimalCalculo.DeInteiro(100 - CONST_PBIO));
+  Result := fator.ParaDouble;
 end;
 
 function CalculoCbsIbsService.ObterGrupoDesoneracao(
   const Cst, cClassTrib: string;
-  BaseCalculo, Aliquota: Double;
-  PercentualReducao: DoubleNullable;
+  BaseCalculo, Aliquota: Currency;
+  PercentualReducao: CurrencyNullable;
   AliquotaDivididaPorCem, PossuiPercentualReducao: Boolean
 ): ResultadoTributacaoRegular;
 var
-  aliquotaEfetiva, redutor, tributoDevido: Double;
+  aliquotaEfetiva, tributoDevido, aliquotaPublicada, redutor, um: DecimalCalculo;
+  aliquotaCurrency, tributoCurrency: Currency;
 begin
-
-  aliquotaEfetiva := Aliquota;
+  aliquotaEfetiva := DecimalCalculo.DeCurrency(Aliquota);
+  aliquotaEfetiva := ArredondamentoCalculo.PercentualParaFracao(aliquotaEfetiva);
 
   if PossuiPercentualReducao and not PercentualReducao.IsNull then
   begin
-    redutor := 1 - PercentualReducao.Value;
-    aliquotaEfetiva := Aliquota * redutor;
+    redutor := DecimalCalculo.DeCurrency(PercentualReducao.Value);
+    redutor := ArredondamentoCalculo.PercentualParaFracao(redutor);
+    um := DecimalCalculo.DeInteiro(1);
+    redutor := um.Subtrair(redutor);
+    aliquotaEfetiva := aliquotaEfetiva.Multiplicar(redutor);
   end;
 
-  tributoDevido := BaseCalculo * aliquotaEfetiva;
+  if AliquotaDivididaPorCem then
+    aliquotaEfetiva := PublicarAliquota(aliquotaEfetiva);
+
+  tributoDevido := DecimalCalculo.DeCurrency(BaseCalculo);
+  tributoDevido := tributoDevido.Multiplicar(aliquotaEfetiva);
+  tributoDevido := ArredondamentoCalculo.ValorFiscal(tributoDevido);
 
   if AliquotaDivididaPorCem then
-    aliquotaEfetiva := NumberService.MovePointRight( aliquotaEfetiva, 2);
+    aliquotaPublicada := ArredondamentoCalculo.FracaoParaPercentual(aliquotaEfetiva)
+  else
+    aliquotaPublicada := aliquotaEfetiva;
 
+  aliquotaCurrency := aliquotaPublicada.ParaCurrency;
+  tributoCurrency := tributoDevido.ParaCurrency;
   Result := ResultadoTributacaoRegular.Create(
-    Cst, cClassTrib, BaseCalculo, aliquotaEfetiva, tributoDevido
+    Cst, cClassTrib, BaseCalculo, aliquotaCurrency, tributoCurrency
   );
 end;
 
@@ -210,8 +235,8 @@ end;
 
 function CalculoCbsIbsService.ObterGrupoMonofasia(
   const ClassificacaoTrib: ClassificacaoTributariaCalculoModel;
-  Quantidade: Currency; AliquotaAdRemPrincipal, AliquotaAdRemSecundaria, TributoCalculado, TributoDevido,
-  VariacaoPontoPercentual: DoubleNullable
+  Quantidade: Currency; AliquotaAdRemPrincipal, AliquotaAdRemSecundaria: DoubleNullable;
+  TributoCalculado, TributoDevido: Currency; VariacaoPontoPercentual: DoubleNullable
 ): ResultadoGrupoMonofasia;
 var
   grupoGMonoPadrao, grupoGMonoReten, grupoGMonoRet: ResultadoGrupoEtapaMonofasia;
@@ -234,7 +259,7 @@ begin
     grupoGMonoPadrao := ResultadoGrupoEtapaMonofasia.Create(
       quantidadeFinal,
       aliquotaFinal,
-      TributoCalculado.Value
+      TributoCalculado
     );
   end
   else
@@ -244,7 +269,7 @@ begin
     grupoGMonoReten := ResultadoGrupoEtapaMonofasia.Create(
       Quantidade * ObterFatorBioCombustivel(),
       AliquotaAdRemSecundaria.Value,
-      TributoDevido.Value
+      TributoDevido
     )
   else
     grupoGMonoReten := ResultadoGrupoEtapaMonofasia.NullInstance();
@@ -253,15 +278,15 @@ begin
     grupoGMonoRet := ResultadoGrupoEtapaMonofasia.Create(
       Quantidade,
       AliquotaAdRemPrincipal.Value,
-      TributoDevido.Value
+      TributoDevido
     )
   else
     grupoGMonoRet := ResultadoGrupoEtapaMonofasia.NullInstance();
 
   if ClassificacaoTrib.InGrupoMonofasiaDiferimento then
     grupoGMonoDiferimento := ResultadoGrupoDiferimentoMonofasia.Create(
-      TributoCalculado.Value - TributoDevido.Value,
-      NumberService.MovePointRightCurr((TributoCalculado.Value - TributoDevido.Value) / TributoCalculado.Value, 2)
+      TributoCalculado - TributoDevido,
+      NumberService.MovePointRightCurr((TributoCalculado - TributoDevido) / TributoCalculado, 2)
     )
   else
     grupoGMonoDiferimento := ResultadoGrupoDiferimentoMonofasia.NullInstance();
@@ -278,25 +303,29 @@ begin
 end;
 
 function CalculoCbsIbsService.ObterGrupoReducao(
-  AliquotaEfetiva, PercentualReducao: DoubleNullable; AliquotaDivididaPorCem: Boolean
+  AliquotaEfetiva, PercentualReducao: CurrencyNullable; AliquotaDivididaPorCem: Boolean
 ): ReducaoAliquotaModel;
 var
-  aliquotaEfet: Double;
+  pAliqEfet, pRedAliq: Currency;
+  valorDecimal: DecimalCalculo;
 begin
   if AliquotaEfetiva.IsNull or PercentualReducao.IsNull then
     Result := ReducaoAliquotaModel.NullInstance()
 
   else
   begin
-    if not AliquotaEfetiva.IsNull and AliquotaDivididaPorCem then
-      aliquotaEfet := NumberService.MovePointRight(AliquotaEfetiva.Value, 2)
+    if AliquotaDivididaPorCem then
+      pAliqEfet := AliquotaEfetiva.Value
     else
-      aliquotaEfet := AliquotaEfetiva.Value;
+    begin
+      valorDecimal := DecimalCalculo.DeCurrency(AliquotaEfetiva.Value);
+      valorDecimal := ArredondamentoCalculo.PercentualParaFracao(valorDecimal);
+      pAliqEfet := valorDecimal.ParaCurrency;
+    end;
 
-    Result := ReducaoAliquotaModel.Create(
-      NumberService.MovePointRightCurr(PercentualReducao.Value, 2),
-      aliquotaEfet
-    );
+    pRedAliq := PercentualReducao.Value;
+
+    Result := ReducaoAliquotaModel.Create(pRedAliq, pAliqEfet);
   end;
 end;
 
@@ -306,6 +335,7 @@ function CalculoCbsIbsService.BuscarAliquotaPadrao(
 var
   aliquota: AliquotaResultadoModel;
   cMun, cUF: IntegerNullable;
+  aliquotaDecimal: DecimalCalculo;
 begin
   cMun := IntegerNullable.CreateOrNull(CodigoMunicipio);
   cUF := IntegerNullable.CreateOrNull(CodigoUf);
@@ -319,7 +349,8 @@ begin
     );
 
   try
-    Result := ArredondamentoUtils.DividirPorCem( aliquota.ValorAplicavel );
+    aliquotaDecimal := ArredondamentoCalculo.PercentualParaFracao(DecimalCalculo.DeCurrency(aliquota.ValorAplicavel));
+    Result := aliquotaDecimal.ParaDouble;
   finally
     aliquota.Free();
   end;
@@ -328,6 +359,7 @@ end;
 function CalculoCbsIbsService.BuscarAliquotaReferencia(TipoTributo: TipoTributoEnum; Data: TDate): Double;
 var
   aliquota: CurrencyNullable;
+  aliquotaDecimal: DecimalCalculo;
 begin
   aliquota := FAliquotaReferenciaRepo.ObterPorTipoTributo( TipoTributo, Data );
   if aliquota.IsNull then
@@ -336,7 +368,8 @@ begin
       [Ord(TipoTributo), DateToStr(Data) ]
     );
 
-  Result := ArredondamentoUtils.DividirPorCem( aliquota.Value );
+  aliquotaDecimal := ArredondamentoCalculo.PercentualParaFracao(DecimalCalculo.DeCurrency(aliquota.Value));
+  Result := aliquotaDecimal.ParaDouble;
 end;
 
 function CalculoCbsIbsService.BuscarAliquotaUniformeSetorial(
@@ -344,6 +377,7 @@ function CalculoCbsIbsService.BuscarAliquotaUniformeSetorial(
 ): Double;
 var
   aliquotaUniformeSetorial: CurrencyNullable;
+  aliquotaDecimal: DecimalCalculo;
 begin
   aliquotaUniformeSetorial := FAliquotaAdValoremServicoRepo.ObterAliquotaAdValorem(
     CodioNBS, TipoTributo, ClassificacaoTributariaId, Data
@@ -356,7 +390,8 @@ begin
     if aliquotaUniformeSetorial.IsNull then
       raise Exception.CreateFmt('Alíquota uniforme setorial não encontrada em %s', [ DateService.ParseLocal(Data) ]);
   end;
-  Result := ArredondamentoUtils.DividirPorCem( aliquotaUniformeSetorial.Value );
+  aliquotaDecimal := ArredondamentoCalculo.PercentualParaFracao(DecimalCalculo.DeCurrency(aliquotaUniformeSetorial.Value));
+  Result := aliquotaDecimal.ParaDouble;
 end;
 
 function CalculoCbsIbsService.BuscarPercentualReducao(ClassificacaoTributariaId: Integer; TipoTributo: TipoTributoEnum;
@@ -374,6 +409,7 @@ function CalculoCbsIbsService.BuscarAliquotaFixa(
 ): Double;
 var
   aliquotaFixa: CurrencyNullable;
+  aliquotaDecimal: DecimalCalculo;
 begin
   aliquotaFixa := FAliquotaAdValoremServicoRepo.ObterAliquotaAdValoremPorClassificacaoTributaria(
     TipoTributo, ClassificacaoTributariaId, Data
@@ -381,7 +417,8 @@ begin
   if aliquotaFixa.IsNull then
     raise Exception.CreateFmt('Alíquota fixa não encontrada em %s', [ DateService.ParseLocal(Data) ]);
 
-  Result := ArredondamentoUtils.DividirPorCem( aliquotaFixa.Value );
+  aliquotaDecimal := ArredondamentoCalculo.PercentualParaFracao(DecimalCalculo.DeCurrency(aliquotaFixa.Value));
+  Result := aliquotaDecimal.ParaDouble;
 end;
 
 function CalculoCbsIbsService.Calcular(
@@ -410,6 +447,7 @@ var
   percentualReducao: CurrencyNullable;
   //inputExpressao: ExpressaoInput;
   variaveisBuilder: IVariaveisAvaliadorBuilder;
+  variaveis: VariaveisAvaliador;
   grupoReducao: ReducaoAliquotaModel;
   grupoDesoneracao: ResultadoTributacaoRegular;
   compraGovernamental: TributacaoCompraGovernamentalModel;
@@ -422,10 +460,15 @@ var
   valorAjuste, valorRedutor, baseCalculoInformada, quantidade, impostoSeletivoInformado,
   valorAliquotaPadraoOuReferencia, valorAliquotaReferencia, valorAliquotaAdValorem, valorAliquotaAdRem,
   valorAliquotaAdRemPrincipal, valorAliquotaAdRemSecundaria, variacaoPontoPercentual,
-  valorPercentualReducao, valorAliquota, pBio, pDif, resultadoAliquota, resultadoAliquotaEfetiva,
-  resultadoBaseCalculo, resultadoTributoCalculado, resultadoTributoDevido,
+  valorPercentualReducao, valorAliquota, pBio, pDif,
   resultadoPercentualDiferimento, resultadoValorDiferimento: DoubleNullable;
-  aliquotaFinal: Double;
+  resultadoAliquota, resultadoAliquotaEfetiva, resultadoBaseCalculo,
+  resultadoTributoCalculado, resultadoTributoDevido: CurrencyNullable;
+  resultadoAliquotaDecimal, resultadoAliquotaEfetivaDecimal, resultadoBaseCalculoDecimal,
+  resultadoTributoCalculadoDecimal, resultadoTributoDevidoDecimal,
+  resultadoPercentualDiferimentoDecimal, resultadoValorDiferimentoDecimal: DecimalCalculo;
+  fatorPercentual, aliquotaDecimal, aliquotaPublicadaDecimal: DecimalCalculo;
+  aliquotaFinal: Currency;
 begin
   cst := '';
   cClassTrib := '';
@@ -468,9 +511,10 @@ begin
   valorPercentualReducao.SetNull();
   valorAjuste.SetNull();
   valorRedutor.SetNull();
+  percentualReducao := CurrencyNullable.NullInstance();
 
-  baseCalculoInformada.SetValue( Item.BaseCalculo );
-  quantidade.SetValue( Item.Quantidade );
+  baseCalculoInformada.SetValue( Item.BaseCalculo.Value );
+  quantidade.SetValue( Item.QuantidadeEfetiva );
   impostoSeletivoInformado.SetNull();
 
   if not Item.ImpostoSeletivo.IsNull and (NumberService.RoundHalfUpTo2(ValorImpostoSeletivoCalculado) > 0) then
@@ -499,6 +543,8 @@ begin
   resultadoTributoDevido.SetNull();
   resultadoPercentualDiferimento.SetNull();
   resultadoValorDiferimento.SetNull();
+  resultadoAliquotaDecimal := DecimalCalculo.Zero;
+  resultadoAliquotaEfetivaDecimal := DecimalCalculo.Zero;
   /////////////////////////////
 
   if possuiPercentualReducao then
@@ -506,7 +552,8 @@ begin
     percentualReducao := BuscarPercentualReducao(classificacaoTrib.Id, TipoTributo, Data);
 
 
-    valorPercentualReducao.SetValue( ArredondamentoUtils.DividirPorCem( percentualReducao.Value ) );
+    fatorPercentual := ArredondamentoCalculo.PercentualParaFracao(DecimalCalculo.DeCurrency(percentualReducao.Value));
+    valorPercentualReducao.SetValue( fatorPercentual.ParaDouble );
   end;
 
   tipoAliquota := TipoAliquotaEnum( IndexText(classificacaoTrib.TipoAliquota,
@@ -535,9 +582,11 @@ begin
         begin
           valorAliquotaAdRemPrincipal.SetValue( CONST_ALIQUOTA_GASOLINA_TIPO_A );
           valorAliquotaAdRemSecundaria.SetValue( CONST_ALIQUOTA_EAC );
-          pBio.SetValue( ArredondamentoUtils.DividirPorCem( CONST_PBIO ));
-          pDif.SetValue( ArredondamentoUtils.DividirPorCem( CONST_PDIF ));
-          variacaoPontoPercentual.SetValue( CONST_ALIQUOTA_EAC );
+          fatorPercentual := ArredondamentoCalculo.PercentualParaFracao(DecimalCalculo.DeInteiro(CONST_PBIO));
+          pBio.SetValue( fatorPercentual.ParaDouble );
+          fatorPercentual := ArredondamentoCalculo.PercentualParaFracao(DecimalCalculo.DeInteiro(CONST_PDIF));
+          pDif.SetValue( fatorPercentual.ParaDouble );
+          variacaoPontoPercentual.SetValue( CONST_VARIACAO_EAC );
         end
         else
         begin
@@ -583,10 +632,20 @@ begin
 
   //putExpressao := exprBuilder.Build();
 
+  // As aliquotas publicadas internas ficam em percentual (Currency); os grupos
+  // convertem para fracao ao replicar as formulas do Java.
   {$REGION 'Aliquota'}
   if not expressaoAliquota.IsNullOrWhiteSpace() then
-    resultadoAliquota.SetValue( FAvaliador.Evaluate( expressaoAliquota.Value, variaveisBuilder.Build(), ArredondamentoUtils.PRECISAO_INTERNA ));
-  variaveisBuilder.Aliquota(resultadoAliquota.Value);
+  begin
+    variaveis := variaveisBuilder.Build();
+    resultadoAliquotaDecimal := FAvaliador.Evaluate( expressaoAliquota.Value, variaveis );
+    if aliquotaDivididaPorCem then
+      resultadoAliquotaDecimal := PublicarAliquota(resultadoAliquotaDecimal);
+    aliquotaPublicadaDecimal := ArredondamentoCalculo.FracaoParaPercentual(resultadoAliquotaDecimal);
+    aliquotaPublicadaDecimal := ArredondamentoCalculo.AliquotaPublicada(aliquotaPublicadaDecimal);
+    resultadoAliquota.SetValue(aliquotaPublicadaDecimal.ParaCurrency);
+  end;
+  variaveisBuilder.SetAliquota(resultadoAliquotaDecimal);
   {$ENDREGION}
 
   {$REGION 'AliquotaEfetiva'}
@@ -594,10 +653,16 @@ begin
   // de aliquota efetiva (espelho de CalculoCbsIbsService.java variaveis1).
   variaveisBuilder.PRedutorCompraGov(PRedutorCompraGov);
   if not expressaoAliquotaEfetiva.IsNullOrWhiteSpace() then
-    resultadoAliquotaEfetiva.SetValue(
-      FAvaliador.Evaluate( expressaoAliquotaEfetiva.Value, variaveisBuilder.Build(), ArredondamentoUtils.PRECISAO_INTERNA )
-    );
-  variaveisBuilder.AliquotaEfetiva(resultadoAliquotaEfetiva.Value);
+  begin
+    variaveis := variaveisBuilder.Build();
+    resultadoAliquotaEfetivaDecimal := FAvaliador.Evaluate( expressaoAliquotaEfetiva.Value, variaveis );
+    if aliquotaDivididaPorCem then
+      resultadoAliquotaEfetivaDecimal := PublicarAliquota(resultadoAliquotaEfetivaDecimal);
+    aliquotaPublicadaDecimal := ArredondamentoCalculo.FracaoParaPercentual(resultadoAliquotaEfetivaDecimal);
+    aliquotaPublicadaDecimal := ArredondamentoCalculo.AliquotaPublicada(aliquotaPublicadaDecimal);
+    resultadoAliquotaEfetiva.SetValue(aliquotaPublicadaDecimal.ParaCurrency);
+  end;
+  variaveisBuilder.SetAliquotaEfetiva(resultadoAliquotaEfetivaDecimal);
   {$ENDREGION}
 
   {$REGION 'BaseCalculo'}
@@ -606,46 +671,60 @@ begin
     .BaseCalculoInformada(baseCalculoInformada.Value )
     .ImpostoSeletivoCalculado(ValorImpostoSeletivoCalculado);
 
-  resultadoBaseCalculo.SetValue( FAvaliador.Evaluate( expressaoBaseCalculo.Value, variaveisBuilder.Build(), ArredondamentoUtils.PRECISAO_INTERNA));
-
-  if NumberService.RoundHalfUpTo2(resultadoBaseCalculo.Value) < ZeroValue then
+  variaveis := variaveisBuilder.Build();
+  resultadoBaseCalculoDecimal := FAvaliador.Evaluate( expressaoBaseCalculo.Value, variaveis);
+  if not tratamentoTrib.InPossuiMonofasia then
+    resultadoBaseCalculoDecimal := ArredondamentoCalculo.ValorFiscal(resultadoBaseCalculoDecimal);
+  if resultadoBaseCalculoDecimal.MenorQue(DecimalCalculo.Zero) then
   begin
-    resultadoBaseCalculo.SetValue( ZeroValue );
+    resultadoBaseCalculoDecimal := DecimalCalculo.Zero;
             // aqui deveria ser lançada uma exceção
             // flexibilidade para a plataforma
   end;
 
-  variaveisBuilder.BaseCalculo(resultadoBaseCalculo.Value);
+  resultadoBaseCalculo.SetValue( resultadoBaseCalculoDecimal.ParaCurrency );
+  variaveisBuilder.SetBaseCalculo(resultadoBaseCalculoDecimal);
   {$ENDREGION}
 
   {$REGION 'TributoCalculado'}
-  resultadoTributoCalculado.SetValue( FAvaliador.Evaluate(
-    expressaoTributoCalculado.Value, variaveisBuilder.Build(), ArredondamentoUtils.PRECISAO_INTERNA
-  ));
+  variaveis := variaveisBuilder.Build();
+  resultadoTributoCalculadoDecimal := FAvaliador.Evaluate(
+    expressaoTributoCalculado.Value, variaveis
+  );
+  resultadoTributoCalculadoDecimal := ArredondamentoCalculo.ValorFiscal(resultadoTributoCalculadoDecimal);
+  if resultadoTributoCalculadoDecimal.MenorQue(DecimalCalculo.Zero) then
+    resultadoTributoCalculadoDecimal := DecimalCalculo.Zero;
+  resultadoTributoCalculado.SetValue( resultadoTributoCalculadoDecimal.ParaCurrency );
 
-  if NumberService.RoundHalfUpTo2(resultadoTributoCalculado.Value) < ZeroValue then
-    resultadoTributoCalculado.SetValue( ZeroValue );
-
-  variaveisBuilder.TributoCalculado(resultadoTributoCalculado.Value);
+  variaveisBuilder.SetTributoCalculado(resultadoTributoCalculadoDecimal);
   {$ENDREGION}
 
   {$REGION 'TributoDevido'}
   if not ExpressaoTributoDevido.IsNullOrWhiteSpace() then
-    resultadoTributoDevido.SetValue(FAvaliador.Evaluate(expressaoTributoDevido.Value, variaveisBuilder.Build(), ArredondamentoUtils.PRECISAO_INTERNA));
+  begin
+    variaveis := variaveisBuilder.Build();
+    resultadoTributoDevidoDecimal := FAvaliador.Evaluate(expressaoTributoDevido.Value, variaveis);
+    resultadoTributoDevidoDecimal := ArredondamentoCalculo.ValorFiscal(resultadoTributoDevidoDecimal);
+    resultadoTributoDevido.SetValue(resultadoTributoDevidoDecimal.ParaCurrency);
+  end;
   {$ENDREGION}
 
   {$REGION 'PercentualDiferimento e ValorDiferimento'}
   if not expressaoPercentualDiferimento.IsNullOrWhiteSpace()
     and not expressaoValorDiferimento.IsNullOrWhiteSpace() then
   begin
-    resultadoPercentualDiferimento.SetValue( FAvaliador.Evaluate(
-      ExpressaoPercentualDiferimento.Value, variaveisBuilder.Build(), ArredondamentoUtils.PRECISAO_INTERNA
-    ));
-    variaveisBuilder.PercentualDiferimento(resultadoPercentualDiferimento.Value);
+    variaveis := variaveisBuilder.Build();
+    resultadoPercentualDiferimentoDecimal := FAvaliador.Evaluate(
+      ExpressaoPercentualDiferimento.Value, variaveis
+    );
+    resultadoPercentualDiferimento.SetValue( resultadoPercentualDiferimentoDecimal.ParaDouble); // I09: DiferimentoModel publicado a partir do Double
+    variaveisBuilder.SetPercentualDiferimento(resultadoPercentualDiferimentoDecimal);
 
-    resultadoValorDiferimento.SetValue( FAvaliador.Evaluate(
-      expressaoValorDiferimento.Value, variaveisBuilder.Build(), ArredondamentoUtils.PRECISAO_INTERNA
-    ));
+    variaveis := variaveisBuilder.Build();
+    resultadoValorDiferimentoDecimal := FAvaliador.Evaluate(
+      expressaoValorDiferimento.Value, variaveis
+    );
+    resultadoValorDiferimento.SetValue( resultadoValorDiferimentoDecimal.ParaDouble); // I09: DiferimentoModel publicado a partir do Double
   end;
   {$ENDREGION}
 
@@ -666,7 +745,7 @@ begin
         // Compra governamental: nao suprimir o grupo de reducao com tributacao
         // regular + compra gov (espelho de CalculoCbsIbsService.java v0039).
         grupoReducao := ObterGrupoReducao(
-          resultadoAliquotaEfetiva, valorPercentualReducao, aliquotaDivididaPorCem
+          resultadoAliquotaEfetiva, percentualReducao, aliquotaDivididaPorCem
         );
       end
       else
@@ -694,7 +773,7 @@ begin
     grupoDesoneracao := ObterGrupoDesoneracao( cst, cClassTrib,
       resultadoBaseCalculo.Value,
       resultadoAliquota.Value,
-      valorPercentualReducao,
+      percentualReducao,
       aliquotaDivididaPorCem,
       possuiPercentualReducao
     );
@@ -702,7 +781,7 @@ begin
   else
   begin
     if classificacaoTrib.InGrupoReducao then
-      grupoReducao := ObterGrupoReducao(resultadoAliquotaEfetiva, valorPercentualReducao, aliquotaDivididaPorCem)
+      grupoReducao := ObterGrupoReducao(resultadoAliquotaEfetiva, percentualReducao, aliquotaDivididaPorCem)
     else
       grupoReducao := ReducaoAliquotaModel.NullInstance();
 
@@ -729,10 +808,14 @@ begin
 
   if TemTributacaoRegular then
     aliquotaFinal := ZeroValue
-  else if aliquotaDivididaPorCem then
-    aliquotaFinal := NumberService.MovePointRightCurr( NumberService.RoundHalfUpTo4( resultadoAliquota.Value ), 2)
   else
-    aliquotaFinal := NumberService.RoundHalfUpTo4( resultadoAliquota.Value );
+  begin
+    aliquotaDecimal := resultadoAliquotaDecimal;
+    if aliquotaDivididaPorCem then
+      aliquotaDecimal := ArredondamentoCalculo.FracaoParaPercentual(aliquotaDecimal);
+    aliquotaDecimal := ArredondamentoCalculo.AliquotaPublicada(aliquotaDecimal);
+    aliquotaFinal := aliquotaDecimal.ParaCurrency;
+  end;
 
   compraGovernamental := ObterGrupoCompraGov(
     TpEnteGov,
@@ -745,8 +828,8 @@ begin
     aliquotaFinal,
     resultadoBaseCalculo,
     quantidade.Value,
-    IfThen(TemTributacaoRegular, ZeroValue, resultadoTributoCalculado.Value),
-    IfThen(TemTributacaoRegular, ZeroValue, resultadoTributoDevido.Value),
+    NumberService.IfThenCurr(TemTributacaoRegular, ZeroValue, resultadoTributoCalculado.Value),
+    NumberService.IfThenCurr(TemTributacaoRegular, ZeroValue, resultadoTributoDevido.Value),
     grupoReducao,
     grupoDesoneracao{e isso mesmo, na calculadora java esta assim},
     compraGovernamental,
@@ -756,8 +839,8 @@ begin
       quantidade.Value,
       valorAliquotaAdRemPrincipal,
       valorAliquotaAdRemSecundaria,
-      resultadoTributoCalculado,
-      resultadoTributoDevido,
+      resultadoTributoCalculado.Value,
+      resultadoTributoDevido.Value,
       variacaoPontoPercentual
     ),
     ''
@@ -767,7 +850,7 @@ end;
 function CalculoCbsIbsService.ObterGrupoCompraGov(
   TpEnteGov: TipoEnteGovernamental;
   TipoTributo: TipoTributoEnum;
-  Aliquota, Valor: Double
+  Aliquota, Valor: Currency
 ): TributacaoCompraGovernamentalModel;
 var
   pAliq, vTrib: Currency;
@@ -778,9 +861,9 @@ begin
     Exit;
   end;
 
-  // A aliquota e armazenada movendo-se a aliquota efetiva duas casas decimais
-  // para a direita (nao divide por 100), conforme CalculoCbsIbsService.java.
-  pAliq := NumberService.MovePointRight(Aliquota, 2);
+  // A aliquota efetiva ja chega publicada em percentual; o Java a obtem com
+  // movePointRight(2) sobre a fracao, sem dividir por 100.
+  pAliq := Aliquota;
   vTrib := Valor;
 
   case TipoTributo of

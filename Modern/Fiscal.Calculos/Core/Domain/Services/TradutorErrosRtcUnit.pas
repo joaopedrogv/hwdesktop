@@ -9,6 +9,7 @@ type
   TradutorErrosRtc = class(TInterfacedObject, ITradutorErrosRTC)
   public
     function Traduzir(Codigo: Integer; const Detalhe: string): string; overload;
+    function Traduzir(const ACodigoTexto, ADetalhe: string): string; overload;
     function Traduzir(const Validacao: ValidacaoItemOutput): string; overload;
     function Traduzir(const Validacoes: ValidacaoItensOutput): TArrayString; overload;
   end;
@@ -53,9 +54,27 @@ begin
     Result := Result + ' [' + Detalhe + ']';
 end;
 
+function TradutorErrosRtc.Traduzir(const ACodigoTexto, ADetalhe: string): string;
+begin
+  if ADetalhe <> '' then
+  begin
+    Result := ADetalhe;
+    Exit;
+  end;
+
+  if ACodigoTexto = CODIGO_BASE_CALCULO_COMPONENTES_INCONSISTENTE then
+    Result := 'A base de cálculo declarada no item diverge da base calculada ' +
+      'a partir dos componentes informados'
+  else
+    Result := ACodigoTexto;
+end;
+
 function TradutorErrosRtc.Traduzir(const Validacao: ValidacaoItemOutput): string;
 begin
-  Result := Self.Traduzir( Validacao.Codigo, Validacao.Detalhe );
+  if Validacao.CodigoTexto <> '' then
+    Result := Self.Traduzir( Validacao.CodigoTexto, Validacao.Detalhe )
+  else
+    Result := Self.Traduzir( Validacao.Codigo, Validacao.Detalhe );
 end;
 
 function TradutorErrosRtc.Traduzir(const Validacoes: ValidacaoItensOutput): TArrayString;

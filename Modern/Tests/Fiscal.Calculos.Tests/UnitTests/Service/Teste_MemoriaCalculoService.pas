@@ -12,7 +12,7 @@ uses
   TratamentoTributarioEtdUnit,
   TratamentoClassificacaoModelUnit,
   ResultadoCbsIbsUnit,
-  DoubleNullableUnit,
+  CurrencyNullableUnit,
   ReducaoAliquotaModelUnit,
   ResultadoTributacaoRegularUnit,
   TributacaoCompraGovernamentalModelUnit,
@@ -148,7 +148,7 @@ begin
   // a memoria deve ser gerada com zero nos placeholders correspondentes.
   Result := ResultadoCbsIbs.Create(
     0,                               // Aliquota (nao anulavel) zerada
-    DoubleNullable.NullInstance(),  // BaseCalculo nula
+    CurrencyNullable.NullInstance(),  // BaseCalculo nula
     0,                               // Quantidade
     0,                               // TributoCalculado
     0,                               // TributoDevido

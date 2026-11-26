@@ -82,6 +82,7 @@ uses
   AliquotaAdRemModelUnit,
   CompraGovernamentalInputUnit,
   CurrencyNullableUnit,
+  BaseCalculoUnificadaServiceUnit,
   INcmAplicavelRepositoryUnit,
   NcmAplicavelEtdUnit,
   INbsAplicavelRepositoryUnit,
@@ -636,7 +637,8 @@ begin
     FAliqAdValoremServRepo,
     FAliqAdRemProdRepo,
     nil, // IRedutorCompraGovernamentalRepository so e consultado com GCompraGov
-    classificacaoService
+    classificacaoService,
+    BaseCalculoUnificadaService.Create()
   );
 end;
 

@@ -4,21 +4,22 @@ interface
 
 uses
   SysUtils, Classes,
+  DecimalCalculoUnit,
   IAvaliadorExpressaoAritmeticaServiceUnit;
 
 type
   AvaliadorExpressaoAritmeticaService = class(TInterfacedObject, IAvaliadorExpressaoAritmeticaService)
   public
-    function Evaluate(const Expressao: string; const Variaveis: VariaveisAvaliador; Scale: ScaleRange): Double;
+    function Evaluate(const Expressao: string; const Variaveis: VariaveisAvaliador): DecimalCalculo;
   end;
 
 implementation
 
 uses
-  Math, strutils, ArredondamentoUtilsUnit;
+  Math, strutils;
 
 type
-  TExpressaoFunc = function(const V: VariaveisAvaliador): Double of object;
+  TExpressaoFunc = function(const V: VariaveisAvaliador): DecimalCalculo of object;
 
 const
   EXPR_NULL                 = '';
@@ -45,133 +46,249 @@ const
   EXPR_TRIB_CALC            = 'tributoCalculado';
   EXPR_TRIB_CALC_X_1_00     = 'tributoCalculado*1.00';
 
-function Exec_NULL_or_ZERO(const V: VariaveisAvaliador): Double;
+function Exec_NULL_or_ZERO(const V: VariaveisAvaliador): DecimalCalculo;
 begin
-  Result := 0;
+  Result := DecimalCalculo.Zero;
 end;
 
-function Exec_PBIO_ADREM_PRINC_SEC(const V: VariaveisAvaliador): Double;
+function Exec_PBIO_ADREM_PRINC_SEC(const V: VariaveisAvaliador): DecimalCalculo;
+var
+  pBio, aliquotaAdRemPrincipal, aliquotaAdRemSecundaria,
+  um, fator, termoPrincipal, termoSecundario, resultado: DecimalCalculo;
 begin
-  Result := (1-V.pBio)*V.aliquotaAdRemPrincipal+V.pBio*V.aliquotaAdRemSecundaria;
+  pBio := V.pBio;
+  aliquotaAdRemPrincipal := V.aliquotaAdRemPrincipal;
+  aliquotaAdRemSecundaria := V.aliquotaAdRemSecundaria;
+  um := DecimalCalculo.DeInteiro(1);
+  fator := um.Subtrair(pBio);
+  termoPrincipal := fator.Multiplicar(aliquotaAdRemPrincipal);
+  termoSecundario := pBio.Multiplicar(aliquotaAdRemSecundaria);
+  resultado := termoPrincipal.Somar(termoSecundario);
+  Result := resultado;
 end;
 
-function Exec_BCINF_ISINF_ISCALC2(const V: VariaveisAvaliador): Double;
+function Exec_BCINF_ISINF_ISCALC2(const V: VariaveisAvaliador): DecimalCalculo;
+var
+  baseCalculoInformada, impostoSeletivoInformado, impostoSeletivoCalculado,
+  cem, um, subtotal, semImposto, fator, quociente, resultado: DecimalCalculo;
 begin
-  Result := (V.baseCalculoInformada-V.impostoSeletivoInformado+V.impostoSeletivoCalculado)*(1-100/100);
+  baseCalculoInformada := V.baseCalculoInformada;
+  impostoSeletivoInformado := V.impostoSeletivoInformado;
+  impostoSeletivoCalculado := V.impostoSeletivoCalculado;
+  subtotal := baseCalculoInformada.Subtrair(impostoSeletivoInformado);
+  semImposto := subtotal.Somar(impostoSeletivoCalculado);
+  cem := DecimalCalculo.DeInteiro(100);
+  um := DecimalCalculo.DeInteiro(1);
+  quociente := cem.Dividir(cem);
+  fator := um.Subtrair(quociente);
+  resultado := semImposto.Multiplicar(fator);
+  Result := resultado;
 end;
 
-function Exec_PBIO_QTDE_ADREMSEC(const V: VariaveisAvaliador): Double;
+function Exec_PBIO_QTDE_ADREMSEC(const V: VariaveisAvaliador): DecimalCalculo;
+var
+  pBio, quantidade, aliquotaAdRemSecundaria,
+  um, fator, razao, comQuantidade, resultado: DecimalCalculo;
 begin
-  Result := (V.pBio/(1-V.pBio))*V.quantidade*V.aliquotaAdRemSecundaria;
+  pBio := V.pBio;
+  quantidade := V.quantidade;
+  aliquotaAdRemSecundaria := V.aliquotaAdRemSecundaria;
+  um := DecimalCalculo.DeInteiro(1);
+  fator := um.Subtrair(pBio);
+  razao := pBio.Dividir(fator);
+  comQuantidade := razao.Multiplicar(quantidade);
+  resultado := comQuantidade.Multiplicar(aliquotaAdRemSecundaria);
+  Result := resultado;
 end;
 
-function Exec_VPP_QTD_PBIO_ADRMSEC(const V: VariaveisAvaliador): Double;
+function Exec_VPP_QTD_PBIO_ADRMSEC(const V: VariaveisAvaliador): DecimalCalculo;
+var
+  variacaoPontoPercentual, quantidade, pBio, aliquotaAdRemSecundaria,
+  cem, variacaoFracao, um, fator, razao, comQuantidade, comBio, resultado: DecimalCalculo;
 begin
-  Result := (V.variacaoPontoPercentual/100)*V.quantidade*(V.pBio/(1-V.pBio))*V.aliquotaAdRemSecundaria;
+  variacaoPontoPercentual := V.variacaoPontoPercentual;
+  quantidade := V.quantidade;
+  pBio := V.pBio;
+  aliquotaAdRemSecundaria := V.aliquotaAdRemSecundaria;
+  cem := DecimalCalculo.DeInteiro(100);
+  variacaoFracao := variacaoPontoPercentual.Dividir(cem);
+  um := DecimalCalculo.DeInteiro(1);
+  fator := um.Subtrair(pBio);
+  razao := pBio.Dividir(fator);
+  comQuantidade := variacaoFracao.Multiplicar(quantidade);
+  comBio := comQuantidade.Multiplicar(razao);
+  resultado := comBio.Multiplicar(aliquotaAdRemSecundaria);
+  Result := resultado;
 end;
 
-function Exec_1_00(const V: VariaveisAvaliador): Double;
+function Exec_1_00(const V: VariaveisAvaliador): DecimalCalculo;
 begin
-  Result := 1.00;
+  Result := DecimalCalculo.DeTexto('1.00');
 end;
 
-function Exec_ALIQUOTA(const V: VariaveisAvaliador): Double;
+function Exec_ALIQUOTA(const V: VariaveisAvaliador): DecimalCalculo;
 begin
   Result := V.aliquota;
 end;
 
-function Exec_ALIQ_REDUZIDA(const V: VariaveisAvaliador): Currency;
+function Exec_ALIQ_REDUZIDA(const V: VariaveisAvaliador): DecimalCalculo;
+var
+  aliquota, percentualReducao, um, fator, resultado: DecimalCalculo;
 begin
-  Result := V.aliquota*(1-V.percentualReducao);
+  aliquota := V.aliquota;
+  percentualReducao := V.percentualReducao;
+  um := DecimalCalculo.DeInteiro(1);
+  fator := um.Subtrair(percentualReducao);
+  resultado := aliquota.Multiplicar(fator);
+  Result := resultado;
 end;
 
-function Exec_ALIQ_RED_CMP_GOV(const V: VariaveisAvaliador): Double;
+function Exec_ALIQ_RED_CMP_GOV(const V: VariaveisAvaliador): DecimalCalculo;
+var
+  aliquota, percentualReducao, pRedutorCompraGov, um, cem,
+  fatorReducao, aliquotaReduzida, redutorFracao, fatorGov, resultado: DecimalCalculo;
 begin
-  Result := V.aliquota*(1-V.percentualReducao)*(1-V.pRedutorCompraGov/100);
+  aliquota := V.aliquota;
+  percentualReducao := V.percentualReducao;
+  pRedutorCompraGov := V.pRedutorCompraGov;
+  um := DecimalCalculo.DeInteiro(1);
+  fatorReducao := um.Subtrair(percentualReducao);
+  aliquotaReduzida := aliquota.Multiplicar(fatorReducao);
+  cem := DecimalCalculo.DeInteiro(100);
+  redutorFracao := pRedutorCompraGov.Dividir(cem);
+  fatorGov := um.Subtrair(redutorFracao);
+  resultado := aliquotaReduzida.Multiplicar(fatorGov);
+  Result := resultado;
 end;
 
-function Exec_ALIQ_ADREM_PRINC(const V: VariaveisAvaliador): Double;
+function Exec_ALIQ_ADREM_PRINC(const V: VariaveisAvaliador): DecimalCalculo;
 begin
   Result := V.aliquotaAdRemPrincipal;
 end;
 
-function Exec_ALIQ_ADREM_SEC(const V: VariaveisAvaliador): Double;
+function Exec_ALIQ_ADREM_SEC(const V: VariaveisAvaliador): DecimalCalculo;
 begin
   Result := V.aliquotaAdRemSecundaria;
 end;
 
-function Exec_BC_ADVLREM_QTD_ADREM(const V: VariaveisAvaliador): Double;
+function Exec_BC_ADVLREM_QTD_ADREM(const V: VariaveisAvaliador): DecimalCalculo;
+var
+  baseCalculo, aliquotaAdValorem, quantidade, aliquotaAdRem,
+  termoAdValorem, termoAdRem, resultado: DecimalCalculo;
 begin
-  Result := V.baseCalculo*V.aliquotaAdValorem+V.quantidade*V.aliquotaAdRem;
+  baseCalculo := V.baseCalculo;
+  aliquotaAdValorem := V.aliquotaAdValorem;
+  quantidade := V.quantidade;
+  aliquotaAdRem := V.aliquotaAdRem;
+  termoAdValorem := baseCalculo.Multiplicar(aliquotaAdValorem);
+  termoAdRem := quantidade.Multiplicar(aliquotaAdRem);
+  resultado := termoAdValorem.Somar(termoAdRem);
+  Result := resultado;
 end;
 
-function Exec_BC_X_ALIQEFET(const V: VariaveisAvaliador): Double;
+function Exec_BC_X_ALIQEFET(const V: VariaveisAvaliador): DecimalCalculo;
+var
+  baseCalculo, aliquotaEfetiva, resultado: DecimalCalculo;
 begin
-  Result := V.baseCalculo*V.aliquotaEfetiva;
+  baseCalculo := V.baseCalculo;
+  aliquotaEfetiva := V.aliquotaEfetiva;
+  resultado := baseCalculo.Multiplicar(aliquotaEfetiva);
+  Result := resultado;
 end;
 
-function Exec_BCINF(const V: VariaveisAvaliador): Double;
+function Exec_BCINF(const V: VariaveisAvaliador): DecimalCalculo;
 begin
   Result := V.baseCalculoInformada;
 end;
 
-function Exec_BCINF_0_50(const V: VariaveisAvaliador): Double;
+function Exec_BCINF_0_50(const V: VariaveisAvaliador): DecimalCalculo;
+var
+  baseCalculoInformada, meio, resultado: DecimalCalculo;
 begin
-  Result := V.baseCalculoInformada*0.5;
+  baseCalculoInformada := V.baseCalculoInformada;
+  meio := DecimalCalculo.DeTexto('0.5');
+  resultado := baseCalculoInformada.Multiplicar(meio);
+  Result := resultado;
 end;
 
-function Exec_BCINF_ISINF_ISCALC(const V: VariaveisAvaliador): Double;
+function Exec_BCINF_ISINF_ISCALC(const V: VariaveisAvaliador): DecimalCalculo;
+var
+  baseCalculoInformada, impostoSeletivoInformado, impostoSeletivoCalculado,
+  subtotal, resultado: DecimalCalculo;
 begin
-  Result := V.baseCalculoInformada-V.impostoSeletivoInformado+V.impostoSeletivoCalculado;
+  baseCalculoInformada := V.baseCalculoInformada;
+  impostoSeletivoInformado := V.impostoSeletivoInformado;
+  impostoSeletivoCalculado := V.impostoSeletivoCalculado;
+  subtotal := baseCalculoInformada.Subtrair(impostoSeletivoInformado);
+  resultado := subtotal.Somar(impostoSeletivoCalculado);
+  Result := resultado;
 end;
 
-function Exec_QUANTIDADE(const V: VariaveisAvaliador): Double;
+function Exec_QUANTIDADE(const V: VariaveisAvaliador): DecimalCalculo;
 begin
   Result := V.quantidade;
 end;
 
-function Exec_QUANTIDADE_ALIQUOTA(const V: VariaveisAvaliador): Double;
+function Exec_QUANTIDADE_ALIQUOTA(const V: VariaveisAvaliador): DecimalCalculo;
+var
+  quantidade, aliquota, resultado: DecimalCalculo;
 begin
-  Result := V.quantidade*V.aliquota;
+  quantidade := V.quantidade;
+  aliquota := V.aliquota;
+  resultado := quantidade.Multiplicar(aliquota);
+  Result := resultado;
 end;
 
-function Exec_QTDE_ADREM_PRINC(const V: VariaveisAvaliador): Double;
+function Exec_QTDE_ADREM_PRINC(const V: VariaveisAvaliador): DecimalCalculo;
+var
+  quantidade, aliquotaAdRemPrincipal, resultado: DecimalCalculo;
 begin
-  Result := V.quantidade*V.aliquotaAdRemPrincipal;
+  quantidade := V.quantidade;
+  aliquotaAdRemPrincipal := V.aliquotaAdRemPrincipal;
+  resultado := quantidade.Multiplicar(aliquotaAdRemPrincipal);
+  Result := resultado;
 end;
 
-function Exec_QTDE_ADREM_PRINC_DIF(const V: VariaveisAvaliador): Double;
+function Exec_QTDE_ADREM_PRINC_DIF(const V: VariaveisAvaliador): DecimalCalculo;
+var
+  quantidade, aliquotaAdRemPrincipal, percentualDiferimento,
+  baseAdRem, um, fator, resultado: DecimalCalculo;
 begin
-  Result := V.quantidade*V.aliquotaAdRemPrincipal*(1-V.percentualDiferimento);
+  quantidade := V.quantidade;
+  aliquotaAdRemPrincipal := V.aliquotaAdRemPrincipal;
+  percentualDiferimento := V.percentualDiferimento;
+  baseAdRem := quantidade.Multiplicar(aliquotaAdRemPrincipal);
+  um := DecimalCalculo.DeInteiro(1);
+  fator := um.Subtrair(percentualDiferimento);
+  resultado := baseAdRem.Multiplicar(fator);
+  Result := resultado;
 end;
 
-function Exec_TRIB_CALC(const V: VariaveisAvaliador): Double;
+function Exec_TRIB_CALC(const V: VariaveisAvaliador): DecimalCalculo;
 begin
   Result := V.tributoCalculado;
 end;
 
-function Exec_TRIB_CALC_X_1_00(const V: VariaveisAvaliador): Double;
+function Exec_TRIB_CALC_X_1_00(const V: VariaveisAvaliador): DecimalCalculo;
+var
+  tributoCalculado, um, resultado: DecimalCalculo;
 begin
-  Result := V.tributoCalculado*1.00;
+  tributoCalculado := V.tributoCalculado;
+  um := DecimalCalculo.DeTexto('1.00');
+  resultado := tributoCalculado.Multiplicar(um);
+  Result := resultado;
 end;
 
 { AvaliadorExpressaoAritmeticaService }
 
-function AvaliadorExpressaoAritmeticaService.Evaluate(const Expressao: string; const Variaveis: VariaveisAvaliador;
-  Scale: ScaleRange): Double;
-var
-  VariavelUnica: Boolean;
+function AvaliadorExpressaoAritmeticaService.Evaluate(const Expressao: string;
+  const Variaveis: VariaveisAvaliador): DecimalCalculo;
 begin
-  VariavelUnica := False;
-
   if Expressao = EXPR_NULL then
     Result := Exec_NULL_or_ZERO(Variaveis)
 
   else if Expressao = EXPR_TRIB_CALC then
-  begin
-    Result := Exec_TRIB_CALC(Variaveis);
-    VariavelUnica := True;
-  end
+    Result := Exec_TRIB_CALC(Variaveis)
 
   else if Expressao = EXPR_BC_X_ALIQEFET then
     Result := Exec_BC_X_ALIQEFET(Variaveis)
@@ -186,16 +303,10 @@ begin
     Result := Exec_BCINF_ISINF_ISCALC(Variaveis)
 
   else if Expressao = EXPR_ALIQUOTA then
-  begin
-    Result := Exec_ALIQUOTA(Variaveis);
-    VariavelUnica := True;
-  end
+    Result := Exec_ALIQUOTA(Variaveis)
 
   else if Expressao = EXPR_BCINF then
-  begin
-    Result := Exec_BCINF(Variaveis);
-    VariavelUnica := True;
-  end
+    Result := Exec_BCINF(Variaveis)
 
   else if Expressao = EXPR_ZERO then
     Result := Exec_NULL_or_ZERO(Variaveis)
@@ -204,16 +315,10 @@ begin
     Result := Exec_BC_ADVLREM_QTD_ADREM(Variaveis)
 
   else if Expressao = EXPR_QUANTIDADE then
-  begin
-    Result := Exec_QUANTIDADE(Variaveis);
-    VariavelUnica := True;
-  end
+    Result := Exec_QUANTIDADE(Variaveis)
 
   else if Expressao = EXPR_ALIQ_ADREM_SEC then
-  begin
-    Result := Exec_ALIQ_ADREM_SEC(Variaveis);
-    VariavelUnica := True;
-  end
+    Result := Exec_ALIQ_ADREM_SEC(Variaveis)
 
   else if Expressao = EXPR_QTDE_ADREM_PRINC then
     Result := Exec_QTDE_ADREM_PRINC(Variaveis)
@@ -222,10 +327,7 @@ begin
     Result := Exec_QUANTIDADE_ALIQUOTA(Variaveis)
 
   else if Expressao = EXPR_ALIQ_ADREM_PRINC then
-  begin
-    Result := Exec_ALIQ_ADREM_PRINC(Variaveis);
-    VariavelUnica := True;
-  end
+    Result := Exec_ALIQ_ADREM_PRINC(Variaveis)
 
   else if Expressao = EXPR_VPP_QTD_PBIO_ADRMSEC then
     Result := Exec_VPP_QTD_PBIO_ADRMSEC(Variaveis)
@@ -254,11 +356,6 @@ begin
   else
     raise Exception.CreateFmt('Expressão desconhecida: %s', [Expressao]);
 
-  // Caso 1 (variavel unica): valor bruto, sem arredondamento.
-  // Caso geral (expressao composta ou constante): arredondamento interno
-  // (8 casas, HALF_EVEN). O parametro Scale e ignorado.
-  if not VariavelUnica then
-    Result := ArredondamentoUtils.ArredondarInterno(Result);
 end;
 
 end.

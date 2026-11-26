@@ -3,69 +3,67 @@ unit IAvaliadorExpressaoAritmeticaServiceUnit;
 interface
 
 uses
-  SysUtils, Math;
+  SysUtils, Math,
+  DecimalCalculoUnit;
 
 type
-  ScaleRange = 0..8;
-
   VariaveisAvaliador = record
   private
-    FAliquota                   : Double;
-    FAliquotaEfetiva            : Double;
-    FAliquotaPadraoOuReferencia : Double;
-    FAliquotaReferencia         : Double;
-    FAliquotaAdValorem          : Double;
-    FAliquotaAdRem              : Double;
-    FAjuste                     : Double;
-    FPercentualReducao          : Double;
-    FPRedutorCompraGov          : Double;
-    FPercentualDiferimento      : Double;
-    FBaseCalculo                : Double;
-    FBaseCalculoInformada       : Double;
-    FQuantidade                 : Double;
-    FTributoCalculado           : Double;
-    FImpostoSeletivoInformado   : Double;
-    FImpostoSeletivoCalculado   : Double;
-    FRedutor                    : Double;
-    FPBio                       : Double;
-    FAliquotaAdRemPrincipal     : Double;
-    FAliquotaAdRemSecundaria    : Double;
-    FVariacaoPontoPercentual    : Double;
+    FAliquota                   : DecimalCalculo;
+    FAliquotaEfetiva            : DecimalCalculo;
+    FAliquotaPadraoOuReferencia : DecimalCalculo;
+    FAliquotaReferencia         : DecimalCalculo;
+    FAliquotaAdValorem          : DecimalCalculo;
+    FAliquotaAdRem              : DecimalCalculo;
+    FAjuste                     : DecimalCalculo;
+    FPercentualReducao          : DecimalCalculo;
+    FPRedutorCompraGov          : DecimalCalculo;
+    FPercentualDiferimento      : DecimalCalculo;
+    FBaseCalculo                : DecimalCalculo;
+    FBaseCalculoInformada       : DecimalCalculo;
+    FQuantidade                 : DecimalCalculo;
+    FTributoCalculado           : DecimalCalculo;
+    FImpostoSeletivoInformado   : DecimalCalculo;
+    FImpostoSeletivoCalculado   : DecimalCalculo;
+    FRedutor                    : DecimalCalculo;
+    FPBio                       : DecimalCalculo;
+    FAliquotaAdRemPrincipal     : DecimalCalculo;
+    FAliquotaAdRemSecundaria    : DecimalCalculo;
+    FVariacaoPontoPercentual    : DecimalCalculo;
   public
     class function Create(): VariaveisAvaliador; static;
 
-    property Aliquota                   : Double read FAliquota;
-    property AliquotaEfetiva            : Double read FAliquotaEfetiva;
-    property AliquotaPadraoOuReferencia : Double read FAliquotaPadraoOuReferencia;
-    property AliquotaReferencia         : Double read FAliquotaReferencia;
-    property AliquotaAdValorem          : Double read FAliquotaAdValorem;
-    property AliquotaAdRem              : Double read FAliquotaAdRem;
-    property Ajuste                     : Double read FAjuste;
-    property PercentualReducao          : Double read FPercentualReducao;
-    property PRedutorCompraGov          : Double read FPRedutorCompraGov;
-    property PercentualDiferimento      : Double read FPercentualDiferimento;
-    property BaseCalculo                : Double read FBaseCalculo;
-    property BaseCalculoInformada       : Double read FBaseCalculoInformada;
-    property Quantidade                 : Double read FQuantidade;
-    property TributoCalculado           : Double read FTributoCalculado;
-    property ImpostoSeletivoInformado   : Double read FImpostoSeletivoInformado;
-    property ImpostoSeletivoCalculado   : Double read FImpostoSeletivoCalculado;
-    property Redutor                    : Double read FRedutor;
-    property PBio                       : Double read FPBio;
-    property AliquotaAdRemPrincipal     : Double read FAliquotaAdRemPrincipal;
-    property AliquotaAdRemSecundaria    : Double read FAliquotaAdRemSecundaria;
-    property VariacaoPontoPercentual    : Double read FVariacaoPontoPercentual;
+    property Aliquota                   : DecimalCalculo read FAliquota;
+    property AliquotaEfetiva            : DecimalCalculo read FAliquotaEfetiva;
+    property AliquotaPadraoOuReferencia : DecimalCalculo read FAliquotaPadraoOuReferencia;
+    property AliquotaReferencia         : DecimalCalculo read FAliquotaReferencia;
+    property AliquotaAdValorem          : DecimalCalculo read FAliquotaAdValorem;
+    property AliquotaAdRem              : DecimalCalculo read FAliquotaAdRem;
+    property Ajuste                     : DecimalCalculo read FAjuste;
+    property PercentualReducao          : DecimalCalculo read FPercentualReducao;
+    property PRedutorCompraGov          : DecimalCalculo read FPRedutorCompraGov;
+    property PercentualDiferimento      : DecimalCalculo read FPercentualDiferimento;
+    property BaseCalculo                : DecimalCalculo read FBaseCalculo;
+    property BaseCalculoInformada       : DecimalCalculo read FBaseCalculoInformada;
+    property Quantidade                 : DecimalCalculo read FQuantidade;
+    property TributoCalculado           : DecimalCalculo read FTributoCalculado;
+    property ImpostoSeletivoInformado   : DecimalCalculo read FImpostoSeletivoInformado;
+    property ImpostoSeletivoCalculado   : DecimalCalculo read FImpostoSeletivoCalculado;
+    property Redutor                    : DecimalCalculo read FRedutor;
+    property PBio                       : DecimalCalculo read FPBio;
+    property AliquotaAdRemPrincipal     : DecimalCalculo read FAliquotaAdRemPrincipal;
+    property AliquotaAdRemSecundaria    : DecimalCalculo read FAliquotaAdRemSecundaria;
+    property VariacaoPontoPercentual    : DecimalCalculo read FVariacaoPontoPercentual;
   end;
 
   IAvaliadorExpressaoAritmeticaService = interface
     ['{F4761342-D8D1-470C-8BEE-53526E48A139}']
     /// <summary>
-    ///   Avalia uma expressao aritmetica. O resultado de expressao composta e
-    ///   arredondado com ArredondamentoUtils.ArredondarInterno (8 casas, HALF_EVEN);
-    ///   expressao de variavel unica retorna o valor bruto. O parametro Scale e
-    ///   ignorado (conformidade com AvaliadorExpressaoAritmetica.java).
+    ///   Avalia a expressao em DecimalCalculo sem arredondar o resultado. Quem publica
+    ///   aplica o arredondamento uma unica vez (conformidade com
+    ///   AvaliadorExpressaoAritmetica.java); a divisao usa 34 digitos significativos.
     /// </summary>
-    function Evaluate(const Expressao: string; const Variaveis: VariaveisAvaliador; Scale: ScaleRange): Double;
+    function Evaluate(const Expressao: string; const Variaveis: VariaveisAvaliador): DecimalCalculo;
   end;
 
   IVariaveisAvaliadorBuilder = interface
@@ -91,6 +89,11 @@ type
     function AliquotaAdRemPrincipal(Value: Double): IVariaveisAvaliadorBuilder;
     function AliquotaAdRemSecundaria(Value: Double): IVariaveisAvaliadorBuilder;
     function VariacaoPontoPercentual(Value: Double): IVariaveisAvaliadorBuilder;
+    function SetAliquota(const Value: DecimalCalculo): IVariaveisAvaliadorBuilder;
+    function SetAliquotaEfetiva(const Value: DecimalCalculo): IVariaveisAvaliadorBuilder;
+    function SetBaseCalculo(const Value: DecimalCalculo): IVariaveisAvaliadorBuilder;
+    function SetTributoCalculado(const Value: DecimalCalculo): IVariaveisAvaliadorBuilder;
+    function SetPercentualDiferimento(const Value: DecimalCalculo): IVariaveisAvaliadorBuilder;
     function Build: VariaveisAvaliador;
   end;
 
@@ -129,6 +132,11 @@ type
     function AliquotaAdRemPrincipal(Value: Double): IVariaveisAvaliadorBuilder;
     function AliquotaAdRemSecundaria(Value: Double): IVariaveisAvaliadorBuilder;
     function VariacaoPontoPercentual(Value: Double): IVariaveisAvaliadorBuilder;
+    function SetAliquota(const Value: DecimalCalculo): IVariaveisAvaliadorBuilder;
+    function SetAliquotaEfetiva(const Value: DecimalCalculo): IVariaveisAvaliadorBuilder;
+    function SetBaseCalculo(const Value: DecimalCalculo): IVariaveisAvaliadorBuilder;
+    function SetTributoCalculado(const Value: DecimalCalculo): IVariaveisAvaliadorBuilder;
+    function SetPercentualDiferimento(const Value: DecimalCalculo): IVariaveisAvaliadorBuilder;
     function Build: VariaveisAvaliador;
   end;
 
@@ -137,127 +145,157 @@ type
 
 function VariaveisBuilder.Aliquota(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FAliquota := Value;
+  FData.FAliquota := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.AliquotaEfetiva(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FAliquotaEfetiva := Value;
+  FData.FAliquotaEfetiva := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.AliquotaPadraoOuReferencia(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FAliquotaPadraoOuReferencia := Value;
+  FData.FAliquotaPadraoOuReferencia := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.AliquotaReferencia(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FAliquotaReferencia := Value;
+  FData.FAliquotaReferencia := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.AliquotaAdValorem(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FAliquotaAdValorem := Value;
+  FData.FAliquotaAdValorem := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.AliquotaAdRem(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FAliquotaAdRem := Value;
+  FData.FAliquotaAdRem := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.AliquotaAdRemPrincipal(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FAliquotaAdRemPrincipal := Value;
+  FData.FAliquotaAdRemPrincipal := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.AliquotaAdRemSecundaria(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FAliquotaAdRemSecundaria := Value;
+  FData.FAliquotaAdRemSecundaria := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.Ajuste(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FAjuste := Value;
+  FData.FAjuste := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.PercentualReducao(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FPercentualReducao := Value;
+  FData.FPercentualReducao := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.PRedutorCompraGov(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FPRedutorCompraGov := Value;
+  FData.FPRedutorCompraGov := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.PBio(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FPBio := Value;
+  FData.FPBio := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.PercentualDiferimento(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FPercentualDiferimento := Value;
+  FData.FPercentualDiferimento := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.BaseCalculo(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FBaseCalculo := Value;
+  FData.FBaseCalculo := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.BaseCalculoInformada(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FBaseCalculoInformada := Value;
+  FData.FBaseCalculoInformada := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.Quantidade(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FQuantidade := Value;
+  FData.FQuantidade := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.TributoCalculado(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FTributoCalculado := Value;
+  FData.FTributoCalculado := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.VariacaoPontoPercentual(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FVariacaoPontoPercentual := Value;
+  FData.FVariacaoPontoPercentual := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.ImpostoSeletivoInformado(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FImpostoSeletivoInformado := Value;
+  FData.FImpostoSeletivoInformado := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.ImpostoSeletivoCalculado(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FImpostoSeletivoCalculado := Value;
+  FData.FImpostoSeletivoCalculado := DecimalCalculo.DeDouble(Value);
   Result := Self;
 end;
 
 function VariaveisBuilder.Redutor(Value: Double): IVariaveisAvaliadorBuilder;
 begin
-  FData.FRedutor := Value;
+  FData.FRedutor := DecimalCalculo.DeDouble(Value);
+  Result := Self;
+end;
+
+function VariaveisBuilder.SetAliquota(const Value: DecimalCalculo): IVariaveisAvaliadorBuilder;
+begin
+  FData.FAliquota := Value;
+  Result := Self;
+end;
+
+function VariaveisBuilder.SetAliquotaEfetiva(const Value: DecimalCalculo): IVariaveisAvaliadorBuilder;
+begin
+  FData.FAliquotaEfetiva := Value;
+  Result := Self;
+end;
+
+function VariaveisBuilder.SetBaseCalculo(const Value: DecimalCalculo): IVariaveisAvaliadorBuilder;
+begin
+  FData.FBaseCalculo := Value;
+  Result := Self;
+end;
+
+function VariaveisBuilder.SetTributoCalculado(const Value: DecimalCalculo): IVariaveisAvaliadorBuilder;
+begin
+  FData.FTributoCalculado := Value;
+  Result := Self;
+end;
+
+function VariaveisBuilder.SetPercentualDiferimento(const Value: DecimalCalculo): IVariaveisAvaliadorBuilder;
+begin
+  FData.FPercentualDiferimento := Value;
   Result := Self;
 end;
 
@@ -275,27 +313,27 @@ end;
 
 class function VariaveisAvaliador.Create: VariaveisAvaliador;
 begin
-  Result.FAliquota                   := 0.00;
-  Result.FAliquotaEfetiva            := 0.00;
-  Result.FAliquotaPadraoOuReferencia := 0.00;
-  Result.FAliquotaReferencia         := 0.00;
-  Result.FAliquotaAdValorem          := 0.00;
-  Result.FAliquotaAdRem              := 0.00;
-  Result.FAjuste                     := 0.00;
-  Result.FPercentualReducao          := 0.00;
-  Result.FPRedutorCompraGov          := 0.00;
-  Result.FPercentualDiferimento      := 0.00;
-  Result.FBaseCalculo                := 0.00;
-  Result.FBaseCalculoInformada       := 0.00;
-  Result.FQuantidade                 := 0.00;
-  Result.FTributoCalculado           := 0.00;
-  Result.FImpostoSeletivoInformado   := 0.00;
-  Result.FImpostoSeletivoCalculado   := 0.00;
-  Result.FRedutor                    := 0.00;
-  Result.FPBio                       := 0.00;
-  Result.FAliquotaAdRemPrincipal     := 0.00;
-  Result.FAliquotaAdRemSecundaria    := 0.00;
-  Result.FVariacaoPontoPercentual    := 0.00;
+  Result.FAliquota                   := DecimalCalculo.Zero;
+  Result.FAliquotaEfetiva            := DecimalCalculo.Zero;
+  Result.FAliquotaPadraoOuReferencia := DecimalCalculo.Zero;
+  Result.FAliquotaReferencia         := DecimalCalculo.Zero;
+  Result.FAliquotaAdValorem          := DecimalCalculo.Zero;
+  Result.FAliquotaAdRem              := DecimalCalculo.Zero;
+  Result.FAjuste                     := DecimalCalculo.Zero;
+  Result.FPercentualReducao          := DecimalCalculo.Zero;
+  Result.FPRedutorCompraGov          := DecimalCalculo.Zero;
+  Result.FPercentualDiferimento      := DecimalCalculo.Zero;
+  Result.FBaseCalculo                := DecimalCalculo.Zero;
+  Result.FBaseCalculoInformada       := DecimalCalculo.Zero;
+  Result.FQuantidade                 := DecimalCalculo.Zero;
+  Result.FTributoCalculado           := DecimalCalculo.Zero;
+  Result.FImpostoSeletivoInformado   := DecimalCalculo.Zero;
+  Result.FImpostoSeletivoCalculado   := DecimalCalculo.Zero;
+  Result.FRedutor                    := DecimalCalculo.Zero;
+  Result.FPBio                       := DecimalCalculo.Zero;
+  Result.FAliquotaAdRemPrincipal     := DecimalCalculo.Zero;
+  Result.FAliquotaAdRemSecundaria    := DecimalCalculo.Zero;
+  Result.FVariacaoPontoPercentual    := DecimalCalculo.Zero;
 end;
 
 { VariaveisAvaliadorBuilder }

@@ -6,10 +6,12 @@ type
   ValidacaoItemOutput = record
   private
     FCodigo: Integer;
+    FCodigoTexto: string;
     FDetalhe: string;
   public
     class function Create(Codigo: Integer; const Detalhe: string = ''): ValidacaoItemOutput; overload; static;
     class function Create(const Detalhe: string): ValidacaoItemOutput; overload; static;
+    class function Create(const ACodigoTexto, ADetalhe: string): ValidacaoItemOutput; overload; static;
     class function CreateFmt(
     Codigo: Integer; const Detalhe: string; const Args : Array of const
     ): ValidacaoItemOutput; overload; static;
@@ -20,6 +22,7 @@ type
     function Clone(): ValidacaoItemOutput;
 
     property Codigo: Integer read FCodigo;
+    property CodigoTexto: string read FCodigoTexto;
     property Detalhe: string read FDetalhe;
   end;
 
@@ -35,6 +38,7 @@ uses
 function ValidacaoItemOutput.Clone: ValidacaoItemOutput;
 begin
   Result := ValidacaoItemOutput.Create( FCodigo, FDetalhe );
+  Result.FCodigoTexto := FCodigoTexto;
 end;
 
 class function ValidacaoItemOutput.Create(Codigo: Integer; const Detalhe: string): ValidacaoItemOutput;
@@ -56,6 +60,12 @@ end;
 class function ValidacaoItemOutput.Create(const Detalhe: string): ValidacaoItemOutput;
 begin
   Result := ValidacaoItemOutput.Create( 999, Detalhe );
+end;
+
+class function ValidacaoItemOutput.Create(const ACodigoTexto, ADetalhe: string): ValidacaoItemOutput;
+begin
+  Result := ValidacaoItemOutput.Create( 0, ADetalhe );
+  Result.FCodigoTexto := ACodigoTexto;
 end;
 
 class function ValidacaoItemOutput.CreateFmt(const Detalhe: string; const Args: array of const): ValidacaoItemOutput;

@@ -69,7 +69,6 @@ class function IBSTotal.FromObjetos(const Detalhes: ROCItens): IBSTotal;
 var
   I: Integer;
   Obj: ROCItemDomain;
-  VIBSUF, VIBSMun: Currency;
 begin
   Result := IBSTotal.CreateVazio;
   Result.FInstance := riNotNull;
@@ -81,11 +80,6 @@ begin
   Result.FGIBSUF := IBSUFTotal.FromObjetos(Detalhes);
   Result.FGIBSMun := IBSMunTotal.FromObjetos(Detalhes);
 
-  // Soma IBS UF + IBS Município
-  VIBSUF := Result.FGIBSUF.VIBSUF;
-  VIBSMun := Result.FGIBSMun.VIBSMun;
-  Result.FVIBS := VIBSUF + VIBSMun;
-
   // Calcula créditos presumidos
   Result.FVCredPres := 0.00;
   Result.FVCredPresCondSus := 0.00;
@@ -93,6 +87,9 @@ begin
   for I := 0 to High(Detalhes) do
   begin
     Obj := Detalhes[I];
+    // Soma o vIBS publicado em cada item (não é vIBSUF + vIBSMun)
+    if (Obj.TribCalc <> nil) and (Obj.GrupoIBSCBSModel <> nil) then
+      Result.FVIBS := Result.FVIBS + Obj.GrupoIBSCBSModel.VIBS;
     if (Obj.TribCalc <> nil) and Obj.PossuiCredPresIbs then
       Result.FVCredPres := Result.FVCredPres + Obj.VCredPresIbs;
     if (Obj.TribCalc <> nil) and Obj.PossuiCredPresCondSusIbs then

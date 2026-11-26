@@ -130,7 +130,12 @@ begin
     try
 
       for validacao in Resultado.Validacoes.Validacoes do
-        FValidacoes.Add( ValidacaoItemOutput.Create( 0, FTradutorValidacoes.Traduzir( validacao )));
+        if validacao.CodigoTexto <> '' then
+          FValidacoes.Add(ValidacaoItemOutput.Create(validacao.CodigoTexto,
+            FTradutorValidacoes.Traduzir(validacao)))
+        else
+          FValidacoes.Add(ValidacaoItemOutput.Create(validacao.Codigo,
+            FTradutorValidacoes.Traduzir(validacao)));
 
       Result := Resultado.ExtrairResultado();
 
@@ -141,7 +146,12 @@ begin
   except
     on E: EValidacaoRTC do
       begin
-        FValidacoes.Add(E.Message);
+        if E.Codigo <> '' then
+          FValidacoes.Add(ValidacaoItemOutput.Create(E.Codigo,
+            FTradutorValidacoes.Traduzir(E.Codigo, E.Message)))
+        else
+          FValidacoes.Add(ValidacaoItemOutput.Create(E.Message));
+
         Result := nil;
       end;
 
@@ -174,7 +184,15 @@ begin
     PRedutor := FRedutorCompraGovService.BuscarValorRedutor(Documento.GetTpEnteGov(), Documento.GetFatoGeradorAplicavel());
   except
     on E: EValidacaoRTC do
-      FValidacoes.Add(E.Message);
+      begin
+        if E.Codigo <> '' then
+          FValidacoes.Add(ValidacaoItemOutput.Create(E.Codigo,
+            FTradutorValidacoes.Traduzir(E.Codigo, E.Message)))
+        else
+          FValidacoes.Add(ValidacaoItemOutput.Create(E.Message));
+
+        Exit;
+      end;
 
     on E: Exception do
       raise;

@@ -47,7 +47,8 @@ var
   I: Integer;
 begin
   for I := Low(FValidacoes) to High(FValidacoes) do
-    if FValidacoes[I].Codigo = Validacao.Codigo then
+    if (FValidacoes[I].Codigo = Validacao.Codigo) and
+      (FValidacoes[I].CodigoTexto = Validacao.CodigoTexto) then
       Exit;
 
   Add(Validacao);
@@ -73,12 +74,18 @@ begin
   begin
     jaExiste := False;
     for F := 0 to High(FValidacoes) do
-      if (AValidacoes[A].Codigo = FValidacoes[F].Codigo)
-        and (AValidacoes[A].Detalhe = FValidacoes[F].Detalhe) then
-      begin
-        jaExiste := True;
+    begin
+      if AValidacoes[A].CodigoTexto <> '' then
+        jaExiste := (AValidacoes[A].Codigo = FValidacoes[F].Codigo)
+          and (AValidacoes[A].CodigoTexto = FValidacoes[F].CodigoTexto)
+      else
+        jaExiste := (AValidacoes[A].Codigo = FValidacoes[F].Codigo)
+          and (FValidacoes[F].CodigoTexto = '')
+          and (AValidacoes[A].Detalhe = FValidacoes[F].Detalhe);
+
+      if jaExiste then
         Break;
-      end;
+    end;
 
     if not jaExiste then
       Add(AValidacoes[A]);
@@ -118,9 +125,13 @@ begin
       if I <> Low(FValidacoes) then
         S := S + sLineBreak;
 
-      S := S
-        + IfThen((FValidacoes[I].Codigo <> 0) and (FValidacoes[I].Codigo <> 999), IntToStr(FValidacoes[I].Codigo) + ' - ')
-        + FValidacoes[I].Detalhe;
+      if FValidacoes[I].CodigoTexto <> '' then
+        S := S + FValidacoes[I].CodigoTexto + ' - '
+      else
+        S := S + IfThen((FValidacoes[I].Codigo <> 0) and (FValidacoes[I].Codigo <> 999),
+          IntToStr(FValidacoes[I].Codigo) + ' - ');
+
+      S := S + FValidacoes[I].Detalhe;
     end;
 
     raise EValidacaoNegocio.Create( S );

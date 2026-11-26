@@ -11,7 +11,7 @@ uses
   IAliquotaAdValoremServicoRepositoryUnit, IAliquotaAdRemProdutoRepositoryUnit, AliquotaImpostoSeletivoModelUnit,
   ICalculoTributoServiceUnit, NcmAplicavelServiceUnit, NbsAplicavelServiceUnit, IClassificacaoTributariaServiceUnit,
   ClassificacaoTributariaModelUnit, TratamentoClassificacaoModelUnit, RedutorCompraGovernamentalServiceUnit,
-  TipoEnteGovernamentalEnumUnit;
+  TipoEnteGovernamentalEnumUnit, IBaseCalculoUnificadaServiceUnit, IntegerNullableUnit;
 
 type
   ProcessamentoItemService = class(TInterfacedObject, IProcessamentoItemService)
@@ -29,6 +29,7 @@ type
     FAliqAdRemProdRepo: IAliquotaAdRemProdutoRepository;
     FRedutorCompraGovService: IRedutorCompraGovernamentalService;
     FClassificacaoTributariaService: IClassificacaoTributariaService;
+    FBaseCalculoUnificadaService: IBaseCalculoUnificadaService;
     FValidacao: ValidacaoOutput;
     //FClassificacaoRepo: IClassificacaoTributariaRepository;
   private
@@ -60,9 +61,14 @@ type
       AliqAdValoremServRepo: IAliquotaAdValoremServicoRepository;
       AliqAdRemProdRepo: IAliquotaAdRemProdutoRepository;
       RedutorCompraGovService: IRedutorCompraGovernamentalService;
-      ClassificacaoTributariaService: IClassificacaoTributariaService
+      ClassificacaoTributariaService: IClassificacaoTributariaService;
+      BaseCalculoUnificadaService: IBaseCalculoUnificadaService
     );
-    function ProcessarItem(const Documento: CalcularTributoInput; const Item: ItemCalculoInput; Data: TDate): ProcessamentoItemResult;
+    function ProcessarItem(const Documento: CalcularTributoInput; const Item: ItemCalculoInput; Data: TDate): ProcessamentoItemResult; overload;
+    function ProcessarItem(const Documento: CalcularTributoInput; const Item: ItemCalculoInput; Data: TDate;
+      const TipoDocumento: IntegerNullable): ProcessamentoItemResult; overload;
+    function ValidarBaseCalculoComComponentes(const Documento: CalcularTributoInput;
+      const Item: ItemCalculoInput; const TipoDocumento: IntegerNullable): ItemCalculoInput;
   end;
 
 implementation
@@ -71,7 +77,7 @@ uses
   SysUtils, StrUtils, DateUtils,
   CodigosErroValidacao, MunicipioEtdUnit, TributoSituacaoTributariaEtdUnit, OperacaoTributacaoModelUnit,
   DoubleNullableUnit, NcmEtdUnit, NbsEtdUnit, CurrencyNullableUnit, AliquotaAdRemModelUnit, EValidacaoRTCUnit,
-  EstadosServiceUnit;
+  EstadosServiceUnit, ValidacaoBaseCalculoComponentesUnit;
 
 { ProcessamentoItemService }
 
@@ -149,7 +155,8 @@ constructor ProcessamentoItemService.Create(
   AliqAdValoremServRepo: IAliquotaAdValoremServicoRepository;
   AliqAdRemProdRepo: IAliquotaAdRemProdutoRepository;
   RedutorCompraGovService: IRedutorCompraGovernamentalService;
-  ClassificacaoTributariaService: IClassificacaoTributariaService
+  ClassificacaoTributariaService: IClassificacaoTributariaService;
+  BaseCalculoUnificadaService: IBaseCalculoUnificadaService
 );
 begin
   FCalculoTributoService := ACalculoTributoService;
@@ -165,6 +172,7 @@ begin
   FAliqAdRemProdRepo := AliqAdRemProdRepo;
   FRedutorCompraGovService := RedutorCompraGovService;
   FClassificacaoTributariaService := ClassificacaoTributariaService;
+  FBaseCalculoUnificadaService := BaseCalculoUnificadaService;
 end;
 
 function ProcessamentoItemService.ValidarClassificacaoTributariaCbsIbs(
@@ -310,9 +318,8 @@ procedure ProcessamentoItemService.ValidarQuantidadeEUnidade(const Item: ItemCal
   Aliquota: AliquotaImpostoSeletivoModel);
 begin
   // C08-03: validacao global de quantidade positiva do item (antes restrita ao bloco ad rem).
-  // No Java (processarItem) a quantidade nula recebe default 1 antes desta validacao;
-  // ItemCalculoInput.Quantidade e Single (sem nulo), logo a quantidade informada e usada diretamente.
-  if (Item.Quantidade <= 0) then
+  // No RTC a quantidade ausente assume 1 antes desta validacao (ProcessamentoItemService:96).
+  if not Item.Quantidade.IsNull and (Item.Quantidade.Value <= 0) then
     FValidacao.Add(
       ValidacaoItemOutput.Create( ECOD_VALIDACAO_GENERICA, 'A quantidade do item deve ser maior do que zero')
     );
@@ -321,7 +328,11 @@ begin
   // Imposto Seletivo (espelho de ProcessamentoItemService.validarQuantidadeEUnidade).
   if not Aliquota.IsNull() and Aliquota.AliquotaAdRem.HasValue and not Item.ImpostoSeletivo.IsNull() then
   begin
-    if (Item.ImpostoSeletivo.Quantidade <= 0) then
+    if Item.ImpostoSeletivo.Quantidade.IsNull then
+      FValidacao.Add(
+        ValidacaoItemOutput.Create( ECOD_VALIDACAO_GENERICA, 'A quantidade do Imposto Seletivo deve ser informada para alíquota ad rem')
+      )
+    else if (Item.ImpostoSeletivo.Quantidade.Value <= 0) then
       FValidacao.Add(
         ValidacaoItemOutput.Create( ECOD_VALIDACAO_GENERICA, 'A quantidade do Imposto Seletivo deve ser maior do que zero para alíquota ad rem')
       );
@@ -378,30 +389,30 @@ end;
 procedure ProcessamentoItemService.ValidarDigitos(const Item: ItemCalculoInput);
 begin
   // C02-01: valores monetarios (13 inteiros / 2 fracionarios).
-  if not DentroLimitesDigitos(Item.BaseCalculo, 13, 2) then
+  if not DentroLimitesDigitos(Item.BaseCalculo.Value, 13, 2) then
     FValidacao.Add(
       ValidacaoItemOutput.Create( ECOD_VALIDACAO_DIGITOS, 'O campo baseCalculo deve ter no máximo 13 dígitos inteiros e 2 decimais')
     );
 
   // C02-02: quantidade (11 inteiros / 4 fracionarios).
-  if not DentroLimitesDigitos(Item.Quantidade, 11, 4) then
+  if not DentroLimitesDigitos(Item.Quantidade.Value, 11, 4) then
     FValidacao.Add(
       ValidacaoItemOutput.Create( ECOD_VALIDACAO_DIGITOS, 'O campo quantidade deve ter no máximo 11 dígitos inteiros e 4 decimais')
     );
 
   if not Item.ImpostoSeletivo.IsNull() then
   begin
-    if not DentroLimitesDigitos(Item.ImpostoSeletivo.BaseCalculo, 13, 2) then
+    if not DentroLimitesDigitos(Item.ImpostoSeletivo.BaseCalculo.Value, 13, 2) then
       FValidacao.Add(
         ValidacaoItemOutput.Create( ECOD_VALIDACAO_DIGITOS, 'O campo baseCalculo do Imposto Seletivo deve ter no máximo 13 dígitos inteiros e 2 decimais')
       );
 
-    if not DentroLimitesDigitos(Item.ImpostoSeletivo.Quantidade, 11, 4) then
+    if not DentroLimitesDigitos(Item.ImpostoSeletivo.Quantidade.Value, 11, 4) then
       FValidacao.Add(
         ValidacaoItemOutput.Create( ECOD_VALIDACAO_DIGITOS, 'O campo quantidade do Imposto Seletivo deve ter no máximo 11 dígitos inteiros e 4 decimais')
       );
 
-    if not DentroLimitesDigitos(Item.ImpostoSeletivo.ImpostoInformado, 13, 2) then
+    if not DentroLimitesDigitos(Item.ImpostoSeletivo.ImpostoInformado.Value, 13, 2) then
       FValidacao.Add(
         ValidacaoItemOutput.Create( ECOD_VALIDACAO_DIGITOS, 'O campo impostoInformado do Imposto Seletivo deve ter no máximo 13 dígitos inteiros e 2 decimais')
       );
@@ -578,20 +589,40 @@ function ProcessamentoItemService.ProcessarItem(
   const Item: ItemCalculoInput;
   Data: TDate
 ): ProcessamentoItemResult;
+begin
+  Result := ProcessarItem(Documento, Item, Data, Documento.TpDoc);
+end;
+
+function ProcessamentoItemService.ProcessarItem(
+  const Documento: CalcularTributoInput;
+  const Item: ItemCalculoInput;
+  Data: TDate;
+  const TipoDocumento: IntegerNullable
+): ProcessamentoItemResult;
 var
   tratamentoOp: TratamentoOperacaoModel;
   operacao: OperacaoTributacaoModel;
   codigoUF: Integer;
+  itemAjustado: ItemCalculoInput;
 begin
   FValidacao := ValidacaoOutput.Create();
 
   ValidarDigitos( Item );
 
-  ValidarNcmNbs( Item, Item.NCM, Item.NBS, Documento.GetFatoGeradorAplicavel() );
+  itemAjustado := Item;
+  if itemAjustado.Quantidade.IsNull then
+    itemAjustado.Quantidade := CurrencyNullable.Create(1);
 
-  ValidarCST( Item, tbtCBS, Documento.GetFatoGeradorAplicavel() );
+  if itemAjustado.HasGComponentesBC and itemAjustado.GComponentesBC.PossuiComponentes then
+    itemAjustado := ValidarBaseCalculoComComponentes(Documento, itemAjustado, TipoDocumento)
+  else
+    itemAjustado := ValidacaoBaseCalculoComponentes.AjustarBaseLegado(itemAjustado);
 
-  tratamentoOp := ObterTratamentoOperacao(Item, Documento.GetFatoGeradorAplicavel());
+  ValidarNcmNbs( itemAjustado, itemAjustado.NCM, itemAjustado.NBS, Documento.GetFatoGeradorAplicavel() );
+
+  ValidarCST( itemAjustado, tbtCBS, Documento.GetFatoGeradorAplicavel() );
+
+  tratamentoOp := ObterTratamentoOperacao(itemAjustado, Documento.GetFatoGeradorAplicavel());
 
   codigoUF := EstadosService.UfToCodigoIBGE(Documento.UF);
 
@@ -599,9 +630,9 @@ begin
       Documento.GetFatoGeradorAplicavel(),
       Documento.Municipio,
       codigoUF,
-      Item.NCM,
-      Item.NBS,
-      Item,
+      itemAjustado.NCM,
+      itemAjustado.NBS,
+      itemAjustado,
       tratamentoOp,
       Documento.GetTpEnteGov(),
       BuscarValorRedutorFromService(Documento.GetTpEnteGov(), Data)
@@ -611,6 +642,16 @@ begin
     FCalculoTributoService.Calcular(operacao),
     FValidacao
   );
+end;
+
+function ProcessamentoItemService.ValidarBaseCalculoComComponentes(
+  const Documento: CalcularTributoInput;
+  const Item: ItemCalculoInput;
+  const TipoDocumento: IntegerNullable
+): ItemCalculoInput;
+begin
+  Result := ValidacaoBaseCalculoComponentes.AjustarItem(
+    Documento, Item, TipoDocumento, FBaseCalculoUnificadaService);
 end;
 
 end.

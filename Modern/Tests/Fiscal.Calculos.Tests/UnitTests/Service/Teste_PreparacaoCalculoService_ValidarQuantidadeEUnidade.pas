@@ -36,7 +36,8 @@ uses
   TratamentoClassificacaoModelUnit,
   AliquotaAdRemModelUnit,
   CompraGovernamentalInputUnit,
-  CurrencyNullableUnit;
+  CurrencyNullableUnit,
+  BaseCalculoUnificadaServiceUnit;
 
 type
   TFakeMunicipiosRepository = class(IMunicipiosRepository)
@@ -128,8 +129,9 @@ type
 
     function PossuiMensagem(const V: ValidacaoOutput; const Trecho: string): Boolean;
     function CriarDocumento: CalcularTributoInput;
-    function CriarItemComNCM(const &IS: ImpostoSeletivoInput; Quantidade: Single; const Unidade: string): ItemCalculoInput;
-    function CriarIS(BaseCalculo, Quantidade: Double; const Unidade: string; ImpostoInformado: Double): ImpostoSeletivoInput;
+    function CriarItemComNCM(const &IS: ImpostoSeletivoInput; const Quantidade: CurrencyNullable; const Unidade: string): ItemCalculoInput;
+    function CriarIS(BaseCalculo: Double; const Quantidade: CurrencyNullable;
+      const Unidade: string; ImpostoInformado: Double): ImpostoSeletivoInput;
     procedure CriarService(const AdValorem: CurrencyNullable; const AdRem: AliquotaAdRemModel);
   public
     [TearDown]
@@ -138,11 +140,16 @@ type
     [Test]
     procedure teste_ISAdRem_SemQuantidadeUnidade_Rejeita;
     [Test]
+    procedure teste_ISAdRem_QuantidadeAusente_DistingueDeZero;
+    [Test]
     procedure teste_ISAdRem_QuantidadeUnidadeValidas_Aceita;
     [Test]
     procedure teste_QuantidadeGlobal_Zero_Rejeita;
     [Test]
     procedure teste_QuantidadeGlobal_Positiva_Aceita;
+
+    [Test]
+    procedure teste_QuantidadeGlobal_Ausente_NaoRejeita;
   end;
 
 implementation
@@ -348,7 +355,8 @@ begin
     FAliqAdValoremServRepo,
     FAliqAdRemProdRepo,
     nil, // IRedutorCompraGovernamentalRepository so e consultado com GCompraGov
-    classTribService
+    classTribService,
+    BaseCalculoUnificadaService.Create()
   );
 end;
 
@@ -358,7 +366,7 @@ begin
 end;
 
 function TTest_PreparacaoCalculoService_ValidarQuantidadeEUnidade.CriarItemComNCM(const &IS: ImpostoSeletivoInput;
-  Quantidade: Single; const Unidade: string): ItemCalculoInput;
+  const Quantidade: CurrencyNullable; const Unidade: string): ItemCalculoInput;
 begin
   Result := ItemCalculoInput.Create(
     1,
@@ -367,16 +375,18 @@ begin
     '000',
     &IS,
     TributacaoRegularInput.NullInstance(),
-    100,
+    CurrencyNullable.Create(100),
     Quantidade,
     Unidade
   );
 end;
 
-function TTest_PreparacaoCalculoService_ValidarQuantidadeEUnidade.CriarIS(BaseCalculo, Quantidade: Double;
-  const Unidade: string; ImpostoInformado: Double): ImpostoSeletivoInput;
+function TTest_PreparacaoCalculoService_ValidarQuantidadeEUnidade.CriarIS(BaseCalculo: Double;
+  const Quantidade: CurrencyNullable; const Unidade: string; ImpostoInformado: Double): ImpostoSeletivoInput;
 begin
-  Result := ImpostoSeletivoInput.Create('000', '000000', BaseCalculo, Quantidade, Unidade, ImpostoInformado);
+  Result := ImpostoSeletivoInput.Create(
+    '000', '000000', CurrencyNullable.Create(BaseCalculo), Quantidade, Unidade,
+    CurrencyNullable.Create(ImpostoInformado));
 end;
 
 function TTest_PreparacaoCalculoService_ValidarQuantidadeEUnidade.PossuiMensagem(const V: ValidacaoOutput; const Trecho: string): Boolean;
@@ -403,13 +413,31 @@ begin
 
   documento := CriarDocumento;
   // Item com quantidade positiva/unidade compativel, mas IS sem quantidade/unidade.
-  item := CriarItemComNCM(CriarIS(100, 0, '', 0), 1, 'UN');
+  item := CriarItemComNCM(CriarIS(100, CurrencyNullable.Create(0), '', 0), CurrencyNullable.Create(1), 'UN');
   resultado := FService.Preparar(documento, item);
 
   Assert.IsTrue(PossuiMensagem(resultado.Validacoes, 'quantidade do Imposto Seletivo deve ser maior do que zero'),
     'IS ad rem sem quantidade deve rejeitar');
   Assert.IsTrue(PossuiMensagem(resultado.Validacoes, 'unidade de medida do Imposto Seletivo deve ser informada'),
     'IS ad rem sem unidade deve rejeitar');
+end;
+
+procedure TTest_PreparacaoCalculoService_ValidarQuantidadeEUnidade.teste_ISAdRem_QuantidadeAusente_DistingueDeZero;
+var
+  documento: CalcularTributoInput;
+  item: ItemCalculoInput;
+  resultado: PreparacaoResultado;
+begin
+  CriarService(CurrencyNullable.Create(1), AliquotaAdRemModel.Create(5, 'UN'));
+
+  documento := CriarDocumento;
+  item := CriarItemComNCM(CriarIS(100, CurrencyNullable.NullInstance(), 'UN', 0), CurrencyNullable.Create(1), 'UN');
+  resultado := FService.Preparar(documento, item);
+
+  Assert.IsTrue(PossuiMensagem(resultado.Validacoes, 'quantidade do Imposto Seletivo deve ser informada'),
+    'quantidade ausente deve ser reportada como nao informada');
+  Assert.IsFalse(PossuiMensagem(resultado.Validacoes, 'quantidade do Imposto Seletivo deve ser maior do que zero'),
+    'quantidade ausente nao deve ser confundida com zero informado');
 end;
 
 procedure TTest_PreparacaoCalculoService_ValidarQuantidadeEUnidade.teste_ISAdRem_QuantidadeUnidadeValidas_Aceita;
@@ -422,7 +450,7 @@ begin
 
   documento := CriarDocumento;
   // IS ad rem com quantidade/unidade validas e compativeis com a aliquota.
-  item := CriarItemComNCM(CriarIS(100, 2, 'UN', 0), 1, 'UN');
+  item := CriarItemComNCM(CriarIS(100, CurrencyNullable.Create(2), 'UN', 0), CurrencyNullable.Create(1), 'UN');
   resultado := FService.Preparar(documento, item);
 
   Assert.IsFalse(PossuiMensagem(resultado.Validacoes, 'quantidade do Imposto Seletivo'),
@@ -441,7 +469,7 @@ begin
   CriarService(CurrencyNullable.Create(1), AliquotaAdRemModel.NullInstance());
 
   documento := CriarDocumento;
-  item := CriarItemComNCM(CriarIS(100, 1, 'UN', 0), 0, 'UN');
+  item := CriarItemComNCM(CriarIS(100, CurrencyNullable.Create(1), 'UN', 0), CurrencyNullable.Create(0), 'UN');
   resultado := FService.Preparar(documento, item);
 
   Assert.IsTrue(PossuiMensagem(resultado.Validacoes, 'quantidade do item deve ser maior do que zero'),
@@ -457,13 +485,28 @@ begin
   CriarService(CurrencyNullable.Create(1), AliquotaAdRemModel.NullInstance());
 
   documento := CriarDocumento;
-  // No Java, quantidade nula recebe default 1; em Delphi o campo e Single, entao o
-  // cenario equivalente e quantidade positiva (default informado pelo chamador).
-  item := CriarItemComNCM(CriarIS(100, 1, 'UN', 0), 1, 'UN');
+  item := CriarItemComNCM(CriarIS(100, CurrencyNullable.Create(1), 'UN', 0), CurrencyNullable.Create(1), 'UN');
   resultado := FService.Preparar(documento, item);
 
   Assert.IsFalse(PossuiMensagem(resultado.Validacoes, 'quantidade do item deve ser maior do que zero'),
-    'item com quantidade positiva (default 1/UN) nao deve rejeitar');
+    'item com quantidade positiva nao deve rejeitar');
+end;
+
+procedure TTest_PreparacaoCalculoService_ValidarQuantidadeEUnidade.teste_QuantidadeGlobal_Ausente_NaoRejeita;
+var
+  documento: CalcularTributoInput;
+  item: ItemCalculoInput;
+  resultado: PreparacaoResultado;
+begin
+  CriarService(CurrencyNullable.Create(1), AliquotaAdRemModel.NullInstance());
+
+  documento := CriarDocumento;
+  item := CriarItemComNCM(CriarIS(100, CurrencyNullable.Create(1), 'UN', 0),
+    CurrencyNullable.NullInstance(), 'UN');
+  resultado := FService.Preparar(documento, item);
+
+  Assert.IsFalse(PossuiMensagem(resultado.Validacoes, 'quantidade do item deve ser maior do que zero'),
+    'quantidade ausente assume 1 e nao deve rejeitar');
 end;
 
 initialization

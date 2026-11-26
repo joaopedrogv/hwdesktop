@@ -38,7 +38,8 @@ type
 implementation
 
 uses
-  NumberServiceUnit;
+  DecimalCalculoUnit,
+  ArredondamentoCalculoUnit;
 
 { IBSMunModel }
 
@@ -50,12 +51,18 @@ constructor IBSMunModel.Create(
   VIBSMun: Extended;
   const MemoriaCalculo: string
 );
+var
+  valor: DecimalCalculo;
 begin
-  FPIBSMun := NumberService.RoundHalfUpTo4(PIBSMun);
+  valor := DecimalCalculo.DeDouble(PIBSMun);
+  valor := ArredondamentoCalculo.AliquotaPublicada(valor);
+  FPIBSMun := valor.ParaDouble;
   FGDif := GDif;
   FGDevTrib := GDevTrib;
   FGRed := GRed;
-  FVIBSMun := NumberService.RoundHalfUpTo2(VIBSMun);
+  valor := DecimalCalculo.DeDouble(VIBSMun);
+  valor := ArredondamentoCalculo.ValorFiscal(valor);
+  FVIBSMun := valor.ParaDouble;
   FMemoriaCalculo := MemoriaCalculo;
 end;
 

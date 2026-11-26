@@ -95,10 +95,10 @@ type
     FPercentualReducaoRepo: TFakePercentualReducaoRepository;
     FService: ICalculoCbsIbsService;
 
-    function CriarTratamento(): TratamentoTributarioEtd;
+    function CriarTratamento(const APossuiPercentualReducao: Boolean = True): TratamentoTributarioEtd;
     function CriarCalculo(): ClassificacaoTributariaCalculoModel;
     function CriarItem(const TemTributacaoRegular: Boolean): ItemCalculoInput;
-    procedure CriarService();
+    procedure CriarService(const APossuiPercentualReducao: Boolean = True);
   public
     [Setup]
     procedure Setup;
@@ -122,6 +122,9 @@ type
 
     [Test]
     procedure teste_PRedutorCompraGov_AplicadoNaAliquotaEfetiva;
+
+    [Test]
+    procedure teste_InGrupoReducao_SemPercentualReducao_GrupoReducaoNulo;
   end;
 
 implementation
@@ -237,7 +240,7 @@ begin
   FAvaliador := nil;
 end;
 
-function TTest_CalculoCbsIbsService_CompraGovernamental.CriarTratamento: TratamentoTributarioEtd;
+function TTest_CalculoCbsIbsService_CompraGovernamental.CriarTratamento(const APossuiPercentualReducao: Boolean): TratamentoTributarioEtd;
 var
   sn: StringNullable;
   dn: DateNullable;
@@ -255,7 +258,7 @@ begin
     'baseCalculo*aliquotaEfetiva',
     'tributoCalculado',
     sn, sn, // percentual diferimento / valor diferimento: em branco
-    False, False, True, False, False, False,
+    False, False, APossuiPercentualReducao, False, False, False,
     0, dn
   );
 end;
@@ -282,15 +285,15 @@ begin
     1, '00000000', '000001', '000',
     ImpostoSeletivoInput.NullInstance(),
     tributacaoRegular,
-    1000, // base calculo
-    1,    // quantidade
+    CurrencyNullable.Create(1000), // base calculo
+    CurrencyNullable.Create(1),    // quantidade
     'UN'
   );
 end;
 
-procedure TTest_CalculoCbsIbsService_CompraGovernamental.CriarService;
+procedure TTest_CalculoCbsIbsService_CompraGovernamental.CriarService(const APossuiPercentualReducao: Boolean);
 begin
-  FTratamentosTribRepo := TFakeTratamentosTributariosRepository.Create(CriarTratamento());
+  FTratamentosTribRepo := TFakeTratamentosTributariosRepository.Create(CriarTratamento(APossuiPercentualReducao));
   FClassificacoesTribRepo := TFakeClassificacaoTributariaRepository.Create(CriarCalculo());
   FAliquotaPadraoRepo := TFakeAliquotaPadraoRepository.Create(25); // 25% -> 0.25 apos dividirPorCem
   FPercentualReducaoRepo := TFakePercentualReducaoRepository.Create(CurrencyNullable.Create(10)); // 10% -> 0.1
@@ -459,6 +462,28 @@ begin
 
   Assert.AreEqual(22.5, semRedutor.CompraGovernamental.PAliqCBS, 0.0001, 'Sem redutor, aliquota efetiva deve ser 0.225 -> 22.5');
   Assert.AreEqual(11.25, comRedutor.CompraGovernamental.PAliqCBS, 0.0001, 'Com redutor de 50%, aliquota efetiva deve ser 0.1125 -> 11.25');
+end;
+
+procedure TTest_CalculoCbsIbsService_CompraGovernamental.teste_InGrupoReducao_SemPercentualReducao_GrupoReducaoNulo;
+var
+  item: ItemCalculoInput;
+  tratamento: TratamentoClassificacaoModel;
+  resultado: ResultadoCbsIbs;
+begin
+  item := CriarItem(False);
+  tratamento := TratamentoClassificacaoModel.Create(1, 1, False, False);
+  CriarService(False);
+
+  resultado := FService.Calcular(
+    tbtCBS, 0, 0, item, tratamento, 0,
+    TratamentoClassificacaoModel.NullInstance(), False,
+    EncodeDate(2027, 1, 1), tegUniao, 0
+  );
+
+  Assert.IsTrue(
+    resultado.GrupoReducao.IsNull(),
+    'Grupo de reducao deve ser nulo quando o tratamento nao possui percentual de reducao'
+  );
 end;
 
 { TFakeSituacaoTributariaService }

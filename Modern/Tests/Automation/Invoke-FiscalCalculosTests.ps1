@@ -2,7 +2,8 @@
 param(
   [switch]$BuildOnly,
   [switch]$ConfirmTestInfrastructure,
-  [string]$DelphiBin
+  [string]$DelphiBin,
+  [string]$FastMM5Path = 'D:\Hw\pac\FastMM5-master'
 )
 
 Set-StrictMode -Version Latest
@@ -52,15 +53,47 @@ function Resolve-DelphiBin {
   throw 'Delphi não encontrado. Informe -DelphiBin com o diretório que contém rsvars.bat.'
 }
 
+function Get-DelphiBuildPaths {
+  param(
+    [string]$RsVarsPath,
+    [string]$FastMM5Path
+  )
+
+  $delphiRoot = Split-Path -Parent (Split-Path -Parent $RsVarsPath)
+  $standardLibrary = Join-Path $delphiRoot 'lib\win32\release'
+
+  $requiredUnits = @(
+    @($standardLibrary, 'System.dcu'),
+    @($FastMM5Path, 'FastMM5.pas')
+  )
+
+  foreach ($requiredUnit in $requiredUnits) {
+    if (-not (Test-Path -LiteralPath (Join-Path $requiredUnit[0] $requiredUnit[1]) -PathType Leaf)) {
+      throw "Diretório de compilação não encontrado: $($requiredUnit[0])"
+    }
+  }
+
+  return [pscustomobject]@{
+    StandardLibrary = $standardLibrary
+    DependencyPath = $FastMM5Path
+  }
+}
+
 function Invoke-DelphiBuild {
   param(
     [string]$RsVarsPath,
-    [string]$ProjectPath
+    [string]$ProjectPath,
+    [string]$LibraryPath,
+    [string]$DependencyPath
   )
 
   $cleanRsVars = $RsVarsPath -replace '"', ''
   $cleanProject = $ProjectPath -replace '"', ''
-  $cmdArguments = "/c `"call `"$cleanRsVars`" && msbuild.exe `"$cleanProject`" /t:Build /p:Config=CI /p:Platform=Win32 /nologo /v:minimal`""
+  # Biblioteca por execução: evita incorporar os caminhos globais da IDE à linha de comando do DCC.
+  # O projeto anexa as dependências ao próprio DCC_UnitSearchPath via $(DCC_UnitSearchPath).
+  $env:HWDESKTOP_FISCALCALCULOS_DELPHI_LIB = $LibraryPath
+  $env:DCC_UnitSearchPath = $DependencyPath
+  $cmdArguments = "/c `"call `"$cleanRsVars`" && msbuild.exe `"$cleanProject`" /t:Build /p:Config=CI /p:Platform=Win32 `"/p:DelphiLibraryPath=%HWDESKTOP_FISCALCALCULOS_DELPHI_LIB%`" /nologo /v:minimal`""
 
   $process = Start-Process -FilePath $env:ComSpec -ArgumentList $cmdArguments -Wait -NoNewWindow -PassThru
   return $process.ExitCode
@@ -84,10 +117,11 @@ if (-not (Test-Path -LiteralPath $projectPath)) {
 
 $resolvedDelphiBin = Resolve-DelphiBin -RequestedPath $DelphiBin
 $rsVarsPath = Join-Path $resolvedDelphiBin 'rsvars.bat'
+$buildPaths = Get-DelphiBuildPaths -RsVarsPath $rsVarsPath -FastMM5Path $FastMM5Path
 
 Write-Host 'Compilando Fiscal.Calculos.Tests (CI/Win32)...'
 
-$buildExitCode = Invoke-DelphiBuild -RsVarsPath $rsVarsPath -ProjectPath $projectPath
+$buildExitCode = Invoke-DelphiBuild -RsVarsPath $rsVarsPath -ProjectPath $projectPath -LibraryPath $buildPaths.StandardLibrary -DependencyPath $buildPaths.DependencyPath
 if ($buildExitCode -ne 0) {
   Write-Error "A compilação falhou com exit code $buildExitCode."
   exit $buildExitCode

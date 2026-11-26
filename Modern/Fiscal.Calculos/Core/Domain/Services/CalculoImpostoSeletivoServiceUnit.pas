@@ -48,8 +48,8 @@ uses
   SysUtils,
   Math,
   TratamentoTributarioEtdUnit,
-  TipoTributoEnumUnit, StringNullableUnit, DoubleNullableUnit, CurrencyNullableUnit, NumberServiceUnit,
-  ArredondamentoUtilsUnit;
+  TipoTributoEnumUnit, StringNullableUnit, DoubleNullableUnit, CurrencyNullableUnit,
+  DecimalCalculoUnit, ArredondamentoCalculoUnit;
 
 { CalculoImpostoSeletivoService }
 
@@ -75,11 +75,15 @@ var
   expressaoTributoDevido: StringNullable;
   cst, cClassTrib, unidade: string;
   variaveisBuilder: IVariaveisAvaliadorBuilder;
+  variaveis: VariaveisAvaliador;
+  resultadoAliquotaDecimal, resultadoAliquotaEfetivaDecimal, resultadoBaseCalculoDecimal,
+  resultadoTributoCalculadoDecimal, resultadoTributoDevidoDecimal: DecimalCalculo;
 
-  valorPercentualReducao, valorAliquota, valorAliquotaAdValorem, resultadoAliquota,
-  resultadoAliquotaEfetiva, resultadoBaseCalculo, resultadoTributoCalculado, resultadoTributoDevido: DoubleNullable;
+  valorPercentualReducao, valorAliquota, valorAliquotaAdValorem: DoubleNullable;
   valorAjuste, valorRedutor, baseCalculoInformada, quantidade, impostoSeletivoInformado, impostoSeletivoCalculado,
   valorAliquotaPadraoOuReferencia, valorAliquotaReferencia, valorAliquotaAdRem: CurrencyNullable;
+  percentualAdValorem, baseCalculoPublicada, tributoCalculadoPublicado, tributoDevidoPublicado,
+  aliquotaPublicada: DecimalCalculo;
   aliquotaFinal: Currency;
 begin
   tratamentoTrib := FTratamentosTribRepo.ObterTratamentoTributario( Tratamento.IdTratamentoTributario );
@@ -104,8 +108,8 @@ begin
   cst := Item.ImpostoSeletivo.Cst;
   cClassTrib := Item.ImpostoSeletivo.CClassTrib;
   unidade := Item.ImpostoSeletivo.Unidade;
-  baseCalculoInformada.SetValue( Item.ImpostoSeletivo.BaseCalculo );
-  quantidade.SetValue( Item.ImpostoSeletivo.Quantidade );
+  baseCalculoInformada := Item.ImpostoSeletivo.BaseCalculo;
+  quantidade := Item.ImpostoSeletivo.Quantidade;
   impostoSeletivoInformado.SetValue( Item.ImpostoSeletivo.ValorImpostoSeletivoInformado );
   impostoSeletivoCalculado.SetNull();
 
@@ -119,16 +123,17 @@ begin
 
   valorAliquotaAdValorem := DoubleNullable.Create( Aliquota.AliquotaAdValorem.Value, Aliquota.AliquotaAdValorem.IsNull );
   if not valorAliquotaAdValorem.IsNull then
-    valorAliquotaAdValorem.SetValue( ArredondamentoUtils.DividirPorCem( valorAliquotaAdValorem.Value ));
+  begin
+    percentualAdValorem := ArredondamentoCalculo.PercentualParaFracao(
+      DecimalCalculo.DeCurrency(Aliquota.AliquotaAdValorem.Value));
+    valorAliquotaAdValorem.SetValue(percentualAdValorem.ParaDouble);
+  end;
   valorAliquotaAdRem := CurrencyNullable.Create( Aliquota.AliquotaAdRem.Value, Aliquota.AliquotaAdRem.IsNull );
 
   /////////////////////////////
-  resultadoAliquota.SetNull();
-  resultadoAliquotaEfetiva.SetNull();
-  resultadoBaseCalculo.SetNull();
-  resultadoTributoCalculado.SetNull();
-  // novos
-  resultadoTributoDevido.SetNull();
+  resultadoAliquotaDecimal := DecimalCalculo.Zero;
+  resultadoAliquotaEfetivaDecimal := DecimalCalculo.Zero;
+  resultadoTributoDevidoDecimal := DecimalCalculo.Zero;
   /////////////////////////////
 
   variaveisBuilder := VariaveisAvaliadorBuilder.Create()
@@ -144,7 +149,10 @@ begin
 
   {$REGION 'Aliquota'}
   if not expressaoAliquota.IsNullOrWhiteSpace() then
-    resultadoAliquota.SetValue(FAvaliador.Evaluate(expressaoAliquota.Value, variaveisBuilder.Build(), ArredondamentoUtils.PRECISAO_INTERNA));
+  begin
+    variaveis := variaveisBuilder.Build();
+    resultadoAliquotaDecimal := FAvaliador.Evaluate(expressaoAliquota.Value, variaveis);
+  end;
   // if (!isNullOrEmpty(expressaoAliquota)) {
   //     var variaveis0 = ofEntries(
   //             entry(ALIQUOTA, valorAliquota)),
@@ -162,7 +170,10 @@ begin
 
   {$REGION 'AliquotaEfetiva'}
   if not expressaoAliquotaEfetiva.IsNullOrWhiteSpace() then
-    resultadoAliquotaEfetiva.SetValue(FAvaliador.Evaluate(expressaoAliquotaEfetiva.Value, variaveisBuilder.Build(), ArredondamentoUtils.PRECISAO_INTERNA));
+  begin
+    variaveis := variaveisBuilder.Build();
+    resultadoAliquotaEfetivaDecimal := FAvaliador.Evaluate(expressaoAliquotaEfetiva.Value, variaveis);
+  end;
   // if (!isNullOrEmpty(expressaoAliquotaEfetiva)) {
   //     var variaveis1 = ofEntries(
   //             entry(QUANTIDADE, quantidade),
@@ -178,8 +189,8 @@ begin
   // }
   {$ENDREGION}
 
-  variaveisBuilder.Aliquota(resultadoAliquota.Value);// isso viria do que esta comentado, aqui ainda esta null
-  variaveisBuilder.AliquotaEfetiva(resultadoAliquotaEfetiva.Value); // aqui também
+  variaveisBuilder.SetAliquota(resultadoAliquotaDecimal);
+  variaveisBuilder.SetAliquotaEfetiva(resultadoAliquotaEfetivaDecimal);
 
   {$REGION 'BaseCalculo'}
   variaveisBuilder
@@ -187,32 +198,39 @@ begin
     .BaseCalculoInformada(baseCalculoInformada.Value )
     .ImpostoSeletivoCalculado(impostoSeletivoCalculado.Value);
 
-  resultadoBaseCalculo.SetValue( FAvaliador.Evaluate( expressaoBaseCalculo.Value, variaveisBuilder.Build(), ArredondamentoUtils.PRECISAO_INTERNA));
-
-  if NumberService.RoundHalfUpTo2(resultadoBaseCalculo.Value) < ZeroValue then
+  variaveis := variaveisBuilder.Build();
+  resultadoBaseCalculoDecimal := FAvaliador.Evaluate( expressaoBaseCalculo.Value, variaveis);
+  baseCalculoPublicada := ArredondamentoCalculo.ValorFiscal(resultadoBaseCalculoDecimal);
+  if baseCalculoPublicada.MenorQue(DecimalCalculo.Zero) then
   begin
-    resultadoBaseCalculo.SetValue( ZeroValue );
+    resultadoBaseCalculoDecimal := DecimalCalculo.Zero;
+    baseCalculoPublicada := DecimalCalculo.Zero;
             // aqui deveria ser lançada uma exceção
             // flexibilidade para a plataforma
   end;
 
-  variaveisBuilder.BaseCalculo(resultadoBaseCalculo.Value);
+  variaveisBuilder.SetBaseCalculo(resultadoBaseCalculoDecimal);
   {$ENDREGION}
 
   {$REGION 'TributoCalculado'}
-  resultadoTributoCalculado.SetValue( FAvaliador.Evaluate(
-    expressaoTributoCalculado.Value, variaveisBuilder.Build(), ArredondamentoUtils.PRECISAO_INTERNA
-  ));
+  variaveis := variaveisBuilder.Build();
+  resultadoTributoCalculadoDecimal := FAvaliador.Evaluate(
+    expressaoTributoCalculado.Value, variaveis
+  );
+  tributoCalculadoPublicado := ArredondamentoCalculo.ValorFiscal(
+    resultadoTributoCalculadoDecimal);
+  if tributoCalculadoPublicado.MenorQue(DecimalCalculo.Zero) then
+    resultadoTributoCalculadoDecimal := DecimalCalculo.Zero;
 
-  if SimpleRoundTo(resultadoTributoCalculado.Value, -2) < ZeroValue then
-    resultadoTributoCalculado.SetValue( ZeroValue );
-
-  variaveisBuilder.TributoCalculado(resultadoTributoCalculado.Value);
+  variaveisBuilder.SetTributoCalculado(resultadoTributoCalculadoDecimal);
   {$ENDREGION}
 
   {$REGION 'TributoDevido'}
   if not ExpressaoTributoDevido.IsNullOrWhiteSpace() then
-    resultadoTributoDevido.SetValue(FAvaliador.Evaluate(expressaoTributoDevido.Value, variaveisBuilder.Build(), ArredondamentoUtils.PRECISAO_INTERNA));
+  begin
+    variaveis := variaveisBuilder.Build();
+    resultadoTributoDevidoDecimal := FAvaliador.Evaluate(expressaoTributoDevido.Value, variaveis);
+  end;
   {$ENDREGION}
 
   // pIS e a aliquota ad valorem em percentual (nao dividida por 100), conforme
@@ -220,19 +238,25 @@ begin
   // Usar o valor original evita o round-trip Double->Currency que colapsaria
   // aliquotas com 3-4 casas decimais.
   if Aliquota.AliquotaAdValorem.HasValue then
-    aliquotaFinal := Aliquota.AliquotaAdValorem.Value
+  begin
+    aliquotaPublicada := ArredondamentoCalculo.AliquotaPublicada(
+      DecimalCalculo.DeCurrency(Aliquota.AliquotaAdValorem.Value));
+    aliquotaFinal := aliquotaPublicada.ParaCurrency;
+  end
   else
     aliquotaFinal := 0;
+
+  tributoDevidoPublicado := ArredondamentoCalculo.ValorFiscal(resultadoTributoDevidoDecimal);
 
   Result := ImpostoSeletivoModel.Create(
     Item.CSTInt,
     item.cClassTrib,
-    NumberService.RoundHalfUpTo2(resultadoBaseCalculo.Value),
+    baseCalculoPublicada.ParaCurrency,
     aliquotaFinal,
     valorAliquotaAdRem.Value,
     unidade,
     quantidade.Value,
-    NumberService.RoundHalfUpTo2(resultadoTributoDevido.Value),
+    tributoDevidoPublicado.ParaCurrency,
     ''
   );
 end;

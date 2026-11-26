@@ -28,6 +28,10 @@ type
     [Test]
     procedure teste_baseNegativaLancaExcecao;
     [Test]
+    procedure teste_baseNegativaFracionariaAbaixoDoCentavoLancaExcecao;
+    [Test]
+    procedure teste_baseNegativaFracionariaAntesDoArredondamentoLancaExcecao;
+    [Test]
     procedure teste_todosCamposZeroRetornaZero;
     [Test]
     procedure teste_camposIndividuaisIntegram;
@@ -384,6 +388,36 @@ var
 begin
   input := BaseCalculoIbsCbsModel.Create(2033, 1000.00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10.00, 0, 0, 0);
   Assert.WillRaise(procedure begin FService.CalculaIbsCbs(input); end, Exception);
+end;
+
+procedure TTest_BaseCalculoService_CalcularCibs.teste_baseNegativaFracionariaAbaixoDoCentavoLancaExcecao;
+var
+  input: BaseCalculoIbsCbsModel;
+begin
+  input := BaseCalculoIbsCbsModel.Create(2027, 0.001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.006, 0);
+  Assert.WillRaise(
+    procedure
+    begin
+      FService.CalculaIbsCbs(input);
+    end,
+    Exception,
+    'Base de cálculo não pode ser negativa. A soma dos valores que não integram a base é maior que a soma dos valores que integram a base'
+  );
+end;
+
+procedure TTest_BaseCalculoService_CalcularCibs.teste_baseNegativaFracionariaAntesDoArredondamentoLancaExcecao;
+var
+  input: BaseCalculoIbsCbsModel;
+begin
+  input := BaseCalculoIbsCbsModel.Create(2027, 0.002, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.006, 0);
+  // A validacao da base ocorre antes do arredondamento; -0.004 ja e negativo.
+  Assert.WillRaise(
+    procedure
+    begin
+      FService.CalculaIbsCbs(input);
+    end,
+    Exception
+  );
 end;
 
 initialization

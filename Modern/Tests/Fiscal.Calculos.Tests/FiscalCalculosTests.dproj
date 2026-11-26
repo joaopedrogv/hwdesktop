@@ -66,7 +66,7 @@
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
-        <DCC_UnitSearchPath>..\..\Adapters\Secondary\Database;..\..\Adapters\Secondary\Database\Firebird;..\..\Adapters\Secondary\Database\SQLite;..\..\Adapters\Secondary\Files;..\..\Adapters\Secondary\Repositories;..\..\Adapters\Secondary\Services;..\..\Core\Application\Contexts;..\..\Core\Application\Interfaces\Shared;..\..\Core\Application\OutputPorts\Shared;..\..\Core\Application\UseCases\Shared;..\..\Core\Domain\Constants\Shared;..\..\Core\Domain\Entities\Shared;..\..\Core\Domain\Ports\Services\Shared;..\..\Core\Domain\Ports\Shared;..\..\Core\Domain\Services\Shared;..\..\Core\Domain\Types\Shared;..\..\Core\Domain\ValueObjects\Shared;..\..\Core\Infrastructure;..\..\Core\Infrastructure\Base;..\..\Core\Infrastructure\Cache;..\..\Core\Infrastructure\Config;..\..\Core\Infrastructure\Data;..\..\Core\Infrastructure\DI;..\..\Core\Infrastructure\Exceptions;..\..\Core\Infrastructure\Interfaces;..\..\Core\Infrastructure\Logging;..\..\Core\Infrastructure\Services;..\..\Fiscal.Calculos\Adapters\Secondary\Repositories;..\..\Fiscal.Calculos\Core\Application\InputPorts\Calculo;..\..\Fiscal.Calculos\Core\Application\OutputPorts;..\..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo;..\..\Fiscal.Calculos\Core\Application\UseCases\BaseDeCalculo;..\..\Fiscal.Calculos\Core\Application\UseCases\CalcularTributo;..\..\Fiscal.Calculos\Core\Application\UseCases\ClassificacoesTributarias;..\..\Fiscal.Calculos\Core\Application\UseCases\Nfse;..\..\Fiscal.Calculos\Core\Application\UseCases\PercentuaisDeReducao;..\..\Fiscal.Calculos\Core\Application\UseCases\TratamentoClassificacoes;..\..\Fiscal.Calculos\Core\Application\UseCases\ValidarTributacaoItem;..\..\Fiscal.Calculos\Core\Domain\Calculos\Expressoes;..\..\Fiscal.Calculos\Core\Domain\Calculos\Interfaces;..\..\Fiscal.Calculos\Core\Domain\Constants;..\..\Fiscal.Calculos\Core\Domain\Entities;..\..\Fiscal.Calculos\Core\Domain\Ports;..\..\Fiscal.Calculos\Core\Domain\Services;..\..\Fiscal.Calculos\Core\Domain\ValueObjects;..\..\Fiscal.Calculos\Core\Infrastructure\Exceptions;..\..\Fiscal.Calculos\Infrastructure;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\..\Adapters\Secondary\Database;..\..\Adapters\Secondary\Database\Firebird;..\..\Adapters\Secondary\Database\SQLite;..\..\Adapters\Secondary\Files;..\..\Adapters\Secondary\Repositories;..\..\Adapters\Secondary\Services;..\..\Core\Application\Contexts;..\..\Core\Application\Interfaces\Shared;..\..\Core\Application\OutputPorts\Shared;..\..\Core\Application\UseCases\Shared;..\..\Core\Domain\Constants\Shared;..\..\Core\Domain\Entities\Shared;..\..\Core\Domain\Ports\Services\Shared;..\..\Core\Domain\Ports\Shared;..\..\Core\Domain\Services\Shared;..\..\Core\Domain\Types\Shared;..\..\Core\Domain\ValueObjects\Shared;..\..\Core\Infrastructure;..\..\Core\Infrastructure\Base;..\..\Core\Infrastructure\Cache;..\..\Core\Infrastructure\Config;..\..\Core\Infrastructure\Data;..\..\Core\Infrastructure\DI;..\..\Core\Infrastructure\Exceptions;..\..\Core\Infrastructure\Interfaces;..\..\Core\Infrastructure\Logging;..\..\Core\Infrastructure\Services;..\..\Fiscal.Calculos\Adapters\Secondary\Repositories;..\..\Fiscal.Calculos\Core\Application\InputPorts\Calculo;..\..\Fiscal.Calculos\Core\Application\OutputPorts;..\..\Fiscal.Calculos\Core\Application\OutputPorts\Calculo;..\..\Fiscal.Calculos\Core\Application\UseCases\BaseDeCalculo;..\..\Fiscal.Calculos\Core\Application\UseCases\CalcularTributo;..\..\Fiscal.Calculos\Core\Application\UseCases\ClassificacoesTributarias;..\..\Fiscal.Calculos\Core\Application\UseCases\Nfse;..\..\Fiscal.Calculos\Core\Application\UseCases\PercentuaisDeReducao;..\..\Fiscal.Calculos\Core\Application\UseCases\TratamentoClassificacoes;..\..\Fiscal.Calculos\Core\Application\UseCases\ValidarTributacaoItem;..\..\Fiscal.Calculos\Core\Domain\Calculos\Expressoes;..\..\Fiscal.Calculos\Core\Domain\Calculos\Interfaces;..\..\Fiscal.Calculos\Core\Domain\Constants;..\..\Fiscal.Calculos\Core\Domain\Entities;..\..\Fiscal.Calculos\Core\Domain\Ports;..\..\Fiscal.Calculos\Core\Domain\Services;..\..\Fiscal.Calculos\Core\Domain\Types;..\..\Fiscal.Calculos\Core\Domain\ValueObjects;..\..\Fiscal.Calculos\Core\Infrastructure\Exceptions;..\..\Fiscal.Calculos\Infrastructure;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <SanitizedProjectName>FiscalCalculosTests</SanitizedProjectName>
         <DCC_Define>TESTINSIGHT;$(DCC_Define)</DCC_Define>
         <VerInfo_Locale>1046</VerInfo_Locale>
@@ -110,7 +110,7 @@
         <Manifest_File>C:\Users\joaop\Documents\Embarcadero\Studio\Projects\(None)</Manifest_File>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_3)'!=''">
-        <DCC_Define>CI;$(DCC_Define)</DCC_Define>
+        <DCC_Define>CI</DCC_Define>
         <VerInfo_Locale>1046</VerInfo_Locale>
     </PropertyGroup>
     <ItemGroup>
@@ -129,6 +129,7 @@
         <DCCReference Include="IntegrationTests\CalculosCorretos\CbsIbs\cclasstrib_000001\Teste_000001_6.pas"/>
         <DCCReference Include="IntegrationTests\CalculosCorretos\CbsIbs\cclasstrib_000001\Teste_000001_7.pas"/>
         <DCCReference Include="IntegrationTests\CalculosCorretos\CbsIbs\cclasstrib_000001\Teste_000001_8.pas"/>
+        <DCCReference Include="IntegrationTests\CalculosCorretos\CbsIbs\cclasstrib_000001\Teste_000001_9.pas"/>
         <DCCReference Include="IntegrationTests\CalculosCorretos\CbsIbs\cclasstrib_011002\Teste_011002_1.pas"/>
         <DCCReference Include="IntegrationTests\CalculosCorretos\CbsIbs\cclasstrib_200002\Teste_200002_1.pas"/>
         <DCCReference Include="IntegrationTests\CalculosCorretos\CbsIbs\cclasstrib_200002\Teste_200002_2.pas"/>
@@ -148,15 +149,25 @@
         <DCCReference Include="IntegrationTests\Indicadores\Teste_indicador_gRed_4_cst515.pas"/>
         <DCCReference Include="UnitTests\DTO\Test_AliquotaResultadoModel.pas"/>
         <DCCReference Include="UnitTests\DTO\Teste_CompraGovernamentalInput.pas"/>
+        <DCCReference Include="UnitTests\DTO\Teste_ComponentesBaseCalculo.pas"/>
         <DCCReference Include="UnitTests\DTO\Teste_IBSCBSTotal_GMono.pas"/>
+        <DCCReference Include="UnitTests\DTO\Teste_IBSTotal_VIBS.pas"/>
         <DCCReference Include="UnitTests\DTO\Teste_ResultadoCbsIbsCompraGovernamental.pas"/>
         <DCCReference Include="UnitTests\DTO\Teste_ROCOperacaoConsumo.pas"/>
         <DCCReference Include="UnitTests\Service\Teste_ArredondamentoUtils.pas"/>
+        <DCCReference Include="UnitTests\Service\Teste_ArredondamentoCalculo.pas"/>
+        <DCCReference Include="UnitTests\Service\Teste_ArquiteturaArredondamento.pas"/>
+        <DCCReference Include="UnitTests\Service\Teste_DecimalCalculo.pas"/>
         <DCCReference Include="UnitTests\Service\Teste_AvaliadorExpressaoAritmetica.pas"/>
         <DCCReference Include="UnitTests\Service\Teste_BaseCalculoService_CalcularCibs.pas"/>
         <DCCReference Include="UnitTests\Service\Teste_BaseCalculoService_CalcularISMercadorias.pas"/>
+        <DCCReference Include="UnitTests\Service\Teste_BaseCalculoUnificadaInput.pas"/>
+        <DCCReference Include="UnitTests\Service\Teste_BaseCalculoUnificadaService.pas"/>
         <DCCReference Include="UnitTests\Service\Teste_CalculoCbsIbsService_CompraGovernamental.pas"/>
+        <DCCReference Include="UnitTests\Service\Teste_CalculoCbsIbsService_CadeiaDecimal.pas"/>
+    <DCCReference Include="UnitTests\Service\Teste_CasosFixosArredondamento.pas"/>
         <DCCReference Include="UnitTests\Service\Teste_CalculoImpostoSeletivo_Precisao.pas"/>
+        <DCCReference Include="UnitTests\Service\Teste_CodigoTextoValidacaoRtc.pas"/>
         <DCCReference Include="UnitTests\Service\Teste_MemoriaCalculoService.pas"/>
         <DCCReference Include="UnitTests\Service\Teste_NbsAplicavelService.pas"/>
         <DCCReference Include="UnitTests\Service\Teste_NfseUseCases_ConsultarIndicadorOperacao.pas"/>
@@ -165,7 +176,9 @@
         <DCCReference Include="UnitTests\Service\Teste_NfseUseCases_ValidarIndicadorOperacao.pas"/>
         <DCCReference Include="UnitTests\Service\Teste_PreparacaoCalculoService_ValidacaoDigitos.pas"/>
         <DCCReference Include="UnitTests\Service\Teste_PreparacaoCalculoService_ValidarQuantidadeEUnidade.pas"/>
+        <DCCReference Include="UnitTests\Service\Teste_ProcessamentoItemService.pas"/>
         <DCCReference Include="UnitTests\Service\Teste_TributacaoCompraGovernamentalModel.pas"/>
+        <DCCReference Include="UnitTests\Service\Teste_ValidacaoBaseLegado.pas"/>
         <DCCReference Include="IntegrationTests\ValidacoesNegocio\Teste_ValidacoesNegocioNbsNcm.pas"/>
         <DCCReference Include="IntegrationTests\Infrastructure\ContainerFiscalTestsUnit.pas"/>
         <DCCReference Include="IntegrationTests\Infrastructure\SetupTestUnit.pas"/>

@@ -38,7 +38,8 @@ type
 implementation
 
 uses
-  NumberServiceUnit;
+  DecimalCalculoUnit,
+  ArredondamentoCalculoUnit;
 
 { CBSModel }
 
@@ -50,12 +51,18 @@ constructor CBSModel.Create(
   VCBS: Currency;
   const MemoriaCalculo: string
 );
+var
+  valor: DecimalCalculo;
 begin
-  FPCBS := NumberService.RoundHalfUpTo4(PCBS);
+  valor := DecimalCalculo.DeCurrency(PCBS);
+  valor := ArredondamentoCalculo.AliquotaPublicada(valor);
+  FPCBS := valor.ParaCurrency;
   FGDif := GDif;
   FGDevTrib := GDevTrib;
   FGRed := GRed;
-  FVCBS := NumberService.RoundHalfUpTo2(VCBS);
+  valor := DecimalCalculo.DeCurrency(VCBS);
+  valor := ArredondamentoCalculo.ValorFiscal(valor);
+  FVCBS := valor.ParaCurrency;
   FMemoriaCalculo := MemoriaCalculo;
 end;
 

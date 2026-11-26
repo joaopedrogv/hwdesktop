@@ -279,7 +279,7 @@ begin
       1, '24021000', '000001', '000',
       ImpostoSeletivoInput.NullInstance(),
       TributacaoRegularInput.NullInstance(),
-      0, 0, 'VN');
+      CurrencyNullable.Create(0), CurrencyNullable.Create(0), 'VN');
 
     LOperacao := OperacaoTributacaoModel.Create(
       EncodeDate(2027, 1, 1),

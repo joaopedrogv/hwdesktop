@@ -63,7 +63,7 @@ implementation
 
 { GrupoIBSCBSModel }
 
-uses NumberServiceUnit;
+uses DecimalCalculoUnit, ArredondamentoCalculoUnit;
 
 constructor GrupoIBSCBSModel.Create(
   VBC: CurrencyNullable;
@@ -74,15 +74,23 @@ constructor GrupoIBSCBSModel.Create(
   const GTribRegular: TributacaoRegularModel;
   const GTribCompraGov: TributacaoCompraGovernamentalModel
 );
+var
+  valor: DecimalCalculo;
 begin
   if VBC.IsNull then
     FVBC := CurrencyNullable.NullInstance()
   else
-    FVBC := CurrencyNullable.Create(NumberService.RoundHalfUpTo2(VBC.Value));
+  begin
+    valor := DecimalCalculo.DeCurrency(VBC.Value);
+    valor := ArredondamentoCalculo.ValorFiscal(valor);
+    FVBC := CurrencyNullable.Create(valor.ParaCurrency);
+  end;
 
   FGIBSUF := GIBSUF;
   FGIBSMun := GIBSMun;
-  FVIBS := NumberService.RoundHalfUpTo2(VIBS);
+  valor := DecimalCalculo.DeCurrency(VIBS);
+  valor := ArredondamentoCalculo.ValorFiscal(valor);
+  FVIBS := valor.ParaCurrency;
   FGCBS := GCBS;
   FGTribRegular := GTribRegular;
   FGTribCompraGov := GTribCompraGov;

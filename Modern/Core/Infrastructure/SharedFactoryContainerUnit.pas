@@ -32,7 +32,8 @@ uses
   PreparacaoCalculoServiceInterUnit, CalculoTributoServiceUnit, CalculoBaseCalculoServiceUnit, ITradutorErrosRtcUnit,
   TradutorErrosRtcUnit, IAvaliadorExpressaoAritmeticaServiceUnit, AvaliadorExpressaoAritmeticaServiceUnit,
   TransferenciaCBSServiceUnit, ProcessamentoItemServiceNovoUnit, RedutorCompraGovernamentalServiceUnit,
-  ISituacaoTributariaServiceUnit, SituacaoTributariaServiceUnit;
+  ISituacaoTributariaServiceUnit, SituacaoTributariaServiceUnit,
+  IBaseCalculoUnificadaServiceUnit, FiscalCalculosFactoryUnit;
 
 { SharedFactory }
 
@@ -65,6 +66,7 @@ var
   transferenciaCBS: ITransferenciaCBSService;
   processamentoItem: IProcessamentoItemService;
   redutorCompraGovernamental: IRedutorCompraGovernamentalService;
+  baseCalculoUnificada: IBaseCalculoUnificadaService;
 begin
   ncmAplService := NcmAplicavelService.Create( FiscalRepoContainer.GetInstance().NcmAplicavelRepo );
   nbsAplService := NbsAplicavelService.Create( FiscalRepoContainer.GetInstance().NbsAplicavelRepo );
@@ -72,6 +74,7 @@ begin
     FiscalRepoContainer.GetInstance().ClassificacaoTributariaRepo
   );
   avaliadorExprss := AvaliadorExpressaoAritmeticaService.Create();
+  baseCalculoUnificada := FiscalCalculosFactory.CreateBaseCalculoUnificadaService();
 
   preparacao := PreparacaoCalculoServiceInter.Create(
     FiscalRepoContainer.GetInstance().MunicipioRepo,
@@ -86,7 +89,8 @@ begin
     FiscalRepoContainer.GetInstance().AliquotaAdValoremServicoRepo,
     FiscalRepoContainer.GetInstance().AliquotaAdRemProdutoRepo,
     FiscalRepoContainer.GetInstance().RedutorCompraGovernamentalRepo,
-    classTribService
+    classTribService,
+    baseCalculoUnificada
   );
 
   situacaoTribService := SituacaoTributariaService.Create(
@@ -143,7 +147,8 @@ begin
     FiscalRepoContainer.GetInstance().AliquotaAdValoremServicoRepo,
     FiscalRepoContainer.GetInstance().AliquotaAdRemProdutoRepo,
     redutorCompraGovernamental,
-    classTribService
+    classTribService,
+    baseCalculoUnificada
   );
 
   Result := CalculadorROCService.Create(

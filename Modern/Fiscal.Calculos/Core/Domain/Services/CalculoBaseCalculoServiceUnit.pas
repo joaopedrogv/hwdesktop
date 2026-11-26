@@ -5,14 +5,15 @@ interface
 uses
   ICalculoBaseCalculoServiceUnit,
   ICalculadorBaseCalculoServiceUnit,
-  CalcularBaseCalculoModelUnit;
+  CalcularBaseCalculoModelUnit,
+  DecimalCalculoUnit;
 
 type
   CalculoBaseCalculoService = class(TInterfacedObject, ICalculoBaseCalculoService)
   private
     procedure ValidaAnoInicioTributo(AnoFatoGerador, AnoInicioTributo: SmallInt; const MensagemErro: string);
     procedure ValidaValoresForaLimiteVigenciaPermitido(AnoFatoGerador: SmallInt; icms, iss: Currency; pis: Currency = 0.00; cofins: Currency = 0.00);
-    procedure ValidaValorFinalBaseCalculo(ValorFinal: Currency);
+    procedure ValidaValorFinalBaseCalculo(const ValorFinal: DecimalCalculo);
   public
     function CalculaIS(const Input: BaseCalculoISMercadoriasModel): Currency;
     function CalculaIbsCbs(const Input: BaseCalculoIbsCbsModel): Currency;
@@ -24,8 +25,8 @@ type
 implementation
 
 uses
-  SysUtils, Math,
-  NumberServiceUnit, ArredondamentoUtilsUnit;
+  SysUtils,
+  ArredondamentoCalculoUnit;
 
 
 const
@@ -41,69 +42,73 @@ const
 function CalculoBaseCalculoService.CalculaIbsCbs(
   const Input: BaseCalculoIbsCbsModel): Currency;
 var
-  integra, naoIntegra, baseCalculo: Double;
+  integra, naoIntegra, baseCalculo: DecimalCalculo;
 begin
   ValidaAnoInicioTributo( Input.AnoFatoGerador, ANO_INICIO_CBS_IBS, MENSAGEM_ERRO_CBS_IBS );
 
   ValidaValoresForaLimiteVigenciaPermitido(Input.AnoFatoGerador, Input.ICMS, Input.ISS, Input.PIS, Input.COFINS);
 
-  integra :=
-    + input.ValorBem
-    + input.AjusteAcrescimos
-    + input.Juros
-    + input.Multas
-    + input.Encargos
-    + input.Frete
-    + input.ImpostoSeletivo
-    + input.OutrosTributos
-    + input.DemaisImportancias;
+  integra := DecimalCalculo.DeCurrency(input.ValorBem);
+  integra := integra.Somar(DecimalCalculo.DeCurrency(input.AjusteAcrescimos));
+  integra := integra.Somar(DecimalCalculo.DeCurrency(input.Juros));
+  integra := integra.Somar(DecimalCalculo.DeCurrency(input.Multas));
+  integra := integra.Somar(DecimalCalculo.DeCurrency(input.Encargos));
+  integra := integra.Somar(DecimalCalculo.DeCurrency(input.Frete));
+  integra := integra.Somar(DecimalCalculo.DeCurrency(input.ImpostoSeletivo));
+  integra := integra.Somar(DecimalCalculo.DeCurrency(input.OutrosTributos));
+  integra := integra.Somar(DecimalCalculo.DeCurrency(input.DemaisImportancias));
 
-  naoIntegra :=
-    + input.IPI
-    + input.DescontoIncondicional
-    + IfThen( Input.AnoFatoGerador < ANO_EXTINCAO_PIS_COFINS, input.PIS)
-    + IfThen( Input.AnoFatoGerador < ANO_EXTINCAO_PIS_COFINS, input.COFINS)
-    + IfThen( Input.AnoFatoGerador < ANO_EXTINCAO_ICMS_ISS, input.ICMS)
-    + IfThen( Input.AnoFatoGerador < ANO_EXTINCAO_ICMS_ISS, input.ISS);
+  naoIntegra := DecimalCalculo.DeCurrency(input.IPI);
+  naoIntegra := naoIntegra.Somar(DecimalCalculo.DeCurrency(input.DescontoIncondicional));
+  if Input.AnoFatoGerador < ANO_EXTINCAO_PIS_COFINS then
+  begin
+    naoIntegra := naoIntegra.Somar(DecimalCalculo.DeCurrency(input.PIS));
+    naoIntegra := naoIntegra.Somar(DecimalCalculo.DeCurrency(input.COFINS));
+  end;
+  if Input.AnoFatoGerador < ANO_EXTINCAO_ICMS_ISS then
+  begin
+    naoIntegra := naoIntegra.Somar(DecimalCalculo.DeCurrency(input.ICMS));
+    naoIntegra := naoIntegra.Somar(DecimalCalculo.DeCurrency(input.ISS));
+  end;
 
-  baseCalculo := ArredondamentoUtils.ArredondarInterno( integra - naoIntegra );
-  Result := NumberService.RoundHalfUpTo2( baseCalculo );
-
-  ValidaValorFinalBaseCalculo(Result);
+  baseCalculo := integra.Subtrair(naoIntegra);
+  ValidaValorFinalBaseCalculo(baseCalculo);
+  baseCalculo := ArredondamentoCalculo.ValorFiscal(baseCalculo);
+  Result := baseCalculo.ParaCurrency;
 end;
 
 function CalculoBaseCalculoService.CalculaIS(
   const Input: BaseCalculoISMercadoriasModel): Currency;
 var
-  integra, naoIntegra, baseCalculo: Double;
+  integra, naoIntegra, baseCalculo: DecimalCalculo;
 begin
   ValidaAnoInicioTributo( Input.AnoFatoGerador, ANO_INICIO_IS, MENSAGEM_ERRO_IS );
 
   ValidaValoresForaLimiteVigenciaPermitido(Input.AnoFatoGerador, Input.ICMS, Input.ISS);
 
-  integra :=
-    + input.ValorBem
-    + input.AjusteAcrescimos
-    + input.Juros
-    + input.Multas
-    + input.Encargos
-    + input.FreteCobrado
-    + input.OutrosTributos
-    + input.DemaisImportancias;
+  integra := DecimalCalculo.DeCurrency(input.ValorBem);
+  integra := integra.Somar(DecimalCalculo.DeCurrency(input.AjusteAcrescimos));
+  integra := integra.Somar(DecimalCalculo.DeCurrency(input.Juros));
+  integra := integra.Somar(DecimalCalculo.DeCurrency(input.Multas));
+  integra := integra.Somar(DecimalCalculo.DeCurrency(input.Encargos));
+  integra := integra.Somar(DecimalCalculo.DeCurrency(input.FreteCobrado));
+  integra := integra.Somar(DecimalCalculo.DeCurrency(input.OutrosTributos));
+  integra := integra.Somar(DecimalCalculo.DeCurrency(input.DemaisImportancias));
 
-  naoIntegra :=
-    { + input.Cosip }
-    + input.IPI
-    + input.DescontoIncondicional
-    + input.Bonificacao
-    + input.DevolucaoVendas
-    + IfThen( Input.AnoFatoGerador < ANO_EXTINCAO_ICMS_ISS, input.ICMS)
-    + IfThen( Input.AnoFatoGerador < ANO_EXTINCAO_ICMS_ISS, input.ISS);
+  naoIntegra := DecimalCalculo.DeCurrency(input.IPI);
+  naoIntegra := naoIntegra.Somar(DecimalCalculo.DeCurrency(input.DescontoIncondicional));
+  naoIntegra := naoIntegra.Somar(DecimalCalculo.DeCurrency(input.Bonificacao));
+  naoIntegra := naoIntegra.Somar(DecimalCalculo.DeCurrency(input.DevolucaoVendas));
+  if Input.AnoFatoGerador < ANO_EXTINCAO_ICMS_ISS then
+  begin
+    naoIntegra := naoIntegra.Somar(DecimalCalculo.DeCurrency(input.ICMS));
+    naoIntegra := naoIntegra.Somar(DecimalCalculo.DeCurrency(input.ISS));
+  end;
 
-  baseCalculo := ArredondamentoUtils.ArredondarInterno( integra - naoIntegra );
-  Result := NumberService.RoundHalfUpTo2( baseCalculo );
-
-  ValidaValorFinalBaseCalculo(Result);
+  baseCalculo := integra.Subtrair(naoIntegra);
+  ValidaValorFinalBaseCalculo(baseCalculo);
+  baseCalculo := ArredondamentoCalculo.ValorFiscal(baseCalculo);
+  Result := baseCalculo.ParaCurrency;
 end;
 
 procedure CalculoBaseCalculoService.ValidaAnoInicioTributo(AnoFatoGerador, AnoInicioTributo: SmallInt;
@@ -122,9 +127,9 @@ begin
     raise Exception.CreateFmt('PIS e/ou COFINS não devem ser informados a partir de %d', [ANO_EXTINCAO_PIS_COFINS]);
 end;
 
-procedure CalculoBaseCalculoService.ValidaValorFinalBaseCalculo(ValorFinal: Currency);
+procedure CalculoBaseCalculoService.ValidaValorFinalBaseCalculo(const ValorFinal: DecimalCalculo);
 begin
-  if ValorFinal < 0 then
+  if ValorFinal.MenorQue(DecimalCalculo.Zero) then
     raise Exception.Create('Base de cálculo não pode ser negativa. A soma dos valores que não integram a base é maior que a soma dos valores que integram a base');
 end;
 

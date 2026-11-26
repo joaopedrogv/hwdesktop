@@ -3,7 +3,8 @@ unit ItemCalculoInputUnit;
 interface
 
 uses
-  TributacaoRegularInputUnit, ImpostoSeletivoInputUnit;
+  TributacaoRegularInputUnit, ImpostoSeletivoInputUnit, ComponentesBaseCalculoInputUnit,
+  CurrencyNullableUnit;
 
 type
   ItemCalculoInput =  record
@@ -16,9 +17,11 @@ type
     FNCM: string;
     FImpostoSeletivo: ImpostoSeletivoInput;
     FUnidade: string;
-    FQuantidade: Currency;
-    FBaseCalculo: Currency;
+    FQuantidade: CurrencyNullable;
+    FBaseCalculo: CurrencyNullable;
     FCST: string;
+    FGComponentesBC: ComponentesBaseCalculoInput;
+    function GetHasGComponentesBC: Boolean;
   public
     class function Create(
       Numero: Integer;
@@ -26,11 +29,68 @@ type
       const cClassTrib: string;
       const CST: string;
       const ImpostoSeletivo: ImpostoSeletivoInput;
+      const TributacaoRegular: TributacaoRegularInput
+    ): ItemCalculoInput; overload; static;
+
+    class function Create(
+      Numero: Integer;
+      const NCMouNBS: string;
+      const cClassTrib: string;
+      const CST: string;
+      const ImpostoSeletivo: ImpostoSeletivoInput;
       const TributacaoRegular: TributacaoRegularInput;
-      BaseCalculo: Currency = 0;
+      const BaseCalculo: CurrencyNullable
+    ): ItemCalculoInput; overload; static;
+
+    class function Create(
+      Numero: Integer;
+      const NCMouNBS: string;
+      const cClassTrib: string;
+      const CST: string;
+      const ImpostoSeletivo: ImpostoSeletivoInput;
+      const TributacaoRegular: TributacaoRegularInput;
+      const BaseCalculo: CurrencyNullable;
+      const Quantidade: CurrencyNullable
+    ): ItemCalculoInput; overload; static;
+
+    class function Create(
+      Numero: Integer;
+      const NCMouNBS: string;
+      const cClassTrib: string;
+      const CST: string;
+      const ImpostoSeletivo: ImpostoSeletivoInput;
+      const TributacaoRegular: TributacaoRegularInput;
+      const BaseCalculo: CurrencyNullable;
+      const Quantidade: CurrencyNullable;
+      const Unidade: string
+    ): ItemCalculoInput; overload; static;
+
+    class function Create(
+      Numero: Integer;
+      const NCMouNBS: string;
+      const cClassTrib: string;
+      const CST: string;
+      const ImpostoSeletivo: ImpostoSeletivoInput;
+      const TributacaoRegular: TributacaoRegularInput;
+      const BaseCalculo: CurrencyNullable;
+      const Quantidade: CurrencyNullable;
+      const Unidade: string;
+      const GComponentesBC: ComponentesBaseCalculoInput
+    ): ItemCalculoInput; overload; static;
+
+    class function Create(
+      Numero: Integer;
+      const NCMouNBS: string;
+      const cClassTrib: string;
+      const CST: string;
+      const ImpostoSeletivo: ImpostoSeletivoInput;
+      const TributacaoRegular: TributacaoRegularInput;
+      const BaseCalculo: Currency;
       Quantidade: Currency = 0;
       const Unidade: string = ''
-    ): ItemCalculoInput; static;
+    ): ItemCalculoInput; overload; static;
+
+    function QuantidadeEfetiva: Currency;
 
     /// <summary>
     ///   Numero sequencial do item
@@ -40,9 +100,11 @@ type
     property NBS: string read FNBS;
     property CST: string read FCST;
     property cClassTrib: string read FcClassTrib;
-    property BaseCalculo: Currency read FBaseCalculo write FBaseCalculo;
-    property Quantidade: Currency read FQuantidade;
+    property BaseCalculo: CurrencyNullable read FBaseCalculo write FBaseCalculo;
+    property Quantidade: CurrencyNullable read FQuantidade write FQuantidade;
     property Unidade: string read FUnidade;
+    property GComponentesBC: ComponentesBaseCalculoInput read FGComponentesBC;
+    property HasGComponentesBC: Boolean read GetHasGComponentesBC;
 
     /// <summary>
     ///   Usado para validacao no Imposto Seletivo
@@ -67,9 +129,95 @@ class function ItemCalculoInput.Create(
   Numero: Integer;
   const NCMouNBS, cClassTrib, CST: string;
   const ImpostoSeletivo: ImpostoSeletivoInput;
+  const TributacaoRegular: TributacaoRegularInput
+  ): ItemCalculoInput;
+begin
+  Result := ItemCalculoInput.Create(
+    Numero,
+    NCMouNBS,
+    cClassTrib,
+    CST,
+    ImpostoSeletivo,
+    TributacaoRegular,
+    CurrencyNullable.NullInstance()
+  );
+end;
+
+class function ItemCalculoInput.Create(
+  Numero: Integer;
+  const NCMouNBS, cClassTrib, CST: string;
+  const ImpostoSeletivo: ImpostoSeletivoInput;
   const TributacaoRegular: TributacaoRegularInput;
-  BaseCalculo, Quantidade: Currency;
+  const BaseCalculo: CurrencyNullable
+  ): ItemCalculoInput;
+begin
+  Result := ItemCalculoInput.Create(
+    Numero,
+    NCMouNBS,
+    cClassTrib,
+    CST,
+    ImpostoSeletivo,
+    TributacaoRegular,
+    BaseCalculo,
+    CurrencyNullable.NullInstance()
+  );
+end;
+
+class function ItemCalculoInput.Create(
+  Numero: Integer;
+  const NCMouNBS, cClassTrib, CST: string;
+  const ImpostoSeletivo: ImpostoSeletivoInput;
+  const TributacaoRegular: TributacaoRegularInput;
+  const BaseCalculo: CurrencyNullable;
+  const Quantidade: CurrencyNullable
+  ): ItemCalculoInput;
+begin
+  Result := ItemCalculoInput.Create(
+    Numero,
+    NCMouNBS,
+    cClassTrib,
+    CST,
+    ImpostoSeletivo,
+    TributacaoRegular,
+    BaseCalculo,
+    Quantidade,
+    ''
+  );
+end;
+
+class function ItemCalculoInput.Create(
+  Numero: Integer;
+  const NCMouNBS, cClassTrib, CST: string;
+  const ImpostoSeletivo: ImpostoSeletivoInput;
+  const TributacaoRegular: TributacaoRegularInput;
+  const BaseCalculo: CurrencyNullable;
+  const Quantidade: CurrencyNullable;
   const Unidade: string
+  ): ItemCalculoInput;
+begin
+  Result := ItemCalculoInput.Create(
+    Numero,
+    NCMouNBS,
+    cClassTrib,
+    CST,
+    ImpostoSeletivo,
+    TributacaoRegular,
+    BaseCalculo,
+    Quantidade,
+    Unidade,
+    ComponentesBaseCalculoInput.NullInstance()
+  );
+end;
+
+class function ItemCalculoInput.Create(
+  Numero: Integer;
+  const NCMouNBS, cClassTrib, CST: string;
+  const ImpostoSeletivo: ImpostoSeletivoInput;
+  const TributacaoRegular: TributacaoRegularInput;
+  const BaseCalculo: CurrencyNullable;
+  const Quantidade: CurrencyNullable;
+  const Unidade: string;
+  const GComponentesBC: ComponentesBaseCalculoInput
   ): ItemCalculoInput;
 begin
   Result.FNumero := Numero;
@@ -88,6 +236,44 @@ begin
   Result.FBaseCalculo := BaseCalculo;
   Result.FQuantidade := Quantidade;
   Result.FUnidade := Trim(Unidade);
+  Result.FGComponentesBC := GComponentesBC;
+end;
+
+class function ItemCalculoInput.Create(
+  Numero: Integer;
+  const NCMouNBS, cClassTrib, CST: string;
+  const ImpostoSeletivo: ImpostoSeletivoInput;
+  const TributacaoRegular: TributacaoRegularInput;
+  const BaseCalculo: Currency;
+  Quantidade: Currency;
+  const Unidade: string
+  ): ItemCalculoInput;
+begin
+  Result := ItemCalculoInput.Create(
+    Numero,
+    NCMouNBS,
+    cClassTrib,
+    CST,
+    ImpostoSeletivo,
+    TributacaoRegular,
+    CurrencyNullable.Create(BaseCalculo),
+    CurrencyNullable.Create(Quantidade),
+    Unidade
+  );
+end;
+
+function ItemCalculoInput.GetHasGComponentesBC: Boolean;
+begin
+  Result := not FGComponentesBC.IsNull();
+end;
+
+// Quantidade ausente assume 1 no RTC (ProcessamentoItemService:96).
+function ItemCalculoInput.QuantidadeEfetiva: Currency;
+begin
+  if FQuantidade.IsNull then
+    Result := 1
+  else
+    Result := FQuantidade.Value;
 end;
 
 end.

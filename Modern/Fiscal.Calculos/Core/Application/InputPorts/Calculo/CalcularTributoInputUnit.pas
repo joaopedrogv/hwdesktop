@@ -5,7 +5,8 @@ interface
 uses
   ItemCalculoInputUnit,
   CompraGovernamentalInputUnit,
-  TipoEnteGovernamentalEnumUnit;
+  TipoEnteGovernamentalEnumUnit,
+  IntegerNullableUnit;
 
 type
   ItensCalculoInput = array of ItemCalculoInput;
@@ -18,6 +19,7 @@ type
     FUF: string;
     FItens: ItensCalculoInput;
     FGCompraGov: CompraGovernamentalInput;
+    FTpDoc: IntegerNullable;
   public
     class function Create(
       DataHoraEmissao: TDateTime;
@@ -26,7 +28,17 @@ type
       const Itens: ItensCalculoInput;
       const GCompraGov: CompraGovernamentalInput;
       DhFatoGerador: TDateTime = 0
-    ): CalcularTributoInput; static;
+    ): CalcularTributoInput; overload; static;
+
+    class function Create(
+      DataHoraEmissao: TDateTime;
+      MunicipioId: Integer;
+      const UF: string;
+      const Itens: ItensCalculoInput;
+      const GCompraGov: CompraGovernamentalInput;
+      DhFatoGerador: TDateTime;
+      const TpDoc: IntegerNullable
+    ): CalcularTributoInput; overload; static;
 
     function GetFatoGeradorAplicavel(): TDateTime;
 
@@ -43,6 +55,7 @@ type
     property UF: string read FUF;
     property Itens: ItensCalculoInput read FItens write FItens;
     property GCompraGov: CompraGovernamentalInput read FGCompraGov write FGCompraGov;
+    property TpDoc: IntegerNullable read FTpDoc;
   end;
 
 implementation
@@ -61,12 +74,28 @@ class function CalcularTributoInput.Create(
   DhFatoGerador: TDateTime
 ): CalcularTributoInput;
 begin
+  Result := CalcularTributoInput.Create(
+    DataHoraEmissao, MunicipioId, UF, Itens, GCompraGov, DhFatoGerador,
+    IntegerNullable.NullInstance());
+end;
+
+class function CalcularTributoInput.Create(
+  DataHoraEmissao: TDateTime;
+  MunicipioId: Integer;
+  const UF: string;
+  const Itens: ItensCalculoInput;
+  const GCompraGov: CompraGovernamentalInput;
+  DhFatoGerador: TDateTime;
+  const TpDoc: IntegerNullable
+): CalcularTributoInput;
+begin
   Result.FDataHoraEmissao := DataHoraEmissao;
   Result.FMunicipio := MunicipioId;
   Result.FUF := UF;
   Result.FItens := Itens;                
   Result.FGCompraGov := GCompraGov;
   Result.FDhFatoGerador := DhFatoGerador;
+  Result.FTpDoc := TpDoc;
 end;
 
 function CalcularTributoInput.GetCodigoUF: Integer;

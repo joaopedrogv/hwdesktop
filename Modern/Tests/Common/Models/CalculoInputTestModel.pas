@@ -7,7 +7,8 @@ uses
   CalcularTributoInputUnit,
   ItemCalculoInputUnit,
   ImpostoSeletivoInputUnit,
-  TributacaoRegularInputUnit;
+  TributacaoRegularInputUnit,
+  CurrencyNullableUnit;
 
 type
   TributacaoRegularTestInput = class
@@ -27,13 +28,17 @@ type
     FQuantidade: Double;
     FUnidade: string;
     FImpostoInformado: Double;
+    FSemBaseCalculoIS: Boolean;
+    FSemImpostoInformado: Boolean;
   public
     property Cst: string read FCst write FCst;
     property CClassTrib: string read FCClassTrib write FCClassTrib;
     property BaseCalculo: Double read FBaseCalculo write FBaseCalculo;
+    property SemBaseCalculoIS: Boolean read FSemBaseCalculoIS write FSemBaseCalculoIS;
     property Quantidade: Double read FQuantidade write FQuantidade;
     property Unidade: string read FUnidade write FUnidade;
     property ImpostoInformado: Double read FImpostoInformado write FImpostoInformado;
+    property SemImpostoInformado: Boolean read FSemImpostoInformado write FSemImpostoInformado;
     property ValorImpostoSeletivoInformado: Double read FImpostoInformado write FImpostoInformado;
   end;
 
@@ -50,6 +55,7 @@ type
     FQuantidade: Single;
     FBaseCalculo: Single;
     FCST: string;
+    FSemBaseCalculo: Boolean;
   public
     destructor Destroy; override;
     property Numero: Integer read FNumero write FNumero;
@@ -58,6 +64,7 @@ type
     property CST: string read FCST write FCST;
     property cClassTrib: string read FcClassTrib write FcClassTrib;
     property BaseCalculo: Single read FBaseCalculo write FBaseCalculo;
+    property SemBaseCalculo: Boolean read FSemBaseCalculo write FSemBaseCalculo;
     property Quantidade: Single read FQuantidade write FQuantidade;
     property Unidade: string read FUnidade write FUnidade;
     property ImpostoSeletivo: ImpostoSeletivoTestInput read FImpostoSeletivo write FImpostoSeletivo;
@@ -142,6 +149,7 @@ var
   itens: ItensCalculoInput;
   reg: TributacaoRegularInput;
   sel: ImpostoSeletivoInput;
+  baseCalculo, baseCalculoIS, impostoInformadoIS: CurrencyNullable;
   CompraGov: CompraGovernamentalInput;
   TpEnteGov: TipoEnteGovernamental;
   TpOperGov: TipoOperacaoGovernamental;
@@ -159,20 +167,37 @@ begin
       reg := TributacaoRegularInput.NullInstance;
 
     if Assigned(AInput.Itens[i].ImpostoSeletivo) then
+    begin
+      if AInput.Itens[i].ImpostoSeletivo.SemBaseCalculoIS then
+        baseCalculoIS := CurrencyNullable.NullInstance()
+      else
+        baseCalculoIS := CurrencyNullable.Create(AInput.Itens[i].ImpostoSeletivo.BaseCalculo);
+
+      if AInput.Itens[i].ImpostoSeletivo.SemImpostoInformado then
+        impostoInformadoIS := CurrencyNullable.NullInstance()
+      else
+        impostoInformadoIS := CurrencyNullable.Create(AInput.Itens[i].ImpostoSeletivo.ImpostoInformado);
+
       sel := ImpostoSeletivoInput.Create(
         AInput.Itens[i].ImpostoSeletivo.Cst,
         AInput.Itens[i].ImpostoSeletivo.CClassTrib,
-        AInput.Itens[i].ImpostoSeletivo.BaseCalculo,
-        AInput.Itens[i].ImpostoSeletivo.Quantidade,
+        baseCalculoIS,
+        CurrencyNullable.Create(AInput.Itens[i].ImpostoSeletivo.Quantidade),
         AInput.Itens[i].ImpostoSeletivo.Unidade,
-        AInput.Itens[i].ImpostoSeletivo.ImpostoInformado
+        impostoInformadoIS
       )
+    end
     else
       sel := ImpostoSeletivoInput.NullInstance;
 
     sNCMouNBS := AInput.Itens[i].NCM;
     if sNCMouNBS = '' then
       sNCMouNBS := AInput.Itens[i].NBS;
+
+    if AInput.Itens[i].SemBaseCalculo then
+      baseCalculo := CurrencyNullable.NullInstance()
+    else
+      baseCalculo := CurrencyNullable.Create(AInput.Itens[i].BaseCalculo);
 
     itens[i] := ItemCalculoInput.Create(
       AInput.Itens[i].Numero,
@@ -181,8 +206,8 @@ begin
       AInput.Itens[i].CST,
       sel,
       reg,
-      AInput.Itens[i].BaseCalculo,
-      AInput.Itens[i].Quantidade,
+      baseCalculo,
+      CurrencyNullable.Create(AInput.Itens[i].Quantidade),
       AInput.Itens[i].Unidade
     );
   end;

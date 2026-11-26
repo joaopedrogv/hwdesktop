@@ -229,6 +229,7 @@
     ..\Fiscal.Calculos\Adapters\Secondary\Repositories\TributoSituacaoTributariaRepositoryUnit.pas;
     ..\Fiscal.Calculos\Core\Application\InputPorts\Calculo\CalcularTributoInputUnit.pas;
     ..\Fiscal.Calculos\Core\Application\InputPorts\Calculo\CompraGovernamentalInputUnit.pas;
+    ..\Fiscal.Calculos\Core\Application\InputPorts\Calculo\ComponentesBaseCalculoInputUnit.pas;
     ..\Fiscal.Calculos\Core\Application\InputPorts\Calculo\ImpostoSeletivoInputUnit.pas;
     ..\Fiscal.Calculos\Core\Application\InputPorts\Calculo\ItemCalculoInputUnit.pas;
     ..\Fiscal.Calculos\Core\Application\InputPorts\Calculo\TributacaoRegularInputUnit.pas;
@@ -319,11 +320,14 @@
     ..\Fiscal.Calculos\Core\Domain\Services\TokenizerServiceUnit.pas;
     ..\Fiscal.Calculos\Core\Domain\ValueObjects\AjusteCompetenciaModelUnit.pas;
     ..\Fiscal.Calculos\Core\Domain\ValueObjects\AliquotaImpostoSeletivoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\ArredondamentoCalculoUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\BaseCalculoUnificadaOutputUnit.pas;
     ..\Fiscal.Calculos\Core\Domain\ValueObjects\CBSModelUnit.pas;
     ..\Fiscal.Calculos\Core\Domain\ValueObjects\ClassificacaoTributariaModelUnit.pas;
     ..\Fiscal.Calculos\Core\Domain\ValueObjects\CompraGovernamentalModelUnit.pas;
     ..\Fiscal.Calculos\Core\Domain\ValueObjects\CreditoPresumidoIBSZFMModelUnit.pas;
     ..\Fiscal.Calculos\Core\Domain\ValueObjects\CreditoPresumidoOperacaoModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\ValueObjects\DecimalCalculoUnit.pas;
     ..\Fiscal.Calculos\Core\Domain\ValueObjects\DevolucaoTributosModelUnit.pas;
     ..\Fiscal.Calculos\Core\Domain\ValueObjects\DiferimentoModelUnit.pas;
     ..\Fiscal.Calculos\Core\Domain\ValueObjects\EstornoCreditoModelUnit.pas;
@@ -353,6 +357,10 @@
     ..\Fiscal.Calculos\Core\Domain\ValueObjects\TributacaoCompraGovernamentalModelUnit.pas;
     ..\Fiscal.Calculos\Core\Domain\ValueObjects\TributacaoRegularModelUnit.pas;
     ..\Fiscal.Calculos\Core\Domain\ValueObjects\TributosModelUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Types\BaseCalculoBaseEnumUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Types\BaseCalculoNaturezaEnumUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Types\BaseCalculoOperacaoEnumUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Types\ElementoBaseCalculoUnit.pas;
     ..\Core\Domain\Types\Shared\StatusRegistroEnumUnit.pas;
     ..\Core\Domain\Types\Shared\TipoTributoFiscalEnumUnit.pas;
     ..\Core\Application\OutputPorts\Shared\ValidationEntityOutputUnit.pas;
@@ -456,6 +464,9 @@
     ..\ERP.Features\Core\Domain\Entities\OperacaoFiscalIbsCbsCondicaoEtdUnit.pas;
     ..\Fiscal.Calculos\Core\Application\UseCases\BaseDeCalculo\CalcularBCImpostoSeletivoUseCaseUnit.pas;
     ..\Fiscal.Calculos\Core\Domain\Services\CalculoBaseCalculoServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\IBaseCalculoUnificadaServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\BaseCalculoUnificadaServiceUnit.pas;
+    ..\Fiscal.Calculos\Core\Domain\Services\ValidacaoBaseCalculoComponentesUnit.pas;
     ..\Fiscal.Calculos\Core\Domain\ValueObjects\CalcularBaseCalculoModelUnit.pas;
     ..\Fiscal.Calculos\Core\Application\UseCases\BaseDeCalculo\CalcularBCIbsCbsUseCaseUnit.pas;
     ..\ERP.Features\Core\Domain\Entities\TributosDFe\TributoDFeTransfCredIbsCbsEtdUnit.pas;

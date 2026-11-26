@@ -281,21 +281,8 @@ begin
   ));
 
   // 2: Criando inputs e Calculando Base de calculo ImpostoSeletivo, CBS e IBS
-    // Falta implentar como configura o Imposto Seletivo, é pra 2027 ainda
-    if True then
-      impSelInput := ImpostoSeletivoInput.NullInstance()
-
-    else
-    begin
-      impSelInput := ImpostoSeletivoInput.Create(
-        {Cst} '',
-        {CClassTrib} '',
-        {BaseCalculo} BaseCalcIS,
-        {Quantidade} 0,
-        {Unidade} '' ,
-        {ImpostoInformado} 0  // É necessario verificar se esse valor Digitado ou é calculado ou ret
-      );
-    end;
+    // A NFS-e nao possui grupo de Imposto Seletivo previamente informado.
+    impSelInput := ImpostoSeletivoInput.NullInstance();
 
     rfTribRegular := nil;
     try
@@ -317,8 +304,8 @@ begin
       Copy(regraFiscal.CClassTrib, 1, 3),
       impSelInput,
       tribRegInput,
-      BaseCalcIbsCbs,
-      1,
+      CurrencyNullable.Create(BaseCalcIbsCbs),
+      CurrencyNullable.Create(1),
       ''
     );
     SetLength(itensInput, 1);
