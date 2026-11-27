@@ -215,6 +215,8 @@ begin
       tribResult
     );
 
+    Result.NFSe.XInfComp := nfseBase.XInfComp;
+
   finally
     nfseBase.Free();
     trib.Free();

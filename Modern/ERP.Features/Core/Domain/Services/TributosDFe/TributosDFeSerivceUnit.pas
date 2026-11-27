@@ -227,6 +227,11 @@ var
     ACbsPdif, ACbsVdif, ACbsVdevtrib, ACbsPredaliq, ACbsAliqefet: DoubleNullable;
   APibsuf, AVibsuf, APibsmun, AVibsmun, AVibs, APcbs, AVcbs: Double;
 begin
+  if Input = nil then
+  begin
+    Result := nil;
+    Exit;
+  end;
 
   if Input.PossuiIBSUF or Input.PossuiIBSMun or Input.PossuiCbs then
   begin
@@ -358,23 +363,19 @@ begin
 
   {$ENDREGION}
 
-  if Input = nil then
-    Result := nil
-
-  else
-    Result := TributoDFeGrupoIbsCbsEtd.Create
-    (
-      Self.Id,
-      Input.VBC.Value,
-      APibsuf,
-      AIbsufPdif,
-      AIbsufVdif,
-      AIbsufVdevtrib, AIbsufPredaliq, AIbsufAliqefet, AVibsuf, APibsmun, AIbsmunPdif,
-      AIbsmunVdif, AIbsmunVdevtrib, AIbsmunPredaliq, AIbsmunAliqefet, AVibsmun, AVibs, APcbs, ACbsPdif, ACbsVdif,
-      ACbsVdevtrib, ACbsPredaliq, ACbsAliqefet, AVcbs,
-      GetTribRegular(Input.TributacaoRegular),
-      GetCompraGov(Input.GTribCompraGov)
-    );
+  Result := TributoDFeGrupoIbsCbsEtd.Create
+  (
+    Self.Id,
+    Input.VBC.Value,
+    APibsuf,
+    AIbsufPdif,
+    AIbsufVdif,
+    AIbsufVdevtrib, AIbsufPredaliq, AIbsufAliqefet, AVibsuf, APibsmun, AIbsmunPdif,
+    AIbsmunVdif, AIbsmunVdevtrib, AIbsmunPredaliq, AIbsmunAliqefet, AVibsmun, AVibs, APcbs, ACbsPdif, ACbsVdif,
+    ACbsVdevtrib, ACbsPredaliq, ACbsAliqefet, AVcbs,
+    GetTribRegular(Input.TributacaoRegular),
+    GetCompraGov(Input.GTribCompraGov)
+  );
 end;
 
 function TributosDFeFromROCCalculadora.GetIS(

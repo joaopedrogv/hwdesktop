@@ -20,6 +20,9 @@ type
     PanelServicos3: TPanel;
     Label14: TLabel;
     edDiscriminacao: TMemo;
+    PanelInfCompl: TPanel;
+    LabelInfCompl: TLabel;
+    edInfCompl: TMemo;
     Label13: TLabel;
     edCodServico2: TMaskEdit;
     btPesquisarServico: TSpeedButton;
@@ -1116,6 +1119,7 @@ begin
   FNFSe.CTribMun := StringNullable.CreateOrNull( StringService.OnlyNumber( edCTribMun.Text ));
   FNFSe.CNBS := StringNullable.CreateOrNull( StringService.OnlyNumber( edCNBS.Text ));
   FNFSe.XDescServ := StringNullable.CreateOrNull( Trim( StringService.TrimChars( edDiscriminacao.Text, sLineBreak )));
+  FNFSe.XInfComp := StringNullable.CreateOrNull( Trim( StringService.TrimChars( edInfCompl.Text, sLineBreak )));
 
   //Valores
   FNFSe.VServ := CurrencyNullable.Create( edVServ.AsCurrency, edVServ.IsNull );
@@ -1332,6 +1336,7 @@ begin
   PanelServicos1.Enabled := not isReadOnlyOrDisable;
   PanelServicos2.Enabled := not isReadOnlyOrDisable;
   edDiscriminacao.ReadOnly := isReadOnlyOrDisable;
+  edInfCompl.ReadOnly := isReadOnlyOrDisable;
 
   PanelValores1.Enabled := not isReadOnlyOrDisable;
   tabISS.Enabled := False;
@@ -1439,6 +1444,8 @@ begin
   ));
   // Servico
   SetupServico();
+
+  edInfCompl.Lines.Text := FNFSe.XInfComp.Value;
      
   // Valores
   edVServ.UpdateValue( FNFSe.VServ.Value, FNFSe.VServ.IsNull );

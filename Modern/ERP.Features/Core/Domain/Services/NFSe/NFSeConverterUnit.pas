@@ -151,6 +151,8 @@ begin
 
   // =============== 5. SERVIÇO ===============
   NFSe.Servico.Discriminacao := DPS.XDescServ.Value;
+  if not DPS.XInfComp.IsNullOrWhiteSpace() then
+    NFSe.Servico.infoCompl.xInfComp := DPS.XInfComp.Value;
   NFSe.Servico.CodigoCnae    := DPS.CCNAE.Value;
   NFSe.Servico.CodigoNBS     := DPS.CNBS.Value;
 
@@ -304,13 +306,15 @@ begin
   begin
     NFSe.IBSCBS.finNFSe := TfinNFSe(DPS.FinNFSe);
     NFSe.IBSCBS.indFinal := TindFinal.ifSim;
-    NFSe.IBSCBS.cIndOp := DPS.CIndOp.Value;
+    if not DPS.CIndOp.IsNullOrWhiteSpace then
+      NFSe.IBSCBS.cIndOp := DPS.CIndOp.Value;
     NFSe.IBSCBS.tpOper := TtpOperGovNFSe(Ord(DPS.TpOper)); // Temos os mesmos valores no enumerado
     NFSe.IBSCBS.tpEnteGov := TtpEnteGov(Ord(DPS.TpEnteGov));
 
     // Destinatario
     NFSe.IBSCBS.indDest := TindDest(DPS.IndDest);
-    if (NFSe.IBSCBS.indDest = TindDest.idTomadorAdquirenteDestinatarioIguais)
+    // dest somente quando o destinatório difere do tomador
+    if (NFSe.IBSCBS.indDest = TindDest.idTomadorAdquirenteIguais)
       and Assigned(DPS.DestIbsCbs)
     then
     begin
@@ -335,27 +339,31 @@ begin
         refNFSe := sChv;
 
     // Tributos do IBSCBS
-    with NFSe.IBSCBS.valores.trib.gIBSCBS do
+    if Assigned(TribDfe) and (Trim(TribDfe.CST) <> '')
+      and (Trim(TribDfe.CClassTrib) <> '') then
     begin
-      CST := StrToCSTIBSCBS( TribDfe.CST );
-      cClassTrib := TribDfe.CClassTrib;
-      if TribDfe.CCredPres.HasValue then
-        cCredPres := StrTocCredPres( TribDfe.CCredPres.Value );
-
-      if TribDfe.CClassRribReg.HasValue then
+      with NFSe.IBSCBS.valores.trib.gIBSCBS do
       begin
-        gTribRegular.CSTReg := StrToCSTIBSCBS( TribDfe.CSTReg.Value );
-        gTribRegular.cClassTribReg := TribDfe.CClassRribReg.Value;
-      end;
+        CST := StrToCSTIBSCBS( TribDfe.CST );
+        cClassTrib := TribDfe.CClassTrib;
+        if TribDfe.CCredPres.HasValue then
+          cCredPres := StrTocCredPres( TribDfe.CCredPres.Value );
 
-      if not TribDfe.PDifUF.IsNullOrZero //DPS.IbsCbs.PDifUF.IsNullOrZero
-        or not TribDfe.PDifMun.IsNullOrZero // DPS.IbsCbs.PDifMun.IsNullOrZero
-        or not TribDfe.PDifCBS.IsNull // DPS.IbsCbs.PDifCBS.IsNullOrZero
-      then
-      begin
-        gDif.pDifUF := TribDfe.PDifUF.Value;
-        gDif.pDifMun := TribDfe.PDifMun.Value;
-        gDif.pDifCBS := TribDfe.PDifCBS.Value;
+        if TribDfe.CClassRribReg.HasValue then
+        begin
+          gTribRegular.CSTReg := StrToCSTIBSCBS( TribDfe.CSTReg.Value );
+          gTribRegular.cClassTribReg := TribDfe.CClassRribReg.Value;
+        end;
+
+        if not TribDfe.PDifUF.IsNullOrZero //DPS.IbsCbs.PDifUF.IsNullOrZero
+          or not TribDfe.PDifMun.IsNullOrZero // DPS.IbsCbs.PDifMun.IsNullOrZero
+          or not TribDfe.PDifCBS.IsNull // DPS.IbsCbs.PDifCBS.IsNullOrZero
+        then
+        begin
+          gDif.pDifUF := TribDfe.PDifUF.Value;
+          gDif.pDifMun := TribDfe.PDifMun.Value;
+          gDif.pDifCBS := TribDfe.PDifCBS.Value;
+        end;
       end;
     end;
   end;

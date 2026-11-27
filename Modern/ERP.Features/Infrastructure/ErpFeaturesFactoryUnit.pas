@@ -812,7 +812,10 @@ function ErpFeaturesFactory.CreatePrepararNFSeParaEmissaoService: IPrepararNFSeP
 begin
 	Result := PrepararNFSeParaEmissaoService.Create(
 		ErpFeaturesRepoContainer.GetInstance().NFSeRepo,
-		ErpFeaturesRepoContainer.GetInstance().PedVendaRepo
+		ErpFeaturesRepoContainer.GetInstance().PedVendaRepo,
+		ErpFeaturesRepoContainer.GetInstance().TributosDFeRepo,
+		FiscalRepoContainer.GetInstance().TratamentoClassificacaoRepo,
+		FiscalRepoContainer.GetInstance().SituacaoTributariaRepo
   );
 end;
 

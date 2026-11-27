@@ -149,9 +149,6 @@ type
     procedure BitBtn9Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-    procedure Button5Click(Sender: TObject);
-    procedure Button4Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure BitBtn8Click(Sender: TObject);
     procedure BitBtn7Click(Sender: TObject);
@@ -162,7 +159,6 @@ type
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure BitBtn2Click(Sender: TObject);
-    procedure BitBtn1Click(Sender: TObject);
     procedure BitBtn18Click(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure btNFe4_EnviarClick(Sender: TObject);
@@ -265,8 +261,8 @@ type
   function nfe_resolver_pendencia_sefaz(CodigoNF: Integer; EmpresaId: Integer; AdbName: WideString; var Aerros: WideString): Boolean; stdcall; external 'hw.nfe.dx.dll';
 
   // FAZNFe
-  function PrintDanfe(xml, pathPDF, paramValues: PWideChar): Integer; stdcall; external 'faznfe.print.dll';
-  function GetLastError(var resp: PWideChar; var BufferSize: Integer ): Boolean; stdcall; external 'faznfe.print.dll';
+//  function PrintDanfe(xml, pathPDF, paramValues: PWideChar): Integer; stdcall; external 'faznfe.print.dll';
+//  function GetLastError(var resp: PWideChar; var BufferSize: Integer ): Boolean; stdcall; external 'faznfe.print.dll';
 
   // Sinc Dados Fiscais
   procedure FiscalSincDadosComandarAtualizacao(); stdcall; external 'hw.nfe.dx.dll';
@@ -413,10 +409,6 @@ begin
   Aretorno := nfe_evento_enviar(Anum, Alote, spedCodEmp.Value, cbBancos.Text, AstrRetorno);
 
   processarRetornoNFe400(Aretorno, AstrRetorno);
-end;
-
-procedure TfrmTestes_DFe.BitBtn1Click(Sender: TObject);
-begin
 end;
 
 procedure TfrmTestes_DFe.BitBtn20Click(Sender: TObject);
@@ -791,12 +783,12 @@ begin
     var bfize := 1024;
     resp :=PWideChar(''.PadLeft(bfize, ' '));
 
-    if PrintDanfe(PWideChar(xml.Text), PWideChar(edFazNFEPathPdf.Text), PWideChar('')) <> 1 then
-    begin
-      if GetLastError(resp, bfize) then
-        ShowMessage(string(resp));
-
-    end;
+//    if PrintDanfe(PWideChar(xml.Text), PWideChar(edFazNFEPathPdf.Text), PWideChar('')) <> 1 then
+//    begin
+//      if GetLastError(resp, bfize) then
+//        ShowMessage(string(resp));
+//
+//    end;
   end;
 
 end;
@@ -1205,18 +1197,6 @@ begin
    ShowMessage('OK');
 end;
 
-
-procedure TfrmTestes_DFe.Button3Click(Sender: TObject);
-begin
-end;
-
-procedure TfrmTestes_DFe.Button4Click(Sender: TObject);
-begin
-end;
-
-procedure TfrmTestes_DFe.Button5Click(Sender: TObject);
-begin
-end;
 
 procedure TfrmTestes_DFe.Button6Click(Sender: TObject);
 var

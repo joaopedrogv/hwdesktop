@@ -117,7 +117,7 @@ begin
     ConfLeg := FConfigsRepo.GetLegacy([ceRegimeFederal]);
     if not ContainsText(ConfLeg.GetString(ceRegimeFederal), 'SIMPLES') and (Input.LayoutNFSe = lytNacionalSemIbsCbs) then
       validator.Add( 'LayoutNFSe', Format(
-        'Regime Federal na Empresa = "%s". Selecione o Layout com IBS e CBS por favor',
+        'Regime Federal na Empresa = "%s". Selecione a opção de cálculo de IBS/CBS por favor',
         [ ConfLeg.GetString(ceRegimeFederal) ]
       ));
 

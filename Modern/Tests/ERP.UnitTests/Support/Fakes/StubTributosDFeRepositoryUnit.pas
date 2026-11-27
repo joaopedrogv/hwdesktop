@@ -13,6 +13,7 @@ type
   private
     FTributoToReturn: TributoDFeContextEtd;
     FGetByIdCalled: Boolean;
+    FGetByIdCallCount: Integer;
     FLastId: string;
     FLastOrigem: TributoDFeOrigemEnum;
     procedure UnexpectedCall(const AMethod: string);
@@ -29,6 +30,7 @@ type
 
     property TributoToReturn: TributoDFeContextEtd read FTributoToReturn write FTributoToReturn;
     property GetByIdCalled: Boolean read FGetByIdCalled;
+    property GetByIdCallCount: Integer read FGetByIdCallCount;
     property LastId: string read FLastId;
     property LastOrigem: TributoDFeOrigemEnum read FLastOrigem;
   end;
@@ -61,6 +63,7 @@ end;
 function TTributosDFeRepositoryStub.GetById(const Id: string; Origem: TributoDFeOrigemEnum): TributoDFeContextEtd;
 begin
   FGetByIdCalled := True;
+  Inc(FGetByIdCallCount);
   FLastId := Id;
   FLastOrigem := Origem;
   Result := FTributoToReturn;

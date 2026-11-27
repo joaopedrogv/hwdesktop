@@ -207,6 +207,7 @@ begin
     .ByName( 'CTRIBNAC', Input.CTribNac )
     .ByName( 'CTRIBMUN', Input.CTribMun )
     .ByName( 'XDESCSERV', Input.XDescServ )
+    .ByName( 'XINFCOMP', Input.XInfComp )
     .ByName( 'CNBS', Input.CNBS )
     .ByName( 'VSERV', Input.VServ )
     .ByName( 'VDESCINCOND', Input.VDescIncond )
@@ -239,7 +240,7 @@ end;
 
 procedure NFSeRepository.ExecuteSqlNFSe(const NFSeId, SQL: string; Input: NFSeEtd);
 begin
-  FConnection.ExecuteCommand( SQL, ParametersBuilder.Create(59)
+  FConnection.ExecuteCommand( SQL, ParametersBuilder.Create(60)
     .ByName( 'ID', NFSeId )
     .ByName( 'COD_EMPRESA', Input.CodEmpresa )
     .ByName( 'COD_CLIENTE', Input.CodCliente )
@@ -267,6 +268,7 @@ begin
     .ByName( 'CTRIBNAC', Input.CTribNac )
     .ByName( 'CTRIBMUN', Input.CTribMun )
     .ByName( 'XDESCSERV', Input.XDescServ )
+    .ByName( 'XINFCOMP', Input.XInfComp )
     .ByName( 'CNBS', Input.CNBS )
     .ByName( 'VSERV', Input.VServ )
     .ByName( 'VDESCINCOND', Input.VDescIncond )
@@ -1152,6 +1154,8 @@ begin
 //    CreateIBSCBS( Q, RefNFSe ),
     CreateSubstituida( Q )
   );
+
+  Result.XInfComp := Q.FieldAsStringNullable('xinfcomp');
 end;
 
 function NFSeRepository.CreateNFSeEventoModelFromQuery(Q: QueryResult): NFSeEventoModel;
@@ -1213,7 +1217,7 @@ begin
     'n.id, n.seqid, n.cod_empresa, n.cod_cliente, n.intermediario_id, n.dest_ibscbs_id, n.op_interna_id, n.cod_servico, ' +
     'n.layout_nfse, n.situacao, n.natureza_emissao, n.tpamb, n.dhemi, n.veraplic, n.serie, n.ndps, ' +
     'n.dcompet, n.clocprestacao, n.finnfse, n.cindop, n.tpoper, n.tpentegov, n.inddest, n.ccnae, n.clc116, ' +
-    'n.ctribnac, n.ctribmun, n.xdescserv, n.cnbs, n.vserv, n.vdescincond, n.tribissqn, n.tpretissqn, n.iss_paliq, ' +
+    'n.ctribnac, n.ctribmun, n.xdescserv, n.xinfcomp, n.cnbs, n.vserv, n.vdescincond, n.tribissqn, n.tpretissqn, n.iss_paliq, ' +
     'n.iss_vbc, n.viss, n.pc_cst, n.pc_vbcpiscofins, n.pc_paliqpis, n.pc_paliqcofins, n.pc_vpis, n.pc_vcofins, ' +
     'n.tpretpiscofins, n.vretirrf, n.vretcsll, n.vretcp, n.vretpis, n.vretcofins, n.ptottribfed, n.ptottribest, ' +
     'n.ptottribmun, n.indtottrib, n.ptottribsn, n.nlote, n.nprotocolo, n.chave_nfse, n.dhproc, n.cstat, n.nnfse, ' +
@@ -1319,7 +1323,7 @@ var
 begin
   recordId := GenerateNewUUID();
 
-  P := ParametersBuilder.Create(51);
+  P := ParametersBuilder.Create(52);
 
   AplicarParametrosNFSeParaEmissao( recordId, Input, P );
 
@@ -1363,7 +1367,7 @@ var
 begin
   recordId := GenerateNewUUID();
 
-  P := ParametersBuilder.Create(56);
+  P := ParametersBuilder.Create(57);
 
   AplicarParametrosNFSeParaEmissao( recordId, Input, P );
   AplicarParametrosNFSeEmitidaNoPortal( Input, P );
@@ -1377,7 +1381,7 @@ begin
     'INSERT INTO NFSE ' +
     '(ID, SEQID, COD_EMPRESA, COD_CLIENTE, INTERMEDIARIO_ID, DEST_IBSCBS_ID, OP_INTERNA_ID, COD_SERVICO, LAYOUT_NFSE, ' +
     'SITUACAO, NATUREZA_EMISSAO, TPAMB, DHEMI, VERAPLIC, SERIE, NDPS, DCOMPET, CLOCPRESTACAO, FINNFSE, CINDOP, ' +
-    'TPOPER, TPENTEGOV, INDDEST, CCNAE, CLC116, CTRIBNAC, CTRIBMUN, XDESCSERV, CNBS, VSERV, VDESCINCOND, TRIBISSQN, ' +
+    'TPOPER, TPENTEGOV, INDDEST, CCNAE, CLC116, CTRIBNAC, CTRIBMUN, XDESCSERV, XINFCOMP, CNBS, VSERV, VDESCINCOND, TRIBISSQN, ' +
     'TPRETISSQN, ISS_PALIQ, ISS_VBC, VISS, PC_CST, PC_VBCPISCOFINS, PC_PALIQPIS, PC_PALIQCOFINS, PC_VPIS, ' +
     'PC_VCOFINS, TPRETPISCOFINS, VRETIRRF, VRETCSLL, VRETCP, VRETPIS, VRETCOFINS, PTOTTRIBFED, PTOTTRIBEST, ' +
     'PTOTTRIBMUN, INDTOTTRIB, PTOTTRIBSN, VLIQ, VTOTNF, VTOTALRET, ' +
@@ -1390,7 +1394,7 @@ begin
     'COALESCE((SELECT MAX(SEQID) FROM NFSE WHERE COD_EMPRESA = :COD_EMPRESA), 0) + 1, ' +
     ':COD_EMPRESA, :COD_CLIENTE, :INTERMEDIARIO_ID, :DEST_IBSCBS_ID, :OP_INTERNA_ID, :COD_SERVICO, ' +
     ':LAYOUT_NFSE, :SITUACAO, :NATUREZA_EMISSAO, :TPAMB, :DHEMI, :VERAPLIC, :SERIE, :NDPS, :DCOMPET, :CLOCPRESTACAO, ' +
-    ':FINNFSE, :CINDOP, :TPOPER, :TPENTEGOV, :INDDEST, :CCNAE, :CLC116, :CTRIBNAC, :CTRIBMUN, :XDESCSERV, :CNBS, ' +
+    ':FINNFSE, :CINDOP, :TPOPER, :TPENTEGOV, :INDDEST, :CCNAE, :CLC116, :CTRIBNAC, :CTRIBMUN, :XDESCSERV, :XINFCOMP, :CNBS, ' +
     ':VSERV, :VDESCINCOND, :TRIBISSQN, :TPRETISSQN, :ISS_PALIQ, :ISS_VBC, :VISS, :PC_CST, :PC_VBCPISCOFINS, ' +
     ':PC_PALIQPIS, :PC_PALIQCOFINS, :PC_VPIS, :PC_VCOFINS, :TPRETPISCOFINS, :VRETIRRF, :VRETCSLL, :VRETCP, :VRETPIS, ' +
     ':VRETCOFINS, :PTOTTRIBFED, :PTOTTRIBEST, :PTOTTRIBMUN, :INDTOTTRIB, :PTOTTRIBSN, :VLIQ, :VTOTNF, :VTOTALRET, ' +
@@ -1410,7 +1414,7 @@ begin
     'DHEMI = :DHEMI, VERAPLIC = :VERAPLIC, SERIE = :SERIE, NDPS = :NDPS, DCOMPET = :DCOMPET, ' +
     'CLOCPRESTACAO = :CLOCPRESTACAO, FINNFSE = :FINNFSE, CINDOP = :CINDOP, TPOPER = :TPOPER, TPENTEGOV = :TPENTEGOV, ' +
     'INDDEST = :INDDEST, CCNAE = :CCNAE, CLC116 = :CLC116, CTRIBNAC = :CTRIBNAC, CTRIBMUN = :CTRIBMUN, ' +
-    'XDESCSERV = :XDESCSERV, CNBS = :CNBS, VSERV = :VSERV, VDESCINCOND = :VDESCINCOND, TRIBISSQN = :TRIBISSQN, ' +
+    'XDESCSERV = :XDESCSERV, XINFCOMP = :XINFCOMP, CNBS = :CNBS, VSERV = :VSERV, VDESCINCOND = :VDESCINCOND, TRIBISSQN = :TRIBISSQN, ' +
     'TPRETISSQN = :TPRETISSQN, ISS_PALIQ = :ISS_PALIQ, ISS_VBC = :ISS_VBC, VISS = :VISS, PC_CST = :PC_CST, ' +
     'PC_VBCPISCOFINS = :PC_VBCPISCOFINS, PC_PALIQPIS = :PC_PALIQPIS, PC_PALIQCOFINS = :PC_PALIQCOFINS, ' +
     'PC_VPIS = :PC_VPIS, PC_VCOFINS = :PC_VCOFINS, TPRETPISCOFINS = :TPRETPISCOFINS, VRETIRRF = :VRETIRRF, ' +
@@ -1548,7 +1552,7 @@ function NFSeRepository.AlterarNFSeEmitidaNoPortal(Input: NFSeEtd): NFSeEtd;
 var
   P: IParametersBuilder;
 begin
-  P := ParametersBuilder.Create(56);
+  P := ParametersBuilder.Create(57);
 
   AplicarParametrosNFSeParaEmissao( Input.Id, Input, P );
   AplicarParametrosNFSeEmitidaNoPortal( Input, P );
@@ -1560,7 +1564,7 @@ function NFSeRepository.AlterarNFSeParaEmissao(Input: NFSeEtd): NFSeEtd;
 var
   P: IParametersBuilder;
 begin
-  P := ParametersBuilder.Create(51);
+  P := ParametersBuilder.Create(52);
 
   AplicarParametrosNFSeParaEmissao( Input.Id, Input, P );
 

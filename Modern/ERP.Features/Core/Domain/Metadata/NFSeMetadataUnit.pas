@@ -64,6 +64,7 @@ begin
   Result.RegisterField('CTribNac', 'CTRIBNAC', 'Codigo Tributação Nacional');
   Result.RegisterField('CTribMun', 'CTRIBMUN', 'Codigo Tributação Municipal');
   Result.RegisterField('XDescServ', 'XDESCSERV', 'Discriminação Serviço');
+  Result.RegisterField('XInfComp', 'XINFCOMP', 'Informações complementares da NFS-e');
   Result.RegisterField('CNBS', 'CNBS', 'NBS');
 
   // Valores do Serviço

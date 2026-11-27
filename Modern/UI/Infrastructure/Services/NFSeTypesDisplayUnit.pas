@@ -97,10 +97,10 @@ const
     'Serviço Prestado/WS', 'Serviço Prestado/Portal', 'Serviço Tomado'
   );
   LayoutNFSeEnumGridStr: array[LayoutNFSeEnum] of string = (
-    '0 - Próprio Prefeitura', '1 - Nacional', '2 - Nacional com IBSCBS'
+    '0 - Próprio Prefeitura', '1 - Nacional (sem cálculo IBS/CBS)', '2 - Nacional (calcula IBS/CBS)'
   );
   LayoutNFSeEnumStr: array[LayoutNFSeEnum] of string = (
-    'Prefeitura', 'Nacional', 'Nacional com IBSCBS'
+    'Prefeitura', 'Nacional (sem cálculo IBS/CBS)', 'Nacional (calcula IBS/CBS)'
   );
   TipoHistoricoNFSeEnumStr: array[TipoHistoricoNFSeEnum] of string = (
     'Alteração de Status', 'Rejeição', 'Evento', 'Email Enviado', 'Log histórico'

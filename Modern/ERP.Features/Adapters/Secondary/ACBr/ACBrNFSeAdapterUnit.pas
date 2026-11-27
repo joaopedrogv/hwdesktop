@@ -420,12 +420,13 @@ begin
 
   {$ENDREGION}
 
+  // Nacional usa sempre o schema v1.01; a opção de layout apenas habilita o cálculo IBS/CBS
   if FConfig.WebService.ApiPropria then
     FACBr.Configuracoes.Geral.LayoutNFSe := TLayoutNFSe.lnfsProvedor
   else
     case FConfig.LayoutNFSe of
       lytPrefeitura       : FACBr.Configuracoes.Geral.LayoutNFSe := TLayoutNFSe.lnfsProvedor;
-      lytNacionalSemIbsCbs: FACBr.Configuracoes.Geral.LayoutNFSe := TLayoutNFSe.lnfsPadraoNacionalv1;
+      lytNacionalSemIbsCbs,
       lytNacionalComIbsCbs: FACBr.Configuracoes.Geral.LayoutNFSe := TLayoutNFSe.lnfsPadraoNacionalv101;
     end;
 
@@ -1033,7 +1034,7 @@ begin
   begin
     case FConfig.LayoutNFSe of
       lytPrefeitura       : Result := TLayoutNFSe.lnfsProvedor;
-      lytNacionalSemIbsCbs: Result := TLayoutNFSe.lnfsPadraoNacionalv1;
+      lytNacionalSemIbsCbs,
       lytNacionalComIbsCbs: Result := TLayoutNFSe.lnfsPadraoNacionalv101;
     end;
   end;

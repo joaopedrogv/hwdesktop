@@ -1364,6 +1364,39 @@ object NFSeFrame: TNFSeFrame
             TabOrder = 0
           end
         end
+        object PanelInfCompl: TPanel
+          AlignWithMargins = True
+          Left = 3
+          Top = 270
+          Width = 809
+          Height = 88
+          Align = alBottom
+          BevelOuter = bvNone
+          TabOrder = 3
+          object LabelInfCompl: TLabel
+            AlignWithMargins = True
+            Left = 3
+            Top = 3
+            Width = 71
+            Height = 82
+            Align = alLeft
+            Alignment = taRightJustify
+            AutoSize = False
+            Caption = 'Informa'#231#245'es complementares'
+            WordWrap = True
+            ExplicitHeight = 48
+          end
+          object edInfCompl: TMemo
+            AlignWithMargins = True
+            Left = 80
+            Top = 3
+            Width = 723
+            Height = 82
+            Align = alClient
+            ScrollBars = ssVertical
+            TabOrder = 0
+          end
+        end
         object PanelServicos2: TPanel
           AlignWithMargins = True
           Left = 3

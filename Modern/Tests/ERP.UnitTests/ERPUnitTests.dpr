@@ -80,7 +80,17 @@ uses
   Test_EventoDFeStatus in 'Domain\Types\Test_EventoDFeStatus.pas',
   Test_TipoEventoDFeTpAutor in 'Domain\Types\Test_TipoEventoDFeTpAutor.pas',
   Test_EventoDFeEvidenciaDoLote in 'Domain\Types\Test_EventoDFeEvidenciaDoLote.pas',
-  Test_EstadosService in 'Domain\Services\Test_EstadosService.pas';
+  Test_EstadosService in 'Domain\Services\Test_EstadosService.pas',
+  Test_NFSeXInfComp in 'Domain\Entities\Test_NFSeXInfComp.pas',
+  StubConfiguracaoNFSeServiceUnit in 'Support\Fakes\StubConfiguracaoNFSeServiceUnit.pas',
+  Test_IniciarSubstuicaoNFSeXInfComp in 'Application\UseCases\Test_IniciarSubstuicaoNFSeXInfComp.pas',
+  Test_ValidacaoNFSeSalvarRascunhoXInfComp in 'Application\UseCases\Test_ValidacaoNFSeSalvarRascunhoXInfComp.pas',
+  Test_TributosDFeServiceGetGrupoIbsCbs in 'Domain\Services\Test_TributosDFeServiceGetGrupoIbsCbs.pas',
+  Test_ValidacaoNFSeFactoryIbsCbs in 'Application\UseCases\Test_ValidacaoNFSeFactoryIbsCbs.pas',
+  StubSituacaoTributariaRepositoryUnit in 'Support\Fakes\StubSituacaoTributariaRepositoryUnit.pas',
+  StubTratamentoClassificacaoRepositoryUnit in 'Support\Fakes\StubTratamentoClassificacaoRepositoryUnit.pas',
+  Test_PrepararNFSeParaEmissaoServiceIndicador in 'Application\Services\Test_PrepararNFSeParaEmissaoServiceIndicador.pas',
+  Test_NFSeConverterIbsCbs in 'Domain\Services\Test_NFSeConverterIbsCbs.pas';
 
 { Keep this comment to prevent the IDE from removing the conditional below when adding a unit. }
 {$IFNDEF USE_TESTINSIGHT}

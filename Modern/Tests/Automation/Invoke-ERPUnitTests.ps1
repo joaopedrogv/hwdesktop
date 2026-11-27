@@ -4,7 +4,8 @@ param(
   [string]$DelphiBin,
   [string]$DelphiLibPath,
   [string]$DUnitXPath,
-  [string]$FastMM5Path
+  [string]$FastMM5Path,
+  [string]$AcbrPath
 )
 
 Set-StrictMode -Version Latest
@@ -54,6 +55,58 @@ function Resolve-DelphiBin {
   throw 'Delphi não encontrado. Informe -DelphiBin com o diretório que contém rsvars.bat.'
 }
 
+function Resolve-AcbrPaths {
+  param(
+    [string]$RequestedPath,
+    [string]$ConfigPath
+  )
+
+  $candidate = $RequestedPath
+  $origin = '-AcbrPath'
+  if (-not $candidate -and $env:ERPUNITTESTS_ACBR) {
+    $candidate = $env:ERPUNITTESTS_ACBR
+    $origin = 'variável de ambiente ERPUNITTESTS_ACBR'
+  }
+
+  if (-not $candidate -and (Test-Path -LiteralPath $ConfigPath -PathType Leaf)) {
+    $configFile = Get-Item -LiteralPath $ConfigPath
+    $settings = Import-PowerShellDataFile -LiteralPath $configFile.FullName
+    $profileName = if ($settings.ContainsKey('DefaultProfile')) { $settings.DefaultProfile } else { $null }
+
+    if ($profileName -and $settings.ContainsKey('Profiles') -and $settings.Profiles -is [hashtable] -and
+      $settings.Profiles.ContainsKey($profileName)) {
+      $profileSettings = $settings.Profiles[$profileName]
+      if ($profileSettings -is [hashtable] -and $profileSettings.ContainsKey('ACBrRoot') -and
+        $profileSettings.ContainsKey('ACBrDcuPath')) {
+        $acbrRoot = [IO.Path]::GetFullPath($profileSettings.ACBrRoot, $configFile.DirectoryName)
+        $candidate = [IO.Path]::GetFullPath($profileSettings.ACBrDcuPath, $acbrRoot)
+        $origin = "perfil '$profileName' de $($configFile.FullName)"
+      }
+    }
+  }
+
+  if (-not $candidate) {
+    throw 'DCUs do ACBr não configurados. Informe -AcbrPath, defina ERPUNITTESTS_ACBR ou configure DefaultProfile com ACBrRoot/ACBrDcuPath em _automation\config\build.local.psd1.'
+  }
+  if (-not (Test-Path -LiteralPath $candidate -PathType Container)) {
+    throw "Diretório de DCUs do ACBr não encontrado ($origin): $candidate"
+  }
+
+  $unitPath = (Resolve-Path -LiteralPath $candidate).ProviderPath
+  $resourcesPath = $null
+
+  # Os DCUs do ACBr referenciam .res da árvore Fontes, que precisa entrar no resource path.
+  for ($directory = Get-Item -LiteralPath $unitPath; $directory; $directory = $directory.Parent) {
+    $candidateResources = Join-Path $directory.FullName 'Fontes\ACBrDFe\ACBrNFSeX'
+    if (Test-Path -LiteralPath $candidateResources -PathType Container) {
+      $resourcesPath = (Resolve-Path -LiteralPath $candidateResources).ProviderPath
+      break
+    }
+  }
+
+  return [pscustomobject]@{ UnitPath = $unitPath; ResourcesPath = $resourcesPath }
+}
+
 function Invoke-DelphiBuild {
   param(
     [string]$RsVarsPath,
@@ -89,15 +142,21 @@ if (-not (Test-Path -LiteralPath $projectPath)) {
   throw "Projeto de testes não encontrado: $projectPath"
 }
 
+$checkoutRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..\..\..')).ProviderPath
+$acbrPaths = Resolve-AcbrPaths -RequestedPath $AcbrPath -ConfigPath (Join-Path $checkoutRoot '_automation\config\build.local.psd1')
 $resolvedDelphiBin = Resolve-DelphiBin -RequestedPath $DelphiBin
 $rsVarsPath = Join-Path $resolvedDelphiBin 'rsvars.bat'
 
 Write-Host 'Compilando ERP.UnitTests (CI/Win32)...'
+Write-Host "DCUs do ACBr: $($acbrPaths.UnitPath)"
+if ($acbrPaths.ResourcesPath) { Write-Host "Recursos do ACBr: $($acbrPaths.ResourcesPath)" }
 
 $projectProperties = @()
 if ($DelphiLibPath) { $projectProperties += 'ERPUNITTESTS_DELPHI_LIB="' + ($DelphiLibPath -replace '"', '') + '"' }
 if ($DUnitXPath) { $projectProperties += 'ERPUNITTESTS_DUNITX="' + ($DUnitXPath -replace '"', '') + '"' }
 if ($FastMM5Path) { $projectProperties += 'ERPUNITTESTS_FASTMM5="' + ($FastMM5Path -replace '"', '') + '"' }
+if ($acbrPaths.UnitPath) { $projectProperties += 'ERPUNITTESTS_ACBR="' + ($acbrPaths.UnitPath -replace '"', '') + '"' }
+if ($acbrPaths.ResourcesPath) { $projectProperties += 'ERPUNITTESTS_ACBR_RESOURCES="' + ($acbrPaths.ResourcesPath -replace '"', '') + '"' }
 
 $buildExitCode = Invoke-DelphiBuild -RsVarsPath $rsVarsPath -ProjectPath $projectPath -Properties $projectProperties
 if ($buildExitCode -ne 0) {

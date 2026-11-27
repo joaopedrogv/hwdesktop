@@ -4,16 +4,46 @@ interface
 
 uses
   SysUtils, Classes,
-  NFSeEtdUnit, IEntityValidatorUnit;
+  NFSeEtdUnit, IEntityValidatorUnit, DateAndTimeNullableUnit;
 
 type
+  TValidacaoIbsCbsNFSeContext = class
+  private
+    FCst: string;
+    FCClassTrib: string;
+    FDataReferencia: DateNullable;
+    FClassificacaoEncontrada: Boolean;
+    FCstEsperado: string;
+    FIndicadorGrupoIbsCbs: Integer;
+    FDetalhamentoInformado: Boolean;
+  public
+    constructor Create(const ACst, ACClassTrib: string;
+      const ADataReferencia: DateNullable;
+      AClassificacaoEncontrada: Boolean;
+      const ACstEsperado: string;
+      AIndicadorGrupoIbsCbs: Integer;
+      ADetalhamentoInformado: Boolean);
+
+    property Cst: string read FCst;
+    property CClassTrib: string read FCClassTrib;
+    property DataReferencia: DateNullable read FDataReferencia;
+    property ClassificacaoEncontrada: Boolean read FClassificacaoEncontrada;
+    property CstEsperado: string read FCstEsperado;
+    property IndicadorGrupoIbsCbs: Integer read FIndicadorGrupoIbsCbs;
+    property DetalhamentoInformado: Boolean read FDetalhamentoInformado;
+  end;
+
   ValidacaoNFSeFactory = class
   private
     class function BuildComum(const Entity: NFSeEtd): IEntityValidator;
     class procedure BuildEmissaoPropria(const Entity: NFSeEtd; Validador: IEntityValidator );
+    class procedure BuildEmissaoIbsCbs(const Entity: NFSeEtd;
+      const Contexto: TValidacaoIbsCbsNFSeContext; Validador: IEntityValidator);
   public
     class function BuildSalvarRascunho(const Entity: NFSeEtd): IEntityValidator;
-    class function BuildEmitirNoWebService(const Entity: NFSeEtd): IEntityValidator;
+    class function BuildEmitirNoWebService(const Entity: NFSeEtd): IEntityValidator; overload;
+    class function BuildEmitirNoWebService(const Entity: NFSeEtd;
+      const Contexto: TValidacaoIbsCbsNFSeContext): IEntityValidator; overload;
     class function BuildEmitirNoPortal(const Entity: NFSeEtd): IEntityValidator;
   end;
 
@@ -22,11 +52,33 @@ implementation
 uses
   StrUtils,
   EntityValidatorFactoryUnit, NumberServiceUnit, NFSeTypesUnit, NFSeTypesDisplayUnit, ValidationEntityOutputUnit,
-  TipoComunsUnit, NFSeMetadataUnit;
+  TipoComunsUnit, NFSeMetadataUnit, EntityMetadataUnit;
+
+{ TValidacaoIbsCbsNFSeContext }
+
+constructor TValidacaoIbsCbsNFSeContext.Create(const ACst, ACClassTrib: string;
+  const ADataReferencia: DateNullable; AClassificacaoEncontrada: Boolean;
+  const ACstEsperado: string; AIndicadorGrupoIbsCbs: Integer;
+  ADetalhamentoInformado: Boolean);
+begin
+  FCst := ACst;
+  FCClassTrib := ACClassTrib;
+  FDataReferencia := ADataReferencia;
+  FClassificacaoEncontrada := AClassificacaoEncontrada;
+  FCstEsperado := ACstEsperado;
+  FIndicadorGrupoIbsCbs := AIndicadorGrupoIbsCbs;
+  FDetalhamentoInformado := ADetalhamentoInformado;
+end;
 
 { ValidacaoNFSeFactory }
 
 class function ValidacaoNFSeFactory.BuildEmitirNoWebService(const Entity: NFSeEtd): IEntityValidator;
+begin
+  Result := ValidacaoNFSeFactory.BuildEmitirNoWebService( Entity, nil );
+end;
+
+class function ValidacaoNFSeFactory.BuildEmitirNoWebService(const Entity: NFSeEtd;
+  const Contexto: TValidacaoIbsCbsNFSeContext): IEntityValidator;
 begin
   Result := ValidacaoNFSeFactory.BuildComum( Entity );
 
@@ -34,6 +86,7 @@ begin
     Exit;
 
   ValidacaoNFSeFactory.BuildEmissaoPropria( Entity, Result );
+  ValidacaoNFSeFactory.BuildEmissaoIbsCbs( Entity, Contexto, Result );
 
   case Entity.Situacao of
     sdpsExcluido:
@@ -76,6 +129,9 @@ begin
       .IsRequired().HasSize( 1, 1000 );
   end;
 
+  if not Entity.XInfComp.IsNullOrWhiteSpace() then
+    Result.Field('XInfComp', Entity.XInfComp).HasSize( 1, 2000 );
+
   if Entity.Substituida <> nil then
   begin
     Result.Field('Substituida.CMotivo', Entity.Substituida.CMotivo).IsRequired();
@@ -100,8 +156,15 @@ begin
 end;
 
 class function ValidacaoNFSeFactory.BuildComum(const Entity: NFSeEtd): IEntityValidator;
+var
+  Metadata: EntityMetadata;
 begin
-  Result := EntityValidatorFactory.Builder( NFSeMetadata.GetMetadata() );
+  Metadata := NFSeMetadata.GetMetadata();
+  Metadata.RegisterAttributeOnly('IbsCbs.Cst', 'CST IBS/CBS');
+  Metadata.RegisterAttributeOnly('IbsCbs', 'Detalhamento IBS/CBS');
+  Metadata.RegisterAttributeOnly('IbsCbs.CClassTrib', 'Classificação tributária IBS/CBS');
+
+  Result := EntityValidatorFactory.Builder( Metadata );
 
   if Entity = nil then
     Result.Add(ValidationEntityItem.Create('Id', 'Nenhuma NFSe encontrada com ID informado'))
@@ -133,6 +196,44 @@ begin
     Validador.Add(ValidationEntityItem.Create(
       'TpRetPisCofins', 'Valor COFINS Retido preenchido, indicador de retenção do COFINS não correspondente'
     ));
+end;
+
+class procedure ValidacaoNFSeFactory.BuildEmissaoIbsCbs(const Entity: NFSeEtd;
+  const Contexto: TValidacaoIbsCbsNFSeContext; Validador: IEntityValidator);
+begin
+  if Contexto = nil then
+    Exit;
+
+  if Contexto.DataReferencia.HasValue then
+    Validador.Field('DCompet', Contexto.DataReferencia)
+      .HasMinValue(EncodeDate(2026, 1, 1),
+        'A competência informada ([@Value]) é anterior a 01/01/2026 e não pode declarar IBS/CBS');
+
+  if Entity.FinNFSe <> 0 then
+    Validador.Add(ValidationEntityItem.Create('FinNFSe',
+      'A emissão comum suporta apenas finalidade regular (finNFSe = 0)'));
+
+  if (Contexto.IndicadorGrupoIbsCbs = 1) and Entity.CIndOp.IsNullOrWhiteSpace then
+    Validador.Add(ValidationEntityItem.Create('CIndOp',
+      'O indicador de operação (cIndOp) é obrigatório quando o indicador do grupo IBS/CBS é 1'));
+
+  if Contexto.DataReferencia.HasValue and not Contexto.ClassificacaoEncontrada then
+    Validador.Add(ValidationEntityItem.Create('IbsCbs.CClassTrib', Format(
+      'A classificação tributária IBS/CBS %s não existe ou está fora de vigência na data %s',
+      [Contexto.CClassTrib, FormatDateTime('dd/mm/yyyy', Contexto.DataReferencia.Value)])));
+
+  if Contexto.ClassificacaoEncontrada and not SameText(Contexto.CstEsperado, Contexto.Cst) then
+    Validador.Add(ValidationEntityItem.Create('IbsCbs.Cst', Format(
+      'O CST informado (%s) não pertence ao grupo da classificação tributária %s (CST esperado: %s)',
+      [Contexto.Cst, Contexto.CClassTrib, Contexto.CstEsperado])));
+
+  if (Contexto.IndicadorGrupoIbsCbs = 0) and not Entity.CIndOp.IsNullOrWhiteSpace then
+    Validador.Add(ValidationEntityItem.Create('CIndOp',
+      'O indicador do grupo IBS/CBS é 0: remova o indicador de operação (cIndOp) para emitir'));
+
+  if (Contexto.IndicadorGrupoIbsCbs = 0) and Contexto.DetalhamentoInformado then
+    Validador.Add(ValidationEntityItem.Create('IbsCbs',
+      'O indicador do grupo IBS/CBS é 0: remova o detalhamento informado na classificação (crédito presumido, tributação regular ou diferimento) para emitir'));
 end;
 
 class function ValidacaoNFSeFactory.BuildEmitirNoPortal(const Entity: NFSeEtd): IEntityValidator;
@@ -188,6 +289,9 @@ class function ValidacaoNFSeFactory.BuildSalvarRascunho(const Entity: NFSeEtd): 
 begin
   Result := ValidacaoNFSeFactory.BuildComum( Entity );
 
+  if Entity = nil then
+    Exit;
+
   case Entity.Situacao of
     sdpsExcluido:
       Result.Add( ValidationEntityItem.Create('Situacao', 'Registro não encontrado') );
@@ -202,6 +306,9 @@ begin
         Format( 'Situação atual [%s] atual não permite alterações', [SituacaoNFSeEnumStr[Entity.Situacao]])
       ));
   end;
+
+  if not Entity.XInfComp.IsNullOrWhiteSpace() then
+    Result.Field('XInfComp', Entity.XInfComp).HasSize(1, 2000);
 end;
 
 end.

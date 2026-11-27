@@ -23,7 +23,7 @@ object frmTestes_DFe: TfrmTestes_DFe
     Top = 0
     Width = 645
     Height = 409
-    ActivePage = TabSheet10
+    ActivePage = tabDPSNFSE
     Align = alClient
     TabOrder = 0
     object TabSheet1: TTabSheet
@@ -35,7 +35,6 @@ object frmTestes_DFe: TfrmTestes_DFe
         Height = 25
         Caption = 'Enviar NFe'
         TabOrder = 0
-        OnClick = BitBtn1Click
       end
       object Button1: TButton
         Left = 8
@@ -80,7 +79,6 @@ object frmTestes_DFe: TfrmTestes_DFe
         Height = 25
         Caption = 'Enviar Evento'
         TabOrder = 5
-        OnClick = Button3Click
       end
       object Button5: TButton
         Left = 8
@@ -89,7 +87,6 @@ object frmTestes_DFe: TfrmTestes_DFe
         Height = 25
         Caption = 'Enviar Evento por Email'
         TabOrder = 6
-        OnClick = Button5Click
       end
       object BitBtn3: TBitBtn
         Left = 152
@@ -106,8 +103,7 @@ object frmTestes_DFe: TfrmTestes_DFe
         Width = 125
         Height = 25
         Caption = 'Imprimir Evento'
-        TabOrder = 9
-        OnClick = Button4Click
+        TabOrder = 8
       end
     end
     object TabSheet2: TTabSheet

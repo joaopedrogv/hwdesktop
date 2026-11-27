@@ -48,6 +48,7 @@ type
     FCTribNac: StringNullable;
     FCTribMun: StringNullable;
     FXDescServ: StringNullable;
+    FXInfComp: StringNullable;
     FCnbs: StringNullable;
     FCodServico: IntegerNullable;
     FVserv: CurrencyNullable;
@@ -230,6 +231,7 @@ type
     property CTribNac: StringNullable read FCTribNac write FCTribNac;
     property CTribMun: StringNullable read FCTribMun write FCTribMun;
     property XDescServ: StringNullable read FXDescServ write FXDescServ;
+    property XInfComp: StringNullable read FXInfComp write FXInfComp;
     property CNBS: StringNullable read FCnbs write FCnbs;
     property CodServico: IntegerNullable read FCodServico write FCodServico;
     property VServ: CurrencyNullable read FVserv write FVserv;
@@ -292,6 +294,7 @@ uses
 constructor NFSeEtd.Create();
 begin
   inherited Create;
+  FXInfComp := StringNullable.NullInstance();
 end;
 
 constructor NFSeEtd.Create(
@@ -792,6 +795,8 @@ begin
       _Servico,
       _Substituida
     );
+
+    NFSeEtd(Result).XInfComp := FXInfComp;
   end;
 end;
 
@@ -827,6 +832,7 @@ begin
       and Self.CTribNac.IsEqualTo(Other.CTribNac)
       and Self.CTribMun.IsEqualTo(Other.CTribMun)
       and Self.XDescServ.IsEqualTo(Other.XDescServ)
+      and Self.XInfComp.IsEqualTo(Other.XInfComp)
       and Self.CNBS.IsEqualTo(Other.CNBS)
       and Self.CodServico.IsEqualTo(Other.CodServico)
       and Self.VServ.IsEqualTo(Other.VServ)
